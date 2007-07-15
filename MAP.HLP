@@ -1,0 +1,173 @@
+[slbkeyhelp]
+t:Treasure  L:Lair      H:Hatchery
+T:Training  l:Library   %:Bridge
+W:Workshop  G:Guard     P:Prison
+O:Torture   B:Barracks  e:Temple
+g:Grave     S:Scavenge  h:Heart
+E:Entrance
+#:Rock      .:Earth     -:Path
+ :Claimed   /:Torchdirt $:Gold
+!:Gem       ~:Water     =:Lava
+^:Drapewall \:Torchwall &:Geminiwall
+*:Womanwall (:Shagwall  @:Graffiti
+
+Doors - wood, iron, braced, magic
+[tngkeyhelp]
+[crtkeyhelp]
+Add creature mode:
+
+Type in the number of the 
+creature you wish to add.
+
+The creature's ownership will
+be set to that of the tile you
+are placing it in.
+[slbhelp]
+Slab mode help:
+
+Use cursor keys, page up/down, home and end, either alone or with
+ctrl or alt (non-Linux only), to move around.
+
+The key on the right of the screen should allow you to read the
+map, and also provides the keys to change the map... just use
+the key shown on the key (as it were) and the map at your cursor
+position will change appropriately.
+
+The background colour of each tiles (or "slab") shows the ownership.
+Red tiles belong to player 0 (the human player in games against the
+computer), cyan to player 1, purple to player 2, blue to player 3,
+and yellow to player 4 (the Avatar). A black background shows the
+tile is currently unowned. Note that earth and impenetrable rock
+will always show up as dark grey against black, whatever you tell
+the editor. (When you save the level, the editor will make sure that
+all rock and earth is unclaimed.)
+
+To change the ownership of a tile, press a number key from 0 to 5; 0
+for player 0, etc, and 5 for unclaimed. 
+
+To change large areas, press ctrl+space. This will put you into
+marking mode. Draw out a rectangle with the movement keys, then
+press a key to change the map (ownership or slab), as if it were an
+individual character. Pressing ctrl+space again will also take you
+out of marking mode.
+
+To mark out a boundary (a wall, for example), press z. This will put
+you into paint mode. Nothing will change until you press a slab key
+or a number from 0 to 5, when you will start painting. Now when you
+move, you paint the tile your cursor is over with either the slab or
+ownership you selected (or both). To change the paint ownership or
+slab, just press another slab or number key. To stop painting, press
+z again.
+
+To add some graffiti to a dungeon, press 'a' for across, or 'd' for
+down. Press delete or backspace to remove graffiti. Graffiti shows
+up as a line of purple @ signs, and will be converted into rock
+with the chosen string on when the level is saved.
+
+To update the dungeon things/dat/clm, press u.
+To switch into "thing" mode, press tab.
+To switch into "clm" mode, press c.
+To quit, press ctrl+q.
+To save, press ctrl+s.
+
+[crthelp]
+Add creature mode help:
+
+A list will appear on the screen of all the available creatures.
+Simply type in the number of the creature you want to create, or 0
+to cancel, then press return.
+
+The creature will be added to the slot that was highlighted in
+"thing" mode. The creature will be owned by whoever owns the tile it
+is created on. However, you may change the ownership of the tile
+later without changing the ownership of the creature.
+
+The creature will be level one; you can change this in "thing" mode.
+
+[tnghelp]
+"Thing" mode help:
+
+Move around as in slab mode.
+The ownership backgrounds are as in slab mode. The numbers which are
+visible represent the number of "things" on that tile. Moving over a
+tile shows the details of the "things" on that tile. If a tile has
+more than 9 "things" on it, it will be shown as a "+".
+
+Press k to copy the highlighted thing (creature or object) onto the
+clipboard. Everything about the object apart from the position in
+the map will be copied, including height, level of creature, etc.
+
+Press y to copy a thing from the clipboard into the highlighted spot.
+
+Press 1-9 to change the highlighted "thing" slot - using the number
+pad with num lock on makes this easier. If a slot has more than one
+thing on it, the number of things will appear in brackets beneath
+the slot. Press / to cycle through the things on the highlighted slot.
+
+Press c to create a new creature in the highlighted slot. The new
+creature will be owned by whoever owns the tile (although the
+ownership of the tile can later be changed without affecting the
+creature). Note that any other "thing" in the highlighted slot will
+be erased, and that creating a creature copies it to the clipboard
+automatically.
+
+Press b to create a spell book (change the type using s and x).
+
+Press g or G to create a pot of gold in the highlighted spot. The
+value is 500 for 'g' and 250 for 'G'.
+
+Press d to create a dungeon special in the highlighted
+spot (change the type using s and x).
+
+Press h to create a dungeon heart in the highlighted spot. It will
+be owned by the owner of the tile.
+
+Press H to create a hero gate. It will be owned by player 4 (Avatar).
+
+Press u to update the dungeon. This will make sure all room objects
+(training posts, spikes, torturers, etc) are placed appropriately,
+as well as updating the .clm and .dat values.
+
+Press t to create a trap (change the type using s and x).
+
+Press T to create a trap box (ie a non-placed trap). Change the type
+using s and x.
+
+Press s and x to increase/decrease the level of a highlighted
+creature, the type of a highlighted trap, the type of a 
+highlighted dungeon special, or the type of a spell book.
+
+Press S and X to change the type of a highlighted creature.
+
+Press o to change the owner of a highlighted thing or creature. The
+ownership cycles through the players (and "unclaimed").
+
+Press l to lock/unlock a highlighted door.
+
+Press delete to remove the "thing" in the highlighted spot.
+
+To switch back to slab mode, press tab.
+To quit, press ctrl+q.
+To save, press ctrl+s.
+
+[clmhelp]
+"Clm" mode help:
+
+Move around as in slab mode. The main map shows exactly the same
+details as in slab made. The only difference is that instead of
+seeing the slab key, you now see the column data for the highlighted
+subtile. This mode is mainly used for testing purposes, and may be
+removed in later releases.
+
+Press 1-9 to change the highlighted column slot - using the number
+pad with num lock on makes this easier.
+
+Press u to update the dungeon. This will make sure all room objects
+(training posts, spikes, torturers, etc) are placed appropriately,
+as well as updating the .clm and .dat values.
+
+To switch back to slab mode, press tab.
+To quit, press ctrl+q.
+To save, press ctrl+s.
+
+[end]

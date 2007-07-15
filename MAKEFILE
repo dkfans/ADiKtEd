@@ -1,0 +1,29 @@
+CC = gcc
+CFLAGS = -c -O -I.
+LINK = gcc
+LFLAGS =
+LIBS = -L. -lslang -lpc
+MAPOBJS = main.o file.o action.o screen.o graffiti.o internal.o \
+	dernc.o font.o
+
+all: map.exe
+
+.c.o:
+	$(CC) $(CFLAGS) $*.c
+
+map.exe: $(MAPOBJS) Makefile
+	 $(LINK) -o map $(MAPOBJS) $(LIBS)
+	 strip map
+	 coff2exe map
+
+dernc.o: dernc.c dernc.h
+main.o: main.c globals.h
+file.o: file.c globals.h
+action.o: action.c globals.h
+screen.o: screen.c globals.h
+graffiti.o: graffiti.c globals.h
+internal.o: internal.c globals.h
+font.o: font.c
+
+clean:
+	del *.o map.exe

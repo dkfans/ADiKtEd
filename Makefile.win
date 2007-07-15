@@ -1,0 +1,57 @@
+# Project: adikted
+# Makefile created by Dev-C++ 4.9.9.2
+
+CPP  = g++.exe
+CC   = gcc.exe
+WINDRES = windres.exe
+RES  = map_private.res
+OBJ  = screen.o action.o dernc.o file.o font.o graffiti.o internal.o main.o obj_names.o $(RES)
+LINKOBJ  = screen.o action.o dernc.o file.o font.o graffiti.o internal.o main.o obj_names.o $(RES)
+LIBS =  -L"D:/ProgsNT/Dev-Cpp/lib" ../../../ProgsNT/Dev-Cpp/lib/libslang.a  
+INCS =  -I"D:/ProgsNT/Dev-Cpp/include" 
+CXXINCS =  -I"D:/ProgsNT/Dev-Cpp/lib/gcc/mingw32/3.4.2/include"  -I"D:/ProgsNT/Dev-Cpp/include/c++/3.4.2/backward"  -I"D:/ProgsNT/Dev-Cpp/include/c++/3.4.2/mingw32"  -I"D:/ProgsNT/Dev-Cpp/include/c++/3.4.2"  -I"D:/ProgsNT/Dev-Cpp/include" 
+BIN  = map.exe
+CXXFLAGS = $(CXXINCS)  
+CFLAGS = $(INCS)  
+RM = rm -f
+
+.PHONY: all all-before all-after clean clean-custom
+
+all: all-before map.exe all-after
+
+
+clean: clean-custom
+	${RM} $(OBJ) $(BIN)
+
+$(BIN): $(OBJ)
+	$(CC) $(LINKOBJ) -o "map.exe" $(LIBS)
+
+screen.o: screen.c
+	$(CC) -c screen.c -o screen.o $(CFLAGS)
+
+action.o: action.c
+	$(CC) -c action.c -o action.o $(CFLAGS)
+
+dernc.o: dernc.c
+	$(CC) -c dernc.c -o dernc.o $(CFLAGS)
+
+file.o: file.c
+	$(CC) -c file.c -o file.o $(CFLAGS)
+
+font.o: font.c
+	$(CC) -c font.c -o font.o $(CFLAGS)
+
+graffiti.o: graffiti.c
+	$(CC) -c graffiti.c -o graffiti.o $(CFLAGS)
+
+internal.o: internal.c
+	$(CC) -c internal.c -o internal.o $(CFLAGS)
+
+main.o: main.c
+	$(CC) -c main.c -o main.o $(CFLAGS)
+
+obj_names.o: obj_names.c
+	$(CC) -c obj_names.c -o obj_names.o $(CFLAGS)
+
+map_private.res: map_private.rc 
+	$(WINDRES) -i map_private.rc --input-format=rc -o map_private.res -O coff 
