@@ -5,23 +5,48 @@
 #ifndef ADIKT_ACTION_H
 #define ADIKT_ACTION_H
 
-#define KEY_BACKSP     8
-#define KEY_TAB        9
-#define KEY_ENTER      13
-#define KEY_F1         SL_KEY_F(1)
-#define KEY_CTRL_Q     17
-#define KEY_CTRL_L     12
-#define KEY_CTRL_N     14
-#define KEY_CTRL_S     19
-#define KEY_CTRL_SPACE 0
+#define TNGCLIPBRD_SIZE 17
 
-#define KEY_UP         SL_KEY_UP
-#define KEY_DOWN       SL_KEY_DOWN
-#define KEY_LEFT       SL_KEY_LEFT
-#define KEY_RIGHT      SL_KEY_RIGHT
-#define KEY_PGUP       SL_KEY_PPAGE
-#define KEY_PGDOWN     SL_KEY_NPAGE
-#define KEY_HOME       SL_KEY_HOME
-#define KEY_END        SL_KEY_END
-#define KEY_DEL        SL_KEY_DELETE
+enum adikt_workmode
+{
+  MD_SLB    = 0x000,
+  MD_TNG    = 0x001,
+  MD_CRTR   = 0x002,
+  MD_HELP   = 0x003,
+  MD_CLM    = 0x004,
+};
+
+extern const char *modenames[];
+
+extern void init_keys(void);
+
+// indicates if the main program loop should end
+extern short finished;
+// main program working mode
+extern int mode;
+
+//Marking mode
+extern short mark;
+extern int markl, markr, markt, markb, markx, marky;
+
+//Painting properties
+extern short paintmode;
+extern short paintown;
+extern unsigned char paintroom;
+
+//Clipboard
+extern char tngclipboard[TNGCLIPBRD_SIZE];
+
+// Size of the screen area where map is drawn
+extern int rows;
+extern int cols;
+
+/* Location of cursor on screen (where appropriate) */
+extern int screenx, screeny;
+/* Location of top left corner of screen in map (where appropriate */
+extern int mapx, mapy;
+
+/* Which subtile is being considered in thing and data modes */
+extern int sx, sy;
+
 #endif // ADIKT_ACTION_H

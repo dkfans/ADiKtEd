@@ -32,12 +32,15 @@ Press F1 for help.
 Version: 0.42b
  Quit changed to ctrl+q
  Added load (ctrl+l) and new map (ctrl+n)
-
 Version: 0.47b
  Fixed to allow compilation under new SLang
  Win32 version
  Fixed coord checking when placing a building
  Fixed keyboard codes to be more platform-independent
+Version: 0.49b
+ Added definitions of more objects, ie. creature lairs
+ Added hero gate counting and numbering
+ Some of code rewritten to be more clear
 
 Author:
 Jon Skeet, skeet@pobox.com

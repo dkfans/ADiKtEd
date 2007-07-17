@@ -1,3 +1,12 @@
+/*
+ * font.c
+ *
+ * Defines font for the graffiti module, for painting grafitties on walls.
+ *
+ */
+
+#include "globals.h"
+
 #ifdef SPECFONT
 
 static unsigned char notdef[] =

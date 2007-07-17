@@ -5,8 +5,8 @@ CPP  = g++.exe
 CC   = gcc.exe
 WINDRES = windres.exe
 RES  = map_private.res
-OBJ  = screen.o action.o dernc.o file.o font.o graffiti.o internal.o main.o obj_names.o $(RES)
-LINKOBJ  = screen.o action.o dernc.o file.o font.o graffiti.o internal.o main.o obj_names.o $(RES)
+OBJ  = action.o dernc.o file.o graffiti.o internal.o main.o obj_utils.o input_kb.o scr_help.o var_utils.o output_scr.o scr_level.o scr_thing.o graffiti_font.o bulcommn.o lev_data.o lev_files.o $(RES)
+LINKOBJ  = action.o dernc.o file.o graffiti.o internal.o main.o obj_utils.o input_kb.o scr_help.o var_utils.o output_scr.o scr_level.o scr_thing.o graffiti_font.o bulcommn.o lev_data.o lev_files.o $(RES)
 LIBS =  -L"D:/ProgsNT/Dev-Cpp/lib" ../../../ProgsNT/Dev-Cpp/lib/libslang.a  
 INCS =  -I"D:/ProgsNT/Dev-Cpp/include" 
 CXXINCS =  -I"D:/ProgsNT/Dev-Cpp/lib/gcc/mingw32/3.4.2/include"  -I"D:/ProgsNT/Dev-Cpp/include/c++/3.4.2/backward"  -I"D:/ProgsNT/Dev-Cpp/include/c++/3.4.2/mingw32"  -I"D:/ProgsNT/Dev-Cpp/include/c++/3.4.2"  -I"D:/ProgsNT/Dev-Cpp/include" 
@@ -26,9 +26,6 @@ clean: clean-custom
 $(BIN): $(OBJ)
 	$(CC) $(LINKOBJ) -o "map.exe" $(LIBS)
 
-screen.o: screen.c
-	$(CC) -c screen.c -o screen.o $(CFLAGS)
-
 action.o: action.c
 	$(CC) -c action.c -o action.o $(CFLAGS)
 
@@ -37,9 +34,6 @@ dernc.o: dernc.c
 
 file.o: file.c
 	$(CC) -c file.c -o file.o $(CFLAGS)
-
-font.o: font.c
-	$(CC) -c font.c -o font.o $(CFLAGS)
 
 graffiti.o: graffiti.c
 	$(CC) -c graffiti.c -o graffiti.o $(CFLAGS)
@@ -50,8 +44,38 @@ internal.o: internal.c
 main.o: main.c
 	$(CC) -c main.c -o main.o $(CFLAGS)
 
-obj_names.o: obj_names.c
-	$(CC) -c obj_names.c -o obj_names.o $(CFLAGS)
+obj_utils.o: obj_utils.c
+	$(CC) -c obj_utils.c -o obj_utils.o $(CFLAGS)
+
+input_kb.o: input_kb.c
+	$(CC) -c input_kb.c -o input_kb.o $(CFLAGS)
+
+scr_help.o: scr_help.c
+	$(CC) -c scr_help.c -o scr_help.o $(CFLAGS)
+
+var_utils.o: var_utils.c
+	$(CC) -c var_utils.c -o var_utils.o $(CFLAGS)
+
+output_scr.o: output_scr.c
+	$(CC) -c output_scr.c -o output_scr.o $(CFLAGS)
+
+scr_level.o: scr_level.c
+	$(CC) -c scr_level.c -o scr_level.o $(CFLAGS)
+
+scr_thing.o: scr_thing.c
+	$(CC) -c scr_thing.c -o scr_thing.o $(CFLAGS)
+
+graffiti_font.o: graffiti_font.c
+	$(CC) -c graffiti_font.c -o graffiti_font.o $(CFLAGS)
+
+bulcommn.o: bulcommn.c
+	$(CC) -c bulcommn.c -o bulcommn.o $(CFLAGS)
+
+lev_data.o: lev_data.c
+	$(CC) -c lev_data.c -o lev_data.o $(CFLAGS)
+
+lev_files.o: lev_files.c
+	$(CC) -c lev_files.c -o lev_files.o $(CFLAGS)
 
 map_private.res: map_private.rc 
 	$(WINDRES) -i map_private.rc --input-format=rc -o map_private.res -O coff 
