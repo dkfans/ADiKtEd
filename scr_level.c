@@ -278,15 +278,15 @@ static void draw_clm(void)
                 if (g==-1)
                 {
                   col = lvl->own[j+mapx][i+mapy]+10;
-                  if (lvl->slb[j+mapx][i+mapy]==0 ||
-                      lvl->slb[j+mapx][i+mapy]==2 ||
-                      lvl->slb[j+mapx][i+mapy]==3)
+                  if ((lvl->slb[j+mapx][i+mapy]==SLAB_TYPE_ROCK) ||
+                      (lvl->slb[j+mapx][i+mapy]==SLAB_TYPE_EARTH) ||
+                      (lvl->slb[j+mapx][i+mapy]==SLAB_TYPE_TORCHDIRT))
                       col=16;
                 }
                 else
                   col=7;
-                if (mark && j+mapx >= markl && j+mapx <= markr
-                  && i+mapy >= markt && i+mapy <= markb)
+                if ((mark) && (j+mapx >= markl) && (j+mapx <= markr)
+                  && (i+mapy >= markt) && (i+mapy <= markb))
                   col+=10;
                 screen_setcolor(col);
                 if (g==-1)

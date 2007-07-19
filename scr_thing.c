@@ -103,7 +103,7 @@ void display_tngdat(void)
             set_cursor_pos(all_rows-8+j*2, cols+20+i*6);
             screen_printf("%s","     ");
             set_cursor_pos(all_rows-7+j*2, cols+20+i*6);
-            if (lvl->tng_subnums [cx*3+i][cy*3+j] > 1)
+            if (lvl->tng_subnums[cx*3+i][cy*3+j] > 1)
             {
                 if (mode==MD_TNG)
                   screen_printf("(%d/%d)", vistng[i][j]+1,

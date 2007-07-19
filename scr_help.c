@@ -50,7 +50,7 @@ void init_help (void)
           what = match_title (title, n);
           if (n && what)
           {
-            *what = (char **)malloc (n*sizeof (char *));
+            *what = (char **)malloc(n*sizeof (char *));
             if (!*what)
                 die ("Out of memory");
           }
@@ -79,7 +79,7 @@ void init_help (void)
       {
           if (what)
           {
-            (*what)[n]=(char *)malloc ((strlen (buffer)+1)*sizeof(char));
+            (*what)[n]=(char *)malloc((strlen (buffer)+1)*sizeof(char));
             if (!(*what)[n])
                 die ("Out of memory");
             strcpy ((*what)[n], buffer);

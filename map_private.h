@@ -5,11 +5,11 @@
 #define MAP_PRIVATE_H
 
 /* VERSION DEFINITIONS */
-#define VER_STRING	"0.4.8.420"
+#define VER_STRING	"0.4.8.664"
 #define VER_MAJOR	0
 #define VER_MINOR	4
 #define VER_RELEASE	8
-#define VER_BUILD	420
+#define VER_BUILD	664
 #define COMPANY_NAME	""
 #define FILE_VERSION	""
 #define FILE_DESCRIPTION	"Adikted Dungeon Keeper map editor"

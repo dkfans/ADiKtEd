@@ -69,7 +69,8 @@ char creatinput[5];
  */
 void proc_key (void) 
 {
-    static char mapname[80];
+    static char usrinput[80];
+    static char mapname[DISKPATH_SIZE];
     unsigned int g;
     g = get_key();
     // Decoding "universal keys" - global actions
@@ -88,45 +89,47 @@ void proc_key (void)
         actions[mode](17); // Grotty but it'll work
       break;
     case KEY_CTRL_L:
-      if (get_str ("Enter map number/name to load: ", mapname))
+      if (get_str ("Enter map number/name to load: ", usrinput))
       {
         message_info_force("Loading map...");
-        if (!*mapname)
+        if (format_map_fname(mapname,usrinput))
         {
+          free_map();
+          load_map(lvl,mapname);
+          message_info("Map \"%s\" loaded", mapname);
+        } else
           message_error("Map loading cancelled");
-          break;
-        }
-        free_map();
-        if (strchr (mapname, '.'))
-          *strchr (mapname, '.')=0;
-        if (atoi (mapname))
-              sprintf (mapname, "%s"SEPARATOR"map%.5d", filebase, atoi (mapname));
-        load_map(lvl,mapname);
-        message_info("Map \"%s\" loaded", mapname);
-      }
-      break;
-    case KEY_CTRL_N:
-      free_map();
-      start_new_map();
-      message_info_force("New map started");
-      break;
-    case KEY_CTRL_S:
-      if (mode==MD_HELP || mode==MD_CRTR)
-          return;
-      if (get_str ("Enter map name: ", mapname))
-      {
-        if (!*mapname)
-        {
-          message_error("Map saving cancelled");
-          break;
-        }
-        if (strchr(mapname, '.'))
-          *strchr(mapname, '.')=0;
-        save_map (mapname);
       } else
       {
         speaker_beep();
       }
+      break;
+    case KEY_CTRL_S:
+      if ((mode==MD_HELP) || (mode==MD_CRTR))
+        break;
+      if (get_str("Enter map number/name to save: ", usrinput))
+      {
+        message_info_force("Saving map...");
+        if (format_map_fname(mapname,usrinput))
+        {
+          save_map(lvl,mapname);
+          message_info("Map \"%s\" saved", mapname);
+        } else
+          message_error("Map saving cancelled");
+      } else
+      {
+        speaker_beep();
+      }
+      break;
+    case KEY_CTRL_N:
+      free_map();
+      start_new_map(lvl);
+      message_info_force("New map started");
+      break;
+    case KEY_CTRL_R:
+      free_map();
+      generate_random_map(lvl);
+      message_info_force("Map generation completed.");
       break;
     default:
         //Sending the action to a function corresponding to actual screen
@@ -222,20 +225,20 @@ static void tngactions(int key)
           message_info_force("Creature number: ");
           break;
         case 'b' :
-          thing = create_object(cx, cy, 0x0b);
-          add_thing (thing);
+          thing = create_object(cx, cy, ITEM_SUBTYPE_SPELLHOE);
+          thing_add(lvl,thing);
           vistng[sx][sy]=lvl->tng_subnums[cx][cy]-1;
           break;
         case 'h' : // Add Dungeon heart
-          thing = create_object (cx, cy, 5);
+          thing = create_object (cx, cy, ITEM_SUBTYPE_DNHEART);
           thing[5]=3; // Raise it up a bit
-          add_thing (thing);
+          thing_add(lvl,thing);
           vistng[sx][sy]=lvl->tng_subnums[cx][cy]-1;
           break;
         case 'H' : // Add hero gate
           thing = create_object (cx, cy, ITEM_SUBTYPE_HEROGATE);
           thing[8]=4;
-          add_thing(thing);
+          thing_add(lvl,thing);
           //Hero gate number
           lvl->stats.hero_gates_count++;
           thing[14]=(char)-lvl->stats.hero_gates_count;
@@ -243,7 +246,7 @@ static void tngactions(int key)
           break;
         case 'a' : // Add action point
           thing = create_action_point (cx, cy);
-          add_thing (thing);
+          thing_add(lvl,thing);
           message_info_force("Added action point %d",(thing[20]<<8)+thing[19]);
           vistng[sx][sy]=lvl->tng_subnums[cx][cy]-1;
           break;
@@ -274,7 +277,7 @@ static void tngactions(int key)
                 thing[12]=(MAP_SIZE_X*(mapy+screeny)+(mapx+screenx)) >> 8;
                 thing[11]=((MAP_SIZE_X*(mapy+screeny)+(mapx+screenx)) & 255);
             }
-            add_thing(thing);
+            thing_add(lvl,thing);
             vistng[sx][sy]=lvl->tng_subnums[cx][cy]-1;
           } else
           {
@@ -296,17 +299,17 @@ static void tngactions(int key)
           break;
         case 'd': // Dungeon special
           thing = create_object (cx, cy, 0x56);
-          add_thing (thing);
+          thing_add(lvl,thing);
           vistng[sx][sy]=lvl->tng_subnums[cx][cy]-1;
           break;
         case 'g': // Gold
           thing = create_object (cx, cy, 3);
-          add_thing (thing);
+          thing_add(lvl,thing);
           vistng[sx][sy]=lvl->tng_subnums[cx][cy]-1;
           break;
         case 'G': // Gold
           thing = create_object (cx, cy, 6);
-          add_thing (thing);
+          thing_add(lvl,thing);
           vistng[sx][sy]=lvl->tng_subnums[cx][cy]-1;
           break;
         case 'o' : // Change ownership of creature/trap/special/spell
@@ -325,7 +328,7 @@ static void tngactions(int key)
             if (thing[6]!=5)
                 break;
             thing[7]++;
-            if (thing[7]==32)
+            if (thing[7]>=32)
                 thing[7]=1;
           }
           break;
@@ -336,7 +339,7 @@ static void tngactions(int key)
             if (thing[6]!=5)
                 break;
             thing[7]--;
-            if (!thing[7])
+            if (thing[7]<=0)
                 thing[7]=31;
           }
           break;
@@ -344,11 +347,11 @@ static void tngactions(int key)
           if (vistng[sx][sy] < lvl->tng_subnums[cx][cy])
           {
             thing = lvl->tng_lookup [cx][cy][vistng[sx][sy]];
-            if (thing[6]==5 && thing[14]<9)
+            if ((thing[6]==THING_TYPE_CREATURE) && (thing[14]<9))
                 thing[14]++;
-            if (thing[6]==8 && thing[7]<6)
+            if ((thing[6]==THING_TYPE_TRAP) && (thing[7]<6))
                 thing[7]++;
-            if (thing[6]==1 && thing[7]>=0x56 && thing[7]<=0x5d)
+            if ((thing[6]==THING_TYPE_ITEM) && (thing[7]>=0x56) && (thing[7]<=0x5d))
             {
                 thing[7]++;
                 if (thing[7]==0x5e)
@@ -396,7 +399,7 @@ static void tngactions(int key)
                 if (thing[7]==0x85)
                   thing[7]=0x30;
             }
-            if (thing[6]==1 && thing[7]>=0x5e && thing[7] <= 0x63)
+            if ((thing[6]==THING_TYPE_ITEM) && thing[7]>=0x5e && thing[7] <= 0x63)
             {
                 thing[7]--;
                 if (thing[7]==0x5d)
@@ -407,12 +410,12 @@ static void tngactions(int key)
         case 't' : // Create trap
           thing = create_object (cx, cy, 1);
           thing[6]=8; // Make it a trap
-          add_thing (thing);
+          thing_add(lvl,thing);
           vistng[sx][sy]=lvl->tng_subnums[cx][cy]-1;
           break;
         case 'T' : // Create trap box
           thing = create_object (cx, cy, 0x5e);
-          add_thing (thing);
+          thing_add(lvl,thing);
           vistng[sx][sy]=lvl->tng_subnums[cx][cy]-1;
           break;
         case '/' : // Cycle through highlighted things
@@ -426,7 +429,7 @@ static void tngactions(int key)
             message_info_force("Action point deleted");
             else
             message_info_force("Thing deleted");
-            delete_thing (cx, cy, vistng[sx][sy]);
+            thing_del(lvl,cx, cy, vistng[sx][sy]);
             vistng[sx][sy]--;
             if (vistng[sx][sy]<0)
                 vistng[sx][sy]=0;
@@ -556,7 +559,7 @@ static void creatureactions(int key)
       monster[6]=5;
       monster[7]=l;
       monster[8]=lvl->own[mapx+screenx][mapy+screeny];
-      add_thing(monster);
+      thing_add(lvl,monster);
       // Copy the monster to the clipboard
       memcpy (tngclipboard, monster+4, 17);
       // Show the new monster

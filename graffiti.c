@@ -174,19 +174,19 @@ void read_graffiti (void)
             graf->fin = (d ? y : x)+i/3;
             for (j=0; j <= i/3; j++)
             {
-                /* Search for "our" torch */
+                // Search for "our" torch
                 for (k=lvl->tng_subnums[bx+(d?1:j*3+1)][by+(d?j*3+1:1)]-1; k >=0; k--)
                 {
                   thing = lvl->tng_lookup[bx+(d?1:j*3+1)][by+(d?j*3+1:1)][k];
-                  /* Check if it's ours */
+                  // Check if it's ours
                   if (thing[6]==1 && thing[7]==2 && thing[5]==127)
                   {
-                      /* Change the slab and remove the torch */
+                      // Change the slab and remove the torch
                       lvl->own[x+(d?0:j)][y+(d?j:0)]=thing[10];
                       lvl->slb[x+(d?0:j)][y+(d?j:0)]=thing[11];
                       update_tngdat (x+(d?0:j), y+(d?j:0));
                   }
-                  delete_thing (bx+(d?1:j*3+1),by+(d?j*3+1:1),k);
+                  thing_del(lvl,bx+(d?1:j*3+1),by+(d?j*3+1:1),k);
                 }
             }
           }
@@ -232,7 +232,7 @@ void draw_graffiti (void)
             thing[5]=127;
             thing[10]=lvl->own[x+(i/3)*(1-d)][y+(i/3)*d]; /* Save the data */
             thing[11]=lvl->slb[x+(i/3)*(1-d)][y+(i/3)*d];
-            add_thing (thing);
+            thing_add(lvl,thing);
             lvl->own[x+(i/3)*(1-d)][y+(i/3)*d]=5;
             lvl->slb[x+(i/3)*(1-d)][y+(i/3)*d]=0;
           }
@@ -244,7 +244,7 @@ void draw_graffiti (void)
           thing[5]=127;
           thing[10]=lvl->own[x+(i/3)*(1-d)][y+(i/3)*d]; /* Save the data */
           thing[11]=lvl->slb[x+(i/3)*(1-d)][y+(i/3)*d];
-          add_thing (thing);
+          thing_add(lvl,thing);
           lvl->own[x+(i/3)*(1-d)][y+(i/3)*d]=5;
           lvl->slb[x+(i/3)*(1-d)][y+(i/3)*d]=0;
       }

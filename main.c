@@ -37,16 +37,20 @@ int main(int argc, char **argv)
     init_keys();
     // read configuration file
     read_init();
+    // random num gen seed selection
+    srand(time(0));
     // Interpreting command line parameters
-    if ((argc==2) && (atoi(argv[1])>0))
-      snprintf(mapname, DISKPATH_SIZE, "%s%smap%.5d", filebase,SEPARATOR, atoi(argv[1]));
-    else
-    if (argc==2)
-      strncpy(mapname,argv[1],DISKPATH_SIZE);
-    else
-      strcpy(mapname,"");
-    //Loading map
-    load_map(lvl,mapname);
+    strcpy(mapname,"");
+    if (argc>=2)
+    {
+        //Loading map
+        if (format_map_fname(mapname,argv[1]))
+        {
+          load_map(lvl,mapname);
+        } else
+          start_new_map(lvl);
+    } else
+        start_new_map(lvl);
     input_init();
     screen_init();
     create_default_clm();
@@ -91,7 +95,7 @@ static void read_init(void)
       if (strchr (buffer, ' '))
           *strchr (buffer, ' ')=0;
       if (!strcmp(buffer, "datmode"))
-          datmode=atoi (p);
+          datmode=atoi(p);
       if (!strcmp(buffer, "filebase"))
       {
           filebase=strdup(p);

@@ -87,11 +87,43 @@ char *message_get()
      return message;
 }
 
-void die(char *x)
+short format_map_fname(char *fname, char *usrinput)
 {
-    done();
-    fprintf(stderr, "%s\n", x);
-    exit(1);
+    // if the file does not have a path
+    if (strstr(usrinput,SEPARATOR)==NULL)
+    {
+          //Then it shouldn't have any dots (no extension)
+          char *dotpos=strrchr(usrinput,'.');
+          if (dotpos!=NULL)
+          {
+              *dotpos='\0';
+              sprintf(fname, "%s", usrinput);
+          } else
+          // If there are no dots or separators, maybe it's a number of map, not filename
+          {
+          if (atoi(usrinput))
+              sprintf (fname, "%s"SEPARATOR"map%.5d", filebase, atoi(usrinput));
+          else
+              sprintf(fname, "%s"SEPARATOR"%s", filebase, usrinput);
+          }
+    } else
+        // File is with path
+    {
+        sprintf(fname, "%s", usrinput);
+    }
+    if (strlen(fname)>0) return true;
+    return false;
+}
+
+void die(const char *format, ...)
+{
+      done();
+      va_list val;
+      va_start(val, format);
+      vfprintf(stderr, format, val);
+      va_end(val);
+      fprintf(stderr, "\n");
+      exit(1);
 }
 
 /*
@@ -99,6 +131,7 @@ void die(char *x)
  */
 void done(void)
 {
+    level_deinit();
     screen_done();
     input_done();
 }

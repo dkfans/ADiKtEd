@@ -17,8 +17,6 @@ void set_dat2 (int cx, int cy, int d);
 void update_square (int x, int y);
 void update_tngdat (int x, int y);
 void check_doors (void);
-void delete_thing (int x, int y, int num);
-void add_thing (unsigned char *thing);
 unsigned char *create_object (int x, int y, int type);
 unsigned char *create_thing (int tx, int ty);
 unsigned char *create_action_point (int x, int y);
@@ -26,7 +24,6 @@ void create_default_clm (void);
 void create_clmdattng(void);
 void check_doors (void);
 int get_dat (int cx, int cy);
-void free_map (void);
 
 static void remove_room_things (int x, int y);
 static int get_corner (int x, int y, int i, int j);
@@ -119,10 +116,10 @@ unsigned char *create_thing (int tx, int ty)
     x=(unsigned char)tx;
     y=(unsigned char)ty;
     
-    ret = (unsigned char *)malloc (21);
+    ret = (unsigned char *)malloc(SIZEOF_DK_TNG_REC);
     if (!ret)
       die ("Out of memory.");
-    for (i=0; i < 21; i++)
+    for (i=0; i < SIZEOF_DK_TNG_REC; i++)
       ret[i]=0;
     ret[0]=(unsigned char)((tx%3)*0x40+0x40);
     ret[2]=(unsigned char)((ty%3)*0x40+0x40);
@@ -131,79 +128,62 @@ unsigned char *create_thing (int tx, int ty)
     return ret;
 }
 
-void add_thing (unsigned char *thing)
-{
-    unsigned int x, y;
-    x = thing[1];
-    y = thing[3];
-
-    tng_tot++;
-    if (is_action_thing (thing))
-      apt_tot++;
-    lvl->tng_subnums[x][y]++;
-    lvl->tng_nums[x/3][y/3]++;
-    if (!lvl->tng_lookup[x][y])
-      lvl->tng_lookup[x][y]=(unsigned char **)malloc (sizeof (unsigned short *));
-    else
-      lvl->tng_lookup[x][y]=(unsigned char **)realloc (lvl->tng_lookup[x][y],
-                          lvl->tng_subnums[x][y]*sizeof (unsigned short *));
-    if (!lvl->tng_lookup[x][y])
-      die ("Out of memory");
-    lvl->tng_lookup[x][y][lvl->tng_subnums[x][y]-1]=thing;
-}
-
-void delete_thing (int x, int y, int num)
-{
-    unsigned char *thing;
-    int i;
-    if (num >= lvl->tng_subnums[x][y])
-      return;
-    tng_tot--;
-    thing = lvl->tng_lookup[x][y][num];
-    if (is_action_thing (thing))
-    {
-      action_used[thing[19]+(thing[20]<<8)]=NULL;
-      apt_tot--;
-    }
-    free (lvl->tng_lookup[x][y][num]);
-    for (i=num; i < lvl->tng_subnums[x][y]-1; i++)
-      lvl->tng_lookup[x][y][i]=lvl->tng_lookup[x][y][i+1];
-    lvl->tng_subnums[x][y]--;
-    lvl->tng_nums[x/3][y/3]--;
-    lvl->tng_lookup[x][y]=(unsigned char **)realloc(lvl->tng_lookup[x][y], 
-                        lvl->tng_subnums[x][y]*sizeof(char *));
-}
-
 static void remove_room_things (int x, int y)
 {
     int cx, cy, i;
-
     for (cx=x*3; cx < x*3+3; cx++)
       for (cy=y*3; cy < y*3+3; cy++)
-          for (i=lvl->tng_subnums[cx][cy]-1; i >=0; i--)
-            if (is_room_thing(lvl->tng_lookup[cx][cy][i]))
-                delete_thing (cx, cy, i);
+      {
+          int last_thing=lvl->tng_subnums[cx][cy]-1;
+          for (i=last_thing; i>=0; i--)
+          {
+            char *thing=lvl->tng_lookup[cx][cy][i];
+            if (is_room_thing(thing))
+                thing_del(lvl,cx, cy, i);
+          }
+     }
 }
 
-void create_clmdattng (void)
+static void remove_noncrucial_room_things(int x, int y)
+{
+    int cx, cy, i;
+    for (cx=x*3; cx < x*3+3; cx++)
+      for (cy=y*3; cy < y*3+3; cy++)
+      {
+          int last_thing=lvl->tng_subnums[cx][cy]-1;
+          for (i=last_thing; i>=0; i--)
+          {
+            char *thing=lvl->tng_lookup[cx][cy][i];
+            if (is_room_thing(thing)&&
+               (!is_crucial_thing(thing)))
+                thing_del(lvl,cx, cy, i);
+          }
+     }
+}
+
+void create_clmdattng(void)
 {
     int x, y;    
-    create_default_clm ();
+    create_default_clm();
     for (x=0; x < MAP_SIZE_X; x++)
       for (y=0; y < MAP_SIZE_Y; y++)
-          update_tngdat (x, y);
+          update_tngdat(x, y);
 }
 
-/* Update a slab and all slabs around it */
+/*
+ * Update a slab and all slabs around it
+ */
 void update_square (int x, int y)
 {
     int i, j;
     for (i=-1; i < 2; i++)
       for (j=-1; j < 2; j++)
-          update_tngdat (x+i, y+j);
+          update_tngdat(x+i, y+j);
 }
 
-/* Update a single slab */
+/*
+ * Update a single slab
+ */
 void update_tngdat(int x, int y)
 {
     int zx, zy, bx, by, s;
@@ -218,28 +198,26 @@ void update_tngdat(int x, int y)
     
     if ((x<0) || (x>MAP_MAXINDEX_X) || (y<0) || (y>MAP_MAXINDEX_Y))
       return;
-    remove_room_things(x, y);
+    //FIXME: previous things shouldn't be just removed, they should be updated!
+    remove_noncrucial_room_things(x, y);
     s = lvl->slb[x][y];
     if (s < 4)
       lvl->own[x][y]=5; // Dirt/rock can't be claimed
-    for (zx=0; zx < 3; zx++)
+    for (zx=0; zx < MAP_SUBNUM_X; zx++)
     {
-      for (zy=0; zy < 3; zy++)
+      for (zy=0; zy < MAP_SUBNUM_Y; zy++)
       {
-          by = y*3+zy;
-          bx = x*3+zx;
-          if (s == 12 || s==13)
-            lvl->wib[bx][by]=2;
-          else
-            lvl->wib[bx][by]=1;
+          by = y*MAP_SUBNUM_Y+zy;
+          bx = x*MAP_SUBNUM_X+zx;
+          lvl->wib[bx][by]=slab_default_wbi_entry(s);
       }
     }
     surround=1;
-    for (i=0; i<3; i++)
+    for (i=0; i<MAP_SUBNUM_X; i++)
     {
-      for (j=0; j<3; j++)
+      for (j=0; j<MAP_SUBNUM_Y; j++)
       {
-          if (x+i-1>=0 && x+i-1 < MAP_SIZE_X && y+j-1>=0 && y+j-1 < MAP_SIZE_Y)
+          if ((x+i-1>=0) && (x+i-1<MAP_SIZE_X) && (y+j-1>=0) && (y+j-1 < MAP_SIZE_Y))
           {
             slbrel[i][j]=lvl->slb[x+i-1][y+j-1];
             ownrel[i][j]=lvl->own[x+i-1][y+j-1];
@@ -330,8 +308,8 @@ void update_tngdat(int x, int y)
       {
           set_dat (x, y, 704, 705, 706, 707, 708, 709, 710, 711, 712);
           thing = create_object (x*3+1, y*3+1, 4); // Dry ice
-          thing[6]=7; // Room effect not object!
-          add_thing (thing);
+          thing[6]=THING_TYPE_ROOMEFFECT; // Room effect not object!
+          thing_add(lvl,thing);
       }
       else
       {
@@ -344,9 +322,9 @@ void update_tngdat(int x, int y)
                 by = y*3+j+1;
                 if (slab_is_central(lvl,i+x,j+y))
                 {
-                  set_dat2 (bx, by, 703);
-                  set_dat2 (bx-i, by, 701);
-                  set_dat2 (bx, by-j, 701);
+                  set_dat2(bx,  by,  703);
+                  set_dat2(bx-i,by,  701);
+                  set_dat2(bx,  by-j,701);
                 }
             }
           }
@@ -357,19 +335,19 @@ void update_tngdat(int x, int y)
             {
                 bx = x*3+i+1;
                 by = y*3+j+1;
-                if (!j && !i) // Ignore ourselves
+                if ((j==0) && (i==0)) // Ignore ourselves
                   continue; 
                 if (!i && slab_is_central(lvl,i+x,j+y))
                 {
-                  set_dat2 (bx-1, by-j, 701);
-                  set_dat2 (bx, by-j, 701);
-                  set_dat2 (bx+1, by-j, 701);
+                  set_dat2 (bx-1,by-j, 701);
+                  set_dat2 (bx,  by-j, 701);
+                  set_dat2 (bx+1,by-j, 701);
                 }
                 if (!j && slab_is_central(lvl,i+x,j+y))
                 {
-                  set_dat2 (bx-i, by-1, 701);
-                  set_dat2 (bx-i, by, 701);
-                  set_dat2 (bx-i, by+1, 701);
+                  set_dat2 (bx-i, by-1,701);
+                  set_dat2 (bx-i, by,  701);
+                  set_dat2 (bx-i, by+1,701);
                 }
             }                        
           }
@@ -383,15 +361,15 @@ void update_tngdat(int x, int y)
                   continue; 
                 if (!i && slab_is_central(lvl,i+x,j+y))
                 {
-                  set_dat2 (bx-1, by, 702);
-                  set_dat2 (bx, by, 702);
-                  set_dat2 (bx+1, by, 702);
+                  set_dat2 (bx-1, by,702);
+                  set_dat2 (bx, by,  702);
+                  set_dat2 (bx+1, by,702);
                 }
                 if (!j && slab_is_central(lvl,i+x,j+y))
                 {
-                  set_dat2 (bx, by-1, 702);
-                  set_dat2 (bx, by, 702);
-                  set_dat2 (bx, by+1, 702);
+                  set_dat2 (bx, by-1,702);
+                  set_dat2 (bx, by,  702);
+                  set_dat2 (bx, by+1,702);
                 }
             }                        
           }
@@ -413,33 +391,33 @@ void update_tngdat(int x, int y)
     case SLAB_TYPE_PRISONCASE: // Prison case is really grotty
       set_corner (x, y, 580, 581, 582, 583, 584, 585, 586, 587, 588);
       // Sides first
-      if (!slbsame [0][1] && slbrel[0][1] > 9)
+      if ((!slbsame [0][1]) && (slbrel[0][1]>9))
       {
-          add_thing (create_object (x*3, y*3, 0x1b));
-          add_thing (create_object (x*3, y*3+1, 0x1b));
-          add_thing (create_object (x*3, y*3+2, 0x1b));
+          thing_add(lvl,create_object (x*3, y*3, 0x1b));
+          thing_add(lvl,create_object (x*3, y*3+1, 0x1b));
+          thing_add(lvl,create_object (x*3, y*3+2, 0x1b));
       }
-      if (!slbsame [2][1] && slbrel[2][1] > 9)
+      if ((!slbsame[2][1]) && (slbrel[2][1]>9))
       {
-          add_thing (create_object (x*3+2, y*3, 0x1b));
-          add_thing (create_object (x*3+2, y*3+1, 0x1b));
-          add_thing (create_object (x*3+2, y*3+2, 0x1b));
+          thing_add(lvl,create_object (x*3+2, y*3, 0x1b));
+          thing_add(lvl,create_object (x*3+2, y*3+1, 0x1b));
+          thing_add(lvl,create_object (x*3+2, y*3+2, 0x1b));
       }
       if (!slbsame [1][0] && slbrel[1][0] > 9)
       {
           if (slbsame[0][1] || slbrel[0][1]<9)
-            add_thing (create_object (x*3, y*3, 0x1b));
-          add_thing (create_object (x*3+1, y*3, 0x1b));
+            thing_add(lvl,create_object (x*3, y*3, 0x1b));
+          thing_add(lvl,create_object (x*3+1, y*3, 0x1b));
           if (slbsame[2][1] || slbrel[2][1]<9)
-            add_thing (create_object (x*3+2, y*3, 0x1b));
+            thing_add(lvl,create_object (x*3+2, y*3, 0x1b));
       }
-      if (!slbsame [1][2] && slbrel[1][2] > 9)
+      if ((!slbsame[1][2]) && (slbrel[1][2]>9))
       {
-          if (slbsame[0][1] || slbrel[0][1]<9)
-            add_thing (create_object (x*3, y*3+2, 0x1b));
-          add_thing (create_object (x*3+1, y*3+2, 0x1b));
-          if (slbsame[2][1] || slbrel[2][1]<9)
-            add_thing (create_object (x*3+2, y*3+2, 0x1b));
+          if ((slbsame[0][1]) || (slbrel[0][1]<9))
+            thing_add(lvl,create_object (x*3, y*3+2, 0x1b));
+          thing_add(lvl,create_object (x*3+1, y*3+2, 0x1b));
+          if ((slbsame[2][1]) || (slbrel[2][1]<9))
+            thing_add(lvl,create_object (x*3+2, y*3+2, 0x1b));
       }
       break;
     case SLAB_TYPE_TORTURE: // Torture
@@ -457,14 +435,14 @@ void update_tngdat(int x, int y)
                   584, 585, 586, 587, 588);
           thing = create_object (x*3+1, y*3+1, 0x20);
       }
-      add_thing (thing);
+      thing_add(lvl,thing);
       break;
     case SLAB_TYPE_TRAINING: // Training
       if (surround)
       {
           set_dat_unif (x, y, 530);
           thing = create_object (x*3+1, y*3+1, 0x1f);
-          add_thing (thing);
+          thing_add(lvl,thing);
       }
       else
       {
@@ -544,9 +522,10 @@ void update_tngdat(int x, int y)
             }
             if (flag2 || flag3)
             {
-                add_thing(create_object 
+                char *obj=create_object 
                         (x*3+1, y*3+1,(lvl->own[x][y]>0 && lvl->own[x][y]<4 ? 
-                                   0x77+lvl->own[x][y] : 0x6f)));
+                                   0x77+lvl->own[x][y] : 0x6f));
+                thing_add(lvl,obj);
                 set_dat2 (x*3+1, y*3+1, 653);
             }
           }
@@ -556,7 +535,7 @@ void update_tngdat(int x, int y)
       if (surround)
       {
           thing = create_object (x*3+1, y*3+1, 0x72);
-          add_thing (thing);
+          thing_add(lvl,thing);
           set_dat (x, y, 561, 561, 561, 561, 
                  560, 561, 561, 562, 561);
       }
@@ -572,7 +551,7 @@ void update_tngdat(int x, int y)
       if (surround)
       {
           thing = create_object (x*3+1, y*3+1, 0x71);
-          add_thing (thing);
+          thing_add(lvl,thing);
       }
       else
           set_pillar_thing (x, y, 642, 2, 0x300);
@@ -627,7 +606,7 @@ void update_tngdat(int x, int y)
     case SLAB_TYPE_GRAVEYARD: // Graveyard
       set_corner (x, y, 630, 631, 632, 633, 634, 635, 636, 637, 638);
       thing = create_object (x*3+1, y*3+1, 0x1d);
-      add_thing (thing);
+      thing_add(lvl,thing);
       // Add dry ice instead of pillars
       for (i=0; i < 3; i+=2)
       {
@@ -638,7 +617,7 @@ void update_tngdat(int x, int y)
             {
                 thing = create_object (x*3+i, y*3+j, 4); // Dry ice
                 thing[6]=7; // Room effect not object!
-                add_thing (thing);
+                thing_add(lvl,thing);
             }
           }
       }
@@ -686,7 +665,7 @@ void update_tngdat(int x, int y)
       {
           thing = create_object (x*3+1, y*3+1, 0x73+lvl->own[x][y]);
           thing[5]=2;
-          add_thing (thing);
+          thing_add(lvl,thing);
       }
       break;
     }
@@ -703,7 +682,7 @@ void update_tngdat(int x, int y)
             thing[4]=0xe0;
             thing[0]=i*0x40+0x40;
             thing[2]=0x80;
-            add_thing (thing);
+            thing_add(lvl,thing);
           }
           if ((slbrel[1][i]==3 || slbrel[1][i]==5)
             && !picture_wall (x, y+i-1, 1, 2-i))
@@ -713,7 +692,7 @@ void update_tngdat(int x, int y)
             thing[4]=0xe0;
             thing[0]=0x80;
             thing[2]=i*0x40+0x40;
-            add_thing(thing);
+            thing_add(lvl,thing);
           }
       }
     }
@@ -789,7 +768,7 @@ static void set_door_dattng (int x, int y, int datbase, int type, int locked)
       for (cy=y*3; cy < y*3+3; cy++)
           for (i=lvl->tng_subnums[cx][cy]-1; i >=0; i--)
             if (lvl->tng_lookup[cx][cy][i][6]==9)
-                delete_thing (cx, cy, i);
+                thing_del(lvl,cx, cy, i);
     set_dat_unif (x, y, 720);
     // Set orientation of door, fairly arbitrarily :)
     if ((!x || lvl->slb[x-1][y]<10)&&(x==MAP_MAXINDEX_X || lvl->slb[x+1][y]<10))
@@ -800,12 +779,12 @@ static void set_door_dattng (int x, int y, int datbase, int type, int locked)
     thing[6]=9; // Make it a door
     thing[13]=o;
     thing[14]=locked;
-    add_thing (thing);
+    thing_add(lvl,thing);
     if (locked)
     {
       thing = create_object (x*3+1, y*3+1, 0x2c);
       thing[5]=5;
-      add_thing (thing);
+      thing_add(lvl,thing);
     }
     set_dat2 (x*3+o, y*3+1-o, datbase);
     set_dat2 (x*3+1, y*3+1, datbase+1);
@@ -815,7 +794,7 @@ static void set_door_dattng (int x, int y, int datbase, int type, int locked)
 /*
  * Create the standard clm file. Entries structured as follows:
  */
-void create_default_clm (void)
+void create_default_clm(void)
 {
     if (!default_clm)
       default_clm=1;
@@ -849,17 +828,17 @@ void create_default_clm (void)
     set_clm (28, 1, 0x1b, 0x1d, 0xa, 0x1b9, 0x1b9, 0x1b9, 0, 0, 0);
 
     // 100-199: Water, lava, paths, claimed areas
-    set_clm (100, 0xcea8, 0x221, 0, 0, 0, 0, 0, 0, 0, 0); // Water 1
-    set_clm (105, 0x18ba, 0x222, 0, 0, 0, 0, 0, 0, 0, 0); // Lava 1
-    set_clm (106, 0x18ba, 0x222, 0, 0, 0, 0, 0, 0, 0, 0); // Lava 2
-    set_clm (110, 0x594, 0xcf, 0x1a, 0, 0, 0, 0, 0, 0, 0); // Path
+    set_clm (100, 0xcea8, 0x0221, 0, 0, 0, 0, 0, 0, 0, 0); // Water 1
+    set_clm (105, 0x18ba, 0x0222, 0, 0, 0, 0, 0, 0, 0, 0); // Lava 1
+    set_clm (106, 0x18ba, 0x0222, 0, 0, 0, 0, 0, 0, 0, 0); // Lava 2
+    set_clm (110, 0x0594, 0x00cf, 0x1a, 0, 0, 0, 0, 0, 0, 0); // Path
     // Expand this later :) FIXME
     // Claimed areas
-    set_clm (130, 0x45, 0xce, 0xc0, 0, 0, 0, 0, 0, 0, 0); // Player 0 centre
-    set_clm (131, 0x12, 0xce, 0xc1, 0, 0, 0, 0, 0, 0, 0); // Player 1 centre
-    set_clm (132, 0x10, 0xce, 0xc2, 0, 0, 0, 0, 0, 0, 0); // Player 2 centre
-    set_clm (133, 0x10, 0xce, 0xc3, 0, 0, 0, 0, 0, 0, 0); // Player 3 centre
-    set_clm (134, 0x184, 0xce, 0xc7, 0, 0, 0, 0, 0, 0, 0); // Player 4 centre
+    set_clm (130, 0x0045, 0x00ce, 0x00c0, 0, 0, 0, 0, 0, 0, 0); // Player 0 centre
+    set_clm (131, 0x0012, 0x00ce, 0x00c1, 0, 0, 0, 0, 0, 0, 0); // Player 1 centre
+    set_clm (132, 0x0010, 0x00ce, 0x00c2, 0, 0, 0, 0, 0, 0, 0); // Player 2 centre
+    set_clm (133, 0x0010, 0x00ce, 0x00c3, 0, 0, 0, 0, 0, 0, 0); // Player 3 centre
+    set_clm (134, 0x0184, 0x00ce, 0x00c7, 0, 0, 0, 0, 0, 0, 0); // Player 4 centre
     // Fix this properly later FIXME
     set_clm (135, 1, 0xce, 0x80, 0, 0, 0, 0, 0, 0, 0); // Non-centres
 
@@ -1646,7 +1625,7 @@ static void set_pillar_thing (int x, int y, int pillar, int thingnum, int thingh
                 }
                 thing [12]=(MAP_SIZE_X*y+x) >> 8;
                 thing [11]=((MAP_SIZE_X*y+x) & 255);
-                add_thing (thing);
+                thing_add(lvl,thing);
             }
           }
       }
@@ -1726,18 +1705,23 @@ static void set_corner (int x, int y, int normal, int b1, int b2, int b3, int b4
 }
 
 // Use our own strange slb thing to get locked/unlocked doors right
-void check_doors (void)
+void check_doors(void)
 {
+    //Preparing array bounds
+    int arr_entries_x=MAP_SIZE_X*MAP_SUBNUM_X;
+    int arr_entries_y=MAP_SIZE_Y*MAP_SUBNUM_Y;
+
     unsigned char *thing;
     int i, j, k;
-    for (i=0; i < 255; i++)
+    for (i=0; i < arr_entries_y; i++)
     {
-      for (j=0; j < 255; j++)
+      for (j=0; j < arr_entries_x; j++)
       {
-          for (k=0; k < lvl->tng_subnums[i][j]; k++)
+          int things_count=lvl->tng_subnums[i][j];
+          for (k=0; k<things_count; k++)
           {
             thing = lvl->tng_lookup[i][j][k];
-            if (thing[6]==9)
+            if (thing[6]==THING_TYPE_DOOR)
             {
                 if ((lvl->slb[i/3][j/3]&0xfe) == thing[7]*2+40) // Update the slab
                   lvl->slb[i/3][j/3] = thing[7]*2+40+thing[14];
@@ -1745,82 +1729,4 @@ void check_doors (void)
           }
       }
     }
-}
-
-void free_map (void)
-{
-    int x, cx, cy, k;
-    
-    if (lvl->slb)
-    {
-      for (x=0; x < MAP_SIZE_X; x++)
-          free (lvl->slb[x]);
-      free (lvl->slb);
-      lvl->slb=NULL;
-    }
-    if (lvl->own)
-    {
-      for (x=0; x < MAP_SIZE_X; x++)
-          free (lvl->own[x]);
-      free (lvl->own);
-      lvl->own=NULL;
-    }
-    if (dat_high)
-    {
-      for (x=0; x < 255; x++)
-          free (dat_high[x]);
-      free (dat_high);
-      dat_high=NULL;
-    }
-    if (dat_low)
-    {
-      for (x=0; x < 255; x++)
-          free (dat_low[x]);
-      free (dat_low);
-      dat_low=NULL;
-    }
-    if (lvl->wib)
-    {
-      for (x=0; x < 255; x++)
-          free (lvl->wib[x]);
-      free (lvl->wib);
-      lvl->wib=NULL;
-    }
-    if (lvl->tng_subnums && lvl->tng_lookup)
-    {
-      for (cx=0; cx < 255; cx++)
-      {
-          for (cy=0; cy < 255; cy++)
-          {
-            for (k=lvl->tng_subnums[cx][cy]-1; k >=0; k--)
-                delete_thing (cx, cy, k);
-          }
-          free (lvl->tng_lookup[cx]);
-          free (lvl->tng_subnums[cx]);
-      }
-      free (lvl->tng_lookup);
-      free (lvl->tng_subnums);
-      lvl->tng_subnums=NULL;
-      lvl->tng_lookup=NULL;
-    }
-    if (lvl->tng_nums)
-    {
-      for (x=0; x < MAP_SIZE_X; x++)
-          free (lvl->tng_nums[x]);
-      free (lvl->tng_nums);
-      lvl->tng_nums=NULL;
-    }
-    if (action_used)
-    {
-      free (action_used);
-      action_used=NULL;
-    }
-    if (lvl->clm)
-    {
-      for (x=0; x < 2048; x++)
-          free (lvl->clm[x]);
-      free (lvl->clm);
-      lvl->clm=NULL;
-    }
-    free_graffiti();
 }

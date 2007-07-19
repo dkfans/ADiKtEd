@@ -14,7 +14,9 @@ extern short message_is_empty();
 extern void message_release();
 extern char *message_get();
 
-extern void die(char *x);
+extern short format_map_fname(char *fname, char *usrinput);
+
+extern void die(const char *format, ...);
 extern void done(void);
 
 #endif // ADIKT_VARUTILS_H

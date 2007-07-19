@@ -15,10 +15,21 @@
 #define KEY_TAB        9
 #define KEY_ENTER      13
 #define KEY_F1         0x201
-#define KEY_CTRL_Q     17
+#define KEY_CTRL_H      8
+#define KEY_CTRL_I      9
+#define KEY_CTRL_J     10
+#define KEY_CTRL_K     11
 #define KEY_CTRL_L     12
+#define KEY_CTRL_M     13  //same as Enter - better use the Enter
 #define KEY_CTRL_N     14
+#define KEY_CTRL_O     15
+#define KEY_CTRL_P     16
+#define KEY_CTRL_Q     17
+#define KEY_CTRL_R     18
 #define KEY_CTRL_S     19
+#define KEY_CTRL_T     20
+#define KEY_CTRL_U     21
+#define KEY_CTRL_V     22
 #define KEY_CTRL_SPACE 0
 
 #define KEY_UP         0x101

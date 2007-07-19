@@ -7,6 +7,8 @@
 
 #include "lev_data.h"
 
-extern void write_tng(LEVEL *lvl,char *fname);
+extern short save_map(LEVEL *lvl,char *mapname);
+
+extern void load_map(LEVEL *lvl,char *fname);
 
 #endif // ADIKT_LEVFILES_H

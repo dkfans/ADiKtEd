@@ -10,8 +10,6 @@
 /* internal.c */
 extern void update_square (int x, int y);
 extern void update_tngdat (int x, int y);
-extern void delete_thing (int x, int y, int num);
-extern void add_thing (unsigned char *thing);
 extern unsigned char *create_object (int x, int y, int type);
 extern unsigned char *create_thing (int tx, int ty);
 extern unsigned char *create_action_point (int x, int y);
@@ -22,12 +20,13 @@ extern int get_dat (int cx, int cy);
 extern void set_dat2 (int cx, int cy, int d);
 extern void free_map (void);
 
-/* file.c */
-extern void load_map (LEVEL *lvl,char *fname);
-extern void save_map (char *mapname);
-extern void start_new_map (void);
+struct memory_file
+{
+    long len;
+    unsigned char *content;
+};
 
-/* Global variables */
+struct memory_file read_file (char *iname);
 
 /* 0 for high-low, 1 for low-high */
 extern int datmode;
@@ -41,7 +40,6 @@ extern char creatinput[5];
 // Note that I store action points as things in here, and separate them
 // out at save time. This makes lots of things a lot easier
 extern unsigned int apt_tot; // Total number of action points
-extern unsigned int tng_tot; // Number of things in total
 
      // Which action point numbers are taken, and where their data is
     // Note: we assume there will be less than 1024 action points. I think

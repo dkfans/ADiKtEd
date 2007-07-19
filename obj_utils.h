@@ -46,6 +46,12 @@
 #define SLAB_TYPE_GEMS         0x34
 #define SLAB_TYPE_GUARDPOST    0x35
 
+#define SLAB_WIB_STATIC        0x00
+#define SLAB_WIB_SKEW          0x01
+#define SLAB_WIB_ANIMATE       0x02
+
+#define OWNERS_COUNT           6
+
 #define THING_TYPE_ITEM        0x01
 #define THING_TYPE_CREATURE    0x05
 #define THING_TYPE_ROOMEFFECT  0x07
@@ -216,6 +222,8 @@ extern short is_action_thing(unsigned char *thing);
 extern short is_room_thing (unsigned char *thing);
 extern int get_item_category(unsigned char stype_idx);
 extern short slab_is_central(LEVEL *lvl,int x,int y);
+extern int slab_default_wbi_entry(unsigned char slab_type);
+extern int slab_siblings_oftype(LEVEL *lvl,int x,int y,unsigned char slab_type);
 
 extern char *get_thing_type_fullname(unsigned char type_idx);
 extern char *get_item_subtype_fullname(unsigned char stype_idx);

@@ -40,16 +40,9 @@
 #define true 1
 #endif
 
-// Map based definitions
-
-#define MAP_SIZE_X 85
-#define MAP_SIZE_Y 85
-#define MAP_MAXINDEX_X MAP_SIZE_X-1
-#define MAP_MAXINDEX_Y MAP_SIZE_Y-1
-
 // Buffer sizes
 
-#define DISKPATH_SIZE   64
+#define DISKPATH_SIZE   256
 #define LINEMSG_SIZE    80
 #define READ_BUFSIZE    256
 

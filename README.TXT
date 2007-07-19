@@ -37,10 +37,15 @@ Version: 0.47b
  Win32 version
  Fixed coord checking when placing a building
  Fixed keyboard codes to be more platform-independent
-Version: 0.49b
+Version: 0.48b
  Added definitions of more objects, ie. creature lairs
  Added hero gate counting and numbering
  Some of code rewritten to be more clear
+Version: 0.49b
+ The way of interpreting user-typed map names is now unified
+ All memory allocation routines checked and rewritten
+ Fixed problem with automatic deletion of DHeart on saving
+ Added some very beginnings of random map generator (ctrl+r)
 
 Author:
 Jon Skeet, skeet@pobox.com

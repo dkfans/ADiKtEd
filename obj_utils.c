@@ -66,14 +66,16 @@ short is_action_thing(unsigned char *thing)
 
 short is_room_thing(unsigned char *thing)
 {
-    if ((thing[6]==THING_TYPE_ROOMEFFECT)
-     && (thing[7]==ROOMEFC_SUBTP_ENTRICE)) // Entrance ice room effect
+  switch (thing[6])
+  {
+  case THING_TYPE_ROOMEFFECT:
+      if (thing[7]==ROOMEFC_SUBTP_ENTRICE) // Entrance ice room effect
+        return true;
+      return false;
+  case THING_TYPE_DOOR:
       return true;
-    if (thing[6] == THING_TYPE_DOOR) // Doors, all
-      return true;
-    if (thing[6] == THING_TYPE_ITEM)
-    {
-      // Everything from ROOMEQUIP category is room_thing
+  case THING_TYPE_ITEM:
+    { // Everything from ROOMEQUIP category is room_thing
       int cat_idx=get_item_category(thing[7]);
       if (cat_idx==ITEM_CATEGR_ROOMEQUIP)
         return true;
@@ -84,8 +86,31 @@ short is_room_thing(unsigned char *thing)
       case ITEM_SUBTYPE_SPINNKEY:  //Key marking closed doors
         return true;
       }
-    }
+    };return false;
+  default:
     return false;
+  }
+}
+
+/*
+ * Returns if the object is crucial for the game. Such object
+ * is not easily removed by the automatic placers.
+ */
+short is_crucial_thing(unsigned char *thing)
+{
+  switch (thing[6])
+  {
+  case THING_TYPE_ITEM:
+      switch (thing[7])
+      {
+      case ITEM_SUBTYPE_DNHEART:
+      case ITEM_SUBTYPE_HEROGATE:
+        return true;
+      }
+    return false;
+  default:
+    return false;
+  }
 }
 
 /*
@@ -880,5 +905,40 @@ short slab_is_central(LEVEL *lvl,int x,int y)
         if ((lvl->slb[x][y]!=lvl->slb[i+x][j+y])||(lvl->own[x][y]!=lvl->own[i+x][j+y]))
           return false;
     return true;
+}
+
+/*
+ * Says how many slabs of given type are in 3x3 area surrounding given slab,
+ * and including it; returns 0..9;
+ */
+int slab_siblings_oftype(LEVEL *lvl,int x,int y,unsigned char slab_type)
+{
+    int amount=0;
+    int i, j;
+    for (i=x-1; i < x+2; i++)
+      for (j=y-1; j < y+2; j++)
+      {
+      if ((i>=0) && (j>=0) && (i<MAP_SIZE_X) && (j<MAP_SIZE_Y))
+        if (lvl->slb[i][j]==slab_type)
+          amount++;
+      }
+    return amount;
+}
+
+/*
+ * Returns a WBI file entry for given slab
+ */
+int slab_default_wbi_entry(unsigned char slab_type)
+{
+  //NOTE: the default levels sometimes have different values here.
+  // maybe a subtile starts to be animated after it is revealed?
+    switch (slab_type)
+    {
+    case SLAB_TYPE_LAVA:
+    case SLAB_TYPE_WATER:
+        return SLAB_WIB_ANIMATE;
+    default:
+        return SLAB_WIB_SKEW;
+    }
 }
 
