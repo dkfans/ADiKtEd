@@ -10,6 +10,7 @@
 #include "globals.h"
 #include "lev_data.h"
 #include "internal.h"
+#include "obj_things.h"
 
 typedef struct
 {
@@ -121,7 +122,8 @@ int add_graffiti (int x, int y, char *string, int d)
 
 void read_graffiti (void)
 {
-    unsigned char *check, *thing;
+    DK_CLM_REC *check;
+    unsigned char *thing;
     int i, j, k;
     int x, y, bx, by, d;
     adikt_graffiti *graf;
@@ -132,7 +134,7 @@ void read_graffiti (void)
     
     check = lvl->clm[2047];
     for (i=0; i < 24; i++)
-      if (check[i] != 0xff)
+      if (check->data[i] != 0xff)
           return;
     
     for (x=0; x < MAP_SIZE_X; x++)
@@ -142,7 +144,7 @@ void read_graffiti (void)
           bx = x*3;
           by = y*3;
           d = get_dat (bx, by)-1500;
-          if (!d || d==1) /* Got some graffiti */
+          if (!d || d==1) // Got some graffiti
           {
             if (!graffiti_num)
                 graffiti_data = (adikt_graffiti **)malloc (sizeof (adikt_graffiti *));
@@ -175,11 +177,12 @@ void read_graffiti (void)
             for (j=0; j <= i/3; j++)
             {
                 // Search for "our" torch
-                for (k=lvl->tng_subnums[bx+(d?1:j*3+1)][by+(d?j*3+1:1)]-1; k >=0; k--)
+                for (k=get_thing_subnums(lvl,bx+(d?1:j*3+1),by+(d?j*3+1:1))-1; k >=0; k--)
                 {
-                  thing = lvl->tng_lookup[bx+(d?1:j*3+1)][by+(d?j*3+1:1)][k];
+                  thing = get_thing(lvl,bx+(d?1:j*3+1),by+(d?j*3+1:1),k);
                   // Check if it's ours
-                  if (thing[6]==1 && thing[7]==2 && thing[5]==127)
+                  if ((get_thing_type(thing)==THING_TYPE_ITEM) && (get_thing_subtype(thing)==ITEM_SUBTYPE_TORCH)
+                       && (get_thing_tilepos_h(thing)==127))
                   {
                       // Change the slab and remove the torch
                       lvl->own[x+(d?0:j)][y+(d?j:0)]=thing[10];
@@ -221,15 +224,15 @@ void draw_graffiti (void)
           set_dat2 (bx+i*(1-d)+dx[d][0], by+i*d+dy[d][0], 1700);
           if (i<l)
             set_dat2 (bx+i*(1-d)+dx[d][1], by+i*d+dy[d][1], 1503+string[i]);
-          else if (i==l) /* Terminate string */
+          else if (i==l) // Terminate string
             set_dat2 (bx+i*(1-d)+dx[d][1], by+i*d+dy[d][1], 1503); 
           else
             set_dat2 (bx+i*(1-d)+dx[d][1], by+i*d+dy[d][1], 1700);
           set_dat2 (bx+i*(1-d)+dx[d][2], by+i*d+dy[d][2], 1700);
           if (i%3==1)
           {
-            thing = create_object (bx+(d ? 1 : i), by+(d ? i : 1), 2);
-            thing[5]=127;
+            thing = create_item(bx+(d ? 1 : i), by+(d ? i : 1), ITEM_SUBTYPE_TORCH);
+            set_thing_tilepos_h(thing,127);
             thing[10]=lvl->own[x+(i/3)*(1-d)][y+(i/3)*d]; /* Save the data */
             thing[11]=lvl->slb[x+(i/3)*(1-d)][y+(i/3)*d];
             thing_add(lvl,thing);
@@ -240,9 +243,9 @@ void draw_graffiti (void)
       set_dat2 (bx, by, 1500+d);
       if (i%3==1)
       {
-          thing = create_object (bx+(d ? 1 : i), by+(d ? i : 1), 2);
-          thing[5]=127;
-          thing[10]=lvl->own[x+(i/3)*(1-d)][y+(i/3)*d]; /* Save the data */
+          thing = create_item (bx+(d ? 1 : i), by+(d ? i : 1), ITEM_SUBTYPE_TORCH);
+          set_thing_tilepos_h(thing,127);
+          thing[10]=lvl->own[x+(i/3)*(1-d)][y+(i/3)*d]; // Save the data
           thing[11]=lvl->slb[x+(i/3)*(1-d)][y+(i/3)*d];
           thing_add(lvl,thing);
           lvl->own[x+(i/3)*(1-d)][y+(i/3)*d]=5;

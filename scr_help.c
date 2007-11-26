@@ -21,12 +21,16 @@ int slbkeyhelprows=0;
 char **slbkeyhelp=NULL;
 int crtkeyhelprows=0;
 char **crtkeyhelp=NULL;
+int itmtkeyhelprows=0;
+char **itmtkeyhelp=NULL;
 int slbhelprows=0;
 char **slbhelp=NULL;
 int tnghelprows=0;
 char **tnghelp=NULL;
 int crthelprows=0;
 char **crthelp=NULL;
+int itmthelprows=0;
+char **itmthelp=NULL;
 int helprows=0;
 char **helptext=NULL;
 
@@ -93,8 +97,12 @@ void init_help (void)
 
 char ***match_title (char *title, int n)
 {
-    static char *titles[]={"slbkeyhelp", "tngkeyhelp", "crtkeyhelp", 
-      "slbhelp", "tnghelp", "crthelp", "clmhelp", NULL};
+    static char *titles[]={
+            "slbkeyhelp", "tngkeyhelp",   //0,1
+            "crtkeyhelp", "itmtkeyhelp",  //2,3
+            "slbhelp", "tnghelp",         //4,5
+            "crthelp", "itmhelp",         //6,7
+            "clmhelp", NULL};
     int i=0;
 
     while (titles[i] && strcmp (titles[i], title))
@@ -111,17 +119,25 @@ char ***match_title (char *title, int n)
       return &crtkeyhelp;
       case 3 :
       if (n!=-1)
+          itmtkeyhelprows=n;
+      return &itmtkeyhelp;
+      case 4 :
+      if (n!=-1)
           slbhelprows=n;
       return &slbhelp;
-      case 4 :
+      case 5 :
       if (n!=-1)
           tnghelprows=n;
       return &tnghelp;
-      case 5 :
+      case 6 :
       if (n!=-1)
           crthelprows=n;
       return &crthelp;
-      case 6 :
+      case 7 :
+      if (n!=-1)
+          itmthelprows=n;
+      return &itmthelp;
+      case 8 :
       if (n!=-1)
           clmhelprows=n;
       return &clmhelp;

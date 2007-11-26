@@ -46,6 +46,15 @@ Version: 0.49b
  All memory allocation routines checked and rewritten
  Fixed problem with automatic deletion of DHeart on saving
  Added some very beginnings of random map generator (ctrl+r)
+Version: 0.49b
+ The random map generator has been extended
+ Added loading and saving of INF,TXT,LGT and WLB files
+ Re-added updating of DAT and CLM (but not TNG) when saving
+Version: 0.50b
+ Most of the TNG support code rewritten completely
+ Renewed "creature" screen (adding creatures)
+ New item screen (allows adding ANY item available in the game)
+ Create room effect function (ctrl+e in "thing" mode)
 
 Author:
 Jon Skeet, skeet@pobox.com

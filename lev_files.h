@@ -7,8 +7,8 @@
 
 #include "lev_data.h"
 
-extern short save_map(LEVEL *lvl,char *mapname);
+extern short save_map(struct LEVEL *lvl);
 
-extern void load_map(LEVEL *lvl,char *fname);
+extern short load_map(struct LEVEL *lvl);
 
 #endif // ADIKT_LEVFILES_H

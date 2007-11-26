@@ -15,11 +15,17 @@
 #include "scr_thing.h"
 #include "scr_help.h"
 #include "action.h"
-#include "obj_utils.h"
+#include "obj_slabs.h"
+#include "obj_things.h"
 #include "internal.h"
 
 // Amount of width the key takes up
 int keycols=40;
+//Variables for navigating in draw_numbered_list screen
+int numbered_list_y=0; //the first visible row
+int numbered_list_pos=0; // selected item position (rel. to screen top)
+int numbered_list_items=8; //number of items in the list
+int numbered_list_cols=2; //number of columns in the item list
 
 /*
  * Draw the screen
@@ -63,7 +69,10 @@ void draw_levscr(void)
       draw_tng();
       break;
     case MD_CRTR:
-      draw_creature();
+      draw_creatrkind();
+      break;
+    case MD_ITMT:
+      draw_itemtype();
       break;
     case MD_HELP:
       draw_help();
@@ -125,6 +134,12 @@ static char *mode_status (int mode)
       break;
     case MD_HELP:
       sprintf (buffer, "   (Help for %s mode)", longmodenames[helpformode]);
+      break;
+    case MD_CRTR:
+      sprintf (buffer, "   (Selecting kind)");
+      break;
+    case MD_ITMT:
+      sprintf (buffer, "   (Selecting type)");
       break;
     default:
       strcpy (buffer, "(unknown mode)");
@@ -216,42 +231,11 @@ static void draw_slb(void)
       show_cursor('@');
 }
 
-static void draw_creature(void)
-{
-    int i;
-    for (i=0; i < rows; i++)
-    {
-      set_cursor_pos(i, 0);
-      SLsmg_set_color(0);
-      // Just do two columns. If this mucks up, so be it
-      char cr_msg[LINEMSG_SIZE];
-      sprintf(cr_msg,"");
-      if (i < 16)
-      {
-          sprintf(cr_msg,"%2d: %-16.16s", i+1, get_creature_subtype_fullname(i+1));
-          if (i+17 < 32)
-            sprintf(cr_msg+strlen(cr_msg),"%2d: %-16.16s", i+17, get_creature_subtype_fullname(i+17));
-      }
-      screen_printf_toeol("%s",cr_msg);
-
-      set_cursor_pos(i, cols);
-      screen_setcolor(2);
-      screen_printchr(' ');
-      screen_printchr(' ');
-      screen_setcolor(0);
-      char *key_help="";
-      if (i < crtkeyhelprows)
-          key_help=crtkeyhelp[i];
-      screen_printf_toeol(" %s",key_help);
-    }
-    set_cursor_pos(get_screen_rows()-1, 17+strlen(creatinput));
-}
-
 static void draw_clm(void)
 {
     int i, j, g;
     int col;
-    unsigned char *c;
+    DK_CLM_REC *c;
     
     int cx, cy;
 
@@ -306,25 +290,25 @@ static void draw_clm(void)
     }
     screen_setcolor(0);
     set_cursor_pos(1, cols+3);
-    c = lvl->clm [0x10000-((dat_high[cx*3+sx][cy*3+sy]<<8)+
-                  dat_low[cx*3+sx][cy*3+sy])];
-    screen_printf("Use: %04X ", c[0]+(c[1]<<8));
+    int clm_idx=0x10000-((lvl->dat_high[cx*3+sx][cy*3+sy]<<8)+lvl->dat_low[cx*3+sx][cy*3+sy]);
+    c = lvl->clm[clm_idx];
+    screen_printf("Use: %04X ", c->data[0]+(c->data[1]<<8));
     set_cursor_pos(1, cols+23);
-    screen_printf("Permanent: %d", c[2]&1);
+    screen_printf("Permanent: %d", c->data[2]&1);
     set_cursor_pos(2, cols+3);
-    screen_printf("Lintel: %d", (c[2]>>1)&7);
+    screen_printf("Lintel: %d", (c->data[2]>>1)&7);
     set_cursor_pos(2, cols+23);
-    screen_printf("Height: %X", (c[2]>>4)&15);
+    screen_printf("Height: %X", (c->data[2]>>4)&15);
     set_cursor_pos(3, cols+3);
-    screen_printf("Solid mask: %04X", c[3]+(c[4]<<8));
+    screen_printf("Solid mask: %04X", c->data[3]+(c->data[4]<<8));
     set_cursor_pos(3, cols+23);
-    screen_printf("Orientation: %02X", c[7]);
+    screen_printf("Orientation: %02X", c->data[7]);
     set_cursor_pos(4, cols+3);
-    screen_printf("Base block: %03X", c[5]+(c[6]<<8));
+    screen_printf("Base block: %03X", c->data[5]+(c->data[6]<<8));
     for (i=0; i < 8; i++)
     {
       set_cursor_pos(5+i, cols+3);
-      screen_printf("Cube %d: %03X", i, c[8+i*2]+(c[9+i*2]<<8));
+      screen_printf("Cube %d: %03X", i, c->data[8+i*2]+(c->data[9+i*2]<<8));
     }
     display_tngdat();
     if (is_graffiti(screenx+mapx, screeny+mapy)==-1)
@@ -339,5 +323,55 @@ void show_cursor(char cur)
     screen_setcolor(9);
     screen_printchr(cur);
     set_cursor_pos(get_screen_rows()-1, get_screen_cols()-1);
+}
+
+/*
+ * Draws screen with a numbered list (as creature types or item types)
+ * and key help for given screen.
+ */
+void draw_numbered_list(char* (*itemstr)(unsigned int),
+        unsigned int start_idx,unsigned int end_idx,unsigned int itm_width,
+        unsigned int skeyhelprows,char **skeyhelp)
+{
+    unsigned int line_length=min(cols,LINEMSG_SIZE);
+    unsigned int entry_width=itm_width+5;
+    numbered_list_cols=max((unsigned int)(line_length/entry_width),1);
+    numbered_list_items=end_idx-start_idx+1;
+    unsigned int num_rows=numbered_list_items/numbered_list_cols
+                        + ((numbered_list_items%numbered_list_cols)>0);
+    unsigned int i,k;
+    int col;
+    for (i=0; i < rows; i++)
+    {
+      set_cursor_pos(i, 0);
+      char it_msg[LINEMSG_SIZE];
+      if (i+numbered_list_y<num_rows)
+        for (k=0;k<numbered_list_cols;k++)
+        {
+          int itm_idx=start_idx+numbered_list_y+i+k*num_rows;
+          if (itm_idx-start_idx==numbered_list_pos)
+              col=45;
+          else
+              col=0;
+          if (itm_idx<=end_idx)
+            sprintf(it_msg,"%3d: %-*.*s",
+                    itm_idx,itm_width,itm_width, itemstr(itm_idx));
+          else
+            sprintf(it_msg,"");
+          screen_setcolor(col);
+          screen_printf("%s",it_msg);
+        }
+      screen_setcolor(0);
+      screen_printf_toeol("");
+      set_cursor_pos(i, cols);
+      screen_setcolor(2);
+      screen_printchr(' ');
+      screen_printchr(' ');
+      screen_setcolor(0);
+      char *key_help="";
+      if (i < skeyhelprows)
+          key_help=skeyhelp[i];
+      screen_printf_toeol(" %s",key_help);
+    }
 }
 

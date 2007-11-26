@@ -20,12 +20,16 @@ extern int slbkeyhelprows;
 extern char **slbkeyhelp;
 extern int crtkeyhelprows;
 extern char **crtkeyhelp;
+extern int itmtkeyhelprows;
+extern char **itmtkeyhelp;
 extern int slbhelprows;
 extern char **slbhelp;
 extern int tnghelprows;
 extern char **tnghelp;
 extern int crthelprows;
 extern char **crthelp;
+extern int itmthelprows;
+extern char **itmthelp;
 extern int helprows;
 extern char **helptext;
 

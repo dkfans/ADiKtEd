@@ -16,6 +16,8 @@ extern char *message_get();
 
 extern short format_map_fname(char *fname, char *usrinput);
 
+extern int rnd (int range);
+
 extern void die(const char *format, ...);
 extern void done(void);
 

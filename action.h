@@ -12,8 +12,9 @@ enum adikt_workmode
   MD_SLB    = 0x000,
   MD_TNG    = 0x001,
   MD_CRTR   = 0x002,
-  MD_HELP   = 0x003,
-  MD_CLM    = 0x004,
+  MD_ITMT   = 0x003,
+  MD_HELP   = 0x004,
+  MD_CLM    = 0x005,
 };
 
 extern const char *modenames[];

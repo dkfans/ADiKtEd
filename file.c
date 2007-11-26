@@ -2,44 +2,26 @@
 #include "globals.h"
 #include "dernc.h"
 #include "lev_data.h"
-#include "obj_utils.h"
+#include "obj_slabs.h"
+#include "obj_things.h"
 #include "internal.h"
 
 
-/* Note that I store action points as things in here, and separate them
- * out at save time. This makes lots of things a lot easier */
-
-unsigned int apt_tot; /* Total number of action points */
-unsigned int tng_tot; /* Number of things in total */
-unsigned char **action_used=NULL; 
-/* Which action point numbers are taken, and where their data is */
-
-/* 
- * Note we assume there will be less than 1024 action points. I think
- * this should do... the most DK uses is 13
- */
-
-/* 
- * Exceptionally grotty hack - we never need the actual data
- * stored in the .dat file, only what the high and low bytes should
- * be. So long as we remember this when we generate the "standard"
- * dungeon things, we'll be fine
- */
-unsigned char **dat_low=NULL;
-unsigned char **dat_high=NULL;
-
 char *filebase;
 
-int vistng[3][3]; /* Which number are we looking at on each subtile */
-
-/* 0 for high-low, 1 for low-high */
+// 0 for high-low, 1 for low-high
 int datmode=0;
 
-int default_clm=0; /* Have we already set up the clm entries */
+int vistng[3][3]; // Which number are we looking at on each subtile
+
+int default_clm=0; // Have we already set up the clm entries
 
 struct memory_file read_file (char *iname);
 
-/* Read a file, possibly compressed, and decompress it if necessary */
+/*
+ * Read a file, possibly compressed, and decompress it if necessary.
+ * Warning: it may destroy the file name from input variable
+ */
 struct memory_file read_file (char *iname)
 {
     FILE *ifp;
@@ -49,6 +31,13 @@ struct memory_file read_file (char *iname)
     struct memory_file ret;
 
     ifp = fopen(iname, "rb");
+    //Prepare "short" filename - no path, max. 32 chars
+    char *ifname=strrchr(iname,'\\');
+    if (ifname==NULL)
+        ifname=iname;
+    if (strlen(ifname) > 31)
+          ifname[32]=0;
+    //If cannot open
     if (!ifp) 
     {
       ret.content=NULL;
@@ -59,8 +48,11 @@ struct memory_file read_file (char *iname)
     plen = ftell (ifp);
     rewind (ifp);
     packed = malloc(plen);
-    if (!packed) 
-      die("read_file: Out of memory.");
+    if (packed==NULL)
+    {
+      sprintf (buffer, "read_file: Cannot allocate memory for \"%s\".",ifname);
+      die(buffer);
+    }
     fread (packed, 1, plen, ifp);
     fclose (ifp);
     ulen = rnc_ulen (packed);
@@ -72,19 +64,18 @@ struct memory_file read_file (char *iname)
           ret.len = plen;
           return ret;
       }
-      if (strlen (iname) > 40)
-          iname[40]=0;
       sprintf (buffer, "read_file: %s", rnc_error (ulen));
-      die (buffer);
+      die(buffer);
     }
     unpacked = malloc(ulen);
-    if (!unpacked) 
-      die ("read_file: Out of memory.");
+    if (unpacked==NULL)
+    {
+      sprintf (buffer, "read_file: Cannot alloc mem to decompress \"%s\".",ifname);
+      die(buffer);
+    }
     ulen = rnc_unpack (packed, unpacked, 0);
     if (ulen < 0)
     {
-      if (strlen (iname) > 40)
-          iname[40]=0;
       sprintf (buffer, "read_file: %s", rnc_error (ulen));
       die (buffer);
     }

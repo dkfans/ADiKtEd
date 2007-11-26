@@ -1,7 +1,8 @@
 /*
  * scr_thing.c
  *
- * Defines functions for initializing and displaying the level thing screen.
+ * Defines functions for initializing and displaying the level thing screen,
+ * includes also creature and item type subscreens.
  *
  */
 
@@ -10,7 +11,9 @@
 #include "globals.h"
 #include "output_scr.h"
 #include "action.h"
-#include "obj_utils.h"
+#include "obj_slabs.h"
+#include "obj_things.h"
+#include "scr_help.h"
 #include "internal.h"
 
 void draw_tng(void)
@@ -47,11 +50,19 @@ void draw_tng(void)
       screen_printchr(' ');
       screen_printchr(' ');
       screen_setcolor(0);
-      screen_printf_toeol(" ");
+      screen_printf_toeol("");
     }
-    if (vistng[sx][sy] < lvl->tng_subnums[cx*3+sx][cy*3+sy])
-      display_thing (lvl->tng_lookup[cx*3+sx][cy*3+sy][vistng[sx][sy]], 
-                   cols+3, 1);
+    short obj_type=get_object_type(lvl, cx*3+sx,cy*3+sy,vistng[sx][sy]);
+    char *obj=get_object(lvl, cx*3+sx,cy*3+sy,vistng[sx][sy]);
+    switch (obj_type)
+    {
+    case OBJECT_TYPE_ACTNPT:
+      display_action_point(obj, cols+3, 1);
+      break;
+    case OBJECT_TYPE_THING:
+      display_thing (obj, cols+3, 1);
+      break;
+    }
     display_tngdat();
     show_cursor(get_thing_char (screenx+mapx, screeny+mapy));
     return;
@@ -88,8 +99,8 @@ void display_tngdat(void)
             screen_setcolor(col);
             if (datmode==0)
                 screen_printf("%02X%02X",
-                        dat_high[cx*3+i][cy*3+j],
-                        dat_low[cx*3+i][cy*3+j]);
+                        lvl->dat_high[cx*3+i][cy*3+j],
+                        lvl->dat_low[cx*3+i][cy*3+j]);
           }
       }
       set_cursor_pos(all_rows-10, cols+20);
@@ -103,70 +114,58 @@ void display_tngdat(void)
             set_cursor_pos(all_rows-8+j*2, cols+20+i*6);
             screen_printf("%s","     ");
             set_cursor_pos(all_rows-7+j*2, cols+20+i*6);
-            if (lvl->tng_subnums[cx*3+i][cy*3+j] > 1)
+            unsigned int obj_num=get_object_subnums(lvl,cx*3+i,cy*3+j);
+            if (obj_num > 1)
             {
                 if (mode==MD_TNG)
-                  screen_printf("(%d/%d)", vistng[i][j]+1,
-                              lvl->tng_subnums[cx*3+i][cy*3+j]);
+                  screen_printf("(%d/%d)", vistng[i][j]+1, obj_num);
                 else
-                  screen_printf("(%d)   ", lvl->tng_subnums[cx*3+i][cy*3+j]);
+                  screen_printf("(%d)   ", obj_num);
             }
             else
                 screen_printf("%s","     ");
             set_cursor_pos(all_rows-8+j*2, cols+20+i*6);
-            if (i==sx && j==sy && mode==MD_TNG)
+            if ((i==sx) && (j==sy) && (mode==MD_TNG))
                 col=10;
             else
                 col=0;
-            if ((vistng[i][j]) < (lvl->tng_subnums[cx*3+i][cy*3+j]))
+            short obj_type=get_object_type(lvl,cx*3+i,cy*3+j,vistng[i][j]);
+            switch (obj_type)
             {
-                thing=lvl->tng_lookup[cx*3+i][cy*3+j][vistng[i][j]];
-                if (is_action_thing(thing))
+              case OBJECT_TYPE_ACTNPT:
                 {
                   col+=35;
                   screen_setcolor(col);
                   screen_printf("%s","action");
-                }
-                else
-                switch (thing[6])
+                };break;
+              case OBJECT_TYPE_THING:
                 {
-                case THING_TYPE_CREATURE:
-                  col += 30+thing[8];
-                  screen_setcolor(col);
-                  screen_printf("%s", get_creature_subtype_shortname(thing[7]));
-                  break;
-                case THING_TYPE_ROOMEFFECT:
-                  col+=35;
-                  screen_setcolor(col);
-                  screen_printf("%s", "effct");
-                  break;
-                case THING_TYPE_TRAP:
-                  col+=35;
-                  screen_setcolor(col);
-                  screen_printf("%s", "trap");
-                  break;
-                case THING_TYPE_DOOR:
-                  col+=35;
-                  screen_setcolor(col);
-                  screen_printf("%s", "door");
-                  break;
-                case THING_TYPE_ITEM:
-                  col+=35;
-                  screen_setcolor(col);
-                  screen_printf("%s",get_item_subtype_shortname(thing[7]));
-                  break;
-                default:
-                  col+=35;
-                  screen_setcolor(col);
-                  screen_printf("%s","thing");
-                  break;
-                }
-            }
-            else
-            {
-                col+=36;
-                screen_setcolor(col);
-                screen_printf("%s","     ");
+                  thing=get_object(lvl,cx*3+i,cy*3+j,vistng[i][j]);
+                  switch (get_thing_type(thing))
+                  {
+                  case THING_TYPE_CREATURE:
+                    col += 30+get_thing_owner(thing);
+                    screen_setcolor(col);
+                    screen_printf("%s", get_creature_subtype_shortname(get_thing_subtype(thing)));
+                    break;
+                  case THING_TYPE_ITEM:
+                    col+=35;
+                    screen_setcolor(col);
+                    screen_printf("%s",get_item_subtype_shortname(get_thing_subtype(thing)));
+                    break;
+                  default:
+                    col+=35;
+                    screen_setcolor(col);
+                    screen_printf("%s",get_thing_type_shortname(get_thing_type(thing)));
+                    break;
+                  }
+                };break;
+              default:
+                {
+                    col+=36;
+                    screen_setcolor(col);
+                    screen_printf("%s","     ");
+                };break;
             }
           }
       }
@@ -175,7 +174,7 @@ void display_tngdat(void)
     
 char get_thing_char (int x, int y)
 {
-    switch (lvl->tng_nums[x][y])
+    switch (get_object_tilnums(lvl,x,y))
     {
     case  0:
       return ' ';
@@ -189,7 +188,7 @@ char get_thing_char (int x, int y)
     case  7:
     case  8:
     case  9:
-      return (char)(lvl->tng_nums[x][y]+'0');
+      return (char)(get_object_tilnums(lvl,x,y)+'0');
       break;
     default:
       return '+';
@@ -200,11 +199,6 @@ void display_thing (unsigned char *thing, int x, int y)
 {
     int m, i;
 
-    if (is_action_thing(thing))
-    {
-      display_action_point(thing, x, y);
-      return;
-    }
     screen_setcolor(0);
     set_cursor_pos(y, x);
     screen_printf("%s","Thing data block:");
@@ -213,41 +207,46 @@ void display_thing (unsigned char *thing, int x, int y)
       set_cursor_pos(m+y+1, x);
       for (i=0; i < 7; i++)
           screen_printf("%02X ", (unsigned int)thing[m*7+i]);
-      SLsmg_erase_eol();
+      screen_printf_toeol("");
     }
     set_cursor_pos(y+5, x);
-    screen_printf("Subtile: %3d,%3d (Tile: %2d, %2d)", thing[1], thing[3],
-              thing[1]/3, thing[3]/3);
+    int tpos_x=get_thing_tilepos_x(thing);
+    int tpos_y=get_thing_tilepos_y(thing);
+    screen_printf("Subtile: %3d,%3d (Tile: %2d, %2d)", tpos_x, tpos_y,
+              tpos_x/MAP_SUBNUM_X, tpos_y/MAP_SUBNUM_Y);
     set_cursor_pos(y+6, x);
-    screen_printf("Position within subtile: %3d, %3d", thing[0], thing[2]);
+    screen_printf("Position within subtile: %3d, %3d",
+              get_thing_subtpos_x(thing), get_thing_subtpos_y(thing));
     set_cursor_pos(y+7, x);
-    screen_printf("Thing type: %s",get_thing_type_fullname(thing[6]));
-    
-    /* Creature */
-    if (thing[6]==THING_TYPE_CREATURE)
+    screen_printf("Thing type: %s",get_thing_type_fullname(get_thing_type(thing)));
+
+    switch (get_thing_type(thing))
+    {
+    // Creature
+    case THING_TYPE_CREATURE:
     {
       set_cursor_pos(y+8, x);
-      screen_printf("Type: %s", get_creature_subtype_fullname(thing[7]));
+      screen_printf("Kind: %s", get_creature_subtype_fullname(get_thing_subtype(thing)));
       set_cursor_pos(y+9, x);
       screen_printf("Level: %d", thing[14]+1);
       set_cursor_pos(y+10, x);
-      screen_printf("Owner: %s", get_owner_type_fullname(thing[8]));
-    }
-    /* Trap */
-    if (thing[6]==THING_TYPE_TRAP)
+      screen_printf("Owner: %s", get_owner_type_fullname(get_thing_owner(thing)));
+    };break;
+    // Trap
+    case THING_TYPE_TRAP:
     {
       set_cursor_pos(y+8, x);
-      screen_printf("Type : %s", get_trap_subtype_fullname(thing[7]));
+      screen_printf("Kind : %s", get_trap_subtype_fullname(get_thing_subtype(thing)));
       set_cursor_pos(y+9, x);
-      screen_printf("Owner: %s", get_owner_type_fullname(thing[8]));
-    }
+      screen_printf("Owner: %s", get_owner_type_fullname(get_thing_owner(thing)));
+    };break;
     // Door
-    if (thing[6]==THING_TYPE_DOOR)
+    case THING_TYPE_DOOR:
     {
       set_cursor_pos(y+8, x);
-      screen_printf("Type : %s", get_door_subtype_fullname(thing[7]));
+      screen_printf("Kind : %s", get_door_subtype_fullname(get_thing_subtype(thing)));
       set_cursor_pos(y+9, x);
-      screen_printf("Owner: %s", get_owner_type_fullname(thing[8]));
+      screen_printf("Owner: %s", get_owner_type_fullname(get_thing_owner(thing)));
       set_cursor_pos(y+10, x);
       char *lock_state;
       if (thing[14])
@@ -255,22 +254,30 @@ void display_thing (unsigned char *thing, int x, int y)
       else
           lock_state="Unlocked";
       screen_printf("%s",lock_state);
-    }
+    };break;
     // Room effect
-    if (thing[6]==THING_TYPE_ROOMEFFECT)
+    case THING_TYPE_ROOMEFFECT:
     {
       set_cursor_pos(y+8, x);
-      screen_printf("Type : %s",get_roomeffect_subtype_fullname(thing[7]));
-    }
+      screen_printf("Kind : %s",get_roomeffect_subtype_fullname(get_thing_subtype(thing)));
+    };break;
     // Object
-    if (thing[6]==THING_TYPE_ITEM)
+    case THING_TYPE_ITEM:
     {
       set_cursor_pos(y+8, x);
-      screen_printf("Type: %s",get_item_subtype_fullname(thing[7]));
+      screen_printf("Kind: %s",get_item_subtype_fullname(get_thing_subtype(thing)));
       set_cursor_pos(y+9, x);
-      screen_printf("Owner: %s", get_owner_type_fullname(thing[8]));
+      screen_printf("Owner: %s", get_owner_type_fullname(get_thing_owner(thing)));
       set_cursor_pos(y+10, x);
-      screen_printf("Category: %s",get_item_category_fullname(thing[7]));
+      screen_printf("Category: %s",get_item_category_fullname(get_thing_subtype(thing)));
+    };break;
+    default:
+    {
+      set_cursor_pos(y+8, x);
+      screen_printf("Unrecognized thing!");
+      set_cursor_pos(y+9, x);
+      screen_printf("Type: %d", (int)get_thing_type(thing));
+    };break;
     }
 }
 
@@ -287,3 +294,18 @@ void display_action_point (unsigned char *point, int x, int y)
     set_cursor_pos(y+3, x);
     screen_printf("Unknown byte pair: %02X %02X", point[17], point[18]);
 }
+
+void draw_creatrkind()
+{
+    draw_numbered_list(get_creature_subtype_fullname,1,CREATR_SUBTP_FLOAT,16,
+        crtkeyhelprows,crtkeyhelp);
+    set_cursor_pos(get_screen_rows()-1, 17);
+}
+
+void draw_itemtype()
+{
+    draw_numbered_list(get_item_subtype_fullname,1,ITEM_SUBTYPE_SPELLARMG,18,
+        itmtkeyhelprows,itmtkeyhelp);
+    set_cursor_pos(get_screen_rows()-1, 17);
+}
+

@@ -1,7 +1,7 @@
 [Project]
 FileName=map.dev
 Name=adikted
-UnitCount=32
+UnitCount=38
 Type=1
 Ver=1
 ObjFiles=
@@ -21,19 +21,19 @@ OverrideOutput=0
 OverrideOutputName=map.exe
 HostApplication=
 Folders=
-CommandLine=
+CommandLine=Levels\MAP00088
 UseCustomMakefile=0
 CustomMakefile=
 IncludeVersionInfo=1
 SupportXPThemes=0
 CompilerSet=0
-CompilerSettings=0000000000000000000000
+CompilerSettings=0000000000000001000000
 
 [VersionInfo]
 Major=0
-Minor=4
-Release=8
-Build=664
+Minor=5
+Release=0
+Build=186
 LanguageID=1033
 CharsetID=1252
 CompanyName=
@@ -117,37 +117,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit11]
-FileName=obj_utils.h
-CompileCpp=0
-Folder=adikted
-Compile=1
-Link=1
-Priority=1000
-OverrideBuildCmd=0
-BuildCmd=
-
 [Unit12]
-FileName=input_kb.c
-CompileCpp=0
-Folder=adikted
-Compile=1
-Link=1
-Priority=1000
-OverrideBuildCmd=0
-BuildCmd=
-
-[Unit13]
-FileName=input_kb.h
-CompileCpp=0
-Folder=adikted
-Compile=1
-Link=1
-Priority=1000
-OverrideBuildCmd=0
-BuildCmd=
-
-[Unit14]
 FileName=scr_help.c
 CompileCpp=0
 Folder=adikted
@@ -157,7 +127,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit15]
+[Unit13]
 FileName=scr_help.h
 CompileCpp=0
 Folder=adikted
@@ -167,7 +137,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit16]
+[Unit14]
 FileName=var_utils.c
 CompileCpp=0
 Folder=adikted
@@ -177,7 +147,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit17]
+[Unit15]
 FileName=var_utils.h
 CompileCpp=0
 Folder=adikted
@@ -187,7 +157,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit18]
+[Unit16]
 FileName=output_scr.h
 CompileCpp=0
 Folder=adikted
@@ -197,7 +167,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit19]
+[Unit17]
 FileName=output_scr.c
 CompileCpp=0
 Folder=adikted
@@ -207,7 +177,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit20]
+[Unit18]
 FileName=scr_level.h
 CompileCpp=0
 Folder=adikted
@@ -217,7 +187,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit21]
+[Unit19]
 FileName=scr_level.c
 CompileCpp=0
 Folder=adikted
@@ -227,7 +197,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit22]
+[Unit20]
 FileName=scr_thing.h
 CompileCpp=0
 Folder=adikted
@@ -237,7 +207,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit23]
+[Unit21]
 FileName=scr_thing.c
 CompileCpp=0
 Folder=adikted
@@ -247,7 +217,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit24]
+[Unit22]
 FileName=graffiti_font.c
 CompileCpp=0
 Folder=adikted
@@ -257,8 +227,28 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit26]
+[Unit23]
+FileName=graffiti.h
+CompileCpp=0
+Folder=adikted
+Compile=1
+Link=1
+Priority=1000
+OverrideBuildCmd=0
+BuildCmd=
+
+[Unit24]
 FileName=bulcommn.h
+CompileCpp=0
+Folder=adikted
+Compile=1
+Link=1
+Priority=1000
+OverrideBuildCmd=0
+BuildCmd=
+
+[Unit26]
+FileName=internal.h
 CompileCpp=0
 Folder=adikted
 Compile=1
@@ -288,16 +278,6 @@ OverrideBuildCmd=0
 BuildCmd=
 
 [Unit25]
-FileName=graffiti.h
-CompileCpp=0
-Folder=adikted
-Compile=1
-Link=1
-Priority=1000
-OverrideBuildCmd=0
-BuildCmd=
-
-[Unit27]
 FileName=bulcommn.c
 CompileCpp=0
 Folder=adikted
@@ -307,17 +287,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit28]
-FileName=internal.h
-CompileCpp=0
-Folder=adikted
-Compile=1
-Link=1
-Priority=1000
-OverrideBuildCmd=0
-BuildCmd=
-
-[Unit29]
+[Unit27]
 FileName=lev_data.h
 CompileCpp=0
 Folder=adikted
@@ -327,17 +297,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit10]
-FileName=obj_utils.c
-CompileCpp=0
-Folder=adikted
-Compile=1
-Link=1
-Priority=1000
-OverrideBuildCmd=0
-BuildCmd=
-
-[Unit30]
+[Unit28]
 FileName=lev_data.c
 CompileCpp=0
 Folder=adikted
@@ -347,7 +307,7 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit31]
+[Unit29]
 FileName=lev_files.h
 CompileCpp=0
 Folder=adikted
@@ -357,8 +317,108 @@ Priority=1000
 OverrideBuildCmd=0
 BuildCmd=
 
-[Unit32]
+[Unit30]
 FileName=lev_files.c
+CompileCpp=0
+Folder=adikted
+Compile=1
+Link=1
+Priority=1000
+OverrideBuildCmd=0
+BuildCmd=
+
+[Unit31]
+FileName=obj_things.h
+CompileCpp=0
+Folder=adikted
+Compile=1
+Link=1
+Priority=1000
+OverrideBuildCmd=0
+BuildCmd=
+
+[Unit32]
+FileName=obj_slabs.c
+CompileCpp=0
+Folder=adikted
+Compile=1
+Link=1
+Priority=1000
+OverrideBuildCmd=0
+BuildCmd=
+
+[Unit10]
+FileName=input_kb.c
+CompileCpp=0
+Folder=adikted
+Compile=1
+Link=1
+Priority=1000
+OverrideBuildCmd=0
+BuildCmd=
+
+[Unit11]
+FileName=input_kb.h
+CompileCpp=0
+Folder=adikted
+Compile=1
+Link=1
+Priority=1000
+OverrideBuildCmd=0
+BuildCmd=
+
+[Unit33]
+FileName=obj_slabs.h
+CompileCpp=0
+Folder=adikted
+Compile=1
+Link=1
+Priority=1000
+OverrideBuildCmd=0
+BuildCmd=
+
+[Unit34]
+FileName=obj_things.c
+CompileCpp=0
+Folder=adikted
+Compile=1
+Link=1
+Priority=1000
+OverrideBuildCmd=0
+BuildCmd=
+
+[Unit35]
+FileName=obj_column.h
+CompileCpp=0
+Folder=adikted
+Compile=1
+Link=1
+Priority=1000
+OverrideBuildCmd=0
+BuildCmd=
+
+[Unit36]
+FileName=obj_column.c
+CompileCpp=0
+Folder=adikted
+Compile=1
+Link=1
+Priority=1000
+OverrideBuildCmd=0
+BuildCmd=
+
+[Unit37]
+FileName=obj_actnpts.h
+CompileCpp=0
+Folder=adikted
+Compile=1
+Link=1
+Priority=1000
+OverrideBuildCmd=0
+BuildCmd=
+
+[Unit38]
+FileName=obj_actnpts.c
 CompileCpp=0
 Folder=adikted
 Compile=1

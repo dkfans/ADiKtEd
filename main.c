@@ -16,13 +16,6 @@ static void read_init(void);
  */
 int main(int argc, char **argv)
 {
-    char mapname[DISKPATH_SIZE];
-    // Do something else here
-#if defined(unix) && !defined(GO32)
-    filebase="levels";
-#else
-    filebase="levels";
-#endif
     // variable that informs if main program loop should finish
     finished=false;
     // say the clipboard is empty to start with
@@ -40,13 +33,12 @@ int main(int argc, char **argv)
     // random num gen seed selection
     srand(time(0));
     // Interpreting command line parameters
-    strcpy(mapname,"");
     if (argc>=2)
     {
         //Loading map
-        if (format_map_fname(mapname,argv[1]))
+        if (format_map_fname(lvl->fname,argv[1]))
         {
-          load_map(lvl,mapname);
+          load_map(lvl);
         } else
           start_new_map(lvl);
     } else
@@ -66,6 +58,12 @@ int main(int argc, char **argv)
 
 static void read_init(void)
 {
+    // Do something else here
+#if defined(unix) && !defined(GO32)
+    filebase="levels";
+#else
+    filebase="levels";
+#endif
     char buffer[READ_BUFSIZE];
     const char config_filename[]="map.ini";
     char *p;

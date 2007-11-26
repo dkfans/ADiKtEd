@@ -39,14 +39,23 @@
 #ifndef true
 #define true 1
 #endif
+#ifndef max
+#define max(a,b) ((a)>(b)?(a):(b))
+#endif
+#ifndef min
+#define min(a,b) ((a)<(b)?(a):(b))
+#endif
 
 // Buffer sizes
 
 #define DISKPATH_SIZE   256
-#define LINEMSG_SIZE    80
+#define LINEMSG_SIZE    160
 #define READ_BUFSIZE    256
 
 // File handling variables
 extern char *filebase;
+
+// 0 for high-low, 1 for low-high
+extern int datmode;
 
 #endif // ADIKT_GLOBALS_H

@@ -3,27 +3,40 @@ CFLAGS = -c -O -I.
 LINK = gcc
 LFLAGS =
 LIBS = -L. -lslang -lpc
-MAPOBJS = main.o file.o action.o screen.o graffiti.o internal.o \
-	dernc.o font.o
+RES  = 
+OBJ  = action.o dernc.o file.o graffiti.o internal.o main.o input_kb.o scr_help.o var_utils.o output_scr.o scr_level.o scr_thing.o graffiti_font.o bulcommn.o lev_data.o lev_files.o obj_slabs.o obj_things.o obj_column.o obj_actnpts.o $(RES)
+BIN  = map.exe
 
 all: map.exe
 
 .c.o:
 	$(CC) $(CFLAGS) $*.c
 
-map.exe: $(MAPOBJS) Makefile
-	 $(LINK) -o map $(MAPOBJS) $(LIBS)
-	 strip map
-	 coff2exe map
+$(BIN): $(OBJ) Makefile
+        $(LINK) -o map $(OBJ) $(LIBS)
+        strip map
+        coff2exe map
 
-dernc.o: dernc.c dernc.h
-main.o: main.c globals.h
-file.o: file.c globals.h
-action.o: action.c globals.h
-screen.o: screen.c globals.h
-graffiti.o: graffiti.c globals.h
-internal.o: internal.c globals.h
-font.o: font.c
+action.o: action.c
+dernc.o: dernc.c
+file.o: file.c
+graffiti.o: graffiti.c
+internal.o: internal.c
+main.o: main.c
+input_kb.o: input_kb.c
+scr_help.o: scr_help.c
+var_utils.o: var_utils.c
+output_scr.o: output_scr.c
+scr_level.o: scr_level.c
+scr_thing.o: scr_thing.c
+graffiti_font.o: graffiti_font.c
+bulcommn.o: bulcommn.c
+lev_data.o: lev_data.c
+lev_files.o: lev_files.c
+obj_slabs.o: obj_slabs.c
+obj_things.o: obj_things.c
+obj_column.o: obj_column.c
+obj_actnpts.o: obj_actnpts.c
 
 clean:
 	del *.o map.exe

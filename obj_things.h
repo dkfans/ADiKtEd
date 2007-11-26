@@ -1,56 +1,9 @@
 /*
- * obj_utils.h
+ * obj_things.h
  */
 
-#ifndef ADIKT_OBJUTILS_H
-#define ADIKT_OBJUTILS_H
-
-#include "lev_data.h"
-
-#define SLAB_TYPE_ROCK         0x00
-#define SLAB_TYPE_GOLD         0x01
-#define SLAB_TYPE_EARTH        0x02
-#define SLAB_TYPE_TORCHDIRT    0x03
-#define SLAB_TYPE_DRAPE        0x04
-#define SLAB_TYPE_TORCHWALL    0x05
-#define SLAB_TYPE_WALLWTWINS   0x06
-#define SLAB_TYPE_WALLWWOMAN   0x07
-#define SLAB_TYPE_WALLPAIRSHR  0x08
-#define SLAB_TYPE_PATH         0x0a
-#define SLAB_TYPE_CLAIMED      0x0b
-#define SLAB_TYPE_LAVA         0x0c
-#define SLAB_TYPE_WATER        0x0d
-#define SLAB_TYPE_PORTAL       0x0e
-#define SLAB_TYPE_TREASURE     0x10
-#define SLAB_TYPE_LIBRARY      0x12
-#define SLAB_TYPE_PRISONCASE   0x14
-#define SLAB_TYPE_TORTURE      0x16
-#define SLAB_TYPE_TRAINING     0x18
-#define SLAB_TYPE_DUNGHEART    0x1a
-#define SLAB_TYPE_WORKSHOP     0x1c
-#define SLAB_TYPE_SCAVENGER    0x1e
-#define SLAB_TYPE_TEMPLE       0x20
-#define SLAB_TYPE_GRAVEYARD    0x22
-#define SLAB_TYPE_HATCHERY     0x24
-#define SLAB_TYPE_LAIR         0x26
-#define SLAB_TYPE_BARRACKS     0x28
-#define SLAB_TYPE_DOORWOOD1    0x2a
-#define SLAB_TYPE_DOORWOOD2    0x2b
-#define SLAB_TYPE_DOORBRACE1   0x2c
-#define SLAB_TYPE_DOORBRACE2   0x2d
-#define SLAB_TYPE_DOORIRON1    0x2e
-#define SLAB_TYPE_DOORIRON2    0x2f
-#define SLAB_TYPE_DOORMAGIC1   0x30
-#define SLAB_TYPE_DOORMAGIC2   0x31
-#define SLAB_TYPE_BRIDGE       0x33
-#define SLAB_TYPE_GEMS         0x34
-#define SLAB_TYPE_GUARDPOST    0x35
-
-#define SLAB_WIB_STATIC        0x00
-#define SLAB_WIB_SKEW          0x01
-#define SLAB_WIB_ANIMATE       0x02
-
-#define OWNERS_COUNT           6
+#ifndef ADIKT_OBJTHINGS_H
+#define ADIKT_OBJTHINGS_H
 
 #define THING_TYPE_ITEM        0x01
 #define THING_TYPE_CREATURE    0x05
@@ -82,17 +35,19 @@
 #define ITEM_SUBTYPE_SPELLSPDC 0x15
 #define ITEM_SUBTYPE_SPELLPROT 0x16
 #define ITEM_SUBTYPE_SPELLCONC 0x17
+
 #define ITEM_SUBTYPE_NULL1     0x18
 #define ITEM_SUBTYPE_NULL2     0x19
+
 #define ITEM_SUBTYPE_ANVIL     0x1a
 #define ITEM_SUBTYPE_PRISONBAR 0x1b
 #define ITEM_SUBTYPE_CANDLSTCK 0x1c //candle with candlestick
 #define ITEM_SUBTYPE_GRAVSTONE 0x1d
 #define ITEM_SUBTYPE_STATUHORN 0x1e
 #define ITEM_SUBTYPE_TRAINPOST 0x1f
-
 #define ITEM_SUBTYPE_TORTSPIKE 0x20
 #define ITEM_SUBTYPE_TEMPLESPN 0x21 //Temple Spangle
+
 #define ITEM_SUBTYPE_POTION1   0x22
 #define ITEM_SUBTYPE_POTION2   0x23
 #define ITEM_SUBTYPE_POTION3   0x24
@@ -212,27 +167,136 @@
 #define ITEM_CATEGR_PWHNDEFFCT 0x0a
 #define ITEM_CATEGR_LIGHTS     0x0b
 
+#define ROOMEFC_SUBTP_UNKN1    0x01
 #define ROOMEFC_SUBTP_DRIPWTR  0x02
 #define ROOMEFC_SUBTP_ROCKFAL  0x03
 #define ROOMEFC_SUBTP_ENTRICE  0x04
 #define ROOMEFC_SUBTP_DRYICE   0x05
 
-extern short is_spellbook(unsigned char *thing);
-extern short is_action_thing(unsigned char *thing);
-extern short is_room_thing (unsigned char *thing);
-extern int get_item_category(unsigned char stype_idx);
-extern short slab_is_central(LEVEL *lvl,int x,int y);
-extern int slab_default_wbi_entry(unsigned char slab_type);
-extern int slab_siblings_oftype(LEVEL *lvl,int x,int y,unsigned char slab_type);
+#define TRAP_SUBTYPE_BOULDER   0x01
+#define TRAP_SUBTYPE_ALARM     0x02
+#define TRAP_SUBTYPE_GAS       0x03
+#define TRAP_SUBTYPE_LIGHTNG   0x04
+#define TRAP_SUBTYPE_WORDPWR   0x05
+#define TRAP_SUBTYPE_LAVA      0x06
+#define TRAP_SUBTYPE_DUMMY     0x07
 
-extern char *get_thing_type_fullname(unsigned char type_idx);
-extern char *get_item_subtype_fullname(unsigned char stype_idx);
-extern char *get_item_subtype_shortname(unsigned char stype_idx);
-extern char *get_creature_subtype_fullname(unsigned char stype_idx);
-extern char *get_creature_subtype_shortname(unsigned char stype_idx);
-extern char *get_trap_subtype_fullname(unsigned char stype_idx);
-extern char *get_door_subtype_fullname(unsigned char stype_idx);
-extern char *get_owner_type_fullname(unsigned char type_idx);
-extern char *get_item_category_fullname(unsigned char stype_idx);
+#define CREATR_SUBTP_WIZRD     0x01
+#define CREATR_SUBTP_BARBARIN  0x02
+#define CREATR_SUBTP_ARCHER    0x03
+#define CREATR_SUBTP_MONK      0x04
+#define CREATR_SUBTP_DWAFT     0x05
+#define CREATR_SUBTP_KNIGHT    0x06
+#define CREATR_SUBTP_AVATAR    0x07
+#define CREATR_SUBTP_TUNELER   0x08
+#define CREATR_SUBTP_WITCH     0x09
+#define CREATR_SUBTP_GIANT     0x0A
+#define CREATR_SUBTP_FAIRY     0x0B
+#define CREATR_SUBTP_THEFT     0x0C
+#define CREATR_SUBTP_SMURI     0x0D
+#define CREATR_SUBTP_REAPER    0x0E
+#define CREATR_SUBTP_SKELETON  0x0F
+#define CREATR_SUBTP_TROLL     0x10
+#define CREATR_SUBTP_DRAGON    0x11
+#define CREATR_SUBTP_SPAWN     0x12
+#define CREATR_SUBTP_FLY       0x13
+#define CREATR_SUBTP_MISTRESS  0x14
+#define CREATR_SUBTP_WARLOCK   0x15
+#define CREATR_SUBTP_BILEDEMN  0x16
+#define CREATR_SUBTP_IMP       0x17
+#define CREATR_SUBTP_BEETLE    0x18
+#define CREATR_SUBTP_VAMPIRE   0x19
+#define CREATR_SUBTP_SPIDER    0x1A
+#define CREATR_SUBTP_HOUND     0x1B
+#define CREATR_SUBTP_GHOST     0x1C
+#define CREATR_SUBTP_TENTCL    0x1D
+#define CREATR_SUBTP_ORC       0x1E
+#define CREATR_SUBTP_FLOAT     0x1F
 
-#endif // ADIKT_OBJUTILS_H
+#define DOOR_SUBTYPE_WOOD      0x01
+#define DOOR_SUBTYPE_BRACED    0x02
+#define DOOR_SUBTYPE_IRON      0x03
+#define DOOR_SUBTYPE_MAGIC     0x04
+
+#define TRAP_SUBTYPE_BOULDER   0x01
+#define TRAP_SUBTYPE_ALARM     0x02
+#define TRAP_SUBTYPE_POISONG   0x03
+#define TRAP_SUBTYPE_LIGHTNG   0x04
+#define TRAP_SUBTYPE_WRDOFPW   0x05
+#define TRAP_SUBTYPE_LAVA      0x06
+#define TRAP_SUBTYPE_DUMMY2    0x07
+#define TRAP_SUBTYPE_DUMMY3    0x08
+#define TRAP_SUBTYPE_DUMMY4    0x09
+#define TRAP_SUBTYPE_DUMMY5    0x0A
+#define TRAP_SUBTYPE_DUMMY6    0x0B
+#define TRAP_SUBTYPE_DUMMY7    0x0C
+
+struct LEVEL;
+
+unsigned char get_thing_type(unsigned char *thing);
+short set_thing_type(unsigned char *thing,unsigned char type_idx);
+unsigned char get_thing_subtype(unsigned char *thing);
+short set_thing_subtype(unsigned char *thing,unsigned char stype_idx);
+unsigned char get_thing_owner(unsigned char *thing);
+short set_thing_owner(unsigned char *thing,unsigned char plyr_idx);
+
+unsigned char get_thing_tilepos_x(unsigned char *thing);
+short set_thing_tilepos_x(unsigned char *thing,unsigned char pos_x);
+unsigned char get_thing_tilepos_y(unsigned char *thing);
+short set_thing_tilepos_y(unsigned char *thing,unsigned char pos_y);
+char get_thing_tilepos_h(unsigned char *thing);
+short set_thing_tilepos_h(unsigned char *thing,char pos_h);
+short set_thing_tilepos(unsigned char *thing,unsigned char pos_x,unsigned char pos_y);
+char get_thing_subtpos_x(unsigned char *thing);
+short set_thing_subtpos_x(unsigned char *thing,char pos_x);
+char get_thing_subtpos_y(unsigned char *thing);
+short set_thing_subtpos_y(unsigned char *thing,char pos_y);
+char get_thing_subtpos_h(unsigned char *thing);
+short set_thing_subtpos_h(unsigned char *thing,char pos_h);
+short set_thing_subtpos(unsigned char *thing,char pos_x,char pos_y);
+
+unsigned char *create_thing_empty();
+unsigned char *create_thing(unsigned int tx, unsigned int ty);
+unsigned char *create_item(unsigned int tx, unsigned int ty, unsigned char stype_idx);
+unsigned char *create_roomeffect(unsigned int tx, unsigned int ty, unsigned char stype_idx);
+unsigned char *create_creature(unsigned int tx, unsigned int ty, unsigned char stype_idx);
+unsigned char *create_trap(unsigned int tx, unsigned int ty, unsigned char stype_idx);
+unsigned char *create_door(unsigned int tx, unsigned int ty, unsigned char stype_idx);
+
+short is_spellbook(unsigned char *thing);
+unsigned char get_spellbook_next(unsigned char stype_idx);
+unsigned char get_spellbook_prev(unsigned char stype_idx);
+short is_dngspecbox(unsigned char *thing);
+unsigned char get_dngspecbox_next(unsigned char stype_idx);
+unsigned char get_dngspecbox_prev(unsigned char stype_idx);
+short is_crtrlair(unsigned char *thing);
+unsigned char get_crtrlair_next(unsigned char stype_idx);
+unsigned char get_crtrlair_prev(unsigned char stype_idx);
+short is_trapbox(unsigned char *thing);
+unsigned char get_trapbox_next(unsigned char stype_idx);
+unsigned char get_trapbox_prev(unsigned char stype_idx);
+short is_trap(unsigned char *thing);
+unsigned char get_trap_next(unsigned char stype_idx);
+unsigned char get_trap_prev(unsigned char stype_idx);
+short is_creature(unsigned char *thing);
+unsigned char get_creature_next(unsigned char stype_idx);
+unsigned char get_creature_prev(unsigned char stype_idx);
+short is_door(unsigned char *thing);
+short is_roomeffect(unsigned char *thing);
+unsigned char get_roomeffect_next(unsigned char stype_idx);
+unsigned char get_roomeffect_prev(unsigned char stype_idx);
+
+short is_room_thing (unsigned char *thing);
+int get_item_category(unsigned char stype_idx);
+
+char *get_thing_type_fullname(unsigned char type_idx);
+char *get_thing_type_shortname(unsigned char type_idx);
+char *get_item_subtype_fullname(unsigned char stype_idx);
+char *get_item_subtype_shortname(unsigned char stype_idx);
+char *get_creature_subtype_fullname(unsigned char stype_idx);
+char *get_creature_subtype_shortname(unsigned char stype_idx);
+char *get_trap_subtype_fullname(unsigned char stype_idx);
+char *get_door_subtype_fullname(unsigned char stype_idx);
+char *get_item_category_fullname(unsigned char stype_idx);
+
+#endif // ADIKT_OBJTHINGS_H

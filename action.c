@@ -9,29 +9,35 @@
 
 #include "globals.h"
 #include "lev_data.h"
-#include "obj_utils.h"
+#include "obj_slabs.h"
+#include "obj_things.h"
+#include "obj_actnpts.h"
 #include "input_kb.h"
 #include "scr_help.h"
+#include "scr_level.h"
 #include "internal.h"
 
 void proc_key(void);
 
 static void slbactions (int key);
 static void creatureactions (int key);
-static int cursor_actions (int key);
+static void itemtypeactions (int key);
+static short cursor_actions (int key);
 static void tngactions (int key);
 static void clmactions (int key);
 static void helpactions (int key);
 static void slb_place_room (unsigned char room);
-static void start_help (void);
-static void end_help (void);
+void start_help(void);
+void end_help(void);
+void start_list(void);
+void end_list(void);
 static void slbposcheck(void);
 static void curposcheck (void);
 static void (*actions [])(int)={slbactions, tngactions, 
-    creatureactions, helpactions, clmactions};
+    creatureactions, itemtypeactions, helpactions, clmactions};
 static void change_ownership (unsigned char purchaser);
 
-const char *modenames[]={"Slab", "Thing", "+body", "Help", "Clm"};
+const char *modenames[]={"Slab", "Thing", "+body", "Item", "Help", "Clm"};
 
 // indicates if the main program loop should end
 short finished;
@@ -61,8 +67,6 @@ int sx=1, sy=1;
 
 //Clipboard
 char tngclipboard[TNGCLIPBRD_SIZE];
-//Creature input buffer
-char creatinput[5];
 
 /*
  * Gets and processes a key stroke.
@@ -70,7 +74,6 @@ char creatinput[5];
 void proc_key (void) 
 {
     static char usrinput[80];
-    static char mapname[DISKPATH_SIZE];
     unsigned int g;
     g = get_key();
     // Decoding "universal keys" - global actions
@@ -83,20 +86,20 @@ void proc_key (void)
         start_help();
         break;
     case KEY_CTRL_Q:
-      if ((mode!=MD_HELP)&&(mode!=MD_CRTR))
+      if ((mode!=MD_HELP)&&(mode!=MD_CRTR)&&(mode!=MD_ITMT))
           finished=true;
       else
-        actions[mode](17); // Grotty but it'll work
+        actions[mode](KEY_CTRL_Q); // Grotty but it'll work
       break;
     case KEY_CTRL_L:
       if (get_str ("Enter map number/name to load: ", usrinput))
       {
         message_info_force("Loading map...");
-        if (format_map_fname(mapname,usrinput))
+        if (format_map_fname(lvl->fname,usrinput))
         {
           free_map();
-          load_map(lvl,mapname);
-          message_info("Map \"%s\" loaded", mapname);
+          load_map(lvl);
+          message_info("Map \"%s\" loaded", lvl->fname);
         } else
           message_error("Map loading cancelled");
       } else
@@ -105,15 +108,15 @@ void proc_key (void)
       }
       break;
     case KEY_CTRL_S:
-      if ((mode==MD_HELP) || (mode==MD_CRTR))
+      if ((mode==MD_HELP) || (mode==MD_CRTR) || (mode==MD_ITMT))
         break;
       if (get_str("Enter map number/name to save: ", usrinput))
       {
         message_info_force("Saving map...");
-        if (format_map_fname(mapname,usrinput))
+        if (format_map_fname(lvl->fname,usrinput))
         {
-          save_map(lvl,mapname);
-          message_info("Map \"%s\" saved", mapname);
+          save_map(lvl);
+          message_info("Map \"%s\" saved", lvl->fname);
         } else
           message_error("Map saving cancelled");
       } else
@@ -144,19 +147,19 @@ static void helpactions(int key)
 {
     switch (key)
     {
-      case KEY_UP:
+    case KEY_UP:
       helpy--;
       break;
-      case KEY_DOWN:
-        helpy++;
+    case KEY_DOWN:
+      helpy++;
       break;
-      case KEY_PGUP:
+    case KEY_PGUP:
       helpy-=rows-1;
       break;
-      case KEY_PGDOWN:
+    case KEY_PGDOWN:
       helpy+=rows-1;
       break;
-      default:
+    default:
       end_help();
     }
     if (helpy+rows > helprows)
@@ -221,222 +224,263 @@ static void tngactions(int key)
           break;
         case 'c':
           mode=MD_CRTR;
-          strcpy (creatinput, "");
-          message_info_force("Creature number: ");
+          start_list();
+          break;
+        case 'i':
+          mode=MD_ITMT;
+          start_list();
           break;
         case 'b' :
-          thing = create_object(cx, cy, ITEM_SUBTYPE_SPELLHOE);
+          thing = create_item(cx, cy, ITEM_SUBTYPE_SPELLHOE);
           thing_add(lvl,thing);
-          vistng[sx][sy]=lvl->tng_subnums[cx][cy]-1;
+          vistng[sx][sy]=get_thing_subnums(lvl,cx,cy)-1;
           break;
         case 'h' : // Add Dungeon heart
-          thing = create_object (cx, cy, ITEM_SUBTYPE_DNHEART);
-          thing[5]=3; // Raise it up a bit
+          thing = create_item (cx, cy, ITEM_SUBTYPE_DNHEART);
+          set_thing_tilepos_h(thing,3); // Raise it up a bit
           thing_add(lvl,thing);
-          vistng[sx][sy]=lvl->tng_subnums[cx][cy]-1;
+          vistng[sx][sy]=get_thing_subnums(lvl,cx,cy)-1;
           break;
         case 'H' : // Add hero gate
-          thing = create_object (cx, cy, ITEM_SUBTYPE_HEROGATE);
-          thing[8]=4;
+          thing = create_item (cx, cy, ITEM_SUBTYPE_HEROGATE);
+          set_thing_owner(thing,4);
           thing_add(lvl,thing);
           //Hero gate number
           lvl->stats.hero_gates_count++;
-          thing[14]=(char)-lvl->stats.hero_gates_count;
-          vistng[sx][sy]=lvl->tng_subnums[cx][cy]-1;
+          thing[14]=(char)(-lvl->stats.hero_gates_count);
+          vistng[sx][sy]=get_thing_subnums(lvl,cx,cy)-1;
           break;
         case 'a' : // Add action point
-          thing = create_action_point (cx, cy);
-          thing_add(lvl,thing);
+          thing = create_actnpt(cx, cy);
+          actnpt_add(lvl,thing);
           message_info_force("Added action point %d",(thing[20]<<8)+thing[19]);
-          vistng[sx][sy]=lvl->tng_subnums[cx][cy]-1;
+          vistng[sx][sy]=get_thing_subnums(lvl,cx,cy)-1;
           break;
         case 'k' : // Copy thing to clipboard
-          if (vistng[sx][sy] < lvl->tng_subnums[cx][cy])
           {
-            thing = lvl->tng_lookup [cx][cy][vistng[sx][sy]];
-            if (thing[6]==0xff) // Action point
+            short obj_type=get_object_type(lvl,cx,cy,vistng[sx][sy]);
+            switch (obj_type)
             {
-            message_error("Can't copy action points to clipboard.");
-                break;
+            case OBJECT_TYPE_THING:
+              thing=get_object(lvl,cx,cy,vistng[sx][sy]);
+              memcpy (tngclipboard, thing+4, 17);
+              message_info("Object now in clipboard.");
+              break;
+            case OBJECT_TYPE_ACTNPT:
+              message_error("Can't copy action points to clipboard.");
+              break;
+            default:
+              message_error("Can't copy to clipboard: nothing selected.");
+              break;
             }
-            memcpy (tngclipboard, thing+4, 17);
-          }
-          else
-          {
-            message_error("Can't copy to clipboard: nothing selected.");
-          }
-          break;
+          };break;
         case 'y' : // Create thing from clipboard
           if (tngclipboard[2])
           {
             thing = create_thing (cx, cy);
             memcpy (thing+4, tngclipboard, 17);
             // Make sure the coordinates are preserved for objects
-            if (thing[2]==1)
+            if (get_thing_subtpos_y(thing)==1)
             {
                 thing[12]=(MAP_SIZE_X*(mapy+screeny)+(mapx+screenx)) >> 8;
                 thing[11]=((MAP_SIZE_X*(mapy+screeny)+(mapx+screenx)) & 255);
             }
             thing_add(lvl,thing);
-            vistng[sx][sy]=lvl->tng_subnums[cx][cy]-1;
+            vistng[sx][sy]=get_thing_subnums(lvl,cx,cy)-1;
           } else
           {
             message_error("Can't create thing: clipboard is empty.");
-          }
-          break;
+          };break;
         case 'u' : // Update all things
           create_clmdattng();
           break;
         case 'l' : // Lock / unlock a door
-          if (vistng[sx][sy] < lvl->tng_subnums[cx][cy])
           {
-            thing = lvl->tng_lookup [cx][cy][vistng[sx][sy]];
-            if (thing[6]==9)
-                thing[14]=1-thing[14];
-            if ((lvl->slb[cx/3][cy/3]&0xfe) == thing[7]*2+40) // Update the slab
-                lvl->slb[cx/3][cy/3] = thing[7]*2+40+thing[14];
-          }
-          break;
+            short obj_type=get_object_type(lvl,cx,cy,vistng[sx][sy]);
+            switch (obj_type)
+            {
+            case OBJECT_TYPE_THING:
+              thing=get_object(lvl,cx,cy,vistng[sx][sy]);
+              if (get_thing_type(thing)==THING_TYPE_DOOR)
+                  thing[14]=1-thing[14];
+              break;
+            default:
+              break;
+            }
+            if ((lvl->slb[cx/MAP_SUBNUM_Y][cy/MAP_SUBNUM_Y]&0xfe) == get_thing_subtype(thing)*2+40) // Update the slab
+                lvl->slb[cx/MAP_SUBNUM_Y][cy/MAP_SUBNUM_Y] = get_thing_subtype(thing)*2+40+thing[14];
+          };break;
         case 'd': // Dungeon special
-          thing = create_object (cx, cy, 0x56);
+          thing = create_item (cx, cy, ITEM_SUBTYPE_SPREVMAP);
           thing_add(lvl,thing);
-          vistng[sx][sy]=lvl->tng_subnums[cx][cy]-1;
+          vistng[sx][sy]=get_thing_subnums(lvl,cx,cy)-1;
           break;
         case 'g': // Gold
-          thing = create_object (cx, cy, 3);
+          thing = create_item (cx, cy, ITEM_SUBTYPE_GOLDCHEST);
           thing_add(lvl,thing);
-          vistng[sx][sy]=lvl->tng_subnums[cx][cy]-1;
+          vistng[sx][sy]=get_thing_subnums(lvl,cx,cy)-1;
           break;
         case 'G': // Gold
-          thing = create_object (cx, cy, 6);
+          thing = create_item (cx, cy, ITEM_SUBTYPE_GOLD);
           thing_add(lvl,thing);
-          vistng[sx][sy]=lvl->tng_subnums[cx][cy]-1;
+          vistng[sx][sy]=get_thing_subnums(lvl,cx,cy)-1;
+          break;
+        case 'e': // Add room effect
+          thing = create_roomeffect(cx, cy, ROOMEFC_SUBTP_DRIPWTR);
+          thing_add(lvl,thing);
+          vistng[sx][sy]=get_thing_subnums(lvl,cx,cy)-1;
           break;
         case 'o' : // Change ownership of creature/trap/special/spell
-          if (vistng[sx][sy] < lvl->tng_subnums[cx][cy])
           {
-            thing = lvl->tng_lookup [cx][cy][vistng[sx][sy]];
-            thing[8]++;
-            if (thing[8]==6)
-                thing[8]=0;
-          }
-          break;
+            short obj_type=get_object_type(lvl,cx,cy,vistng[sx][sy]);
+            switch (obj_type)
+            {
+            case OBJECT_TYPE_THING:
+              thing = get_object(lvl,cx,cy,vistng[sx][sy]);
+              set_thing_owner(thing,get_player_next(get_thing_owner(thing)));
+              break;
+            default:
+              message_error("Can't change owner: no \"thing\" selected.");
+              break;
+            }
+          };break;
         case 'S' : // Change type of creature
-          if (vistng[sx][sy] < lvl->tng_subnums[cx][cy])
           {
-            thing = lvl->tng_lookup [cx][cy][vistng[sx][sy]];
-            if (thing[6]!=5)
-                break;
-            thing[7]++;
-            if (thing[7]>=32)
-                thing[7]=1;
-          }
-          break;
+            short obj_type=get_object_type(lvl,cx,cy,vistng[sx][sy]);
+            switch (obj_type)
+            {
+            case OBJECT_TYPE_THING:
+              thing = get_object(lvl,cx,cy,vistng[sx][sy]);
+              if (!is_creature(thing)) break;
+              set_thing_subtype(thing,get_creature_next(get_thing_subtype(thing)));
+              break;
+            default:
+              message_error("Can't change type: no \"thing\" selected.");
+              break;
+            }
+          };break;
         case 'X' : // Change type of creature
-          if (vistng[sx][sy] < lvl->tng_subnums[cx][cy])
           {
-            thing = lvl->tng_lookup [cx][cy][vistng[sx][sy]];
-            if (thing[6]!=5)
-                break;
-            thing[7]--;
-            if (thing[7]<=0)
-                thing[7]=31;
-          }
-          break;
-        case 's' : // Change level of creature/trap/special/spell
-          if (vistng[sx][sy] < lvl->tng_subnums[cx][cy])
+            short obj_type=get_object_type(lvl,cx,cy,vistng[sx][sy]);
+            switch (obj_type)
+            {
+            case OBJECT_TYPE_THING:
+              thing = get_object(lvl,cx,cy,vistng[sx][sy]);
+              if (!is_creature(thing)) break;
+              set_thing_subtype(thing,get_creature_prev(get_thing_subtype(thing)));
+              break;
+            default:
+              message_error("Can't change type: no \"thing\" selected.");
+              break;
+            }
+          };break;
+        case 's' : // Change level of creature/trap/special/spell/lair/room efct
           {
-            thing = lvl->tng_lookup [cx][cy][vistng[sx][sy]];
-            if ((thing[6]==THING_TYPE_CREATURE) && (thing[14]<9))
-                thing[14]++;
-            if ((thing[6]==THING_TYPE_TRAP) && (thing[7]<6))
-                thing[7]++;
-            if ((thing[6]==THING_TYPE_ITEM) && (thing[7]>=0x56) && (thing[7]<=0x5d))
+            short obj_type=get_object_type(lvl,cx,cy,vistng[sx][sy]);
+            switch (obj_type)
             {
-                thing[7]++;
-                if (thing[7]==0x5e)
-                  thing[7]=0x56;
+            case OBJECT_TYPE_THING:
+              thing = get_object(lvl,cx,cy,vistng[sx][sy]);
+              if ((get_thing_type(thing)==THING_TYPE_CREATURE) && (thing[14]<9))
+                  thing[14]++;
+              else
+              if (is_trap(thing))
+                  set_thing_subtype(thing,get_trap_next(get_thing_subtype(thing)));
+              else
+              if (is_dngspecbox(thing))
+                  set_thing_subtype(thing,get_dngspecbox_next(get_thing_subtype(thing)));
+              else
+              if (is_spellbook(thing))
+                  set_thing_subtype(thing,get_spellbook_next(get_thing_subtype(thing)));
+              else
+              if (is_trapbox(thing))
+                  set_thing_subtype(thing,get_trapbox_next(get_thing_subtype(thing)));
+              else
+              if (is_crtrlair(thing))
+                  set_thing_subtype(thing,get_crtrlair_next(get_thing_subtype(thing)));
+              else
+              if (is_roomeffect(thing))
+                  set_thing_subtype(thing,get_roomeffect_next(get_thing_subtype(thing)));
+              else
+                  message_error("This item has no level nor type.");
+              break;
+            default:
+              message_error("Can't change level: no thing selected.");
+              break;
             }
-            if (is_spellbook(thing))
-            {
-                thing[7]++;
-                if (thing[7]==0x18)
-                  thing[7]=0x2d;
-                if (thing[7]==0x31)
-                  thing[7]=0x86;
-                if (thing[7]==0x87)
-                  thing[7]=0xb;
-            }
-            if (thing[6]==1 && thing[7]>=0x5e && thing[7] <= 0x63)
-            {
-                thing[7]++;
-                if (thing[7]==0x64)
-                  thing[7]=0x5e;
-            }
-          }
-          break;
-        case 'x' : // Change level of creature/trap/special/spell
-          if (vistng[sx][sy] < lvl->tng_subnums[cx][cy])
+          };break;
+        case 'x' : // Change level of creature/trap/special/spell/lair/room efct
           {
-            thing = lvl->tng_lookup [cx][cy][vistng[sx][sy]];
-            if (thing[6]==5 && thing[14])
-                thing[14]--;
-            if (thing[6]==8 && thing[7]>1)
-                thing[7]--;
-            if (thing[6]==1 && thing[7]>=0x54 && thing[7]<=0x5d)
+            short obj_type=get_object_type(lvl,cx,cy,vistng[sx][sy]);
+            switch (obj_type)
             {
-                thing[7]--;
-                if (thing[7]==0x55)
-                  thing[7]=0x5d;
+            case OBJECT_TYPE_THING:
+              thing = get_object(lvl,cx,cy,vistng[sx][sy]);
+              if ((get_thing_type(thing)==THING_TYPE_CREATURE) && (thing[14]>0))
+                  thing[14]--;
+              else
+              if (is_trap(thing))
+                  set_thing_subtype(thing,get_trap_prev(get_thing_subtype(thing)));
+              else
+              if (is_dngspecbox(thing))
+                  set_thing_subtype(thing,get_dngspecbox_prev(get_thing_subtype(thing)));
+              else
+              if (is_spellbook(thing))
+                  set_thing_subtype(thing,get_spellbook_prev(get_thing_subtype(thing)));
+              else
+              if (is_trapbox(thing))
+                  set_thing_subtype(thing,get_trapbox_prev(get_thing_subtype(thing)));
+              else
+              if (is_crtrlair(thing))
+                  set_thing_subtype(thing,get_crtrlair_prev(get_thing_subtype(thing)));
+              else
+              if (is_roomeffect(thing))
+                  set_thing_subtype(thing,get_roomeffect_prev(get_thing_subtype(thing)));
+              else
+                  message_error("This item has no level nor type.");
+              break;
+            default:
+              message_error("Can't change level: no thing selected.");
+              break;
             }
-            if (is_spellbook(thing))
-            {
-                thing[7]--;
-                if (thing[7]==0x2c)
-                  thing[7]=0x17;
-                if (thing[7]==0xa)
-                  thing[7]=0x86;
-                if (thing[7]==0x85)
-                  thing[7]=0x30;
-            }
-            if ((thing[6]==THING_TYPE_ITEM) && thing[7]>=0x5e && thing[7] <= 0x63)
-            {
-                thing[7]--;
-                if (thing[7]==0x5d)
-                  thing[7]=0x63;
-            }
-          }
-          break;
+          };break;
         case 't' : // Create trap
-          thing = create_object (cx, cy, 1);
-          thing[6]=8; // Make it a trap
+          thing = create_trap (cx, cy, TRAP_SUBTYPE_BOULDER);
           thing_add(lvl,thing);
-          vistng[sx][sy]=lvl->tng_subnums[cx][cy]-1;
+          vistng[sx][sy]=get_thing_subnums(lvl,cx,cy)-1;
           break;
         case 'T' : // Create trap box
-          thing = create_object (cx, cy, 0x5e);
+          thing = create_item (cx, cy, ITEM_SUBTYPE_TBBOULDER);
           thing_add(lvl,thing);
-          vistng[sx][sy]=lvl->tng_subnums[cx][cy]-1;
+          vistng[sx][sy]=get_thing_subnums(lvl,cx,cy)-1;
           break;
         case '/' : // Cycle through highlighted things
-          if (lvl->tng_subnums[cx][cy])
-            vistng[sx][sy]=(vistng[sx][sy]+1)%(lvl->tng_subnums[cx][cy]);
-          break;
-        case 127 : // delete
-          if (vistng[sx][sy] < lvl->tng_subnums[cx][cy])
           {
-            if (is_action_point (cx, cy, vistng[sx][sy]))
-            message_info_force("Action point deleted");
-            else
-            message_info_force("Thing deleted");
-            thing_del(lvl,cx, cy, vistng[sx][sy]);
-            vistng[sx][sy]--;
-            if (vistng[sx][sy]<0)
-                vistng[sx][sy]=0;
-          }
-          break;
+          unsigned int obj_num=get_object_subnums(lvl,cx,cy);
+          if (obj_num > 0)
+            vistng[sx][sy]=(vistng[sx][sy]+1)%(obj_num);
+          };break;
+        case KEY_DEL: // delete
+          {
+            short obj_type=get_object_type(lvl,cx,cy,vistng[sx][sy]);
+            switch (obj_type)
+            {
+            case OBJECT_TYPE_ACTNPT:
+              object_del(lvl,cx, cy, vistng[sx][sy]);
+              message_info_force("Action point deleted.");
+              break;
+            case OBJECT_TYPE_THING:
+              object_del(lvl,cx, cy, vistng[sx][sy]);
+              message_info_force("Thing deleted.");
+              break;
+            default:
+              message_error("Nothing to delete.");
+              break;
+            }
+            if (vistng[sx][sy]>0) vistng[sx][sy]--;
+          };break;
         default:
-        message_info("Unrecognized tng key code: %d",key);
+          message_info("Unrecognized tng key code: %d",key);
           speaker_beep();
       }
     }
@@ -500,10 +544,55 @@ static void clmactions (int key)
           create_clmdattng();
           break;
         default:
-        message_info("Unrecognized clm key code: %d",key);
+          message_info("Unrecognized clm key code: %d",key);
           speaker_beep();
       }
     }
+}
+
+/*
+ * Covers actions from all screens with numbered list.
+ */
+short list_actions(int key)
+{
+    int num_rows=numbered_list_items/numbered_list_cols
+                        + ((numbered_list_items%numbered_list_cols)>0);
+    switch (key)
+    {
+    case KEY_UP:
+      numbered_list_pos--;
+      break;
+    case KEY_DOWN:
+      numbered_list_pos++;
+      break;
+    case KEY_LEFT:
+      numbered_list_pos-=numbered_list_items/numbered_list_cols
+                        + ((numbered_list_items%numbered_list_cols)>0);
+      break;
+    case KEY_RIGHT:
+      numbered_list_pos+=numbered_list_items/numbered_list_cols
+                        + ((numbered_list_items%numbered_list_cols)>0);
+      break;
+    case KEY_PGUP:
+      numbered_list_pos-=rows-1;
+      break;
+    case KEY_PGDOWN:
+      numbered_list_pos+=rows-1;
+      break;
+    default:
+      return false;
+    }
+    if (numbered_list_pos >= numbered_list_items)
+      numbered_list_pos=numbered_list_items-1;
+    if (numbered_list_pos<0) numbered_list_pos=0;
+    //Compute the row where selected item is
+    int curr_row=numbered_list_pos%num_rows;
+    if (numbered_list_y>curr_row) numbered_list_y=curr_row;
+    if (numbered_list_y+rows<curr_row+1) numbered_list_y=curr_row-rows+1;
+    if (numbered_list_y+rows > num_rows+1)
+      numbered_list_y=num_rows-rows+1;
+    if (numbered_list_y<0) numbered_list_y=0;
+    return true;
 }
 
 /*
@@ -511,67 +600,65 @@ static void clmactions (int key)
  */
 static void creatureactions(int key)
 {
-    int l;
-    unsigned char *monster;
-    
-    l = strlen (creatinput);
-    switch (key)
+    unsigned char *thing;
+    if (!list_actions(key))
     {
-    case '0':
-    case '1':
-    case '2':
-    case '3':
-    case '4':
-    case '5':
-    case '6':
-    case '7':
-    case '8':
-    case '9':
-      if (l<2)
+      switch (key)
       {
-        creatinput[l]=key;
-        creatinput[l+1]=0;
-      }      else
-      {
+        case KEY_TAB:
+        case KEY_DEL:
+          message_info("Adding creature cancelled");
+          mode=MD_TNG;
+          break;
+        case KEY_ENTER:
+          thing = create_creature((mapx+screenx)*3+sx, (mapy+screeny)*3+sy,numbered_list_pos+1);
+          thing[5]=1;
+          thing[6]=5;
+          thing[8]=lvl->own[mapx+screenx][mapy+screeny];
+          thing_add(lvl,thing);
+          // Show the new thing
+          vistng[sx][sy]=get_thing_subnums(lvl,(mapx+screenx)*3+sx,(mapy+screeny)*3+sy)-1;
+          end_list();
+          message_info("Creature added");
+          mode=MD_TNG;
+          break;
+        default:
+          message_info("Unrecognized item key code: %d",key);
           speaker_beep();
       }
-      break;
-    case KEY_BACKSP:
-    case KEY_DEL:
-      if (l)
-        creatinput [l-1]=0;
-      break;
-    case KEY_ENTER:
-      l = atoi (creatinput);
-      if (!l)
-      {
-        message_info_force("");
-        mode=MD_TNG;
-        break;
-      }
-      if (l > 31)
-      {
-        speaker_beep();
-        break;
-      }
-      monster = create_thing ((mapx+screenx)*3+sx, (mapy+screeny)*3+sy);
-      monster[5]=1;
-      monster[6]=5;
-      monster[7]=l;
-      monster[8]=lvl->own[mapx+screenx][mapy+screeny];
-      thing_add(lvl,monster);
-      // Copy the monster to the clipboard
-      memcpy (tngclipboard, monster+4, 17);
-      // Show the new monster
-      vistng[sx][sy]=lvl->tng_subnums[(mapx+screenx)*3+sx]
-        [(mapy+screeny)*3+sy]-1;
-      message_info_force("Creature added");
-      mode=MD_TNG;
-      break;
-    default:
-      speaker_beep();
     }
-    message_info_force("Creature number: %s", creatinput);
+}
+
+/*
+ * Covers actions from the item type screen.
+ */
+static void itemtypeactions(int key)
+{
+    unsigned char *thing;
+    if (!list_actions(key))
+    {
+      switch (key)
+      {
+        case KEY_TAB:
+        case KEY_DEL:
+          message_info("Adding thing cancelled");
+          mode=MD_TNG;
+          break;
+        case KEY_ENTER:
+          thing = create_item((mapx+screenx)*3+sx, (mapy+screeny)*3+sy,numbered_list_pos+1);
+          thing[8]=lvl->own[mapx+screenx][mapy+screeny];
+          thing_add(lvl,thing);
+          // Show the new thing
+          vistng[sx][sy]=get_thing_subnums(lvl,(mapx+screenx)*3+sx,(mapy+screeny)*3+sy)-1;
+          end_list();
+          message_info("Item added");
+          mode=MD_TNG;
+          break;
+        default:
+          message_info("Unrecognized item key code: %d",key);
+          speaker_beep();
+      }
+    }
 }
 
 /*
@@ -586,16 +673,16 @@ static void slbactions(int key)
     {
       switch (key)
       {
-        case 'u': // Update all things
+      case 'u': // Update all things
         create_clmdattng();
         break;
-        case KEY_TAB:
+      case KEY_TAB:
         mode=MD_TNG;
         break;
-        case 'c':
+      case 'c':
         mode=MD_CLM;
         break;
-        case KEY_CTRL_SPACE:
+      case KEY_CTRL_SPACE:
         if (mark)
         {
           mark=false;
@@ -668,7 +755,7 @@ static void slbactions(int key)
 /*
  * Covers cursor actions from non-help screens.
  */
-static int cursor_actions (int key)
+static short cursor_actions(int key)
 {
     int osx, osy, omx, omy;
     int i, j;
@@ -748,7 +835,7 @@ static int cursor_actions (int key)
       screeny+=10;
       break;
       default:
-      return 0;
+      return false;
     }
     curposcheck();
     if ((omx+osx != screenx+mapx) || (omy+osy != screeny+mapy))
@@ -756,13 +843,13 @@ static int cursor_actions (int key)
     for (i=0; i < 3; i++)
       for (j=0; j < 3; j++)
         vistng[i][j]=0;
-    return 1;
+    return true;
 }
 
 /*
  * Action function - start the help mode.
  */
-static void start_help ()
+void start_help()
 {
     message_info_force("Use arrow keys and page up/down to move, "
       "any other key to return.");
@@ -771,21 +858,25 @@ static void start_help ()
     switch (helpformode)
     {
       case MD_SLB:
-      helprows=slbhelprows;
-      helptext=slbhelp;
-      break;
+        helprows=slbhelprows;
+        helptext=slbhelp;
+        break;
       case MD_CRTR:
-      helprows=crthelprows;
-      helptext=crthelp;
-      break;
+        helprows=crthelprows;
+        helptext=crthelp;
+        break;
+      case MD_ITMT:
+        helprows=itmthelprows;
+        helptext=itmthelp;
+        break;
       case MD_TNG:
-      helprows=tnghelprows;
-      helptext=tnghelp;
-      break;
+        helprows=tnghelprows;
+        helptext=tnghelp;
+        break;
       case MD_CLM:
-      helprows=clmhelprows;
-      helptext=clmhelp;
-      break;
+        helprows=clmhelprows;
+        helptext=clmhelp;
+        break;
     }
     mode=MD_HELP;
 }
@@ -793,9 +884,31 @@ static void start_help ()
 /*
  * Action function - end the help mode.
  */
-static void end_help (void)
+void end_help()
 {
     mode=helpformode;
+    message_release();
+    message_info("Returned to last work mode.");
+}
+
+/*
+ * Action function - start any of the the list modes.
+ */
+void start_list()
+{
+    numbered_list_y=0; //the first visible row
+    numbered_list_pos=0; // selected item position (rel. to screen top)
+    numbered_list_items=8; //number of items in the list
+    numbered_list_cols=2; //number of columns in the item list
+    message_info("Use arrow keys and page up/down to move, "
+      "enter to choose.");
+}
+
+/*
+ * Action function - end any of the the list modes.
+ */
+void end_list()
+{
     message_release();
 }
 
@@ -833,7 +946,7 @@ static void slb_place_room (unsigned char room)
       return;
     }
     // And another...
-    if ((markr>MAP_MAXINDEX_X) || (markb>MAP_MAXINDEX_Y) ||      (markl<0) || (markt<0))
+    if ((markr>MAP_MAXINDEX_X) || (markb>MAP_MAXINDEX_Y) || (markl<0) || (markt<0))
       return;
     for (x=markl; x <= markr; x++)
     {
@@ -856,8 +969,8 @@ static void change_ownership(unsigned char purchaser)
 {
     int x, y;
     // Sanity check, almost certainly unneeded
-    if (screenx+mapx > MAP_MAXINDEX_X || screeny+mapy > MAP_MAXINDEX_Y ||
-      screeny+mapy < 0 || screeny+mapy < 0)
+    if ((screenx+mapx > MAP_MAXINDEX_X) || (screeny+mapy > MAP_MAXINDEX_Y) ||
+      (screeny+mapy < 0) || (screeny+mapy < 0))
       return;
     if (!mark)
     {
@@ -866,8 +979,8 @@ static void change_ownership(unsigned char purchaser)
       return;
     }
     // And another...
-    if (markr > MAP_MAXINDEX_X || markb > MAP_MAXINDEX_Y ||
-      markl < 0 || markt < 0)
+    if ((markr > MAP_MAXINDEX_X) || (markb > MAP_MAXINDEX_Y) ||
+      (markl < 0) || (markt < 0))
       return;
     for (x=markl; x <= markr; x++)
       for (y=markt; y <= markb; y++)

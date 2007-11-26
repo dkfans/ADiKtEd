@@ -135,6 +135,8 @@ void input_init(void)
         exit(1);
     }
     SLang_set_abort_signal(NULL);
+    //This could allow reading CTRL+key sequences
+//    SLgetkey_map_to_ansi(1);
     SLang_flush_input(); 
     input_initied=true;
 }

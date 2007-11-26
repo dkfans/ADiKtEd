@@ -14,12 +14,21 @@ E:Entrance
 Doors - wood, iron, braced, magic
 [tngkeyhelp]
 [crtkeyhelp]
-Add creature mode:
+Creature type mode:
 
-Type in the number of the 
-creature you wish to add.
+Select the creature
+you wish to add.
 
 The creature's ownership will
+be set to that of the tile you
+are placing it in.
+[itmtkeyhelp]
+Item type mode:
+
+Select the item
+you wish to add.
+
+The item's ownership will
 be set to that of the tile you
 are placing it in.
 [slbhelp]
@@ -67,6 +76,8 @@ with the chosen string on when the level is saved.
 To update the dungeon things/dat/clm, press u.
 To switch into "thing" mode, press tab.
 To switch into "clm" mode, press c.
+Create new, empty map with ctrl+n or autogenerate map with ctrl+r.
+To load map, press ctrl+l.
 To quit, press ctrl+q.
 To save, press ctrl+s.
 
@@ -74,8 +85,9 @@ To save, press ctrl+s.
 Add creature mode help:
 
 A list will appear on the screen of all the available creatures.
-Simply type in the number of the creature you want to create, or 0
-to cancel, then press return.
+Simply select the creature you want with arrow keys, then press return.
+
+You can cancel operation with tab or del.
 
 The creature will be added to the slot that was highlighted in
 "thing" mode. The creature will be owned by whoever owns the tile it
@@ -83,6 +95,22 @@ is created on. However, you may change the ownership of the tile
 later without changing the ownership of the creature.
 
 The creature will be level one; you can change this in "thing" mode.
+
+[itmhelp]
+Item selection and options help:
+
+A list will appear on the screen of all the available items.
+Simply select the item you want to create with arrow keys,
+then press enter.
+
+Note that this function may set the item parameters in a wrong
+way. You should use other functions to add traps, doors, specials
+and similar objects (see "thing" mode help for details).
+
+The item will be added to the slot that was highlighted in
+"thing" mode.
+
+To cancel, press tab or del.
 
 [tnghelp]
 "Thing" mode help:
@@ -132,6 +160,12 @@ Press t to create a trap (change the type using s and x).
 
 Press T to create a trap box (ie a non-placed trap). Change the type
 using s and x.
+
+Press e to create room effect (change the type using s and x).
+
+Press i to create any item. Use this function to create items other
+than those available under other keys - it may be unable to set
+item properties correctly.
 
 Press s and x to increase/decrease the level of a highlighted
 creature, the type of a highlighted trap, the type of a 

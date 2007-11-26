@@ -12,4 +12,7 @@ extern char get_thing_char (int x, int y);
 extern void display_thing (unsigned char *thing, int x, int y);
 extern void display_action_point (unsigned char *point, int x, int y);
 
+void draw_creatrkind();
+void draw_itemtype();
+
 #endif // ADIKT_SCRTHING_H

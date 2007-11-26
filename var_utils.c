@@ -30,6 +30,20 @@ void strip_crlf(char *string_in)
     }
 }
 
+void trim_right(char *string_in)
+{
+    int i;
+    unsigned char *string = (unsigned char *) string_in;
+    
+    for(i=strlen((char *)string)-1;i>=0;i--)
+    {
+        if(string[i]<=32)
+            string[i]=0;
+        else
+            break;
+    }
+}
+
 void message_error(const char *format, ...)
 {
       va_list val;
@@ -135,3 +149,9 @@ void done(void)
     screen_done();
     input_done();
 }
+
+int rnd (int range)
+{
+    return (int) (((float)range)*rand()/(RAND_MAX+1.0));
+}
+

@@ -1,18 +1,18 @@
 # Project: adikted
 # Makefile created by Dev-C++ 4.9.9.2
 
-CPP  = g++.exe
-CC   = gcc.exe
+CPP  = g++.exe -D__DEBUG__
+CC   = gcc.exe -D__DEBUG__
 WINDRES = windres.exe
 RES  = map_private.res
-OBJ  = action.o dernc.o file.o graffiti.o internal.o main.o obj_utils.o input_kb.o scr_help.o var_utils.o output_scr.o scr_level.o scr_thing.o graffiti_font.o bulcommn.o lev_data.o lev_files.o $(RES)
-LINKOBJ  = action.o dernc.o file.o graffiti.o internal.o main.o obj_utils.o input_kb.o scr_help.o var_utils.o output_scr.o scr_level.o scr_thing.o graffiti_font.o bulcommn.o lev_data.o lev_files.o $(RES)
-LIBS =  -L"D:/ProgsNT/Dev-Cpp/lib" ../../../ProgsNT/Dev-Cpp/lib/libslang.a  
+OBJ  = action.o dernc.o file.o graffiti.o internal.o main.o input_kb.o scr_help.o var_utils.o output_scr.o scr_level.o scr_thing.o graffiti_font.o bulcommn.o lev_data.o lev_files.o obj_slabs.o obj_things.o obj_column.o obj_actnpts.o $(RES)
+LINKOBJ  = action.o dernc.o file.o graffiti.o internal.o main.o input_kb.o scr_help.o var_utils.o output_scr.o scr_level.o scr_thing.o graffiti_font.o bulcommn.o lev_data.o lev_files.o obj_slabs.o obj_things.o obj_column.o obj_actnpts.o $(RES)
+LIBS =  -L"D:/ProgsNT/Dev-Cpp/lib" ../../../ProgsNT/Dev-Cpp/lib/libslang.a  -g3 
 INCS =  -I"D:/ProgsNT/Dev-Cpp/include" 
 CXXINCS =  -I"D:/ProgsNT/Dev-Cpp/lib/gcc/mingw32/3.4.2/include"  -I"D:/ProgsNT/Dev-Cpp/include/c++/3.4.2/backward"  -I"D:/ProgsNT/Dev-Cpp/include/c++/3.4.2/mingw32"  -I"D:/ProgsNT/Dev-Cpp/include/c++/3.4.2"  -I"D:/ProgsNT/Dev-Cpp/include" 
 BIN  = map.exe
-CXXFLAGS = $(CXXINCS)  
-CFLAGS = $(INCS)  
+CXXFLAGS = $(CXXINCS)   -g3
+CFLAGS = $(INCS)   -g3
 RM = rm -f
 
 .PHONY: all all-before all-after clean clean-custom
@@ -44,9 +44,6 @@ internal.o: internal.c
 main.o: main.c
 	$(CC) -c main.c -o main.o $(CFLAGS)
 
-obj_utils.o: obj_utils.c
-	$(CC) -c obj_utils.c -o obj_utils.o $(CFLAGS)
-
 input_kb.o: input_kb.c
 	$(CC) -c input_kb.c -o input_kb.o $(CFLAGS)
 
@@ -76,6 +73,18 @@ lev_data.o: lev_data.c
 
 lev_files.o: lev_files.c
 	$(CC) -c lev_files.c -o lev_files.o $(CFLAGS)
+
+obj_slabs.o: obj_slabs.c
+	$(CC) -c obj_slabs.c -o obj_slabs.o $(CFLAGS)
+
+obj_things.o: obj_things.c
+	$(CC) -c obj_things.c -o obj_things.o $(CFLAGS)
+
+obj_column.o: obj_column.c
+	$(CC) -c obj_column.c -o obj_column.o $(CFLAGS)
+
+obj_actnpts.o: obj_actnpts.c
+	$(CC) -c obj_actnpts.c -o obj_actnpts.o $(CFLAGS)
 
 map_private.res: map_private.rc 
 	$(WINDRES) -i map_private.rc --input-format=rc -o map_private.res -O coff 
