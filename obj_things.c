@@ -31,7 +31,7 @@ const char *creature_fullnames[]={"", "Wizard", "Barbarian",
     "Skeleton", "Troll", "Dragon", "Demon Spawn", "Fly", "Dark Mistress",
     "Warlock", "Bile Demon", "Imp", "Beetle", "Vampire", "Spider",
     "Hell Hound", "Ghost", "Tentacle", "Orc", "Floating spirit"};
-const char *roomeffects[]={"unknown 0", "unknown 1", "Dripping water",
+const char *roomeffects[]={"unknown 0", "Lava", "Dripping water",
     "Rock Fall", "Entrance Ice", "Dry ice", "unknown 6", "unknown 7",
     "unknown 8"};
 
@@ -90,7 +90,7 @@ const unsigned char creatr_types[]={
       CREATR_SUBTP_FLOAT};
 
 const unsigned char roomefct_types[]={
-      ROOMEFC_SUBTP_UNKN1,ROOMEFC_SUBTP_DRIPWTR,ROOMEFC_SUBTP_ROCKFAL,
+      ROOMEFC_SUBTP_LAVA,ROOMEFC_SUBTP_DRIPWTR,ROOMEFC_SUBTP_ROCKFAL,
       ROOMEFC_SUBTP_ENTRICE,ROOMEFC_SUBTP_DRYICE
       };
 
@@ -1352,9 +1352,10 @@ int get_item_category(unsigned char stype_idx)
         case ITEM_SUBTYPE_POTION3:
         case ITEM_SUBTYPE_SPINNKEY:
         case ITEM_SUBTYPE_ARMOUR: 
+          return ITEM_CATEGR_VARIOUS;
         case ITEM_SUBTYPE_UNKN32: 
         default:
-          return ITEM_CATEGR_VARIOUS;
+          return ITEM_CATEGR_UNKNOWN;
       }
 }
 
@@ -1455,3 +1456,93 @@ char *get_roomeffect_subtype_fullname(unsigned char stype_idx)
        return "unknown(?!)";
 }
 
+short item_verify(unsigned char *thing, char *err_msg)
+{
+  unsigned char stype_idx=get_thing_subtype(thing);
+  switch (get_item_category(stype_idx))
+  {
+    case ITEM_CATEGR_VARIOUS:
+    case ITEM_CATEGR_ROOMEQUIP:
+    case ITEM_CATEGR_STATUES:
+    case ITEM_CATEGR_SPELLBOOK:
+    case ITEM_CATEGR_GOLD:
+    case ITEM_CATEGR_FOOD:
+    case ITEM_CATEGR_CREATLAIR:
+    case ITEM_CATEGR_SPECIALBOX:
+    case ITEM_CATEGR_WRKSHOPBOX:
+    case ITEM_CATEGR_PWHNDEFFCT:
+    case ITEM_CATEGR_LIGHTS:
+      return VERIF_OK;
+    case ITEM_CATEGR_NULL:
+      sprintf(err_msg,"Null item subtype (%d)",(int)stype_idx);
+      return VERIF_WARN;
+    default:
+      sprintf(err_msg,"Unknown item subtype (%d)",(int)stype_idx);
+      return VERIF_WARN;
+  }
+}
+
+short creature_verify(unsigned char *thing, char *err_msg)
+{
+  unsigned char stype_idx=get_thing_subtype(thing);
+  if ((stype_idx>CREATR_SUBTP_FLOAT)||(stype_idx<CREATR_SUBTP_WIZRD))
+  {
+      sprintf(err_msg,"Unknown creature subtype (%d)",(int)stype_idx);
+      return VERIF_WARN;
+  }
+  return VERIF_OK;
+}
+
+short roomeffect_verify(unsigned char *thing, char *err_msg)
+{
+  unsigned char stype_idx=get_thing_subtype(thing);
+  if ((stype_idx>ROOMEFC_SUBTP_DRYICE)||(stype_idx<ROOMEFC_SUBTP_LAVA))
+  {
+      sprintf(err_msg,"Unknown room effect subtype (%d)",(int)stype_idx);
+      return VERIF_WARN;
+  }
+  return VERIF_OK;
+}
+
+short door_verify(unsigned char *thing, char *err_msg)
+{
+  unsigned char stype_idx=get_thing_subtype(thing);
+  if ((stype_idx>DOOR_SUBTYPE_MAGIC)||(stype_idx<DOOR_SUBTYPE_WOOD))
+  {
+      sprintf(err_msg,"Unknown door subtype (%d)",(int)stype_idx);
+      return VERIF_WARN;
+  }
+  return VERIF_OK;
+}
+
+short trap_verify(unsigned char *thing, char *err_msg)
+{
+  unsigned char stype_idx=get_thing_subtype(thing);
+  if ((stype_idx>TRAP_SUBTYPE_LAVA)||(stype_idx<TRAP_SUBTYPE_BOULDER))
+  {
+      sprintf(err_msg,"Unknown trap subtype (%d)",(int)stype_idx);
+      return VERIF_WARN;
+  }
+  return VERIF_OK;
+}
+
+short thing_verify(unsigned char *thing, char *err_msg)
+{
+  short result;
+  switch(get_thing_type(thing))
+  {
+    case THING_TYPE_ITEM:
+      return item_verify(thing, err_msg);
+    case THING_TYPE_CREATURE:
+      return creature_verify(thing, err_msg);
+    case THING_TYPE_ROOMEFFECT:
+      return roomeffect_verify(thing, err_msg);
+    case THING_TYPE_TRAP:
+      return trap_verify(thing, err_msg);
+    case THING_TYPE_DOOR:
+      return door_verify(thing, err_msg);
+    default:
+      sprintf(err_msg,"Unknown thing type (%d)",(int)get_thing_type(thing));
+      return VERIF_WARN;
+  }
+}

@@ -155,3 +155,10 @@ int rnd (int range)
     return (int) (((float)range)*rand()/(RAND_MAX+1.0));
 }
 
+int arr_ushort_pos(const unsigned short *arr,unsigned short slab_type,int array_count)
+{
+    int i;
+    for (i=0;i<array_count;i++)
+      if (arr[i]==slab_type) return i;
+    return -1;
+}

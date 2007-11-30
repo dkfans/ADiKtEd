@@ -35,10 +35,6 @@ typedef struct {
   } DK_LGT_REC;
 
 typedef struct {
-    unsigned char data[24];
-  } DK_CLM_REC;
-
-typedef struct {
     int hero_gates_count;
   } LEVSTATS;
 
@@ -56,7 +52,7 @@ struct LEVEL {
     unsigned char **wlb;
     //Column file - constant-size array of entries used for displaying tiles,
     // size COLUMN_ENTRIES x SIZEOF_DK_CLM_REC
-    DK_CLM_REC **clm;
+    unsigned char **clm;
     //Texture information file - one byte file, identifies texture pack index
     unsigned char inf;
     //Script text - a text file containing level parameters as editable script;
@@ -105,7 +101,10 @@ short level_clear_tng(struct LEVEL *lvl);
 short level_free();
 short level_free_tng(struct LEVEL *lvl);
 
-int verify_map(struct LEVEL *lvl);
+short level_verify(struct LEVEL *lvl, char *actn_name);
+short level_verify_struct(struct LEVEL *lvl, char *err_msg);
+short actnpts_verify(struct LEVEL *lvl, char *err_msg);
+short level_verify_logic(struct LEVEL *lvl, char *err_msg);
 void start_new_map(struct LEVEL *lvl);
 void free_map(void);
 
@@ -124,6 +123,11 @@ char *get_object(struct LEVEL *lvl,unsigned int x,unsigned int y,unsigned int z)
 void object_del(struct LEVEL *lvl,unsigned int x,unsigned int y,unsigned int z);
 unsigned int get_object_subnums(struct LEVEL *lvl,unsigned int x,unsigned int y);
 unsigned int get_object_tilnums(struct LEVEL *lvl,unsigned int x,unsigned int y);
+
+short get_subtl_wib(struct LEVEL *lvl, unsigned int sx, unsigned int sy);
+void set_subtl_wib(struct LEVEL *lvl, short nval, unsigned int sx, unsigned int sy);
+short get_tile_wlb(struct LEVEL *lvl, unsigned int tx, unsigned int ty);
+void set_tile_wlb(struct LEVEL *lvl, short nval, unsigned int tx, unsigned int ty);
 
 extern struct LEVEL *lvl;
 

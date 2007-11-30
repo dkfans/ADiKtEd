@@ -45,7 +45,8 @@ int main(int argc, char **argv)
         start_new_map(lvl);
     input_init();
     screen_init();
-    create_default_clm();
+//!!!!TODO: hack for checking new CLM support
+//    create_default_clm();
     check_doors();
     do 
     {

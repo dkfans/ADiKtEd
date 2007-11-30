@@ -12,7 +12,6 @@ struct LEVEL;
 extern void update_square (int x, int y);
 extern void update_tngdat (int x, int y);
 extern void create_clmdattng(void);
-extern int get_dat (int cx, int cy);
 extern void free_map (void);
 
 extern int picture_wall (int x, int y, int dx, int dy);

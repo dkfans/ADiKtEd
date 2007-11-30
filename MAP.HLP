@@ -76,6 +76,7 @@ with the chosen string on when the level is saved.
 To update the dungeon things/dat/clm, press u.
 To switch into "thing" mode, press tab.
 To switch into "clm" mode, press c.
+To verify the map integrity and rules, press v.
 Create new, empty map with ctrl+n or autogenerate map with ctrl+r.
 To load map, press ctrl+l.
 To quit, press ctrl+q.

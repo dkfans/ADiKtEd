@@ -5,20 +5,22 @@
 #ifndef ADIKT_VARUTILS_H
 #define ADIKT_VARUTILS_H
 
-extern void strip_crlf(char *string_in);
+void strip_crlf(char *string_in);
 
-extern void message_error(const char *format, ...);
-extern void message_info(const char *format, ...);
-extern void message_info_force(const char *format, ...);
-extern short message_is_empty();
-extern void message_release();
-extern char *message_get();
+void message_error(const char *format, ...);
+void message_info(const char *format, ...);
+void message_info_force(const char *format, ...);
+short message_is_empty();
+void message_release();
+char *message_get();
 
-extern short format_map_fname(char *fname, char *usrinput);
+int arr_ushort_pos(const unsigned short *arr,unsigned short slab_type,int array_count);
 
-extern int rnd (int range);
+short format_map_fname(char *fname, char *usrinput);
 
-extern void die(const char *format, ...);
-extern void done(void);
+int rnd(int range);
+
+void die(const char *format, ...);
+void done(void);
 
 #endif // ADIKT_VARUTILS_H

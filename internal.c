@@ -12,9 +12,9 @@
 #include "lev_data.h"
 #include "obj_slabs.h"
 #include "obj_things.h"
+#include "lev_things.h"
 #include "graffiti.h"
 
-static void remove_room_things (int x, int y);
 static int get_corner (int x, int y, int i, int j);
 static void finish_clm (void);
 static void set_room_wall4 (int num, unsigned int use, 
@@ -28,42 +28,8 @@ static void set_room_wall2 (int num, unsigned int use,
                       int c3, int c4, int c5, int stat);
 static void set_room_wall (int num, unsigned int use, int base, int c1, int c2,
                 int c3, int c4, int stat);
-static void set_pillar_thing (int x, int y, int pillar, int thingnum, int thinghgt);
-static void set_pillar (int x, int y, int pillar);
 static void set_door_dattng (int x, int y, int datbase, int type, int locked);
 
-
-static void remove_room_things (int x, int y)
-{
-    int cx, cy, i;
-    for (cx=x*3; cx < x*3+3; cx++)
-      for (cy=y*3; cy < y*3+3; cy++)
-      {
-          int last_thing=get_thing_subnums(lvl,cx,cy)-1;
-          for (i=last_thing; i>=0; i--)
-          {
-            char *thing=get_thing(lvl,cx,cy,i);
-            if (is_room_thing(thing))
-                thing_del(lvl,cx, cy, i);
-          }
-     }
-}
-
-static void remove_noncrucial_room_things(int x, int y)
-{
-    int cx, cy, i;
-    for (cx=x*3; cx < x*3+3; cx++)
-      for (cy=y*3; cy < y*3+3; cy++)
-      {
-          int last_thing=get_thing_subnums(lvl,cx,cy)-1;
-          for (i=last_thing; i>=0; i--)
-          {
-            char *thing=get_thing(lvl,cx,cy,i);
-            if (is_room_thing(thing) && (!is_crucial_thing(thing)))
-                thing_del(lvl,cx, cy, i);
-          }
-     }
-}
 
 void create_clmdattng(void)
 {
@@ -102,6 +68,7 @@ void update_square (int x, int y)
 
 /*
  * Update a single slab
+ * OLD - delete pending
  */
 void update_tngdat(int x, int y)
 {
@@ -128,7 +95,7 @@ void update_tngdat(int x, int y)
       {
           by = y*MAP_SUBNUM_Y+zy;
           bx = x*MAP_SUBNUM_X+zx;
-          lvl->wib[bx][by]=slab_default_wbi_entry(s);
+//          lvl->wib[bx][by]=slab_default_wbi_entry(s);
       }
     }
     surround=1;
@@ -160,47 +127,47 @@ void update_tngdat(int x, int y)
     switch (s)
     {
     case SLAB_TYPE_ROCK: // Rock
-      set_dat_unif (x, y, 1);
+      set_dat_unif (lvl, x, y, 1);
       break;
     case SLAB_TYPE_GOLD: // Gold
-      set_dat (x, y, rnd(5)+2, rnd(5)+2, rnd(5)+2, rnd(5)+2,
+      set_dat (lvl, x, y, rnd(5)+2, rnd(5)+2, rnd(5)+2, rnd(5)+2,
              rnd(5)+2, rnd(5)+2, rnd(5)+2, rnd(5)+2, rnd(5)+2);
       break;
     case SLAB_TYPE_EARTH: // Earth
-      set_dat (x, y, rnd(8)+10, rnd(8)+10, rnd(8)+10, 
+      set_dat (lvl, x, y, rnd(8)+10, rnd(8)+10, rnd(8)+10, 
              rnd(8)+10, rnd(8)+10, rnd(8)+10, 
              rnd(8)+10, rnd(8)+10, rnd(8)+10);
       break;
     case SLAB_TYPE_TORCHDIRT: // Torch dirt
-      set_dat (x, y, rnd(8)+10, rnd(8)+10, rnd(8)+10, 
+      set_dat (lvl, x, y, rnd(8)+10, rnd(8)+10, rnd(8)+10, 
              rnd(8)+10, rnd(8)+10, rnd(8)+10, 
              rnd(8)+10, rnd(8)+10, rnd(8)+10);
       for (i=0; i < 3; i+=2)
       {
           if ((slbrel[i][1]>9) && (slbrel[i][1] != 52) &&
             ((slbrel[i][1]<42) || (slbrel[i][1] > 49)))
-            set_dat2 (x*3+i, y*3+1, 18);
+            set_dat_subtile(lvl, x*3+i, y*3+1, 18);
           if ((slbrel[1][i]>9) && (slbrel[1][i] != 52) &&
             ((slbrel[1][i]<42) || (slbrel[1][i] > 49)))
-            set_dat2 (x*3+1, y*3+j, 18);
+            set_dat_subtile(lvl, x*3+1, y*3+j, 18);
       }
       break;
-    case SLAB_TYPE_DRAPE: // Drape
+    case SLAB_TYPE_WALLDRAPE: // Drape
       set_wall (x, y, 450+lvl->own[x][y]*3, 451+lvl->own[x][y]*3, 
               452+lvl->own[x][y]*3);
       break;
-    case SLAB_TYPE_TORCHWALL: // Torch wall
+    case SLAB_TYPE_WALLTORCH: // Torch wall
       set_wall (x, y, 219, 220, 221);
       for (i=0; i < 3; i+=2)
       {
           if ((slbrel[i][1]>9) && (slbrel[i][1] != 52) &&
             ((slbrel[i][1]<42) || (slbrel[i][1] > 49)) &&
             !picture_wall (x, y, i, 1))
-            set_dat2 (x*3+i, y*3+1, 208);
+            set_dat_subtile(lvl, x*3+i, y*3+1, 208);
           if ((slbrel[1][i]>9) && (slbrel[1][i] != 52) &&
             ((slbrel[1][i]<42) || (slbrel[1][i] > 49)) &&
             !picture_wall (x, y, 1, i))
-            set_dat2 (x*3+1, y*3+i, 208);
+            set_dat_subtile(lvl, x*3+1, y*3+i, 208);
       }
       break;
     case SLAB_TYPE_WALLWTWINS: // Wall with twins
@@ -213,27 +180,27 @@ void update_tngdat(int x, int y)
       set_wall (x, y, 222, 223, 224);
       break;
     case SLAB_TYPE_PATH: // Path
-      set_dat_unif (x, y, 110);
+      set_dat_unif (lvl, x, y, 110);
       break;
     case SLAB_TYPE_CLAIMED: // Claimed
-      set_dat (x, y, 135,135,135,135,130+lvl->own[x][y],135,135,135,135);
+      set_dat (lvl, x, y, 135,135,135,135,130+lvl->own[x][y],135,135,135,135);
       break;
     case SLAB_TYPE_LAVA: // Lava
-      set_dat_unif (x, y, 105);
+      set_dat_unif (lvl, x, y, 105);
       break;
     case SLAB_TYPE_WATER: // Water
-      set_dat_unif (x, y, 100);
+      set_dat_unif (lvl, x, y, 100);
       break;
     case SLAB_TYPE_PORTAL: // Portal
       if (surround)
       {
-          set_dat (x, y, 704, 705, 706, 707, 708, 709, 710, 711, 712);
+          set_dat (lvl, x, y, 704, 705, 706, 707, 708, 709, 710, 711, 712);
           thing = create_roomeffect(x*3+1, y*3+1, ROOMEFC_SUBTP_ENTRICE); // Dry ice
           thing_add(lvl,thing);
       }
       else
       {
-          set_dat_unif (x, y, 700); // Now we only need to add extras
+          set_dat_unif (lvl, x, y, 700); // Now we only need to add extras
           for (i=-1; i < 2; i+=2)
           {
             for (j=-1; j < 2; j+=2)
@@ -242,9 +209,9 @@ void update_tngdat(int x, int y)
                 by = y*3+j+1;
                 if (slab_is_central(lvl,i+x,j+y))
                 {
-                  set_dat2(bx,  by,  703);
-                  set_dat2(bx-i,by,  701);
-                  set_dat2(bx,  by-j,701);
+                  set_dat_subtile(lvl, bx,  by,  703);
+                  set_dat_subtile(lvl, bx-i,by,  701);
+                  set_dat_subtile(lvl, bx,  by-j,701);
                 }
             }
           }
@@ -259,15 +226,15 @@ void update_tngdat(int x, int y)
                   continue; 
                 if (!i && slab_is_central(lvl,i+x,j+y))
                 {
-                  set_dat2 (bx-1,by-j, 701);
-                  set_dat2 (bx,  by-j, 701);
-                  set_dat2 (bx+1,by-j, 701);
+                  set_dat_subtile(lvl, bx-1,by-j, 701);
+                  set_dat_subtile(lvl, bx,  by-j, 701);
+                  set_dat_subtile(lvl, bx+1,by-j, 701);
                 }
                 if (!j && slab_is_central(lvl,i+x,j+y))
                 {
-                  set_dat2 (bx-i, by-1,701);
-                  set_dat2 (bx-i, by,  701);
-                  set_dat2 (bx-i, by+1,701);
+                  set_dat_subtile(lvl, bx-i, by-1,701);
+                  set_dat_subtile(lvl, bx-i, by,  701);
+                  set_dat_subtile(lvl, bx-i, by+1,701);
                 }
             }                        
           }
@@ -281,30 +248,30 @@ void update_tngdat(int x, int y)
                   continue; 
                 if (!i && slab_is_central(lvl,i+x,j+y))
                 {
-                  set_dat2 (bx-1, by,702);
-                  set_dat2 (bx, by,  702);
-                  set_dat2 (bx+1, by,702);
+                  set_dat_subtile(lvl, bx-1, by,702);
+                  set_dat_subtile(lvl, bx, by,  702);
+                  set_dat_subtile(lvl, bx+1, by,702);
                 }
                 if (!j && slab_is_central(lvl,i+x,j+y))
                 {
-                  set_dat2 (bx, by-1,702);
-                  set_dat2 (bx, by,  702);
-                  set_dat2 (bx, by+1,702);
+                  set_dat_subtile(lvl, bx, by-1,702);
+                  set_dat_subtile(lvl, bx, by,  702);
+                  set_dat_subtile(lvl, bx, by+1,702);
                 }
             }                        
           }
       }
       break;
     case SLAB_TYPE_TREASURE: // Treasure
-      set_dat_unif (x, y, 500);
+      set_dat_unif (lvl, x, y, 500);
       set_pillar_thing (x, y, 501, 0x1c, 0x100);
       break;
     case SLAB_TYPE_LIBRARY: // Library
       if (surround)
-          set_dat (x, y, 540,540,540,541,542,543,540,540,540);
+          set_dat (lvl, x, y, 540,540,540,541,542,543,540,540,540);
       else
       {
-          set_dat_unif (x, y, 540);
+          set_dat_unif (lvl, x, y, 540);
           set_pillar (x, y, 544);
       }
       break;
@@ -343,13 +310,13 @@ void update_tngdat(int x, int y)
     case SLAB_TYPE_TORTURE: // Torture
       if (surround)
       {
-          set_dat (x, y, 591, 591, 591, 591, 590,
+          set_dat (lvl, x, y, 591, 591, 591, 591, 590,
                  591, 591, 591, 591);
           thing = create_item(x*3+1, y*3+1, ITEM_SUBTYPE_TORTURER);
       }
       else
       {
-          set_dat (x, y, 591, 591, 591, 591, 590,
+          set_dat (lvl, x, y, 591, 591, 591, 591, 590,
                  591, 591, 591, 591);
           set_corner (x, y, 0, 581, 582, 583, 
                   584, 585, 586, 587, 588);
@@ -360,7 +327,7 @@ void update_tngdat(int x, int y)
     case SLAB_TYPE_TRAINING: // Training
       if (surround)
       {
-          set_dat_unif (x, y, 530);
+          set_dat_unif (lvl, x, y, 530);
           thing = create_item(x*3+1, y*3+1, ITEM_SUBTYPE_TRAINPOST);
           thing_add(lvl,thing);
       }
@@ -376,10 +343,10 @@ void update_tngdat(int x, int y)
       flag2=0; // Have we got a top left / bottom right corner?
       flag3=0; // Have we got a top right / bottom left corner?
       if (surround)
-          set_dat_unif (x, y, 650);
+          set_dat_unif (lvl, x, y, 650);
       else
       {
-          set_dat_unif (x, y, 651); // Now we only need to add extras
+          set_dat_unif (lvl, x, y, 651); // Now we only need to add extras
           for (i=-1; i < 2; i++)
           {
             for (j=-1; j < 2; j++)
@@ -391,21 +358,21 @@ void update_tngdat(int x, int y)
                 if (slab_is_central(lvl,i+x,j+y))
                 {
                   flag1=1;
-                  set_dat2 (bx, by, 656);
-                  set_dat2 (bx-i, by-j, 655);
+                  set_dat_subtile(lvl, bx, by, 656);
+                  set_dat_subtile(lvl, bx-i, by-j, 655);
                   if (!i)
                   {
-                      set_dat2 (bx-1, by, 656);      
-                      set_dat2 (bx+1, by, 656);
-                      set_dat2 (bx-1, by-j, 655);
-                      set_dat2 (bx+1, by-j, 655);
+                      set_dat_subtile(lvl, bx-1, by, 656);      
+                      set_dat_subtile(lvl, bx+1, by, 656);
+                      set_dat_subtile(lvl, bx-1, by-j, 655);
+                      set_dat_subtile(lvl, bx+1, by-j, 655);
                   }
                   if (!j)
                   {
-                      set_dat2 (bx, by-1, 656);      
-                      set_dat2 (bx, by+1, 656);
-                      set_dat2 (bx-i, by-1, 655);
-                      set_dat2 (bx-i, by+1, 655);
+                      set_dat_subtile(lvl, bx, by-1, 656);      
+                      set_dat_subtile(lvl, bx, by+1, 656);
+                      set_dat_subtile(lvl, bx-i, by-1, 655);
+                      set_dat_subtile(lvl, bx-i, by+1, 655);
                   }
                 }
             }
@@ -424,28 +391,28 @@ void update_tngdat(int x, int y)
                         flag2=1;
                       else
                         flag3=1;
-                      set_dat2 (bx, by, 657+lvl->own[x][y]);
-                      set_dat2 (bx-i, by, 654);
-                      set_dat2 (bx, by-j, 654);
+                      set_dat_subtile(lvl, bx, by, 657+lvl->own[x][y]);
+                      set_dat_subtile(lvl, bx-i, by, 654);
+                      set_dat_subtile(lvl, bx, by-j, 654);
                   }
                 }
             }
             if (flag2 && !flag3)
             {
-                set_dat2 (x*3+2, y*3, 652);
-                set_dat2 (x*3, y*3+2, 652);
+                set_dat_subtile(lvl, x*3+2, y*3, 652);
+                set_dat_subtile(lvl, x*3, y*3+2, 652);
             }
             if (flag3 && !flag2)
             {
-                set_dat2 (x*3, y*3, 652);
-                set_dat2 (x*3+2, y*3+2, 652);
+                set_dat_subtile(lvl, x*3, y*3, 652);
+                set_dat_subtile(lvl, x*3+2, y*3+2, 652);
             }
             if (flag2 || flag3)
             {
                 char *obj=create_item(x*3+1, y*3+1,
                   (lvl->own[x][y]>0 && lvl->own[x][y]<4 ? 0x77+lvl->own[x][y] : ITEM_SUBTYPE_HEARTFLMR));
                 thing_add(lvl,obj);
-                set_dat2 (x*3+1, y*3+1, 653);
+                set_dat_subtile(lvl, x*3+1, y*3+1, 653);
             }
           }
       }
@@ -455,17 +422,17 @@ void update_tngdat(int x, int y)
       {
           thing = create_item(x*3+1, y*3+1, ITEM_SUBTYPE_WRKSHPMCH);
           thing_add(lvl,thing);
-          set_dat (x, y, 561, 561, 561, 561, 
+          set_dat (lvl, x, y, 561, 561, 561, 561, 
                  560, 561, 561, 562, 561);
       }
       else
       {
-          set_dat_unif (x, y, 560);
+          set_dat_unif (lvl, x, y, 560);
           set_pillar_thing (x, y, 563, 0x1a, 0x100);
       }
       break;
     case SLAB_TYPE_SCAVENGER: // Scavenger room
-      set_dat (x, y, 641, 641, 641, 641, 640,
+      set_dat (lvl, x, y, 641, 641, 641, 641, 640,
              641, 641, 641, 641);
       if (surround)
       {
@@ -477,10 +444,10 @@ void update_tngdat(int x, int y)
       break;
     case SLAB_TYPE_TEMPLE: // Temple
       if (surround)
-          set_dat (x, y, 612, 613, 614, 615, 616, 617, 618, 619, 620);
+          set_dat (lvl, x, y, 612, 613, 614, 615, 616, 617, 618, 619, 620);
       else
       {
-          set_dat_unif (x, y, 610); // Now we only need to add extras
+          set_dat_unif (lvl, x, y, 610); // Now we only need to add extras
           for (i=-1; i < 2; i+=2)
           {
             for (j=-1; j < 2; j+=2)
@@ -489,8 +456,8 @@ void update_tngdat(int x, int y)
                 by = y*3+j+1;
                 if (slab_is_central(lvl,i+x,j+y))
                 {
-                  set_dat2 (bx, by, 622);
-                  set_dat2 (bx-i, by-j, 611);
+                  set_dat_subtile(lvl, bx, by, 622);
+                  set_dat_subtile(lvl, bx-i, by-j, 611);
                 }
             }
           }
@@ -505,17 +472,17 @@ void update_tngdat(int x, int y)
                 
                 if (!i && slab_is_central(lvl,i+x,j+y))
                 {
-                  set_dat2 (bx-i, by-j, 610);
-                  set_dat2 (bx-1, by, 621);
-                  set_dat2 (bx, by, 621);
-                  set_dat2 (bx+1, by, 621);
+                  set_dat_subtile(lvl, bx-i, by-j, 610);
+                  set_dat_subtile(lvl, bx-1, by, 621);
+                  set_dat_subtile(lvl, bx, by, 621);
+                  set_dat_subtile(lvl, bx+1, by, 621);
                 }
                 if (!j && slab_is_central(lvl,i+x,j+y))
                 {
-                  set_dat2 (bx-i, by-j, 610);
-                  set_dat2 (bx, by-1, 621);
-                  set_dat2 (bx, by, 621);
-                  set_dat2 (bx, by+1, 621);
+                  set_dat_subtile(lvl, bx-i, by-j, 610);
+                  set_dat_subtile(lvl, bx, by-1, 621);
+                  set_dat_subtile(lvl, bx, by, 621);
+                  set_dat_subtile(lvl, bx, by+1, 621);
                 }
             }                        
           }
@@ -549,7 +516,7 @@ void update_tngdat(int x, int y)
                 515, 516, 517, 518);
       break;
     case SLAB_TYPE_BARRACKS: // Barracks
-      set_dat_unif (x, y, 600);
+      set_dat_unif (lvl, x, y, 600);
       set_pillar_thing (x, y, 601, 2, 0x320);
       break;
     case SLAB_TYPE_DOORWOOD1:// Wooden door
@@ -569,15 +536,15 @@ void update_tngdat(int x, int y)
       set_door_dattng (x, y, 730, 4, s&1);
       break;
     case SLAB_TYPE_BRIDGE:// Bridge
-      set_dat (x, y, 551, 552, 550, 552, 552, 552, 550, 552, 551);
+      set_dat (lvl, x, y, 551, 552, 550, 552, 552, 552, 550, 552, 551);
       break;
     case SLAB_TYPE_GEMS:// Gems
-      set_dat (x, y, rnd(9)+20, rnd(9)+20, rnd(9)+20, 
+      set_dat (lvl, x, y, rnd(9)+20, rnd(9)+20, rnd(9)+20, 
              rnd(9)+20, rnd(9)+20, rnd(9)+20, 
              rnd(9)+20, rnd(9)+20, rnd(9)+20);
       break;
     case SLAB_TYPE_GUARDPOST: // Guardpost
-      set_dat (x, y, 571, 572, 570, 572, 572, 572, 570, 572, 571);
+      set_dat (lvl, x, y, 571, 572, 570, 572, 572, 572, 570, 572, 571);
       // Put the flagpost on for keepers
       if (lvl->own[x][y] < 4)
       {
@@ -688,7 +655,7 @@ static void set_door_dattng (int x, int y, int datbase, int type, int locked)
             if (is_door(thing))
                 thing_del(lvl,cx, cy, i);
           }
-    set_dat_unif (x, y, 720);
+    set_dat_unif (lvl, x, y, 720);
     // Set orientation of door, fairly arbitrarily :)
     if ((!(x) || (lvl->slb[x-1][y]<10))&&((x==MAP_MAXINDEX_X) || (lvl->slb[x+1][y]<10)))
       o=0;
@@ -705,9 +672,9 @@ static void set_door_dattng (int x, int y, int datbase, int type, int locked)
       set_thing_tilepos_h(thing,5);
       thing_add(lvl,thing);
     }
-    set_dat2 (x*3+o, y*3+1-o, datbase);
-    set_dat2 (x*3+1, y*3+1, datbase+1);
-    set_dat2 (x*3+2-o, y*3+1+o, datbase+2);
+    set_dat_subtile(lvl, x*3+o, y*3+1-o, datbase);
+    set_dat_subtile(lvl, x*3+1, y*3+1, datbase+1);
+    set_dat_subtile(lvl, x*3+2-o, y*3+1+o, datbase+2);
 }
 
 void set_wall (int x, int y, int d1, int d2, int d3)
@@ -741,13 +708,13 @@ void set_wall (int x, int y, int d1, int d2, int d3)
           }
       }
     }
-    set_dat (x, y, rnd(8)+10, rnd(8)+10, rnd(8)+10, 
+    set_dat (lvl, x, y, rnd(8)+10, rnd(8)+10, rnd(8)+10, 
            rnd(8)+10, rnd(8)+10, rnd(8)+10, 
            rnd(8)+10, rnd(8)+10, rnd(8)+10);
     if (surround)
       return;
 
-    set_dat2 (bx+1, by+1, 202+lvl->own[x][y]);
+    set_dat_subtile(lvl, bx+1, by+1, 202+lvl->own[x][y]);
     
     for (i=0; i < 3; i+=2)
     {
@@ -761,51 +728,51 @@ void set_wall (int x, int y, int d1, int d2, int d3)
           if (!slbsame[i][j] &&
             (slbsame[i][1]==slbsame[1][j]))
           {
-            set_dat2 (bx+i, by+j, get_corner (x, y, i, j));
+            set_dat_subtile(lvl, bx+i, by+j, get_corner (x, y, i, j));
             face[i][j]=0;
           }
           else
           {
             face[i][j]=1;
             if (face[i][1]) 
-                set_dat2 (bx+i, by+j, 219+i);
+                set_dat_subtile(lvl, bx+i, by+j, 219+i);
             if (face[1][j])
-                set_dat2 (bx+i, by+j, 219+j);
+                set_dat_subtile(lvl, bx+i, by+j, 219+j);
           }
       }
     }
     if (face[0][0] && face[1][0] && face[2][0])
     {
-      set_dat2 (bx, by, d1);
-      set_dat2 (bx+1, by, d2);
-      set_dat2 (bx+2, by, d3);
+      set_dat_subtile(lvl, bx, by, d1);
+      set_dat_subtile(lvl, bx+1, by, d2);
+      set_dat_subtile(lvl, bx+2, by, d3);
     }
     else if (face [1][0])
-      set_dat2 (bx+1, by, 220);
+      set_dat_subtile(lvl, bx+1, by, 220);
     if (face[0][0] && face[0][1] && face[0][2])
     {
-      set_dat2 (bx, by, d1);
-      set_dat2 (bx, by+1, d2);
-      set_dat2 (bx, by+2, d3);
+      set_dat_subtile(lvl, bx, by, d1);
+      set_dat_subtile(lvl, bx, by+1, d2);
+      set_dat_subtile(lvl, bx, by+2, d3);
     }
     else if (face [0][1])
-      set_dat2 (bx, by+1, 220);
+      set_dat_subtile(lvl, bx, by+1, 220);
     if (face[0][2] && face[1][2] && face[2][2])
     {
-      set_dat2 (bx, by+2, d1);
-      set_dat2 (bx+1, by+2, d2);
-      set_dat2 (bx+2, by+2, d3);
+      set_dat_subtile(lvl, bx, by+2, d1);
+      set_dat_subtile(lvl, bx+1, by+2, d2);
+      set_dat_subtile(lvl, bx+2, by+2, d3);
     }
     else if (face [1][2])
-      set_dat2 (bx+1, by+2, 220);
+      set_dat_subtile(lvl, bx+1, by+2, 220);
     if (face[2][0] && face[2][1] && face[2][2])
     {
-      set_dat2 (bx+2, by, d1);
-      set_dat2 (bx+2, by+1, d2);
-      set_dat2 (bx+2, by+2, d3);
+      set_dat_subtile(lvl, bx+2, by, d1);
+      set_dat_subtile(lvl, bx+2, by+1, d2);
+      set_dat_subtile(lvl, bx+2, by+2, d3);
     }
     else if (face [2][1])
-      set_dat2 (bx+2, by+1, 220);
+      set_dat_subtile(lvl, bx+2, by+1, 220);
     for (i=0; i < 3; i+=2)
     {
       j = picture_wall (x, y, i, 1);
@@ -813,17 +780,17 @@ void set_wall (int x, int y, int d1, int d2, int d3)
       {
           if (face[i][0] && face[i][1] && face[i][2])
           {
-            set_dat2 (bx+i, by, j);
-            set_dat2 (bx+i, by+1, j+1);
-            set_dat2 (bx+i, by+2, j+2);
+            set_dat_subtile(lvl, bx+i, by, j);
+            set_dat_subtile(lvl, bx+i, by+1, j+1);
+            set_dat_subtile(lvl, bx+i, by+2, j+2);
           }
           else
           {
-            set_dat2 (bx+i, by+1, 209);
+            set_dat_subtile(lvl, bx+i, by+1, 209);
             if (face[i][0])
-                set_dat2 (bx+i, by, 209);
+                set_dat_subtile(lvl, bx+i, by, 209);
             if (face[i][2])
-                set_dat2 (bx+i, by+2, 209);
+                set_dat_subtile(lvl, bx+i, by+2, 209);
           }
       }
       j = picture_wall (x, y, 1, i);
@@ -831,17 +798,17 @@ void set_wall (int x, int y, int d1, int d2, int d3)
       {
           if (face[0][i] && face[1][i] && face[2][i])
           {
-            set_dat2 (bx, by+i, j);
-            set_dat2 (bx+1, by+i, j+1);
-            set_dat2 (bx+2, by+i, j+2);
+            set_dat_subtile(lvl, bx, by+i, j);
+            set_dat_subtile(lvl, bx+1, by+i, j+1);
+            set_dat_subtile(lvl, bx+2, by+i, j+2);
           }
           else
           {
-            set_dat2 (bx+1, by+i, 209);
+            set_dat_subtile(lvl, bx+1, by+i, 209);
             if (face[0][i])
-                set_dat2 (bx, by+i, 209);
+                set_dat_subtile(lvl, bx, by+i, 209);
             if (face[2][i])
-                set_dat2 (bx+2, by+i, 209);
+                set_dat_subtile(lvl, bx+2, by+i, 209);
           }
       }
     }
@@ -868,57 +835,3 @@ static int get_corner (int x, int y, int i, int j)
     return cor[s];
 }
     
-static void set_pillar(int x, int y, int pillar)
-{
-    set_pillar_thing(x, y, pillar, 0, 0);
-}
-
-static void set_pillar_thing(int x, int y, int pillar, int thingnum, int thinghgt)
-{
-    int slbsame[3][3];
-    int i, j;
-    int bx, by;
-    unsigned char *thing;
-    
-    bx = x*3;
-    by = y*3;
-    for (i=0; i < 3; i++)
-    {
-      for (j=0; j < 3; j++)
-      {
-          slbsame[i][j]=0;
-          if (x+i-1>=0 && x+i-1 < MAP_SIZE_X && y+j-1>=0 && y+j-1 < MAP_SIZE_Y)
-          {
-            if (lvl->slb[x][y]==lvl->slb[x+i-1][y+j-1] && 
-                lvl->own[x][y]==lvl->own[x+i-1][y+j-1])
-                slbsame[i][j]=1;
-          }
-      }
-    }
-    for (i=0; i < 3; i+=2)
-    {
-      for (j=0; j < 3; j+=2)
-      {
-          if (slbsame[i][1] && slbsame[1][j] &&
-            !slbsame[2-i][1] && !slbsame[1][2-j])
-          {
-            if (pillar)
-                set_dat2 (bx+i, by+j, pillar);
-            if (thingnum)
-            {
-                thing = create_item(bx+1, by+1, thingnum);
-                set_thing_tilepos_h(thing,(thinghgt>>8)&255);
-                set_thing_subtpos_h(thing,thinghgt&255);
-                if (thingnum == 2) // Put torches right by the pillars
-                {
-                  set_thing_subtpos(thing,i*0x40+0x40,j*0x40+0x40);
-                }
-                thing [12]=(MAP_SIZE_X*y+x) >> 8;
-                thing [11]=((MAP_SIZE_X*y+x) & 255);
-                thing_add(lvl,thing);
-            }
-          }
-      }
-    }
-}
-

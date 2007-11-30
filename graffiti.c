@@ -122,7 +122,7 @@ int add_graffiti (int x, int y, char *string, int d)
 
 void read_graffiti (void)
 {
-    DK_CLM_REC *check;
+    unsigned char *clm_check;
     unsigned char *thing;
     int i, j, k;
     int x, y, bx, by, d;
@@ -132,9 +132,9 @@ void read_graffiti (void)
     graffiti_data = NULL;
     graffiti_num=0;
     
-    check = lvl->clm[2047];
+    clm_check = lvl->clm[2047];
     for (i=0; i < 24; i++)
-      if (check->data[i] != 0xff)
+      if (clm_check[i] != 0xff)
           return;
     
     for (x=0; x < MAP_SIZE_X; x++)
@@ -143,7 +143,7 @@ void read_graffiti (void)
       {
           bx = x*3;
           by = y*3;
-          d = get_dat (bx, by)-1500;
+          d = get_dat_subtile(lvl, bx, by)-1500;
           if (!d || d==1) // Got some graffiti
           {
             if (!graffiti_num)
@@ -159,7 +159,7 @@ void read_graffiti (void)
             graf->y=y;
             graf->d=d;
             i=0;
-            while (get_dat(bx+(d ? 1 : i), by+(d ? i : 1))-1503 &&
+            while (get_dat_subtile(lvl, bx+(d ? 1 : i), by+(d ? i : 1))-1503 &&
                    bx+(d ? 1 : i) < 255 && by+(d ? i : 1) < 255)
                 i++;
             graf->string = (char *)malloc (i+1);
@@ -167,10 +167,10 @@ void read_graffiti (void)
                 die ("Out of memory");
             for (j=0; j < i; j++)
                 graf->string[j]=(char)
-                  (get_dat (bx+(d ? 1 : j), by+(d ? j : 1))-1503);
+                  (get_dat_subtile(lvl, bx+(d ? 1 : j), by+(d ? j : 1))-1503);
             graf->string[i]=0;
             i=0;
-            while (get_dat(bx+(d ? 1 : i), by+(d ? i : 1))-1502 &&
+            while (get_dat_subtile(lvl, bx+(d ? 1 : i), by+(d ? i : 1))-1502 &&
                    bx+(d ? 1 : i) < 255 && by+(d ? i : 1) < 255)
                 i++;
             graf->fin = (d ? y : x)+i/3;
@@ -221,14 +221,14 @@ void draw_graffiti (void)
           len+=chars[(unsigned char)string[i]][0];
       for (i=0; i < len+1+l; i++)
       {
-          set_dat2 (bx+i*(1-d)+dx[d][0], by+i*d+dy[d][0], 1700);
+          set_dat_subtile(lvl, bx+i*(1-d)+dx[d][0], by+i*d+dy[d][0], 1700);
           if (i<l)
-            set_dat2 (bx+i*(1-d)+dx[d][1], by+i*d+dy[d][1], 1503+string[i]);
+            set_dat_subtile(lvl, bx+i*(1-d)+dx[d][1], by+i*d+dy[d][1], 1503+string[i]);
           else if (i==l) // Terminate string
-            set_dat2 (bx+i*(1-d)+dx[d][1], by+i*d+dy[d][1], 1503); 
+            set_dat_subtile(lvl, bx+i*(1-d)+dx[d][1], by+i*d+dy[d][1], 1503); 
           else
-            set_dat2 (bx+i*(1-d)+dx[d][1], by+i*d+dy[d][1], 1700);
-          set_dat2 (bx+i*(1-d)+dx[d][2], by+i*d+dy[d][2], 1700);
+            set_dat_subtile(lvl, bx+i*(1-d)+dx[d][1], by+i*d+dy[d][1], 1700);
+          set_dat_subtile(lvl, bx+i*(1-d)+dx[d][2], by+i*d+dy[d][2], 1700);
           if (i%3==1)
           {
             thing = create_item(bx+(d ? 1 : i), by+(d ? i : 1), ITEM_SUBTYPE_TORCH);
@@ -240,7 +240,7 @@ void draw_graffiti (void)
             lvl->slb[x+(i/3)*(1-d)][y+(i/3)*d]=0;
           }
       }
-      set_dat2 (bx, by, 1500+d);
+      set_dat_subtile(lvl, bx, by, 1500+d);
       if (i%3==1)
       {
           thing = create_item (bx+(d ? 1 : i), by+(d ? i : 1), ITEM_SUBTYPE_TORCH);
@@ -253,7 +253,7 @@ void draw_graffiti (void)
       }
       /* Put in the graffiti terminating jobsworth */
       i--;
-      set_dat2 (bx+i*(1-d)+dx[d][1], by+i*d+dy[d][1], 1502);
+      set_dat_subtile(lvl, bx+i*(1-d)+dx[d][1], by+i*d+dy[d][1], 1502);
       if (!d)
       {
           bx2 = bx+len+l-1;
@@ -262,13 +262,13 @@ void draw_graffiti (void)
           {
             for (j=0; j < chars[(unsigned char)string[i]][0]; j++)
             {
-                set_dat2 (bx++, by+2, 1700+chars [(unsigned char)string[i]][j+1]);
-                set_dat2 (bx2--, by, 1700+chars [(unsigned char)string[i]][j+1]);
+                set_dat_subtile(lvl, bx++, by+2, 1700+chars [(unsigned char)string[i]][j+1]);
+                set_dat_subtile(lvl, bx2--, by, 1700+chars [(unsigned char)string[i]][j+1]);
             }
             if (i!=l-1)
             {
-                set_dat2 (bx++, by+2, 1700);
-                set_dat2 (bx2--, by, 1700);
+                set_dat_subtile(lvl, bx++, by+2, 1700);
+                set_dat_subtile(lvl, bx2--, by, 1700);
             }
           }
       }
@@ -280,13 +280,13 @@ void draw_graffiti (void)
           {
             for (j=0; j < chars[(unsigned char)string[i]][0]; j++)
             {
-                set_dat2 (bx, by++, 1700+chars [(unsigned char)string[i]][j+1]);
-                set_dat2 (bx+2, by2--, 1700+chars [(unsigned char)string[i]][j+1]);
+                set_dat_subtile(lvl, bx, by++, 1700+chars [(unsigned char)string[i]][j+1]);
+                set_dat_subtile(lvl, bx+2, by2--, 1700+chars [(unsigned char)string[i]][j+1]);
             }
             if (i!=l-1)
             {
-                set_dat2 (bx, by++, 1700);
-                set_dat2 (bx+2, by2--, 1700);
+                set_dat_subtile(lvl, bx, by++, 1700);
+                set_dat_subtile(lvl, bx+2, by2--, 1700);
             }
           }
       }

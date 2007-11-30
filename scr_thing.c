@@ -99,8 +99,8 @@ void display_tngdat(void)
             screen_setcolor(col);
             if (datmode==0)
                 screen_printf("%02X%02X",
-                        lvl->dat_high[cx*3+i][cy*3+j],
-                        lvl->dat_low[cx*3+i][cy*3+j]);
+                        (unsigned int)lvl->dat_high[cx*3+i][cy*3+j],
+                        (unsigned int)lvl->dat_low[cx*3+i][cy*3+j]);
           }
       }
       set_cursor_pos(all_rows-10, cols+20);

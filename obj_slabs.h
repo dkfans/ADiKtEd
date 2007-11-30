@@ -9,8 +9,8 @@
 #define SLAB_TYPE_GOLD         0x01
 #define SLAB_TYPE_EARTH        0x02
 #define SLAB_TYPE_TORCHDIRT    0x03
-#define SLAB_TYPE_DRAPE        0x04
-#define SLAB_TYPE_TORCHWALL    0x05
+#define SLAB_TYPE_WALLDRAPE    0x04
+#define SLAB_TYPE_WALLTORCH    0x05
 #define SLAB_TYPE_WALLWTWINS   0x06
 #define SLAB_TYPE_WALLWWOMAN   0x07
 #define SLAB_TYPE_WALLPAIRSHR  0x08
@@ -44,10 +44,6 @@
 #define SLAB_TYPE_GEMS         0x34
 #define SLAB_TYPE_GUARDPOST    0x35
 
-#define SLAB_WIB_STATIC        0x00
-#define SLAB_WIB_SKEW          0x01
-#define SLAB_WIB_ANIMATE       0x02
-
 #define PLAYERS_COUNT          6
 #define PLAYER0                0x00
 #define PLAYER1                0x01
@@ -59,11 +55,22 @@
 struct LEVEL;
 
 short slab_is_central(struct LEVEL *lvl,int x,int y);
-int slab_default_wbi_entry(unsigned char slab_type);
+short slabs_verify(struct LEVEL *lvl, char *err_msg);
+
 int slab_siblings_oftype(struct LEVEL *lvl,int x,int y,unsigned char slab_type);
 void slab_draw_smear(struct LEVEL *lvl,int startx,int starty,int startr,
                      int endx,int endy,int endr,int bend,unsigned char slab_type);
 void slab_draw_circle(struct LEVEL *lvl,int x,int y,int rad,unsigned char slab_type);
+
+short slab_is_short(unsigned char slab_type);
+short slab_is_door(unsigned char slab_type);
+short slab_is_room(unsigned char slab_type);
+short slab_is_wall(unsigned char slab_type);
+short slab_is_space(unsigned char slab_type);
+short slab_is_tall_unclmabl(unsigned char slab_type);
+short slab_is_tall(unsigned char slab_type);
+short slab_is_short_clmabl(unsigned char slab_type);
+short slab_verify_entry(unsigned char slab_type, char *err_msg);
 
 void check_doors(void);
 

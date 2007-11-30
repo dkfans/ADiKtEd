@@ -26,7 +26,7 @@ static short cursor_actions (int key);
 static void tngactions (int key);
 static void clmactions (int key);
 static void helpactions (int key);
-static void slb_place_room (unsigned char room);
+void slb_place_room(unsigned char room);
 void start_help(void);
 void end_help(void);
 void start_list(void);
@@ -73,7 +73,7 @@ char tngclipboard[TNGCLIPBRD_SIZE];
  */
 void proc_key (void) 
 {
-    static char usrinput[80];
+    static char usrinput[READ_BUFSIZE];
     unsigned int g;
     g = get_key();
     // Decoding "universal keys" - global actions
@@ -601,6 +601,7 @@ short list_actions(int key)
 static void creatureactions(int key)
 {
     unsigned char *thing;
+    message_release();
     if (!list_actions(key))
     {
       switch (key)
@@ -635,6 +636,7 @@ static void creatureactions(int key)
 static void itemtypeactions(int key)
 {
     unsigned char *thing;
+    message_release();
     if (!list_actions(key))
     {
       switch (key)
@@ -667,7 +669,7 @@ static void itemtypeactions(int key)
 static void slbactions(int key)
 {
     int d;
-    static char graf[80];
+    static char graf[READ_BUFSIZE];
     message_release();
     if (!cursor_actions(key))
     {
@@ -675,6 +677,9 @@ static void slbactions(int key)
       {
       case 'u': // Update all things
         create_clmdattng();
+        break;
+      case 'v': // Verify whole map
+        level_verify(lvl,NULL);
         break;
       case KEY_TAB:
         mode=MD_TNG;
@@ -698,7 +703,7 @@ static void slbactions(int key)
       case KEY_DEL: // Delete graffiti if there is any here
         d = is_graffiti(mapx+screenx, mapy+screeny);
         if (d != -1)
-          delete_graffiti (d);
+          delete_graffiti(d);
         break;
       case 'a': // Add/view graffiti across
       case 'd': // Add/view graffiti down
@@ -737,7 +742,7 @@ static void slbactions(int key)
         message_info("Paint mode %s",paintmode?"on":"off");
           break;
         default:
-          if (key < slbplacenkeys && slbplacekeys[key]!=255)
+          if ((key < slbplacenkeys) && (slbplacekeys[key]!=255))
           {
             slb_place_room(slbplacekeys[key]);
             if (paintmode)
@@ -920,7 +925,7 @@ static void slbposcheck(void)
     if (paintmode)
     {
       if (paintroom != 255)
-          slb_place_room (paintroom);
+          slb_place_room(paintroom);
       if (paintown >= 0)
           change_ownership ((char)paintown);
     }
@@ -929,7 +934,7 @@ static void slbposcheck(void)
 /*
  * Action function - place room in slb mode.
  */
-static void slb_place_room (unsigned char room)
+void slb_place_room(unsigned char room)
 {
     int x, y;
     int oldslb;
@@ -942,7 +947,9 @@ static void slb_place_room (unsigned char room)
     {
       oldslb = lvl->slb[screenx+mapx][screeny+mapy];
       lvl->slb[screenx+mapx][screeny+mapy]=room;
-      update_square (screenx+mapx, screeny+mapy);
+          update_datclm_for_slab(lvl, screenx+mapx, screeny+mapy);
+//!!!!TODO: hack for checking new CLM support
+//      update_square (screenx+mapx, screeny+mapy);
       return;
     }
     // And another...
@@ -958,7 +965,9 @@ static void slb_place_room (unsigned char room)
     }
     for (x=markl-1; x <= markr+1; x++)
       for (y=markt-1; y <= markb+1; y++)
-          update_tngdat (x, y);
+          update_datclm_for_slab(lvl, x, y);
+//!!!!TODO: hack for checking new CLM support
+          //update_tngdat (x, y);
     mark=false;
 }
 
@@ -1034,13 +1043,34 @@ void init_keys(void)
     int i=0;
     // Arrays storing keyboard shortcuts and corresponding rooms
     // These must end with zero
-    static const unsigned int keys[]={'t', 'L', 'H', 'T', 'l', '%',
-      'W', 'G', 'P', 'O', 'B', 'e', 'g', 'S', 's', 'h', '#', '.', '-',
-      ' ', '/', '^', '\\', '&', '*', '(', '$', '!', '~', '=', 
-      'w', 'b', 'i', 'm', 'E', 0};
-    static const unsigned char rooms[]={16, 38, 36, 24, 18, 51,
-      28, 53, 20, 22, 40, 32, 34, 30, 30, 26, 0, 2, 10, 
-      11, 3, 4, 5, 6, 7, 8, 1, 52, 13, 12, 42, 44, 46, 48, 14, 0};
+    static const unsigned int keys[]={
+      't', 'L', 'H',
+      'T', 'l', '%',
+      'W', 'G', 'P',
+      'O', 'B', 'e',
+      'g', 'S', 's',
+      'h', '#', '.',
+      '-', ' ', '/',
+      '^', '\\', '&',
+      '*', '(', '$',
+      '!', '~', '`',
+      '=', 'w', 'b',
+      'i', 'm', 'E',
+       0};
+    static const unsigned char rooms[]={
+      SLAB_TYPE_TREASURE, SLAB_TYPE_LAIR, SLAB_TYPE_HATCHERY,
+      SLAB_TYPE_TRAINING, SLAB_TYPE_LIBRARY, SLAB_TYPE_BRIDGE,
+      SLAB_TYPE_WORKSHOP, SLAB_TYPE_GUARDPOST, SLAB_TYPE_PRISONCASE,
+      SLAB_TYPE_TORTURE, SLAB_TYPE_BARRACKS, SLAB_TYPE_TEMPLE,
+      SLAB_TYPE_GRAVEYARD, SLAB_TYPE_SCAVENGER, SLAB_TYPE_SCAVENGER,
+      SLAB_TYPE_DUNGHEART, SLAB_TYPE_ROCK, SLAB_TYPE_EARTH,
+      SLAB_TYPE_PATH, SLAB_TYPE_CLAIMED, SLAB_TYPE_TORCHDIRT,
+      SLAB_TYPE_WALLDRAPE, SLAB_TYPE_WALLTORCH, SLAB_TYPE_WALLWTWINS,
+      SLAB_TYPE_WALLWWOMAN, SLAB_TYPE_WALLPAIRSHR, SLAB_TYPE_GOLD,
+      SLAB_TYPE_GEMS, SLAB_TYPE_WATER, SLAB_TYPE_WATER,
+      SLAB_TYPE_LAVA, SLAB_TYPE_DOORWOOD1, SLAB_TYPE_DOORBRACE1,
+      SLAB_TYPE_DOORIRON1, SLAB_TYPE_DOORMAGIC1, SLAB_TYPE_PORTAL,
+      0};
 
     if (sizeof(keys)/sizeof(*keys) != sizeof(rooms)/sizeof(*rooms))
       die ("init_keys: Number of rooms doesn't match number of keys");

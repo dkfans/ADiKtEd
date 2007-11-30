@@ -32,13 +32,13 @@ short level_init()
     int arr_entries_y=MAP_SIZE_Y*MAP_SUBNUM_Y;
 
   { //allocating CLM structures
-    lvl->clm = (DK_CLM_REC **)malloc(COLUMN_ENTRIES*sizeof(char *));
+    lvl->clm = (unsigned char **)malloc(COLUMN_ENTRIES*sizeof(char *));
     if (lvl->clm==NULL)
         die("level_init: Out of memory");
     int i;
     for (i=0; i<COLUMN_ENTRIES; i++)
     {
-      lvl->clm[i]=(DK_CLM_REC *)malloc(sizeof(DK_CLM_REC));
+      lvl->clm[i]=(unsigned char *)malloc(SIZEOF_DK_CLM_REC);
       if (lvl->clm[i]==NULL)
         die("level_init: Out of memory");
     }
@@ -208,7 +208,7 @@ short level_clear_other(struct LEVEL *lvl)
     for (i=0; i<COLUMN_ENTRIES; i++)
       if (lvl->clm[i]!=NULL)
       {
-        memset(lvl->clm[i]->data,0,sizeof(DK_CLM_REC));
+        memset(lvl->clm[i],0,SIZEOF_DK_CLM_REC);
       }
 
     for (i=0; i < MAP_SIZE_Y; i++)
@@ -489,7 +489,131 @@ short level_free()
   return result;
 }
 
-int verify_map(struct LEVEL *lvl)
+short level_verify(struct LEVEL *lvl, char *actn_name)
+{
+  char err_msg[LINEMSG_SIZE];
+  strcpy(err_msg,"Unknown error");
+  short result=VERIF_OK;
+  if (result==VERIF_OK)
+  {
+    result=level_verify_struct(lvl,err_msg);
+  }
+  if (result==VERIF_OK)
+  {
+    result=things_verify(lvl,err_msg);
+  }
+  if (result==VERIF_OK)
+  {
+    result=slabs_verify(lvl,err_msg);
+  }
+  if (result==VERIF_OK)
+  {
+    result=actnpts_verify(lvl,err_msg);
+  }
+  if (result==VERIF_OK)
+  {
+    result=columns_verify(lvl,err_msg);
+  }
+//TODO: verify inf, txt, dat,...
+  if (result==VERIF_OK)
+  {
+    result=level_verify_logic(lvl,err_msg);
+  }
+  switch (result)
+  {
+    case VERIF_OK:
+      message_info("Level verification passed.");
+      return VERIF_OK;
+    case VERIF_WARN:
+      if (actn_name==NULL)
+        message_error("Warning: %s",err_msg);
+      else
+        message_error("Warning: %s (%s performed)",err_msg,actn_name);
+      return VERIF_WARN;
+    default:
+      if (actn_name==NULL)
+      message_error("Error: %s",err_msg);
+      else
+      message_error("Error: %s (%s cancelled)",err_msg,actn_name);
+      return VERIF_ERROR;
+  }
+}
+
+/*
+ * Verifies internal LEVEL structure integrity. Returns VERIF_ERROR,
+ * VERIF_WARN or VERIF_OK
+ */
+short level_verify_struct(struct LEVEL *lvl, char *err_msg)
+{
+    //Preparing array bounds
+    int arr_entries_x=MAP_SIZE_X*MAP_SUBNUM_X;
+    int arr_entries_y=MAP_SIZE_Y*MAP_SUBNUM_Y;
+    //Checking base pointers
+    if (lvl->tng_subnums==NULL)
+    {
+          strncpy(err_msg,"Null internal object tng_subnums!",LINEMSG_SIZE);
+          return VERIF_ERROR;
+    }
+    if (lvl->apt_subnums==NULL)
+    {
+          strncpy(err_msg,"Null internal object apt_subnums!",LINEMSG_SIZE);
+          return VERIF_ERROR;
+    }
+    //Sweeping through structures
+    int i, j, k;
+    for (i=0; i < arr_entries_y; i++)
+    {
+      for (j=0; j < arr_entries_x; j++)
+      {
+        int things_count=get_thing_subnums(lvl,i,j);
+        for (k=0; k <things_count ; k++)
+        {
+          unsigned char *thing = get_thing(lvl,i,j,k);
+          if (thing==NULL)
+          {
+              sprintf(err_msg,"Null thing pointer at slab %d,%d.",i/MAP_SUBNUM_X, j/MAP_SUBNUM_Y);
+              return VERIF_ERROR;
+          }
+        }
+
+        int actpt_count=lvl->apt_subnums[i][j];
+        for (k=0; k <actpt_count ; k++)
+        {
+          unsigned char *actnpt = lvl->apt_lookup[i][j][k];
+          if (actnpt==NULL)
+          {
+              sprintf(err_msg,"Null action point pointer at slab %d,%d.",i/MAP_SUBNUM_X, j/MAP_SUBNUM_Y);
+              return VERIF_ERROR;
+          }
+        }
+        
+      }
+    }
+    for (i=0; i<COLUMN_ENTRIES; i++)
+    {
+      if (lvl->clm[i]==NULL)
+      {
+        sprintf(err_msg,"Null CoLuMn entry at index %d.",i);
+        return VERIF_ERROR;
+      }
+    }
+  return VERIF_OK;
+}
+
+/*
+ * Verifies action points parameters. Returns VERIF_ERROR,
+ * VERIF_WARN or VERIF_OK
+ */
+short actnpts_verify(struct LEVEL *lvl, char *err_msg)
+{
+  return VERIF_OK;
+}
+
+/*
+ * Verifies various logic aspects of a map. Returns VERIF_ERROR,
+ * VERIF_WARN or VERIF_OK
+ */
+short level_verify_logic(struct LEVEL *lvl, char *err_msg)
 {
     //Preparing array bounds
     int arr_entries_x=MAP_SIZE_X*MAP_SUBNUM_X;
@@ -501,79 +625,47 @@ int verify_map(struct LEVEL *lvl)
     for (i=0; i < PLAYERS_COUNT; i++)
       hearts[i]=0;
 
-    if (lvl->tng_subnums==NULL)
-    {
-          message_error("Error: Null internal object tng_subnums!");
-          return 0;
-    }
-    if (lvl->apt_subnums==NULL)
-    {
-          message_error("Error: Null internal object apt_subnums!");
-          return 0;
-    }
     for (i=0; i < arr_entries_y; i++)
     {
       for (j=0; j < arr_entries_x; j++)
       {
-
-        int things_count=lvl->tng_subnums[i][j];
+        int things_count=get_thing_subnums(lvl,i,j);
         for (k=0; k <things_count ; k++)
         {
-          unsigned char *thing = lvl->tng_lookup[i][j][k];
-          if (thing==NULL)
-          {
-              message_error("Error: Null thing pointer "
-                         "at slab %d,%d. (action cancelled))",i/MAP_SUBNUM_X, j/MAP_SUBNUM_Y);
-                return 0;
-          }
+          unsigned char *thing = get_thing(lvl,i,j,k);
+
           if ((get_thing_type(thing)==THING_TYPE_ITEM) && (get_thing_subtype(thing)==ITEM_SUBTYPE_DNHEART))
           {
             if (get_thing_owner(thing)>=PLAYERS_COUNT-1) // Orphan heart
             {
-              message_error("Warning: Unowned dungeon heart on "
-                         "slab %d,%d. (Map saved)",i/MAP_SUBNUM_X, j/MAP_SUBNUM_Y);
-                return 2;
+              sprintf(err_msg,"Unowned dungeon heart on slab %d,%d.",i/MAP_SUBNUM_X, j/MAP_SUBNUM_Y);
+              return VERIF_WARN;
             } else
             {
               hearts[get_thing_owner(thing)]++;
             }
           }
         }
-
-        int actpt_count=lvl->apt_subnums[i][j];
-        for (k=0; k <actpt_count ; k++)
-        {
-          unsigned char *actnpt = lvl->apt_lookup[i][j][k];
-          if (actnpt==NULL)
-          {
-              message_error("Error: Null action point pointer "
-                         "at slab %d,%d. (action cancelled))",i/MAP_SUBNUM_X, j/MAP_SUBNUM_Y);
-                return 0;
-          }
-        }
         
       }
     }
-    for (i=0; i < 5; i++)
+    for (i=0; i < PLAYERS_COUNT; i++)
     {
       if (hearts[i]>1)
       {
-        message_error("Warning: Player %d owns %d dungeon "
-             "hearts. (Map saved)", i, hearts[i]);
-          return 2;
+        sprintf(err_msg,"Player %d owns %d dungeon hearts.",i, hearts[i]);
+        return VERIF_WARN;
       }
     }
     if (!hearts[0])
     {
-        message_error("Warning: Human player doesn't have a dungeon"
-             " heart. (Map saved)");
-      return 2;
+        sprintf(err_msg,"Human player doesn't have a dungeon heart.");
+        return VERIF_WARN;
     }
-    /* Future verifications:
-     * Maybe check that no things are trapped in rock/earth?
-     */
+    // Future verifications:
+    // Maybe check that no things are trapped in rock/earth?
      
-    return 1;
+  return VERIF_OK;
 }
 
 /*
@@ -636,7 +728,7 @@ void start_new_map(struct LEVEL *lvl)
     for (i=0; i < COLUMN_ENTRIES; i++)
     {
       for (j=0; j < SIZEOF_DK_CLM_REC; j++)
-          lvl->clm[i]->data[j]=0;
+          (lvl->clm[i])[j]=0;
     }
 
     lvl->inf=0x00;
@@ -657,22 +749,22 @@ void generate_random_map(struct LEVEL *lvl)
         if (rand()<rnd_bound)
         {
           lvl->slb[j][i]=SLAB_TYPE_ROCK;
-          lvl->own[j][i]=5;
+          lvl->own[j][i]=PLAYER_UNSET;
         }
         if (rand()<rnd_bound)
         {
           lvl->slb[j][MAP_MAXINDEX_X-i]=SLAB_TYPE_ROCK;
-          lvl->own[j][MAP_MAXINDEX_X-i]=5;
+          lvl->own[j][MAP_MAXINDEX_X-i]=PLAYER_UNSET;
         }
         if (rand()<rnd_bound)
         {
           lvl->slb[i][j]=SLAB_TYPE_ROCK;
-          lvl->own[i][j]=5;
+          lvl->own[i][j]=PLAYER_UNSET;
         }
         if (rand()<rnd_bound)
         {
           lvl->slb[MAP_MAXINDEX_X-i][j]=SLAB_TYPE_ROCK;
-          lvl->own[MAP_MAXINDEX_X-i][j]=5;
+          lvl->own[MAP_MAXINDEX_X-i][j]=PLAYER_UNSET;
         }
       }
     int num_smears=(rand()%20);
@@ -709,11 +801,11 @@ void generate_random_map(struct LEVEL *lvl)
             if (nsibln>slabgrow_bound_val)
             {
               lvl->slb[cx][cy]=SLAB_TYPE_ROCK;
-              lvl->own[cx][cy]=5;
+              lvl->own[cx][cy]=PLAYER_UNSET;
             } else
             {
               lvl->slb[cx][cy]=SLAB_TYPE_EARTH;
-              lvl->own[cx][cy]=5;
+              lvl->own[cx][cy]=PLAYER_UNSET;
             }
         }
     for (i=1; i < MAP_MAXINDEX_X-1; i++)
@@ -723,12 +815,12 @@ void generate_random_map(struct LEVEL *lvl)
           if (nsibln<2)
           {
               lvl->slb[i][j]=SLAB_TYPE_EARTH;
-              lvl->own[i][j]=5;
+              lvl->own[i][j]=PLAYER_UNSET;
           }
           if (nsibln>7)
           {
               lvl->slb[i][j]=SLAB_TYPE_ROCK;
-              lvl->own[i][j]=5;
+              lvl->own[i][j]=PLAYER_UNSET;
           }
       }
     create_clmdattng();
@@ -971,4 +1063,42 @@ unsigned int get_object_tilnums(struct LEVEL *lvl,unsigned int x,unsigned int y)
 {
     if (lvl->tng_apt_nums==NULL) return 0;
     return lvl->tng_apt_nums[x%MAP_SIZE_X][y%MAP_SIZE_Y];
+}
+
+short get_subtl_wib(struct LEVEL *lvl, unsigned int sx, unsigned int sy)
+{
+    //Preparing array bounds
+    unsigned int arr_entries_x=MAP_SIZE_X*MAP_SUBNUM_X;
+    unsigned int arr_entries_y=MAP_SIZE_Y*MAP_SUBNUM_Y;
+    //Bounding position
+    sx %= arr_entries_x;
+    sy %= arr_entries_y;
+    return lvl->wib[sx][sy];
+}
+
+void set_subtl_wib(struct LEVEL *lvl, short nval, unsigned int sx, unsigned int sy)
+{
+    //Preparing array bounds
+    unsigned int arr_entries_x=MAP_SIZE_X*MAP_SUBNUM_X;
+    unsigned int arr_entries_y=MAP_SIZE_Y*MAP_SUBNUM_Y;
+    //Bounding position
+    sx %= arr_entries_x;
+    sy %= arr_entries_y;
+    lvl->wib[sx][sy]=nval;
+}
+
+short get_tile_wlb(struct LEVEL *lvl, unsigned int tx, unsigned int ty)
+{
+    //Bounding position
+    tx %= MAP_SIZE_X;
+    ty %= MAP_SUBNUM_Y;
+    return lvl->wlb[tx][ty];
+}
+
+void set_tile_wlb(struct LEVEL *lvl, short nval, unsigned int tx, unsigned int ty)
+{
+    //Bounding position
+    tx %= MAP_SIZE_X;
+    ty %= MAP_SUBNUM_Y;
+    lvl->wlb[tx][ty]=nval;
 }

@@ -166,8 +166,9 @@
 #define ITEM_CATEGR_WRKSHOPBOX 0x09
 #define ITEM_CATEGR_PWHNDEFFCT 0x0a
 #define ITEM_CATEGR_LIGHTS     0x0b
+#define ITEM_CATEGR_UNKNOWN    0x10
 
-#define ROOMEFC_SUBTP_UNKN1    0x01
+#define ROOMEFC_SUBTP_LAVA     0x01
 #define ROOMEFC_SUBTP_DRIPWTR  0x02
 #define ROOMEFC_SUBTP_ROCKFAL  0x03
 #define ROOMEFC_SUBTP_ENTRICE  0x04
@@ -298,5 +299,7 @@ char *get_creature_subtype_shortname(unsigned char stype_idx);
 char *get_trap_subtype_fullname(unsigned char stype_idx);
 char *get_door_subtype_fullname(unsigned char stype_idx);
 char *get_item_category_fullname(unsigned char stype_idx);
+
+short thing_verify(unsigned char *thing, char *err_msg);
 
 #endif // ADIKT_OBJTHINGS_H

@@ -538,13 +538,14 @@ short write_wlb(struct LEVEL *lvl,char *fname)
  */
 short save_map(struct LEVEL *lvl)
 {
-    if (verify_map(lvl)<1)
+    if (level_verify(lvl,"save")==VERIF_ERROR)
       return false;
 
-    //This has been changed to create_default_clm, because user should have
-    // choice is updating the "things" structure
+    //This has been changed to create_clmdat, because user should have
+    // choice in updating the "things" structure
     //create_clmdattng();
-    create_clmdat();
+//!!!!TODO: hack for checking new CLM support
+//    create_clmdat();
 
     draw_graffiti();
 
@@ -646,8 +647,8 @@ short load_map(struct LEVEL *lvl)
   if (result)
   {
     sprintf (fnames, "%s.dat", lvl->fname);
-    result&=load_subtile(lvl,lvl->dat_low, fnames, 131072, 255, 255, 512, 1, 0, 2, 0);
-    result&=load_subtile(lvl,lvl->dat_high, fnames, 131072, 255, 255, 512, 1, 0, 2, 1);
+    result&=load_subtile(lvl,(unsigned char **)lvl->dat_low, fnames, 131072, 255, 255, 512, 1, 0, 2, 0);
+    result&=load_subtile(lvl,(unsigned char **)lvl->dat_high, fnames, 131072, 255, 255, 512, 1, 0, 2, 1);
   }    
   if (result)
   {

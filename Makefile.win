@@ -5,8 +5,8 @@ CPP  = g++.exe -D__DEBUG__
 CC   = gcc.exe -D__DEBUG__
 WINDRES = windres.exe
 RES  = map_private.res
-OBJ  = action.o dernc.o file.o graffiti.o internal.o main.o input_kb.o scr_help.o var_utils.o output_scr.o scr_level.o scr_thing.o graffiti_font.o bulcommn.o lev_data.o lev_files.o obj_slabs.o obj_things.o obj_column.o obj_actnpts.o $(RES)
-LINKOBJ  = action.o dernc.o file.o graffiti.o internal.o main.o input_kb.o scr_help.o var_utils.o output_scr.o scr_level.o scr_thing.o graffiti_font.o bulcommn.o lev_data.o lev_files.o obj_slabs.o obj_things.o obj_column.o obj_actnpts.o $(RES)
+OBJ  = action.o dernc.o file.o graffiti.o internal.o main.o input_kb.o scr_help.o var_utils.o output_scr.o scr_level.o scr_thing.o graffiti_font.o bulcommn.o lev_data.o lev_files.o obj_slabs.o obj_things.o obj_column.o obj_actnpts.o lev_things.o lev_column.o $(RES)
+LINKOBJ  = action.o dernc.o file.o graffiti.o internal.o main.o input_kb.o scr_help.o var_utils.o output_scr.o scr_level.o scr_thing.o graffiti_font.o bulcommn.o lev_data.o lev_files.o obj_slabs.o obj_things.o obj_column.o obj_actnpts.o lev_things.o lev_column.o $(RES)
 LIBS =  -L"D:/ProgsNT/Dev-Cpp/lib" ../../../ProgsNT/Dev-Cpp/lib/libslang.a  -g3 
 INCS =  -I"D:/ProgsNT/Dev-Cpp/include" 
 CXXINCS =  -I"D:/ProgsNT/Dev-Cpp/lib/gcc/mingw32/3.4.2/include"  -I"D:/ProgsNT/Dev-Cpp/include/c++/3.4.2/backward"  -I"D:/ProgsNT/Dev-Cpp/include/c++/3.4.2/mingw32"  -I"D:/ProgsNT/Dev-Cpp/include/c++/3.4.2"  -I"D:/ProgsNT/Dev-Cpp/include" 
@@ -85,6 +85,12 @@ obj_column.o: obj_column.c
 
 obj_actnpts.o: obj_actnpts.c
 	$(CC) -c obj_actnpts.c -o obj_actnpts.o $(CFLAGS)
+
+lev_things.o: lev_things.c
+	$(CC) -c lev_things.c -o lev_things.o $(CFLAGS)
+
+lev_column.o: lev_column.c
+	$(CC) -c lev_column.c -o lev_column.o $(CFLAGS)
 
 map_private.res: map_private.rc 
 	$(WINDRES) -i map_private.rc --input-format=rc -o map_private.res -O coff 

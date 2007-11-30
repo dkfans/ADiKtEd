@@ -52,6 +52,11 @@
 #define LINEMSG_SIZE    160
 #define READ_BUFSIZE    256
 
+// Return values for verification functions
+#define VERIF_ERROR   0
+#define VERIF_OK      1
+#define VERIF_WARN    2
+
 // File handling variables
 extern char *filebase;
 

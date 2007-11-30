@@ -17,6 +17,7 @@
 #include "action.h"
 #include "obj_slabs.h"
 #include "obj_things.h"
+#include "obj_column.h"
 #include "internal.h"
 
 // Amount of width the key takes up
@@ -235,7 +236,7 @@ static void draw_clm(void)
 {
     int i, j, g;
     int col;
-    DK_CLM_REC *c;
+    char *clmentry;
     
     int cx, cy;
 
@@ -290,26 +291,35 @@ static void draw_clm(void)
     }
     screen_setcolor(0);
     set_cursor_pos(1, cols+3);
-    int clm_idx=0x10000-((lvl->dat_high[cx*3+sx][cy*3+sy]<<8)+lvl->dat_low[cx*3+sx][cy*3+sy]);
-    c = lvl->clm[clm_idx];
-    screen_printf("Use: %04X ", c->data[0]+(c->data[1]<<8));
+    int clm_idx=get_dat_subtile(lvl, cx*3+sx, cy*3+sy);
+    clmentry = lvl->clm[clm_idx%COLUMN_ENTRIES];
+    struct COLUMN_REC *clm_rec;
+    clm_rec=create_column_rec();
+    get_clm_entry(clm_rec, clmentry);
+    screen_printf("Use: %04X (decimal:%5d)", clm_rec->use,clm_rec->use);
     set_cursor_pos(1, cols+23);
-    screen_printf("Permanent: %d", c->data[2]&1);
+    screen_printf("Permanent: %d", clm_rec->permanent);
     set_cursor_pos(2, cols+3);
-    screen_printf("Lintel: %d", (c->data[2]>>1)&7);
+    screen_printf("Lintel: %d", clm_rec->lintel);
     set_cursor_pos(2, cols+23);
-    screen_printf("Height: %X", (c->data[2]>>4)&15);
+    screen_printf("Height: %X", clm_rec->height);
     set_cursor_pos(3, cols+3);
-    screen_printf("Solid mask: %04X", c->data[3]+(c->data[4]<<8));
+    screen_printf("Solid mask: %04X", clm_rec->solid);
     set_cursor_pos(3, cols+23);
-    screen_printf("Orientation: %02X", c->data[7]);
+    screen_printf("Orientation: %02X", clm_rec->orientation);
     set_cursor_pos(4, cols+3);
-    screen_printf("Base block: %03X", c->data[5]+(c->data[6]<<8));
+    screen_printf("Base block: %03X", clm_rec->base);
     for (i=0; i < 8; i++)
     {
       set_cursor_pos(5+i, cols+3);
-      screen_printf("Cube %d: %03X", i, c->data[8+i*2]+(c->data[9+i*2]<<8));
+      screen_printf("Cube %d: %03X (CLM index:%4d)", i, clm_rec->c[i],clm_idx);
     }
+    free_column_rec(clm_rec);
+    set_cursor_pos(14, cols+3);
+    screen_printf("WIB animate: %03X", get_subtl_wib(lvl, cx*3+sx, cy*3+sy));
+    set_cursor_pos(15, cols+3);
+    screen_printf("WLB tile info: %03X", get_subtl_wib(lvl, cx, cy));
+
     display_tngdat();
     if (is_graffiti(screenx+mapx, screeny+mapy)==-1)
       show_cursor(slbkey[lvl->slb[screenx+mapx][screeny+mapy]]);

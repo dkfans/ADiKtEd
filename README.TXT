@@ -54,7 +54,10 @@ Version: 0.50b
  Most of the TNG support code rewritten completely
  Renewed "creature" screen (adding creatures)
  New item screen (allows adding ANY item available in the game)
- Create room effect function (ctrl+e in "thing" mode)
+ Create room effect function (e key in "thing" mode)
+Version: 0.51b
+ Enhanced map verification function (press v in slab mode)
+ Completely rewritten CLM/DAT support (it was lot of work...)
 
 Author:
 Jon Skeet, skeet@pobox.com
