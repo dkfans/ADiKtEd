@@ -7,6 +7,7 @@
  */
 
 #include "obj_slabs.h"
+
 #include "lev_data.h"
 #include "globals.h"
 #include "obj_things.h"
@@ -22,6 +23,14 @@ const unsigned char owners_list[]={
 const unsigned short slabs_space[]={
     SLAB_TYPE_PATH, SLAB_TYPE_CLAIMED, SLAB_TYPE_LAVA,
     SLAB_TYPE_WATER
+};
+
+const unsigned short slabs_short_unclmabl[]={
+    SLAB_TYPE_PATH, SLAB_TYPE_LAVA, SLAB_TYPE_WATER
+};
+
+const unsigned short slabs_wealth[]={
+    SLAB_TYPE_GOLD, SLAB_TYPE_GEMS,
 };
 
 const unsigned short slabs_tall_unclmabl[]={
@@ -50,18 +59,33 @@ const unsigned short slabs_doors[]={
     SLAB_TYPE_DOORMAGIC1, SLAB_TYPE_DOORMAGIC2
 };
 
-unsigned char get_player_next(unsigned char plyr_idx)
+unsigned char get_owner_next(unsigned char plyr_idx)
 {
   plyr_idx++;
   if (plyr_idx<PLAYERS_COUNT) return plyr_idx;
   return 0;
 }
 
-unsigned char get_player_prev(unsigned char plyr_idx)
+unsigned char get_owner_prev(unsigned char plyr_idx)
 {
   plyr_idx--;
   if (plyr_idx<PLAYERS_COUNT) return plyr_idx;
   return PLAYERS_COUNT-1;
+}
+
+/*
+ * Sets slabs which can't be claimed as unowned (PLAYER_UNSET)
+ */
+void update_slab_owners(struct LEVEL *lvl)
+{
+    int tx, ty;    
+    for (ty=0; ty<MAP_SIZE_Y; ty++)
+      for (tx=0; tx<MAP_SIZE_X; tx++)
+      {
+        unsigned char slb=get_tile_slab(lvl, tx, ty);
+        if (!slab_is_clmabl(slb))
+          set_tile_owner(lvl,tx,ty,PLAYER_UNSET);
+      }
 }
 
 /*
@@ -160,6 +184,14 @@ short slab_is_wall(unsigned char slab_type)
     return false;
 }
 
+short slab_is_wealth(unsigned char slab_type)
+{
+     int array_count=sizeof(slabs_wealth)/sizeof(unsigned short);
+    int idx=arr_ushort_pos(slabs_wealth,slab_type,array_count);
+    if (idx>=0) return true;
+    return false;
+}
+
 short slab_is_space(unsigned char slab_type)
 {
      int array_count=sizeof(slabs_space)/sizeof(unsigned short);
@@ -174,6 +206,15 @@ short slab_is_tall_unclmabl(unsigned char slab_type)
      int array_count=sizeof(slabs_tall_unclmabl)/sizeof(unsigned short);
     //All such things are listed in slabs_tall_unclmabl array
     int idx=arr_ushort_pos(slabs_tall_unclmabl,slab_type,array_count);
+    if (idx>=0) return true;
+    return false;
+}
+
+short slab_is_short_unclmabl(unsigned char slab_type)
+{
+     int array_count=sizeof(slabs_short_unclmabl)/sizeof(unsigned short);
+    //All such things are listed in slabs_space array
+    int idx=arr_ushort_pos(slabs_short_unclmabl,slab_type,array_count);
     if (idx>=0) return true;
     return false;
 }
@@ -204,34 +245,25 @@ short slab_is_short_clmabl(unsigned char slab_type)
     return false;
 }
 
-
-/*
- * Use our own strange slb thing to get locked/unlocked doors right
- */
-void check_doors(void)
+short slab_is_claimedgnd(unsigned char slab_type)
 {
-    //Preparing array bounds
-    int arr_entries_x=MAP_SIZE_X*MAP_SUBNUM_X;
-    int arr_entries_y=MAP_SIZE_Y*MAP_SUBNUM_Y;
+    if (slab_is_door(slab_type)) return true;
+    if (slab_type==SLAB_TYPE_CLAIMED) return true;
+    return false;
+}
 
-    unsigned char *thing;
-    int cx, cy, k;
-    for (cy=0; cy < arr_entries_y; cy++)
-    {
-      for (cx=0; cx < arr_entries_x; cx++)
-      {
-          int things_count=get_thing_subnums(lvl,cx,cy);
-          for (k=0; k<things_count; k++)
-          {
-            thing = get_thing(lvl,cx,cy,k);
-            if (is_door(thing))
-            {
-                if ((lvl->slb[cx/MAP_SUBNUM_X][cy/MAP_SUBNUM_Y]&0xfe) == get_thing_subtype(thing)*2+40) // Update the slab
-                  lvl->slb[cx/MAP_SUBNUM_X][cy/MAP_SUBNUM_Y] = get_thing_subtype(thing)*2+40+thing[14];
-            }
-          }
-      }
-    }
+short slab_is_clmabl(unsigned char slab_type)
+{
+    if (slab_is_short_unclmabl(slab_type)) return false;
+    if (slab_is_tall_unclmabl(slab_type)) return false;
+    return true;
+}
+
+short slab_needs_adjacent_torch(unsigned char slab_type)
+{
+    if (slab_type==SLAB_TYPE_TORCHDIRT) return true;
+    if (slab_type==SLAB_TYPE_WALLTORCH) return true;
+    return false;
 }
 
 /*

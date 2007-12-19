@@ -12,10 +12,7 @@
 #include <slang.h>
 
 short input_initied=false;
-
-char *slbkey;
-unsigned char *slbplacekeys;
-int slbplacenkeys;
+short disable_sounds=false;
 
 /*
  * Function for retrieving single key from keyboard.
@@ -65,12 +62,12 @@ int get_str (char *prompt, char *buf)
 #if defined(unix) && !defined(GO32)
       safe_update = FALSE;
 #endif
-      if (c == 13)
+      if ((c == KEY_ENTER)&&(len>0))
       {
           buf[len] = '\0';
           return true;
       } 
-      else if (c == 27 || c == 7)
+      else if ((c == KEY_ESCAPE) || (c == 7))
       {
         message_error("User break of input");
           SLKeyBoard_Quit=0;
@@ -86,30 +83,12 @@ int get_str (char *prompt, char *buf)
             speaker_beep();
       }
 
-      if ((c == 127 || c == 8) && len > 0)
+      if (((c == 127) || (c == KEY_BACKSP)) && len > 0)
           len--;
 
       if (c == 'U'-'@')             /* ^U kill line */
           len = 0;
     }
-}
-
-/*
- * Inits slbkey variable - allocates memory and fills it
- */
-void init_slbkey(void)
-{
-    static char got[]="#$./^\\&*()- =~E?t?l?P?O?T?h?W?S?e?g?H?L?B?wwbbiimm?%!G";
-    const int MAX_NUM_KEYS=256;
-    slbkey=(char *)malloc(MAX_NUM_KEYS);
-    if (!slbkey)
-      die("init_slbkey: Out of memory");
-    int i;
-    int l = strlen(got);
-    for (i=0; i < l; i++)
-      slbkey[i]=got[i];
-    for (i=l-1; i < MAX_NUM_KEYS; i++)
-      slbkey[i]='?';
 }
 
 /*
@@ -156,6 +135,7 @@ void input_done(void)
  */
 void speaker_beep()
 {
-      SLtt_beep();
+    if (disable_sounds) return;
+    SLtt_beep();
 }
 

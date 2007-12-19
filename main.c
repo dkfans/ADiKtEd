@@ -3,61 +3,15 @@
  */
 
 #include "globals.h"
-#include "action.h"
+#include "scr_actn.h"
+#include "lev_data.h"
 #include "scr_help.h"
 #include "var_utils.h"
-#include "internal.h"
+#include "input_kb.h"
 
-static void read_init(void);
+const char config_filename[]="map.ini";
 
-/*
- * Main function; initializes variables, loads map from commandline
- * parameters and enters the main program loop.
- */
-int main(int argc, char **argv)
-{
-    // variable that informs if main program loop should finish
-    finished=false;
-    // say the clipboard is empty to start with
-    tngclipboard[2]=0;
-    // create object for storing map
-    level_init();
-    // initialize slbkey array
-    init_slbkey();
-    // read help file
-    init_help();
-    // initialize keyboard shortcuts
-    init_keys();
-    // read configuration file
-    read_init();
-    // random num gen seed selection
-    srand(time(0));
-    // Interpreting command line parameters
-    if (argc>=2)
-    {
-        //Loading map
-        if (format_map_fname(lvl->fname,argv[1]))
-        {
-          load_map(lvl);
-        } else
-          start_new_map(lvl);
-    } else
-        start_new_map(lvl);
-    input_init();
-    screen_init();
-//!!!!TODO: hack for checking new CLM support
-//    create_default_clm();
-    check_doors();
-    do 
-    {
-      draw_levscr();
-      proc_key();
-    } while (!finished);
-    done();
-    return 0;
-}
-
-static void read_init(void)
+void read_init(void)
 {
     // Do something else here
 #if defined(unix) && !defined(GO32)
@@ -66,7 +20,6 @@ static void read_init(void)
     filebase="levels";
 #endif
     char buffer[READ_BUFSIZE];
-    const char config_filename[]="map.ini";
     char *p;
     int l;
     
@@ -93,8 +46,8 @@ static void read_init(void)
       while ((*p==' ')||(*p=='\t')) p++;
       if (strchr (buffer, ' '))
           *strchr (buffer, ' ')=0;
-      if (!strcmp(buffer, "datmode"))
-          datmode=atoi(p);
+      if (!strcmp(buffer, "dat_view_mode"))
+          dat_view_mode=atoi(p);
       if (!strcmp(buffer, "filebase"))
       {
           filebase=strdup(p);
@@ -108,3 +61,105 @@ static void read_init(void)
     }
 }
 
+void get_command_line_options(int argc, char **argv)
+{
+    int cmnds_count=0;
+    short get_msgout_fname=false;
+    short get_savout_fname=false;
+    int i;
+    for (i=1;i<argc;i++)
+    {
+      char *comnd=argv[i];
+      if (strlen(comnd)<1) continue;
+      if ((comnd[0]=='-')||(comnd[0]=='/'))
+      { //Setting program option
+        get_msgout_fname=false;
+        get_savout_fname=false;
+        if (strcmp(comnd+1,"v")==0)
+        {
+          automated_commands[cmnds_count]='v';
+          cmnds_count++;
+        } else
+        if ((strcmp(comnd+1,"q")==0)||(strcmp(comnd+1,"Q")==0))
+        {
+          automated_commands[cmnds_count]=KEY_CTRL_Q;
+          cmnds_count++;
+        } else
+        if (strcmp(comnd+1,"r")==0)
+        {
+          automated_commands[cmnds_count]=KEY_CTRL_R;
+          cmnds_count++;
+        } else
+        if (strcmp(comnd+1,"n")==0)
+        {
+          automated_commands[cmnds_count]=KEY_CTRL_N;
+          cmnds_count++;
+        } else
+        if (strcmp(comnd+1,"ds")==0)
+        {
+          disable_sounds=true;
+        } else
+        if (strcmp(comnd+1,"s")==0)
+        {
+          automated_commands[cmnds_count]=KEY_F5;
+          cmnds_count++;
+          get_savout_fname=true;
+        } else
+        if (strcmp(comnd+1,"m")==0)
+        {
+          get_msgout_fname=true;
+        } else
+        message_info_force("Unrecognized command line option: \"%s\".",comnd);
+      } else
+      { //Setting map name
+        if (get_msgout_fname)
+        {
+          set_msglog_fname(comnd);
+        } else
+        if (get_savout_fname)
+        {
+          format_map_fname(lvl->savfname,comnd);
+        } else
+        {
+          format_map_fname(lvl->fname,comnd);
+        }
+      }
+    }
+}
+
+
+/*
+ * Main function; initializes variables, loads map from commandline
+ * parameters and enters the main program loop.
+ */
+int main(int argc, char **argv)
+{
+    // variable that informs if main program loop should finish
+    finished=false;
+    // create object for storing map
+    level_init();
+    // Initialize the message displaying and storing
+    init_messages();
+    // random num gen seed selection
+    srand(time(0));
+    // initing keyboard input and screen output
+    init_levscr();
+    // read configuration file
+    read_init();
+    // Interpreting command line parameters
+    get_command_line_options(argc,argv);
+    if (strlen(lvl->fname)>0)
+    {
+      load_map(lvl);
+    } else
+    {
+      start_new_map(lvl);
+    }
+    do 
+    {
+      draw_levscr(lvl);
+      proc_key();
+    } while (!finished);
+    done();
+    return 0;
+}

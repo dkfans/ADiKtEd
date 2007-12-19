@@ -9,38 +9,66 @@
 
 #define MAP_SIZE_X 85
 #define MAP_SIZE_Y 85
+#define MAP_SIZE_H 1
+#define MAP_SUBNUM_H 8
 #define MAP_SUBNUM_X 3
 #define MAP_SUBNUM_Y 3
+#define MAP_SUBTOTAL_X (MAP_SIZE_X*MAP_SUBNUM_X)
+#define MAP_SUBTOTAL_Y (MAP_SIZE_Y*MAP_SUBNUM_Y)
 #define MAP_MAXINDEX_X MAP_SIZE_X-1
 #define MAP_MAXINDEX_Y MAP_SIZE_Y-1
 #define COLUMN_ENTRIES 2048
 
-#define OBJECT_TYPE_NONE   0
-#define OBJECT_TYPE_ACTNPT 1
-#define OBJECT_TYPE_THING  2
-
-// Note we assume there will be less than MAX_ACTIONS of action points.
-// I think this should do... the most DK uses is 13
-#define MAX_ACTIONS 1024
+#define OBJECT_TYPE_NONE     0
+#define OBJECT_TYPE_ACTNPT   1
+#define OBJECT_TYPE_THING    2
+#define OBJECT_TYPE_STLIGHT  3
+#define OBJECT_TYPE_COLUMN  16
+#define OBJECT_TYPE_SLAB    17
+#define OBJECT_TYPE_DATLST  18
 
 //Disk files entries
 
 #define SIZEOF_DK_TNG_REC 21
 #define SIZEOF_DK_CLM_REC 24
-#define SIZEOF_DK_APT_REC 21  //change after separating from tng
+#define SIZEOF_DK_APT_REC 8
 #define SIZEOF_DK_LGT_REC 20
+
+#define SIZEOF_DK_CLM_HEADER 8
+#define SIZEOF_DK_APT_HEADER 4
+#define SIZEOF_DK_LGT_HEADER 4
+#define SIZEOF_DK_TNG_HEADER 2
 
 typedef struct {
     unsigned char data[20];
   } DK_LGT_REC;
 
 typedef struct {
+    //Things strats
+    int creatures_count;
+    int roomeffects_count;
+    int traps_count;
+    int doors_count;
+    int items_count;
+    //Items stats
     int hero_gates_count;
+    int dn_hearts_count;
+    int spellbooks_count;
+    int dng_specboxes_count;
+    int crtr_lairs_count;
+    int statues_count;
+    int torches_count;
+    int gold_things_count;
+    int furniture_count;
+    //Various stats
+    int room_things_count;
   } LEVSTATS;
 
 struct LEVEL {
-    //map file name
+    //map file name (for loading)
     char *fname;
+    //map file name (for saving)
+    char *savfname;
     //Slab file - tile type definitions, size MAP_SIZE_Y x MAP_SIZE_X
     unsigned char **slb;
     //Owners file - tile owner index, size MAP_SIZE_Y x MAP_SIZE_X
@@ -48,28 +76,24 @@ struct LEVEL {
     //Vibration file - subtile animation indices, size arr_entries_y x arr_entries_x
     unsigned char **wib;
     //WLB file - some additional info about water and lava tiles,
-    // size MAP_SIZE_Y x MAP_SIZE_X
+    // size MAP_SIZE_Y x MAP_SIZE_X, not always present
     unsigned char **wlb;
     //Column file - constant-size array of entries used for displaying tiles,
     // size COLUMN_ENTRIES x SIZEOF_DK_CLM_REC
     unsigned char **clm;
+    //How many DAT entries points at every column
+    unsigned int *clm_utilize;
+    //Column file header
+    unsigned char *clm_hdr;
     //Texture information file - one byte file, identifies texture pack index
     unsigned char inf;
     //Script text - a text file containing level parameters as editable script;
     // number of lines and file size totally variable
     unsigned char **txt;
     unsigned int txt_lines_count;
-    //Light file - contains static light definitions
-    DK_LGT_REC **lgt;
-    unsigned int lgt_enties_count;
 
-    // Note that I store action points as things in here, and separate them
-    // out at save time. This makes lots of things a lot easier
+    //our objects - apt, tng and lgt
 
-    // Which action point numbers are taken, and where their data is
-    // Note: we assume there will be less than 1024 action points. I think
-    // this should do... the most DK uses is 13
-//    unsigned char **apt;
     unsigned char ****apt_lookup; // Index to action points, by subtile
     unsigned short **apt_subnums; // Number of action points in a subtile
     unsigned int apt_total_count; // Total number of action points
@@ -78,7 +102,12 @@ struct LEVEL {
     unsigned short **tng_subnums; // Number of things in a subtile
     unsigned int tng_total_count; // Number of things in total
 
-    unsigned short **tng_apt_nums;    // Number of things and actions in a tile
+    //Light file - contains static light definitions
+    unsigned char ****lgt_lookup; // Index to static light, by subtile
+    unsigned short **lgt_subnums; // Number of static lights in a subtile
+    unsigned int lgt_total_count; // Total number of static lights
+
+    unsigned short **tng_apt_lgt_nums;    // Number of all objects in a tile
 
     // Exceptionally grotty hack - we never need the actual data
     // stored in the .dat file, only what the high and low bytes should
@@ -97,6 +126,10 @@ short level_deinit();
 
 short level_clear(struct LEVEL *lvl);
 short level_clear_tng(struct LEVEL *lvl);
+short level_clear_apt(struct LEVEL *lvl);
+short level_clear_lgt(struct LEVEL *lvl);
+short level_clear_datclm(struct LEVEL *lvl);
+short level_clear_other(struct LEVEL *lvl);
 
 short level_free();
 short level_free_tng(struct LEVEL *lvl);
@@ -106,10 +139,13 @@ short level_verify_struct(struct LEVEL *lvl, char *err_msg);
 short actnpts_verify(struct LEVEL *lvl, char *err_msg);
 short level_verify_logic(struct LEVEL *lvl, char *err_msg);
 void start_new_map(struct LEVEL *lvl);
+void generate_random_map(struct LEVEL *lvl);
+void generate_slab_bkgnd_default(struct LEVEL *lvl);
+void generate_slab_bkgnd_random(struct LEVEL *lvl);
 void free_map(void);
 
 char *get_thing(struct LEVEL *lvl,unsigned int x,unsigned int y,unsigned int num);
-void thing_add(struct LEVEL *lvl,unsigned char *thing);
+int thing_add(struct LEVEL *lvl,unsigned char *thing);
 void thing_del(struct LEVEL *lvl,unsigned int x,unsigned int y,unsigned int num);
 unsigned int get_thing_subnums(struct LEVEL *lvl,unsigned int x,unsigned int y);
 
@@ -118,16 +154,31 @@ void actnpt_add(struct LEVEL *lvl,unsigned char *actnpt);
 void actnpt_del(struct LEVEL *lvl,unsigned int x,unsigned int y,unsigned int num);
 unsigned int get_actnpt_subnums(struct LEVEL *lvl,unsigned int x,unsigned int y);
 
+char *get_stlight(struct LEVEL *lvl,unsigned int x,unsigned int y,unsigned int num);
+void stlight_add(struct LEVEL *lvl,unsigned char *stlight);
+void stlight_del(struct LEVEL *lvl,unsigned int x,unsigned int y,unsigned int num);
+unsigned int get_stlight_subnums(struct LEVEL *lvl,unsigned int x,unsigned int y);
+
 short get_object_type(struct LEVEL *lvl, unsigned int x, unsigned int y, unsigned int z);
 char *get_object(struct LEVEL *lvl,unsigned int x,unsigned int y,unsigned int z);
 void object_del(struct LEVEL *lvl,unsigned int x,unsigned int y,unsigned int z);
 unsigned int get_object_subnums(struct LEVEL *lvl,unsigned int x,unsigned int y);
 unsigned int get_object_tilnums(struct LEVEL *lvl,unsigned int x,unsigned int y);
+int get_object_subtl_last(struct LEVEL *lvl,unsigned int x,unsigned int y,short obj_type);
+void update_object_owners(struct LEVEL *lvl);
 
 short get_subtl_wib(struct LEVEL *lvl, unsigned int sx, unsigned int sy);
-void set_subtl_wib(struct LEVEL *lvl, short nval, unsigned int sx, unsigned int sy);
+void set_subtl_wib(struct LEVEL *lvl, unsigned int sx, unsigned int sy, short nval);
 short get_tile_wlb(struct LEVEL *lvl, unsigned int tx, unsigned int ty);
-void set_tile_wlb(struct LEVEL *lvl, short nval, unsigned int tx, unsigned int ty);
+void set_tile_wlb(struct LEVEL *lvl, unsigned int tx, unsigned int ty, short nval);
+
+unsigned char get_tile_owner(struct LEVEL *lvl, unsigned int tx, unsigned int ty);
+void set_tile_owner(struct LEVEL *lvl, unsigned int tx, unsigned int ty, unsigned char nval);
+unsigned char get_tile_slab(struct LEVEL *lvl, unsigned int tx, unsigned int ty);
+void set_tile_slab(struct LEVEL *lvl, unsigned int tx, unsigned int ty, unsigned char nval);
+
+void update_level_stats(struct LEVEL *lvl);
+void update_thing_stats(struct LEVEL *lvl);
 
 extern struct LEVEL *lvl;
 

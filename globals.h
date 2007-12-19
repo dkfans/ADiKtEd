@@ -57,10 +57,21 @@
 #define VERIF_OK      1
 #define VERIF_WARN    2
 
+struct memory_file
+{
+    long len;
+    unsigned char *content;
+};
+
+struct memory_file read_file (char *iname);
+
 // File handling variables
 extern char *filebase;
 
-// 0 for high-low, 1 for low-high
-extern int datmode;
+// The way DAT entries are shown
+extern short dat_view_mode;
+
+// True means DAT/CLM/WIB are updated automatically
+extern short datclm_auto_update;
 
 #endif // ADIKT_GLOBALS_H

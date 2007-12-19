@@ -15,6 +15,7 @@
 char *message_prv;
 char *message;
 short message_is_warn;
+FILE *msgout_fp;
 
 void strip_crlf(char *string_in)
 {
@@ -46,15 +47,17 @@ void trim_right(char *string_in)
 
 void message_error(const char *format, ...)
 {
-      va_list val;
-      va_start(val, format);
-      char *msg=message_prv;
-      if (msg==NULL) msg=(char *)malloc(LINEMSG_SIZE*sizeof(char));
-      message_prv=message;
-      message=msg;
-      vsprintf(message, format, val);
-      va_end(val);
-      message_is_warn=true;
+    va_list val;
+    va_start(val, format);
+    char *msg=message_prv;
+    if (msg==NULL) msg=(char *)malloc(LINEMSG_SIZE*sizeof(char));
+    message_prv=message;
+    message=msg;
+    vsprintf(message, format, val);
+    va_end(val);
+    message_is_warn=true;
+    if (msgout_fp!=NULL)
+      fprintf(msgout_fp,"%s\n",message);
     speaker_beep();
 }
 
@@ -66,29 +69,33 @@ short message_is_empty()
 
 void message_info(const char *format, ...)
 {
-      if ((!message_is_empty())&&(message_is_warn)) return;
-      va_list val;
-      va_start(val, format);
-      char *msg=message_prv;
-      if (msg==NULL) msg=(char *)malloc(LINEMSG_SIZE*sizeof(char));
-      message_prv=message;
-      message=msg;
-      vsprintf(message, format, val);
-      va_end(val);
-      message_is_warn=false;
+    if ((!message_is_empty())&&(message_is_warn)) return;
+    va_list val;
+    va_start(val, format);
+    char *msg=message_prv;
+    if (msg==NULL) msg=(char *)malloc(LINEMSG_SIZE*sizeof(char));
+    message_prv=message;
+    message=msg;
+    vsprintf(message, format, val);
+    va_end(val);
+    message_is_warn=false;
+    if (msgout_fp!=NULL)
+      fprintf(msgout_fp,"%s\n",message);
 }
 
 void message_info_force(const char *format, ...)
 {
-      va_list val;
-      va_start(val, format);
-      char *msg=message_prv;
-      if (msg==NULL) msg=(char *)malloc(LINEMSG_SIZE*sizeof(char));
-      message_prv=message;
-      message=msg;
-      vsprintf(message, format, val);
-      va_end(val);
-      message_is_warn=false;
+    va_list val;
+    va_start(val, format);
+    char *msg=message_prv;
+    if (msg==NULL) msg=(char *)malloc(LINEMSG_SIZE*sizeof(char));
+    message_prv=message;
+    message=msg;
+    vsprintf(message, format, val);
+    va_end(val);
+    message_is_warn=false;
+    if (msgout_fp!=NULL)
+      fprintf(msgout_fp,"%s\n",message);
 }
 
 void message_release()
@@ -99,6 +106,42 @@ void message_release()
 char *message_get()
 {
      return message;
+}
+
+/*
+ * Popups are temporary messages, visible only until next screen redraw.
+ */
+void popup_show(const char *title,const char *format, ...)
+{
+      char *msg;
+      msg=(char *)malloc(LINEMSG_SIZE*sizeof(char));
+      va_list val;
+      va_start(val, format);
+      vsprintf(msg, format, val);
+      va_end(val);
+      int rows=get_screen_rows();
+      int cols=get_screen_cols();
+      int textlen=max(strlen(title),strlen(msg));
+      int window_rows=4;
+      int window_cols=3*cols/4;
+      if (textlen+2>window_cols)
+        window_cols=textlen+2;
+      if (window_cols>cols-2)
+        window_cols=max(cols-2,0);
+      int posx=(cols-window_cols)>>1;
+      int posy=(rows-window_rows)>>1;
+      screen_setcolor(PRINT_COLOR_RED_ON_WHITE);
+      screen_draw_window(posy,posx,window_rows,window_cols,1,bsDouble);
+      int title_x=(cols-strlen(title)-2)>>1;
+      if (title_x<posx) title_x=posx;
+      set_cursor_pos(posy,title_x);
+      screen_printf(" %s ",title);
+      set_cursor_pos(posy+2,posx+1);
+      screen_printf("%s",msg);
+      screen_refresh();
+      if (msgout_fp!=NULL)
+        fprintf(msgout_fp,"%s\n",message);
+      free(msg);
 }
 
 short format_map_fname(char *fname, char *usrinput)
@@ -129,6 +172,32 @@ short format_map_fname(char *fname, char *usrinput)
     return false;
 }
 
+short set_msglog_fname(char *fname)
+{
+    msgout_fp=fopen(fname,"wb");
+    if (msgout_fp!=NULL)
+    {
+      fprintf(msgout_fp,"aDiKtEd message log file\n");
+      return true;
+    }
+    return false;
+}
+
+void init_messages()
+{
+  message=NULL;
+  message_prv=NULL;
+  msgout_fp=NULL;
+}
+
+void free_messages()
+{
+    free(message_prv);
+    free(message);
+    if (msgout_fp!=NULL)
+      fclose(msgout_fp);
+}
+
 void die(const char *format, ...)
 {
       done();
@@ -146,7 +215,9 @@ void die(const char *format, ...)
 void done(void)
 {
     level_deinit();
+    free_levscr();
     screen_done();
+    free_messages();
     input_done();
 }
 

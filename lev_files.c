@@ -8,12 +8,13 @@
 #include "lev_files.h"
 
 #include "globals.h"
-#include "internal.h"
 #include "obj_slabs.h"
 #include "obj_things.h"
 #include "bulcommn.h"
+#include "scr_actn.h"
+#include "obj_column.h"
 
-short load_subtile(struct LEVEL *lvl,unsigned char **dest,
+short load_subtile(unsigned char **dest,
                         char *fname, int length, int x, int y,
                         int linesize, int nlines, int lineoffset,
                         int mbytes, int byteoffset)
@@ -38,7 +39,7 @@ short load_subtile(struct LEVEL *lvl,unsigned char **dest,
     return true;
 }
 
-unsigned char **load_subtile_malloc(struct LEVEL *lvl,char *fname, int length, 
+unsigned char **load_subtile_malloc(char *fname, int length, 
                         int x, int y,
                         int linesize, int nlines, int lineoffset,
                         int mbytes, int byteoffset)
@@ -56,7 +57,7 @@ unsigned char **load_subtile_malloc(struct LEVEL *lvl,char *fname, int length,
           die ("load_subtile: Out of memory");
     }
     // Loading
-    short result=load_subtile(lvl,dest,fname,length,x,y,
+    short result=load_subtile(dest,fname,length,x,y,
         linesize,nlines,lineoffset,mbytes,byteoffset);
     if (result)
       return dest;
@@ -76,19 +77,19 @@ int load_tng(struct LEVEL *lvl,char *fname)
     unsigned char *thing;
     
     mem = read_file (fname);
-    if (mem.len < 2)
+    if (mem.len < SIZEOF_DK_TNG_HEADER)
       return false;
     
     tng_num = read_short_le_buf(mem.content);
 
     // Check everything's cushty
-    if (mem.len != tng_num*SIZEOF_DK_TNG_REC+2)
+    if (mem.len != tng_num*SIZEOF_DK_TNG_REC+SIZEOF_DK_TNG_HEADER)
       return false;
 
     for (i=0; i < tng_num; i++)
     {
       unsigned char *thing = create_thing_empty();
-      int offs=SIZEOF_DK_TNG_REC*i+2;
+      int offs=SIZEOF_DK_TNG_REC*i+SIZEOF_DK_TNG_HEADER;
       memcpy(thing, mem.content+offs, SIZEOF_DK_TNG_REC);
       //Counting hero gates
       if (get_thing_type(thing) == THING_TYPE_ITEM)
@@ -98,6 +99,8 @@ int load_tng(struct LEVEL *lvl,char *fname)
       }
       thing_add(lvl,thing);
     }
+    if (tng_num != lvl->tng_total_count)
+      die("Internal error in load_tng: tng_num=%d tng_total=%d", tng_num, lvl->tng_total_count);
     free (mem.content);
     return true;
 }
@@ -109,50 +112,56 @@ short load_clm(struct LEVEL *lvl,char *fname)
     if (lvl->clm==NULL)
       return false;
     mem = read_file(fname);
-    if (mem.len != 49152+8)
-      return 0;
-    for (i=0; i<COLUMN_ENTRIES; i++)
+    if (mem.len < SIZEOF_DK_CLM_HEADER)
+      return false;
+    memcpy(lvl->clm_hdr, mem.content+0, SIZEOF_DK_CLM_HEADER);
+    int num_clms=read_long_le_buf(mem.content+0);
+    if (mem.len != SIZEOF_DK_CLM_REC*num_clms+SIZEOF_DK_CLM_HEADER)
+      return false;
+    if (num_clms>COLUMN_ENTRIES)
+      return false;
+    for (i=0; i<num_clms; i++)
     {
-      int offs=SIZEOF_DK_CLM_REC*i+8;
+      int offs=SIZEOF_DK_CLM_REC*i+SIZEOF_DK_CLM_HEADER;
       memcpy(lvl->clm[i], mem.content+offs, SIZEOF_DK_CLM_REC);
     }
     free (mem.content);
-    return 1;
+    return true;
 }
 
-/* This *must* be called *after* tng_* are set up */
+/*
+ * Loads the APT file fname, fills LEVEL apt entries
+ * This _must_ be called _after_ tng_* are set up
+ */
 int load_apt (struct LEVEL *lvl,char *fname)
 {
     struct memory_file mem;
-    int i, n, nn;
-    unsigned char *ret;
+    int i;
+    unsigned char *actnpt;
     
     mem = read_file (fname);
-    if (mem.len < 2)
+    if (mem.len < SIZEOF_DK_APT_HEADER)
       return false;
     
     if (lvl->apt_lookup==NULL)
       return false;
     
     lvl->apt_total_count=0;
-    nn = mem.content[0]+(mem.content[1]<<8)+
-      (mem.content[2]<<16)+(mem.content[3]<<24);
+    long apt_num;
+    apt_num = read_long_le_buf(mem.content+0);
     // Check everything's cushty
-    if (mem.len != nn*8+4)
-      return 0;
-    for (i=0; i < nn; i++)
+    if (mem.len != apt_num*SIZEOF_DK_APT_REC+SIZEOF_DK_APT_HEADER)
+      return false;
+    for (i=0; i < apt_num; i++)
     {
-      ret=(unsigned char *)malloc(SIZEOF_DK_APT_REC);
-      if (!ret)
-          return false;
-      memcpy (ret, mem.content+8*i+4, 4);
-      // Make sure we know it's an action point
-      memset (ret+4, 0xff, 13);
-      memcpy (ret+17, mem.content+8*i+8, 4);
-      actnpt_add(lvl,ret);
+      actnpt=(unsigned char *)malloc(SIZEOF_DK_APT_REC);
+      if (actnpt==NULL)
+        die("Cannot allocate mem for loading action points");
+      memcpy (actnpt, mem.content+SIZEOF_DK_APT_REC*i+SIZEOF_DK_APT_HEADER, SIZEOF_DK_APT_REC);
+      actnpt_add(lvl,actnpt);
     }
-    if (nn != lvl->apt_total_count)
-      die("Internal error in load_apt: nn=%d apt_tot=%d", nn, lvl->apt_total_count);
+    if (apt_num != lvl->apt_total_count)
+      die("Internal error in load_apt: apt_num=%d apt_total=%d", apt_num, lvl->apt_total_count);
     free (mem.content);
     return true;
 }
@@ -169,13 +178,36 @@ short load_inf(struct LEVEL *lvl,char *fname)
     return true;
 }
 
+short load_wib(struct LEVEL *lvl,char *fname)
+{
+    return load_subtile(lvl->wib, fname, 65536, 255, 255, 256, 1, 0, 1, 0);
+}
+
+short load_slb(struct LEVEL *lvl,char *fname)
+{
+    return load_subtile(lvl->slb, fname, 14450, MAP_SIZE_Y, MAP_SIZE_X, 170, 1, 0, 2, 0);
+}
+
+short load_own(struct LEVEL *lvl,char *fname)
+{
+    return load_subtile(lvl->own, fname, 65536, MAP_SIZE_Y, MAP_SIZE_X, 256, 3, 0, 3, 0); 
+}
+
+short load_dat(struct LEVEL *lvl,char *fname)
+{
+    short result;
+    result=load_subtile((unsigned char **)(lvl->dat_low), fname, 131072, 255, 255, 512, 1, 0, 2, 0);
+    result&=load_subtile((unsigned char **)(lvl->dat_high), fname, 131072, 255, 255, 512, 1, 0, 2, 1);
+    return result;
+}
+
 short load_txt(struct LEVEL *lvl,char *fname)
 {
     struct memory_file mem;
     mem = read_file(fname);
-    //If filesize too small - pannic
-    if (mem.len < 4)
-      return false;
+    //If filesize too small - pannic (but return true - txt file don't have to exist)
+    if (mem.len < 2)
+      return true;
     unsigned char *content=mem.content;
     unsigned char *ptr=mem.content;
     unsigned char *ptr_end=mem.content+mem.len;
@@ -193,11 +225,12 @@ short load_txt(struct LEVEL *lvl,char *fname)
     {
       if (ptr>=ptr_end) ptr=ptr_end-1;
       unsigned char *nptr=memchr(ptr, 0x0a, ptr_end-ptr );
+      //Skip control characters (but leave spaces and TABs)
       while ((ptr<nptr)&&((unsigned char)ptr[0]<0x20)&&((unsigned char)ptr[0]!=0x09)) ptr++;
       if (nptr==NULL)
         nptr=ptr_end;
       int linelen=(char *)nptr-(char *)ptr;
-
+      //At end, skip control characters and spaces too
       while ((linelen>0)&&((unsigned char)ptr[linelen-1]<=0x20)) linelen--;
       lvl->txt[currline]=(unsigned char *)malloc((linelen+1)*sizeof(unsigned char *));
       memcpy(lvl->txt[currline],ptr,linelen);
@@ -210,36 +243,52 @@ short load_txt(struct LEVEL *lvl,char *fname)
     return true;
 }
 
+/*
+ * Loads the LGT file fname, fills LEVEL light entries
+ * This _must_ be called _after_ tng_* are set up
+ */
 short load_lgt(struct LEVEL *lvl,char *fname)
 {
     struct memory_file mem;
-    mem = read_file(fname);
-    //If wrong filesize - pannic
-    if (mem.len < 4)
+    unsigned char *stlight;
+    
+    mem = read_file (fname);
+    if (mem.len < SIZEOF_DK_LGT_HEADER)
       return false;
-    int itmcount;
-    itmcount=read_long_le_buf(mem.content);
-    lvl->lgt=malloc(itmcount*sizeof(DK_LGT_REC *));
+    
+    if (lvl->lgt_lookup==NULL)
+      return false;
+    
+    lvl->lgt_total_count=0;
+    long lgt_num;
+    lgt_num = read_long_le_buf(mem.content+0);
+    // Check everything's cushty
+    if (mem.len != lgt_num*SIZEOF_DK_LGT_REC+SIZEOF_DK_LGT_HEADER)
+      return false;
     int i;
-    for (i=0;i<itmcount;i++)
+    for (i=0; i<lgt_num; i++)
     {
-        int mempos=4+i*SIZEOF_DK_LGT_REC;
-        lvl->lgt[i]=(DK_LGT_REC *)malloc(SIZEOF_DK_LGT_REC);
-        if (mem.len>=mempos+SIZEOF_DK_LGT_REC)
-          memcpy(lvl->lgt[i],mem.content+mempos,SIZEOF_DK_LGT_REC);
-        else
-          return false;
+      stlight=(unsigned char *)malloc(SIZEOF_DK_LGT_REC);
+      if (stlight==NULL)
+        die("Cannot allocate mem for loading static lights");
+      memcpy (stlight, mem.content+SIZEOF_DK_LGT_REC*i+SIZEOF_DK_LGT_HEADER, SIZEOF_DK_LGT_REC);
+      stlight_add(lvl,stlight);
     }
-    lvl->lgt_enties_count=itmcount;
+    if (lgt_num != lvl->lgt_total_count)
+      die("Internal error in load_lgt: lgt_num=%d lgt_total=%d", lgt_num, lvl->lgt_total_count);
     free (mem.content);
     return true;
 }
 
+/*
+ * Loads WLB file.
+ * WLB seems to be unused by the game, but are always written by BF editor.
+ */
 short load_wlb(struct LEVEL *lvl,char *fname)
 {
     struct memory_file mem;
     mem = read_file(fname);
-    //If wrong filesize - pannic
+    //If wrong filesize - don't load
     if (mem.len != MAP_SIZE_X*MAP_SIZE_Y)
       return false;
     int i,j;
@@ -253,21 +302,21 @@ short load_wlb(struct LEVEL *lvl,char *fname)
     return true;
 }
 
-short write_slb (struct LEVEL *lvl,char *fname)
+short write_slb(struct LEVEL *lvl,char *fname)
 {
     FILE *fp;
-    int i, j;
+    int i, k;
     fp = fopen (fname, "wb");
     if (!fp)
     {
       message_error("Can't open \"%s\" for writing", fname);
       return false;
     }
-    for (i=0; i < MAP_SIZE_Y; i++)
+    for (k=0; k < MAP_SIZE_Y; k++)
     {
-      for (j=0; j < MAP_SIZE_X; j++)
+      for (i=0; i < MAP_SIZE_X; i++)
       {
-          fputc (lvl->slb[j][i], fp);
+          fputc (lvl->slb[i][k], fp);
           fputc (0, fp);
       }
     }
@@ -337,7 +386,7 @@ short write_dat(struct LEVEL *lvl,char *fname)
     return true;
 }
 
-short write_clm (struct LEVEL *lvl,char *fname)
+short write_clm(struct LEVEL *lvl,char *fname)
 {
     FILE *fp;
     int i;
@@ -347,14 +396,10 @@ short write_clm (struct LEVEL *lvl,char *fname)
       message_error("Can't open \"%s\" for writing", fname);
       return false;
     }
-    fputc (0, fp);
-    fputc (8, fp);
-    for (i=0; i < 6; i++)
-      fputc (0, fp);
+    write_long_le_buf(lvl->clm_hdr+0,COLUMN_ENTRIES);
+    fwrite(lvl->clm_hdr, SIZEOF_DK_CLM_HEADER, 1, fp);
     for (i=0; i<COLUMN_ENTRIES; i++)
-    {
-      fwrite (lvl->clm[i], 24, 1, fp);
-    }
+      fwrite(lvl->clm[i], SIZEOF_DK_CLM_REC, 1, fp);
     fclose (fp);
     return true;
 }
@@ -414,8 +459,8 @@ short write_apt(struct LEVEL *lvl,char *fname)
           int num_subs=lvl->apt_subnums[cx][cy];
           for (k=0; k<num_subs; k++)
           {
-                fwrite (lvl->apt_lookup[cx][cy][k], 4, 1, fp);
-                fwrite (lvl->apt_lookup[cx][cy][k]+17, 4, 1, fp);
+                char *actnpt=get_actnpt(lvl,cx,cy,k);
+                fwrite (actnpt, SIZEOF_DK_APT_REC, 1, fp);
           }
       }
     }
@@ -494,25 +539,38 @@ short write_txt(struct LEVEL *lvl,char *fname)
  */
 short write_lgt(struct LEVEL *lvl,char *fname)
 {
+    //Preparing array bounds
+    int arr_entries_x=MAP_SIZE_X*MAP_SUBNUM_X;
+    int arr_entries_y=MAP_SIZE_Y*MAP_SUBNUM_Y;
+
     FILE *fp;
-    int i;
     fp = fopen (fname, "wb");
     if (!fp)
     {
       message_error("Can't open \"%s\" for writing", fname);
       return false;
     }
-    write_long_le_file(fp, lvl->lgt_enties_count);
-    for (i=0;i<lvl->lgt_enties_count;i++)
+    write_long_le_file (fp,lvl->lgt_total_count);
+    int cy, cx, k;
+    for (cy=0; cy<arr_entries_y; cy++)
     {
-        fwrite(lvl->lgt[i], SIZEOF_DK_LGT_REC, 1, fp);
+      for (cx=0; cx<arr_entries_x; cx++)
+      {
+          int num_subs=get_stlight_subnums(lvl,cx,cy);
+          for (k=0; k<num_subs; k++)
+          {
+                char *stlight=get_stlight(lvl,cx,cy,k);
+                fwrite (stlight, SIZEOF_DK_LGT_REC, 1, fp);
+          }
+      }
     }
-    fclose(fp);
+    fclose (fp);
     return true;
 }
 
 /*
  * Saves WLB file.
+ * WLB seems to be unused by the game, but are always written by BF editor.
  */
 short write_wlb(struct LEVEL *lvl,char *fname)
 {
@@ -541,73 +599,45 @@ short save_map(struct LEVEL *lvl)
     if (level_verify(lvl,"save")==VERIF_ERROR)
       return false;
 
-    //This has been changed to create_clmdat, because user should have
-    // choice in updating the "things" structure
-    //create_clmdattng();
-//!!!!TODO: hack for checking new CLM support
-//    create_clmdat();
+    //Once there was an CLM/DAT/TNG update function here,
+    // but the new way is to minimize file chamges - so it's been removed
+    update_slab_owners(lvl);
 
     draw_graffiti();
 
-//!!!!!!!!!!!WARN: hack for generating test maps
-/*
-int i,j;
-  int entridx=1;
-  for (i=0; i<MAP_SIZE_Y; i++)
-    for (j=0; j<MAP_SIZE_X; j++)
-    {
-      int num=i*MAP_MAXINDEX_X+j;
-      if ((i%2==1)&&(j%20!=0)&&(entridx<170))
-        {
-          if (j%20>9)
-            set_dat_unif (j, i, entridx);
-          else
-            set_dat (j, i, 0, 0, 0, 0, entridx, 0, 0, 0, 0);
-          int clmidx=entridx+276;
-          int btmidx=(clmidx==0x0199)?0x0028:clmidx;
-          set_clm_entry (entridx, 0xffff, 1, 7, 8, 0x3f, 0x1b, 0, 
-                         btmidx, btmidx,
-                         clmidx, clmidx,
-                         clmidx, clmidx, 
-                         clmidx, clmidx );
-        if (j%20==19)
-            entridx++;
-        }
-        else
-        {
-        set_dat_unif (j, i, 0);
-        }
-    }
-*/
-    
     char *fnames;
-    fnames = (char *)malloc(strlen(lvl->fname)+5);
+    fnames = (char *)malloc(strlen(lvl->savfname)+5);
     if (fnames==NULL)
       die ("save_map: Out of memory");
     short result=true;
-    sprintf (fnames, "%s.own", lvl->fname);
+    sprintf (fnames, "%s.own", lvl->savfname);
     result&=write_own(lvl,fnames);
-    sprintf (fnames, "%s.slb", lvl->fname);
+    sprintf (fnames, "%s.slb", lvl->savfname);
     result&=write_slb(lvl,fnames);
-    sprintf (fnames, "%s.dat", lvl->fname);
+    sprintf (fnames, "%s.dat", lvl->savfname);
     result&=write_dat(lvl,fnames);
-    sprintf (fnames, "%s.clm", lvl->fname);
+    sprintf (fnames, "%s.clm", lvl->savfname);
     result&=write_clm(lvl,fnames);
-    sprintf (fnames, "%s.tng", lvl->fname);
+    sprintf (fnames, "%s.tng", lvl->savfname);
     result&=write_tng(lvl,fnames);
-    sprintf (fnames, "%s.apt", lvl->fname);
+    sprintf (fnames, "%s.apt", lvl->savfname);
     result&=write_apt(lvl,fnames);
-    sprintf (fnames, "%s.wib", lvl->fname);
+    sprintf (fnames, "%s.wib", lvl->savfname);
     result&=write_wib(lvl,fnames);
-    sprintf (fnames, "%s.inf", lvl->fname);
+    sprintf (fnames, "%s.inf", lvl->savfname);
     result&=write_inf(lvl,fnames);
-    sprintf (fnames, "%s.txt", lvl->fname);
+    sprintf (fnames, "%s.txt", lvl->savfname);
     result&=write_txt(lvl,fnames);
-    sprintf (fnames, "%s.lgt", lvl->fname);
+    sprintf (fnames, "%s.lgt", lvl->savfname);
     result&=write_lgt(lvl,fnames);
-    sprintf (fnames, "%s.wlb", lvl->fname);
+    sprintf (fnames, "%s.wlb", lvl->savfname);
     result&=write_wlb(lvl,fnames);
     read_graffiti();
+    if ((result)&&(strlen(lvl->fname)<1))
+    {
+      strncpy(lvl->fname,lvl->savfname,DISKPATH_SIZE);
+      lvl->fname[DISKPATH_SIZE-1]=0;
+    }
     free(fnames);
     return result;
 }
@@ -618,10 +648,6 @@ int i,j;
 short load_map(struct LEVEL *lvl)
 {
   char *fnames;
-  int i, j;
-  for (i=0; i < 3; i++)
-    for (j=0; j < 3; j++)
-        vistng[i][j]=0;
     
   level_free(lvl);
   if ((lvl->fname==NULL)||(strlen(lvl->fname)<1))
@@ -637,18 +663,17 @@ short load_map(struct LEVEL *lvl)
   if (result)
   {
     sprintf (fnames, "%s.slb", lvl->fname);
-    result&=load_subtile(lvl,lvl->slb, fnames, 14450, 85, 85, 170, 1, 0, 2, 0);
+    result&=load_slb(lvl,fnames);
   }    
   if (result)
   {
     sprintf (fnames, "%s.own", lvl->fname);
-    result&=load_subtile(lvl,lvl->own, fnames, 65536, 85, 85, 256, 3, 0, 3, 0); 
+    result&=load_own(lvl,fnames);
   }    
   if (result)
   {
     sprintf (fnames, "%s.dat", lvl->fname);
-    result&=load_subtile(lvl,(unsigned char **)lvl->dat_low, fnames, 131072, 255, 255, 512, 1, 0, 2, 0);
-    result&=load_subtile(lvl,(unsigned char **)lvl->dat_high, fnames, 131072, 255, 255, 512, 1, 0, 2, 1);
+    result&=load_dat(lvl,fnames);
   }    
   if (result)
   {
@@ -662,18 +687,18 @@ short load_map(struct LEVEL *lvl)
   }    
   if (result)
   {
+    sprintf (fnames, "%s.lgt", lvl->fname);
+    result&=load_lgt(lvl,fnames);
+  }    
+  if (result)
+  {
     sprintf (fnames, "%s.clm", lvl->fname);
     result&=load_clm(lvl,fnames);
   }    
   if (result)
   {
     sprintf (fnames, "%s.wib", lvl->fname);
-    result&=load_subtile(lvl,lvl->wib, fnames, 65536, 255, 255, 256, 1, 0, 1, 0);
-  }    
-  if (result)
-  {
-    sprintf (fnames, "%s.inf", lvl->fname);
-    result&=load_inf(lvl,fnames);
+    result&=load_wib(lvl,fnames);
   }    
   if (result)
   {
@@ -682,25 +707,115 @@ short load_map(struct LEVEL *lvl)
   }    
   if (result)
   {
-    sprintf (fnames, "%s.lgt", lvl->fname);
-    result&=load_lgt(lvl,fnames);
+    sprintf (fnames, "%s.inf", lvl->fname);
+    //INFs contain only texture number, so ignore error on loading them
+    load_inf(lvl,fnames);
   }    
   if (result)
   {
     sprintf (fnames, "%s.wlb", lvl->fname);
-    result&=load_wlb(lvl,fnames);
+    //WLBs are not very importand, and may even not exist,
+    // so ignore any error when loading them
+    load_wlb(lvl,fnames);
   }    
-
-  if (!result)
-  {
+    if (!result)
+    {
         message_error("Couldn't load \"%s\"", fnames);
         free(fnames);
         free_map();
         start_new_map(lvl);
         return false;
-  }
+    }
+    if (strlen(lvl->savfname)<1)
+    {
+      strncpy(lvl->savfname,lvl->fname,DISKPATH_SIZE);
+      lvl->savfname[DISKPATH_SIZE-1]=0;
+    }
+    update_level_stats(lvl);
     read_graffiti();
     free(fnames);
     return true;
 }
 
+/*
+ * Utility function for reverse engineering the CLM format
+ */
+short write_def_clm_source(struct LEVEL *lvl,char *fname)
+{
+    FILE *fp;
+    int i,k;
+    fp = fopen (fname, "w");
+    if (!fp)
+    {
+      message_error("Can't open \"%s\" for writing", fname);
+      return false;
+    }
+
+    //Preparing array bounds
+    int arr_entries_x=MAP_SIZE_X*MAP_SUBNUM_X;
+    int arr_entries_y=MAP_SIZE_Y*MAP_SUBNUM_Y;
+
+    unsigned char *clmentry;
+    struct COLUMN_REC *clm_rec;
+    clm_rec=create_column_rec();
+    for (i=0; i<COLUMN_ENTRIES; i++)
+      {
+        clmentry = (unsigned char *)(lvl->clm[i]);
+        get_clm_entry(clm_rec, clmentry);
+        int csum=read_short_le_buf(clmentry+2);
+/*        clm_rec->c[0]+clm_rec->c[1]+clm_rec->c[2]+clm_rec->c[3]+
+            clm_rec->c[4]+clm_rec->c[5]+clm_rec->c[6]+clm_rec->c[7]+
+            clm_rec->base;*/
+//        if ((lvl->clm_utilize[i])!=(clm_rec->use))
+        {
+/*          char binstr0[9];
+          char binstr1[9];
+          char binstr2[9];
+          char binstr3[9];
+          char binstr4[9];
+          char binstr5[9];
+          for (k=0;k<8;k++)
+            binstr0[k]='0'+((clmentry[0]&(1<<k))!=0);
+          binstr0[8]=0;
+          for (k=0;k<8;k++)
+            binstr1[k]='0'+((clmentry[1]&(1<<k))!=0);
+          binstr1[8]=0;
+          for (k=0;k<8;k++)
+            binstr2[k]='0'+((clmentry[2]&(1<<k))!=0);
+          binstr2[8]=0;
+          for (k=0;k<8;k++)
+            binstr3[k]='0'+((clmentry[3]&(1<<k))!=0);
+          binstr3[8]=0;
+          for (k=0;k<8;k++)
+            binstr4[k]='0'+((clmentry[4]&(1<<k))!=0);
+          binstr4[8]=0;
+          for (k=0;k<8;k++)
+            binstr5[k]='0'+((use_cntr[i]&(1<<k))!=0);
+          binstr5[8]=0;
+          fprintf(fp,"%4d   %s %s(%5d) %s %s %s (%s=%d)\n",i,binstr0,binstr1,clm_rec->use,binstr2,binstr3,binstr4,binstr5,use_cntr[i]);
+*/
+          fprintf(fp,"COLUMN(%4d,%5d,%2d,%2d,%2d, 0x%02x, 0x%03x,%2d,",
+           i,(unsigned short)(clm_rec->use), clm_rec->permanent, clm_rec->lintel,
+           clm_rec->height, clm_rec->solid, clm_rec->base, clm_rec->orientation);
+            fprintf(fp,"    0x%03x, 0x%03x, 0x%03x, 0x%03x, 0x%03x, 0x%03x, 0x%03x, 0x%03x) u=%d u0=%d\n",
+              clm_rec->c[0],clm_rec->c[1],clm_rec->c[2],clm_rec->c[3],
+              clm_rec->c[4],clm_rec->c[5],clm_rec->c[6],clm_rec->c[7],
+              lvl->clm_utilize[i],(unsigned short)(clm_rec->use-(lvl->clm_utilize[i])));
+/*          fprintf(fp,"  set_clm_ent_idx(lvl,%4d,%5d,%2d,%2d,%2d, 0x%02x, 0x%03x,%2d,\n",
+           i,(unsigned short)(clm_rec->use-(lvl->clm_utilize[i])), clm_rec->permanent, clm_rec->lintel,
+           clm_rec->height, clm_rec->solid, clm_rec->base, clm_rec->orientation);
+        if ((clm_rec->c[5]==0)&&(clm_rec->c[6]==0)&&(clm_rec->c[7]==0))
+            fprintf(fp,"    0x%03x, 0x%03x, 0x%03x, 0x%03x, 0x%03x, 0x%x, 0x%x, 0x%x);\n",
+              clm_rec->c[0],clm_rec->c[1],clm_rec->c[2],clm_rec->c[3],
+              clm_rec->c[4],clm_rec->c[5],clm_rec->c[6],clm_rec->c[7]);
+          else
+            fprintf(fp,"    0x%03x, 0x%03x, 0x%03x, 0x%03x, 0x%03x, 0x%03x, 0x%03x, 0x%03x);\n",
+              clm_rec->c[0],clm_rec->c[1],clm_rec->c[2],clm_rec->c[3],
+              clm_rec->c[4],clm_rec->c[5],clm_rec->c[6],clm_rec->c[7]);
+*/
+        }
+      }
+    free_column_rec(clm_rec);
+    fclose (fp);
+    return true;
+}

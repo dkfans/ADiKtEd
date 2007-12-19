@@ -9,9 +9,9 @@
 #include "lev_data.h"
 
 #include "globals.h"
-#include "internal.h"
 #include "obj_slabs.h"
 #include "obj_things.h"
+#include "obj_column.h"
 
 struct LEVEL *lvl=NULL;
 
@@ -27,6 +27,8 @@ short level_init()
     // map file name
     lvl->fname=(char *)malloc(DISKPATH_SIZE);
     memset(lvl->fname,0,DISKPATH_SIZE*sizeof(char));
+    lvl->savfname=(char *)malloc(DISKPATH_SIZE);
+    memset(lvl->savfname,0,DISKPATH_SIZE*sizeof(char));
     //Preparing array bounds
     int arr_entries_x=MAP_SIZE_X*MAP_SUBNUM_X;
     int arr_entries_y=MAP_SIZE_Y*MAP_SUBNUM_Y;
@@ -42,6 +44,8 @@ short level_init()
       if (lvl->clm[i]==NULL)
         die("level_init: Out of memory");
     }
+    lvl->clm_hdr=(unsigned char *)malloc(SIZEOF_DK_CLM_HEADER);
+    lvl->clm_utilize=(unsigned int *)malloc(COLUMN_ENTRIES*sizeof(unsigned int *));
   }
   { //allocating SLB structures
     int i;
@@ -93,11 +97,22 @@ short level_init()
         die("level_init: Out of memory");
     }
   }
+  {
+    int i;
+    lvl->tng_apt_lgt_nums = (unsigned short **)malloc(MAP_SIZE_Y*sizeof(unsigned short *));
+    if (lvl->tng_apt_lgt_nums==NULL)
+      die("level_init: Out of memory");
+    for (i=0; i<MAP_SIZE_Y; i++)
+    {
+      lvl->tng_apt_lgt_nums[i]= (unsigned short *)malloc(MAP_SIZE_X*sizeof(unsigned short));
+      if (lvl->tng_apt_lgt_nums[i]==NULL)
+        die("level_init: Out of memory");
+    }
+  }
   { //Allocating "things" structure
     lvl->tng_lookup = (unsigned char ****)malloc(arr_entries_y*sizeof(unsigned char ***));
     lvl->tng_subnums= (unsigned short **)malloc(arr_entries_y*sizeof(unsigned short *));
-    lvl->tng_apt_nums =   (unsigned short **)malloc(MAP_SIZE_Y*sizeof(unsigned short *));
-    if ((lvl->tng_lookup==NULL) || (lvl->tng_subnums==NULL) || (lvl->tng_apt_nums==NULL))
+    if ((lvl->tng_lookup==NULL) || (lvl->tng_subnums==NULL))
       die("level_init: Out of memory");
     int i;
     for (i=0; i<arr_entries_y; i++)
@@ -105,12 +120,6 @@ short level_init()
       lvl->tng_lookup[i]=(unsigned char ***)malloc (arr_entries_x*sizeof(unsigned char **));
       lvl->tng_subnums[i]=(unsigned short *)malloc (arr_entries_x*sizeof(unsigned short));
       if ((lvl->tng_lookup[i]==NULL) || (lvl->tng_subnums[i]==NULL))
-        die("level_init: Out of memory");
-    }
-    for (i=0; i<MAP_SIZE_Y; i++)
-    {
-      lvl->tng_apt_nums[i]= (unsigned short *)malloc(MAP_SIZE_X*sizeof(unsigned short));
-      if (lvl->tng_apt_nums[i]==NULL)
         die("level_init: Out of memory");
     }
   }
@@ -125,6 +134,20 @@ short level_init()
       lvl->apt_lookup[i]=(unsigned char ***)malloc (arr_entries_x*sizeof(unsigned char **));
       lvl->apt_subnums[i]=(unsigned short *)malloc (arr_entries_x*sizeof(unsigned short));
       if ((lvl->apt_lookup[i]==NULL) || (lvl->apt_subnums[i]==NULL))
+        die("level_init: Out of memory");
+    }
+  }
+  { //Allocating "static lights" structure
+    lvl->lgt_lookup = (unsigned char ****)malloc(arr_entries_y*sizeof(unsigned char ***));
+    lvl->lgt_subnums= (unsigned short **)malloc(arr_entries_y*sizeof(unsigned short *));
+    if ((lvl->lgt_lookup==NULL) || (lvl->lgt_subnums==NULL))
+      die("level_init: Out of memory");
+    int i;
+    for (i=0; i<arr_entries_y; i++)
+    {
+      lvl->lgt_lookup[i]=(unsigned char ***)malloc (arr_entries_x*sizeof(unsigned char **));
+      lvl->lgt_subnums[i]=(unsigned short *)malloc (arr_entries_x*sizeof(unsigned short));
+      if ((lvl->lgt_lookup[i]==NULL) || (lvl->lgt_subnums[i]==NULL))
         die("level_init: Out of memory");
     }
   }
@@ -164,7 +187,7 @@ short level_clear_tng(struct LEVEL *lvl)
       }
     for (i=0; i<MAP_SIZE_Y; i++)
       for (j=0; j<MAP_SIZE_X; j++)
-          lvl->tng_apt_nums[i][j]=0;
+          lvl->tng_apt_lgt_nums[i][j]=0;
 
     //Clearing related stats variables
     lvl->stats.hero_gates_count=0;
@@ -194,6 +217,76 @@ short level_clear_apt(struct LEVEL *lvl)
 }
 
 /*
+ * clears the "lights" structure for storing level; drops any old pointers
+ * without deallocating them; requies level_init() to be run first;
+ */
+short level_clear_lgt(struct LEVEL *lvl)
+{
+    //Preparing array bounds
+    int arr_entries_x=MAP_SIZE_X*MAP_SUBNUM_X;
+    int arr_entries_y=MAP_SIZE_Y*MAP_SUBNUM_Y;
+    //Clearing single variables
+    lvl->lgt_total_count=0;
+    //Clearing pointer arrays
+    int i,j;
+    for (i=0; i<arr_entries_y; i++)
+      for (j=0; j<arr_entries_x; j++)
+      {
+          lvl->lgt_lookup[i][j]=NULL;
+          lvl->lgt_subnums[i][j]=0;
+      }
+  return true;
+}
+
+/*
+ * clears the "column" structure for storing level; will not drop any pointers;
+ * requies level_init() to be run first;
+ */
+short level_clear_datclm(struct LEVEL *lvl)
+{
+    //Preparing array bounds
+    int arr_entries_x=MAP_SIZE_X*MAP_SUBNUM_X;
+    int arr_entries_y=MAP_SIZE_Y*MAP_SUBNUM_Y;
+
+    // zero-filling CLM memory
+    int i,k;
+    for (i=0; i<COLUMN_ENTRIES; i++)
+    {
+      lvl->clm_utilize[i]=0;
+      if (lvl->clm[i]!=NULL)
+        memset(lvl->clm[i],0,SIZEOF_DK_CLM_REC);
+    }
+    //Clearing CLM header
+    memset(lvl->clm_hdr,0,SIZEOF_DK_CLM_HEADER);
+    write_long_le_buf(lvl->clm_hdr+0,COLUMN_ENTRIES);
+    // Setting all DAT entries to one, first column
+    // (it is unused in all maps)
+    for (k=0; k<arr_entries_y; k++)
+      for (i=0; i<arr_entries_x; i++)
+      {
+          set_dat_subtile(lvl, i, k, 0);
+          lvl->clm_utilize[0]++;
+      }
+
+    //Filling CLM entries with unused, zero-filled ones
+    unsigned char *clmentry;
+    struct COLUMN_REC *clm_rec;
+    clm_rec=create_column_rec();
+    //Firs one is special - should have nonzero use at start
+    clmentry = (unsigned char *)(lvl->clm[0]);
+    fill_column_rec_sim(clm_rec,lvl->clm_utilize[0], 0,  0, 0, 0, 0, 0, 0, 0, 0);
+    set_clm_entry(clmentry, clm_rec);
+    fill_column_rec_sim(clm_rec,0, 0,  0, 0, 0, 0, 0, 0, 0, 0);
+    for (i=1; i < COLUMN_ENTRIES; i++)
+    {
+      clmentry = (unsigned char *)(lvl->clm[i]);
+      set_clm_entry(clmentry, clm_rec);
+    }
+    free_column_rec(clm_rec);
+    return true;
+}
+
+/*
  * clears the structures for storing level which do not have separate
  * clearing function; drops any old pointers, only file name remains;
  * without deallocating them; requies level_init() to be run first;
@@ -205,12 +298,6 @@ short level_clear_other(struct LEVEL *lvl)
     int arr_entries_y=MAP_SIZE_Y*MAP_SUBNUM_Y;
 
     int i;
-    for (i=0; i<COLUMN_ENTRIES; i++)
-      if (lvl->clm[i]!=NULL)
-      {
-        memset(lvl->clm[i],0,SIZEOF_DK_CLM_REC);
-      }
-
     for (i=0; i < MAP_SIZE_Y; i++)
     {
       if (lvl->slb[i]!=NULL)
@@ -233,7 +320,7 @@ short level_clear_other(struct LEVEL *lvl)
     for (i=0; i < arr_entries_y; i++)
     {
       if (lvl->wib[i]!=NULL)
-        memset(lvl->wib[i],0,arr_entries_x*sizeof(char));
+        memset(lvl->wib[i],COLUMN_WIB_SKEW,arr_entries_x*sizeof(char));
     }
 
     for (i=0; i < MAP_SIZE_Y; i++)
@@ -249,10 +336,6 @@ short level_clear_other(struct LEVEL *lvl)
     lvl->txt=NULL;
     lvl->txt_lines_count=0;
 
-    // LGT light definition file
-    lvl->lgt=NULL;
-    lvl->lgt_enties_count=0;
-    
     return true;
 }
 
@@ -263,8 +346,10 @@ short level_clear_other(struct LEVEL *lvl)
 short level_clear(struct LEVEL *lvl)
 {
   short result=true;
+  result&=level_clear_lgt(lvl);
   result&=level_clear_apt(lvl);
   result&=level_clear_tng(lvl);
+  result&=level_clear_datclm(lvl);
   result&=level_clear_other(lvl);
   return result;
 }
@@ -286,7 +371,8 @@ short level_deinit()
       int i;
       for (i=0; i<MAP_SIZE_Y; i++)
           free(lvl->slb[i]);
-      free(lvl->slb);
+// This is very strange - this line reads adress 0x0 (!?)
+//      free(lvl->slb);
     }
 
     //Freeing OWN structure
@@ -324,12 +410,12 @@ short level_deinit()
     }
 
     //Freeing "things" structure
-    if (lvl->tng_apt_nums!=NULL)
+    if (lvl->tng_apt_lgt_nums!=NULL)
     {
       int i;
       for (i=0; i<MAP_SIZE_Y; i++)
-        free(lvl->tng_apt_nums[i]);
-      free(lvl->tng_apt_nums);
+        free(lvl->tng_apt_lgt_nums[i]);
+      free(lvl->tng_apt_lgt_nums);
     }
     if (lvl->tng_lookup!=NULL)
     {
@@ -346,7 +432,7 @@ short level_deinit()
       free(lvl->tng_subnums);
     }
 
-    //Freeing actions structure
+    //Freeing action points structure
     if (lvl->apt_lookup!=NULL)
     {
       int i;
@@ -362,6 +448,22 @@ short level_deinit()
       free(lvl->apt_subnums);
     }
 
+    //Freeing static lights structure
+    if (lvl->lgt_lookup!=NULL)
+    {
+      int i;
+      for (i=0; i<arr_entries_y; i++)
+        free(lvl->lgt_lookup[i]);
+      free(lvl->lgt_lookup);
+    }
+    if (lvl->lgt_subnums!=NULL)
+    {
+      int i;
+      for (i=0; i<arr_entries_y; i++)
+        free(lvl->lgt_subnums[i]);
+      free(lvl->lgt_subnums);
+    }
+
     //Freeing column structure
     if (lvl->clm!=NULL)
     {
@@ -369,6 +471,8 @@ short level_deinit()
       for (i=0; i<COLUMN_ENTRIES; i++)
           free (lvl->clm[i]);
       free(lvl->clm);
+      free(lvl->clm_hdr);
+      free(lvl->clm_utilize);
     }
 
     //Freeing WLB structure
@@ -379,8 +483,9 @@ short level_deinit()
           free(lvl->wlb[i]);
       free(lvl->wlb);
     }
-    
+
     free(lvl->fname);
+    free(lvl->savfname);
 
     //Final freeing - main lvl object
     free(lvl);
@@ -452,8 +557,8 @@ short level_free_txt(struct LEVEL *lvl)
   int idx=lvl->txt_lines_count;
   while (idx>0)
   {
-    free(lvl->txt[idx]);
     idx--;
+    free(lvl->txt[idx]);
   }
   free(lvl->txt);
   return true;
@@ -466,13 +571,24 @@ short level_free_txt(struct LEVEL *lvl)
  */
 short level_free_lgt(struct LEVEL *lvl)
 {
-    int i;
-    for (i=0;i<lvl->lgt_enties_count;i++)
+    //Preparing array bounds
+    int arr_entries_x=MAP_SIZE_X*MAP_SUBNUM_X;
+    int arr_entries_y=MAP_SIZE_Y*MAP_SUBNUM_Y;
+    //Freeing object arrays
+    if ((lvl->lgt_subnums!=NULL) && (lvl->lgt_lookup!=NULL))
     {
-        free(lvl->lgt[i]);
+      int cx,cy,k;
+      for (cx=0; cx<arr_entries_x; cx++)
+      {
+          for (cy=0; cy<arr_entries_y; cy++)
+          {
+            int last_idx=lvl->lgt_subnums[cx][cy]-1;
+            for (k=last_idx; k >=0; k--)
+                stlight_del(lvl,cx, cy, k);
+          }
+      }
     }
-    free(lvl->lgt);
-    lvl->lgt_enties_count=0;
+  return true;
 }
 
 /*
@@ -483,9 +599,10 @@ short level_free_lgt(struct LEVEL *lvl)
 short level_free()
 {
   short result=true;
+  result&=level_free_lgt(lvl);
+  result&=level_free_apt(lvl);
   result&=level_free_tng(lvl);
   result&=level_free_txt(lvl);
-  result&=level_free_lgt(lvl);
   return result;
 }
 
@@ -494,30 +611,41 @@ short level_verify(struct LEVEL *lvl, char *actn_name)
   char err_msg[LINEMSG_SIZE];
   strcpy(err_msg,"Unknown error");
   short result=VERIF_OK;
-  if (result==VERIF_OK)
+  short nres;
+  if (result!=VERIF_ERROR)
   {
-    result=level_verify_struct(lvl,err_msg);
+    nres=level_verify_struct(lvl,err_msg);
+    if (nres!=VERIF_OK) result=nres;
   }
-  if (result==VERIF_OK)
+  if (result!=VERIF_ERROR)
   {
-    result=things_verify(lvl,err_msg);
+    nres=things_verify(lvl,err_msg);
+    if (nres!=VERIF_OK) result=nres;
   }
-  if (result==VERIF_OK)
+  if (result!=VERIF_ERROR)
   {
-    result=slabs_verify(lvl,err_msg);
+    nres=slabs_verify(lvl,err_msg);
+    if (nres!=VERIF_OK) result=nres;
   }
-  if (result==VERIF_OK)
+  if (result!=VERIF_ERROR)
   {
-    result=actnpts_verify(lvl,err_msg);
+    nres=actnpts_verify(lvl,err_msg);
+    if (nres!=VERIF_OK) result=nres;
   }
-  if (result==VERIF_OK)
+  if (result!=VERIF_ERROR)
   {
-    result=columns_verify(lvl,err_msg);
+    nres=columns_verify(lvl,err_msg);
+    if (nres!=VERIF_OK) result=nres;
   }
-//TODO: verify inf, txt, dat,...
-  if (result==VERIF_OK)
+  if (result!=VERIF_ERROR)
   {
-    result=level_verify_logic(lvl,err_msg);
+    nres=dat_verify(lvl,err_msg);
+    if (nres!=VERIF_OK) result=nres;
+  }
+  if (result!=VERIF_ERROR)
+  {
+    nres=level_verify_logic(lvl,err_msg);
+    if (nres!=VERIF_OK) result=nres;
   }
   switch (result)
   {
@@ -559,6 +687,11 @@ short level_verify_struct(struct LEVEL *lvl, char *err_msg)
           strncpy(err_msg,"Null internal object apt_subnums!",LINEMSG_SIZE);
           return VERIF_ERROR;
     }
+    if (lvl->lgt_subnums==NULL)
+    {
+          strncpy(err_msg,"Null internal object lgt_subnums!",LINEMSG_SIZE);
+          return VERIF_ERROR;
+    }
     //Sweeping through structures
     int i, j, k;
     for (i=0; i < arr_entries_y; i++)
@@ -587,6 +720,16 @@ short level_verify_struct(struct LEVEL *lvl, char *err_msg)
           }
         }
         
+        int stlight_count=lvl->lgt_subnums[i][j];
+        for (k=0; k <stlight_count ; k++)
+        {
+          unsigned char *stlight = lvl->lgt_lookup[i][j][k];
+          if (stlight==NULL)
+          {
+              sprintf(err_msg,"Null static light pointer at slab %d,%d.",i/MAP_SUBNUM_X, j/MAP_SUBNUM_Y);
+              return VERIF_ERROR;
+          }
+        }
       }
     }
     for (i=0; i<COLUMN_ENTRIES; i++)
@@ -596,6 +739,16 @@ short level_verify_struct(struct LEVEL *lvl, char *err_msg)
         sprintf(err_msg,"Null CoLuMn entry at index %d.",i);
         return VERIF_ERROR;
       }
+    }
+    if ((lvl->clm_hdr==NULL)||(lvl->clm_utilize==NULL))
+    {
+      sprintf(err_msg,"Null CoLuMn help arrays.");
+      return VERIF_ERROR;
+    }
+    if (lvl->inf>7)
+    {
+          strncpy(err_msg,"Unexpected value of INF entry.",LINEMSG_SIZE);
+          return VERIF_WARN;
     }
   return VERIF_OK;
 }
@@ -633,8 +786,8 @@ short level_verify_logic(struct LEVEL *lvl, char *err_msg)
         for (k=0; k <things_count ; k++)
         {
           unsigned char *thing = get_thing(lvl,i,j,k);
-
-          if ((get_thing_type(thing)==THING_TYPE_ITEM) && (get_thing_subtype(thing)==ITEM_SUBTYPE_DNHEART))
+          unsigned char type_idx=get_thing_type(thing);
+          if (is_dnheart(thing))
           {
             if (get_thing_owner(thing)>=PLAYERS_COUNT-1) // Orphan heart
             {
@@ -643,6 +796,34 @@ short level_verify_logic(struct LEVEL *lvl, char *err_msg)
             } else
             {
               hearts[get_thing_owner(thing)]++;
+            }
+          }
+//          if ((type_idx==THING_TYPE_ITEM))
+          {
+            int pos_h=(unsigned short)get_thing_tilepos_h(thing);
+            int subt_x=(unsigned short)get_thing_subtpos_x(thing);
+            int subt_y=(unsigned short)get_thing_subtpos_y(thing);
+            unsigned char slab=get_tile_slab(lvl,i/MAP_SUBNUM_X,j/MAP_SUBNUM_Y);
+            int col_h=get_subtile_column_height(lvl,i,j);
+            //Checking if we're close to sibling column - if we are, its heigh may be
+            // importand too. (disabled after verifying if official editor)
+/*            if ((subt_x<=64)||(subt_x>=192)||
+                (subt_y<=64)||(subt_y>=192))
+            {
+              int modx=0;
+              int mody=0;
+              if (subt_x<=64) modx=1;
+              if (subt_x>=192) modx=-1;
+              if (subt_y<=64) mody=1;
+              if (subt_y>=192) mody=-1;
+              int mod_h=get_subtile_column_height(lvl,i+modx,j+mody);
+              if (mod_h<col_h)
+                col_h=mod_h;
+            }*/
+            if ((pos_h<col_h)&&(!slab_is_door(slab))||(pos_h<min(col_h,1)))
+            {
+              sprintf(err_msg,"Thing trapped in solid column on slab %d,%d (h=%d<%d).",i/MAP_SUBNUM_X, j/MAP_SUBNUM_Y,pos_h,col_h);
+              return VERIF_WARN;
             }
           }
         }
@@ -657,90 +838,73 @@ short level_verify_logic(struct LEVEL *lvl, char *err_msg)
         return VERIF_WARN;
       }
     }
-    if (!hearts[0])
+    if (hearts[0]==0)
     {
         sprintf(err_msg,"Human player doesn't have a dungeon heart.");
         return VERIF_WARN;
     }
-    // Future verifications:
-    // Maybe check that no things are trapped in rock/earth?
-     
   return VERIF_OK;
 }
 
 /*
- * creates new level;  requies the memory to be allocated by level_init();
- * calls level_clear(), but not level_free() at start;
+ * Fills SLB/OWN structure with "default" background,
+ * unowned earth surrounded by rock.
+ * DAT/CLM values are not updated here.
  */
-void start_new_map(struct LEVEL *lvl)
+void generate_slab_bkgnd_default(struct LEVEL *lvl)
 {
-    level_clear(lvl);
-
-    //Preparing array bounds
-    int arr_entries_x=MAP_SIZE_X*MAP_SUBNUM_X;
-    int arr_entries_y=MAP_SIZE_Y*MAP_SUBNUM_Y;
-
     // Filling the map with SLAB_TYPE_EARTH
     int i,j;
     for (i=1; i < MAP_MAXINDEX_Y; i++)
       for (j=1; j < MAP_MAXINDEX_X; j++)
       {
-          lvl->slb[i][j]=SLAB_TYPE_EARTH; // Dirt
-          lvl->own[i][j]=PLAYER_UNSET; //=5, simply ;)
+          set_tile_slab(lvl,i,j,SLAB_TYPE_EARTH); // Digable dirt
+          set_tile_owner(lvl,i,j,PLAYER_UNSET); //=5, simply ;)
       }
     // Impenetrable rock
+    for (i=0; i < MAP_SIZE_X; i++)
+    {
+      set_tile_slab(lvl,i,0,SLAB_TYPE_ROCK);
+      set_tile_slab(lvl,i,MAP_MAXINDEX_Y,SLAB_TYPE_ROCK);
+      set_tile_owner(lvl,i,0,PLAYER_UNSET);
+      set_tile_owner(lvl,i,MAP_MAXINDEX_Y,PLAYER_UNSET);
+    }
     for (i=0; i < MAP_SIZE_Y; i++)
     {
-      lvl->slb[i][0]=SLAB_TYPE_ROCK;
-      lvl->slb[i][MAP_MAXINDEX_X]=SLAB_TYPE_ROCK;
-      lvl->slb[0][i]=SLAB_TYPE_ROCK;
-      lvl->slb[MAP_MAXINDEX_X][i]=SLAB_TYPE_ROCK;
-      lvl->own[i][0]=PLAYER_UNSET;
-      lvl->own[i][MAP_MAXINDEX_X]=PLAYER_UNSET;
-      lvl->own[0][i]=PLAYER_UNSET;
-      lvl->own[MAP_MAXINDEX_X][i]=PLAYER_UNSET;
+      set_tile_slab(lvl,0,i,SLAB_TYPE_ROCK);
+      set_tile_slab(lvl,MAP_MAXINDEX_X,i,SLAB_TYPE_ROCK);
+      set_tile_owner(lvl,0,i,PLAYER_UNSET);
+      set_tile_owner(lvl,MAP_MAXINDEX_Y,i,PLAYER_UNSET);
     }
-
-    // Clearing things and action points
-    lvl->tng_total_count=0;
-    lvl->apt_total_count=0;
-    for (i=0; i < MAP_SIZE_Y; i++)
-      for (j=0; j < MAP_SIZE_X; j++)
-          lvl->tng_apt_nums[i][j]=0;
-    for (i=0; i < arr_entries_y; i++)
-      for (j=0; j < arr_entries_x; j++)
-      {
-          lvl->tng_lookup[i][j]=NULL;
-          lvl->tng_subnums[i][j]=0;
-          lvl->apt_lookup[i][j]=NULL;
-          lvl->apt_subnums[i][j]=0;
-      }
-
-    //Default values for DAT and WIB
-    for (i=0; i < arr_entries_y; i++)
-      for (j=0; j < arr_entries_x; j++)
-      {
-          lvl->dat_high[i][j]=0xfc;
-          lvl->dat_low[i][j]=0x4c;
-          lvl->wib[i][j]=1;
-      }
-
-    for (i=0; i < COLUMN_ENTRIES; i++)
-    {
-      for (j=0; j < SIZEOF_DK_CLM_REC; j++)
-          (lvl->clm[i])[j]=0;
-    }
-
-    lvl->inf=0x00;
-
-    read_graffiti();
 }
 
-void generate_random_map(struct LEVEL *lvl)
+/*
+ * Fills SLB/OWN structure with "random" background,
+ * map made of earth with random rock at borders.
+ * DAT/CLM values are not updated here.
+ */
+void generate_slab_bkgnd_random(struct LEVEL *lvl)
 {
-     start_new_map(lvl);
-    // Impenetrable rock at borders
+// TODO: check if there are not closed regions of earth, link them with
+// earth corridors
     int i,j,k,l;
+    // Filling the map with SLAB_TYPE_EARTH
+    for (i=1; i < MAP_MAXINDEX_Y; i++)
+      for (j=1; j < MAP_MAXINDEX_X; j++)
+          set_tile_slab(lvl,i,j,SLAB_TYPE_EARTH); // Digable dirt
+    // Impenetrable rock
+    for (i=0; i < MAP_SIZE_X; i++)
+    {
+      set_tile_slab(lvl,i,0,SLAB_TYPE_ROCK);
+      set_tile_slab(lvl,i,MAP_MAXINDEX_Y,SLAB_TYPE_ROCK);
+    }
+    for (i=0; i < MAP_SIZE_Y; i++)
+    {
+      set_tile_slab(lvl,0,i,SLAB_TYPE_ROCK);
+      set_tile_slab(lvl,MAP_MAXINDEX_X,i,SLAB_TYPE_ROCK);
+    }
+
+    // Impenetrable rock at borders
     for (i=1; i < (MAP_MAXINDEX_Y>>1); i++)
       for (j=0; j < MAP_MAXINDEX_X-1; j++)
       {
@@ -748,23 +912,19 @@ void generate_random_map(struct LEVEL *lvl)
         int rnd_bound=RAND_MAX/((i/2)+1);
         if (rand()<rnd_bound)
         {
-          lvl->slb[j][i]=SLAB_TYPE_ROCK;
-          lvl->own[j][i]=PLAYER_UNSET;
+          set_tile_slab(lvl,j,i,SLAB_TYPE_ROCK);
         }
         if (rand()<rnd_bound)
         {
-          lvl->slb[j][MAP_MAXINDEX_X-i]=SLAB_TYPE_ROCK;
-          lvl->own[j][MAP_MAXINDEX_X-i]=PLAYER_UNSET;
+          set_tile_slab(lvl,j,MAP_MAXINDEX_X-i,SLAB_TYPE_ROCK);
         }
         if (rand()<rnd_bound)
         {
-          lvl->slb[i][j]=SLAB_TYPE_ROCK;
-          lvl->own[i][j]=PLAYER_UNSET;
+          set_tile_slab(lvl,i,j,SLAB_TYPE_ROCK);
         }
         if (rand()<rnd_bound)
         {
-          lvl->slb[MAP_MAXINDEX_X-i][j]=SLAB_TYPE_ROCK;
-          lvl->own[MAP_MAXINDEX_X-i][j]=PLAYER_UNSET;
+          set_tile_slab(lvl,MAP_MAXINDEX_X-i,j,SLAB_TYPE_ROCK);
         }
       }
     int num_smears=(rand()%20);
@@ -800,12 +960,10 @@ void generate_random_map(struct LEVEL *lvl)
             int nsibln=slab_siblings_oftype(lvl,cx,cy,SLAB_TYPE_ROCK);
             if (nsibln>slabgrow_bound_val)
             {
-              lvl->slb[cx][cy]=SLAB_TYPE_ROCK;
-              lvl->own[cx][cy]=PLAYER_UNSET;
+              set_tile_slab(lvl,cx,cy,SLAB_TYPE_ROCK);
             } else
             {
-              lvl->slb[cx][cy]=SLAB_TYPE_EARTH;
-              lvl->own[cx][cy]=PLAYER_UNSET;
+              set_tile_slab(lvl,cx,cy,SLAB_TYPE_EARTH);
             }
         }
     for (i=1; i < MAP_MAXINDEX_X-1; i++)
@@ -814,16 +972,63 @@ void generate_random_map(struct LEVEL *lvl)
           int nsibln=slab_siblings_oftype(lvl,i,j,SLAB_TYPE_ROCK);
           if (nsibln<2)
           {
-              lvl->slb[i][j]=SLAB_TYPE_EARTH;
-              lvl->own[i][j]=PLAYER_UNSET;
+              set_tile_slab(lvl,i,j,SLAB_TYPE_EARTH);
           }
           if (nsibln>7)
           {
-              lvl->slb[i][j]=SLAB_TYPE_ROCK;
-              lvl->own[i][j]=PLAYER_UNSET;
+              set_tile_slab(lvl,i,j,SLAB_TYPE_ROCK);
           }
       }
-    create_clmdattng();
+    //Everything generated here should be unclaimed
+    for (i=0; i < MAP_SIZE_X; i++)
+      for (j=0; j < MAP_SIZE_Y; j++)
+          set_tile_owner(lvl, i, j, PLAYER_UNSET);
+}
+
+/*
+ * creates new level;  requies the memory to be allocated by level_init();
+ * calls level_clear(), but not level_free() at start;
+ */
+void start_new_map(struct LEVEL *lvl)
+{
+    level_clear(lvl);
+    //Preparing array bounds
+    int arr_entries_x=MAP_SIZE_X*MAP_SUBNUM_X;
+    int arr_entries_y=MAP_SIZE_Y*MAP_SUBNUM_Y;
+
+    generate_slab_bkgnd_default(lvl);
+
+    // CLM should be empty, add permanent entries
+    add_permanent_columns(lvl);
+    //And update all DAT/CLM values; it also updates the WIB values.
+    if (datclm_auto_update)
+        update_datclm_for_whole_map(lvl);
+
+    lvl->inf=0x00;
+
+    update_level_stats(lvl);
+    read_graffiti();
+}
+
+void generate_random_map(struct LEVEL *lvl)
+{
+    level_clear(lvl);
+    //Preparing array bounds
+    int arr_entries_x=MAP_SIZE_X*MAP_SUBNUM_X;
+    int arr_entries_y=MAP_SIZE_Y*MAP_SUBNUM_Y;
+
+    generate_slab_bkgnd_random(lvl);
+
+    // CLM should be empty, add permanent entries
+    add_permanent_columns(lvl);
+    //And update all DAT/CLM values; it also updates the WIB values.
+    if (datclm_auto_update)
+        update_datclm_for_whole_map(lvl);
+
+    lvl->inf=rnd(8);
+
+    update_level_stats(lvl);
+    read_graffiti();
 }
 
 void free_map(void)
@@ -847,7 +1052,10 @@ char *get_thing(struct LEVEL *lvl,unsigned int x,unsigned int y,unsigned int num
     return thing;
 }
 
-void thing_add(struct LEVEL *lvl,unsigned char *thing)
+/*
+ * Adds a thing to the structure. Returns its index in structure.
+ */
+int thing_add(struct LEVEL *lvl,unsigned char *thing)
 {
     //Preparing array bounds
     int arr_entries_x=MAP_SIZE_X*MAP_SUBNUM_X;
@@ -858,7 +1066,7 @@ void thing_add(struct LEVEL *lvl,unsigned char *thing)
     lvl->tng_total_count++;
     //setting TNG entries
     lvl->tng_subnums[x][y]++;
-    lvl->tng_apt_nums[(x/MAP_SUBNUM_X)][(y/MAP_SUBNUM_Y)]++;
+    lvl->tng_apt_lgt_nums[(x/MAP_SUBNUM_X)][(y/MAP_SUBNUM_Y)]++;
     if (lvl->tng_lookup[x][y]==NULL)
       lvl->tng_lookup[x][y]=(unsigned char **)malloc(sizeof(char *));
     else
@@ -868,6 +1076,7 @@ void thing_add(struct LEVEL *lvl,unsigned char *thing)
       die("thing_add: Out of memory");
     int new_idx=lvl->tng_subnums[x][y]-1;
     lvl->tng_lookup[x][y][new_idx]=thing;
+    return new_idx;
 }
 
 /*
@@ -892,7 +1101,7 @@ void thing_del(struct LEVEL *lvl,unsigned int x, unsigned int y, unsigned int nu
     for (i=num; i < lvl->tng_subnums[x][y]-1; i++)
       lvl->tng_lookup[x][y][i]=lvl->tng_lookup[x][y][i+1];
     lvl->tng_subnums[x][y]--;
-    lvl->tng_apt_nums[x/3][y/3]--;
+    lvl->tng_apt_lgt_nums[x/3][y/3]--;
     lvl->tng_lookup[x][y]=(unsigned char **)realloc(lvl->tng_lookup[x][y], 
                         lvl->tng_subnums[x][y]*sizeof(char *));
 }
@@ -931,14 +1140,14 @@ void actnpt_add(struct LEVEL *lvl,unsigned char *actnpt)
     int arr_entries_x=MAP_SIZE_X*MAP_SUBNUM_X;
     int arr_entries_y=MAP_SIZE_Y*MAP_SUBNUM_Y;
     unsigned int x, y;
-    x = actnpt[1]%arr_entries_x;
-    y = actnpt[3]%arr_entries_y;
+    x = get_actnpt_tilepos_x(actnpt)%arr_entries_x;
+    y = get_actnpt_tilepos_y(actnpt)%arr_entries_y;
     lvl->apt_total_count++;
     //setting APT entries
     unsigned int apt_snum=lvl->apt_subnums[x][y];
     apt_snum++;
     lvl->apt_subnums[x][y]=apt_snum;
-    lvl->tng_apt_nums[(x/MAP_SUBNUM_X)][(y/MAP_SUBNUM_Y)]++;
+    lvl->tng_apt_lgt_nums[(x/MAP_SUBNUM_X)][(y/MAP_SUBNUM_Y)]++;
     if (lvl->apt_lookup[x][y]==NULL)
       lvl->apt_lookup[x][y]=(unsigned char **)malloc(sizeof(char *));
     else
@@ -967,13 +1176,13 @@ void actnpt_del(struct LEVEL *lvl,unsigned int x, unsigned int y, unsigned int n
     lvl->apt_total_count--;
     unsigned char *actnpt;
     actnpt = lvl->apt_lookup[x][y][num];
-    free(lvl->apt_lookup[x][y][num]);
+    free(actnpt);
     int i;
     apt_snum--;
     for (i=num; i < apt_snum; i++)
       lvl->apt_lookup[x][y][i]=lvl->apt_lookup[x][y][i+1];
     lvl->apt_subnums[x][y]=apt_snum;
-    lvl->tng_apt_nums[x/MAP_SUBNUM_X][y/MAP_SUBNUM_Y]--;
+    lvl->tng_apt_lgt_nums[x/MAP_SUBNUM_X][y/MAP_SUBNUM_Y]--;
     lvl->apt_lookup[x][y]=(unsigned char **)realloc(lvl->apt_lookup[x][y], 
                         apt_snum*sizeof(char *));
 }
@@ -989,9 +1198,89 @@ unsigned int get_actnpt_subnums(struct LEVEL *lvl,unsigned int x,unsigned int y)
     return lvl->apt_subnums[x][y];
 }
 
+char *get_stlight(struct LEVEL *lvl,unsigned int x,unsigned int y,unsigned int num)
+{
+    //Preparing array bounds
+    unsigned int arr_entries_x=MAP_SIZE_X*MAP_SUBNUM_X;
+    unsigned int arr_entries_y=MAP_SIZE_Y*MAP_SUBNUM_Y;
+    //Bounding position
+    x %= arr_entries_x;
+    y %= arr_entries_y;
+    unsigned char *stlight=NULL;
+    if (num < lvl->lgt_subnums[x][y])
+      stlight = lvl->lgt_lookup[x][y][num];
+    return stlight;
+}
 
 /*
- * Checks what type the object is. Objects are action points or things.
+ * Adds a given static light to the LEVEL structure, updates counter variables
+ */
+void stlight_add(struct LEVEL *lvl,unsigned char *stlight)
+{
+    //Preparing array bounds
+    int arr_entries_x=MAP_SIZE_X*MAP_SUBNUM_X;
+    int arr_entries_y=MAP_SIZE_Y*MAP_SUBNUM_Y;
+    unsigned int x, y;
+    x = get_stlight_tilepos_x(stlight)%arr_entries_x;
+    y = get_stlight_tilepos_y(stlight)%arr_entries_y;
+    lvl->lgt_total_count++;
+    //setting LGT entries
+    unsigned int lgt_snum=lvl->lgt_subnums[x][y];
+    lgt_snum++;
+    lvl->lgt_subnums[x][y]=lgt_snum;
+    lvl->tng_apt_lgt_nums[(x/MAP_SUBNUM_X)][(y/MAP_SUBNUM_Y)]++;
+    if (lvl->lgt_lookup[x][y]==NULL)
+      lvl->lgt_lookup[x][y]=(unsigned char **)malloc(sizeof(char *));
+    else
+      lvl->lgt_lookup[x][y]=(unsigned char **)realloc(lvl->lgt_lookup[x][y],
+                          lgt_snum*sizeof(char *));
+    if (lvl->lgt_lookup[x][y]==NULL)
+      die("stlight_add: Cannot allocate memory.");
+    unsigned int new_idx=lgt_snum-1;
+    lvl->lgt_lookup[x][y][new_idx]=stlight;
+}
+
+/*
+ * Removes given static light from the LEVEL structure, updates counter variables.
+ * Also frees memory allocated for the static light.
+ */
+void stlight_del(struct LEVEL *lvl,unsigned int x, unsigned int y, unsigned int num)
+{
+    //Preparing array bounds
+    int arr_entries_x=MAP_SIZE_X*MAP_SUBNUM_X;
+    int arr_entries_y=MAP_SIZE_Y*MAP_SUBNUM_Y;
+    x%=arr_entries_x;
+    y%=arr_entries_y;
+    unsigned int lgt_snum=lvl->lgt_subnums[x][y];
+    if (num >= lgt_snum)
+      return;
+    lvl->lgt_total_count--;
+    unsigned char *stlight;
+    stlight = lvl->lgt_lookup[x][y][num];
+    free(lvl->lgt_lookup[x][y][num]);
+    int i;
+    lgt_snum--;
+    for (i=num; i < lgt_snum; i++)
+      lvl->lgt_lookup[x][y][i]=lvl->lgt_lookup[x][y][i+1];
+    lvl->lgt_subnums[x][y]=lgt_snum;
+    lvl->tng_apt_lgt_nums[x/MAP_SUBNUM_X][y/MAP_SUBNUM_Y]--;
+    lvl->lgt_lookup[x][y]=(unsigned char **)realloc(lvl->lgt_lookup[x][y], 
+                        lgt_snum*sizeof(char *));
+}
+
+unsigned int get_stlight_subnums(struct LEVEL *lvl,unsigned int x,unsigned int y)
+{
+    //Preparing array bounds
+    unsigned int arr_entries_x=MAP_SIZE_X*MAP_SUBNUM_X;
+    unsigned int arr_entries_y=MAP_SIZE_Y*MAP_SUBNUM_Y;
+    //Bounding position
+    x %= arr_entries_x;
+    y %= arr_entries_y;
+    return lvl->lgt_subnums[x][y];
+}
+
+/*
+ * Checks what type the object is. Objects are action points, things or lights.
  * Returns one of OBJECT_TYPE_* value
  */
 short get_object_type(struct LEVEL *lvl, unsigned int x, unsigned int y, unsigned int z)
@@ -1000,12 +1289,14 @@ short get_object_type(struct LEVEL *lvl, unsigned int x, unsigned int y, unsigne
     int arr_entries_x=MAP_SIZE_X*MAP_SUBNUM_X;
     int arr_entries_y=MAP_SIZE_Y*MAP_SUBNUM_Y;
     //Bounding indices
-    x%=arr_entries_x;
-    y%=arr_entries_y;
+    if ((x>=arr_entries_x)||(y>=arr_entries_y))
+      return OBJECT_TYPE_NONE;
     int tng_num=lvl->tng_subnums[x][y];
     if (z<tng_num) return OBJECT_TYPE_THING;
     int apt_num=lvl->apt_subnums[x][y];
     if (z<(tng_num+apt_num)) return OBJECT_TYPE_ACTNPT;
+    int lgt_num=lvl->lgt_subnums[x][y];
+    if (z<(tng_num+apt_num+lgt_num)) return OBJECT_TYPE_STLIGHT;
     return OBJECT_TYPE_NONE;
 }
 
@@ -1015,14 +1306,17 @@ char *get_object(struct LEVEL *lvl,unsigned int x,unsigned int y,unsigned int z)
     int arr_entries_x=MAP_SIZE_X*MAP_SUBNUM_X;
     int arr_entries_y=MAP_SIZE_Y*MAP_SUBNUM_Y;
     //Bounding indices
-    x%=arr_entries_x;
-    y%=arr_entries_y;
+    if ((x>=arr_entries_x)||(y>=arr_entries_y))
+      return NULL;
     int tng_num=lvl->tng_subnums[x][y];
     if (z<tng_num)
       return get_thing(lvl,x,y,z);
     int apt_num=lvl->apt_subnums[x][y];
     if (z<(tng_num+apt_num))
       return get_actnpt(lvl,x,y,z-tng_num);
+    int lgt_num=lvl->lgt_subnums[x][y];
+    if (z<(tng_num+apt_num+lgt_num))
+      return get_stlight(lvl,x,y,z-tng_num-apt_num);
     return NULL;
 }
 
@@ -1046,6 +1340,12 @@ void object_del(struct LEVEL *lvl,unsigned int x,unsigned int y,unsigned int z)
       actnpt_del(lvl,x,y,z-tng_num);
       return;
     }
+    int lgt_num=lvl->lgt_subnums[x][y];
+    if (z<(tng_num+apt_num+lgt_num))
+    {
+      stlight_del(lvl,x,y,z-tng_num-apt_num);
+      return;
+    }
 }
 
 unsigned int get_object_subnums(struct LEVEL *lvl,unsigned int x,unsigned int y)
@@ -1054,15 +1354,39 @@ unsigned int get_object_subnums(struct LEVEL *lvl,unsigned int x,unsigned int y)
     unsigned int arr_entries_x=MAP_SIZE_X*MAP_SUBNUM_X;
     unsigned int arr_entries_y=MAP_SIZE_Y*MAP_SUBNUM_Y;
     //Bounding position
-    x %= arr_entries_x;
-    y %= arr_entries_y;
-    return lvl->tng_subnums[x][y]+lvl->apt_subnums[x][y];
+    if ((x>=arr_entries_x)||(y>=arr_entries_y))
+      return 0;
+    return lvl->tng_subnums[x][y]+lvl->apt_subnums[x][y]+lvl->lgt_subnums[x][y];
 }
 
 unsigned int get_object_tilnums(struct LEVEL *lvl,unsigned int x,unsigned int y)
 {
-    if (lvl->tng_apt_nums==NULL) return 0;
-    return lvl->tng_apt_nums[x%MAP_SIZE_X][y%MAP_SIZE_Y];
+    if (lvl->tng_apt_lgt_nums==NULL) return 0;
+    return lvl->tng_apt_lgt_nums[x%MAP_SIZE_X][y%MAP_SIZE_Y];
+}
+
+/*
+ * Returns index of the last object with given type. May return -1 if no object found.
+ */
+int get_object_subtl_last(struct LEVEL *lvl,unsigned int x,unsigned int y,short obj_type)
+{
+    //Preparing array bounds
+    unsigned int arr_entries_x=MAP_SIZE_X*MAP_SUBNUM_X;
+    unsigned int arr_entries_y=MAP_SIZE_Y*MAP_SUBNUM_Y;
+    //Bounding position
+    if ((x>=arr_entries_x)||(y>=arr_entries_y))
+      return 0;
+    int last=-1;
+    last+=lvl->tng_subnums[x][y];
+    if (obj_type==OBJECT_TYPE_THING)
+      return last;
+    last+=lvl->apt_subnums[x][y];
+    if (obj_type==OBJECT_TYPE_ACTNPT)
+      return last;
+    last+=lvl->lgt_subnums[x][y];
+    if (obj_type==OBJECT_TYPE_STLIGHT)
+      return last;
+    return get_object_subnums(lvl,x,y)-1;
 }
 
 short get_subtl_wib(struct LEVEL *lvl, unsigned int sx, unsigned int sy)
@@ -1076,14 +1400,14 @@ short get_subtl_wib(struct LEVEL *lvl, unsigned int sx, unsigned int sy)
     return lvl->wib[sx][sy];
 }
 
-void set_subtl_wib(struct LEVEL *lvl, short nval, unsigned int sx, unsigned int sy)
+void set_subtl_wib(struct LEVEL *lvl, unsigned int sx, unsigned int sy, short nval)
 {
     //Preparing array bounds
     unsigned int arr_entries_x=MAP_SIZE_X*MAP_SUBNUM_X;
     unsigned int arr_entries_y=MAP_SIZE_Y*MAP_SUBNUM_Y;
     //Bounding position
-    sx %= arr_entries_x;
-    sy %= arr_entries_y;
+    if ((sx>=arr_entries_x)||(sy>=arr_entries_y))
+        return;
     lvl->wib[sx][sy]=nval;
 }
 
@@ -1091,14 +1415,135 @@ short get_tile_wlb(struct LEVEL *lvl, unsigned int tx, unsigned int ty)
 {
     //Bounding position
     tx %= MAP_SIZE_X;
-    ty %= MAP_SUBNUM_Y;
+    ty %= MAP_SIZE_Y;
     return lvl->wlb[tx][ty];
 }
 
-void set_tile_wlb(struct LEVEL *lvl, short nval, unsigned int tx, unsigned int ty)
+void set_tile_wlb(struct LEVEL *lvl, unsigned int tx, unsigned int ty, short nval)
+{
+    //Bounding position
+    if ((tx>=MAP_SIZE_X)||(ty>=MAP_SIZE_Y)) return;
+    lvl->wlb[tx][ty]=nval;
+}
+
+unsigned char get_tile_owner(struct LEVEL *lvl, unsigned int tx, unsigned int ty)
 {
     //Bounding position
     tx %= MAP_SIZE_X;
-    ty %= MAP_SUBNUM_Y;
-    lvl->wlb[tx][ty]=nval;
+    ty %= MAP_SIZE_Y;
+    return lvl->own[tx][ty];
+}
+
+void set_tile_owner(struct LEVEL *lvl, unsigned int tx, unsigned int ty, unsigned char nval)
+{
+    //Bounding position
+    if ((tx>=MAP_SIZE_X)||(ty>=MAP_SIZE_Y)) return;
+    lvl->own[tx][ty]=nval;
+}
+
+unsigned char get_tile_slab(struct LEVEL *lvl, unsigned int tx, unsigned int ty)
+{
+    if (lvl->slb==NULL) return SLAB_TYPE_ROCK;
+    //Bounding position
+    if ((tx>=MAP_SIZE_X)||(ty>=MAP_SIZE_Y)) return SLAB_TYPE_ROCK;
+    return lvl->slb[tx][ty];
+}
+
+/*
+ * Sets a new value to SLB item, without updating DAT or CLM or anything.
+ */
+void set_tile_slab(struct LEVEL *lvl, unsigned int tx, unsigned int ty, unsigned char nval)
+{
+    //Bounding position
+    if ((tx>=MAP_SIZE_X)||(ty>=MAP_SIZE_Y)) return;
+    lvl->slb[tx][ty]=nval;
+}
+
+/*
+ * Updates some statistics about the level; The update includes
+ * "utilize" values of columns
+ */
+void update_level_stats(struct LEVEL *lvl)
+{
+     update_clm_utilize_counters(lvl);
+     update_thing_stats(lvl);
+}
+
+void update_thing_stats(struct LEVEL *lvl)
+{
+    //Preparing array bounds
+    int arr_entries_x=MAP_SIZE_X*MAP_SUBNUM_X;
+    int arr_entries_y=MAP_SIZE_Y*MAP_SUBNUM_Y;
+
+    //Clearing related stats variables
+    lvl->stats.creatures_count=0;
+    lvl->stats.roomeffects_count=0;
+    lvl->stats.traps_count=0;
+    lvl->stats.doors_count=0;
+    lvl->stats.items_count=0;
+    // Stats for various items
+    lvl->stats.hero_gates_count=0;
+    lvl->stats.dn_hearts_count=0;
+    lvl->stats.spellbooks_count=0;
+    lvl->stats.dng_specboxes_count=0;
+    lvl->stats.crtr_lairs_count=0;
+    lvl->stats.statues_count=0;
+    lvl->stats.torches_count=0;
+    lvl->stats.gold_things_count=0;
+    lvl->stats.room_things_count=0;
+    lvl->stats.furniture_count=0;
+
+    //Sweeping through structures
+    int i, j, k;
+    for (i=0; i < arr_entries_y; i++)
+    {
+      for (j=0; j < arr_entries_x; j++)
+      {
+        int things_count=get_thing_subnums(lvl,i,j);
+        for (k=0; k <things_count ; k++)
+        {
+          unsigned char *thing = get_thing(lvl,i,j,k);
+          if (thing==NULL) continue;
+          unsigned char type_idx=get_thing_type(thing);
+          switch (type_idx)
+          {
+          case THING_TYPE_CREATURE:
+              lvl->stats.creatures_count++;
+              break;
+          case THING_TYPE_ROOMEFFECT:
+              lvl->stats.roomeffects_count++;
+              break;
+          case THING_TYPE_TRAP:
+              lvl->stats.traps_count++;
+              break;
+          case THING_TYPE_DOOR:
+              lvl->stats.doors_count++;
+              break;
+          case THING_TYPE_ITEM:
+              lvl->stats.items_count++;
+              break;
+          }
+          if (is_herogate(thing))
+              lvl->stats.hero_gates_count++;
+          if (is_dnheart(thing))
+              lvl->stats.dn_hearts_count++;
+          if (is_spellbook(thing))
+              lvl->stats.spellbooks_count++;
+          if (is_dngspecbox(thing))
+              lvl->stats.dng_specboxes_count++;
+          if (is_crtrlair(thing))
+              lvl->stats.crtr_lairs_count++;
+          if (is_statue(thing))
+              lvl->stats.statues_count++;
+          if (is_torch(thing))
+              lvl->stats.torches_count++;
+          if (is_gold(thing))
+              lvl->stats.gold_things_count++;
+          if (is_room_thing(thing))
+              lvl->stats.room_things_count++;
+          if (is_furniture(thing))
+              lvl->stats.furniture_count++;
+        }
+      }
+    }
 }

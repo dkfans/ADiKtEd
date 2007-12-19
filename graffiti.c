@@ -9,8 +9,8 @@
 
 #include "globals.h"
 #include "lev_data.h"
-#include "internal.h"
 #include "obj_things.h"
+#include "obj_slabs.h"
 
 typedef struct
 {
@@ -52,11 +52,11 @@ int is_graffiti (int x, int y)
     for (i=0; i < graffiti_num; i++)
     {
       graf = graffiti_data[i];
-      if (graf->d && x == graf->x && y>=graf->y
-          && y <=graf->fin)
+      if ((graf->d) && (x==graf->x) && (y>=graf->y)
+          && (y<=graf->fin))
           return i;
-      if (!graf->d && y == graf->y && x>=graf->x
-          && x <=graf->fin)
+      if ((!graf->d) && (y==graf->y) && (x>=graf->x)
+          && (x<=graf->fin))
           return i;
     }
     return -1;
@@ -69,7 +69,7 @@ char *get_graffiti (int n)
     return graffiti_data[n]->string;
 }
 
-void delete_graffiti (int n)
+void delete_graffiti(int n)
 {
     int i;
     if (n >= graffiti_num)
@@ -79,7 +79,7 @@ void delete_graffiti (int n)
     for (i=n; i < graffiti_num-1; i++)
       graffiti_data[i]=graffiti_data[i+1];
     graffiti_num--;
-    if (graffiti_num)
+    if (graffiti_num>0)
     {
       graffiti_data = (adikt_graffiti **)realloc (graffiti_data, (graffiti_num)*
                          sizeof (adikt_graffiti *));
@@ -120,6 +120,38 @@ int add_graffiti (int x, int y, char *string, int d)
     return 1;
 }
 
+/* static CLM entries used for graffiti
+    // Funky stuff for text
+    {
+      int i;
+      if (fontheight == 8)
+          for (i=0; i < 256; i++)
+            set_clm_ent_idx(lvl, 1700+i, 0xffff, 1, 7, 8, 0x3f, 0x1b, 0, 
+                         ((i>>0)&1) ? 0x184 : 2, ((i>>1)&1) ? 0x184 : 2, 
+                         ((i>>2)&1) ? 0x184 : 2, ((i>>3)&1) ? 0x184 : 2, 
+                         ((i>>4)&1) ? 0x184 : 2, ((i>>5)&1) ? 0x184 : 2, 
+                         ((i>>6)&1) ? 0x184 : 2, ((i>>7)&1) ? 0x184 : 2);
+      else
+          for (i=0; i < 256; i++)
+            set_clm_ent_idx(lvl, 1700+i, 0xffff, 1, 7, 8, 0x3f, 0x1b, 0, 0x1b,
+                         fontheight>0 ? (((i>>0)&1) ? 0x184 : 2) : 0,
+                         fontheight>1 ? (((i>>1)&1) ? 0x184 : 2) : 0,
+                         fontheight>2 ? (((i>>2)&1) ? 0x184 : 2) : 0,
+                         fontheight>3 ? (((i>>3)&1) ? 0x184 : 2) : 0,
+                         fontheight>4 ? (((i>>4)&1) ? 0x184 : 2) : 0,
+                         fontheight>5 ? (((i>>5)&1) ? 0x184 : 2) : 0,
+                         fontheight>6 ? (((i>>6)&1) ? 0x184 : 2) : 0);
+      for (i=0; i < 130; i++)
+          set_clm_ent_idx(lvl, 1500+i, 0xffff, 1, 7, 8, 0x3f, 0x1b, 0, 0x1b,
+                     fontheight>0 ? 2 : 0,
+                     fontheight>1 ? 2 : 0,
+                     fontheight>2 ? 2 : 0,
+                     fontheight>3 ? 2 : 0,
+                     fontheight>4 ? 2 : 0,
+                     fontheight>5 ? 2 : 0,
+                     fontheight>6 ? 2 : 0); 
+    }
+*/
 void read_graffiti (void)
 {
     unsigned char *clm_check;
@@ -127,12 +159,13 @@ void read_graffiti (void)
     int i, j, k;
     int x, y, bx, by, d;
     adikt_graffiti *graf;
-    /* Check this is one of our files */
     
     graffiti_data = NULL;
     graffiti_num=0;
-    
-    clm_check = lvl->clm[2047];
+
+    // Check this is one of our files
+//TODO: this is no longer proper way    
+    clm_check = lvl->clm[COLUMN_ENTRIES-1];
     for (i=0; i < 24; i++)
       if (clm_check[i] != 0xff)
           return;
@@ -144,9 +177,9 @@ void read_graffiti (void)
           bx = x*3;
           by = y*3;
           d = get_dat_subtile(lvl, bx, by)-1500;
-          if (!d || d==1) // Got some graffiti
+          if (d==0 || d==1) // Got some graffiti
           {
-            if (!graffiti_num)
+            if (graffiti_num<=0)
                 graffiti_data = (adikt_graffiti **)malloc (sizeof (adikt_graffiti *));
             else
                 graffiti_data = (adikt_graffiti **)realloc (graffiti_data, (graffiti_num+1)*
@@ -159,6 +192,7 @@ void read_graffiti (void)
             graf->y=y;
             graf->d=d;
             i=0;
+//TODO: DATs no longer mean anything - are not constant now
             while (get_dat_subtile(lvl, bx+(d ? 1 : i), by+(d ? i : 1))-1503 &&
                    bx+(d ? 1 : i) < 255 && by+(d ? i : 1) < 255)
                 i++;
@@ -185,9 +219,10 @@ void read_graffiti (void)
                        && (get_thing_tilepos_h(thing)==127))
                   {
                       // Change the slab and remove the torch
-                      lvl->own[x+(d?0:j)][y+(d?j:0)]=thing[10];
-                      lvl->slb[x+(d?0:j)][y+(d?j:0)]=thing[11];
-                      update_tngdat (x+(d?0:j), y+(d?j:0));
+                      set_tile_owner(lvl,x+(d?0:j),y+(d?j:0),thing[10]);
+                      set_tile_slab(lvl,x+(d?0:j),y+(d?j:0),thing[11]);
+//!!!!TODO: hack for checking new CLM support
+//                      update_tngdat (x+(d?0:j), y+(d?j:0));
                   }
                   thing_del(lvl,bx+(d?1:j*3+1),by+(d?j*3+1:1),k);
                 }
@@ -197,7 +232,7 @@ void read_graffiti (void)
     }
 }
 
-void draw_graffiti (void)
+void draw_graffiti(void)
 {
     int x, y, d;
     char *string;
@@ -221,6 +256,7 @@ void draw_graffiti (void)
           len+=chars[(unsigned char)string[i]][0];
       for (i=0; i < len+1+l; i++)
       {
+//TODO: DATs no longer mean anything - are not constant now
           set_dat_subtile(lvl, bx+i*(1-d)+dx[d][0], by+i*d+dy[d][0], 1700);
           if (i<l)
             set_dat_subtile(lvl, bx+i*(1-d)+dx[d][1], by+i*d+dy[d][1], 1503+string[i]);
@@ -233,11 +269,11 @@ void draw_graffiti (void)
           {
             thing = create_item(bx+(d ? 1 : i), by+(d ? i : 1), ITEM_SUBTYPE_TORCH);
             set_thing_tilepos_h(thing,127);
-            thing[10]=lvl->own[x+(i/3)*(1-d)][y+(i/3)*d]; /* Save the data */
-            thing[11]=lvl->slb[x+(i/3)*(1-d)][y+(i/3)*d];
+            thing[10]=get_tile_owner(lvl,x+(i/3)*(1-d),y+(i/3)*d); // Save the data
+            thing[11]=get_tile_slab(lvl,x+(i/3)*(1-d),y+(i/3)*d);
             thing_add(lvl,thing);
-            lvl->own[x+(i/3)*(1-d)][y+(i/3)*d]=5;
-            lvl->slb[x+(i/3)*(1-d)][y+(i/3)*d]=0;
+            set_tile_owner(lvl,x+(i/3)*(1-d),y+(i/3)*d,PLAYER_UNSET);
+            set_tile_slab(lvl,x+(i/3)*(1-d),y+(i/3)*d,SLAB_TYPE_ROCK);
           }
       }
       set_dat_subtile(lvl, bx, by, 1500+d);
@@ -245,11 +281,11 @@ void draw_graffiti (void)
       {
           thing = create_item (bx+(d ? 1 : i), by+(d ? i : 1), ITEM_SUBTYPE_TORCH);
           set_thing_tilepos_h(thing,127);
-          thing[10]=lvl->own[x+(i/3)*(1-d)][y+(i/3)*d]; // Save the data
-          thing[11]=lvl->slb[x+(i/3)*(1-d)][y+(i/3)*d];
+          thing[10]=get_tile_owner(lvl,x+(i/3)*(1-d),y+(i/3)*d); // Save the data
+          thing[11]=get_tile_slab(lvl,x+(i/3)*(1-d),y+(i/3)*d);
           thing_add(lvl,thing);
-          lvl->own[x+(i/3)*(1-d)][y+(i/3)*d]=5;
-          lvl->slb[x+(i/3)*(1-d)][y+(i/3)*d]=0;
+          set_tile_owner(lvl,x+(i/3)*(1-d),y+(i/3)*d,PLAYER_UNSET);
+          set_tile_slab(lvl,x+(i/3)*(1-d),y+(i/3)*d,SLAB_TYPE_ROCK);
       }
       /* Put in the graffiti terminating jobsworth */
       i--;

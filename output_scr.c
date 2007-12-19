@@ -123,49 +123,124 @@ void screen_init(void)
       exit (1);
     }
 
-    SLtt_set_color (0, "buffer", "lightgray", "black");
-    SLtt_set_color (1, "select", "black", "lightgray");
-    SLtt_set_color (2, "status", "yellow", "blue");
-    SLtt_set_color (3, "escape", "brightred", "black");
-    SLtt_set_color (4, "invalid", "yellow", "black");
-    SLtt_set_color (5, "invalid", "white", "black");
-    SLtt_set_color (7, "graffiti", "brightmagenta", "black");
-    SLtt_set_color (9, "cursor", "red", "white");
+    SLtt_set_color(PRINT_COLOR_LGREY_ON_BLACK , "buffer", "lightgray", "black");
+    SLtt_set_color(PRINT_COLOR_BLACK_ON_LGREY , "select", "black", "lightgray");
+    SLtt_set_color(PRINT_COLOR_YELLOW_ON_BLUE , "status", "yellow", "blue");
+    SLtt_set_color(PRINT_COLOR_LRED_ON_BLACK  , "escape", "brightred", "black");
+    SLtt_set_color(PRINT_COLOR_YELLOW_ON_BLACK, "invalid", "yellow", "black");
+    SLtt_set_color(PRINT_COLOR_WHITE_ON_BLACK , "invalid", "white", "black");
+    SLtt_set_color(PRINT_COLOR_LMAGENT_ON_BLACK, "graffiti", "brightmagenta", "black");
+    SLtt_set_color(PRINT_COLOR_RED_ON_WHITE   , "cursor", "red", "white");
     
-    /* Used in slb/tng main display */    
-    SLtt_set_color (10,"Keeper 0","white","red");
-    SLtt_set_color (11,"Keeper 1","white","cyan");
-    SLtt_set_color (12,"Keeper 2","white","green");
-    SLtt_set_color (13,"Keeper 3","white","brown");
-    SLtt_set_color (14,"Keeper 4","white","blue");
+    // Used in slb/tng main display
+    SLtt_set_color (PRINT_COLOR_WHITE_ON_RED,  "Keeper 0","white","red");
+    SLtt_set_color (PRINT_COLOR_WHITE_ON_BLUE, "Keeper 1","white","blue");
+    SLtt_set_color (PRINT_COLOR_WHITE_ON_GREEN,"Keeper 2","white","green");
+    SLtt_set_color (PRINT_COLOR_WHITE_ON_BROWN,"Keeper 3","white","brown");
+    SLtt_set_color (PRINT_COLOR_WHITE_ON_CYAN, "Keeper 4","white","cyan");
     SLtt_set_color (15,"Unclaimed","lightgray","black");
-    SLtt_set_color (16,"Dirt/rock","gray","black");
-    SLtt_set_color (17, "graffiti", "magenta", "white");
+    SLtt_set_color (PRINT_COLOR_GREY_ON_BLACK  ,"Dirt/rock","gray","black");
+    SLtt_set_color (PRINT_COLOR_MAGENT_ON_WHITE, "graffiti", "magenta", "white");
     SLtt_set_color (20,"Keeper 0","red","white");
-    SLtt_set_color (21,"Keeper 1","cyan","white");
-    SLtt_set_color (22,"Keeper 2","green", "white");
-    SLtt_set_color (23,"Keeper 3","yellow", "lightgray");
-    SLtt_set_color (24,"Keeper 4","blue", "lightgray");
+    SLtt_set_color (PRINT_COLOR_BLUE_ON_LGREY  ,"Keeper 1","blue", "lightgray");
+    SLtt_set_color (PRINT_COLOR_GREEN_ON_WHITE ,"Keeper 2","green", "white");
+    SLtt_set_color (PRINT_COLOR_YELLOW_ON_LGREY,"Keeper 3","yellow", "lightgray");
+    SLtt_set_color (PRINT_COLOR_CYAN_ON_WHITE  ,"Keeper 4","cyan","white");
     SLtt_set_color (25,"Unclaimed", "black", "lightgray");
     SLtt_set_color (26,"Dirt/rock","black", "lightgray");
     
-    /* Used in dat display */
+    // Used in dat display
     SLtt_set_color (30,"Keeper 0","brightred","black");
-    SLtt_set_color (31,"Keeper 1","brightcyan","black");
+    SLtt_set_color (31,"Keeper 1","brightblue", "black");
     SLtt_set_color (33,"Keeper 2","brightgreen", "black");
     SLtt_set_color (33,"Keeper 3","yellow", "black");
-    SLtt_set_color (34,"Keeper 4","brightblue", "black");
+    SLtt_set_color (34,"Keeper 4","brightcyan","black");
     SLtt_set_color (35,"Unclaimed", "lightgray", "black");
     SLtt_set_color (36,"Blank","lightgray","black");
     SLtt_set_color (40,"Keeper 0","white","red");
-    SLtt_set_color (41,"Keeper 1","white","cyan");
+    SLtt_set_color (41,"Keeper 1","white","blue");
     SLtt_set_color (42,"Keeper 2","white","green");
     SLtt_set_color (43,"Keeper 3","white","brown");
-    SLtt_set_color (44,"Keeper 4","white","blue");
+    SLtt_set_color (44,"Keeper 4","white","cyan");
     SLtt_set_color (45,"Unclaimed","black","lightgray");
     SLtt_set_color (46,"Blank","black","lightgray");
 
     screen_initied=true;
+}
+
+void screen_draw_vline(int posy,int posx,int length,short border_style)
+{
+  char fill;
+  switch (border_style)
+  {
+  case bsSingle :fill=179; break;
+  case bsDouble :fill=186; break;
+  case bsSolid  :fill=32; break;
+  default: fill='.'; break;
+  }
+  int i;
+  for (i=0;i<length;i++)
+  {
+    set_cursor_pos(posy+i,posx);
+    screen_printchr(fill);
+  }
+}
+
+void screen_draw_hline(int posy,int posx,int length,short border_style)
+{
+  set_cursor_pos(posy,posx);
+  char fill;
+  switch (border_style)
+  {
+  case bsSingle :fill=196; break;
+  case bsDouble :fill=205; break;
+  case bsSolid  :fill=32; break;
+  default: fill='.'; break;
+  }
+  int i;
+  for (i=0;i<length;i++)
+  {
+//    set_cursor_pos(posy,posx+i);
+    screen_printchr(fill);
+  }
+}
+
+void screen_draw_window(int posy,int posx,int sizey,int sizex,int border_size,short border_style)
+{
+  //The window fill
+  int startx,starty;
+  int border_v=0;
+  if (border_size>0) border_v=((3*border_size)>>1)+1;
+  startx=(posx-border_v);
+  starty=(posy-border_size);
+  int i;
+  for (i=1;i<sizey+2*border_size+2;i++)
+  {
+    screen_draw_hline(starty,startx,(sizex+2*border_v+1),bsSolid);
+    starty++;
+  }
+  //draw frame corners
+  char corner1,corner2,corner3,corner4;
+  switch (border_style)
+  {
+  case bsSingle :corner1=218;corner2=191;corner3=192;corner4=217; break;
+  case bsDouble :corner1=201;corner2=187;corner3=200;corner4=188; break;
+  case bsSolid  :corner1=32; corner2=32; corner3=32; corner4=32; break;
+  default       :corner1='.'; corner2='.'; corner3='.'; corner4='.'; break;
+  };
+  set_cursor_pos(posy,posx);
+  screen_printchr(corner1);
+  set_cursor_pos(posy,posx+sizex);
+  screen_printchr(corner2);
+  set_cursor_pos(posy+sizey,posx);
+  screen_printchr(corner3);
+  set_cursor_pos(posy+sizey,posx+sizex);
+  screen_printchr(corner4);
+  //and lines between corners
+  screen_draw_vline(posy+1,posx,(sizey-1),border_style);
+  screen_draw_hline(posy,posx+1,(sizex-1),border_style);
+  screen_draw_vline(posy+1,posx+sizex,(sizey-1),border_style);
+  screen_draw_hline(posy+sizey,posx+1,(sizex-1),border_style);
 }
 
 #if defined(unix) && !defined(GO32)

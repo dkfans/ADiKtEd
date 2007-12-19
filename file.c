@@ -4,17 +4,12 @@
 #include "lev_data.h"
 #include "obj_slabs.h"
 #include "obj_things.h"
-#include "internal.h"
 
 
 char *filebase;
 
-// 0 for high-low, 1 for low-high
-int datmode=0;
-
-int vistng[3][3]; // Which number are we looking at on each subtile
-
-int default_clm=0; // Have we already set up the clm entries
+// 0 for no view,, 1 for byte data, 2 for column idx
+short dat_view_mode=0;
 
 struct memory_file read_file (char *iname);
 
@@ -27,7 +22,7 @@ struct memory_file read_file (char *iname)
     FILE *ifp;
     long plen, ulen;
     void *packed, *unpacked;
-    char buffer[80];
+    char buffer[LINEMSG_SIZE];
     struct memory_file ret;
 
     ifp = fopen(iname, "rb");

@@ -67,14 +67,35 @@ const unsigned char items_trapbxs[]={
       ITEM_SUBTYPE_TBDUMMY5,ITEM_SUBTYPE_TBDUMMY6,ITEM_SUBTYPE_TBDUMMY7};
 
 const unsigned char items_traps[]={
-      TRAP_SUBTYPE_BOULDER,TRAP_SUBTYPE_ALARM,TRAP_SUBTYPE_POISONG,
-      TRAP_SUBTYPE_LIGHTNG,TRAP_SUBTYPE_WRDOFPW,TRAP_SUBTYPE_LAVA,
+      TRAP_SUBTYPE_BOULDER,TRAP_SUBTYPE_ALARM,TRAP_SUBTYPE_GAS,
+      TRAP_SUBTYPE_LIGHTNG,TRAP_SUBTYPE_WORDPWR,TRAP_SUBTYPE_LAVA,
       TRAP_SUBTYPE_DUMMY2,TRAP_SUBTYPE_DUMMY3,TRAP_SUBTYPE_DUMMY4,
       TRAP_SUBTYPE_DUMMY5,TRAP_SUBTYPE_DUMMY6,TRAP_SUBTYPE_DUMMY7};
 
 const unsigned char items_doors[]={
       ITEM_SUBTYPE_DBWOOD,ITEM_SUBTYPE_DBBRACE,
       ITEM_SUBTYPE_DBSTEEL,ITEM_SUBTYPE_DBMAGIC};
+
+const unsigned char items_statues[]={
+      ITEM_SUBTYPE_STATUEWO,ITEM_SUBTYPE_STATUHORN,ITEM_SUBTYPE_STATUE2,
+      ITEM_SUBTYPE_STATUE3,ITEM_SUBTYPE_STATUE4,ITEM_SUBTYPE_STATUE5,
+      ITEM_SUBTYPE_STATUE6,ITEM_SUBTYPE_TEMPLESTA};
+
+const unsigned char items_furniture[]={
+      ITEM_SUBTYPE_BARREL,ITEM_SUBTYPE_POTION1,ITEM_SUBTYPE_POTION2,
+      ITEM_SUBTYPE_POTION3,ITEM_SUBTYPE_ARMOUR,ITEM_SUBTYPE_CANDLSTCK };
+
+const unsigned char items_gold[]={
+      ITEM_SUBTYPE_GOLDCHEST,ITEM_SUBTYPE_GOLD,ITEM_SUBTYPE_COIN,
+      ITEM_SUBTYPE_GLDHOARD1,ITEM_SUBTYPE_GLDHOARD2,ITEM_SUBTYPE_GLDHOARD3,
+      ITEM_SUBTYPE_GLDHOARD4,ITEM_SUBTYPE_GLDHOARD5, };
+
+const unsigned char items_food[]={
+      ITEM_SUBTYPE_CHICKNGRW, ITEM_SUBTYPE_CHICKN, ITEM_SUBTYPE_CHICKNSTB,
+      ITEM_SUBTYPE_CHICKNWOB, ITEM_SUBTYPE_CHICKNCRK, ITEM_SUBTYPE_CHICKN2, };
+
+const unsigned char items_torches[]={
+      ITEM_SUBTYPE_TORCHUN, ITEM_SUBTYPE_TORCH, };
 
 const unsigned char creatr_types[]={
       CREATR_SUBTP_WIZRD,CREATR_SUBTP_BARBARIN,CREATR_SUBTP_ARCHER,
@@ -89,14 +110,21 @@ const unsigned char creatr_types[]={
       CREATR_SUBTP_GHOST,CREATR_SUBTP_TENTCL,CREATR_SUBTP_ORC,
       CREATR_SUBTP_FLOAT};
 
+const unsigned char door_types[]={
+      DOOR_SUBTYPE_WOOD,DOOR_SUBTYPE_BRACED,
+      DOOR_SUBTYPE_IRON,DOOR_SUBTYPE_MAGIC};
+
 const unsigned char roomefct_types[]={
       ROOMEFC_SUBTP_LAVA,ROOMEFC_SUBTP_DRIPWTR,ROOMEFC_SUBTP_ROCKFAL,
       ROOMEFC_SUBTP_ENTRICE,ROOMEFC_SUBTP_DRYICE
       };
 
+// True means TNG/APT/LGT are updated automatically
+short obj_auto_update=true;
+
 unsigned char get_thing_type(unsigned char *thing)
 {
-    if (thing==NULL) return 0;
+    if (thing==NULL) return THING_TYPE_NONE;
     return thing[6];
 }
 
@@ -109,7 +137,7 @@ short set_thing_type(unsigned char *thing,unsigned char type_idx)
 
 unsigned char get_thing_subtype(unsigned char *thing)
 {
-    if (thing==NULL) return 0;
+    if (thing==NULL) return ITEM_SUBTYPE_NULL;
     return thing[7];
 }
 
@@ -122,8 +150,8 @@ short set_thing_subtype(unsigned char *thing,unsigned char stype_idx)
 
 unsigned char get_thing_owner(unsigned char *thing)
 {
-    if (thing==NULL) return 0;
-    if (thing[8]>=PLAYERS_COUNT) return 0;
+    if (thing==NULL) return PLAYER_UNSET;
+    if (thing[8]>=PLAYERS_COUNT) return PLAYER_UNSET;
     return thing[8];
 }
 
@@ -154,70 +182,126 @@ unsigned char get_thing_tilepos_y(unsigned char *thing)
 
 short set_thing_tilepos_y(unsigned char *thing,unsigned char pos_y)
 {
-    if (thing==NULL) return 0;
+    if (thing==NULL) return false;
     thing[3]=pos_y;
+    return true;
 }
 
 short set_thing_tilepos(unsigned char *thing,unsigned char pos_x,unsigned char pos_y)
 {
-    if (thing==NULL) return 0;
+    if (thing==NULL) return false;
     thing[1]=pos_x;
     thing[3]=pos_y;
+    return true;
 }
 
-char get_thing_tilepos_h(unsigned char *thing)
+unsigned char get_thing_tilepos_h(unsigned char *thing)
 {
     if (thing==NULL) return 0;
     return (char)thing[5];
 }
 
-short set_thing_tilepos_h(unsigned char *thing,char pos_h)
+short set_thing_tilepos_h(unsigned char *thing,unsigned char pos_h)
 {
-    if (thing==NULL) return 0;
+    if (thing==NULL) return false;
     thing[5]=pos_h;
+    return true;
 }
 
-char get_thing_subtpos_x(unsigned char *thing)
+unsigned char get_thing_subtpos_x(unsigned char *thing)
 {
-    if (thing==NULL) return 0;
+    if (thing==NULL) return 128;
     return (char)thing[0];
 }
 
-short set_thing_subtpos_x(unsigned char *thing,char pos_x)
+short set_thing_subtpos_x(unsigned char *thing,unsigned char pos_x)
 {
-    if (thing==NULL) return 0;
+    if (thing==NULL) return false;
     thing[0]=pos_x;
+    return true;
 }
 
-char get_thing_subtpos_y(unsigned char *thing)
+unsigned char get_thing_subtpos_y(unsigned char *thing)
 {
-    if (thing==NULL) return 0;
+    if (thing==NULL) return 0x80;
     return (char)thing[2];
 }
 
-short set_thing_subtpos_y(unsigned char *thing,char pos_y)
+short set_thing_subtpos_y(unsigned char *thing,unsigned char pos_y)
 {
-    if (thing==NULL) return 0;
+    if (thing==NULL) return false;
     thing[2]=pos_y;
+    return true;
 }
 
-short set_thing_subtpos(unsigned char *thing,char pos_x,char pos_y)
+short set_thing_subtpos(unsigned char *thing,unsigned char pos_x,unsigned char pos_y)
 {
-    if (thing==NULL) return 0;
+    if (thing==NULL) return false;
     thing[0]=pos_x;
     thing[2]=pos_y;
+    return true;
 }
 
-char get_thing_subtpos_h(unsigned char *thing)
+unsigned char get_thing_subtpos_h(unsigned char *thing)
 {
-    if (thing==NULL) return 0;
+    if (thing==NULL) return 0x80;
     return (char)thing[4];
 }
 
-short set_thing_subtpos_h(unsigned char *thing,char pos_h)
+short set_thing_subtpos_h(unsigned char *thing,unsigned char pos_h)
+{
+    if (thing==NULL) return false;
+    thing[4]=pos_h;
+    return true;
+}
+
+/*
+ * Level is used as creature param, but also for numbering hero gates
+ * and door lock state
+ */
+unsigned char get_thing_level(unsigned char *thing)
 {
     if (thing==NULL) return 0;
-    thing[4]=pos_h;
+    return thing[14];
+}
+
+short set_thing_level(unsigned char *thing,unsigned char lev_num)
+{
+    if (thing==NULL) return false;
+    thing[14]=lev_num;
+    return true;
+}
+
+/*
+ * For some things, this is a number of tile (not subtile) at wchich the thing is
+ */
+unsigned short get_thing_tilenum(unsigned char *thing)
+{
+    if (thing==NULL) return 0;
+    return (unsigned short)((thing[12]<<8)+thing[11]);
+}
+
+/*
+ * For some things, this is a number of tile (not subtile) at wchich the thing is
+ */
+short set_thing_tilenum(unsigned char *thing,unsigned short til_num)
+{
+    if (thing==NULL) return false;
+    thing[12]=(til_num>>8);
+    thing[11]=til_num%255;
+    return true;
+}
+
+unsigned char get_door_orientation(unsigned char *thing)
+{
+    if (thing==NULL) return DOOR_ORIENT_NSPASS;
+    return thing[13];
+}
+
+short set_door_orientation(unsigned char *thing,unsigned char orient)
+{
+    if (thing==NULL) return false;
+    thing[13]=orient;
 }
 
 char *get_thing_type_fullname(unsigned char type_idx)
@@ -239,6 +323,117 @@ char *get_thing_type_shortname(unsigned char type_idx)
 }
 
 /*
+ * Returns SLB entry on which the thing is usually placed.
+ * Note that if SLAB_TYPE_CLAIMED is returned, this means
+ * a thing can be found on any short slab (all rooms,water,path,...)
+ */
+unsigned char get_usual_thing_slab(unsigned char *thing)
+{
+  if (thing==NULL) return SLAB_TYPE_CLAIMED;
+  unsigned char type_idx=get_thing_type(thing);
+  unsigned char stype_idx=get_thing_subtype(thing);
+  switch (type_idx)
+  {
+  case THING_TYPE_CREATURE:
+      return SLAB_TYPE_CLAIMED;
+  case THING_TYPE_TRAP:
+      return SLAB_TYPE_CLAIMED;
+  case THING_TYPE_ITEM:
+      return get_usual_item_slab(stype_idx);
+  case THING_TYPE_ROOMEFFECT:
+      {
+        switch (stype_idx)
+        {
+        case ROOMEFC_SUBTP_LAVA:
+            return SLAB_TYPE_LAVA;
+        case ROOMEFC_SUBTP_DRIPWTR:
+            return SLAB_TYPE_WATER;
+        case ROOMEFC_SUBTP_ROCKFAL:
+            return SLAB_TYPE_PATH;
+        case ROOMEFC_SUBTP_ENTRICE:
+            return SLAB_TYPE_PORTAL;
+        case ROOMEFC_SUBTP_DRYICE:
+            return SLAB_TYPE_GRAVEYARD;
+        }
+      };break;
+  case THING_TYPE_DOOR:
+      {
+        switch (stype_idx)
+        {
+        case DOOR_SUBTYPE_WOOD:
+            return SLAB_TYPE_DOORWOOD1;
+        case DOOR_SUBTYPE_BRACED:
+            return SLAB_TYPE_DOORBRACE1;
+        case DOOR_SUBTYPE_IRON:
+            return SLAB_TYPE_DOORIRON1;
+        case DOOR_SUBTYPE_MAGIC:
+            return SLAB_TYPE_DOORMAGIC1;
+        }
+      };break;
+  }
+  return SLAB_TYPE_CLAIMED;
+}
+
+/*
+ * Returns SLB entry on which the item is usually placed.
+ * Note that if SLAB_TYPE_CLAIMED is returned, this means
+ * a thing can be found on any short slab (all rooms,water,path,...)
+ */
+unsigned char get_usual_item_slab(unsigned char stype_idx)
+{
+  int catg=get_item_category(stype_idx);
+  switch (catg)
+  {
+  case ITEM_CATEGR_FOOD:
+      return SLAB_TYPE_HATCHERY;
+  case ITEM_CATEGR_CREATLAIR:
+      return SLAB_TYPE_LAIR;
+  case ITEM_CATEGR_ROOMEQUIP:
+    {
+    //TODO: validate when all rooms will be done
+        switch (stype_idx)
+        {
+        case ITEM_SUBTYPE_DNHEART:
+        case ITEM_SUBTYPE_HEARTFLMR:
+        case ITEM_SUBTYPE_HEARTFLMB:
+        case ITEM_SUBTYPE_HEARTFLMG:
+        case ITEM_SUBTYPE_HEARTFLMY:
+          return SLAB_TYPE_DUNGHEART;
+        case ITEM_SUBTYPE_FLAGPOST:
+        case ITEM_SUBTYPE_GURDFLAGR:
+        case ITEM_SUBTYPE_GURDFLAGB:
+        case ITEM_SUBTYPE_GURDFLAGG:
+        case ITEM_SUBTYPE_GURDFLAGY:
+          return SLAB_TYPE_GUARDPOST;
+        //TODO: not sure about these
+        case ITEM_SUBTYPE_CANDLSTCK:
+        case ITEM_SUBTYPE_BARREL:
+        case ITEM_SUBTYPE_HEROGATE:
+          return SLAB_TYPE_CLAIMED;
+        case ITEM_SUBTYPE_TEMPLESTA:
+        case ITEM_SUBTYPE_TEMPLESPN:
+          return SLAB_TYPE_TEMPLE;
+        case ITEM_SUBTYPE_PRISONBAR:
+          return SLAB_TYPE_PRISONCASE;
+        case ITEM_SUBTYPE_SCAVNGEYE:
+          return SLAB_TYPE_SCAVENGER;
+        case ITEM_SUBTYPE_ANVIL:
+        case ITEM_SUBTYPE_WRKSHPMCH:
+          return SLAB_TYPE_WORKSHOP;
+        case ITEM_SUBTYPE_GRAVSTONE:
+          return SLAB_TYPE_GRAVEYARD;
+        case ITEM_SUBTYPE_TRAINPOST:
+          return SLAB_TYPE_TRAINING;
+        case ITEM_SUBTYPE_TORTSPIKE:
+        case ITEM_SUBTYPE_TORTURER:
+          return SLAB_TYPE_TORTURE;
+        }
+    };break;
+  }
+  return SLAB_TYPE_CLAIMED;
+}
+
+/*
  * Creates a new thing, completely empty one,
  * without placing it into LEVEL structure
  */
@@ -255,91 +450,97 @@ unsigned char *create_thing_empty()
  * Creates a new thing, prepared to be placed in given coordinates,
  * but without placing it into LEVEL structure
  */
-unsigned char *create_thing(unsigned int tx, unsigned int ty)
+unsigned char *create_thing(unsigned int sx, unsigned int sy)
 {
     //Preparing array bounds
     int arr_entries_x=MAP_SIZE_X*MAP_SUBNUM_X;
     int arr_entries_y=MAP_SIZE_Y*MAP_SUBNUM_Y;
-    tx%=arr_entries_x;
-    ty%=arr_entries_y;
+    sx%=arr_entries_x;
+    sy%=arr_entries_y;
 
     unsigned char *thing;
     thing = create_thing_empty();
     int i;
     for (i=0; i < SIZEOF_DK_TNG_REC; i++)
       thing[i]=0;
-    set_thing_subtpos(thing,((tx%MAP_SUBNUM_X)*0x40+0x40),((ty%MAP_SUBNUM_Y)*0x40+0x40));
-    set_thing_tilepos(thing,(unsigned char)tx,(unsigned char)ty);
+    set_thing_subtpos(thing,((sx%MAP_SUBNUM_X)*0x40+0x40),((sy%MAP_SUBNUM_Y)*0x40+0x40));
+    set_thing_tilepos(thing,(unsigned char)sx,(unsigned char)sy);
     set_thing_tilepos_h(thing,1); // Default height is floor height
     // Setting the owner
     set_thing_owner(thing,PLAYER_UNSET);
-    // Put it in the centre of the square
-    set_thing_subtpos(thing,-1,-1);
+    return thing;
+}
+
+/*
+ * Creates a new thing, prepared to be placed in given coordinates,
+ * with body copied from another thing, given as parameter.
+ */
+unsigned char *create_thing_copy(unsigned int sx, unsigned int sy,unsigned char *src)
+{
+    //Preparing array bounds
+    int arr_entries_x=MAP_SIZE_X*MAP_SUBNUM_X;
+    int arr_entries_y=MAP_SIZE_Y*MAP_SUBNUM_Y;
+    sx%=arr_entries_x;
+    sy%=arr_entries_y;
+
+    unsigned char *thing;
+    thing = create_thing_empty();
+    int i;
+    memcpy(thing,src,SIZEOF_DK_TNG_REC);
+    set_thing_subtpos(thing,((sx%MAP_SUBNUM_X)*0x40+0x40),((sy%MAP_SUBNUM_Y)*0x40+0x40));
+    set_thing_tilepos(thing,(unsigned char)sx,(unsigned char)sy);
     return thing;
 }
 
 /*
  * Creates a new thing of type item
  */
-unsigned char *create_item(unsigned int tx, unsigned int ty, unsigned char stype_idx)
+unsigned char *create_item(unsigned int sx, unsigned int sy, unsigned char stype_idx)
 {
     unsigned char *thing;
-    thing = create_thing(tx,ty);
+    thing = create_thing(sx,sy);
     set_thing_type(thing,THING_TYPE_ITEM);
     set_thing_subtype(thing,stype_idx);
-    set_thing_owner(thing,lvl->own[(tx/MAP_SUBNUM_X)][(ty/MAP_SUBNUM_Y)]);
+    set_thing_owner(thing,get_tile_owner(lvl,sx/MAP_SUBNUM_X,sy/MAP_SUBNUM_Y));
     return thing;
 }
 
 /*
  * Creates a new thing of type room effect
  */
-unsigned char *create_roomeffect(unsigned int tx, unsigned int ty, unsigned char stype_idx)
+unsigned char *create_roomeffect(unsigned int sx, unsigned int sy, unsigned char stype_idx)
 {
     unsigned char *thing;
-    thing = create_thing(tx,ty);
+    thing = create_thing(sx,sy);
     set_thing_type(thing,THING_TYPE_ROOMEFFECT);
     set_thing_subtype(thing,stype_idx);
-    set_thing_owner(thing,lvl->own[(tx/MAP_SUBNUM_X)][(ty/MAP_SUBNUM_Y)]);
+    set_thing_owner(thing,get_tile_owner(lvl,sx/MAP_SUBNUM_X,sy/MAP_SUBNUM_Y));
     return thing;
 }
 
 /*
  * Creates a new thing of type creature
  */
-unsigned char *create_creature(unsigned int tx, unsigned int ty, unsigned char stype_idx)
+unsigned char *create_creature(unsigned int sx, unsigned int sy, unsigned char stype_idx)
 {
     unsigned char *thing;
-    thing = create_thing(tx,ty);
+    thing = create_thing(sx,sy);
     set_thing_type(thing,THING_TYPE_CREATURE);
     set_thing_subtype(thing,stype_idx);
-    set_thing_owner(thing,lvl->own[(tx/MAP_SUBNUM_X)][(ty/MAP_SUBNUM_Y)]);
+    set_thing_owner(thing,get_tile_owner(lvl,sx/MAP_SUBNUM_X,sy/MAP_SUBNUM_Y));
     return thing;
 }
 
 /*
  * Creates a new thing of type trap
  */
-unsigned char *create_trap(unsigned int tx, unsigned int ty, unsigned char stype_idx)
+unsigned char *create_trap(unsigned int sx, unsigned int sy, unsigned char stype_idx)
 {
     unsigned char *thing;
-    thing = create_thing(tx,ty);
+    thing = create_thing(sx,sy);
     set_thing_type(thing,THING_TYPE_TRAP);
     set_thing_subtype(thing,stype_idx);
-    set_thing_owner(thing,lvl->own[(tx/MAP_SUBNUM_X)][(ty/MAP_SUBNUM_Y)]);
-    return thing;
-}
-
-/*
- * Creates a new thing of type door
- */
-unsigned char *create_door(unsigned int tx, unsigned int ty, unsigned char stype_idx)
-{
-    unsigned char *thing;
-    thing = create_thing(tx,ty);
-    set_thing_type(thing,THING_TYPE_DOOR);
-    set_thing_subtype(thing,stype_idx);
-    set_thing_owner(thing,lvl->own[(tx/MAP_SUBNUM_X)][(ty/MAP_SUBNUM_Y)]);
+    set_thing_owner(thing,get_tile_owner(lvl,sx/MAP_SUBNUM_X,sy/MAP_SUBNUM_Y));
     return thing;
 }
 
@@ -602,6 +803,34 @@ short is_door(unsigned char *thing)
 }
 
 /*
+ * Returns subtype of a next door type
+ */
+unsigned char get_door_next(unsigned char stype_idx)
+{
+     int array_count=sizeof(door_types)/sizeof(unsigned char);
+    //find the door in door_types array
+    unsigned char *pos=memchr(door_types,stype_idx,array_count);
+    if (pos!=NULL) pos+=sizeof(unsigned char);
+    if ((pos<door_types)||(pos>=door_types+sizeof(door_types)))
+      pos=(unsigned char *)door_types;
+    return *pos;
+}
+
+/*
+ * Returns subtype of a previous door type
+ */
+unsigned char get_door_prev(unsigned char stype_idx)
+{
+     int array_count=sizeof(door_types)/sizeof(unsigned char);
+    //find the door in door_types array
+    unsigned char *pos=memchr(door_types,stype_idx,array_count);
+    if (pos!=NULL) pos-=sizeof(unsigned char);
+    if ((pos<door_types)||(pos>=door_types+sizeof(door_types)))
+      pos=(unsigned char *)door_types+(array_count-1)*sizeof(unsigned char);
+    return *pos;
+}
+
+/*
  * Returns if the thing is a room effect
  */
 short is_roomeffect(unsigned char *thing)
@@ -639,6 +868,234 @@ unsigned char get_roomeffect_prev(unsigned char stype_idx)
     return *pos;
 }
 
+/*
+ * Returns if the thing is a statue
+ */
+short is_statue(unsigned char *thing)
+{
+     int array_count=sizeof(items_statues)/sizeof(unsigned char);
+    //All statues are items
+    if (get_thing_type(thing) != THING_TYPE_ITEM)
+      return false;
+    //and they are listed in items_statues array
+    char *pos=memchr(items_statues,get_thing_subtype(thing),array_count);
+    if (pos!=NULL) return true;
+    return false;
+}
+
+/*
+ * Returns subtype of a next statue
+ */
+unsigned char get_statue_next(unsigned char stype_idx)
+{
+     int array_count=sizeof(items_statues)/sizeof(unsigned char);
+    //find the statue in items_statues array
+    unsigned char *pos=memchr(items_statues,stype_idx,array_count);
+    if (pos!=NULL) pos+=sizeof(unsigned char);
+    if ((pos<items_statues)||(pos>=items_statues+sizeof(items_statues)))
+      pos=(unsigned char *)items_statues;
+    return *pos;
+}
+
+/*
+ * Returns subtype of a previous statue
+ */
+unsigned char get_statue_prev(unsigned char stype_idx)
+{
+     int array_count=sizeof(items_statues)/sizeof(unsigned char);
+    //find the statue in items_statues array
+    unsigned char *pos=memchr(items_statues,stype_idx,array_count);
+    if (pos!=NULL) pos-=sizeof(unsigned char);
+    if ((pos<items_statues)||(pos>=items_statues+sizeof(items_statues)))
+      pos=(unsigned char *)items_statues+(array_count-1)*sizeof(unsigned char);
+    return *pos;
+}
+
+/*
+ * Returns if the thing is a furniture
+ */
+short is_furniture(unsigned char *thing)
+{
+     int array_count=sizeof(items_furniture)/sizeof(unsigned char);
+    //All furniture are items
+    if (get_thing_type(thing) != THING_TYPE_ITEM)
+      return false;
+    //and they are listed in items_furniture array
+    char *pos=memchr(items_furniture,get_thing_subtype(thing),array_count);
+    if (pos!=NULL) return true;
+    return false;
+}
+
+/*
+ * Returns subtype of a next furniture
+ */
+unsigned char get_furniture_next(unsigned char stype_idx)
+{
+     int array_count=sizeof(items_furniture)/sizeof(unsigned char);
+    //find the furniture in items_furniture array
+    unsigned char *pos=memchr(items_furniture,stype_idx,array_count);
+    if (pos!=NULL) pos+=sizeof(unsigned char);
+    if ((pos<items_furniture)||(pos>=items_furniture+sizeof(items_furniture)))
+      pos=(unsigned char *)items_furniture;
+    return *pos;
+}
+
+/*
+ * Returns subtype of a previous furniture
+ */
+unsigned char get_furniture_prev(unsigned char stype_idx)
+{
+     int array_count=sizeof(items_furniture)/sizeof(unsigned char);
+    //find the furniture in items_furniture array
+    unsigned char *pos=memchr(items_furniture,stype_idx,array_count);
+    if (pos!=NULL) pos-=sizeof(unsigned char);
+    if ((pos<items_furniture)||(pos>=items_furniture+sizeof(items_furniture)))
+      pos=(unsigned char *)items_furniture+(array_count-1)*sizeof(unsigned char);
+    return *pos;
+}
+
+/*
+ * Returns if the thing is a furniture
+ */
+short is_food(unsigned char *thing)
+{
+     int array_count=sizeof(items_food)/sizeof(unsigned char);
+    //All food are items
+    if (get_thing_type(thing) != THING_TYPE_ITEM)
+      return false;
+    //and they are listed in items_food array
+    char *pos=memchr(items_food,get_thing_subtype(thing),array_count);
+    if (pos!=NULL) return true;
+    return false;
+}
+
+/*
+ * Returns subtype of a next food
+ */
+unsigned char get_food_next(unsigned char stype_idx)
+{
+     int array_count=sizeof(items_food)/sizeof(unsigned char);
+    //find the food in items_food array
+    unsigned char *pos=memchr(items_food,stype_idx,array_count);
+    if (pos!=NULL) pos+=sizeof(unsigned char);
+    if ((pos<items_food)||(pos>=items_food+sizeof(items_food)))
+      pos=(unsigned char *)items_food;
+    return *pos;
+}
+
+/*
+ * Returns subtype of a previous food
+ */
+unsigned char get_food_prev(unsigned char stype_idx)
+{
+     int array_count=sizeof(items_food)/sizeof(unsigned char);
+    //find the food in items_food array
+    unsigned char *pos=memchr(items_food,stype_idx,array_count);
+    if (pos!=NULL) pos-=sizeof(unsigned char);
+    if ((pos<items_food)||(pos>=items_food+sizeof(items_food)))
+      pos=(unsigned char *)items_food+(array_count-1)*sizeof(unsigned char);
+    return *pos;
+}
+
+short is_gold(unsigned char *thing)
+{
+     int array_count=sizeof(items_gold)/sizeof(unsigned char);
+    //All are items
+    if (get_thing_type(thing) != THING_TYPE_ITEM)
+      return false;
+    //and they are listed in items_gold array
+    char *pos=memchr(items_gold,get_thing_subtype(thing),array_count);
+    if (pos!=NULL) return true;
+    return false;
+}
+
+/*
+ * Returns subtype of a next gold
+ */
+unsigned char get_gold_next(unsigned char stype_idx)
+{
+     int array_count=sizeof(items_gold)/sizeof(unsigned char);
+    //find the gold in items_gold array
+    unsigned char *pos=memchr(items_gold,stype_idx,array_count);
+    if (pos!=NULL) pos+=sizeof(unsigned char);
+    if ((pos<items_gold)||(pos>=items_gold+sizeof(items_gold)))
+      pos=(unsigned char *)items_gold;
+    return *pos;
+}
+
+/*
+ * Returns subtype of a previous gold
+ */
+unsigned char get_gold_prev(unsigned char stype_idx)
+{
+     int array_count=sizeof(items_gold)/sizeof(unsigned char);
+    //find the gold in items_gold array
+    unsigned char *pos=memchr(items_gold,stype_idx,array_count);
+    if (pos!=NULL) pos-=sizeof(unsigned char);
+    if ((pos<items_gold)||(pos>=items_gold+sizeof(items_gold)))
+      pos=(unsigned char *)items_gold+(array_count-1)*sizeof(unsigned char);
+    return *pos;
+}
+
+/*
+ * Returns if the thing is a torch
+ */
+short is_torch(unsigned char *thing)
+{
+     int array_count=sizeof(items_torches)/sizeof(unsigned char);
+    //All torches are items
+    if (get_thing_type(thing) != THING_TYPE_ITEM)
+      return false;
+    //and they are listed in items_torches array
+    char *pos=memchr(items_torches,get_thing_subtype(thing),array_count);
+    if (pos!=NULL) return true;
+    return false;
+}
+
+/*
+ * Returns subtype of a next torch
+ */
+unsigned char get_torch_next(unsigned char stype_idx)
+{
+     int array_count=sizeof(items_torches)/sizeof(unsigned char);
+    //find the torch in items_torches array
+    unsigned char *pos=memchr(items_torches,stype_idx,array_count);
+    if (pos!=NULL) pos+=sizeof(unsigned char);
+    if ((pos<items_torches)||(pos>=items_torches+sizeof(items_torches)))
+      pos=(unsigned char *)items_torches;
+    return *pos;
+}
+
+/*
+ * Returns subtype of a previous torch
+ */
+unsigned char get_torch_prev(unsigned char stype_idx)
+{
+     int array_count=sizeof(items_torches)/sizeof(unsigned char);
+    //find the torch in items_torches array
+    unsigned char *pos=memchr(items_torches,stype_idx,array_count);
+    if (pos!=NULL) pos-=sizeof(unsigned char);
+    if ((pos<items_torches)||(pos>=items_torches+sizeof(items_torches)))
+      pos=(unsigned char *)items_torches+(array_count-1)*sizeof(unsigned char);
+    return *pos;
+}
+
+short is_herogate(unsigned char *thing)
+{
+  if (get_thing_type(thing)==THING_TYPE_ITEM)
+  if (get_thing_subtype(thing)==ITEM_SUBTYPE_HEROGATE)
+        return true;
+    return false;
+}
+
+short is_dnheart(unsigned char *thing)
+{
+  if (get_thing_type(thing)==THING_TYPE_ITEM)
+  if (get_thing_subtype(thing)==ITEM_SUBTYPE_DNHEART)
+        return true;
+    return false;
+}
+
 short is_room_thing(unsigned char *thing)
 {
   switch (get_thing_type(thing))
@@ -659,6 +1116,34 @@ short is_room_thing(unsigned char *thing)
       {
       case ITEM_SUBTYPE_TORCH:     //the torch on claimed wall
       case ITEM_SUBTYPE_SPINNKEY:  //Key marking closed doors
+        return true;
+      }
+    };return false;
+  default:
+    return false;
+  }
+}
+
+/*
+ * Returns true if the thing has affect on CLM entries
+ * and should be passed to CLM generation routine
+ */
+short is_clmaffective_thing(unsigned char *thing)
+{
+  switch (get_thing_type(thing))
+  {
+  case THING_TYPE_DOOR:
+      return true;
+  case THING_TYPE_ITEM:
+    { // Everything from ROOMEQUIP category affects clm entries
+      int cat_idx=get_item_category(get_thing_subtype(thing));
+      if (cat_idx==ITEM_CATEGR_ROOMEQUIP)
+        return true;
+      // Also some other items which are not ROOMEQUIP
+      switch (get_thing_subtype(thing))
+      {
+      case ITEM_SUBTYPE_TORCH:     //the torch on claimed wall
+      case ITEM_SUBTYPE_TORCHUN:   //the torch on unclaimed dirt
         return true;
       }
     };return false;
@@ -689,7 +1174,7 @@ short is_crucial_thing(unsigned char *thing)
 }
 
 /*
- * Returns object type name as text
+ * Returns item type name as text
  */
 char *get_item_subtype_fullname(unsigned char stype_idx)
 {
@@ -1529,6 +2014,14 @@ short trap_verify(unsigned char *thing, char *err_msg)
 short thing_verify(unsigned char *thing, char *err_msg)
 {
   short result;
+  int pos_h=(unsigned char)get_thing_tilepos_h(thing);
+  int pos_x=(unsigned char)get_thing_tilepos_x(thing);
+  int pos_y=(unsigned char)get_thing_tilepos_y(thing);
+  if ((pos_h>=MAP_SUBNUM_H)||(pos_x>=MAP_SUBTOTAL_X)||(pos_y>=MAP_SUBTOTAL_Y))
+  {
+    sprintf(err_msg,"Thing position (%d,%d,%d) invalid",pos_x,pos_y,pos_h);
+    return VERIF_WARN;
+  }
   switch(get_thing_type(thing))
   {
     case THING_TYPE_ITEM:

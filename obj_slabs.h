@@ -66,16 +66,21 @@ short slab_is_short(unsigned char slab_type);
 short slab_is_door(unsigned char slab_type);
 short slab_is_room(unsigned char slab_type);
 short slab_is_wall(unsigned char slab_type);
+short slab_is_wealth(unsigned char slab_type);
 short slab_is_space(unsigned char slab_type);
 short slab_is_tall_unclmabl(unsigned char slab_type);
 short slab_is_tall(unsigned char slab_type);
 short slab_is_short_clmabl(unsigned char slab_type);
+short slab_is_short_unclmabl(unsigned char slab_type);
+short slab_is_clmabl(unsigned char slab_type);
+short slab_is_claimedgnd(unsigned char slab_type);
+short slab_needs_adjacent_torch(unsigned char slab_type);
 short slab_verify_entry(unsigned char slab_type, char *err_msg);
 
-void check_doors(void);
 
 char *get_owner_type_fullname(unsigned char own_idx);
-unsigned char get_player_next(unsigned char plyr_idx);
-unsigned char get_player_prev(unsigned char plyr_idx);
+unsigned char get_owner_next(unsigned char plyr_idx);
+unsigned char get_owner_prev(unsigned char plyr_idx);
+void update_slab_owners(struct LEVEL *lvl);
 
 #endif // ADIKT_OBJSLABS_H

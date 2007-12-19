@@ -1,18 +1,18 @@
 # Project: adikted
 # Makefile created by Dev-C++ 4.9.9.2
 
-CPP  = g++.exe -D__DEBUG__
-CC   = gcc.exe -D__DEBUG__
+CPP  = g++.exe
+CC   = gcc.exe
 WINDRES = windres.exe
 RES  = map_private.res
-OBJ  = action.o dernc.o file.o graffiti.o internal.o main.o input_kb.o scr_help.o var_utils.o output_scr.o scr_level.o scr_thing.o graffiti_font.o bulcommn.o lev_data.o lev_files.o obj_slabs.o obj_things.o obj_column.o obj_actnpts.o lev_things.o lev_column.o $(RES)
-LINKOBJ  = action.o dernc.o file.o graffiti.o internal.o main.o input_kb.o scr_help.o var_utils.o output_scr.o scr_level.o scr_thing.o graffiti_font.o bulcommn.o lev_data.o lev_files.o obj_slabs.o obj_things.o obj_column.o obj_actnpts.o lev_things.o lev_column.o $(RES)
-LIBS =  -L"D:/ProgsNT/Dev-Cpp/lib" ../../../ProgsNT/Dev-Cpp/lib/libslang.a  -g3 
+OBJ  = dernc.o file.o graffiti.o main.o input_kb.o scr_help.o var_utils.o output_scr.o scr_thing.o graffiti_font.o bulcommn.o lev_data.o lev_files.o obj_slabs.o obj_things.o obj_column.o obj_actnpts.o lev_things.o lev_column.o obj_column_per.o scr_list.o scr_slab.o scr_clm.o scr_actn.o scr_txted.o lev_script.o $(RES)
+LINKOBJ  = dernc.o file.o graffiti.o main.o input_kb.o scr_help.o var_utils.o output_scr.o scr_thing.o graffiti_font.o bulcommn.o lev_data.o lev_files.o obj_slabs.o obj_things.o obj_column.o obj_actnpts.o lev_things.o lev_column.o obj_column_per.o scr_list.o scr_slab.o scr_clm.o scr_actn.o scr_txted.o lev_script.o $(RES)
+LIBS =  -L"D:/ProgsNT/Dev-Cpp/lib" ../../../ProgsNT/Dev-Cpp/lib/libslang.a  -march=pentium-mmx 
 INCS =  -I"D:/ProgsNT/Dev-Cpp/include" 
 CXXINCS =  -I"D:/ProgsNT/Dev-Cpp/lib/gcc/mingw32/3.4.2/include"  -I"D:/ProgsNT/Dev-Cpp/include/c++/3.4.2/backward"  -I"D:/ProgsNT/Dev-Cpp/include/c++/3.4.2/mingw32"  -I"D:/ProgsNT/Dev-Cpp/include/c++/3.4.2"  -I"D:/ProgsNT/Dev-Cpp/include" 
 BIN  = map.exe
-CXXFLAGS = $(CXXINCS)   -g3
-CFLAGS = $(INCS)   -g3
+CXXFLAGS = $(CXXINCS)   -march=pentium-mmx
+CFLAGS = $(INCS)   -march=pentium-mmx
 RM = rm -f
 
 .PHONY: all all-before all-after clean clean-custom
@@ -26,9 +26,6 @@ clean: clean-custom
 $(BIN): $(OBJ)
 	$(CC) $(LINKOBJ) -o "map.exe" $(LIBS)
 
-action.o: action.c
-	$(CC) -c action.c -o action.o $(CFLAGS)
-
 dernc.o: dernc.c
 	$(CC) -c dernc.c -o dernc.o $(CFLAGS)
 
@@ -37,9 +34,6 @@ file.o: file.c
 
 graffiti.o: graffiti.c
 	$(CC) -c graffiti.c -o graffiti.o $(CFLAGS)
-
-internal.o: internal.c
-	$(CC) -c internal.c -o internal.o $(CFLAGS)
 
 main.o: main.c
 	$(CC) -c main.c -o main.o $(CFLAGS)
@@ -55,9 +49,6 @@ var_utils.o: var_utils.c
 
 output_scr.o: output_scr.c
 	$(CC) -c output_scr.c -o output_scr.o $(CFLAGS)
-
-scr_level.o: scr_level.c
-	$(CC) -c scr_level.c -o scr_level.o $(CFLAGS)
 
 scr_thing.o: scr_thing.c
 	$(CC) -c scr_thing.c -o scr_thing.o $(CFLAGS)
@@ -91,6 +82,27 @@ lev_things.o: lev_things.c
 
 lev_column.o: lev_column.c
 	$(CC) -c lev_column.c -o lev_column.o $(CFLAGS)
+
+obj_column_per.o: obj_column_per.c
+	$(CC) -c obj_column_per.c -o obj_column_per.o $(CFLAGS)
+
+scr_list.o: scr_list.c
+	$(CC) -c scr_list.c -o scr_list.o $(CFLAGS)
+
+scr_slab.o: scr_slab.c
+	$(CC) -c scr_slab.c -o scr_slab.o $(CFLAGS)
+
+scr_clm.o: scr_clm.c
+	$(CC) -c scr_clm.c -o scr_clm.o $(CFLAGS)
+
+scr_actn.o: scr_actn.c
+	$(CC) -c scr_actn.c -o scr_actn.o $(CFLAGS)
+
+scr_txted.o: scr_txted.c
+	$(CC) -c scr_txted.c -o scr_txted.o $(CFLAGS)
+
+lev_script.o: lev_script.c
+	$(CC) -c lev_script.c -o lev_script.o $(CFLAGS)
 
 map_private.res: map_private.rc 
 	$(WINDRES) -i map_private.rc --input-format=rc -o map_private.res -O coff 

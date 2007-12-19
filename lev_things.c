@@ -11,45 +11,7 @@
 #include "globals.h"
 #include "obj_things.h"
 #include "lev_data.h"
-
-/*
- * Removes all things that usually exist only in specific rooms
- */
-void remove_room_things (int x, int y)
-{
-    int cx, cy, i;
-    for (cx=x*3; cx < x*3+3; cx++)
-      for (cy=y*3; cy < y*3+3; cy++)
-      {
-          int last_thing=get_thing_subnums(lvl,cx,cy)-1;
-          for (i=last_thing; i>=0; i--)
-          {
-            char *thing=get_thing(lvl,cx,cy,i);
-            if (is_room_thing(thing))
-                thing_del(lvl,cx, cy, i);
-          }
-     }
-}
-
-/*
- * Removes all things that usually exist only in specific rooms,
- * and aren't crucial for the game (like gates and dungeon hearts)
- */
-void remove_noncrucial_room_things(int x, int y)
-{
-    int cx, cy, i;
-    for (cx=x*3; cx < x*3+3; cx++)
-      for (cy=y*3; cy < y*3+3; cy++)
-      {
-          int last_thing=get_thing_subnums(lvl,cx,cy)-1;
-          for (i=last_thing; i>=0; i--)
-          {
-            char *thing=get_thing(lvl,cx,cy,i);
-            if (is_room_thing(thing) && (!is_crucial_thing(thing)))
-                thing_del(lvl,cx, cy, i);
-          }
-     }
-}
+#include "obj_slabs.h"
 
 /*
  * Verifies thing types and parameters. Returns VERIF_ERROR,
@@ -84,56 +46,243 @@ short things_verify(struct LEVEL *lvl, char *err_msg)
   return VERIF_OK;
 }
 
-void set_pillar(int x, int y, int pillar)
+/*
+ * Sets lock state for the given door; creates/deletes spinning key thing.
+ */
+short set_door_lock(struct LEVEL *lvl, unsigned char *thing, unsigned char nlock)
 {
-    set_pillar_thing(x, y, pillar, 0, 0);
+    if (thing==NULL) return false;
+    unsigned short sx=get_thing_tilepos_x(thing);
+    unsigned short sy=get_thing_tilepos_y(thing);
+    unsigned char *thing_key=NULL;
+    unsigned int tng_num=get_thing_subnums(lvl,sx,sy);
+    while (tng_num>0)
+    {
+        tng_num--;
+        thing_key=get_thing(lvl,sx,sy,tng_num);
+        if ((get_thing_type(thing_key)==THING_TYPE_ITEM) && 
+            (get_thing_subtype(thing_key)==ITEM_SUBTYPE_SPINNKEY))
+          break;
+        thing_key=NULL;
+    }
+    if (nlock==DOOR_PASS_UNLOCKED)
+    {
+        if (thing_key!=NULL)
+          thing_del(lvl,sx,sy,tng_num);
+    } else
+    {
+        if (thing_key==NULL)
+        {
+          thing_key = create_item(sx,sy,ITEM_SUBTYPE_SPINNKEY);
+          //TODO: set the spinning key properties (height, other?)
+          thing_add(lvl,thing_key);
+        }
+    }
+    set_thing_level(thing,nlock);
+    return true;
 }
 
-void set_pillar_thing(int x, int y, int pillar, int thingnum, int thinghgt)
+/*
+ * Returns lock state for the given door.
+ */
+unsigned char get_door_lock(struct LEVEL *lvl, unsigned char *thing)
 {
-    int slbsame[3][3];
-    int i, j;
-    int bx, by;
-    unsigned char *thing;
-    
-    bx = x*3;
-    by = y*3;
-    for (i=0; i < 3; i++)
+  return get_thing_level(thing);
+}
+
+/*
+ * Returns the orientation that doors should have.
+ */
+unsigned char compute_door_orientation(struct LEVEL *lvl, unsigned char *thing)
+{
+    unsigned short tx=get_thing_tilepos_x(thing)/MAP_SUBNUM_X;
+    unsigned short ty=get_thing_tilepos_y(thing)/MAP_SUBNUM_Y;
+    // Check the previous orientation - if it matches, then it is preferred
+    if (get_door_orientation(thing)==DOOR_ORIENT_NSPASS)
     {
-      for (j=0; j < 3; j++)
-      {
-          slbsame[i][j]=0;
-          if (x+i-1>=0 && x+i-1 < MAP_SIZE_X && y+j-1>=0 && y+j-1 < MAP_SIZE_Y)
-          {
-            if (lvl->slb[x][y]==lvl->slb[x+i-1][y+j-1] && 
-                lvl->own[x][y]==lvl->own[x+i-1][y+j-1])
-                slbsame[i][j]=1;
-          }
-      }
-    }
-    for (i=0; i < 3; i+=2)
+      unsigned char slab_e=get_tile_slab(lvl, tx+1, ty);
+      unsigned char slab_w=get_tile_slab(lvl, tx-1, ty);
+      if (slab_is_tall(slab_e)&&slab_is_tall(slab_w))
+        return DOOR_ORIENT_NSPASS;
+      else
+        return DOOR_ORIENT_EWPASS;
+    } else
     {
-      for (j=0; j < 3; j+=2)
-      {
-          if (slbsame[i][1] && slbsame[1][j] &&
-            !slbsame[2-i][1] && !slbsame[1][2-j])
-          {
-            if (pillar)
-                set_dat_subtile(lvl, bx+i, by+j, pillar);
-            if (thingnum)
-            {
-                thing = create_item(bx+1, by+1, thingnum);
-                set_thing_tilepos_h(thing,(thinghgt>>8)&255);
-                set_thing_subtpos_h(thing,thinghgt&255);
-                if (thingnum == 2) // Put torches right by the pillars
-                {
-                  set_thing_subtpos(thing,i*0x40+0x40,j*0x40+0x40);
-                }
-                thing [12]=(MAP_SIZE_X*y+x) >> 8;
-                thing [11]=((MAP_SIZE_X*y+x) & 255);
-                thing_add(lvl,thing);
-            }
-          }
-      }
+      unsigned char slab_n=get_tile_slab(lvl, tx, ty-1);
+      unsigned char slab_s=get_tile_slab(lvl, tx, ty+1);
+      if (slab_is_tall(slab_n)&&slab_is_tall(slab_s))
+        return DOOR_ORIENT_EWPASS;
+      else
+        return DOOR_ORIENT_NSPASS;
     }
 }
+
+/*
+ * Creates a new thing of type door. Sets orientation and owner for given position.
+ */
+unsigned char *create_door(struct LEVEL *lvl, unsigned int sx, unsigned int sy, unsigned char stype_idx)
+{
+    unsigned char *thing;
+    thing = create_thing(sx,sy);
+    set_thing_type(thing,THING_TYPE_DOOR);
+    set_thing_subtype(thing,stype_idx);
+    set_thing_owner(thing,get_tile_owner(lvl,sx/MAP_SUBNUM_X,sy/MAP_SUBNUM_Y));
+    set_thing_subtpos(thing,0x80,0x80);
+    set_thing_tilepos_h(thing,5);
+    set_door_orientation(thing,compute_door_orientation(lvl,thing));
+    //Set default lock state
+    set_thing_level(thing,DOOR_PASS_UNLOCKED);
+    return thing;
+}
+
+unsigned char *create_torch(struct LEVEL *lvl, unsigned int sx, unsigned int sy,  unsigned char stype_idx)
+{
+    unsigned char *thing;
+    thing = create_thing(sx,sy);
+    set_thing_type(thing,THING_TYPE_ITEM);
+    set_thing_subtype(thing,stype_idx);
+    set_thing_owner(thing,get_tile_owner(lvl,sx/MAP_SUBNUM_X,sy/MAP_SUBNUM_Y));
+    set_thing_tilepos_h(thing,2);
+    set_thing_subtpos_h(thing,0x0e0);
+    //TODO: set the subtile position near wall (find the wall first)
+    // (one dimension should be 0x0c0)
+    unsigned char sub_x=0x080;
+    unsigned char sub_y=0x080;
+    if ((sx%MAP_SUBNUM_X)==0)
+      sub_x=0x040;
+    else
+    if ((sx%MAP_SUBNUM_X)==2)
+      sub_x=0x0c0;
+    else
+    if ((sy%MAP_SUBNUM_Y)==0)
+      sub_y=0x040;
+    else
+    if ((sy%MAP_SUBNUM_Y)==2)
+      sub_y=0x0c0;
+    set_thing_subtpos(thing,sub_x,sub_y);
+    return thing;
+}
+
+/*
+ * Updates TNG, APT and LGT entries for the whole map - all tiles
+ * and subtiles are reset. Additionally, USE values in columns
+ * are recomputed to avoid mistakes.
+ */
+void update_obj_for_whole_map(struct LEVEL *lvl)
+{
+    int i,k;
+    for (k=0;k<MAP_SIZE_Y;k++)
+      for (i=0;i<MAP_SIZE_X;i++)
+          update_clmaffective_obj_for_slab(lvl, i, k);
+}
+
+/*
+ * Updates TNG, APT and LGT entries for given map tile coordinates
+ * and also updates enties in all neightbour squares
+ */
+void update_obj_for_square_radius1(struct LEVEL *lvl, int tx, int ty)
+{
+    int i,k;
+    for (k=ty-1;k<=ty+1;k++)
+      for (i=tx-1;i<=tx+1;i++)
+      {
+        if ((i>=0) && (k>=0) && (i<MAP_SIZE_X) && (k<MAP_SIZE_Y))
+          update_clmaffective_obj_for_slab(lvl, i, k);
+      }
+}
+
+/*
+ * Updates TNG, APT and LGT entries for given map tile coordinates range
+ */
+void update_obj_for_square(struct LEVEL *lvl, int tx_first, int tx_last,
+    int ty_first, int ty_last)
+{
+    int i,k;
+    for (k=ty_first;k<=ty_last;k++)
+      for (i=tx_first;i<=tx_last;i++)
+      {
+        if ((i>=0) && (k>=0) && (i<MAP_SIZE_X) && (k<MAP_SIZE_Y))
+          update_clmaffective_obj_for_slab(lvl, i, k);
+      }
+}
+
+void update_clmaffective_obj_for_slab(struct LEVEL *lvl, int tx, int ty)
+{
+    remove_misplaced_objs_on_slab(lvl,tx,ty);
+    unsigned char slab=get_tile_slab(lvl,tx,ty);
+    if (slab_is_room(slab))
+    {
+      update_room_things_on_slab(lvl,tx,ty);
+    } else
+    if (slab_is_door(slab))
+    {
+      update_door_things_on_slab(lvl,tx,ty);
+    } else
+    if (slab_needs_adjacent_torch(slab))
+    {
+      update_torch_things_near_slab(lvl,tx,ty);
+    }
+}
+
+/*
+ * Removes objects that usually belong do different slab type than the one we're on
+ */
+void remove_misplaced_objs_on_slab(struct LEVEL *lvl, int tx, int ty)
+{
+    unsigned char slab=get_tile_slab(lvl,tx,ty);
+    int sx, sy, i;
+    for (sx=tx*3; sx < tx*3+3; sx++)
+      for (sy=ty*3; sy < ty*3+3; sy++)
+      {
+          int last_thing=get_thing_subnums(lvl,sx,sy)-1;
+          for (i=last_thing; i>=0; i--)
+          {
+            char *thing=get_thing(lvl,sx,sy,i);
+            unsigned char expect_slb=get_usual_thing_slab(thing);
+            if ((expect_slb!=slab)&&
+               ((expect_slb!=SLAB_TYPE_CLAIMED)||(slab_is_tall(slab))))
+                thing_del(lvl,sx, sy, i);
+          }
+     }
+}
+
+void update_room_things_on_slab(struct LEVEL *lvl, int tx, int ty)
+{
+//TODO: make the update function
+//note: it can't use CLM entries, only SLB and OWN.
+}
+
+void update_door_things_on_slab(struct LEVEL *lvl, int tx, int ty)
+{
+//TODO: make the update function
+//note: it can't use CLM entries, only SLB and OWN.
+}
+
+void update_torch_things_near_slab(struct LEVEL *lvl, int tx, int ty)
+{
+//TODO: make the update function
+//note: it can't use CLM entries, only SLB and OWN.
+}
+
+
+
+/*
+ * Removes all things that usually exist only in specific rooms,
+ * and aren't crucial for the game (like gates and dungeon hearts)
+ */
+void remove_noncrucial_room_things(int tx, int ty)
+{
+    int sx, sy, i;
+    for (sx=tx*3; sx < tx*3+3; sx++)
+      for (sy=ty*3; sy < ty*3+3; sy++)
+      {
+          int last_thing=get_thing_subnums(lvl,sx,sy)-1;
+          for (i=last_thing; i>=0; i--)
+          {
+            char *thing=get_thing(lvl,sx,sy,i);
+            if (is_room_thing(thing) && (!is_crucial_thing(thing)))
+                thing_del(lvl,sx, sy, i);
+          }
+     }
+}
+

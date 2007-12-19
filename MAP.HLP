@@ -1,18 +1,24 @@
 [slbkeyhelp]
-t:Treasure  L:Lair      H:Hatchery
-T:Training  l:Library   %:Bridge
-W:Workshop  G:Guard     P:Prison
-O:Torture   B:Barracks  e:Temple
-g:Grave     S:Scavenge  h:Heart
-E:Entrance
-#:Rock      .:Earth     -:Path
- :Claimed   /:Torchdirt $:Gold
-!:Gem       ~:Water     =:Lava
-^:Drapewall \:Torchwall &:Geminiwall
-*:Womanwall (:Shagwall  @:Graffiti
+\wt\s:Treasure  \wL\s:Lair      \wH\s:Hatchery
+\wT\s:Training  \wl\s:Library   \w%\s:Bridge
+\wW\s:Workshop  \wG\s:Guard     \wP\s:Prison
+\wO\s:Torture   \wB\s:Barracks  \we\s:Temple
+\wg\s:Grave     \wS\s:Scavenge  \wh\s:Heart
+\wE\s:Entrance
+\w#\s:Rock      \w.\s:Earth     \w-\s:Path
+\w \s:Claimed   \w/\s:Torchdirt \w$\s:Gold
+\w!\s:Gem       \w~\s:Water     \w=\s:Lava
+\w^\s:Drapewall \w\\\s:Torchwall \w&\s:Geminiwall
+\w*\s:Womanwall \w(\s:Shagwall  \w@\s:Graffiti
 
-Doors - wood, iron, braced, magic
+Doors - \ww\sood, \wi\sron, \wb\sraced, \wm\sagic
 [tngkeyhelp]
+\wa\s:Action pt \wL\s:St light  \wc\s:Creature
+\we\s:Room efct \wb\s:Spell bk  \wg\s:Gold
+\wd\s:Dng specl \wT\s:Trap box  \wt\s:Trap
+\wh\s:Dng heart \wH\s:Hero gate \wr\s:Torch
+\wf\s:Chicken
+
 [crtkeyhelp]
 Creature type mode:
 
@@ -34,8 +40,8 @@ are placing it in.
 [slbhelp]
 Slab mode help:
 
-Use cursor keys, page up/down, home and end, either alone or with
-ctrl or alt (non-Linux only), to move around.
+Use \wcursor keys\s, \wpage up/down\s, \whome\s and \wend\s, either alone or with
+\wctrl\s or \walt\s (non-Linux only), to move around.
 
 The key on the right of the screen should allow you to read the
 map, and also provides the keys to change the map... just use
@@ -43,52 +49,54 @@ the key shown on the key (as it were) and the map at your cursor
 position will change appropriately.
 
 The background colour of each tiles (or "slab") shows the ownership.
-Red tiles belong to player 0 (the human player in games against the
-computer), cyan to player 1, purple to player 2, blue to player 3,
-and yellow to player 4 (the Avatar). A black background shows the
+\RRed\s tiles belong to \Rplayer 0\s (the human player in games against the
+computer), \Bblue\s to \Bplayer 1\s, \Ggreen\s to \Gplayer 2\s, \Yyellow\s to \Yplayer 3\s,
+and \Ccyan\s to \Cplayer 4\s (the Avatar). A black background shows the
 tile is currently unowned. Note that earth and impenetrable rock
-will always show up as dark grey against black, whatever you tell
-the editor. (When you save the level, the editor will make sure that
-all rock and earth is unclaimed.)
+will back to unclaimed state if you press 'u' or save the level
+(it just can't be claimed).
 
-To change the ownership of a tile, press a number key from 0 to 5; 0
-for player 0, etc, and 5 for unclaimed. 
+To change the ownership of a tile, press a number key from \w0\s to \w5\s; \w0\s
+for \Rplayer 0\s, etc, and \w5\s for unclaimed. 
 
-To change large areas, press ctrl+space. This will put you into
+To change large areas, press \wctrl+space\s. This will put you into
 marking mode. Draw out a rectangle with the movement keys, then
 press a key to change the map (ownership or slab), as if it were an
-individual character. Pressing ctrl+space again will also take you
+individual character. Pressing \wctrl+space\s again will also take you
 out of marking mode.
 
-To mark out a boundary (a wall, for example), press z. This will put
+To mark out a boundary (a wall, for example), press \wz\s. This will put
 you into paint mode. Nothing will change until you press a slab key
-or a number from 0 to 5, when you will start painting. Now when you
+or a number from \w0\s to \w5\s, when you will start painting. Now when you
 move, you paint the tile your cursor is over with either the slab or
 ownership you selected (or both). To change the paint ownership or
 slab, just press another slab or number key. To stop painting, press
-z again.
+'\wz\s' again.
 
-To add some graffiti to a dungeon, press 'a' for across, or 'd' for
-down. Press delete or backspace to remove graffiti. Graffiti shows
+To add some graffiti to a dungeon, press '\wa\s' for across, or '\wd\s' for
+down. Press \wdelete\s or \wbackspace\s to remove graffiti. Graffiti shows
 up as a line of purple @ signs, and will be converted into rock
 with the chosen string on when the level is saved.
 
-To update the dungeon things/dat/clm, press u.
-To switch into "thing" mode, press tab.
-To switch into "clm" mode, press c.
-To verify the map integrity and rules, press v.
-Create new, empty map with ctrl+n or autogenerate map with ctrl+r.
-To load map, press ctrl+l.
-To quit, press ctrl+q.
-To save, press ctrl+s.
+To update the dungeon things/dat/clm, press '\wu\s'.
+To toggle automatic update of things/dat/clm, press \wctrl+u\s.
+To switch into "thing" mode, press \wtab\s.
+To switch into "column" mode, press '\wc\s'.
+To switch into "script" mode, press \wctrl+t\s.
+To verify the map integrity and rules, press '\wv\s'.
+To toggle view of compass rose, press \wctrl+p\s.
+Create new, empty map with \wctrl+n\s or autogenerate map with \wctrl+r\s.
+To load map, press \wctrl+l\s.
+To quit, press \wctrl+q\s.
+To save, press \wctrl+s\s.
 
 [crthelp]
 Add creature mode help:
 
 A list will appear on the screen of all the available creatures.
-Simply select the creature you want with arrow keys, then press return.
+Simply select the creature you want with \warrow keys\s, then press \wenter\s.
 
-You can cancel operation with tab or del.
+You can cancel operation with \wtab\s or \wdelete\s.
 
 The creature will be added to the slot that was highlighted in
 "thing" mode. The creature will be owned by whoever owns the tile it
@@ -111,98 +119,158 @@ and similar objects (see "thing" mode help for details).
 The item will be added to the slot that was highlighted in
 "thing" mode.
 
-To cancel, press tab or del.
+To cancel, press \wtab\s or \wdelete\s.
 
 [tnghelp]
 "Thing" mode help:
 
 Move around as in slab mode.
-The ownership backgrounds are as in slab mode. The numbers which are
-visible represent the number of "things" on that tile. Moving over a
-tile shows the details of the "things" on that tile. If a tile has
-more than 9 "things" on it, it will be shown as a "+".
+The ownership backgrounds are as in slab mode, but the map slabs view
+is simplified - you won't see all the different items from slab mode,
+but only three background terrain types: '#' for rock, '.' for earth,
+walls, gold etc, and ' ' for path, lava, water etc.
 
-Press k to copy the highlighted thing (creature or object) onto the
+Instead, you will see numbers and letters representing amount and type
+of objects contained in every map tile. If a tile contains more than
+one object, or one object which has no related letter, a digit 0..9
+will appear. If a tile has more than 9 objects on it, it will be shown
+as a "+". Moving over a tile shows the details of the objects on that
+tile.
+
+The key on the right of the screen should allow you to read the object
+types where they're displayed as letters.
+
+Press \wk\s to copy the highlighted thing (creature or object) onto the
 clipboard. Everything about the object apart from the position in
 the map will be copied, including height, level of creature, etc.
 
-Press y to copy a thing from the clipboard into the highlighted spot.
+Press \wy\s to copy a thing from the clipboard into the highlighted spot.
 
-Press 1-9 to change the highlighted "thing" slot - using the number
+Press \w1\s-\w9\s to change the highlighted "thing" slot - using the number
 pad with num lock on makes this easier. If a slot has more than one
 thing on it, the number of things will appear in brackets beneath
-the slot. Press / to cycle through the things on the highlighted slot.
+the slot. Press \w/\s to cycle through the things on the highlighted slot.
 
-Press c to create a new creature in the highlighted slot. The new
+Press \wc\s to create a new creature in the highlighted slot. The new
 creature will be owned by whoever owns the tile (although the
 ownership of the tile can later be changed without affecting the
 creature). Note that any other "thing" in the highlighted slot will
 be erased, and that creating a creature copies it to the clipboard
 automatically.
 
-Press b to create a spell book (change the type using s and x).
+Press \wb\s to create a spell book (change the type using \ws\s and \wx\s).
 
-Press g or G to create a pot of gold in the highlighted spot. The
-value is 500 for 'g' and 250 for 'G'.
+Press '\wg\s' or '\wG\s' to create a pot of gold in the highlighted spot. The
+value is 500 for '\wg\s' and 250 for '\wG\s'.
 
-Press d to create a dungeon special in the highlighted
-spot (change the type using s and x).
+Press \wd\s to create a dungeon special in the highlighted
+spot (change the type using \ws\s and \wx\s).
 
-Press h to create a dungeon heart in the highlighted spot. It will
+Press \wh\s to create a dungeon heart in the highlighted spot. It will
 be owned by the owner of the tile.
 
-Press H to create a hero gate. It will be owned by player 4 (Avatar).
+Press \wH\s to create a hero gate. It will be owned by \Cplayer 4\s (Avatar).
 
-Press u to update the dungeon. This will make sure all room objects
+Press \wu\s to update the dungeon. This will make sure all room objects
 (training posts, spikes, torturers, etc) are placed appropriately,
 as well as updating the .clm and .dat values.
 
-Press t to create a trap (change the type using s and x).
+Press \wt\s to create a trap (change the type using \ws\s and \wx\s).
 
-Press T to create a trap box (ie a non-placed trap). Change the type
-using s and x.
+Press \wT\s to create a trap box (a non-placed trap). Change the type
+using \ws\s and \wx\s.
 
-Press e to create room effect (change the type using s and x).
+Press \we\s to create room effect (change the type using \ws\s and \wx\s).
 
-Press i to create any item. Use this function to create items other
+Press \wL\s to create static light.
+
+Press \wi\s to create any item. Use this function to create items other
 than those available under other keys - it may be unable to set
 item properties correctly.
 
-Press s and x to increase/decrease the level of a highlighted
+Press \ws\s and \wx\s to increase/decrease the level of a highlighted
 creature, the type of a highlighted trap, the type of a 
 highlighted dungeon special, or the type of a spell book.
 
-Press S and X to change the type of a highlighted creature.
+Press \wS\s and \wX\s to change the type of a highlighted creature.
 
-Press o to change the owner of a highlighted thing or creature. The
+Press \wo\s to change the owner of a highlighted thing or creature. The
 ownership cycles through the players (and "unclaimed").
 
-Press l to lock/unlock a highlighted door.
+Press \wl\s to lock/unlock a highlighted door.
 
 Press delete to remove the "thing" in the highlighted spot.
 
-To switch back to slab mode, press tab.
-To quit, press ctrl+q.
-To save, press ctrl+s.
+To switch back to slab mode, press \wtab\s.
+To switch into script mode, press \wctrl+t\s.
+To quit, press \wctrl+q\s.
+To save, press \wctrl+s\s.
 
 [clmhelp]
-"Clm" mode help:
+"Column" mode help:
 
 Move around as in slab mode. The main map shows exactly the same
 details as in slab made. The only difference is that instead of
 seeing the slab key, you now see the column data for the highlighted
-subtile. This mode is mainly used for testing purposes, and may be
-removed in later releases.
+subtile. This mode is mainly used for testing purposes, and for
+advanced mapmakers.
 
-Press 1-9 to change the highlighted column slot - using the number
-pad with num lock on makes this easier.
+Press \w1\s-\w9\s to change the highlighted column slot - using the \wnumber
+\wpad\s with \wnum lock\s on makes this easier.
 
-Press u to update the dungeon. This will make sure all room objects
+Press \wa\s to auto-update .dat and .clm values for selected slab.
+All columns of the current slab will be re-created, and the program
+will be set to always re-create columns for this slab automatically.
+
+Press \wu\s to update the dungeon. This will make sure all room objects
 (training posts, spikes, torturers, etc) are placed appropriately,
 as well as updating the .clm and .dat values.
 
-To switch back to slab mode, press tab.
-To quit, press ctrl+q.
-To save, press ctrl+s.
+Press \wm\s to manually set columns for the selected slab using
+one of the Adikted generation functions. The column will no longer
+be autogenerated on update.
 
+To switch back to slab mode, press \wtab\s.
+To quit, press \wctrl+q\s.
+To save, press \wctrl+s\s.
+
+[tips]
+There is no escape from the reaper.
+Even the salamander sometimes burns.
+You can autogenerate random maps with ctrl+r.
+Press F1 to view help for the current work mode.
+Escape where? To the dungeon?
+To exit, press ctrl+q. To get help, press F1.
+To fix map for the official editor, press u.
+Random maps will generate faster if you press ctrl+u.
+When you place a slab, the 3x3 square is auto-updated.
+To verify the map integrity and rules, press v.
+Want to know where north is? Then press ctrl+p.
+To see directions as they are in the game, press ctrl+p.
+[compass]
+                  *
+ /\\~~~~~~~~~~~~~~~|~~~~~~~~~~~~~~~/\\
+(o )              .              ( o)
+ \\/             .` `.             \\/
+ /\\           .`     `.           /\\
+(           .`         `.           )
+ )        .`      \wN\s      `.        (
+(       .`  \wNW\s    |    \wNE\s  `.       )
+ )     .`    <\\> )|( </>    `.     (
+(    .`        \\  |  /        `.    )
+ ) .`        )  \\ | /  (       `.  (
+  .`       )     \\|/     (       `. 
+.`   \wW\s---)--------\wO\s--------(---\wE\s   `.
+ `.        )     /|\\     (        .`
+ ) `.        )  / | \\  (        .` (
+(   `.         /  |  \\         .`   )
+ )    `.     </> )|( <\\>     .`    (
+(       `.  \wSW\s    |    \wSE\s  .`       )
+ )       `.       \wS\s       .`       (
+(          `.           .`          )
+ \\/          `.       .`          \\/
+ /\\            `.   .`            /\\
+(o )             `.`             ( o)
+ \\/~~~~~~~~~~~~~~~|~~~~~~~~~~~~~~~\\/
+                 -|-
 [end]

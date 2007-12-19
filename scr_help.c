@@ -2,61 +2,81 @@
  * scr_help.c
  *
  * Defines functions for initializing and displaying the help screen.
+ * This also includes keyboard actions for the screen.
  *
  */
 
 #include "scr_help.h"
 
 #include "globals.h"
-#include "action.h"
+#include "scr_actn.h"
+#include "output_scr.h"
+#include "input_kb.h"
 
 // Help variables
 
-int helpformode=0;
-int helpy=0;
+const char *help_filename="map.hlp";
 
-int clmhelprows=0;
-char **clmhelp=NULL;
-int slbkeyhelprows=0;
-char **slbkeyhelp=NULL;
-int crtkeyhelprows=0;
-char **crtkeyhelp=NULL;
-int itmtkeyhelprows=0;
-char **itmtkeyhelp=NULL;
-int slbhelprows=0;
-char **slbhelp=NULL;
-int tnghelprows=0;
-char **tnghelp=NULL;
-int crthelprows=0;
-char **crthelp=NULL;
-int itmthelprows=0;
-char **itmthelp=NULL;
-int helprows=0;
-char **helptext=NULL;
+HELP_DATA *help;
 
-void init_help (void)
+short init_help(void)
 {
-    char buffer [256];
-    char title[256];
+    //Creating and clearing help variable
+    help=(HELP_DATA *)malloc(sizeof(HELP_DATA));
+    if (help==NULL)
+     die("init_help: Cannot allocate memory.");
+    help->formode=0;
+    help->y=0;
+    help->rows=0;
+    help->text=NULL;
+
+    help->clmrows=0;
+    help->clm=NULL;
+    help->slbkeyrows=0;
+    help->slbkey=NULL;
+    help->tngkeyrows=0;
+    help->tngkey=NULL;
+    help->crtkeyrows=0;
+    help->crtkey=NULL;
+    help->itmtkeyrows=0;
+    help->itmtkey=NULL;
+    help->slbrows=0;
+    help->slb=NULL;
+    help->tngrows=0;
+    help->tng=NULL;
+    help->crtrows=0;
+    help->crt=NULL;
+    help->itmtrows=0;
+    help->itmt=NULL;
+    help->tiprows=0;
+    help->tips=NULL;
+    help->compassrows=0;
+    help->compass=NULL;
+
+    char buffer[READ_BUFSIZE];
+    char title[READ_BUFSIZE];
     int n=0;
     char ***what;
     FILE *fp;
     strcpy (title, "");
-    fp = fopen ("map.hlp", "rb");
+    fp = fopen (help_filename, "rb");
     // Non-fatal error
     if (!fp)
-      return;
-    while (fgets (buffer, 255, fp))
+    {
+      message_info("Help file \"%s\" not found.",help_filename);
+      return false;
+    }
+    while (fgets(buffer, READ_BUFSIZE-1, fp))
     {
       strip_crlf(buffer);
-      if (buffer[0]=='[' && buffer[strlen (buffer)-1]==']')
+      if (buffer[0]=='[' && buffer[strlen(buffer)-1]==']')
       {
           what = match_title (title, n);
           if (n && what)
           {
             *what = (char **)malloc(n*sizeof (char *));
             if (!*what)
-                die ("Out of memory");
+                die ("init_help: Out of memory");
           }
           n=0;
           strcpy (title, buffer+1);
@@ -69,10 +89,10 @@ void init_help (void)
     strcpy (title, "");
     what=NULL;
     n=0;
-    while (fgets (buffer, 255, fp))
+    while (fgets (buffer, READ_BUFSIZE-1, fp))
     {
       strip_crlf(buffer);
-      if (buffer[0]=='[' && buffer[strlen (buffer)-1]==']')
+      if (buffer[0]=='[' && buffer[strlen(buffer)-1]==']')
       {
           strcpy (title, buffer+1);
           title[strlen(title)-1]=0;
@@ -85,7 +105,7 @@ void init_help (void)
           {
             (*what)[n]=(char *)malloc((strlen (buffer)+1)*sizeof(char));
             if (!(*what)[n])
-                die ("Out of memory");
+                die ("init_help: Out of memory");
             strcpy ((*what)[n], buffer);
           }
           n++;
@@ -93,16 +113,55 @@ void init_help (void)
     }
     fseek (fp, (long)0, SEEK_SET);
     fclose (fp);
+    return true;
 }
 
-char ***match_title (char *title, int n)
+/*
+ * Deallocates memory for the help screen.
+ */
+void free_help(void)
 {
-    static char *titles[]={
+  free(help);
+}
+
+/*
+ * Covers actions from the help screen.
+ */
+void actions_help(int key)
+{
+    switch (key)
+    {
+    case KEY_UP:
+      help->y--;
+      break;
+    case KEY_DOWN:
+      help->y++;
+      break;
+    case KEY_PGUP:
+      help->y-=scrmode->rows-1;
+      break;
+    case KEY_PGDOWN:
+      help->y+=scrmode->rows-1;
+      break;
+    default:
+      end_help();
+    }
+    if (help->y+scrmode->rows > help->rows)
+      help->y=help->rows-scrmode->rows;
+    if (help->y < 0)
+      help->y=0;
+}
+
+char ***match_title(char *title, int n)
+{
+    static const char *titles[]={
             "slbkeyhelp", "tngkeyhelp",   //0,1
             "crtkeyhelp", "itmtkeyhelp",  //2,3
             "slbhelp", "tnghelp",         //4,5
             "crthelp", "itmhelp",         //6,7
-            "clmhelp", NULL};
+            "clmhelp", "tips",            //8,9
+            "scrphelp", "txtrhelp",       //10,11
+            "compass", NULL};             //12
     int i=0;
 
     while (titles[i] && strcmp (titles[i], title))
@@ -111,53 +170,250 @@ char ***match_title (char *title, int n)
     {
       case 0 :
       if (n!=-1)
-          slbkeyhelprows=n;
-      return &slbkeyhelp;
+          help->slbkeyrows=n;
+      return &(help->slbkey);
+      case 1 :
+      if (n!=-1)
+          help->tngkeyrows=n;
+      return &(help->tngkey);
       case 2 :
       if (n!=-1)
-          crtkeyhelprows=n;
-      return &crtkeyhelp;
+          help->crtkeyrows=n;
+      return &(help->crtkey);
       case 3 :
       if (n!=-1)
-          itmtkeyhelprows=n;
-      return &itmtkeyhelp;
+          help->itmtkeyrows=n;
+      return &(help->itmtkey);
       case 4 :
       if (n!=-1)
-          slbhelprows=n;
-      return &slbhelp;
+          help->slbrows=n;
+      return &(help->slb);
       case 5 :
       if (n!=-1)
-          tnghelprows=n;
-      return &tnghelp;
+          help->tngrows=n;
+      return &(help->tng);
       case 6 :
       if (n!=-1)
-          crthelprows=n;
-      return &crthelp;
+          help->crtrows=n;
+      return &(help->crt);
       case 7 :
       if (n!=-1)
-          itmthelprows=n;
-      return &itmthelp;
+          help->itmtrows=n;
+      return &(help->itmt);
       case 8 :
       if (n!=-1)
-          clmhelprows=n;
-      return &clmhelp;
+          help->clmrows=n;
+      return &(help->clm);
+      case 9 :
+      if (n!=-1)
+          help->tiprows=n;
+      return &(help->tips);
+      case 10:
+      if (n!=-1)
+          help->scrprows=n;
+      return &(help->scrp);
+      case 11:
+      if (n!=-1)
+          help->txtrrows=n;
+      return &(help->txtr);
+      case 12:
+      if (n!=-1)
+          help->compassrows=n;
+      return &(help->compass);
       default :
       return NULL;
     }
 }
 
-extern void draw_help(void)
+/*
+ * Action function - start the help mode.
+ */
+short start_help()
+{
+    help->formode=scrmode->mode;
+    help->y=0;
+    switch (help->formode)
+    {
+      case MD_SLB:
+        help->rows=help->slbrows;
+        help->text=help->slb;
+        break;
+      case MD_CRTR:
+        help->rows=help->crtrows;
+        help->text=help->crt;
+        break;
+      case MD_ITMT:
+        help->rows=help->itmtrows;
+        help->text=help->itmt;
+        break;
+      case MD_TNG:
+        help->rows=help->tngrows;
+        help->text=help->tng;
+        break;
+      case MD_CLM:
+        help->rows=help->clmrows;
+        help->text=help->clm;
+        break;
+      case MD_SCRP:
+        help->rows=help->scrprows;
+        help->text=help->scrp;
+        break;
+      case MD_TXTR:
+        help->rows=help->txtrrows;
+        help->text=help->txtr;
+        break;
+      default:
+        help->rows=0;
+        help->text=NULL;
+        break;
+    }
+    if ((help->rows<1)||(help->text==NULL))
+    {
+      message_error("Cannot find help data for current screen.");
+      return false;
+    }
+    message_info_force("Use arrow keys and page up/down to move, "
+      "any other key to return.");
+    scrmode->mode=MD_HELP;
+    return true;
+}
+
+/*
+ * Action function - end the help mode.
+ */
+void end_help()
+{
+    if (scrmode->mode!=help->formode)
+      scrmode->mode=help->formode;
+    else
+      scrmode->mode=MD_SLB;
+    message_release();
+    message_info("Returned to last work mode.");
+}
+
+void draw_help(void)
 {
     int i;
-    screen_setcolor(0);
-    for (i=0; i < rows; i++)
+    for (i=0; i < scrmode->rows; i++)
     {
-      set_cursor_pos(i,0);
       char *help_line="";
-      if (helpy+i < helprows)
-          help_line=helptext[helpy+i];
-      screen_printf_toeol("%s",help_line);
+      if (help->y+i < help->rows)
+          help_line=help->text[help->y+i];
+      draw_help_line(i,0,help_line);
     }
     set_cursor_pos(get_screen_rows()-1, get_screen_cols()-1);
 }
 
+void draw_help_line(int posy,int posx,char *text)
+{
+      char *line=(char *)malloc(LINEMSG_SIZE*sizeof(char));
+      set_cursor_pos(posy,posx);
+      screen_setcolor(PRINT_COLOR_LGREY_ON_BLACK);
+      char *lpos=text;
+      char *lend;
+      do {
+        lend=strchr(lpos,'\\');
+        if (lend==NULL)
+        {
+          strncpy(line,lpos,LINEMSG_SIZE);
+          line[LINEMSG_SIZE-1]=0;
+        }
+        else
+        {
+          int llen=lend-lpos;
+          if (llen>=LINEMSG_SIZE) llen=LINEMSG_SIZE-1;
+          if (llen>0)
+          {
+            strncpy(line,lpos,llen+1);
+            line[llen]=0;
+          } else
+            line[0]=0;
+        }
+        screen_printf("%s",line);
+        if (lend!=NULL)
+          if (strlen(lend)>0)
+          {
+              if (lend[1]=='\\')
+              {
+                screen_printf("\\");
+              } else
+              if (lend[1]=='w')
+              {
+                screen_setcolor(PRINT_COLOR_WHITE_ON_BLACK);
+              } else
+              if (lend[1]=='s')
+              {
+                screen_setcolor(PRINT_COLOR_LGREY_ON_BLACK);
+              }
+              if (lend[1]=='R')
+              {
+                screen_setcolor(PRINT_COLOR_WHITE_ON_RED);
+              }
+              if (lend[1]=='C')
+              {
+                screen_setcolor(PRINT_COLOR_WHITE_ON_CYAN);
+              }
+              if (lend[1]=='G')
+              {
+                screen_setcolor(PRINT_COLOR_WHITE_ON_GREEN);
+              }
+              if (lend[1]=='Y')
+              {
+                screen_setcolor(PRINT_COLOR_WHITE_ON_BROWN);
+              }
+              if (lend[1]=='B')
+              {
+                screen_setcolor(PRINT_COLOR_WHITE_ON_BLUE);
+              }
+
+              lend++;
+          }
+
+        lpos=lend+1;
+      } while (lend!=NULL);
+      screen_printf_toeol("");
+      free(line);
+}
+
+char *get_random_tip()
+{
+    if ((help->tiprows<1)||(help->tips==NULL))
+      return "No tip, sorry.";
+    int num=rnd(help->tiprows);
+    return help->tips[num];
+}
+
+short init_key_help(int mode)
+{
+    switch (mode)
+    {
+      case MD_SLB:
+        help->rows=help->slbkeyrows;
+        help->text=help->slbkey;
+        break;
+      case MD_CRTR:
+        help->rows=help->crtkeyrows;
+        help->text=help->crtkey;
+        break;
+      case MD_ITMT:
+        help->rows=help->itmtkeyrows;
+        help->text=help->itmtkey;
+        break;
+      case MD_TNG:
+        help->rows=help->tngkeyrows;
+        help->text=help->tngkey;
+        break;
+      case MD_CLM:
+      case MD_SCRP:
+      case MD_TXTR:
+      default:
+        help->rows=0;
+        help->text=NULL;
+        break;
+    }
+    if ((help->rows<1)||(help->text==NULL))
+    {
+      return false;
+    }
+    return true;
+}

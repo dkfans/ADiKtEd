@@ -9,11 +9,26 @@ tutorial.txt. You may wish to print this out.
 Here's the Win32 version executable. Just put all the
 files in the same directory, edit map.ini as appropriate (don't
 worry about changing datmode, that just changes the way round the
-bytes on the .dat display are shown), and run it. Running it with a
-level number tries to find that level using the filebase directive
-in map.ini. Running it with a filename (eg newmap) tries to load
-that map from the current directory. Running it with no options
-starts a new map. When it saves a map, it will ask you what you wish
+bytes on the .dat display are shown), and run it.
+Usage: map [mapfile] [-m <logfile>] [-v] [-r] [-n] [-q]
+where:
+  mapfile  Specifies filename (eg newmap), or just map number
+          (like 18 etc.) which is loaded. Skipping this will start
+          with new map.
+  -m logfile  Allows you to save all messages shown on the bottom
+          of screen when Adkted is working. You must specify output
+          file where the messages will be written (ie. adi_msg.log).
+  -v  Triggers map verification; you could combine it with "-m" option
+          to get verification result in a text file.
+  -r  Starts new, random map. If [mapfile] was specified, then
+          it is loaded, but then cleared and replaced by the
+          random map.
+  -n  Forces to start new map, even if the [mapfile] was specified.
+          The [mapfile] is loaded, but then replaced.
+  -q  Quits Adikted after the tasks from previous parameters have been
+          completed. Useful for automated work.
+
+When Adikted saves a map, it will ask you what you wish
 to call it. I suggest you don't save directly over the Dungeon
 Keeper original levels, but keep it in the current directory until
 you're finished. When you're ready to test it, use a command like
@@ -58,6 +73,27 @@ Version: 0.50b
 Version: 0.51b
  Enhanced map verification function (press v in slab mode)
  Completely rewritten CLM/DAT support (it was lot of work...)
+Version: 0.51a
+ New, dynamic CLM generation
+ Completely new functions to geneate map graphic (DAT/CLM entries)
+ Written support of all terrain types, but no rooms
+ No automatic 'thing' generation
+ Graffiti not working due to DAT support changes
+Version: 0.52a
+ Added support of Dungeon Heart, Portal, Library, Temple
+ Some fixups and expansions in TNG support
+ Added some command line parameters
+ Rewritten screen refreshing, new look of Thing mode
+ Help file format extended
+ Clipboard can now copy action points and static lights
+ More items can be switched to similar using s/x
+Version: 0.53a
+ Compass view under ctrl+p
+ Added support of Hatchery, Lair, Graveyard, Barracks, Train room
+ Better function for generating rooms surrounded by lava/water
+TODO before beta:
+ Auto creating room things
+ Support of all rooms
 
 Author:
 Jon Skeet, skeet@pobox.com
