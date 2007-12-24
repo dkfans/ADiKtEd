@@ -51,6 +51,7 @@
 #define PLAYER3                0x03
 #define PLAYER_GOOD            0x04
 #define PLAYER_UNSET           0x05
+#define PLAYER_ALL             0x06  //used in scripts only
 
 struct LEVEL;
 

@@ -7,7 +7,7 @@
 
 #include "globals.h"
 
-#ifdef SPECFONT
+#ifdef LARGE_FONT_DEF
 
 static unsigned char notdef[] =
     {8, 0x55, 0xAA, 0x55, 0xAA, 0x55, 0xAA, 0x55, 0xAA };
@@ -204,44 +204,44 @@ static unsigned char char126[] =
 
 int fontheight=8;
 unsigned char *chars[] = {
-    notdef, notdef, notdef, notdef, notdef, notdef, notdef,
-    notdef, notdef, notdef, notdef, notdef, notdef, notdef,
-    notdef, notdef, notdef, notdef, notdef, notdef, notdef,
-    notdef, notdef, notdef, notdef, notdef, notdef, notdef,
-    notdef, notdef, notdef, notdef, char32, char33, char34,
-    char35, char36, char37, char38, char39, char40, char41,
-    char42, char43, char44, char45, char46, char47, char48,
-    char49, char50, char51, char52, char53, char54, char55,
-    char56, char57, char58, char59, char60, char61, char62,
-    char63, char64, char65, char66, char67, char68, char69,
-    char70, char71, char72, char73, char74, char75, char76,
-    char77, char78, char79, char80, char81, char82, char83,
-    char84, char85, char86, char87, char88, char89, char90,
-    char91, char92, char93, char94, char95, char96, char97,
-    char98, char99, char100, char101, char102, char103,
-    char104, char105, char106, char107, char108, char109,
-    char110, char111, char112, char113, char114, char115,
-    char116, char117, char118, char119, char120, char121,
-    char122, char123, char124, char125, char126, notdef,
-    notdef, notdef, notdef, notdef, notdef, notdef, notdef,
-    notdef, notdef, notdef, notdef, notdef, notdef, notdef,
-    notdef, notdef, notdef, notdef, notdef, notdef, notdef,
-    notdef, notdef, notdef, notdef, notdef, notdef, notdef,
-    notdef, notdef, notdef, notdef, notdef, notdef, notdef,
-    notdef, notdef, notdef, notdef, notdef, notdef, notdef,
-    notdef, notdef, notdef, notdef, notdef, notdef, notdef,
-    notdef, notdef, notdef, notdef, notdef, notdef, notdef,
-    notdef, notdef, notdef, notdef, notdef, notdef, notdef,
-    notdef, notdef, notdef, notdef, notdef, notdef, notdef,
-    notdef, notdef, notdef, notdef, notdef, notdef, notdef,
-    notdef, notdef, notdef, notdef, notdef, notdef, notdef,
-    notdef, notdef, notdef, notdef, notdef, notdef, notdef,
-    notdef, notdef, notdef, notdef, notdef, notdef, notdef,
-    notdef, notdef, notdef, notdef, notdef, notdef, notdef,
-    notdef, notdef, notdef, notdef, notdef, notdef, notdef,
-    notdef, notdef, notdef, notdef, notdef, notdef, notdef,
-    notdef, notdef, notdef, notdef, notdef, notdef, notdef,
-    notdef, notdef
+    notdef,  notdef,  notdef,  notdef,  notdef,  notdef,  notdef, // 00
+    notdef,  notdef,  notdef,  notdef,  notdef,  notdef,  notdef, // 08
+    notdef,  notdef,  notdef,  notdef,  notdef,  notdef,  notdef, // 10
+    notdef,  notdef,  notdef,  notdef,  notdef,  notdef,  notdef, // 18
+    notdef,  notdef,  notdef,  notdef,  char32,  char33,  char34, // 20
+    char35,  char36,  char37,  char38,  char39,  char40,  char41, // 28
+    char42,  char43,  char44,  char45,  char46,  char47,  char48, // 30
+    char49,  char50,  char51,  char52,  char53,  char54,  char55,
+    char56,  char57,  char58,  char59,  char60,  char61,  char62, // 40
+    char63,  char64,  char65,  char66,  char67,  char68,  char69,
+    char70,  char71,  char72,  char73,  char74,  char75,  char76, // 50
+    char77,  char78,  char79,  char80,  char81,  char82,  char83,
+    char84,  char85,  char86,  char87,  char88,  char89,  char90, // 60
+    char91,  char92,  char93,  char94,  char95,  char96,  char97,
+    char98,  char99,  char100, char101, char102, char103, char104,// 70
+    char105, char106, char107, char108, char109, char110, char111,
+    char112, char113, char114, char115, char116, char117, char118,// 80
+    char119, char120, char121, char122, char123, char124, char125,
+    char126, notdef,  notdef,  notdef,  notdef,  notdef,  notdef, // 90
+    notdef,  notdef,  notdef,  notdef   notdef,  notdef,  notdef,
+    notdef,  notdef,  notdef,  notdef,  notdef,  notdef,  notdef, // a0
+    notdef,  notdef,  notdef,  notdef,  notdef,  notdef,  notdef,
+    notdef,  notdef,  notdef,  notdef,  notdef,  notdef,  notdef, // b0
+    notdef,  notdef,  notdef,  notdef,  notdef,  notdef,  notdef,
+    notdef,  notdef,  notdef,  notdef,  notdef,  notdef,  notdef, // c0
+    notdef,  notdef,  notdef,  notdef,  notdef,  notdef,  notdef,
+    notdef,  notdef,  notdef,  notdef,  notdef,  notdef,  notdef, // d0
+    notdef,  notdef,  notdef,  notdef,  notdef,  notdef,  notdef,
+    notdef,  notdef,  notdef,  notdef,  notdef,  notdef,  notdef, // e0
+    notdef,  notdef,  notdef,  notdef,  notdef,  notdef,  notdef,
+    notdef,  notdef,  notdef,  notdef,  notdef,  notdef,  notdef, // f0
+    notdef,  notdef,  notdef,  notdef,  notdef,  notdef,  notdef,
+    notdef,  notdef,  notdef,  notdef,  notdef,  notdef,  notdef,
+    notdef,  notdef,  notdef,  notdef,  notdef,  notdef,  notdef,
+    notdef,  notdef,  notdef,  notdef,  notdef,  notdef,  notdef,
+    notdef,  notdef,  notdef,  notdef,  notdef,  notdef,  notdef,
+    notdef,  notdef,  notdef,  notdef,  
+    
 };
 
 #else
@@ -306,38 +306,38 @@ f3(notdef,15,a,15);
 
 int fontheight=6;
 unsigned char *chars[] = {
-    chnotdef,chnotdef,chnotdef,chnotdef,chnotdef,chnotdef,chnotdef,chnotdef,   /* 00 */
-    chnotdef,chnotdef,chnotdef,chnotdef,chnotdef,chnotdef,chnotdef,chnotdef,   /* 08 */
-    chnotdef,chnotdef,chnotdef,chnotdef,chnotdef,chnotdef,chnotdef,chnotdef,   /* 10 */
-    chnotdef,chnotdef,chnotdef,chnotdef,chnotdef,chnotdef,chnotdef,chnotdef,   /* 18 */
-    chspace ,chexclam,chdblqt ,chnotdef,chnotdef,chnotdef,chnotdef,chcquote,   /* 20 */
-    chnotdef,chnotdef,chnotdef,chnotdef,chcomma ,chnotdef,chperiod,chnotdef,   /* 28 */
-    ch0     ,ch1     ,ch2     ,ch3     ,ch4     ,ch5     ,ch6     ,ch7     ,   /* 30 */
-    ch8     ,ch9     ,chcolon ,chsemi  ,chnotdef,chnotdef,chnotdef,chquery ,   /* 38 */
-    chatsign,chA     ,chB     ,chC     ,chD     ,chE     ,chF     ,chG     ,   /* 40 */
-    chH     ,chI     ,chJ     ,chK     ,chL     ,chM     ,chN     ,chO     ,   /* 48 */
-    chP     ,chQ     ,chR     ,chS     ,chT     ,chU     ,chV     ,chW     ,   /* 50 */
-    chX     ,chY     ,chZ     ,chnotdef,chnotdef,chnotdef,chnotdef,chnotdef,   /* 58 */
-    choquote,chA     ,chB     ,chC     ,chD     ,chE     ,chF     ,chG     ,   /* 60 */
-    chH     ,chI     ,chJ     ,chK     ,chL     ,chM     ,chN     ,chO     ,   /* 68 */
-    chP     ,chQ     ,chR     ,chS     ,chT     ,chU     ,chV     ,chW     ,   /* 70 */
-    chX     ,chY     ,chZ     ,chnotdef,chnotdef,chnotdef,chnotdef,chnotdef,   /* 78 */
-    chnotdef,chnotdef,chnotdef,chnotdef,chnotdef,chnotdef,chnotdef,chnotdef,   /* 80 */
-    chnotdef,chnotdef,chnotdef,chnotdef,chnotdef,chnotdef,chnotdef,chnotdef,   /* 88 */
-    chnotdef,chnotdef,chnotdef,chnotdef,chnotdef,chnotdef,chnotdef,chnotdef,   /* 90 */
-    chnotdef,chnotdef,chnotdef,chnotdef,chnotdef,chnotdef,chnotdef,chnotdef,   /* 98 */
-    chnotdef,chnotdef,chnotdef,chnotdef,chnotdef,chnotdef,chnotdef,chnotdef,   /* A0 */
-    chnotdef,chnotdef,chnotdef,chnotdef,chnotdef,chnotdef,chnotdef,chnotdef,   /* A8 */
-    chnotdef,chnotdef,chnotdef,chnotdef,chnotdef,chnotdef,chnotdef,chnotdef,   /* B0 */
-    chnotdef,chnotdef,chnotdef,chnotdef,chnotdef,chnotdef,chnotdef,chnotdef,   /* B8 */
-    chnotdef,chnotdef,chnotdef,chnotdef,chnotdef,chnotdef,chnotdef,chnotdef,   /* C0 */
-    chnotdef,chnotdef,chnotdef,chnotdef,chnotdef,chnotdef,chnotdef,chnotdef,   /* C8 */
-    chnotdef,chnotdef,chnotdef,chnotdef,chnotdef,chnotdef,chnotdef,chnotdef,   /* D0 */
-    chnotdef,chnotdef,chnotdef,chnotdef,chnotdef,chnotdef,chnotdef,chnotdef,   /* D8 */
-    chnotdef,chnotdef,chnotdef,chnotdef,chnotdef,chnotdef,chnotdef,chnotdef,   /* E0 */
-    chnotdef,chnotdef,chnotdef,chnotdef,chnotdef,chnotdef,chnotdef,chnotdef,   /* E8 */
-    chnotdef,chnotdef,chnotdef,chnotdef,chnotdef,chnotdef,chnotdef,chnotdef,   /* F0 */
-    chnotdef,chnotdef,chnotdef,chnotdef,chnotdef,chnotdef,chnotdef,chnotdef,   /* F8 */
+    chnotdef,chnotdef,chnotdef,chnotdef,chnotdef,chnotdef,chnotdef,chnotdef,   // 00
+    chnotdef,chnotdef,chnotdef,chnotdef,chnotdef,chnotdef,chnotdef,chnotdef,   // 08
+    chnotdef,chnotdef,chnotdef,chnotdef,chnotdef,chnotdef,chnotdef,chnotdef,   // 10
+    chnotdef,chnotdef,chnotdef,chnotdef,chnotdef,chnotdef,chnotdef,chnotdef,   // 18
+    chspace ,chexclam,chdblqt ,chnotdef,chnotdef,chnotdef,chnotdef,chcquote,   // 20
+    chnotdef,chnotdef,chnotdef,chnotdef,chcomma ,chnotdef,chperiod,chnotdef,   // 28
+    ch0     ,ch1     ,ch2     ,ch3     ,ch4     ,ch5     ,ch6     ,ch7     ,   // 30
+    ch8     ,ch9     ,chcolon ,chsemi  ,chnotdef,chnotdef,chnotdef,chquery ,   // 38
+    chatsign,chA     ,chB     ,chC     ,chD     ,chE     ,chF     ,chG     ,   // 40
+    chH     ,chI     ,chJ     ,chK     ,chL     ,chM     ,chN     ,chO     ,   // 48
+    chP     ,chQ     ,chR     ,chS     ,chT     ,chU     ,chV     ,chW     ,   // 50
+    chX     ,chY     ,chZ     ,chnotdef,chnotdef,chnotdef,chnotdef,chnotdef,   // 58
+    choquote,chA     ,chB     ,chC     ,chD     ,chE     ,chF     ,chG     ,   // 60
+    chH     ,chI     ,chJ     ,chK     ,chL     ,chM     ,chN     ,chO     ,   // 68
+    chP     ,chQ     ,chR     ,chS     ,chT     ,chU     ,chV     ,chW     ,   // 70
+    chX     ,chY     ,chZ     ,chnotdef,chnotdef,chnotdef,chnotdef,chnotdef,   // 78
+    chnotdef,chnotdef,chnotdef,chnotdef,chnotdef,chnotdef,chnotdef,chnotdef,   // 80
+    chnotdef,chnotdef,chnotdef,chnotdef,chnotdef,chnotdef,chnotdef,chnotdef,   // 88
+    chnotdef,chnotdef,chnotdef,chnotdef,chnotdef,chnotdef,chnotdef,chnotdef,   // 90
+    chnotdef,chnotdef,chnotdef,chnotdef,chnotdef,chnotdef,chnotdef,chnotdef,   // 98
+    chnotdef,chnotdef,chnotdef,chnotdef,chnotdef,chnotdef,chnotdef,chnotdef,   // A0
+    chnotdef,chnotdef,chnotdef,chnotdef,chnotdef,chnotdef,chnotdef,chnotdef,   // A8
+    chnotdef,chnotdef,chnotdef,chnotdef,chnotdef,chnotdef,chnotdef,chnotdef,   // B0
+    chnotdef,chnotdef,chnotdef,chnotdef,chnotdef,chnotdef,chnotdef,chnotdef,   // B8
+    chnotdef,chnotdef,chnotdef,chnotdef,chnotdef,chnotdef,chnotdef,chnotdef,   // C0
+    chnotdef,chnotdef,chnotdef,chnotdef,chnotdef,chnotdef,chnotdef,chnotdef,   // C8
+    chnotdef,chnotdef,chnotdef,chnotdef,chnotdef,chnotdef,chnotdef,chnotdef,   // D0
+    chnotdef,chnotdef,chnotdef,chnotdef,chnotdef,chnotdef,chnotdef,chnotdef,   // D8
+    chnotdef,chnotdef,chnotdef,chnotdef,chnotdef,chnotdef,chnotdef,chnotdef,   // E0
+    chnotdef,chnotdef,chnotdef,chnotdef,chnotdef,chnotdef,chnotdef,chnotdef,   // E8
+    chnotdef,chnotdef,chnotdef,chnotdef,chnotdef,chnotdef,chnotdef,chnotdef,   // F0
+    chnotdef,chnotdef,chnotdef,chnotdef,chnotdef,chnotdef,chnotdef,chnotdef,   // F8
 };
 
 #endif

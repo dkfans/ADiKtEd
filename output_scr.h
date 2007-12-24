@@ -41,6 +41,7 @@ void screen_draw_vline(int posy,int posx,int length,short border_style);
 void screen_draw_window(int posy,int posx,int sizey,int sizex,int border_size,short border_style);
 void screen_refresh();
 void screen_init(void);
+void screen_reinit_and_update(void);
 void screen_done(void);
 
 

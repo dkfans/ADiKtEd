@@ -77,9 +77,13 @@ extern MAPMODE_DATA *mapmode;
 extern unsigned int *automated_commands;
 // indicates if the main program loop should end
 extern short finished;
+// I/O enable variables
+extern short screen_enabled;
+extern short input_enabled;
 
 // Screen maintain functions
-void init_levscr(void);
+void init_levscr_basics(void);
+void init_levscr_modes(void);
 void free_levscr(void);
 void draw_levscr(struct LEVEL *lvl);
 

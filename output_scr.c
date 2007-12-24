@@ -12,10 +12,10 @@
 #include <slang.h>
 
 short screen_initied=false;
+extern struct LEVEL *lvl;
 
 #if defined(unix) && !defined(GO32)
 int sigwinch (int sigtype);
-void update (void);
 volatile int safe_update, update_required;
 #endif
 
@@ -35,22 +35,15 @@ int get_screen_cols()
 }
 
 /*
- * Get the screen size.
+ * Get the screen size. This is modified version of the SLANG library function
+ * SLtt_get_screen_size. The modification allows it to work in MSDOS.
  */
 static void get_screen_size (void)
 {
+#if !defined(MSDOS)
+    SLtt_get_screen_size();
+#else
     int r = 0, c = 0;
-
-#ifdef TIOCGWINSZ
-    struct winsize wind_struct;
-
-    if ((ioctl(1,TIOCGWINSZ,&wind_struct) == 0)
-      || (ioctl(0, TIOCGWINSZ, &wind_struct) == 0)
-      || (ioctl(2, TIOCGWINSZ, &wind_struct) == 0)) {
-        c = (int) wind_struct.ws_col;
-        r = (int) wind_struct.ws_row;
-    }
-#elif defined(MSDOS)
     union REGS regs;
 
     regs.h.ah = 0x0F;
@@ -60,26 +53,29 @@ static void get_screen_size (void)
     regs.x.ax = 0x1130, regs.h.bh = 0;
     int86 (0x10, &regs, &regs);
     r = regs.h.dl + 1;
-#endif
 
-    if ((r <= 0) || (r > 200)) r = 24;
-    if ((c <= 0) || (c > 250)) c = 80;
-    SLtt_Screen_Rows = r;
-    SLtt_Screen_Cols = c;
+   if ((r <= 0) || (r > SLTT_MAX_SCREEN_ROWS)) r = 24;
+   if ((c <= 0) || (c > SLTT_MAX_SCREEN_COLS)) c = 80;
+   SLtt_Screen_Rows = r;
+   SLtt_Screen_Cols = c;
+#endif
 }
 
 void set_cursor_pos(int row,int col)
 {
+  if (!screen_initied) return;
   SLsmg_gotorc (row,col);
 }
 
 void screen_setcolor(int idx)
 {
+  if (!screen_initied) return;
   SLsmg_set_color(idx);
 }
 
 void screen_printf(char *format, ...)
 {
+    if (!screen_initied) return;
     va_list val;
     va_start(val, format);
     SLsmg_vprintf(format, val);
@@ -88,6 +84,7 @@ void screen_printf(char *format, ...)
 
 void screen_printf_toeol(char *format, ...)
 {
+    if (!screen_initied) return;
     va_list val;
     va_start(val, format);
     SLsmg_vprintf(format, val);
@@ -97,12 +94,14 @@ void screen_printf_toeol(char *format, ...)
 
 void screen_printchr(char dst)
 {
+    if (!screen_initied) return;
     SLsmg_write_char(dst);
 }
 
 void screen_refresh()
 {
-  SLsmg_refresh();
+    if (!screen_initied) return;
+    SLsmg_refresh();
 }
 
 /*
@@ -244,24 +243,34 @@ void screen_draw_window(int posy,int posx,int sizey,int sizex,int border_size,sh
 }
 
 #if defined(unix) && !defined(GO32)
+/*
+ * Function allows automatic screen redraw on terminal size change
+ * on UNIX/LINUX. Should be set as answer to the SIGWINCH signal.
+ */
 int sigwinch (int sigtype)
 {
     if (safe_update)
-      update();
+      screen_reinit_and_update();
     else
       update_required = TRUE;
     signal (SIGWINCH, (void *) sigwinch);
     return 0;
 }
 
-void update(void) 
-{
-    SLsmg_reset_smg ();
-    get_screen_size ();
-    SLsmg_init_smg ();
-    draw_scr ();
-}
 #endif
+
+/*
+ * Should be called when program window size changes.
+ * Automatically run on UNIX systems by sigwinch().
+ */
+void screen_reinit_and_update(void) 
+{
+    if (!screen_initied) return;
+    SLsmg_reset_smg();
+    get_screen_size();
+    SLsmg_init_smg();
+    draw_levscr(lvl);
+}
 
 /*
  * Clean up all the stuff that init() did.

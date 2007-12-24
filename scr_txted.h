@@ -13,7 +13,7 @@ typedef struct {
     int prevmode;
     int y;
     int rows;
-    unsigned char **text;
+    char **text;
   } TXTED_DATA;
 
 extern TXTED_DATA *editor;

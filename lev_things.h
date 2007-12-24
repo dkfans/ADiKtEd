@@ -7,13 +7,16 @@
 
 struct LEVEL;
 
+typedef void (*cr_tng_func)(struct LEVEL *lvl, int tx, int ty,
+        unsigned char *surr_slb,unsigned char *surr_own);
+
 short things_verify(struct LEVEL *lvl, char *err_msg);
 
 unsigned char *create_door(struct LEVEL *lvl, unsigned int sx, unsigned int sy, unsigned char stype_idx);
 unsigned char *create_torch(struct LEVEL *lvl, unsigned int sx, unsigned int sy,  unsigned char stype_idx);
 
 short set_door_lock(struct LEVEL *lvl, unsigned char *thing, unsigned char nlock);
-unsigned char get_door_lock(struct LEVEL *lvl, unsigned char *thing);
+unsigned char get_door_lock(unsigned char *thing);
 unsigned char compute_door_orientation(struct LEVEL *lvl, unsigned char *thing);
 
 void update_obj_for_square(struct LEVEL *lvl, int tx_first, int tx_last,

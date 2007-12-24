@@ -31,7 +31,7 @@ void change_visited_tile(void);
 int display_thing(unsigned char *thing, int x, int y);
 int display_action_point(unsigned char *actnpt, int x, int y);
 int display_static_light(unsigned char *stlight, int x, int y);
-int display_obj_stats(int x, int y);
+int display_obj_stats(int scr_row, int scr_col);
 int display_tng_subtiles(int scr_row, int scr_col,int ty,int tx);
 
 //Functions - internal

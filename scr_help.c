@@ -344,7 +344,33 @@ void draw_help_line(int posy,int posx,char *text)
               if (lend[1]=='s')
               {
                 screen_setcolor(PRINT_COLOR_LGREY_ON_BLACK);
-              }
+              } else
+              if (lend[1]=='i')
+              {
+                screen_setcolor(PRINT_COLOR_BLACK_ON_LGREY);
+              } else
+              if (lend[1]=='r')
+              {
+                screen_setcolor(PRINT_COLOR_LRED_ON_BLACK);
+              } else
+              if (lend[1]=='y')
+              {
+                screen_setcolor(PRINT_COLOR_YELLOW_ON_BLACK);
+              } else
+              if (lend[1]=='m')
+              {
+                screen_setcolor(PRINT_COLOR_LMAGENT_ON_BLACK);
+              } else
+
+              if (lend[1]=='D')
+              {
+                screen_setcolor(PRINT_COLOR_YELLOW_ON_BLUE);
+              } else
+
+              if (lend[1]=='P')
+              {
+                screen_setcolor(PRINT_COLOR_RED_ON_WHITE);
+              } else
               if (lend[1]=='R')
               {
                 screen_setcolor(PRINT_COLOR_WHITE_ON_RED);

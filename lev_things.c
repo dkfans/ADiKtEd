@@ -9,9 +9,9 @@
 #include "lev_things.h"
 
 #include "globals.h"
-#include "obj_things.h"
 #include "lev_data.h"
 #include "obj_slabs.h"
+#include "obj_things.h"
 
 /*
  * Verifies thing types and parameters. Returns VERIF_ERROR,
@@ -75,6 +75,7 @@ short set_door_lock(struct LEVEL *lvl, unsigned char *thing, unsigned char nlock
         {
           thing_key = create_item(sx,sy,ITEM_SUBTYPE_SPINNKEY);
           //TODO: set the spinning key properties (height, other?)
+          set_thing_tilepos_h(thing,5);
           thing_add(lvl,thing_key);
         }
     }
@@ -85,7 +86,7 @@ short set_door_lock(struct LEVEL *lvl, unsigned char *thing, unsigned char nlock
 /*
  * Returns lock state for the given door.
  */
-unsigned char get_door_lock(struct LEVEL *lvl, unsigned char *thing)
+unsigned char get_door_lock(unsigned char *thing)
 {
   return get_thing_level(thing);
 }
@@ -246,25 +247,435 @@ void remove_misplaced_objs_on_slab(struct LEVEL *lvl, int tx, int ty)
      }
 }
 
+/*
+ * Updates things associated with room - for every room calls the spefific
+ * update function.
+ */
 void update_room_things_on_slab(struct LEVEL *lvl, int tx, int ty)
 {
+  unsigned char slab=get_tile_slab(lvl,tx,ty);
+  switch (slab)
+  {
+    case SLAB_TYPE_PORTAL:
+/*    create_things_slb_room(delete_room_things,delete_room_things,
+        delete_room_things,create_things_slb_portal_inside,delete_room_things,
+        clm_recs,surr_slb,surr_own,surr_tng);*/
+      break;
+    case SLAB_TYPE_TREASURE:
+      break;
+    case SLAB_TYPE_PRISONCASE:
+      break;
+    case SLAB_TYPE_TORTURE:
+      break;
+    case SLAB_TYPE_TRAINING:
+      break;
+    case SLAB_TYPE_DUNGHEART:
+      break;
+    case SLAB_TYPE_WORKSHOP:
+      break;
+    case SLAB_TYPE_SCAVENGER:
+      break;
+    case SLAB_TYPE_TEMPLE:
+      break;
+    case SLAB_TYPE_GRAVEYARD:
+      break;
+    case SLAB_TYPE_HATCHERY:
+      break;
+    case SLAB_TYPE_BRIDGE:
+      break;
+    case SLAB_TYPE_GUARDPOST:
+      break;
+    case SLAB_TYPE_LIBRARY:
+    case SLAB_TYPE_LAIR:
+    case SLAB_TYPE_BARRACKS:
+    default:
+      break;
+    }
+
 //TODO: make the update function
 //note: it can't use CLM entries, only SLB and OWN.
 }
 
+/*
+ * Updates things on a slab containing door. If there is no door thing,
+ * the function creates it, otherwise updates its parameters.
+ */
 void update_door_things_on_slab(struct LEVEL *lvl, int tx, int ty)
 {
-//TODO: make the update function
-//note: it can't use CLM entries, only SLB and OWN.
+  unsigned char door_subtype;
+  unsigned char slab=get_tile_slab(lvl,tx,ty);
+  switch (slab)
+  {
+    case SLAB_TYPE_DOORWOOD1:
+    case SLAB_TYPE_DOORWOOD2:
+      door_subtype=DOOR_SUBTYPE_WOOD;
+      break;
+    case SLAB_TYPE_DOORBRACE1:
+    case SLAB_TYPE_DOORBRACE2:
+      door_subtype=DOOR_SUBTYPE_BRACED;
+      break;
+    case SLAB_TYPE_DOORIRON1:
+    case SLAB_TYPE_DOORIRON2:
+      door_subtype=DOOR_SUBTYPE_IRON;
+      break;
+    case SLAB_TYPE_DOORMAGIC1:
+    case SLAB_TYPE_DOORMAGIC2:
+      door_subtype=DOOR_SUBTYPE_MAGIC;
+      break;
+    default:
+      door_subtype=DOOR_SUBTYPE_WOOD;
+      break;
+    }
+    //Search for door things on all subtiles, delete if there is more than one
+    unsigned char *thing=NULL;
+    unsigned char *sec_thing;
+    int sx, sy, i;
+    for (sx=tx*3; sx < tx*3+3; sx++)
+      for (sy=ty*3; sy < ty*3+3; sy++)
+          for (i=get_thing_subnums(lvl,sx,sy)-1; i >=0; i--)
+          {
+            sec_thing=get_thing(lvl,sx,sy,i);
+            if (is_door(sec_thing))
+            {
+              // delete if we already have proper thing
+              if (thing!=NULL)
+                thing_del(lvl,sx, sy, i);
+              else
+              {
+                //If that's firs one - keep it, but remove from level structure
+                // (we will add it later to make sure it is in central subtile)
+                thing=sec_thing;
+                thing_drop(lvl,sx, sy, i);
+              }
+            }
+          }
+    // If we didn't find door thing, create the new one
+    if (thing==NULL)
+    {
+      thing=create_door(lvl, tx*3+1, ty*3+1, door_subtype);
+    } else
+    // and if we found one, modify its parameters
+    {
+      set_thing_subtype(thing,door_subtype);
+      set_thing_tilepos(thing,tx*3+1,ty*3+1);
+      set_door_lock(lvl, thing, get_door_lock(thing));
+      set_door_orientation(thing,compute_door_orientation(lvl,thing));
+    }
+    thing_add(lvl,thing);
 }
 
 void update_torch_things_near_slab(struct LEVEL *lvl, int tx, int ty)
 {
+
 //TODO: make the update function
 //note: it can't use CLM entries, only SLB and OWN.
 }
 
+/*
+ * Updates things on any room slab by calling proper function
+ * from these given as parameters.
+ */
+void create_things_slb_room(cr_tng_func cr_floor,cr_tng_func cr_edge,
+        cr_tng_func cr_corner,cr_tng_func cr_inside,cr_tng_func cr_nearinsd,
+        struct LEVEL *lvl, int tx, int ty)
+{
+  unsigned char *surr_slb=(unsigned char *)malloc(9*sizeof(unsigned char));
+  unsigned char *surr_own=(unsigned char *)malloc(9*sizeof(unsigned char));
+  get_slab_surround(surr_slb,surr_own,NULL,tx,ty);
+  unsigned char slab=surr_slb[IDIR_CENTR];
+  unsigned char ownr=surr_own[IDIR_CENTR];
+  //Checking if completely surrounded
+  if ((surr_slb[IDIR_NORTH]==slab)&&(surr_own[IDIR_NORTH]==ownr) &&
+      (surr_slb[IDIR_EAST]==slab)&&(surr_own[IDIR_EAST]==ownr) &&
+      (surr_slb[IDIR_SOUTH]==slab)&&(surr_own[IDIR_SOUTH]==ownr) &&
+      (surr_slb[IDIR_WEST]==slab)&&(surr_own[IDIR_WEST]==ownr))
+  {
+      if  ((surr_slb[IDIR_NE]==slab)&&(surr_own[IDIR_NE]==ownr) &&
+           (surr_slb[IDIR_SE]==slab)&&(surr_own[IDIR_SE]==ownr) &&
+           (surr_slb[IDIR_SW]==slab)&&(surr_own[IDIR_SW]==ownr) &&
+           (surr_slb[IDIR_NW]==slab)&&(surr_own[IDIR_NW]==ownr))
+      {
+          cr_inside(lvl,tx,ty,surr_slb,surr_own);
+      } else
+      {
+          //The 'near inside' columns are usually same that floor,
+          //but may differ for rooms with specific corners
+          cr_nearinsd(lvl,tx,ty,surr_slb,surr_own);
+      }
+      return;
+  }
+  //If not completely, maybe we're surrounded from 3 sides (5 with corners)?
+  if (((surr_slb[IDIR_NORTH]==slab)&&(surr_own[IDIR_NORTH]==ownr) &&
+       (surr_slb[IDIR_NE]==slab)&&(surr_own[IDIR_NE]==ownr) &&
+       (surr_slb[IDIR_EAST]==slab)&&(surr_own[IDIR_EAST]==ownr) &&
+       (surr_slb[IDIR_SE]==slab)&&(surr_own[IDIR_SE]==ownr) &&
+       (surr_slb[IDIR_SOUTH]==slab)&&(surr_own[IDIR_SOUTH]==ownr)) ||
+      ((surr_slb[IDIR_EAST]==slab)&&(surr_own[IDIR_EAST]==ownr) &&
+       (surr_slb[IDIR_SE]==slab)&&(surr_own[IDIR_SE]==ownr) &&
+       (surr_slb[IDIR_SOUTH]==slab)&&(surr_own[IDIR_SOUTH]==ownr) &&
+       (surr_slb[IDIR_SW]==slab)&&(surr_own[IDIR_SW]==ownr) &&
+       (surr_slb[IDIR_WEST]==slab)&&(surr_own[IDIR_WEST]==ownr)) ||
+      ((surr_slb[IDIR_SOUTH]==slab)&&(surr_own[IDIR_SOUTH]==ownr) &&
+       (surr_slb[IDIR_SW]==slab)&&(surr_own[IDIR_SW]==ownr) &&
+       (surr_slb[IDIR_WEST]==slab)&&(surr_own[IDIR_WEST]==ownr) &&
+       (surr_slb[IDIR_NW]==slab)&&(surr_own[IDIR_NW]==ownr) &&
+       (surr_slb[IDIR_NORTH]==slab)&&(surr_own[IDIR_NORTH]==ownr)) ||
+      ((surr_slb[IDIR_WEST]==slab)&&(surr_own[IDIR_WEST]==ownr) &&
+       (surr_slb[IDIR_NW]==slab)&&(surr_own[IDIR_NW]==ownr) &&
+       (surr_slb[IDIR_NORTH]==slab)&&(surr_own[IDIR_NORTH]==ownr) &&
+       (surr_slb[IDIR_NE]==slab)&&(surr_own[IDIR_NE]==ownr) &&
+       (surr_slb[IDIR_EAST]==slab)&&(surr_own[IDIR_EAST]==ownr)))
+  {
+      cr_edge(lvl,tx,ty,surr_slb,surr_own);
+      return;
+  }
+  //If still nothing, maybe we have same surround from two sides and 1 corner,
+  // and another two are surely something else
+  if (((surr_slb[IDIR_NORTH]==slab)&&(surr_own[IDIR_NORTH]==ownr) &&
+       (surr_slb[IDIR_EAST]==slab)&&(surr_own[IDIR_EAST]==ownr) &&
+      ((surr_slb[IDIR_SOUTH]!=slab)||(surr_own[IDIR_SOUTH]!=ownr)) &&
+      ((surr_slb[IDIR_WEST]!=slab)||(surr_own[IDIR_WEST]!=ownr))) ||
 
+      ((surr_slb[IDIR_EAST]==slab)&&(surr_own[IDIR_EAST]==ownr) &&
+       (surr_slb[IDIR_SOUTH]==slab)&&(surr_own[IDIR_SOUTH]==ownr) &&
+      ((surr_slb[IDIR_NORTH]!=slab)||(surr_own[IDIR_NORTH]!=ownr)) &&
+      ((surr_slb[IDIR_WEST]!=slab)||(surr_own[IDIR_WEST]!=ownr))) ||
+
+      ((surr_slb[IDIR_SOUTH]==slab)&&(surr_own[IDIR_SOUTH]==ownr) &&
+       (surr_slb[IDIR_WEST]==slab)&&(surr_own[IDIR_WEST]==ownr) &&
+      ((surr_slb[IDIR_NORTH]!=slab)||(surr_own[IDIR_NORTH]!=ownr)) &&
+      ((surr_slb[IDIR_EAST]!=slab)||(surr_own[IDIR_EAST]!=ownr))) ||
+
+      ((surr_slb[IDIR_WEST]==slab)&&(surr_own[IDIR_WEST]==ownr) &&
+       (surr_slb[IDIR_NORTH]==slab)&&(surr_own[IDIR_NORTH]==ownr) &&
+      ((surr_slb[IDIR_SOUTH]!=slab)||(surr_own[IDIR_SOUTH]!=ownr)) &&
+      ((surr_slb[IDIR_EAST]!=slab)||(surr_own[IDIR_EAST]!=ownr))))
+  {
+      cr_corner(lvl,tx,ty,surr_slb,surr_own);
+      return;
+  }
+  //If nothing found - update as floor of this room
+  cr_floor(lvl,tx,ty,surr_slb,surr_own);
+}
+
+
+/*
+ * Update a single slab
+ * OLD - delete pending, but first it may be useful in making new functiions
+ */
+/*void update_tng(int x, int y)
+{
+    int zx, zy, bx, by, s;
+    
+    int i, j;
+    int slbsame[3][3];
+    int slbrel[3][3];
+    int ownrel[3][3];
+    int surround;
+    int flag1, flag2, flag3;
+    unsigned char *thing;
+    
+    if ((x<0) || (x>MAP_MAXINDEX_X) || (y<0) || (y>MAP_MAXINDEX_Y))
+      return;
+    remove_noncrucial_room_things(x, y);
+    s = lvl->slb[x][y];
+    surround=1;
+    for (i=0; i<3; i++)
+    {
+      for (j=0; j<3; j++)
+      {
+          if ((x+i-1>=0) && (x+i-1<MAP_SIZE_X) && (y+j-1>=0) && (y+j-1 < MAP_SIZE_Y))
+          {
+            slbrel[i][j]=lvl->slb[x+i-1][y+j-1];
+            ownrel[i][j]=lvl->own[x+i-1][y+j-1];
+            if ( (lvl->slb[x][y]==slbrel[i][j]) && (lvl->own[x][y]==ownrel[i][j]) )
+              slbsame[i][j]=1;
+            else
+            {
+              slbsame[i][j]=0;
+              surround=0;
+            }
+          }
+          else
+          {
+            slbrel[i][j]=-1;
+            ownrel[i][j]=-1;
+            slbsame[i][j]=0;
+            surround=0;
+          }
+      }
+    }
+    switch (s)
+    {
+    case SLAB_TYPE_PORTAL: // Portal
+      if (surround)
+      {
+          thing = create_roomeffect(x*3+1, y*3+1, ROOMEFC_SUBTP_ENTRICE); // Dry ice
+          thing_add(lvl,thing);
+      }
+      break;
+    case SLAB_TYPE_PRISONCASE: // Prison case is really grotty
+      // Sides first
+      if ((!slbsame [0][1]) && (slbrel[0][1]>9))
+      {
+          thing_add(lvl,create_item(x*3, y*3, ITEM_SUBTYPE_PRISONBAR));
+          thing_add(lvl,create_item(x*3, y*3+1, ITEM_SUBTYPE_PRISONBAR));
+          thing_add(lvl,create_item(x*3, y*3+2, ITEM_SUBTYPE_PRISONBAR));
+      }
+      if ((!slbsame[2][1]) && (slbrel[2][1]>9))
+      {
+          thing_add(lvl,create_item(x*3+2, y*3, ITEM_SUBTYPE_PRISONBAR));
+          thing_add(lvl,create_item(x*3+2, y*3+1, ITEM_SUBTYPE_PRISONBAR));
+          thing_add(lvl,create_item(x*3+2, y*3+2, ITEM_SUBTYPE_PRISONBAR));
+      }
+      if (!slbsame [1][0] && slbrel[1][0] > 9)
+      {
+          if (slbsame[0][1] || slbrel[0][1]<9)
+            thing_add(lvl,create_item(x*3, y*3, ITEM_SUBTYPE_PRISONBAR));
+          thing_add(lvl,create_item(x*3+1, y*3, ITEM_SUBTYPE_PRISONBAR));
+          if (slbsame[2][1] || slbrel[2][1]<9)
+            thing_add(lvl,create_item(x*3+2, y*3, ITEM_SUBTYPE_PRISONBAR));
+      }
+      if ((!slbsame[1][2]) && (slbrel[1][2]>9))
+      {
+          if ((slbsame[0][1]) || (slbrel[0][1]<9))
+            thing_add(lvl,create_item(x*3, y*3+2, ITEM_SUBTYPE_PRISONBAR));
+          thing_add(lvl,create_item(x*3+1, y*3+2, ITEM_SUBTYPE_PRISONBAR));
+          if ((slbsame[2][1]) || (slbrel[2][1]<9))
+            thing_add(lvl,create_item(x*3+2, y*3+2, ITEM_SUBTYPE_PRISONBAR));
+      }
+      break;
+    case SLAB_TYPE_TORTURE: // Torture
+      if (surround)
+      {
+          thing = create_item(x*3+1, y*3+1, ITEM_SUBTYPE_TORTURER);
+      }
+      else
+      {
+          thing = create_item(x*3+1, y*3+1, ITEM_SUBTYPE_TORTSPIKE);
+      }
+      thing_add(lvl,thing);
+      break;
+    case SLAB_TYPE_TRAINING: // Training
+      if (surround)
+      {
+          thing = create_item(x*3+1, y*3+1, ITEM_SUBTYPE_TRAINPOST);
+          thing_add(lvl,thing);
+      }
+      break;
+    case SLAB_TYPE_DUNGHEART: // Dungeon heart - not perfect, 
+               // but should be okay most of the time
+      flag1=0; // Are we on an edge?
+      flag2=0; // Have we got a top left / bottom right corner?
+      flag3=0; // Have we got a top right / bottom left corner?
+      {
+          for (i=-1; i < 2; i++)
+          {
+            for (j=-1; j < 2; j++)
+            {
+                if ((!j && !i) || (i && j)) // Ignore ourselves and corners
+                  continue; 
+                bx = x*3+i+1;
+                by = y*3+j+1;
+                if (slab_is_central(lvl,i+x,j+y))
+                {
+                  flag1=1;
+                }
+            }
+          }
+          if (!flag1) // Not on any edges
+          {
+            for (i=-1; i < 2; i+=2)
+            {
+                for (j=-1; j < 2; j+=2)
+                {
+                  bx = x*3+i+1;
+                  by = y*3+j+1;
+                  if (slab_is_central(lvl,x+i,y+j))
+                  {
+                      if (i==j)
+                        flag2=1;
+                      else
+                        flag3=1;
+                  }
+                }
+            }
+            if (flag2 || flag3)
+            {
+                char *obj=create_item(x*3+1, y*3+1,
+                  (lvl->own[x][y]>0 && lvl->own[x][y]<4 ? 0x77+lvl->own[x][y] : ITEM_SUBTYPE_HEARTFLMR));
+                thing_add(lvl,obj);
+            }
+          }
+      }
+      break;
+    case SLAB_TYPE_WORKSHOP: // Workshop 
+      if (surround)
+      {
+          thing = create_item(x*3+1, y*3+1, ITEM_SUBTYPE_WRKSHPMCH);
+          thing_add(lvl,thing);
+      }
+      break;
+    case SLAB_TYPE_SCAVENGER: // Scavenger room
+      if (surround)
+      {
+          thing = create_item(x*3+1, y*3+1, ITEM_SUBTYPE_SCAVNGEYE);
+          thing_add(lvl,thing);
+      }
+      break;
+    case SLAB_TYPE_GRAVEYARD: // Graveyard
+      thing = create_item(x*3+1, y*3+1, ITEM_SUBTYPE_GRAVSTONE);
+      thing_add(lvl,thing);
+      // Add dry ice instead of pillars
+      for (i=0; i < 3; i+=2)
+      {
+          for(j=0; j < 3; j+=2)
+          {
+            if (slbsame[i][1] && slbsame[1][j] &&
+                !slbsame[2-i][1] && !slbsame[1][2-j])
+            {
+                thing = create_roomeffect(x*3+i, y*3+j, ROOMEFC_SUBTP_ENTRICE); // Dry ice
+                thing_add(lvl,thing);
+            }
+          }
+      }
+      break;
+    case SLAB_TYPE_GUARDPOST: // Guardpost
+      // Put the flagpost on for keepers
+      if (lvl->own[x][y] < 4)
+      {
+          thing = create_item(x*3+1, y*3+1, 0x73+lvl->own[x][y]);
+          set_thing_tilepos_h(thing,2);
+          thing_add(lvl,thing);
+      }
+      break;
+    }
+    // Add torches to the room if it's an appropriate type
+    if (s > 9 && !(s>=42 && s <=49) && s != 52)
+    {
+      for (i=0; i < 3; i+=2)
+      {
+          if ((slbrel[i][1]==3 || slbrel[i][1]==5)
+            && !picture_wall (x+i-1, y, 2-i, 1))
+          {
+            thing = create_item(x*3+i, y*3+1, ITEM_SUBTYPE_TORCH);
+            set_thing_tilepos_h(thing,2);
+            set_thing_subtpos_h(thing,0xe0);
+            set_thing_subtpos(thing,i*0x40+0x40,-1);
+            thing_add(lvl,thing);
+          }
+          if ((slbrel[1][i]==3 || slbrel[1][i]==5)
+            && !picture_wall (x, y+i-1, 1, 2-i))
+          {
+            thing = create_item(x*3+1, y*3+i, ITEM_SUBTYPE_TORCH);
+            set_thing_tilepos_h(thing,2);
+            set_thing_subtpos_h(thing,0xe0);
+            set_thing_subtpos(thing,0x80,i*0x40+0x40);
+            thing_add(lvl,thing);
+          }
+      }
+    }
+}*/
 
 /*
  * Removes all things that usually exist only in specific rooms,

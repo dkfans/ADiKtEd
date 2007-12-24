@@ -43,16 +43,23 @@ unsigned int *automated_commands;
 
 // indicates if the main program loop should end
 short finished;
+// I/O enable variables
+short screen_enabled;
+short input_enabled;
 
 /*
- * Initializes the screen to work with Adikted.
+ * Initializes basic structures and dynamic variables, which may be needed
+ * on parameters reading process. Only the basic structures are inited here.
  */
-void init_levscr(void)
+void init_levscr_basics(void)
 {
-    // initilaize screen support library
-    screen_init();
-    // and keyboard input
-    input_init();
+    // variable that informs if main program loop should finish
+    finished=false;
+    // random num gen seed selection
+    srand(time(0));
+    //Basic configuration variables
+    screen_enabled=true;
+    input_enabled=true;
     //Creating and clearing screen mode info variable
     scrmode=(SCRMODE_DATA *)malloc(sizeof(SCRMODE_DATA));
     if (scrmode==NULL)
@@ -66,6 +73,19 @@ void init_levscr(void)
     automated_commands=malloc(READ_BUFSIZE*sizeof(unsigned int));
     for (i=0; i < READ_BUFSIZE; i++)
       automated_commands[i]=0;
+}
+
+/*
+ * Initializes the screen to work with Adikted.
+ */
+void init_levscr_modes(void)
+{
+    // initilaize screen support library
+    if (screen_enabled)
+      screen_init();
+    // and keyboard input
+    if (input_enabled)
+      input_init();
     // init modes - read help file
     init_help();
     // init modes - create list structures
@@ -120,6 +140,8 @@ void free_levscr(void)
     free(automated_commands);
     free(mapmode);
     free(scrmode);
+    // Shutting down screen support
+    screen_done();
 }
 
 /*
@@ -135,6 +157,8 @@ void draw_levscr(struct LEVEL *lvl)
     int all_cols=get_screen_cols();
     scrmode->rows = all_rows-2;
     scrmode->cols = all_cols-scrmode->keycols;
+    //If we shouldn't draw on screen - just exit.
+    if (!screen_enabled) return;
     // If we don't have much room at all, just forget it!
     if (scrmode->cols < 0) return;
 
@@ -149,11 +173,11 @@ void draw_levscr(struct LEVEL *lvl)
     int ty=mapmode->screeny+mapmode->mapy;
     set_cursor_pos(all_rows-1, 0);
     screen_setcolor(PRINT_COLOR_LGREY_ON_BLACK);
-    if (is_graffiti (tx,ty)!=-1)
+    if (graffiti_idx(lvl,tx,ty)>=0)
     {
       char *graf_txt;
       graf_txt=(char *)malloc(LINEMSG_SIZE*sizeof(char));
-      strncpy(graf_txt,get_graffiti(is_graffiti(tx,ty)),LINEMSG_SIZE-1);
+      strncpy(graf_txt,get_graffiti_text(lvl,graffiti_idx(lvl,tx,ty)),LINEMSG_SIZE-1);
       graf_txt[LINEMSG_SIZE-1]=0;
       message_info("Graffiti: %s",graf_txt);
       free(graf_txt);
@@ -366,11 +390,11 @@ void draw_map_area(struct LEVEL *lvl,short show_ground,short show_rooms,short sh
               char out_ch;
               int g;
               if (show_rooms)
-                  g = is_graffiti(tx,ty);
+                  g = graffiti_idx(lvl,tx,ty);
               else
                   g = -1;
-              screen_setcolor(get_draw_map_tile_color(lvl,tx,ty,(g!=-1)));
-              out_ch=get_draw_map_tile_char(lvl,tx,ty,show_ground,show_rooms,show_things,(g!=-1));
+              screen_setcolor(get_draw_map_tile_color(lvl,tx,ty,(g>=0)));
+              out_ch=get_draw_map_tile_char(lvl,tx,ty,show_ground,show_rooms,show_things,(g>=0));
               screen_printchr(out_ch);
             } else
             {
@@ -396,10 +420,10 @@ void draw_map_cursor(struct LEVEL *lvl,short show_ground,short show_rooms,short 
     char out_ch;
     int g;
     if (show_rooms)
-      g = is_graffiti(tx,ty);
+      g = graffiti_idx(lvl,tx,ty);
     else
       g = -1;
-    out_ch=get_draw_map_tile_char(lvl,tx,ty,show_ground,show_rooms,show_things,(g!=-1));
+    out_ch=get_draw_map_tile_char(lvl,tx,ty,show_ground,show_rooms,show_things,(g>=0));
     show_cursor(out_ch);
 }
 
@@ -518,6 +542,11 @@ void proc_key(void)
       memmove(automated_commands,automated_commands+1,(READ_BUFSIZE-1)*sizeof(unsigned int));
     } else
     {
+      if (!input_enabled)
+      {
+        finished=true;
+        return;
+      }
       g = get_key();
     }
     // Decoding "universal keys" - global actions

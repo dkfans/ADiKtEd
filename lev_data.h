@@ -39,9 +39,44 @@
 #define SIZEOF_DK_LGT_HEADER 4
 #define SIZEOF_DK_TNG_HEADER 2
 
-typedef struct {
-    unsigned char data[20];
-  } DK_LGT_REC;
+// Direction indices of the 9-element arrays, like slab columns
+//  or surround variable
+#define IDIR_CENTR 4
+#define IDIR_NW    0
+#define IDIR_NORTH 1
+#define IDIR_NE    2
+#define IDIR_EAST  5
+#define IDIR_SE    8
+#define IDIR_SOUTH 7
+#define IDIR_SW    6
+#define IDIR_WEST  3
+// Now explaining the constants as elements of an array:
+//       IDIR_NW     IDIR_NORTH    IDIR_NE
+//       IDIR_WEST   IDIR_CENTR    IDIR_EAST
+//       IDIR_SW     IDIR_SOUTH    IDIR_SE
+
+//Orientation - for graffiti
+#define ORIENT_NS         0x00
+#define ORIENT_WE         0x01
+#define ORIENT_SN         0x02
+#define ORIENT_EW         0x03
+#define ORIENT_TOP        0x04
+
+//Font - for graffiti
+#define GRAFF_FONT_NONE        0x00
+#define GRAFF_FONT_ADICLSSC    0x01
+
+struct DK_GRAFFITI {
+    int tx;
+    int ty;
+    char *text;
+    unsigned short font;
+    unsigned short orient;
+    int height;
+    int fin_tx;
+    int fin_ty;
+    unsigned short cube;
+  };
 
 typedef struct {
     //Things strats
@@ -89,7 +124,7 @@ struct LEVEL {
     unsigned char inf;
     //Script text - a text file containing level parameters as editable script;
     // number of lines and file size totally variable
-    unsigned char **txt;
+    char **txt;
     unsigned int txt_lines_count;
 
     //our objects - apt, tng and lgt
@@ -116,7 +151,14 @@ struct LEVEL {
     unsigned char **dat_low;
     unsigned char **dat_high;
 
+    // Elements that are not part of DK levels, but are importand for Adikted
+    // Level statistics
     LEVSTATS stats;
+    // Custom columns definition
+    struct DK_CUSTOM_CLM **cust_clm;
+    unsigned int cust_clm_count;
+    struct DK_GRAFFITI **graffiti;
+    unsigned int graffiti_count;
   };
 
 // creates object for storing map
@@ -147,6 +189,7 @@ void free_map(void);
 char *get_thing(struct LEVEL *lvl,unsigned int x,unsigned int y,unsigned int num);
 int thing_add(struct LEVEL *lvl,unsigned char *thing);
 void thing_del(struct LEVEL *lvl,unsigned int x,unsigned int y,unsigned int num);
+void thing_drop(struct LEVEL *lvl,unsigned int x, unsigned int y, unsigned int num);
 unsigned int get_thing_subnums(struct LEVEL *lvl,unsigned int x,unsigned int y);
 
 char *get_actnpt(struct LEVEL *lvl,unsigned int x,unsigned int y,unsigned int num);

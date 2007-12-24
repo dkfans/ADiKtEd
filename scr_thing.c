@@ -222,7 +222,7 @@ void actions_mdtng(int key)
               thing=get_object(lvl,sx,sy,visiting_z);
               if (get_thing_type(thing)==THING_TYPE_DOOR)
               {
-                  if (get_door_lock(lvl,thing)!=DOOR_PASS_UNLOCKED)
+                  if (get_door_lock(thing)!=DOOR_PASS_UNLOCKED)
                   {
                     set_door_lock(lvl,thing,DOOR_PASS_UNLOCKED);
                     message_info("Door unlocked");
@@ -517,7 +517,7 @@ void draw_mdtng_panel(void)
       break;
     default:
       k=display_mode_keyhelp(k,scr_col1,scrmode->mode);
-      display_obj_stats(scr_col1, k);
+      display_obj_stats(k,scr_col1);
       break;
     }
     display_tngdat();
@@ -670,7 +670,7 @@ int display_thing(unsigned char *thing, int x, int y)
       screen_printf("Owner: %s", get_owner_type_fullname(get_thing_owner(thing)));
       set_cursor_pos(y++, x);
       char *lock_state;
-      if (get_door_lock(lvl,thing)==DOOR_PASS_UNLOCKED)
+      if (get_door_lock(thing)==DOOR_PASS_UNLOCKED)
           lock_state="Unlocked";
       else
           lock_state="Locked";
@@ -783,53 +783,55 @@ int display_static_light(unsigned char *stlight, int x, int y)
     return y;
 }
 
-int display_obj_stats(int x, int y)
+int display_obj_stats(int scr_row, int scr_col)
 {
     int m, i;
-    int scr_col1=x+2;
-    int scr_col2=x+21;
+    int scr_col1=scr_col+2;
+    int scr_col2=scr_col+21;
     screen_setcolor(PRINT_COLOR_LGREY_ON_BLACK);
-    set_cursor_pos(y++, x);
+    set_cursor_pos(scr_row++, scr_col);
     screen_printf("%s","Map objects statistics");
-    set_cursor_pos(y++, x);
+    set_cursor_pos(scr_row++, scr_col);
     screen_printf("Static lights on map: %d",lvl->lgt_total_count);
-    set_cursor_pos(y++, x);
+    set_cursor_pos(scr_row++, scr_col);
     screen_printf("Action points on map: %d",lvl->apt_total_count);
-    set_cursor_pos(y++, x);
+    set_cursor_pos(scr_row++, scr_col);
     screen_printf("Things on map: %d",lvl->tng_total_count);
-    set_cursor_pos(y, scr_col1);
+    set_cursor_pos(scr_row, scr_col1);
     screen_printf("Creatures:%6d",lvl->stats.creatures_count);
-    set_cursor_pos(y++, scr_col2);
+    set_cursor_pos(scr_row++, scr_col2);
     screen_printf("Traps:%4d",lvl->stats.traps_count);
-    set_cursor_pos(y, scr_col1);
+    set_cursor_pos(scr_row, scr_col1);
     screen_printf("Room Effcts:%4d",lvl->stats.roomeffects_count);
-    set_cursor_pos(y++, scr_col2);
+    set_cursor_pos(scr_row++, scr_col2);
     screen_printf("Doors:%4d",lvl->stats.doors_count);
-    set_cursor_pos(y++, scr_col1);
+    set_cursor_pos(scr_row, scr_col1);
+    screen_printf("Graffiti:%4d",lvl->graffiti_count);
+    set_cursor_pos(scr_row++, scr_col2);
     screen_printf("Items:%4d",lvl->stats.items_count);
-    set_cursor_pos(y++, x);
+    set_cursor_pos(scr_row++, scr_col);
     screen_printf("%s","Detailed items");
-    set_cursor_pos(y, scr_col2);
+    set_cursor_pos(scr_row, scr_col2);
     screen_printf("Hero gats:%4d",lvl->stats.hero_gates_count);
-    set_cursor_pos(y++, scr_col1);
+    set_cursor_pos(scr_row++, scr_col1);
     screen_printf("Dung hearts:%4d",lvl->stats.dn_hearts_count);
-    set_cursor_pos(y, scr_col2);
+    set_cursor_pos(scr_row, scr_col2);
     screen_printf("Torches:%6d",lvl->stats.torches_count);
-    set_cursor_pos(y++, scr_col1);
+    set_cursor_pos(scr_row++, scr_col1);
     screen_printf("Dn specials:%4d",lvl->stats.dng_specboxes_count);
-    set_cursor_pos(y, scr_col2);
+    set_cursor_pos(scr_row, scr_col2);
     screen_printf("Statues:%6d",lvl->stats.statues_count);
-    set_cursor_pos(y++, scr_col1);
+    set_cursor_pos(scr_row++, scr_col1);
     screen_printf("Spell books:%4d",lvl->stats.spellbooks_count);
-    set_cursor_pos(y, scr_col2);
+    set_cursor_pos(scr_row, scr_col2);
     screen_printf("Gold tngs:%4d",lvl->stats.gold_things_count);
-    set_cursor_pos(y++, scr_col1);
+    set_cursor_pos(scr_row++, scr_col1);
     screen_printf("Creatr lairs:%3d",lvl->stats.crtr_lairs_count);
-    set_cursor_pos(y, scr_col2);
+    set_cursor_pos(scr_row, scr_col2);
     screen_printf("Furniture:%4d",lvl->stats.furniture_count);
-    set_cursor_pos(y++, scr_col1);
+    set_cursor_pos(scr_row++, scr_col1);
     screen_printf("Room things:%4d",lvl->stats.room_things_count);
-    return y;
+    return scr_row;
 }
 
 int display_tng_subtiles(int scr_row, int scr_col,int ty,int tx)

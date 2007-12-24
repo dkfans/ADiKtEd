@@ -80,22 +80,6 @@
 #define COLUMN_WIB_SKEW        0x01
 #define COLUMN_WIB_ANIMATE     0x02
 
-// Direction indices of the 9-element arrays, like slab columns
-//  or surround variable
-#define IDIR_CENTR 4
-#define IDIR_NW    0
-#define IDIR_NORTH 1
-#define IDIR_NE    2
-#define IDIR_EAST  5
-#define IDIR_SE    8
-#define IDIR_SOUTH 7
-#define IDIR_SW    6
-#define IDIR_WEST  3
-// Now explaining the constants as elements of an array:
-//       IDIR_NW     IDIR_NORTH    IDIR_NE
-//       IDIR_WEST   IDIR_CENTR    IDIR_EAST
-//       IDIR_SW     IDIR_SOUTH    IDIR_SE
-
 struct COLUMN_REC {
     unsigned int use;
     short permanent;
@@ -110,6 +94,12 @@ struct COLUMN_REC {
     short orientation;
     // c1 is the lowest square, c8 - the top one.
     unsigned int c[8];
+  };
+
+struct DK_CUSTOM_CLM {
+    int sx;
+    int sy;
+    struct COLUMN_REC column;
   };
 
 typedef void (*cr_clm_func)(struct COLUMN_REC *clm_recs[9],
@@ -446,6 +436,24 @@ void place_column_barracks_raise(struct COLUMN_REC *clm_rec, unsigned char owner
 
 void fill_column_training_floor(struct COLUMN_REC *clm_rec, unsigned char owner);
 void fill_column_training_pillar(struct COLUMN_REC *clm_rec, unsigned char owner);
+
+void fill_column_treasure_floor(struct COLUMN_REC *clm_rec, unsigned char owner);
+void fill_column_treasure_pillar(struct COLUMN_REC *clm_rec, unsigned char owner);
+
+void fill_column_workshop_floor(struct COLUMN_REC *clm_rec, unsigned char owner);
+void fill_column_workshop_pillar(struct COLUMN_REC *clm_rec, unsigned char owner);
+
+void fill_column_scavenger_inside_cntr(struct COLUMN_REC *clm_rec, unsigned char owner);
+void fill_column_scavenger_floor(struct COLUMN_REC *clm_rec, unsigned char owner);
+void fill_column_scavenger_pillar(struct COLUMN_REC *clm_rec, unsigned char owner);
+
+void fill_column_prison_inside(struct COLUMN_REC *clm_rec, unsigned char owner);
+
+void fill_column_guardpost_floor_a(struct COLUMN_REC *clm_rec, unsigned char owner);
+void fill_column_guardpost_floor_b(struct COLUMN_REC *clm_rec, unsigned char owner);
+void fill_column_guardpost_floor_c(struct COLUMN_REC *clm_rec, unsigned char owner);
+
+void fill_column_bridge_inside(struct COLUMN_REC *clm_rec, unsigned char owner);
 
 short surrnd_not_enemy(unsigned char *surr_own, short direction);
 

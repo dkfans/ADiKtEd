@@ -287,6 +287,31 @@ short level_clear_datclm(struct LEVEL *lvl)
 }
 
 /*
+ * Clears (via zeroing) stats for given level.
+ */
+short level_clear_stats(struct LEVEL *lvl)
+{
+    lvl->stats.creatures_count=0;
+    lvl->stats.roomeffects_count=0;
+    lvl->stats.traps_count=0;
+    lvl->stats.doors_count=0;
+    lvl->stats.items_count=0;
+    //Items stats
+    lvl->stats.hero_gates_count=0;
+    lvl->stats.dn_hearts_count=0;
+    lvl->stats.spellbooks_count=0;
+    lvl->stats.dng_specboxes_count=0;
+    lvl->stats.crtr_lairs_count=0;
+    lvl->stats.statues_count=0;
+    lvl->stats.torches_count=0;
+    lvl->stats.gold_things_count=0;
+    lvl->stats.furniture_count=0;
+    //Various stats
+    lvl->stats.room_things_count=0;
+    return true;
+}
+
+/*
  * clears the structures for storing level which do not have separate
  * clearing function; drops any old pointers, only file name remains;
  * without deallocating them; requies level_init() to be run first;
@@ -336,6 +361,12 @@ short level_clear_other(struct LEVEL *lvl)
     lvl->txt=NULL;
     lvl->txt_lines_count=0;
 
+    // The Adikted-custom elements
+    lvl->cust_clm=NULL;
+    lvl->cust_clm_count=0;
+    lvl->graffiti=NULL;
+    lvl->graffiti_count=0;
+
     return true;
 }
 
@@ -350,6 +381,7 @@ short level_clear(struct LEVEL *lvl)
   result&=level_clear_apt(lvl);
   result&=level_clear_tng(lvl);
   result&=level_clear_datclm(lvl);
+  result&=level_clear_stats(lvl);
   result&=level_clear_other(lvl);
   return result;
 }
@@ -1007,7 +1039,6 @@ void start_new_map(struct LEVEL *lvl)
     lvl->inf=0x00;
 
     update_level_stats(lvl);
-    read_graffiti();
 }
 
 void generate_random_map(struct LEVEL *lvl)
@@ -1024,11 +1055,8 @@ void generate_random_map(struct LEVEL *lvl)
     //And update all DAT/CLM values; it also updates the WIB values.
     if (datclm_auto_update)
         update_datclm_for_whole_map(lvl);
-
     lvl->inf=rnd(8);
-
     update_level_stats(lvl);
-    read_graffiti();
 }
 
 void free_map(void)
@@ -1089,15 +1117,28 @@ void thing_del(struct LEVEL *lvl,unsigned int x, unsigned int y, unsigned int nu
     unsigned int arr_entries_x=MAP_SIZE_X*MAP_SUBNUM_X;
     unsigned int arr_entries_y=MAP_SIZE_Y*MAP_SUBNUM_Y;
     //Bounding position
-    x %= arr_entries_x;
-    y %= arr_entries_y;
+    if ((x>=arr_entries_x)||(y>=arr_entries_y)) return;
     unsigned char *thing;
+    thing = lvl->tng_lookup[x][y][num];
+    thing_drop(lvl,x,y,num);
+    free (thing);
+}
+
+/*
+ * Removes given thing from the LEVEL structure, updates counter variables.
+ * Does not frees memory allocated for the thing - just drops the pointers.
+ */
+void thing_drop(struct LEVEL *lvl,unsigned int x, unsigned int y, unsigned int num)
+{
+    //Preparing array bounds
+    unsigned int arr_entries_x=MAP_SIZE_X*MAP_SUBNUM_X;
+    unsigned int arr_entries_y=MAP_SIZE_Y*MAP_SUBNUM_Y;
+    //Bounding position
+    if ((x>=arr_entries_x)||(y>=arr_entries_y)) return;
     int i;
     if (num >= lvl->tng_subnums[x][y])
       return;
     lvl->tng_total_count--;
-    thing = lvl->tng_lookup[x][y][num];
-    free (lvl->tng_lookup[x][y][num]);
     for (i=num; i < lvl->tng_subnums[x][y]-1; i++)
       lvl->tng_lookup[x][y][i]=lvl->tng_lookup[x][y][i+1];
     lvl->tng_subnums[x][y]--;

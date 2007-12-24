@@ -444,8 +444,6 @@ unsigned short column_wib_entry(struct COLUMN_REC *clm_rec,
 void create_columns_for_slab(struct COLUMN_REC *clm_recs[9],
         unsigned char *surr_slb,unsigned char *surr_own, unsigned char **surr_tng)
 {
-//TODO: delete this line when all CLMs are filled
-      create_columns_slb_rock(clm_recs,surr_slb,surr_own,surr_tng);
   unsigned char slab=surr_slb[IDIR_CENTR];
   switch (slab)
   {
@@ -2585,97 +2583,302 @@ void create_columns_slb_training_inside(struct COLUMN_REC *clm_recs[9],
   create_columns_slb_training_floor(clm_recs,surr_slb,surr_own,surr_tng);
 }
 
-//!!!!!!!!!! unfinished beyond this line
-
-void create_columns_slb_bridge(struct COLUMN_REC *clm_recs[9],
+void create_columns_slb_treasure_floor(struct COLUMN_REC *clm_recs[9],
         unsigned char *surr_slb,unsigned char *surr_own, unsigned char **surr_tng)
 {
+  int i,k;
+  for (i=0;i<3;i++)
+   for (k=0;k<3;k++)
+   {
+     fill_column_treasure_floor(clm_recs[k*3+i],surr_own[IDIR_CENTR]);
+   }
+  modify_liquid_surrounding(clm_recs, surr_slb, 0, 0x0a4, 0x0a3);
+}
+
+void create_columns_slb_treasure_edge(struct COLUMN_REC *clm_recs[9],
+        unsigned char *surr_slb,unsigned char *surr_own, unsigned char **surr_tng)
+{
+  create_columns_slb_treasure_floor(clm_recs,surr_slb,surr_own,surr_tng);
+}
+
+void create_columns_slb_treasure_corner(struct COLUMN_REC *clm_recs[9],
+        unsigned char *surr_slb,unsigned char *surr_own, unsigned char **surr_tng)
+{
+  create_columns_slb_treasure_floor(clm_recs,surr_slb,surr_own,surr_tng);
+  unsigned short *dir=get_room_corner_direction_indices(surr_slb,surr_own);
+  fill_column_treasure_pillar(clm_recs[dir[IDIR_SE]], surr_own[IDIR_CENTR]);
+}
+
+void create_columns_slb_treasure_inside(struct COLUMN_REC *clm_recs[9],
+        unsigned char *surr_slb,unsigned char *surr_own, unsigned char **surr_tng)
+{
+  create_columns_slb_treasure_floor(clm_recs,surr_slb,surr_own,surr_tng);
+}
+
+void create_columns_slb_workshop_floor(struct COLUMN_REC *clm_recs[9],
+        unsigned char *surr_slb,unsigned char *surr_own, unsigned char **surr_tng)
+{
+  int i,k;
+  for (i=0;i<3;i++)
+   for (k=0;k<3;k++)
+   {
+     fill_column_workshop_floor(clm_recs[k*3+i],surr_own[IDIR_CENTR]);
+   }
+  modify_liquid_surrounding(clm_recs, surr_slb, 0, 0x109, 0x108);
+}
+
+void create_columns_slb_workshop_edge(struct COLUMN_REC *clm_recs[9],
+        unsigned char *surr_slb,unsigned char *surr_own, unsigned char **surr_tng)
+{
+  create_columns_slb_workshop_floor(clm_recs,surr_slb,surr_own,surr_tng);
+}
+
+void create_columns_slb_workshop_corner(struct COLUMN_REC *clm_recs[9],
+        unsigned char *surr_slb,unsigned char *surr_own, unsigned char **surr_tng)
+{
+  create_columns_slb_workshop_floor(clm_recs,surr_slb,surr_own,surr_tng);
+  unsigned short *dir=get_room_corner_direction_indices(surr_slb,surr_own);
+  fill_column_workshop_pillar(clm_recs[dir[IDIR_SE]], surr_own[IDIR_CENTR]);
+}
+
+void create_columns_slb_workshop_inside(struct COLUMN_REC *clm_recs[9],
+        unsigned char *surr_slb,unsigned char *surr_own, unsigned char **surr_tng)
+{
+  create_columns_slb_workshop_floor(clm_recs,surr_slb,surr_own,surr_tng);
+  //On central slabs, we can use lava and water cubes too - they have same top.
+  int i,k;
+  for (i=0;i<3;i++)
+   for (k=0;k<3;k++)
+   {
+     clm_recs[k*3+i]->c[0]=0x107 +rnd(3);
+   }
+}
+
+void create_columns_slb_scavenger_floor(struct COLUMN_REC *clm_recs[9],
+        unsigned char *surr_slb,unsigned char *surr_own, unsigned char **surr_tng)
+{
+  int i,k;
+  for (i=0;i<3;i++)
+   for (k=0;k<3;k++)
+   {
+     fill_column_scavenger_floor(clm_recs[k*3+i],surr_own[IDIR_CENTR]);
+   }
+  fill_column_scavenger_inside_cntr(clm_recs[IDIR_CENTR],surr_own[IDIR_CENTR]);
+  modify_liquid_surrounding(clm_recs, surr_slb, 0, 0x11b, 0x11a);
+}
+
+void create_columns_slb_scavenger_edge(struct COLUMN_REC *clm_recs[9],
+        unsigned char *surr_slb,unsigned char *surr_own, unsigned char **surr_tng)
+{
+  create_columns_slb_scavenger_floor(clm_recs,surr_slb,surr_own,surr_tng);
+}
+
+void create_columns_slb_scavenger_corner(struct COLUMN_REC *clm_recs[9],
+        unsigned char *surr_slb,unsigned char *surr_own, unsigned char **surr_tng)
+{
+  create_columns_slb_scavenger_floor(clm_recs,surr_slb,surr_own,surr_tng);
+  unsigned short *dir=get_room_corner_direction_indices(surr_slb,surr_own);
+  fill_column_scavenger_pillar(clm_recs[dir[IDIR_SE]], surr_own[IDIR_CENTR]);
+}
+
+void create_columns_slb_scavenger_inside(struct COLUMN_REC *clm_recs[9],
+        unsigned char *surr_slb,unsigned char *surr_own, unsigned char **surr_tng)
+{
+  create_columns_slb_scavenger_floor(clm_recs,surr_slb,surr_own,surr_tng);
+}
+
+void create_columns_slb_prison_floor(struct COLUMN_REC *clm_recs[9],
+        unsigned char *surr_slb,unsigned char *surr_own, unsigned char **surr_tng)
+{
+  const unsigned short dir_a[]={IDIR_WEST, IDIR_NORTH, IDIR_EAST, IDIR_SOUTH};
+  const unsigned short dir_b[]={IDIR_NORTH, IDIR_EAST, IDIR_SOUTH, IDIR_WEST};
+  const unsigned short dir_c[]={IDIR_NW, IDIR_NE, IDIR_SE, IDIR_SW};
+  unsigned char slab=surr_slb[IDIR_CENTR];
+  unsigned char ownr=surr_own[IDIR_CENTR];
+  //Center
+  fill_column_prison_inside(clm_recs[IDIR_CENTR], surr_own[IDIR_CENTR]);
+  //Corners
+  int i;
+  for (i=0;i<4;i++)
+  {
+     fill_column_prison_inside(clm_recs[dir_c[i]], surr_own[IDIR_CENTR]);
+
+    if ((surr_slb[dir_a[i]]==slab)&&(surr_own[dir_a[i]]==ownr)&&
+        (surr_slb[dir_b[i]]==slab)&&(surr_own[dir_b[i]]==ownr))
+    { //Surrounded by our area
+       clm_recs[dir_c[i]]->c[0]=0x0c8;
+    } else
+    if ((surr_slb[dir_a[i]]==slab)&&(surr_own[dir_a[i]]==ownr))
+    { //our on side A only
+        switch (dir_c[i])
+        {
+        case IDIR_NW://West only, not north
+           clm_recs[dir_c[i]]->c[0]=0x0ca;
+           break;
+        case IDIR_NE://North only, not east
+           clm_recs[dir_c[i]]->c[0]=0x0cd;
+           break;
+        case IDIR_SW://South only, not west
+           clm_recs[dir_c[i]]->c[0]=0x0cc;
+           break;
+        case IDIR_SE://East only, not south
+           clm_recs[dir_c[i]]->c[0]=0x0cf;
+           break;
+        }
+    } else
+    if ((surr_slb[dir_b[i]]==slab)&&(surr_own[dir_b[i]]==ownr))
+    { //our on side B only
+        switch (dir_c[i])
+        {
+        case IDIR_NW://not west
+           clm_recs[dir_c[i]]->c[0]=0x0cc;
+           break;
+        case IDIR_SW://not south
+           clm_recs[dir_c[i]]->c[0]=0x0cf;
+           break;
+        case IDIR_NE://not north
+           clm_recs[dir_c[i]]->c[0]=0x0ca;
+           break;
+        case IDIR_SE://not east
+           clm_recs[dir_c[i]]->c[0]=0x0cd;
+           break;
+        }
+    } else
+    { //Surrounded by not our area
+        switch (dir_c[i])
+        {
+        case IDIR_NW:
+           clm_recs[dir_c[i]]->c[0]=0x0c9;
+          break;
+        case IDIR_NE:
+           clm_recs[dir_c[i]]->c[0]=0x0cb;
+          break;
+        case IDIR_SW:
+           clm_recs[dir_c[i]]->c[0]=0x0ce;
+          break;
+        case IDIR_SE:
+           clm_recs[dir_c[i]]->c[0]=0x0d0;
+          break;
+        }
+    }
+  }
+  //And the middle columns
+  for (i=0;i<4;i++)
+  {
+     fill_column_prison_inside(clm_recs[dir_a[i]], surr_own[IDIR_CENTR]);
+
+    if ((surr_slb[dir_a[i]]==slab)&&(surr_own[dir_a[i]]==ownr))
+    {
+       clm_recs[dir_a[i]]->c[0]=0x0c8;
+    } else
+    {
+        switch (dir_a[i])
+        {
+        case IDIR_SOUTH:
+           clm_recs[dir_a[i]]->c[0]=0x0cf;
+           break;
+        case IDIR_WEST:
+           clm_recs[dir_a[i]]->c[0]=0x0cc;
+           break;
+        case IDIR_NORTH:
+           clm_recs[dir_a[i]]->c[0]=0x0ca;
+           break;
+        case IDIR_EAST:
+           clm_recs[dir_a[i]]->c[0]=0x0cd;
+           break;
+        }
+    }
+  }
+  // Liquid surrounding - quite hard here
+  unsigned short *water_cube=malloc(9*sizeof(unsigned short));
+  unsigned short *lava_cube  =malloc(9*sizeof(unsigned short));
+  water_cube[IDIR_NW]=0x0d9;
+  water_cube[IDIR_NE]=0x0db;
+  water_cube[IDIR_SW]=0x0de;
+  water_cube[IDIR_SE]=0x0e0;
+  water_cube[IDIR_NORTH]=0x0da;
+  water_cube[IDIR_EAST]= 0x0dd;
+  water_cube[IDIR_SOUTH]=0x0df;
+  water_cube[IDIR_WEST]= 0x0dc;
+  lava_cube[IDIR_NW]=0x0d1;
+  lava_cube[IDIR_NE]=0x0d3;
+  lava_cube[IDIR_SW]=0x0d6;
+  lava_cube[IDIR_SE]=0x0d8;
+  lava_cube[IDIR_NORTH]=0x0d2;
+  lava_cube[IDIR_EAST]= 0x0d5;
+  lava_cube[IDIR_SOUTH]=0x0d7;
+  lava_cube[IDIR_WEST]= 0x0d4;
+  modify_liquid_surrounding_advncd(clm_recs,surr_slb,surr_own, 0,water_cube,lava_cube);
+  free(water_cube);
+  free(lava_cube);
+}
+
+void create_columns_slb_prison_edge(struct COLUMN_REC *clm_recs[9],
+        unsigned char *surr_slb,unsigned char *surr_own, unsigned char **surr_tng)
+{
+    create_columns_slb_prison_floor(clm_recs,surr_slb,surr_own,surr_tng);
+}
+
+void create_columns_slb_prison_corner(struct COLUMN_REC *clm_recs[9],
+        unsigned char *surr_slb,unsigned char *surr_own, unsigned char **surr_tng)
+{
+    create_columns_slb_prison_floor(clm_recs,surr_slb,surr_own,surr_tng);
+}
+
+void create_columns_slb_prison_inside(struct COLUMN_REC *clm_recs[9],
+        unsigned char *surr_slb,unsigned char *surr_own, unsigned char **surr_tng)
+{
+    int i;
+    for (i=0;i<9;i++)
+      fill_column_prison_inside(clm_recs[i], surr_own[IDIR_CENTR]);
+}
+
+void create_columns_slb_torture_floor(struct COLUMN_REC *clm_recs[9],
+        unsigned char *surr_slb,unsigned char *surr_own, unsigned char **surr_tng)
+{
+    create_columns_slb_prison_floor(clm_recs,surr_slb,surr_own,surr_tng);
+    clm_recs[IDIR_CENTR]->c[0]=0x0e7;
+}
+
+void create_columns_slb_torture_edge(struct COLUMN_REC *clm_recs[9],
+        unsigned char *surr_slb,unsigned char *surr_own, unsigned char **surr_tng)
+{
+    create_columns_slb_torture_floor(clm_recs,surr_slb,surr_own,surr_tng);
+}
+
+void create_columns_slb_torture_corner(struct COLUMN_REC *clm_recs[9],
+        unsigned char *surr_slb,unsigned char *surr_own, unsigned char **surr_tng)
+{
+    create_columns_slb_torture_floor(clm_recs,surr_slb,surr_own,surr_tng);
+}
+
+void create_columns_slb_torture_inside(struct COLUMN_REC *clm_recs[9],
+        unsigned char *surr_slb,unsigned char *surr_own, unsigned char **surr_tng)
+{
+    create_columns_slb_prison_inside(clm_recs,surr_slb,surr_own,surr_tng);
+    clm_recs[IDIR_CENTR]->c[0]=0x0e7;
 }
 
 void create_columns_slb_guardpost(struct COLUMN_REC *clm_recs[9],
         unsigned char *surr_slb,unsigned char *surr_own, unsigned char **surr_tng)
 {
+    fill_column_guardpost_floor_c(clm_recs[IDIR_NORTH], surr_own[IDIR_CENTR]);
+    fill_column_guardpost_floor_a(clm_recs[IDIR_NE], surr_own[IDIR_CENTR]);
+    fill_column_guardpost_floor_c(clm_recs[IDIR_EAST], surr_own[IDIR_CENTR]);
+    fill_column_guardpost_floor_b(clm_recs[IDIR_SE], surr_own[IDIR_CENTR]);
+    fill_column_guardpost_floor_c(clm_recs[IDIR_SOUTH], surr_own[IDIR_CENTR]);
+    fill_column_guardpost_floor_a(clm_recs[IDIR_SW], surr_own[IDIR_CENTR]);
+    fill_column_guardpost_floor_c(clm_recs[IDIR_WEST], surr_own[IDIR_CENTR]);
+    fill_column_guardpost_floor_b(clm_recs[IDIR_NW], surr_own[IDIR_CENTR]);
+    fill_column_guardpost_floor_c(clm_recs[IDIR_CENTR], surr_own[IDIR_CENTR]);
 }
 
-void create_columns_slb_treasure_floor(struct COLUMN_REC *clm_recs[9],
+void create_columns_slb_bridge(struct COLUMN_REC *clm_recs[9],
         unsigned char *surr_slb,unsigned char *surr_own, unsigned char **surr_tng)
 {
-}
-void create_columns_slb_treasure_edge(struct COLUMN_REC *clm_recs[9],
-        unsigned char *surr_slb,unsigned char *surr_own, unsigned char **surr_tng)
-{
-}
-void create_columns_slb_treasure_corner(struct COLUMN_REC *clm_recs[9],
-        unsigned char *surr_slb,unsigned char *surr_own, unsigned char **surr_tng)
-{
-}
-void create_columns_slb_treasure_inside(struct COLUMN_REC *clm_recs[9],
-        unsigned char *surr_slb,unsigned char *surr_own, unsigned char **surr_tng)
-{
-}
-void create_columns_slb_prison_floor(struct COLUMN_REC *clm_recs[9],
-        unsigned char *surr_slb,unsigned char *surr_own, unsigned char **surr_tng)
-{
-}
-void create_columns_slb_prison_edge(struct COLUMN_REC *clm_recs[9],
-        unsigned char *surr_slb,unsigned char *surr_own, unsigned char **surr_tng)
-{
-}
-void create_columns_slb_prison_corner(struct COLUMN_REC *clm_recs[9],
-        unsigned char *surr_slb,unsigned char *surr_own, unsigned char **surr_tng)
-{
-}
-void create_columns_slb_prison_inside(struct COLUMN_REC *clm_recs[9],
-        unsigned char *surr_slb,unsigned char *surr_own, unsigned char **surr_tng)
-{
-}
-void create_columns_slb_torture_floor(struct COLUMN_REC *clm_recs[9],
-        unsigned char *surr_slb,unsigned char *surr_own, unsigned char **surr_tng)
-{
-}
-void create_columns_slb_torture_edge(struct COLUMN_REC *clm_recs[9],
-        unsigned char *surr_slb,unsigned char *surr_own, unsigned char **surr_tng)
-{
-}
-void create_columns_slb_torture_corner(struct COLUMN_REC *clm_recs[9],
-        unsigned char *surr_slb,unsigned char *surr_own, unsigned char **surr_tng)
-{
-}
-void create_columns_slb_torture_inside(struct COLUMN_REC *clm_recs[9],
-        unsigned char *surr_slb,unsigned char *surr_own, unsigned char **surr_tng)
-{
-}
-void create_columns_slb_workshop_floor(struct COLUMN_REC *clm_recs[9],
-        unsigned char *surr_slb,unsigned char *surr_own, unsigned char **surr_tng)
-{
-}
-void create_columns_slb_workshop_edge(struct COLUMN_REC *clm_recs[9],
-        unsigned char *surr_slb,unsigned char *surr_own, unsigned char **surr_tng)
-{
-}
-void create_columns_slb_workshop_corner(struct COLUMN_REC *clm_recs[9],
-        unsigned char *surr_slb,unsigned char *surr_own, unsigned char **surr_tng)
-{
-}
-void create_columns_slb_workshop_inside(struct COLUMN_REC *clm_recs[9],
-        unsigned char *surr_slb,unsigned char *surr_own, unsigned char **surr_tng)
-{
-}
-void create_columns_slb_scavenger_floor(struct COLUMN_REC *clm_recs[9],
-        unsigned char *surr_slb,unsigned char *surr_own, unsigned char **surr_tng)
-{
-}
-void create_columns_slb_scavenger_edge(struct COLUMN_REC *clm_recs[9],
-        unsigned char *surr_slb,unsigned char *surr_own, unsigned char **surr_tng)
-{
-}
-void create_columns_slb_scavenger_corner(struct COLUMN_REC *clm_recs[9],
-        unsigned char *surr_slb,unsigned char *surr_own, unsigned char **surr_tng)
-{
-}
-void create_columns_slb_scavenger_inside(struct COLUMN_REC *clm_recs[9],
-        unsigned char *surr_slb,unsigned char *surr_own, unsigned char **surr_tng)
-{
+    int i;
+    for (i=0;i<9;i++)
+      fill_column_bridge_inside(clm_recs[i], surr_own[IDIR_CENTR]);
 }
 
 void fill_column_rock(struct COLUMN_REC *clm_rec, unsigned char owner)
@@ -3163,5 +3366,78 @@ void fill_column_training_pillar(struct COLUMN_REC *clm_rec, unsigned char owner
 {
     fill_column_rec_sim(clm_rec, 0, 0x13e,
         0x0fc, 0x0fb, 0x0fa, 0x0f9, 0x0f9, 0x0f1, 0x0, 0x0);
+}
+
+void fill_column_treasure_floor(struct COLUMN_REC *clm_rec, unsigned char owner)
+{
+     fill_column_rec_sim(clm_rec, 0, 0x06a,
+         0x09f, 0x0, 0x0, 0x0, 0x0, 0, 0, 0);
+}
+
+void fill_column_treasure_pillar(struct COLUMN_REC *clm_rec, unsigned char owner)
+{
+    fill_column_rec_sim(clm_rec, 0, 0x06a,
+        0x09f, 0x03e, 0x039, 0x03a, 0x039, 0x041, 0x0, 0x0);
+}
+
+void fill_column_workshop_floor(struct COLUMN_REC *clm_rec, unsigned char owner)
+{
+     fill_column_rec_sim(clm_rec, 0, 0x15a,
+         0x107, 0x0, 0x0, 0x0, 0x0, 0, 0, 0);
+}
+
+void fill_column_workshop_pillar(struct COLUMN_REC *clm_rec, unsigned char owner)
+{
+    fill_column_rec_sim(clm_rec, 0, 0x01b,
+        0x01c, 0x10e, 0x10d, 0x10c, 0x10b, 0x0, 0x0, 0x0);
+}
+
+
+void fill_column_scavenger_floor(struct COLUMN_REC *clm_rec, unsigned char owner)
+{
+     fill_column_rec_sim(clm_rec, 0, 0x0f8,
+         0x119, 0x0, 0x0, 0x0, 0x0, 0, 0, 0);
+}
+
+void fill_column_scavenger_pillar(struct COLUMN_REC *clm_rec, unsigned char owner)
+{
+    fill_column_rec_sim(clm_rec, 0, 0x0f8,
+        0x019, 0x118, 0x117, 0x116, 0x115, 0x0, 0x0, 0x0);
+}
+
+void fill_column_scavenger_inside_cntr(struct COLUMN_REC *clm_rec, unsigned char owner)
+{
+     fill_column_rec_sim(clm_rec, 0, 0x0f8,
+         0x11c, 0x0, 0x0, 0x0, 0x0, 0, 0, 0);
+}
+
+void fill_column_prison_inside(struct COLUMN_REC *clm_rec, unsigned char owner)
+{
+     fill_column_rec_sim(clm_rec, 0, 0x118,
+         0x0c8, 0x0, 0x0, 0x0, 0x0, 0, 0, 0);
+}
+
+void fill_column_guardpost_floor_a(struct COLUMN_REC *clm_rec, unsigned char owner)
+{
+     fill_column_rec_sim(clm_rec, 0, 0x0b0 +rnd(3),
+         0x07e +rnd(3), 0x1b4, 0x0, 0x0, 0x0, 0, 0, 0);
+}
+
+void fill_column_guardpost_floor_b(struct COLUMN_REC *clm_rec, unsigned char owner)
+{
+     fill_column_rec_sim(clm_rec, 0, 0x0b0 +rnd(3),
+         0x07e +rnd(3), 0x1b5, 0x0, 0x0, 0x0, 0, 0, 0);
+}
+
+void fill_column_guardpost_floor_c(struct COLUMN_REC *clm_rec, unsigned char owner)
+{
+     fill_column_rec_sim(clm_rec, 0, 0x0b0 +rnd(3),
+         0x07e +rnd(3), 0x1b6, 0x0, 0x0, 0x0, 0, 0, 0);
+}
+
+void fill_column_bridge_inside(struct COLUMN_REC *clm_rec, unsigned char owner)
+{
+     fill_column_rec_sim(clm_rec, 0, 0x1f3,
+         0x1b8, 0x0, 0x0, 0x0, 0x0, 0, 0, 0);
 }
 

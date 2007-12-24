@@ -41,10 +41,10 @@ are placing it in.
 Slab mode help:
 
 Use \wcursor keys\s, \wpage up/down\s, \whome\s and \wend\s, either alone or with
-\wctrl\s or \walt\s (non-Linux only), to move around.
+\wctrl\s or \walt\s (not on all systems), to \ymove around\s.
 
-The key on the right of the screen should allow you to read the
-map, and also provides the keys to change the map... just use
+The key on the right of the screen should allow you to \yread the
+\ymap\s, and also provides the keys to \ychange the map\s... just use
 the key shown on the key (as it were) and the map at your cursor
 position will change appropriately.
 
@@ -56,39 +56,43 @@ tile is currently unowned. Note that earth and impenetrable rock
 will back to unclaimed state if you press 'u' or save the level
 (it just can't be claimed).
 
-To change the ownership of a tile, press a number key from \w0\s to \w5\s; \w0\s
+To \ychange the ownership\s of a tile, press a number key from \w0\s to \w5\s; \w0\s
 for \Rplayer 0\s, etc, and \w5\s for unclaimed. 
 
-To change large areas, press \wctrl+space\s. This will put you into
+To \ychange large areas\s, press \wctrl+space\s. This will put you into
 marking mode. Draw out a rectangle with the movement keys, then
 press a key to change the map (ownership or slab), as if it were an
 individual character. Pressing \wctrl+space\s again will also take you
 out of marking mode.
 
-To mark out a boundary (a wall, for example), press \wz\s. This will put
-you into paint mode. Nothing will change until you press a slab key
+To mark out a boundary (a wall, for example), press '\wz\s'. This will put
+you into \ypaint mode\s. Nothing will change until you press a slab key
 or a number from \w0\s to \w5\s, when you will start painting. Now when you
 move, you paint the tile your cursor is over with either the slab or
 ownership you selected (or both). To change the paint ownership or
 slab, just press another slab or number key. To stop painting, press
 '\wz\s' again.
 
-To add some graffiti to a dungeon, press '\wa\s' for across, or '\wd\s' for
-down. Press \wdelete\s or \wbackspace\s to remove graffiti. Graffiti shows
-up as a line of purple @ signs, and will be converted into rock
-with the chosen string on when the level is saved.
+To add some \ygraffiti\s to a dungeon, press '\wa\s' for across, or '\wd\s' for
+down. Press \wdelete\s or \wbackspace\s to remove graffiti. Use '\wx\s' to
+change its orientation. Graffiti shows up as a line of purple \m@\s signs.
+If you'll make graffiti on something other than unpenetrable rock, it
+will disappear when the tile near it will change (will be claimed,
+digged or room placed). To avoid the disappearing, place graffiti
+on rock. If you don't want its background to look like rock, use
+custom columns (see column mode help for details).
 
-To update the dungeon things/dat/clm, press '\wu\s'.
-To toggle automatic update of things/dat/clm, press \wctrl+u\s.
-To switch into "thing" mode, press \wtab\s.
-To switch into "column" mode, press '\wc\s'.
-To switch into "script" mode, press \wctrl+t\s.
-To verify the map integrity and rules, press '\wv\s'.
-To toggle view of compass rose, press \wctrl+p\s.
-Create new, empty map with \wctrl+n\s or autogenerate map with \wctrl+r\s.
-To load map, press \wctrl+l\s.
-To quit, press \wctrl+q\s.
-To save, press \wctrl+s\s.
+To \yupdate\s the dungeon things/dat/clm, press '\wu\s'.
+To toggle \yautomatic update\s of things/dat/clm, press \wctrl+u\s.
+To switch into \y"thing" mode\s, press \wtab\s.
+To switch into \y"column" mode\s, press '\wc\s'.
+To switch into \y"script" mode\s, press \wctrl+t\s.
+To \yverify\s the map integrity and rules, press '\wv\s'.
+To toggle view of \ycompass rose\s, press \wctrl+p\s.
+Create new, \yempty map\s with \wctrl+n\s or \yautogenerate map\s with \wctrl+r\s.
+To \yload map\s, press \wctrl+l\s to re-load same map again, press \wF7\s.
+To \ysave\s, press \wctrl+s\s. To save on last saved file name, press \wF5\s.
+To \yquit\s, press \wctrl+q\s.
 
 [crthelp]
 Add creature mode help:

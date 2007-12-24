@@ -99,6 +99,14 @@ void get_command_line_options(int argc, char **argv)
         {
           disable_sounds=true;
         } else
+        if (strcmp(comnd+1,"dvid")==0)
+        {
+          screen_enabled=false;
+        } else
+        if (strcmp(comnd+1,"dinp")==0)
+        {
+          input_enabled=false;
+        } else
         if (strcmp(comnd+1,"s")==0)
         {
           automated_commands[cmnds_count]=KEY_F5;
@@ -134,20 +142,19 @@ void get_command_line_options(int argc, char **argv)
  */
 int main(int argc, char **argv)
 {
-    // variable that informs if main program loop should finish
-    finished=false;
-    // create object for storing map
-    level_init();
+    //Allocate and set basic configuration variables
+    init_levscr_basics();
     // Initialize the message displaying and storing
     init_messages();
-    // random num gen seed selection
-    srand(time(0));
-    // initing keyboard input and screen output
-    init_levscr();
+    // create object for storing map
+    level_init();
     // read configuration file
     read_init();
     // Interpreting command line parameters
     get_command_line_options(argc,argv);
+    // initing keyboard input and screen output, also all modes.
+    init_levscr_modes();
+    // Load a map, or start new one
     if (strlen(lvl->fname)>0)
     {
       load_map(lvl);

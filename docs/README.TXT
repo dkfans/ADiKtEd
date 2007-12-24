@@ -10,7 +10,7 @@ Here's the Win32 version executable. Just put all the
 files in the same directory, edit map.ini as appropriate (don't
 worry about changing datmode, that just changes the way round the
 bytes on the .dat display are shown), and run it.
-Usage: map [mapfile] [-m <logfile>] [-v] [-r] [-n] [-q]
+Usage: map [mapfile] [-m <logfile>] [-v] [-r] [-n] -s [mapfile] [-q]
 where:
   mapfile  Specifies filename (eg newmap), or just map number
           (like 18 etc.) which is loaded. Skipping this will start
@@ -18,6 +18,10 @@ where:
   -m logfile  Allows you to save all messages shown on the bottom
           of screen when Adkted is working. You must specify output
           file where the messages will be written (ie. adi_msg.log).
+  -s [mapfile]  Saves the map. Can overwrite the opened file, or save
+          to another one given as next parameter. Note that commands
+          that come after this one are executed after the map is saved,
+          and therefore are lost on quit.
   -v  Triggers map verification; you could combine it with "-m" option
           to get verification result in a text file.
   -r  Starts new, random map. If [mapfile] was specified, then
@@ -27,6 +31,13 @@ where:
           The [mapfile] is loaded, but then replaced.
   -q  Quits Adikted after the tasks from previous parameters have been
           completed. Useful for automated work.
+  -ds  Disable all sounds. Makes Adikted silent, and less annoying.
+  -dvid  Disable showing anything on screen. Screen is not initied
+         nor refreshed. Usefull if you want only run some commands
+         and quit.
+  -dinp  Disable keyboard input. Adikted will exit after executing
+          all comands given in parameters. For users it works just
+          like -q option, but it won't even init keyboard input.
 
 When Adikted saves a map, it will ask you what you wish
 to call it. I suggest you don't save directly over the Dungeon
@@ -79,6 +90,7 @@ Version: 0.51a
  Written support of all terrain types, but no rooms
  No automatic 'thing' generation
  Graffiti not working due to DAT support changes
+ Project moved back to alpha state
 Version: 0.52a
  Added support of Dungeon Heart, Portal, Library, Temple
  Some fixups and expansions in TNG support
@@ -91,9 +103,12 @@ Version: 0.53a
  Compass view under ctrl+p
  Added support of Hatchery, Lair, Graveyard, Barracks, Train room
  Better function for generating rooms surrounded by lava/water
+Version: 0.54a
+ Support of all rooms completed
+ Graffiti support renewed
+ Created ADI file format, its reading and writing
 TODO before beta:
  Auto creating room things
- Support of all rooms
 
 Author:
 Jon Skeet, skeet@pobox.com

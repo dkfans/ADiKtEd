@@ -218,7 +218,7 @@ short load_txt(struct LEVEL *lvl,char *fname)
       lines_count++;
       if (ptr!=NULL) ptr++;
     }
-    lvl->txt=(unsigned char **)malloc(lines_count*sizeof(unsigned char **));
+    lvl->txt=(char **)malloc(lines_count*sizeof(unsigned char **));
     ptr=mem.content;
     int currline=0;
     while (currline<lines_count)
@@ -300,6 +300,59 @@ short load_wlb(struct LEVEL *lvl,char *fname)
       }
     free (mem.content);
     return true;
+}
+
+/*
+ * Loads ADiKtEd script and executes all commands
+ */
+unsigned short script_load_and_execute(struct LEVEL *lvl,char *fname,char *err_msg)
+{
+    sprintf(err_msg,"No error");
+    struct memory_file mem;
+    mem = read_file(fname);
+    if (mem.len < 2)
+      return ERR_FILE_NFOUND;
+    unsigned char *content=mem.content;
+    unsigned char *ptr=mem.content;
+    unsigned char *ptr_end=mem.content+mem.len;
+    int lines_count=0;
+    while (ptr>=content)
+    {
+      ptr=memchr(ptr, 0x0a, (char *)ptr_end-(char *)ptr );
+      lines_count++;
+      if (ptr!=NULL) ptr++;
+    }
+    ptr=mem.content;
+    int currline=0;
+    int result=ERR_NONE;
+    char *line;
+    while (currline<lines_count)
+    {
+      if (ptr>=ptr_end) ptr=ptr_end-1;
+      unsigned char *nptr=memchr(ptr, 0x0a, ptr_end-ptr );
+      //Skip control characters (but leave spaces and TABs)
+      while ((ptr<nptr)&&((unsigned char)ptr[0]<0x20)&&((unsigned char)ptr[0]!=0x09)) ptr++;
+      if (nptr==NULL)
+        nptr=ptr_end;
+      int linelen=(char *)nptr-(char *)ptr;
+      //At end, skip control characters and spaces too
+      while ((linelen>0)&&((unsigned char)ptr[linelen-1]<=0x20)) linelen--;
+
+      line=(unsigned char *)malloc((linelen+1)*sizeof(unsigned char *));
+      memcpy(line,ptr,linelen);
+      line[linelen]='\0';
+      short res=execute_script_line(lvl,line,err_msg);
+      if (!res)
+      {
+        sprintf(err_msg+strlen(err_msg),", line %d",currline);
+        result=ERR_FILE_BADDATA;
+      }
+      free(line);
+      ptr=nptr+1;
+      currline++;
+    }
+    free (mem.content);
+    return result;
 }
 
 short write_slb(struct LEVEL *lvl,char *fname)
@@ -517,21 +570,7 @@ short write_inf(struct LEVEL *lvl,char *fname)
  */
 short write_txt(struct LEVEL *lvl,char *fname)
 {
-    FILE *fp;
-    int i;
-    fp = fopen (fname, "wb");
-    if (!fp)
-    {
-      message_error("Can't open \"%s\" for writing", fname);
-      return false;
-    }
-    for (i=0;i<lvl->txt_lines_count;i++)
-    {
-      fputs(lvl->txt[i],fp);
-      fputs("\n",fp);
-    }
-    fclose(fp);
-    return true;
+   return write_text_file(lvl->txt,lvl->txt_lines_count,fname);
 }
 
 /*
@@ -592,6 +631,44 @@ short write_wlb(struct LEVEL *lvl,char *fname)
 }
 
 /*
+ * Saves ADI scripf file. Creates it first.
+ */
+short write_adi_script(struct LEVEL *lvl,char *fname)
+{
+   //Creating text lines
+   char **lines=NULL;
+   int lines_count=0;
+   add_graffiti_to_script(&lines,&lines_count,lvl);
+   add_custom_clms_to_script(&lines,&lines_count,lvl);
+   short result;
+   result=write_text_file(lines,lines_count,fname);
+   text_file_free(lines,lines_count);
+   return result;
+}
+
+/*
+ * Saves any text file.
+ */
+short write_text_file(char **lines,int lines_count,char *fname)
+{
+    FILE *fp;
+    int i;
+    fp = fopen (fname, "wb");
+    if (!fp)
+    {
+      message_error("Can't open \"%s\" for writing", fname);
+      return false;
+    }
+    for (i=0;i<lines_count;i++)
+    {
+      fputs(lines[i],fp);
+      fputs("\n",fp);
+    }
+    fclose(fp);
+    return true;
+}
+
+/*
  * Saves the whole map. Includes all files editable in Adikted.
  */
 short save_map(struct LEVEL *lvl)
@@ -602,8 +679,6 @@ short save_map(struct LEVEL *lvl)
     //Once there was an CLM/DAT/TNG update function here,
     // but the new way is to minimize file chamges - so it's been removed
     update_slab_owners(lvl);
-
-    draw_graffiti();
 
     char *fnames;
     fnames = (char *)malloc(strlen(lvl->savfname)+5);
@@ -632,7 +707,8 @@ short save_map(struct LEVEL *lvl)
     result&=write_lgt(lvl,fnames);
     sprintf (fnames, "%s.wlb", lvl->savfname);
     result&=write_wlb(lvl,fnames);
-    read_graffiti();
+    sprintf (fnames, "%s.adi", lvl->savfname);
+    result&=write_adi_script(lvl,fnames);
     if ((result)&&(strlen(lvl->fname)<1))
     {
       strncpy(lvl->fname,lvl->savfname,DISKPATH_SIZE);
@@ -648,7 +724,7 @@ short save_map(struct LEVEL *lvl)
 short load_map(struct LEVEL *lvl)
 {
   char *fnames;
-    
+  char *err_msg;
   level_free(lvl);
   if ((lvl->fname==NULL)||(strlen(lvl->fname)<1))
   {
@@ -656,8 +732,9 @@ short load_map(struct LEVEL *lvl)
     return false;
   }
   level_clear(lvl);
+  err_msg=(char *)malloc(LINEMSG_SIZE);
   fnames = (char *)malloc(strlen(lvl->fname)+5);
-  if (fnames==NULL)
+  if ((fnames==NULL)||(err_msg==NULL))
     die ("load_map: Out of memory.");
   short result=true;
   if (result)
@@ -718,6 +795,13 @@ short load_map(struct LEVEL *lvl)
     // so ignore any error when loading them
     load_wlb(lvl,fnames);
   }    
+  if (result)
+  {
+    sprintf (fnames, "%s.adi", lvl->fname);
+    int adi_result=script_load_and_execute(lvl,fnames,err_msg);
+    if (adi_result==ERR_FILE_BADDATA)
+        message_info_force("ADI script warning: %s (load completed)", err_msg);
+  }    
     if (!result)
     {
         message_error("Couldn't load \"%s\"", fnames);
@@ -732,8 +816,8 @@ short load_map(struct LEVEL *lvl)
       lvl->savfname[DISKPATH_SIZE-1]=0;
     }
     update_level_stats(lvl);
-    read_graffiti();
     free(fnames);
+    free(err_msg);
     return true;
 }
 

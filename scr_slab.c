@@ -55,7 +55,6 @@ void free_mdslab(void)
 void actions_mdslab(int key)
 {
     int d;
-    static char graf[READ_BUFSIZE];
     message_release();
     if (!cursor_actions(key))
     {
@@ -95,27 +94,19 @@ void actions_mdslab(int key)
           message_info("Mark mode %s",mapmode->mark?"on":"off");
           break;
         case KEY_DEL: // Delete graffiti if there is any here
-          d = is_graffiti(tx,ty);
-          if (d != -1)
+          d = graffiti_idx(lvl,tx,ty);
+          if (d>=0)
           {
             message_info("Graffiti deleted");
-            delete_graffiti(d);
+            graffiti_del(lvl,d);
           } else
             message_error("Nothing to delete");
           break;
         case 'a': // Add/view graffiti across
+            slb_place_graffiti(lvl,tx,ty,ORIENT_WE);
+          break;
         case 'd': // Add/view graffiti down
-          if ((mapmode->mark) || (mapmode->paintmode))
-          {
-            message_error("Can't draw graffiti whilst painting or marking");
-            return;
-          }
-          d = (key=='d' ? 1 : 0);
-          if (get_str ("Enter graffiti: ", graf))
-            if (!add_graffiti (tx, ty, graf, d))
-            {
-               message_error("Not enough room for graffiti!");
-            }
+            slb_place_graffiti(lvl,tx,ty,ORIENT_NS);
           break;
           case '0':
           case '1':
@@ -264,12 +255,34 @@ void change_ownership(unsigned char purchaser)
     mapmode->mark=false;
 }
 
+void slb_place_graffiti(struct LEVEL *lvl,int tx, int ty,unsigned short orient)
+{
+    static char graf_text[READ_BUFSIZE];
+    if ((mapmode->mark) || (mapmode->paintmode))
+    {
+        message_error("Can't draw graffiti whilst painting or marking");
+        return;
+    }
+    if (get_str("Enter graffiti: ", graf_text))
+    {
+      int graf_idx;
+      graf_idx=graffiti_add(lvl,tx,ty,0,graf_text,GRAFF_FONT_ADICLSSC,orient,0x0184);
+      if (graf_idx<0)
+      {
+        message_error("Cannot add graffiti(not enought room?)");
+        return;
+      }
+      graffiti_update_columns(lvl,graf_idx);
+      message_info("Graffiti placed");
+    }
+}
+
 /*
  * Init function - creates arrays for keyboard shortcuts in slab mode.
  */
 void init_mdslab_keys()
 {
-    int i=0;
+    int i;
     // Arrays storing keyboard shortcuts and corresponding rooms
     // These must end with zero
     static const unsigned int room_keys[]={
@@ -277,12 +290,12 @@ void init_mdslab_keys()
       'T', 'l', '%',
       'W', 'G', 'P',
       'O', 'B', 'e',
-      'g', 'S', 's',
+      'g', 's', 'S',
       'h', '#', '.',
       '-', ' ', '/',
       '^', '\\', '&',
       '*', '(', '$',
-      '!', '~', '`',
+      '!', '`', '~',
       '=', 'w', 'b',
       'i', 'm', 'E',
        0};
@@ -303,7 +316,8 @@ void init_mdslab_keys()
 
     if (sizeof(room_keys)/sizeof(*room_keys) != sizeof(room_types)/sizeof(*room_types))
       die ("init_keys: Number of rooms doesn't match number of keys");
-
+    mdslab->placenkeys=1;
+    i=0;
     while (room_keys[i])
     {
       if (room_keys[i] > mdslab->placenkeys)
@@ -326,17 +340,26 @@ void init_mdslab_keys()
       i++;
     }
 
-    static char got[]="#$./^\\&*()- =~E?t?l?P?O?T?h?W?S?e?g?H?L?B?wwbbiimm?%!G";
     const int MAX_NUM_KEYS=256;
     slbkey=(char *)malloc(MAX_NUM_KEYS);
     if (!slbkey)
       die("init_slbkey: Out of memory");
-
-    int l = strlen(got);
-    for (i=0; i < l; i++)
-      slbkey[i]=got[i];
-    for (i=l-1; i < MAX_NUM_KEYS; i++)
+    for (i=0; i < MAX_NUM_KEYS; i++)
       slbkey[i]='?';
+    i=0;
+    while (room_keys[i])
+    {
+      slbkey[room_types[i]]=room_keys[i];
+      i++;
+    }
+    // Hack for some slabs that are not in room_types[], 
+    // or if we just want another char to view
+    slbkey[SLAB_TYPE_DOORWOOD2]='w';
+    slbkey[SLAB_TYPE_DOORBRACE2]='b';
+    slbkey[SLAB_TYPE_DOORIRON2]='i';
+    slbkey[SLAB_TYPE_DOORMAGIC2]='m';
+// Old way - delete pending
+//    static char got[]="#$./^\\&*()- =~E?t?l?P?O?T?h?W?S?e?g?H?L?B?wwbbiimm?%!G";
 }
 
 /*
@@ -353,6 +376,9 @@ void free_mdslab_keys()
  */
 void draw_mdslab(void)
 {
+    int tx,ty;
+    tx=mapmode->mapx+mapmode->screenx;
+    ty=mapmode->mapy+mapmode->screeny;
     draw_map_area(lvl,true,true,false);
     if (mapmode->panel_mode!=PV_MODE)
     {
@@ -360,7 +386,34 @@ void draw_mdslab(void)
     } else
     {
       int scr_row=display_mode_keyhelp(0,scrmode->cols+3,scrmode->mode);
+      int graff_idx=graffiti_idx(lvl,tx,ty);
+      if (graff_idx>=0)
+        scr_row=display_graffiti(lvl,scr_row+1,scrmode->cols+3,graff_idx);
       display_tngdat();
     }
     draw_map_cursor(lvl,true,true,false);
+}
+
+int display_graffiti(struct LEVEL *lvl,int scr_row, int scr_col,int graff_idx)
+{
+    int scr_col1=scr_col+2;
+    int scr_col2=scr_col+20;
+    screen_setcolor(PRINT_COLOR_LGREY_ON_BLACK);
+    set_cursor_pos(scr_row++, scr_col);
+    screen_printf("%s %d","Graffiti",graff_idx+1);
+    if (graff_idx>=lvl->graffiti_count) return scr_row;
+    struct DK_GRAFFITI *graf=lvl->graffiti[graff_idx];
+    if (graf==NULL) return scr_row;
+    set_cursor_pos(scr_row, scr_col1);
+    screen_printf("Position: %d,%d",graf->tx,graf->ty);
+    set_cursor_pos(scr_row++, scr_col2);
+    screen_printf("End: %d,%d",graf->fin_tx,graf->fin_ty);
+    set_cursor_pos(scr_row, scr_col1);
+    screen_printf("Orientation: %s",get_orientation_shortname(graf->orient));
+    set_cursor_pos(scr_row++, scr_col2);
+    screen_printf("Font: %s",get_font_longname(graf->font));
+    set_cursor_pos(scr_row++, scr_col1);
+    screen_printf("Text: ");
+    screen_setcolor(PRINT_COLOR_WHITE_ON_BLACK);
+    screen_printf("%s",graf->text);
 }

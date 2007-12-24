@@ -194,6 +194,9 @@ void update_datclm_for_slab(struct LEVEL *lvl, int tx, int ty)
   for (i=0;i<9;i++)
     clm_recs[i]=create_column_rec();
   create_columns_for_slab(clm_recs,surr_slb,surr_own,surr_tng);
+  //Custom columns, and graffiti
+  if (slab_has_custom_columns(lvl, tx, ty))
+    update_custom_columns_for_slab(clm_recs,lvl,tx,ty);
   //Use the columns to set DAT/CLM entries in LEVEL
   set_new_datclm_values(lvl, tx, ty, clm_recs);
   // Flushing dynamic data
@@ -219,9 +222,12 @@ void get_slab_surround(unsigned char *surr_slb,unsigned char *surr_own,
     int i,k;
     int s_idx;
     //Cleanup of the input variables
-    for (i=0;i<3;i++)
-      for (k=0;k<3;k++)
-        surr_tng[k*3+i]=NULL;
+    if (surr_tng!=NULL)
+    {
+      for (i=0;i<3;i++)
+        for (k=0;k<3;k++)
+          surr_tng[k*3+i]=NULL;
+    }
     //Sweeping and extracting slab type and owner
     for (i=-1;i<=1;i++)
       for (k=-1;k<=1;k++)
@@ -229,21 +235,29 @@ void get_slab_surround(unsigned char *surr_slb,unsigned char *surr_own,
           s_idx=i+1+(k+1)*3;
           if ((x+i<0)||(y+k<0)||(x+i>=MAP_MAXINDEX_X)||(y+k>=MAP_MAXINDEX_Y))
           {
+            if (surr_slb!=NULL)
               surr_slb[s_idx]=SLAB_TYPE_ROCK;
+            if (surr_own!=NULL)
               surr_own[s_idx]=PLAYER_UNSET;
           }
           else
           {
+            if (surr_slb!=NULL)
               surr_slb[s_idx]=get_tile_slab(lvl,x+i,y+k);
+            if (surr_own!=NULL)
+            {
               surr_own[s_idx]=get_tile_owner(lvl,x+i,y+k);
               if (surr_own[s_idx]>PLAYER_UNSET)
                   surr_own[s_idx]=PLAYER_UNSET;
+            }
           }
       }
     //Sweeping again and extracting things
-    for (i=-2;i<=2;i++)
-      for (k=-2;k<=2;k++)
-      {
+    if (surr_tng!=NULL)
+    {
+      for (i=-2;i<=2;i++)
+        for (k=-2;k<=2;k++)
+        {
           //We're not interested in corners of the 5x5 subtile block
           if (((i==-2)||(i==2))&&((k==-2)||(k==2))) continue;
           //Finding the index in target array (3x3)
@@ -266,7 +280,8 @@ void get_slab_surround(unsigned char *surr_slb,unsigned char *surr_own,
             if (is_clmaffective_thing(thing))
                 surr_tng[s_idx]=thing;
           }
-      }
+        }
+    }
 }
 
 /*
@@ -566,3 +581,78 @@ short clm_entry_is_used(unsigned int clmidx)
     return (lvl->clm_utilize[clmidx]>0)||(permanent);
 }
 
+/*
+ * Returns if the slab has any custom columns on it. This includes Graffiti.
+ */
+short slab_has_custom_columns(struct LEVEL *lvl, int tx, int ty)
+{
+    if (cust_col_nidx(lvl,tx,ty,0)>=0)
+        return true;
+    if (graffiti_idx(lvl,tx,ty)>=0)
+        return true;
+    return false;
+}
+
+/*
+ * Updates custom columns for a slab. Returns number of changed columns.
+ * Note: also updates graffiti.
+ */
+int update_custom_columns_for_slab(struct COLUMN_REC *clm_recs[9],struct LEVEL *lvl, int tx, int ty)
+{
+    int mod_clms=0;
+    if (cust_col_nidx(lvl,tx,ty,0)>=0)
+        mod_clms+=draw_cust_clms_on_slab(clm_recs,lvl,tx,ty);
+    if (graffiti_idx(lvl,tx,ty)>=0)
+        mod_clms+=draw_graffiti_on_slab(clm_recs,lvl,tx,ty);
+    return mod_clms;
+}
+
+/*
+ * Draws custom columns on given columns array. Returns num of changed entries.
+ * draws only the cust_col, no graffiti.
+ */
+int draw_cust_clms_on_slab(struct COLUMN_REC *clm_recs[9],struct LEVEL *lvl, int tx, int ty)
+{
+    int mod_clms=0;
+    //TODO
+    return mod_clms;
+}
+
+/*
+ * Returns index of 'num'th custom column at given tile, or -1 if not found.
+ */
+int cust_col_nidx(struct LEVEL *lvl, int tx, int ty,int num)
+{
+    int i;
+    int n=0;
+    struct DK_CUSTOM_CLM *ccol;
+    for (i=0; i < lvl->cust_clm_count; i++)
+    {
+      ccol = lvl->cust_clm[i];
+      if (((ccol->sx/3)==tx) && ((ccol->sy/3)==ty))
+      {
+          if (n==num) return i;
+          n++;
+      }
+    }
+    return -1;
+}
+
+/*
+ * Returns index of next custom column at given tile,
+ * the one after prev_idx; or -1 if not found.
+ * To get first cust_col, prev_idx must be -1.
+ */
+int cust_col_idx_next(struct LEVEL *lvl, int tx, int ty,int prev_idx)
+{
+    if (prev_idx<-1) return -1;
+    int i;
+    struct DK_CUSTOM_CLM *ccol;
+    for (i=prev_idx+1; i < lvl->cust_clm_count; i++)
+    {
+      ccol = lvl->cust_clm[i];
+      if (((ccol->sx/3)==tx) && ((ccol->sy/3)==ty))
+        return i;
+    }
+    return -1;
+}

@@ -20,6 +20,7 @@ void draw_mdclm_panel(void);
 
 //Functions - lower level
 int display_dat_subtiles(int scr_row, int scr_col,int ty,int tx);
+int display_column(unsigned char *clmentry,int clm_idx, int scr_row, int scr_col);
 
 //Functions - internal
 

@@ -49,8 +49,7 @@ void actions_mdclm(int key)
       {
         case KEY_TAB:
         case KEY_ESCAPE:
-          scrmode->mode=MD_SLB;
-          message_info("Returned to Slab mode.");
+          end_mdclm();
           break;
         case 'u': // Update all things/dat/clm/w?b
           update_slab_owners(lvl);
@@ -88,6 +87,8 @@ short start_mdclm()
 void end_mdclm()
 {
     mapmode->panel_mode=PV_MODE;
+    scrmode->mode=MD_SLB;
+    message_info("Returned to Slab mode.");
 }
 
 int display_dat_subtiles(int scr_row, int scr_col,int ty,int tx)
@@ -149,41 +150,44 @@ void draw_mdclm_panel(void)
     int clm_idx=get_dat_subtile(lvl,sx,sy);
     char *clmentry;
     clmentry = lvl->clm[clm_idx%COLUMN_ENTRIES];
+    int pos_y;
+    pos_y=display_column(clmentry, clm_idx,0,scrmode->cols+3);
+    set_cursor_pos(pos_y++, scrmode->cols+3);
+    screen_printf_toeol("WIB animate: %03X", get_subtl_wib(lvl,sx,sy));
+//    set_cursor_pos(pos_y++, scrmode->cols+3);
+//    screen_printf("WLB tile info: %03X", get_subtl_wlb(lvl, tx, ty));
+    display_tngdat();
+}
+
+int display_column(unsigned char *clmentry,int clm_idx, int scr_row, int scr_col)
+{
     struct COLUMN_REC *clm_rec;
     clm_rec=create_column_rec();
     get_clm_entry(clm_rec, clmentry);
     screen_setcolor(PRINT_COLOR_LGREY_ON_BLACK);
-    int i;
-    int k=0;
-    int scr_col1=scrmode->cols+3;
-    int scr_col2=scrmode->cols+23;
-
-    set_cursor_pos(k++, scr_col1);
+    int scr_col2=scr_col+20;
+    set_cursor_pos(scr_row++, scr_col);
     screen_printf("Use: %04X (dec: %d)", clm_rec->use,clm_rec->use);
-    set_cursor_pos(k, scr_col1);
+    set_cursor_pos(scr_row, scr_col);
     screen_printf("Lintel: %d", clm_rec->lintel);
-    set_cursor_pos(k++, scr_col2);
+    set_cursor_pos(scr_row++, scr_col2);
     screen_printf("CLM index: %4d", clm_idx);
-    set_cursor_pos(k, scr_col1);
+    set_cursor_pos(scr_row, scr_col);
     screen_printf("Solid mask: %04X", clm_rec->solid);
-    set_cursor_pos(k++, scr_col2);
+    set_cursor_pos(scr_row++, scr_col2);
     screen_printf("Height: %X", clm_rec->height);
-    set_cursor_pos(k, scr_col1);
+    set_cursor_pos(scr_row, scr_col);
     screen_printf("Base block: %03X", clm_rec->base);
-    set_cursor_pos(k++, scr_col2);
+    set_cursor_pos(scr_row++, scr_col2);
     screen_printf("Permanent: %d", clm_rec->permanent);
-    set_cursor_pos(k, scr_col2);
+    set_cursor_pos(scr_row, scr_col2);
     screen_printf("Orientation: %02X", clm_rec->orientation);
+    int i;
     for (i=0; i < 8; i++)
     {
-      set_cursor_pos(k++, scr_col1);
+      set_cursor_pos(scr_row++, scr_col);
       screen_printf("Cube %d: %03X", i, clm_rec->c[i]);
     }
     free_column_rec(clm_rec);
-    set_cursor_pos(k++, scr_col1);
-    screen_printf_toeol("WIB animate: %03X", get_subtl_wib(lvl,sx,sy));
-//    set_cursor_pos(k++, cols+3);
-//    screen_printf("WLB tile info: %03X", get_subtl_wlb(lvl, tx, ty));
-
-    display_tngdat();
+    return scr_row;
 }

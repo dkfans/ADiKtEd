@@ -216,7 +216,6 @@ void done(void)
 {
     level_deinit();
     free_levscr();
-    screen_done();
     free_messages();
     input_done();
 }

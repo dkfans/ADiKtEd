@@ -10,6 +10,7 @@
 #include "globals.h"
 #include "lev_data.h"
 #include "obj_slabs.h"
+#include "obj_column.h"
 
 //Objectives of creatures in partys
 const char objctv_defend_party_cmdtext[]="DEFEND_PARTY";
@@ -211,8 +212,8 @@ const char room_workshp_cmdtext[]="WORKSHOP";
 const char room_training_cmdtext[]="TRAINING";
 const char room_torture_cmdtext[]="TORTURE";
 const char room_prison_cmdtext[]="PRISON";
-const char research_cmdtext[]="RESEARCH";
-const char treasure_cmdtext[]="TREASURE";
+const char room_library_cmdtext[]="RESEARCH";
+const char room_treasure_cmdtext[]="TREASURE";
 const char room_entrance_cmdtext[]="ENTRANCE";
 //Computer player tweaks (undocumented)
 const char comp_sell_trapsdoors_cmdtext[]="COMPUTER_SELL_TRAPS_AND_DOORS";
@@ -234,3 +235,365 @@ const char comp_check_room_dug_cmdtext[]="COMPUTER_CHECK_ROOM_DUG";
 const char comp_dig_room_cmdtext[]="COMPUTER_DIG_ROOM";
 const char comp_dig_room_passage_cmdtext[]="COMPUTER_DIG_ROOM_PASSAGE";
 
+// ADiKtEd-specific commands
+
+const char custom_column_cmdtext[]="CUSTOM_COLUMN";
+const char graffiti_cmdtext[]="GRAFFITI";
+
+const char orient_ns_cmdtext[]="ORIENT_NS";
+const char orient_we_cmdtext[]="ORIENT_WE";
+const char orient_sn_cmdtext[]="ORIENT_SN";
+const char orient_ew_cmdtext[]="ORIENT_EW";
+const char orient_tp_cmdtext[]="ORIENT_TOP";
+
+const char font_none_cmdtext[]="FONT_NONE";
+const char font_adiclssc_cmdtext[]="FONT_ADICLSSC";
+
+//Command arrays
+
+const char *cmd_adikted_arr[]={
+        "",custom_column_cmdtext,graffiti_cmdtext  //0x000,0x001,0x002
+        };
+
+const char *cmd_orient_arr[]={
+        orient_ns_cmdtext,orient_we_cmdtext,orient_sn_cmdtext,  //0x000,0x001,0x002
+        orient_ew_cmdtext,orient_tp_cmdtext                     //0x003, 0x004
+        };
+
+const char *cmd_orient_shortnames[]={
+        "NS","WE","SN","EW","Top" };
+
+const char *cmd_font_longnames[]={
+        "none","Classic" };
+
+/*
+ * Executes command from the CMD_ADIKTED group
+ */
+short execute_adikted_command(struct LEVEL *lvl,struct DK_SCRIPT_COMMAND *cmd,char *err_msg)
+{
+    char text[READ_BUFSIZE];
+    switch (cmd->index)
+    {
+    case CUSTOM_COLUMN:
+       if (cmd->param_count<10)
+       {
+         sprintf(err_msg,"%s requires more parameters",custom_column_cmdtext);
+         return false;
+       }
+       int sx=-1,sy=-1;
+       if (sscanf(cmd->params[0],"%d",&sx)<1)
+       {
+         sprintf(err_msg,"Cannot read map subtile X coordinate");
+         return false;
+       }
+       if (sscanf(cmd->params[1],"%d",&sy)<1)
+       {
+         sprintf(err_msg,"Cannot read map subtile Y coordinate");
+         return false;
+       }
+         //TODO
+       return true;
+    case DEFINE_GRAFFITI:
+      {
+       if (cmd->param_count<7)
+       {
+         sprintf(err_msg,"%s requires more parameters",graffiti_cmdtext);
+         return false;
+       }
+       int tx=-1,ty=-1,height=0;
+       if (sscanf(cmd->params[0],"%d",&tx)<1)
+       {
+         sprintf(err_msg,"Cannot read map tile X coordinate");
+         return false;
+       }
+       if (sscanf(cmd->params[1],"%d",&ty)<1)
+       {
+         sprintf(err_msg,"Cannot read map tile Y coordinate");
+         return false;
+       }
+       if (sscanf(cmd->params[2],"%d",&height)<1)
+       {
+         sprintf(err_msg,"Cannot read height in tile");
+         return false;
+       }
+       int orient;
+       orient=orient_cmd_index(cmd->params[3]);
+       int font;
+       //TODO: make different fonts support
+       font=GRAFF_FONT_ADICLSSC;//font_cmd_index(cmd->params[4]);
+       if (orient<0) orient=ORIENT_NS;
+       if (font<0) font=GRAFF_FONT_ADICLSSC;
+       int i,textlen;
+       unsigned int cube=0x0184;
+       if (sscanf(cmd->params[5],"%d",&cube)<1)
+       {
+         sprintf(err_msg,"Cannot read filler cube index");
+         return false;
+       }
+       textlen=strlen(cmd->params[6]);
+       if (textlen>=READ_BUFSIZE) textlen=READ_BUFSIZE-1;
+       for (i=0;i<textlen;i++)
+       {
+         char c=cmd->params[6][i];
+         if ((c<=32)||(c=='_')) text[i]=' '; else
+         if (c=='.') text[i]=','; else
+         if (c=='{') text[i]='('; else
+         if (c=='}') text[i]=')'; else
+           text[i]=c;
+       }
+       text[textlen]='\0';
+       int graf_idx=graffiti_add(lvl,tx,ty,height,text,font,orient,cube);
+       if (graf_idx<0) return false;
+      };return true;
+    default:
+      {
+      };return false;
+    }
+}
+
+short execute_script_line(struct LEVEL *lvl,char *line,char *err_msg)
+{
+    struct DK_SCRIPT_COMMAND *cmd;
+    cmd=malloc(sizeof(struct DK_SCRIPT_COMMAND));
+    if (cmd==NULL) die("Cannot allocate memory to execute script command");
+    script_command_clear(cmd);
+    int result;
+    if (decompose_script_command(cmd,line))
+    {
+      switch (cmd->group)
+      {
+      case CMD_ADIKTED:
+          result=execute_adikted_command(lvl,cmd,err_msg);
+          break;
+      default:
+          sprintf(err_msg,"Command is not executable in ADiKtEd");
+          result=false;
+          break;
+      }
+    } else
+    {
+      //Check if it's just empty line
+      if ((line==NULL)||(strlen(line)<1))
+      {
+        result=true;
+      } else
+      {
+        sprintf(err_msg,"Cannot identify command");
+        result=false;
+      }
+    }
+    script_command_free(cmd);
+    return result;
+}
+
+short decompose_script_command(struct DK_SCRIPT_COMMAND *cmd,char *text)
+{
+  if ((cmd==NULL)||(text==NULL)) return false;
+  //Decomposing the string into single parameters - getting first (command name)
+  char *wordtxt;
+  wordtxt = strtok (text," \t,(");
+  cmd->index=-1;
+  int cmd_idx;
+  if (cmd->index<0)
+  {
+    cmd_idx=adikted_cmd_index(wordtxt);
+    if (cmd_idx>=0)
+    {
+      cmd->group=CMD_ADIKTED;
+      cmd->index=cmd_idx;
+    }
+  }
+  if (cmd->index<0) return false;
+  //Decomposing the string into single parameters - getting the rest of parameters
+  while (wordtxt != NULL)
+  {
+    wordtxt = strtok(NULL, " \t,)");
+    script_command_param_add(cmd,wordtxt);
+  }
+  return true;
+}
+
+short script_command_param_add(struct DK_SCRIPT_COMMAND *cmd,char *param)
+{
+    if ((cmd==NULL)||(param==NULL)) return false;
+    int param_idx=cmd->param_count;
+    cmd->params=realloc(cmd->params,(param_idx+1)*sizeof(char *));
+    cmd->params[param_idx]=strdup(param);
+    cmd->param_count=param_idx+1;
+    return true;
+}
+
+int adikted_cmd_index(char *cmdtext)
+{
+    if ((cmdtext==NULL)||(strlen(cmdtext)<2)) return -1;
+    int i=0;
+    int array_count=sizeof(cmd_adikted_arr)/sizeof(char *);
+    while (i<array_count)
+    {
+      if (strcmp(cmd_adikted_arr[i],cmdtext)==0)
+        return i;
+      i++;
+    }
+    return -1;
+}
+
+const char *adikted_cmd_text(int cmdidx)
+{
+    int array_count=sizeof(cmd_adikted_arr)/sizeof(char *);
+    if ((cmdidx<0)||(cmdidx>=array_count)) return "X";
+    return cmd_adikted_arr[cmdidx];
+}
+
+int orient_cmd_index(char *cmdtext)
+{
+    if ((cmdtext==NULL)||(strlen(cmdtext)<2)) return -1;
+    int i=0;
+    int array_count=sizeof(cmd_orient_arr)/sizeof(char *);
+    while (i<array_count)
+    {
+      if (strcmp(cmd_orient_arr[i],cmdtext)==0)
+        return i;
+      i++;
+    }
+    return -1;
+}
+
+const char *orient_cmd_text(int cmdidx)
+{
+    int array_count=sizeof(cmd_orient_arr)/sizeof(char *);
+    if ((cmdidx<0)||(cmdidx>=array_count)) return "X";
+    return cmd_orient_arr[cmdidx];
+}
+
+/*
+ * Clears values in given DK_SCRIPT_COMMAND without deallocating memory
+ */
+void script_command_clear(struct DK_SCRIPT_COMMAND *cmd)
+{
+    cmd->group=CMD_UNKNOWN;
+    cmd->index=-1;
+    cmd->params=NULL;
+    cmd->param_count=0;
+}
+
+/*
+ * Frees memory allocated for given DK_SCRIPT_COMMAND
+ */
+void script_command_free(struct DK_SCRIPT_COMMAND *cmd)
+{
+    int i;
+    for (i=cmd->param_count-1;i>=0;i--)
+        free(cmd->params[i]);
+    free(cmd);
+}
+
+/*
+ * Frees all lines in text file given in parameters
+ */
+void text_file_free(char **lines,int lines_count)
+{
+     int i;
+     for (i=lines_count-1;i>=0;i--)
+       free(lines[i]);
+     free(lines);
+}
+
+/*
+ * Adds a text line at end of given text file. Adds directly,
+ * without making copy of the text. Returns index of the new line.
+ */
+int text_file_line_add(char ***lines,int *lines_count,char *text)
+{
+    int line_idx=*lines_count;
+    *lines=realloc(*lines,(line_idx+1)*sizeof(char *));
+    if ((*lines)==NULL) die("Cannot allocate text file lines");
+    (*lines)[line_idx]=text;
+    (*lines_count)++;
+    return line_idx;
+}
+
+/*
+ * Adds a text line at end of given text file. Adds copy of text
+ * variable. Returns index of the new line.
+ */
+int text_file_linecp_add(char ***lines,int *lines_count,char *text)
+{
+    int line_idx=*lines_count;
+    *lines=realloc(*lines,(line_idx+1)*sizeof(char *));
+    if ((*lines)==NULL) die("Cannot allocate text file lines");
+    (*lines)[line_idx]=strdup(text);
+    (*lines_count)++;
+    return line_idx;
+}
+
+short add_graffiti_to_script(char ***lines,int *lines_count,struct LEVEL *lvl)
+{
+    int i,k;
+    struct DK_GRAFFITI *graf;
+    char *line;
+    line=(char *)malloc(LINEMSG_SIZE*sizeof(char));
+    char *graftxt;
+    graftxt=(char *)malloc(LINEMSG_SIZE*sizeof(char));
+    for (i=0; i < lvl->graffiti_count; i++)
+    {
+      graf = lvl->graffiti[i];
+      if (graf==NULL) continue;
+      int graf_len=strlen(graf->text);
+      for (k=0;k<graf_len;k++)
+      {
+        char c=graf->text[k];
+        if (c<=32) graftxt[k]='_'; else
+        if (c==',') graftxt[k]='.'; else
+        if (c=='(') graftxt[k]='{'; else
+        if (c==')') graftxt[k]='}'; else
+          graftxt[k]=c;
+      }
+      graftxt[graf_len]='\0';
+      sprintf(line,"%s(%d,%d,%d,%s,%s,0x%04x,%s)",graffiti_cmdtext,graf->tx,graf->ty,graf->height,
+                orient_cmd_text(graf->orient),font_adiclssc_cmdtext,graf->cube,graftxt);
+      text_file_linecp_add(lines,lines_count,line);
+    }
+    free(line);
+    free(graftxt);
+    return true;
+}
+
+short add_custom_clms_to_script(char ***lines,int *lines_count,struct LEVEL *lvl)
+{
+    int i;
+    struct DK_CUSTOM_CLM *cclm;
+    char *line;
+    line=(char *)malloc(LINEMSG_SIZE*sizeof(char));
+    for (i=0; i < lvl->cust_clm_count; i++)
+    {
+      cclm = lvl->cust_clm[i];
+      sprintf(line,"%s(%d,%d,...)",custom_column_cmdtext,cclm->sx,cclm->sy);
+      text_file_linecp_add(lines,lines_count,line);
+    }
+    free(line);
+    return true;
+}
+
+/*
+ * Returns orientation name string
+ */
+char *get_orientation_shortname(unsigned short orient)
+{
+     int types_count=sizeof(cmd_orient_shortnames)/sizeof(char *);
+     if (orient<types_count)
+       return (char *)cmd_orient_shortnames[orient];
+     else
+       return "unkn";
+}
+
+/*
+ * Returns font name string
+ */
+char *get_font_longname(unsigned short font)
+{
+     int types_count=sizeof(cmd_font_longnames)/sizeof(char *);
+     if (font<types_count)
+       return (char *)cmd_font_longnames[font];
+     else
+       return "unkn";
+}

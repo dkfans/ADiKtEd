@@ -7,6 +7,8 @@
 
 // Variables
 
+struct LEVEL;
+
 typedef struct {
     unsigned char *placekeys;
     int placenkeys;
@@ -37,5 +39,6 @@ void free_mdslab_keys();
 void slbposcheck(void);
 void change_ownership(unsigned char purchaser);
 void slb_place_room(unsigned char room);
+void slb_place_graffiti(struct LEVEL *lvl,int tx, int ty,unsigned short orient);
 
 #endif // ADIKT_SCRSLAB_H

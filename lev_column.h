@@ -47,6 +47,12 @@ short get_subtile_column_rec(struct LEVEL *lvl, struct COLUMN_REC *clm_rec, int 
 unsigned short get_subtile_column_height(struct LEVEL *lvl, int sx, int sy);
 unsigned short get_subtile_column_solid(struct LEVEL *lvl, int sx, int sy);
 
+// Custom columns support; graffiti are also custom columns
+short slab_has_custom_columns(struct LEVEL *lvl, int tx, int ty);
+int update_custom_columns_for_slab(struct COLUMN_REC *clm_recs[9],struct LEVEL *lvl, int tx, int ty);
+int cust_col_nidx(struct LEVEL *lvl, int tx, int ty,int num);
+int draw_cust_clms_on_slab(struct COLUMN_REC *clm_recs[9],struct LEVEL *lvl, int tx, int ty);
+
 // This one is special - put in separate file
 void add_permanent_columns(struct LEVEL *lvl);
 
