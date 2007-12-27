@@ -5,6 +5,8 @@
 #ifndef ADIKT_SCRLIST_H
 #define ADIKT_SCRLIST_H
 
+struct LEVEL;
+
 //Variables for navigating in list screen
 
 typedef struct {
@@ -22,7 +24,7 @@ short init_list(void);
 void free_list(void);
 
 //Functions - start and stop
-short start_list(int lstmode);
+short start_list(struct LEVEL *lvl,int lstmode);
 void end_list(void);
 
 //Functions - actions and screen
@@ -30,11 +32,16 @@ void draw_crtre();
 void actions_crtre(int key);
 void draw_itemt();
 void actions_itemt(int key);
-void actions_textr(int key);
+void draw_mdtextr();
+void actions_mdtextr(int key);
+void draw_mdcclm();
+void actions_mdcclm(int key);
+void draw_mdcube();
+void actions_mdcube(int key);
 
 //Functions - lower level
 short actions_list(int key);
-void draw_numbered_list(char *(*itemstr)(unsigned char),
+void draw_numbered_list(char *(*itemstr)(unsigned short),
         unsigned int start_idx,unsigned int end_idx,unsigned int itm_width);
 
 //Functions - internal

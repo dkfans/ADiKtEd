@@ -60,8 +60,11 @@
 #define ORIENT_WE         0x01
 #define ORIENT_SN         0x02
 #define ORIENT_EW         0x03
-#define ORIENT_TOP        0x04
-
+#define ORIENT_TNS        0x04
+#define ORIENT_TWE        0x05
+#define ORIENT_TSN        0x06
+#define ORIENT_TEW        0x07
+ 
 //Font - for graffiti
 #define GRAFF_FONT_NONE        0x00
 #define GRAFF_FONT_ADICLSSC    0x01
@@ -203,7 +206,7 @@ void stlight_del(struct LEVEL *lvl,unsigned int x,unsigned int y,unsigned int nu
 unsigned int get_stlight_subnums(struct LEVEL *lvl,unsigned int x,unsigned int y);
 
 short get_object_type(struct LEVEL *lvl, unsigned int x, unsigned int y, unsigned int z);
-char *get_object(struct LEVEL *lvl,unsigned int x,unsigned int y,unsigned int z);
+unsigned char *get_object(struct LEVEL *lvl,unsigned int x,unsigned int y,unsigned int z);
 void object_del(struct LEVEL *lvl,unsigned int x,unsigned int y,unsigned int z);
 unsigned int get_object_subnums(struct LEVEL *lvl,unsigned int x,unsigned int y);
 unsigned int get_object_tilnums(struct LEVEL *lvl,unsigned int x,unsigned int y);

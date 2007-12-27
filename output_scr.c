@@ -150,10 +150,10 @@ void screen_init(void)
     
     // Used in dat display
     SLtt_set_color (30,"Keeper 0","brightred","black");
-    SLtt_set_color (31,"Keeper 1","brightblue", "black");
+    SLtt_set_color (PRINT_COLOR_LBLUE_ON_BLACK,"Keeper 1","brightblue", "black");
     SLtt_set_color (33,"Keeper 2","brightgreen", "black");
     SLtt_set_color (33,"Keeper 3","yellow", "black");
-    SLtt_set_color (34,"Keeper 4","brightcyan","black");
+    SLtt_set_color (PRINT_COLOR_LCYAN_ON_BLACK,"Keeper 4","brightcyan","black");
     SLtt_set_color (35,"Unclaimed", "lightgray", "black");
     SLtt_set_color (36,"Blank","lightgray","black");
     SLtt_set_color (40,"Keeper 0","white","red");

@@ -37,6 +37,26 @@ you wish to add.
 The item's ownership will
 be set to that of the tile you
 are placing it in.
+[txtrkeyhelp]
+Texture select mode:
+
+Select the texture which you want
+to be used when drawing map.
+[cclmkeyhelp]
+Custom columns mode:
+
+Select the visual appearence
+for current map tile.
+
+Note that the appearence may
+depend on the tile siblings,
+even if it is custom column.
+[cubekeyhelp]
+Custom cubes mode:
+
+Select cubes for the current
+map subtile. The exact cube
+values will be used in map.
 [slbhelp]
 Slab mode help:
 
@@ -53,8 +73,12 @@ The background colour of each tiles (or "slab") shows the ownership.
 computer), \Bblue\s to \Bplayer 1\s, \Ggreen\s to \Gplayer 2\s, \Yyellow\s to \Yplayer 3\s,
 and \Ccyan\s to \Cplayer 4\s (the Avatar). A black background shows the
 tile is currently unowned. Note that earth and impenetrable rock
-will back to unclaimed state if you press 'u' or save the level
-(it just can't be claimed).
+will back to unclaimed state if you press '\wu\s' or save the level
+(it just can't be claimed). The \mpurple\s color shows tiles, which
+graphic has been altered by user. These tiles may look like something
+else that they really are, or may have user-modifications. User
+can make such tiles by placing graffiti or using manual columns.
+
 
 To \ychange the ownership\s of a tile, press a number key from \w0\s to \w5\s; \w0\s
 for \Rplayer 0\s, etc, and \w5\s for unclaimed. 
@@ -73,14 +97,23 @@ ownership you selected (or both). To change the paint ownership or
 slab, just press another slab or number key. To stop painting, press
 '\wz\s' again.
 
-To add some \ygraffiti\s to a dungeon, press '\wa\s' for across, or '\wd\s' for
-down. Press \wdelete\s or \wbackspace\s to remove graffiti. Use '\wx\s' to
-change its orientation. Graffiti shows up as a line of purple \m@\s signs.
-If you'll make graffiti on something other than unpenetrable rock, it
-will disappear when the tile near it will change (will be claimed,
-digged or room placed). To avoid the disappearing, place graffiti
-on rock. If you don't want its background to look like rock, use
-custom columns (see column mode help for details).
+To draw some \ygraffiti\s to a dungeon, press '\wd\s'. You can alter its
+orientation using '\wa\s' - it will swich through 8 possible orientations.
+Press \wdelete\s or \wbackspace\s to remove graffiti.
+
+Graffiti shows up as a line of purple \m@\s signs. If you'll make
+graffiti on something other than unpenetrable rock, it will disappear
+when the tile near it will change (will be claimed, digged or room
+placed). To avoid the disappearing, place graffiti on rock. If you
+don't want its background to look like rock, use manual columns
+(see column mode help for details).
+
+Note that single graffiti is visible only from one side of the tile,
+for example if it has WE (west-east) orientation, it will only
+be visible from south. To see the text from both sides, you have to
+create two graffiti items with oposite orientation (like WE and EW).
+You can put the graffiti lower or higher (\ychange height\s) using
+'\w[\s' and '\w]\s' keys.
 
 To \yupdate\s the dungeon things/dat/clm, press '\wu\s'.
 To toggle \yautomatic update\s of things/dat/clm, press \wctrl+u\s.
@@ -144,71 +177,72 @@ tile.
 The key on the right of the screen should allow you to read the object
 types where they're displayed as letters.
 
-Press \wk\s to copy the highlighted thing (creature or object) onto the
+Press \wk\s to \ycopy\s the highlighted thing (creature or object) onto the
 clipboard. Everything about the object apart from the position in
 the map will be copied, including height, level of creature, etc.
 
-Press \wy\s to copy a thing from the clipboard into the highlighted spot.
+Press \wy\s to \ypaste\s a thing from the clipboard into the highlighted spot.
 
-Press \w1\s-\w9\s to change the highlighted "thing" slot - using the number
+Press \w1\s-\w9\s to change the \yhighlighted "thing" slot\s - using the number
 pad with num lock on makes this easier. If a slot has more than one
 thing on it, the number of things will appear in brackets beneath
-the slot. Press \w/\s to cycle through the things on the highlighted slot.
+the slot. Press \w/\s to \ycycle through things\s on the highlighted slot.
 
-Press \wc\s to create a new creature in the highlighted slot. The new
+Press \wc\s to \ycreate a new creature\s in the highlighted slot. The new
 creature will be owned by whoever owns the tile (although the
 ownership of the tile can later be changed without affecting the
-creature). Note that any other "thing" in the highlighted slot will
-be erased, and that creating a creature copies it to the clipboard
-automatically.
+creature).
 
-Press \wb\s to create a spell book (change the type using \ws\s and \wx\s).
+Press \wb\s to create a \yspell book\s (change the type using \ws\s and \wx\s).
 
-Press '\wg\s' or '\wG\s' to create a pot of gold in the highlighted spot. The
+Press '\wg\s' or '\wG\s' to create a \ypot of gold\s in the highlighted spot. The
 value is 500 for '\wg\s' and 250 for '\wG\s'.
 
-Press \wd\s to create a dungeon special in the highlighted
+Press \wd\s to create a \ydungeon special\s in the highlighted
 spot (change the type using \ws\s and \wx\s).
 
-Press \wh\s to create a dungeon heart in the highlighted spot. It will
+Press \wh\s to create a \ydungeon heart\s in the highlighted spot. It will
 be owned by the owner of the tile.
 
-Press \wH\s to create a hero gate. It will be owned by \Cplayer 4\s (Avatar).
+Press \wH\s to create a \yhero gate\s. It will be owned by \Cplayer 4\s (Avatar).
 
-Press \wu\s to update the dungeon. This will make sure all room objects
+Press \wu\s to \yupdate\s the dungeon. This will make sure all room objects
 (training posts, spikes, torturers, etc) are placed appropriately,
 as well as updating the .clm and .dat values.
 
-Press \wt\s to create a trap (change the type using \ws\s and \wx\s).
+Press \wt\s to create a \ytrap\s (change the type using \ws\s and \wx\s).
 
-Press \wT\s to create a trap box (a non-placed trap). Change the type
+Press \wT\s to create a \ytrap box\s (a non-placed trap). Change the type
 using \ws\s and \wx\s.
 
-Press \we\s to create room effect (change the type using \ws\s and \wx\s).
+Press \we\s to create \yroom effect\s (change the type using \ws\s and \wx\s).
 
-Press \wL\s to create static light.
+Press \wL\s to create \ystatic light\s.
 
-Press \wi\s to create any item. Use this function to create items other
+Press \wi\s to create \yany item\s. Use this function to create items other
 than those available under other keys - it may be unable to set
 item properties correctly.
 
-Press \ws\s and \wx\s to increase/decrease the level of a highlighted
+Press \ws\s and \wx\s to \yincrease/decrease level\s of a highlighted
 creature, the type of a highlighted trap, the type of a 
 highlighted dungeon special, or the type of a spell book.
+This also works on other items (even torches), so try it.
 
-Press \wS\s and \wX\s to change the type of a highlighted creature.
+Press \wS\s and \wX\s to \ychange type\s of a highlighted creature.
 
-Press \wo\s to change the owner of a highlighted thing or creature. The
+Press \wo\s to \ychange owner\s of a highlighted thing or creature. The
 ownership cycles through the players (and "unclaimed").
 
-Press \wl\s to lock/unlock a highlighted door.
+Press '\w[\s' and '\w]\s' to \ychange height/altitude\s of highlighted object.
 
-Press delete to remove the "thing" in the highlighted spot.
+Press \wl\s to \ylock/unlock\s a highlighted door.
 
-To switch back to slab mode, press \wtab\s.
-To switch into script mode, press \wctrl+t\s.
-To quit, press \wctrl+q\s.
-To save, press \wctrl+s\s.
+Press \wdelete\s to \yremove "thing"\s in the highlighted spot.
+
+To switch back to \yslab mode\s, press \wtab\s.
+To switch into \yscript mode\s, press \wctrl+t\s.
+To \yquit\s, press \wctrl+q\s.
+To \ysave\s, press \wctrl+s\s. To save on last saved file name, press \wF5\s.
 
 [clmhelp]
 "Column" mode help:
@@ -222,21 +256,21 @@ advanced mapmakers.
 Press \w1\s-\w9\s to change the highlighted column slot - using the \wnumber
 \wpad\s with \wnum lock\s on makes this easier.
 
-Press \wa\s to auto-update .dat and .clm values for selected slab.
+Press \wa\s to \yauto-update\s .dat and .clm values for selected slab.
 All columns of the current slab will be re-created, and the program
 will be set to always re-create columns for this slab automatically.
 
-Press \wu\s to update the dungeon. This will make sure all room objects
+Press \wu\s to \yupdate\s the dungeon. This will make sure all room objects
 (training posts, spikes, torturers, etc) are placed appropriately,
 as well as updating the .clm and .dat values.
 
-Press \wm\s to manually set columns for the selected slab using
+Press \wm\s to \ymanually set\s all columns for the selected slab using
 one of the Adikted generation functions. The column will no longer
 be autogenerated on update.
 
-To switch back to slab mode, press \wtab\s.
-To quit, press \wctrl+q\s.
-To save, press \wctrl+s\s.
+To switch back to \yslab mode\s, press \wtab\s.
+To \yquit\s, press \wctrl+q\s.
+To \ysave\s, press \wctrl+s\s.
 
 [tips]
 There is no escape from the reaper.
@@ -251,30 +285,60 @@ When you place a slab, the 3x3 square is auto-updated.
 To verify the map integrity and rules, press v.
 Want to know where north is? Then press ctrl+p.
 To see directions as they are in the game, press ctrl+p.
+[scrphelp]
+Script editor help:
+
+Here you can watch the script. You can modify it with external text
+editor, but remember that Adikted will write its version when map is
+saved.
+Therefore you should edit the script after finishing work with
+Adikted, or keep it under other file name.
+[txtrhelp]
+Texture selector help:
+
+This is quite simple - just select the texture from list.
+Texture number will be written into .inf file when saving map.
+
+To cancel selection and exit, press \wesc\s or \wtab\s.
+[cclmhelp]
+Custom columns mode help:
+
+Select custom columns generation function from the list.
+If you wish to manually set the columns, you should use
+"custom cubes" function instead.
+
+To cancel selection and exit, press \wesc\s or \wtab\s.
+[cubehelp]
+Custom cubes mode help:
+
+Select cubes to place on the subtile you wish to be customized.
+Original column graphic will be replaced by your columns.
+
+To cancel selection and exit, press \wesc\s or \wtab\s.
 [compass]
                   *
- /\\~~~~~~~~~~~~~~~|~~~~~~~~~~~~~~~/\\
-(o )              .              ( o)
- \\/             .` `.             \\/
- /\\           .`     `.           /\\
-(           .`         `.           )
- )        .`      \wN\s      `.        (
-(       .`  \wNW\s    |    \wNE\s  `.       )
- )     .`    <\\> )|( </>    `.     (
-(    .`        \\  |  /        `.    )
- ) .`        )  \\ | /  (       `.  (
-  .`       )     \\|/     (       `. 
-.`   \wW\s---)--------\wO\s--------(---\wE\s   `.
- `.        )     /|\\     (        .`
- ) `.        )  / | \\  (        .` (
-(   `.         /  |  \\         .`   )
- )    `.     </> )|( <\\>     .`    (
-(       `.  \wSW\s    |    \wSE\s  .`       )
- )       `.       \wS\s       .`       (
-(          `.           .`          )
- \\/          `.       .`          \\/
- /\\            `.   .`            /\\
-(o )             `.`             ( o)
- \\/~~~~~~~~~~~~~~~|~~~~~~~~~~~~~~~\\/
+\b /\\~~~~~~~~~~~~~~~\s|\b~~~~~~~~~~~~~~~/\\
+\b(\co\b )\s              .              \b( \co\b)
+\b \\/\s             .` `.             \b\\/
+\b /\\\s           .`     `.           \b/\\
+\b(\s           .`         `.           \b)
+\b )\s        .`      \wN\s      `.        \b(
+\b(\s       .`  \wNW\s    \y|\s    \wNE\s  `.       \b)
+\b )\s     .`    <\y\\\s> )\y|\s( <\y/\s>    `.     \b(
+\b(\s    .`        \y\\  |  /\s        `.    \b)
+\b )\s .`        )  \y\\ | /\s  (       `.  \b(
+  .`       )     \y\\|/\s     (       `. 
+.`   \wW\y---\s)\y--------\wO\y--------\s(\y---\wE\s   `.
+ `.        )     \y/|\\\s     (        .`
+\b )\s `.        )  \y/ | \\\s  (        .` \b(
+\b(\s   `.         \y/  |  \\\s         .`   \b)
+\b )\s    `.     <\y/\s> )\y|\s( <\y\\\s>     .`    \b(
+\b(\s       `.  \wSW\s    \y|\s    \wSE\s  .`       \b)
+\b )\s       `.       \wS\s       .`       \b(
+\b(\s          `.           .`          \b)
+\b \\/\s          `.       .`          \b\\/
+\b /\\\s            `.   .`            \b/\\
+\b(\co\b )\s             `.`             \b( \co\b)
+\b \\/~~~~~~~~~~~~~~~\s|\b~~~~~~~~~~~~~~~\\/
                  -|-
 [end]

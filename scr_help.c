@@ -40,6 +40,12 @@ short init_help(void)
     help->crtkey=NULL;
     help->itmtkeyrows=0;
     help->itmtkey=NULL;
+    help->txtrkeyrows=0;
+    help->txtrkey=NULL;
+    help->cclmkeyrows=0;
+    help->cclmkey=NULL;
+    help->cubekeyrows=0;
+    help->cubekey=NULL;
     help->slbrows=0;
     help->slb=NULL;
     help->tngrows=0;
@@ -48,6 +54,14 @@ short init_help(void)
     help->crt=NULL;
     help->itmtrows=0;
     help->itmt=NULL;
+    help->scrprows=0;
+    help->scrp=NULL;
+    help->txtrrows=0;
+    help->txtr=NULL;
+    help->cclmrows=0;
+    help->cclm=NULL;
+    help->cuberows=0;
+    help->cube=NULL;
     help->tiprows=0;
     help->tips=NULL;
     help->compassrows=0;
@@ -161,7 +175,10 @@ char ***match_title(char *title, int n)
             "crthelp", "itmhelp",         //6,7
             "clmhelp", "tips",            //8,9
             "scrphelp", "txtrhelp",       //10,11
-            "compass", NULL};             //12
+            "cclmhelp", "cubehelp",       //12,13
+            "txtrkeyhelp", "cclmkeyhelp", //14,15
+            "cubekeyhelp",                //16
+            "compass", NULL};             //17
     int i=0;
 
     while (titles[i] && strcmp (titles[i], title))
@@ -218,6 +235,26 @@ char ***match_title(char *title, int n)
       return &(help->txtr);
       case 12:
       if (n!=-1)
+          help->cclmrows=n;
+      return &(help->cclm);
+      case 13:
+      if (n!=-1)
+          help->cuberows=n;
+      return &(help->cube);
+      case 14:
+      if (n!=-1)
+          help->txtrkeyrows=n;
+      return &(help->txtrkey);
+      case 15:
+      if (n!=-1)
+          help->cclmkeyrows=n;
+      return &(help->cclmkey);
+      case 16:
+      if (n!=-1)
+          help->cubekeyrows=n;
+      return &(help->cubekey);
+      case 17:
+      if (n!=-1)
           help->compassrows=n;
       return &(help->compass);
       default :
@@ -228,7 +265,7 @@ char ***match_title(char *title, int n)
 /*
  * Action function - start the help mode.
  */
-short start_help()
+short start_help(struct LEVEL *lvl)
 {
     help->formode=scrmode->mode;
     help->y=0;
@@ -262,6 +299,14 @@ short start_help()
         help->rows=help->txtrrows;
         help->text=help->txtr;
         break;
+      case MD_CCLM:
+        help->rows=help->cclmrows;
+        help->text=help->cclm;
+        break;
+      case MD_CUBE:
+        help->rows=help->cuberows;
+        help->text=help->cube;
+        break;
       default:
         help->rows=0;
         help->text=NULL;
@@ -291,7 +336,7 @@ void end_help()
     message_info("Returned to last work mode.");
 }
 
-void draw_help(void)
+void draw_help()
 {
     int i;
     for (i=0; i < scrmode->rows; i++)
@@ -361,6 +406,14 @@ void draw_help_line(int posy,int posx,char *text)
               {
                 screen_setcolor(PRINT_COLOR_LMAGENT_ON_BLACK);
               } else
+              if (lend[1]=='c')
+              {
+                screen_setcolor(PRINT_COLOR_LCYAN_ON_BLACK);
+              } else
+              if (lend[1]=='b')
+              {
+                screen_setcolor(PRINT_COLOR_LBLUE_ON_BLACK);
+              } else
 
               if (lend[1]=='D')
               {
@@ -429,9 +482,20 @@ short init_key_help(int mode)
         help->rows=help->tngkeyrows;
         help->text=help->tngkey;
         break;
+      case MD_TXTR:
+        help->rows=help->txtrkeyrows;
+        help->text=help->txtrkey;
+        break;
+      case MD_CCLM:
+        help->rows=help->cclmkeyrows;
+        help->text=help->cclmkey;
+        break;
+      case MD_CUBE:
+        help->rows=help->cubekeyrows;
+        help->text=help->cubekey;
+        break;
       case MD_CLM:
       case MD_SCRP:
-      case MD_TXTR:
       default:
         help->rows=0;
         help->text=NULL;

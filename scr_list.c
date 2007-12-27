@@ -12,11 +12,13 @@
 #include "globals.h"
 #include "output_scr.h"
 #include "input_kb.h"
+#include "lev_data.h"
 #include "scr_actn.h"
 #include "scr_help.h"
 #include "scr_thing.h"
 #include "obj_things.h"
-#include "lev_data.h"
+#include "obj_column.h"
+#include "lev_column.h"
 
 // Variables
 
@@ -117,7 +119,7 @@ void actions_itemt(int key)
 /*
  * Covers actions from texture selection screen.
  */
-void actions_textr(int key)
+void actions_mdtextr(int key)
 {
     message_release();
     if (!actions_list(key))
@@ -137,6 +139,84 @@ void actions_textr(int key)
           break;
         default:
           message_info("Unrecognized texture key code: %d",key);
+          speaker_beep();
+      }
+    }
+}
+
+/*
+ * Covers actions from custom columns screen.
+ */
+void actions_mdcclm(int key)
+{
+    struct DK_CUSTOM_CLM *cclm_recs[9];
+    struct COLUMN_REC *clm_recs[9];
+    int tx=(mapmode->mapx+mapmode->screenx);
+    int ty=(mapmode->mapy+mapmode->screeny);
+    message_release();
+    if (!actions_list(key))
+    {
+      switch (key)
+      {
+        case KEY_TAB:
+        case KEY_DEL:
+        case KEY_ESCAPE:
+          end_list();
+          message_info("Customization cancelled");
+          break;
+        case KEY_ENTER:
+          {
+            int i,k;
+            for (k=0;k<3;k++)
+              for (i=0;i<3;i++)
+              {
+                cclm_recs[k*3+i]=create_cust_col(tx*3+i,ty*3+k);
+                clm_recs[k*3+i]=cclm_recs[k*3+i]->rec;
+              }
+            //Retrieving parameters from LEVEL structure - the slab and its surrounding
+            unsigned char *surr_slb=(unsigned char *)malloc(9*sizeof(unsigned char));
+            unsigned char *surr_own=(unsigned char *)malloc(9*sizeof(unsigned char));
+            unsigned char **surr_tng=(unsigned char **)malloc(9*sizeof(unsigned char *));
+            get_slab_surround(surr_slb,surr_own,surr_tng,tx,ty);
+            fill_custom_column_data(list->pos,clm_recs,surr_slb,surr_own,surr_tng);
+            for (k=0;k<3;k++)
+              for (i=0;i<3;i++)
+              {
+                cust_col_add_or_update(lvl,&cclm_recs[k*3+i]);
+              }
+            end_list();
+            message_info("Custom columns set");
+          };break;
+        default:
+          message_info("Unrecognized custom columns key code: %d",key);
+          speaker_beep();
+      }
+    }
+}
+
+/*
+ * Covers actions from custom cubes screen.
+ */
+void actions_mdcube(int key)
+{
+    message_release();
+    if (!actions_list(key))
+    {
+      switch (key)
+      {
+        case KEY_TAB:
+        case KEY_DEL:
+        case KEY_ESCAPE:
+          end_list();
+          message_info("Customization cancelled");
+          break;
+        case KEY_ENTER:
+          //TODO
+          end_list();
+          message_info("Column cubes set");
+          break;
+        default:
+          message_info("Unrecognized custom cubes key code: %d",key);
           speaker_beep();
       }
     }
@@ -191,7 +271,7 @@ short actions_list(int key)
 /*
  * Action function - start any of the the list modes.
  */
-short start_list(int lstmode)
+short start_list(struct LEVEL *lvl,int lstmode)
 {
     list->prevmode=scrmode->mode;
     list->y=0; //the first visible row
@@ -220,7 +300,7 @@ void end_list()
  * Draws screen with a numbered list (as creature types or item types)
  * and key help for given screen.
  */
-void draw_numbered_list(char *(*itemstr)(unsigned char),
+void draw_numbered_list(char *(*itemstr)(unsigned short),
         unsigned int start_idx,unsigned int end_idx,unsigned int itm_width)
 {
     unsigned int line_length=min(scrmode->cols,LINEMSG_SIZE);
@@ -285,5 +365,25 @@ void draw_crtre()
 void draw_itemt()
 {
     draw_numbered_list(get_item_subtype_fullname,1,ITEM_SUBTYPE_SPELLARMG,18);
+    set_cursor_pos(get_screen_rows()-1, 17);
+}
+
+void draw_mdtextr()
+{
+    draw_mdempty();
+//    draw_numbered_list(get_item_subtype_fullname,1,ITEM_SUBTYPE_SPELLARMG,18);
+    set_cursor_pos(get_screen_rows()-1, 17);
+}
+
+void draw_mdcclm()
+{
+    draw_numbered_list(get_custom_column_fullname,0,CUST_CLM_GEN_MAX_INDEX,18);
+    set_cursor_pos(get_screen_rows()-1, 17);
+}
+
+void draw_mdcube()
+{
+    draw_mdempty();
+//    draw_numbered_list(get_item_subtype_fullname,1,ITEM_SUBTYPE_SPELLARMG,18);
     set_cursor_pos(get_screen_rows()-1, 17);
 }

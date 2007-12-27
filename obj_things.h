@@ -328,15 +328,15 @@ int get_item_category(unsigned char stype_idx);
 unsigned char get_usual_item_slab(unsigned char stype_idx);
 unsigned char get_usual_thing_slab(unsigned char *thing);
 
-char *get_thing_type_fullname(unsigned char type_idx);
-char *get_thing_type_shortname(unsigned char type_idx);
-char *get_item_subtype_fullname(unsigned char stype_idx);
-char *get_item_subtype_shortname(unsigned char stype_idx);
-char *get_creature_subtype_fullname(unsigned char stype_idx);
-char *get_creature_subtype_shortname(unsigned char stype_idx);
-char *get_trap_subtype_fullname(unsigned char stype_idx);
-char *get_door_subtype_fullname(unsigned char stype_idx);
-char *get_item_category_fullname(unsigned char stype_idx);
+char *get_thing_type_fullname(unsigned short type_idx);
+char *get_thing_type_shortname(unsigned short type_idx);
+char *get_item_subtype_fullname(unsigned short stype_idx);
+char *get_item_subtype_shortname(unsigned short stype_idx);
+char *get_creature_subtype_fullname(unsigned short stype_idx);
+char *get_creature_subtype_shortname(unsigned short stype_idx);
+char *get_trap_subtype_fullname(unsigned short stype_idx);
+char *get_door_subtype_fullname(unsigned short stype_idx);
+char *get_item_category_fullname(unsigned short stype_idx);
 
 short thing_verify(unsigned char *thing, char *err_msg);
 

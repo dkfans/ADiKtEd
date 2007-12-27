@@ -206,6 +206,7 @@ int adikted_cmd_index(char *cmdtext);
 const char *adikted_cmd_text(int cmdidx);
 int orient_cmd_index(char *cmdtext);
 const char *orient_cmd_text(int cmdidx);
+unsigned short get_orientation_next(unsigned short orient);
 
 //Other lower level functions
 short script_command_param_add(struct DK_SCRIPT_COMMAND *cmd,char *param);
@@ -213,6 +214,7 @@ void script_command_clear(struct DK_SCRIPT_COMMAND *cmd);
 void script_command_free(struct DK_SCRIPT_COMMAND *cmd);
 char *get_orientation_shortname(unsigned short orient);
 char *get_font_longname(unsigned short font);
+short script_param_to_int(int *val,char *param);
 
 //Lower level - executing commands
 short execute_adikted_command(struct LEVEL *lvl,struct DK_SCRIPT_COMMAND *cmd,char *err_msg);

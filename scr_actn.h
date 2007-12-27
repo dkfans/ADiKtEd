@@ -17,7 +17,11 @@ enum adikt_workmode
   MD_CLM    = 0x005,
   MD_SCRP   = 0x006,
   MD_TXTR   = 0x007,
+  MD_CCLM   = 0x008,
+  MD_CUBE   = 0x009,
 };
+
+#define MODES_COUNT 10
 
 enum adikt_panel_viewmode
 {

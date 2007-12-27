@@ -14,6 +14,8 @@ enum borderStyle {bsSingle,bsDouble,bsSolid};
 #define PRINT_COLOR_YELLOW_ON_BLACK   4
 #define PRINT_COLOR_WHITE_ON_BLACK    5
 #define PRINT_COLOR_LMAGENT_ON_BLACK  7
+#define PRINT_COLOR_LBLUE_ON_BLACK    31
+#define PRINT_COLOR_LCYAN_ON_BLACK    34
 #define PRINT_COLOR_RED_ON_WHITE      9
 
 #define PRINT_COLOR_WHITE_ON_RED      10

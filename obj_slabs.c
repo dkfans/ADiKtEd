@@ -59,6 +59,37 @@ const unsigned short slabs_doors[]={
     SLAB_TYPE_DOORMAGIC1, SLAB_TYPE_DOORMAGIC2
 };
 
+const char *all_slabs_fullnames[]={
+
+     SLB_ROCK_LTEXT,SLB_GOLD_LTEXT,              //00
+     SLB_EARTH_LTEXT,SLB_TORCHDIRT_LTEXT,
+     SLB_WALLDRAPE_LTEXT,SLB_WALLTORCH_LTEXT,
+     SLB_WALLWTWINS_LTEXT,SLB_WALLWWOMAN_LTEXT,
+     SLB_WALLPAIRSHR_LTEXT,SLB_UNKN_LTEXT,        //08
+     SLB_PATH_LTEXT,SLB_CLAIMED_LTEXT,           //0A
+     SLB_LAVA_LTEXT,SLB_WATER_LTEXT,
+     SLB_PORTAL_LTEXT,SLB_UNKN_LTEXT,
+     SLB_TREASURE_LTEXT,SLB_UNKN_LTEXT,
+     SLB_LIBRARY_LTEXT,SLB_UNKN_LTEXT,
+     SLB_PRISON_LTEXT,SLB_UNKN_LTEXT,
+     SLB_TORTURE_LTEXT,SLB_UNKN_LTEXT,
+     SLB_TRAINING_LTEXT,SLB_UNKN_LTEXT,
+     SLB_DUNGHEART_LTEXT,SLB_UNKN_LTEXT,
+     SLB_WORKSHOP_LTEXT,SLB_UNKN_LTEXT,
+     SLB_SCAVENGER_LTEXT,SLB_UNKN_LTEXT,
+     SLB_TEMPLE_LTEXT,SLB_UNKN_LTEXT,
+     SLB_GRAVEYARD_LTEXT,SLB_UNKN_LTEXT,
+     SLB_HATCHERY_LTEXT,SLB_UNKN_LTEXT,
+     SLB_LAIR_LTEXT,SLB_UNKN_LTEXT,
+     SLB_BARRACKS_LTEXT,SLB_UNKN_LTEXT,        //28
+     SLB_DOORWOOD_LTEXT,SLB_DOORWOOD_LTEXT,
+     SLB_DOORBRACE_LTEXT,SLB_DOORBRACE_LTEXT,
+     SLB_DOORIRON_LTEXT,SLB_DOORIRON_LTEXT,
+     SLB_DOORMAGIC_LTEXT,SLB_DOORMAGIC_LTEXT, //2f
+     SLB_UNKN_LTEXT,SLB_BRIDGE_LTEXT,
+     SLB_GEMS_LTEXT,SLB_GUARDPOST_LTEXT,
+     };
+
 unsigned char get_owner_next(unsigned char plyr_idx)
 {
   plyr_idx++;
@@ -324,4 +355,16 @@ short slab_verify_entry(unsigned char slab_type, char *err_msg)
     if (slab_is_tall_unclmabl(slab_type)) return VERIF_OK;
     sprintf(err_msg,"Unknown slab entry %d",(int)slab_type);
     return VERIF_WARN;
+}
+
+/*
+ * Returns slab type name string
+ */
+char *get_slab_fullname(unsigned short slb_type)
+{
+     int types_count=sizeof(all_slabs_fullnames)/sizeof(char *);
+     if (slb_type<types_count)
+       return (char *)all_slabs_fullnames[slb_type];
+     else
+       return "unknown(?!)";
 }

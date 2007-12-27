@@ -8,72 +8,74 @@
 #ifndef ADIKT_OBJCOLMN_H
 #define ADIKT_OBJCOLMN_H
 
-#define CLM_BOX_EMPTY1         0x0000
+#define CUBE_EMPTY1         0x0000
   //Standard, digable earth
-#define CLM_BOX_EARTHSTD1      0x0001
-#define CLM_BOX_EARTHSTD2      0x0002
-#define CLM_BOX_EARTHSTD3      0x0003
+#define CUBE_EARTHSTD1      0x0001
+#define CUBE_EARTHSTD2      0x0002
+#define CUBE_EARTHSTD3      0x0003
   //Tamped earth; it looks like digable from top,
   // but is different in profile
-#define CLM_BOX_EARTHTAMPED1   0x0004
-#define CLM_BOX_EARTHTAMPED2   0x0005
-#define CLM_BOX_EARTHTAMPED3   0x0006
+#define CUBE_EARTHTAMPED1   0x0004
+#define CUBE_EARTHTAMPED2   0x0005
+#define CUBE_EARTHTAMPED3   0x0006
 
 //TODO: add defines here
 
-#define CLM_BOX_LAVA1          0x0028
-#define CLM_BOX_LAVA2          0x0029
+#define CUBE_LAVA1          0x0028
+#define CUBE_LAVA2          0x0029
 
 //TODO: add defines here
 
   // Rock with a little of something else on bottom
-#define CLM_BOX_ROCKNEARDARK   0x0198
-#define CLM_BOX_ROCKNEARLAVA   0x0199
+#define CUBE_ROCKNEARDARK   0x0198
+#define CUBE_ROCKNEARLAVA   0x0199
   // Rock floors, color visible on sides
-#define CLM_BOX_ROCKFLOORBLUE1 0x019a
-#define CLM_BOX_ROCKFLOORBLUE2 0x019b
-#define CLM_BOX_ROCKFLOORBLUE3 0x019c
-#define CLM_BOX_ROCKFLOORGREY1 0x019d
-#define CLM_BOX_ROCKFLOORGREY2 0x019e
-#define CLM_BOX_ROCKFLOORGREY3 0x019f
-#define CLM_BOX_ROCKFLOORYELL1 0x01a0
-#define CLM_BOX_ROCKFLOORYELL2 0x01a1
-#define CLM_BOX_ROCKFLOORGREY4 0x01a2
-#define CLM_BOX_ROCKFLOORGREY5 0x01a3
-#define CLM_BOX_ROCKFLOORWHITE 0x01a4
-#define CLM_BOX_ROCFLOORKRED   0x01a5
+#define CUBE_ROCKFLOORBLUE1 0x019a
+#define CUBE_ROCKFLOORBLUE2 0x019b
+#define CUBE_ROCKFLOORBLUE3 0x019c
+#define CUBE_ROCKFLOORGREY1 0x019d
+#define CUBE_ROCKFLOORGREY2 0x019e
+#define CUBE_ROCKFLOORGREY3 0x019f
+#define CUBE_ROCKFLOORYELL1 0x01a0
+#define CUBE_ROCKFLOORYELL2 0x01a1
+#define CUBE_ROCKFLOORGREY4 0x01a2
+#define CUBE_ROCKFLOORGREY5 0x01a3
+#define CUBE_ROCKFLOORWHITE 0x01a4
+#define CUBE_ROCFLOORKRED   0x01a5
   // Rocks with glassy "eye" at top
-#define CLM_BOX_EYEDROCKRED    0x017e
-#define CLM_BOX_EYEDROCKBLUE   0x01a6
-#define CLM_BOX_EYEDROCKGREEN  0x01a7
-#define CLM_BOX_EYEDROCKYELLOW 0x01a8
-#define CLM_BOX_EYEDROCKBLINK  0x01a9
-#define CLM_BOX_EYEDROCKWHITE  0x01aa
+#define CUBE_EYEDROCKRED    0x017e
+#define CUBE_EYEDROCKBLUE   0x01a6
+#define CUBE_EYEDROCKGREEN  0x01a7
+#define CUBE_EYEDROCKYELLOW 0x01a8
+#define CUBE_EYEDROCKBLINK  0x01a9
+#define CUBE_EYEDROCKWHITE  0x01aa
   //Various color rocks
-#define CLM_BOX_ROCKGREEN      0x01ab
-#define CLM_BOX_ROCKBLUE       0x01ac
-#define CLM_BOX_ROCKYELLOW     0x01ad
-#define CLM_BOX_ROCKBLACK      0x01ae
-#define CLM_BOX_ROCKWHITE      0x01af
-#define CLM_BOX_ROCKRED        0x01b0
+#define CUBE_ROCKGREEN      0x01ab
+#define CUBE_ROCKBLUE       0x01ac
+#define CUBE_ROCKYELLOW     0x01ad
+#define CUBE_ROCKBLACK      0x01ae
+#define CUBE_ROCKWHITE      0x01af
+#define CUBE_ROCKRED        0x01b0
   //Unpenetrable wall
-#define CLM_BOX_ROCK           0x01b1
+#define CUBE_ROCK           0x01b1
   //Wall of stone
-#define CLM_BOX_STONEWALL1     0x01b2
-#define CLM_BOX_STONEWALL2     0x01b3
+#define CUBE_STONEWALL1     0x01b2
+#define CUBE_STONEWALL2     0x01b3
   //Wood, for briges, but maybe other things
-#define CLM_BOX_WOOD1          0x01b4
-#define CLM_BOX_WOOD2          0x01b5
-#define CLM_BOX_WOOD3          0x01b6
-#define CLM_BOX_WOOD4          0x01b7
-#define CLM_BOX_WOOD5          0x01b8
+#define CUBE_WOOD1          0x01b4
+#define CUBE_WOOD2          0x01b5
+#define CUBE_WOOD3          0x01b6
+#define CUBE_WOOD4          0x01b7
+#define CUBE_WOOD5          0x01b8
   //The purple gems
-#define CLM_BOX_GEMS1          0x01b9
-#define CLM_BOX_GEMS2          0x01ba
-#define CLM_BOX_GEMS3          0x01bb
-#define CLM_BOX_GEMS4          0x01bc
+#define CUBE_GEMS1          0x01b9
+#define CUBE_GEMS2          0x01ba
+#define CUBE_GEMS3          0x01bb
+#define CUBE_GEMS4          0x01bc
 
-#define CLM_BOX_MAX_INDEX      511
+#define CUBE_MAX_INDEX         511
+
+#define CUST_CLM_GEN_MAX_INDEX  34
 
 //WIB entry values
 #define COLUMN_WIB_STATIC      0x00
@@ -99,7 +101,8 @@ struct COLUMN_REC {
 struct DK_CUSTOM_CLM {
     int sx;
     int sy;
-    struct COLUMN_REC column;
+    unsigned short wib_val;
+    struct COLUMN_REC *rec;
   };
 
 typedef void (*cr_clm_func)(struct COLUMN_REC *clm_recs[9],
@@ -107,6 +110,7 @@ typedef void (*cr_clm_func)(struct COLUMN_REC *clm_recs[9],
 
 struct COLUMN_REC *create_column_rec();
 void free_column_rec(struct COLUMN_REC *clm_rec);
+short clm_rec_copy(struct COLUMN_REC *dest_rec,const struct COLUMN_REC *src_rec);
 void fill_column_rec_sim(struct COLUMN_REC *clm_rec, unsigned int use, int base,
         int c0, int c1, int c2, int c3, int c4, int c5, int c6, int c7);
 void fill_column_rec_simp(struct COLUMN_REC *clm_rec, unsigned int use, int base,
@@ -139,6 +143,10 @@ unsigned short compute_clm_rec_height(const struct COLUMN_REC *clm_rec);
 unsigned short get_clm_entry_height(const unsigned char *clmentry);
 unsigned short get_clm_entry_solid(const unsigned char *clmentry);
 short clm_verify_entry(const unsigned char *clmentry, char *err_msg);
+
+char *get_custom_column_fullname(unsigned short idx);
+short fill_custom_column_data(unsigned short idx,struct COLUMN_REC *clm_recs[9],
+        unsigned char *surr_slb,unsigned char *surr_own, unsigned char **surr_tng);
 
 void create_columns_for_slab(struct COLUMN_REC *clm_recs[9],
         unsigned char *surr_slb,unsigned char *surr_own, unsigned char **surr_tng);

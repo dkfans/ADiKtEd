@@ -304,7 +304,7 @@ short set_door_orientation(unsigned char *thing,unsigned char orient)
     thing[13]=orient;
 }
 
-char *get_thing_type_fullname(unsigned char type_idx)
+char *get_thing_type_fullname(unsigned short type_idx)
 {
      int types_count=sizeof(thing_fullnames)/sizeof(char *);
      if (type_idx<types_count)
@@ -313,7 +313,7 @@ char *get_thing_type_fullname(unsigned char type_idx)
        return "unknown(?!)";
 }
 
-char *get_thing_type_shortname(unsigned char type_idx)
+char *get_thing_type_shortname(unsigned short type_idx)
 {
      int types_count=sizeof(thing_shortnames)/sizeof(char *);
      if (type_idx<types_count)
@@ -1176,7 +1176,7 @@ short is_crucial_thing(unsigned char *thing)
 /*
  * Returns item type name as text
  */
-char *get_item_subtype_fullname(unsigned char stype_idx)
+char *get_item_subtype_fullname(unsigned short stype_idx)
 {
       switch (stype_idx)
       {
@@ -1478,7 +1478,7 @@ char *get_item_subtype_fullname(unsigned char stype_idx)
 /*
  * Returns object type name which is max 5 chars long
  */
-char *get_item_subtype_shortname(unsigned char stype_idx)
+char *get_item_subtype_shortname(unsigned short stype_idx)
 {
       switch (stype_idx)
       {
@@ -1847,7 +1847,7 @@ int get_item_category(unsigned char stype_idx)
 /*
  * Returns creature type name string
  */
-char *get_creature_subtype_fullname(unsigned char stype_idx)
+char *get_creature_subtype_fullname(unsigned short stype_idx)
 {
      int types_count=sizeof(creature_fullnames)/sizeof(char *);
      if (stype_idx<types_count)
@@ -1859,7 +1859,7 @@ char *get_creature_subtype_fullname(unsigned char stype_idx)
 /*
  * Returns creature type name which is max 5 chars long
  */
-char *get_creature_subtype_shortname(unsigned char stype_idx)
+char *get_creature_subtype_shortname(unsigned short stype_idx)
 {
      int types_count=sizeof(creature_names)/sizeof(char *);
      if (stype_idx<types_count)
@@ -1871,7 +1871,7 @@ char *get_creature_subtype_shortname(unsigned char stype_idx)
 /*
  * Returns trap type name string
  */
-char *get_trap_subtype_fullname(unsigned char stype_idx)
+char *get_trap_subtype_fullname(unsigned short stype_idx)
 {
      int types_count=sizeof(traps)/sizeof(char *);
      if (stype_idx<types_count)
@@ -1883,7 +1883,7 @@ char *get_trap_subtype_fullname(unsigned char stype_idx)
 /*
  * Returns door type name string
  */
-char *get_door_subtype_fullname(unsigned char stype_idx)
+char *get_door_subtype_fullname(unsigned short stype_idx)
 {
      int types_count=sizeof(doors)/sizeof(char *);
      if (stype_idx<types_count)
@@ -1895,7 +1895,7 @@ char *get_door_subtype_fullname(unsigned char stype_idx)
 /*
  * Returns item category text for given subtype
  */
-char *get_item_category_fullname(unsigned char stype_idx)
+char *get_item_category_fullname(unsigned short stype_idx)
 {
      int cat_idx=get_item_category(stype_idx);
      switch (cat_idx)

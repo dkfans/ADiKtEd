@@ -5,6 +5,8 @@
 #ifndef ADIKT_SCRHELP_H
 #define ADIKT_SCRHELP_H
 
+struct LEVEL;
+
 // Help variables
 
 typedef struct {
@@ -23,6 +25,12 @@ typedef struct {
     char **crtkey;
     int itmtkeyrows;
     char **itmtkey;
+    int txtrkeyrows;
+    char **txtrkey;
+    int cclmkeyrows;
+    char **cclmkey;
+    int cubekeyrows;
+    char **cubekey;
     int slbrows;
     char **slb;
     int tngrows;
@@ -35,6 +43,10 @@ typedef struct {
     char **scrp;
     int txtrrows;
     char **txtr;
+    int cclmrows;
+    char **cclm;
+    int cuberows;
+    char **cube;
     int tiprows;
     char **tips;
     int compassrows;
@@ -49,12 +61,12 @@ void free_help(void);
 short init_key_help(int mode);
 
 //Functions - start and stop
-short start_help(void);
+short start_help(struct LEVEL *lvl);
 void end_help(void);
 
 //Functions - actions and screen
 void actions_help(int key);
-void draw_help(void);
+void draw_help();
 
 //Functions - lower level
 void draw_help_line(int posy,int posx,char *text);

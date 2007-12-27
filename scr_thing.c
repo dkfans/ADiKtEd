@@ -69,14 +69,14 @@ void actions_mdtng(int key)
       {
         case KEY_TAB:
           end_mdtng();
-          start_mdslab();
+          start_mdslab(lvl);
           message_info("Slab mode activated");
           break;
         case 'c': //add creature
-          start_list(MD_CRTR);
+          start_list(lvl,MD_CRTR);
           break;
         case 'i': //add item
-          start_list(MD_ITMT);
+          start_list(lvl,MD_ITMT);
           break;
         case 'b' : // create spell
           tng_makeitem(sx,sy,ITEM_SUBTYPE_SPELLHOE);
@@ -425,6 +425,16 @@ void actions_mdtng(int key)
           if (obj_num > 0)
             mdtng->vistng[mapmode->subtl_x][mapmode->subtl_y]=(mdtng->vistng[mapmode->subtl_x][mapmode->subtl_y]+1)%(obj_num);
           };break;
+        case '[' :
+          {
+            int visiting_z=mdtng->vistng[mapmode->subtl_x][mapmode->subtl_y];
+            tng_change_height(lvl,sx,sy,visiting_z,-64);
+          };break;
+        case ']' :
+          {
+            int visiting_z=mdtng->vistng[mapmode->subtl_x][mapmode->subtl_y];
+            tng_change_height(lvl,sx,sy, visiting_z,+64);
+          };break;
         case KEY_DEL: // delete
           {
             int visiting_z=mdtng->vistng[mapmode->subtl_x][mapmode->subtl_y];
@@ -465,7 +475,7 @@ void actions_mdtng(int key)
 /*
  * Action function - start the thing mode.
  */
-short start_mdtng()
+short start_mdtng(struct LEVEL *lvl)
 {
     mapmode->mark=false;
     change_visited_tile();
@@ -484,7 +494,7 @@ void end_mdtng()
 /*
  * Draws screen for the thing mode.
  */
-void draw_mdtng(void)
+void draw_mdtng()
 {
     draw_map_area(lvl,true,false,true);
     if (mapmode->panel_mode!=PV_MODE)
@@ -495,7 +505,7 @@ void draw_mdtng(void)
     return;
 }
 
-void draw_mdtng_panel(void)
+void draw_mdtng_panel()
 {
     int sx, sy;
     sx = (mapmode->screenx+mapmode->mapx)*3+mapmode->subtl_x;
@@ -791,12 +801,16 @@ int display_obj_stats(int scr_row, int scr_col)
     screen_setcolor(PRINT_COLOR_LGREY_ON_BLACK);
     set_cursor_pos(scr_row++, scr_col);
     screen_printf("%s","Map objects statistics");
+    set_cursor_pos(scr_row, scr_col);
+    screen_printf("Static lights:%4d",lvl->lgt_total_count);
+    set_cursor_pos(scr_row++, scr_col+20);
+    screen_printf("Graffiti:%5d",lvl->graffiti_count);
+    set_cursor_pos(scr_row, scr_col);
+    screen_printf("Action points:%4d",lvl->apt_total_count);
+    set_cursor_pos(scr_row++, scr_col+20);
+    screen_printf("Cust.clms:%4d",lvl->cust_clm_count);
     set_cursor_pos(scr_row++, scr_col);
-    screen_printf("Static lights on map: %d",lvl->lgt_total_count);
-    set_cursor_pos(scr_row++, scr_col);
-    screen_printf("Action points on map: %d",lvl->apt_total_count);
-    set_cursor_pos(scr_row++, scr_col);
-    screen_printf("Things on map: %d",lvl->tng_total_count);
+    screen_printf("Things on map:%4d",lvl->tng_total_count);
     set_cursor_pos(scr_row, scr_col1);
     screen_printf("Creatures:%6d",lvl->stats.creatures_count);
     set_cursor_pos(scr_row++, scr_col2);
@@ -805,9 +819,7 @@ int display_obj_stats(int scr_row, int scr_col)
     screen_printf("Room Effcts:%4d",lvl->stats.roomeffects_count);
     set_cursor_pos(scr_row++, scr_col2);
     screen_printf("Doors:%4d",lvl->stats.doors_count);
-    set_cursor_pos(scr_row, scr_col1);
-    screen_printf("Graffiti:%4d",lvl->graffiti_count);
-    set_cursor_pos(scr_row++, scr_col2);
+    set_cursor_pos(scr_row++, scr_col1);
     screen_printf("Items:%4d",lvl->stats.items_count);
     set_cursor_pos(scr_row++, scr_col);
     screen_printf("%s","Detailed items");
@@ -958,3 +970,68 @@ void tng_makeitem(int sx,int sy,unsigned char stype_idx)
     mdtng->vistng[mapmode->subtl_x][mapmode->subtl_y]=get_object_subtl_last(lvl,sx,sy,OBJECT_TYPE_THING);
 }
 
+void tng_change_height(struct LEVEL *lvl, unsigned int sx, unsigned int sy,unsigned int z,int delta_height)
+{
+    unsigned char *obj=get_object(lvl,sx,sy,z);
+    short obj_type=get_object_type(lvl,sx,sy,z);
+    int height,subheight;
+    if (obj==NULL)
+    {
+        message_error("Cannot find object");
+        return;
+    }
+    switch (obj_type)
+    {
+    case OBJECT_TYPE_STLIGHT:
+      height=get_stlight_tilepos_h(obj);
+      subheight=get_stlight_subtpos_h(obj)+delta_height;
+      break;
+    case OBJECT_TYPE_ACTNPT:
+      message_error("Action points have no height");
+      return;
+    case OBJECT_TYPE_THING:
+      height=get_thing_tilepos_h(obj);
+      subheight=get_thing_subtpos_h(obj)+delta_height;
+      break;
+    default:
+      message_error("Cannot recognize object");
+      return;
+      break;
+    }
+    while (subheight<0)
+    {
+        height--;
+        subheight+=256;
+    }
+    while (subheight>255)
+    {
+        height++;
+        subheight-=256;
+    }
+    if (height>=MAP_SUBNUM_H)
+    {
+        height=MAP_SUBNUM_H-1;
+        subheight=255;
+        message_error("Object height limit reached");
+    } else
+    if (height<0)
+    {
+        height=0;
+        subheight=0;
+        message_error("Object height limit reached");
+    } else
+    {
+        message_info("Object height adjusted");
+    }
+    switch (obj_type)
+    {
+    case OBJECT_TYPE_STLIGHT:
+      set_stlight_tilepos_h(obj,height);
+      set_stlight_subtpos_h(obj,subheight);
+      break;
+    case OBJECT_TYPE_THING:
+      set_thing_tilepos_h(obj,height);
+      set_thing_subtpos_h(obj,subheight);
+      break;
+    }
+}

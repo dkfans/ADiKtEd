@@ -44,15 +44,35 @@ void read_init(void)
       (*p)=0;
       p++;
       while ((*p==' ')||(*p=='\t')) p++;
-      if (strchr (buffer, ' '))
-          *strchr (buffer, ' ')=0;
+      int spacepos=strlen(buffer)-1;
+      while (spacepos>0)
+      {
+          if ((buffer[spacepos]==' ')||(buffer[spacepos]=='\t')||(buffer[spacepos]=='\n'))
+          {
+            buffer[spacepos]='\0';
+            spacepos--;
+          } else
+          {
+            spacepos=-1;
+          }
+      }
+      spacepos=strlen(p)-1;
+      while (spacepos>0)
+      {
+          if ((p[spacepos]==' ')||(p[spacepos]=='\t')||(p[spacepos]=='\n'))
+          {
+            p[spacepos]='\0';
+            spacepos--;
+          } else
+          {
+            spacepos=-1;
+          }
+      }
       if (!strcmp(buffer, "dat_view_mode"))
           dat_view_mode=atoi(p);
       if (!strcmp(buffer, "filebase"))
       {
           filebase=strdup(p);
-          if (strchr(filebase,' '))
-            *strchr(filebase,' ')=0;
           l = strlen (filebase);
           if (l)
             if (filebase[l-1]==SEPARATOR[0])

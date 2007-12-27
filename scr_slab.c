@@ -16,6 +16,7 @@
 #include "scr_help.h"
 #include "obj_things.h"
 #include "obj_slabs.h"
+#include "graffiti.h"
 
 
 // Variables
@@ -72,12 +73,12 @@ void actions_mdslab(int key)
           break;
         case KEY_TAB:
           end_mdslab();
-          start_mdtng();
+          start_mdtng(lvl);
           message_info("Thing mode activated");
           break;
         case 'c':
           end_mdslab();
-          start_mdclm();
+          start_mdclm(lvl);
           message_info("Column mode activated");
           break;
         case KEY_CTRL_SPACE:
@@ -98,27 +99,61 @@ void actions_mdslab(int key)
           if (d>=0)
           {
             message_info("Graffiti deleted");
+            graffiti_clear_from_columns(lvl,d);
             graffiti_del(lvl,d);
           } else
             message_error("Nothing to delete");
           break;
-        case 'a': // Add/view graffiti across
-            slb_place_graffiti(lvl,tx,ty,ORIENT_WE);
+        case 'a': // Change graffiti orientation
+//            slb_place_graffiti(lvl,tx,ty,ORIENT_WE);
+            slb_next_graffiti_orient(lvl,graffiti_idx(lvl,tx,ty));
           break;
         case 'd': // Add/view graffiti down
             slb_place_graffiti(lvl,tx,ty,ORIENT_NS);
           break;
-          case '0':
-          case '1':
-          case '2':
-          case '3':
-          case '4':
-          case '5':
+        case '0':
+        case '1':
+        case '2':
+        case '3':
+        case '4':
+        case '5':
             mapmode->paintown=key-'0';
             change_ownership ((char)(key-'0'));
             message_info("Slab owner changed");
             break;
-          case 'z':
+        case '[':
+          d = graffiti_idx(lvl,tx,ty);
+          if (d>=0)
+          {
+            struct DK_GRAFFITI *graf;
+            graf=get_graffiti(lvl,d);
+            int nheight=graf->height-1;
+            if (set_graffiti_height(graf,nheight)==nheight)
+            {
+              message_info("Height decreased");
+              graffiti_update_columns(lvl,d);
+            } else
+              message_error("Value limit reached");
+          } else
+            message_error("Nothing to decrease");
+          break;
+        case ']':
+          d = graffiti_idx(lvl,tx,ty);
+          if (d>=0)
+          {
+            struct DK_GRAFFITI *graf;
+            graf=get_graffiti(lvl,d);
+            int nheight=graf->height+1;
+            if (set_graffiti_height(graf,nheight)==nheight)
+            {
+              message_info("Height increased");
+              graffiti_update_columns(lvl,d);
+            } else
+              message_error("Value limit reached");
+          } else
+            message_error("Nothing to increase");
+          break;
+        case 'z':
             if (mapmode->paintmode==false)
             {
               mapmode->paintmode=true;
@@ -153,7 +188,7 @@ void actions_mdslab(int key)
 /*
  * Action function - start the mdslab mode.
  */
-short start_mdslab()
+short start_mdslab(struct LEVEL *lvl)
 {
     scrmode->mode=MD_SLB;
     return true;
@@ -277,6 +312,32 @@ void slb_place_graffiti(struct LEVEL *lvl,int tx, int ty,unsigned short orient)
     }
 }
 
+void slb_next_graffiti_orient(struct LEVEL *lvl,int graf_idx)
+{
+    if (graf_idx<0)
+    {
+        message_error("Nothing to change found");
+        return;
+    }
+    struct DK_GRAFFITI *graf;
+    graf=get_graffiti(lvl, graf_idx);
+    if (graf==NULL)
+    {
+        message_error("Bad graffiti object index");
+        return;
+    }
+    unsigned short new_orient=get_orientation_next(graf->orient);
+    graffiti_clear_from_columns(lvl,graf_idx);
+    short result=set_graffiti_orientation(graf,new_orient);
+    graffiti_update_columns(lvl,graf_idx);
+    if (!result)
+    {
+        message_error("Cannot change orientation");
+        return;
+    }
+    message_info("Graffiti orientation altered");
+}
+
 /*
  * Init function - creates arrays for keyboard shortcuts in slab mode.
  */
@@ -374,7 +435,7 @@ void free_mdslab_keys()
 /*
  * Draws screen for the mdslab mode.
  */
-void draw_mdslab(void)
+void draw_mdslab()
 {
     int tx,ty;
     tx=mapmode->mapx+mapmode->screenx;
@@ -385,10 +446,23 @@ void draw_mdslab(void)
       draw_forced_panel(lvl,mapmode->panel_mode);
     } else
     {
-      int scr_row=display_mode_keyhelp(0,scrmode->cols+3,scrmode->mode);
+      int scr_row=0;
+      int scr_col=scrmode->cols+3;
       int graff_idx=graffiti_idx(lvl,tx,ty);
-      if (graff_idx>=0)
-        scr_row=display_graffiti(lvl,scr_row+1,scrmode->cols+3,graff_idx);
+      if (graff_idx<0)
+      {
+        scr_row=display_mode_keyhelp(scr_row,scr_col,scrmode->mode);
+      } else
+      {
+        scr_row=display_graffiti(lvl,scr_row,scr_col,graff_idx);
+      }
+      scr_row++;
+      set_cursor_pos(scr_row++, scr_col);
+      unsigned short slb_type=get_tile_slab(lvl,tx,ty);
+      screen_setcolor(PRINT_COLOR_LGREY_ON_BLACK);
+      screen_printf("Slab: ");
+      screen_setcolor(PRINT_COLOR_WHITE_ON_BLACK);
+      screen_printf("%s",get_slab_fullname(slb_type));
       display_tngdat();
     }
     draw_map_cursor(lvl,true,true,false);
@@ -412,8 +486,13 @@ int display_graffiti(struct LEVEL *lvl,int scr_row, int scr_col,int graff_idx)
     screen_printf("Orientation: %s",get_orientation_shortname(graf->orient));
     set_cursor_pos(scr_row++, scr_col2);
     screen_printf("Font: %s",get_font_longname(graf->font));
+    set_cursor_pos(scr_row, scr_col1);
+    screen_printf("Height pos: %d",graf->height);
+    set_cursor_pos(scr_row++, scr_col2);
+    screen_printf("Cube: 0x%04x",graf->cube);
     set_cursor_pos(scr_row++, scr_col1);
     screen_printf("Text: ");
     screen_setcolor(PRINT_COLOR_WHITE_ON_BLACK);
     screen_printf("%s",graf->text);
+    return scr_row;
 }

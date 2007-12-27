@@ -11,6 +11,7 @@
 #include "lev_data.h"
 #include "obj_slabs.h"
 #include "obj_column.h"
+#include "lev_column.h"
 
 //Objectives of creatures in partys
 const char objctv_defend_party_cmdtext[]="DEFEND_PARTY";
@@ -244,7 +245,10 @@ const char orient_ns_cmdtext[]="ORIENT_NS";
 const char orient_we_cmdtext[]="ORIENT_WE";
 const char orient_sn_cmdtext[]="ORIENT_SN";
 const char orient_ew_cmdtext[]="ORIENT_EW";
-const char orient_tp_cmdtext[]="ORIENT_TOP";
+const char orient_tpns_cmdtext[]="ORIENT_TOPNS";
+const char orient_tpwe_cmdtext[]="ORIENT_TOPWE";
+const char orient_tpsn_cmdtext[]="ORIENT_TOPSN";
+const char orient_tpew_cmdtext[]="ORIENT_TOPEW";
 
 const char font_none_cmdtext[]="FONT_NONE";
 const char font_adiclssc_cmdtext[]="FONT_ADICLSSC";
@@ -255,16 +259,36 @@ const char *cmd_adikted_arr[]={
         "",custom_column_cmdtext,graffiti_cmdtext  //0x000,0x001,0x002
         };
 
+const short orient_constants[]={
+        ORIENT_NS,ORIENT_WE,ORIENT_SN,ORIENT_EW,
+        ORIENT_TNS,ORIENT_TWE,ORIENT_TSN,ORIENT_TEW
+        };
+
 const char *cmd_orient_arr[]={
-        orient_ns_cmdtext,orient_we_cmdtext,orient_sn_cmdtext,  //0x000,0x001,0x002
-        orient_ew_cmdtext,orient_tp_cmdtext                     //0x003, 0x004
+        orient_ns_cmdtext,orient_we_cmdtext,orient_sn_cmdtext,      //0x000,0x001,0x002
+        orient_ew_cmdtext,orient_tpns_cmdtext, orient_tpwe_cmdtext, //0x003,0x004,0x005
+        orient_tpsn_cmdtext,orient_tpew_cmdtext,                    //0x006,0x007
         };
 
 const char *cmd_orient_shortnames[]={
-        "NS","WE","SN","EW","Top" };
+        "NS","WE","SN","EW","TpNS","TpWE","TpSN","TpEW" };
 
 const char *cmd_font_longnames[]={
         "none","Classic" };
+
+short script_param_to_int(int *val,char *param)
+{
+  if ((param==NULL)||(val==NULL)) return false;
+  int n_read;
+  if (strncmp(param,"0x",2)==0)
+  {
+    n_read=sscanf(param+2,"%x",val);
+  } else
+  {
+    n_read=sscanf(param,"%d",val);
+  }
+  return (n_read==1);
+}
 
 /*
  * Executes command from the CMD_ADIKTED group
@@ -275,23 +299,54 @@ short execute_adikted_command(struct LEVEL *lvl,struct DK_SCRIPT_COMMAND *cmd,ch
     switch (cmd->index)
     {
     case CUSTOM_COLUMN:
-       if (cmd->param_count<10)
+       if (cmd->param_count<14)
        {
          sprintf(err_msg,"%s requires more parameters",custom_column_cmdtext);
          return false;
        }
        int sx=-1,sy=-1;
-       if (sscanf(cmd->params[0],"%d",&sx)<1)
+       short result=true;
+       result&=script_param_to_int(&sx,cmd->params[0]);
+       result&=script_param_to_int(&sy,cmd->params[1]);
+       if (!result)
        {
-         sprintf(err_msg,"Cannot read map subtile X coordinate");
+         sprintf(err_msg,"Cannot read map subtile coordinates");
          return false;
        }
-       if (sscanf(cmd->params[1],"%d",&sy)<1)
+       int wib_val;
+       int lintel;
+       int orient;
+       int base;
+       result&=script_param_to_int(&wib_val,cmd->params[2]);
+       result&=script_param_to_int(&lintel,cmd->params[3]);
+       result&=script_param_to_int(&orient,cmd->params[4]);
+       result&=script_param_to_int(&base,cmd->params[5]);
+       if (!result)
        {
-         sprintf(err_msg,"Cannot read map subtile Y coordinate");
+         sprintf(err_msg,"Cannot read basic column parameters");
          return false;
        }
-         //TODO
+       int c[8];
+       int i;
+       for (i=0;i<8;i++)
+           result&=script_param_to_int(&c[i],cmd->params[6+i]);
+       if (!result)
+       {
+         sprintf(err_msg,"Cannot read column cubes");
+         return false;
+       }
+       //Creating and filling custom column
+       struct DK_CUSTOM_CLM *ccol;
+       ccol=create_cust_col(sx,sy);
+       struct COLUMN_REC *clm_rec=ccol->rec;
+       ccol->wib_val=wib_val;
+       clm_rec->lintel=lintel;
+       clm_rec->orientation=orient;
+       clm_rec->base=base;
+       for (i=0;i<8;i++)
+           clm_rec->c[i]=c[i];
+       //Adding custom column to level
+       cust_col_add_obj(lvl,ccol);
        return true;
     case DEFINE_GRAFFITI:
       {
@@ -301,14 +356,12 @@ short execute_adikted_command(struct LEVEL *lvl,struct DK_SCRIPT_COMMAND *cmd,ch
          return false;
        }
        int tx=-1,ty=-1,height=0;
-       if (sscanf(cmd->params[0],"%d",&tx)<1)
+       short result=true;
+       result&=script_param_to_int(&tx,cmd->params[0]);
+       result&=script_param_to_int(&ty,cmd->params[1]);
+       if (!result)
        {
-         sprintf(err_msg,"Cannot read map tile X coordinate");
-         return false;
-       }
-       if (sscanf(cmd->params[1],"%d",&ty)<1)
-       {
-         sprintf(err_msg,"Cannot read map tile Y coordinate");
+         sprintf(err_msg,"Cannot read map tile coordinates");
          return false;
        }
        if (sscanf(cmd->params[2],"%d",&height)<1)
@@ -325,7 +378,8 @@ short execute_adikted_command(struct LEVEL *lvl,struct DK_SCRIPT_COMMAND *cmd,ch
        if (font<0) font=GRAFF_FONT_ADICLSSC;
        int i,textlen;
        unsigned int cube=0x0184;
-       if (sscanf(cmd->params[5],"%d",&cube)<1)
+       //Note: +2 is to skip 0x; must change this later...
+       if (sscanf(cmd->params[5]+2,"%x",&cube)<1)
        {
          sprintf(err_msg,"Cannot read filler cube index");
          return false;
@@ -549,7 +603,7 @@ short add_graffiti_to_script(char ***lines,int *lines_count,struct LEVEL *lvl)
           graftxt[k]=c;
       }
       graftxt[graf_len]='\0';
-      sprintf(line,"%s(%d,%d,%d,%s,%s,0x%04x,%s)",graffiti_cmdtext,graf->tx,graf->ty,graf->height,
+      sprintf(line,"%s(%d,%d,%d,%s,%s,0x%03x,%s)",graffiti_cmdtext,graf->tx,graf->ty,graf->height,
                 orient_cmd_text(graf->orient),font_adiclssc_cmdtext,graf->cube,graftxt);
       text_file_linecp_add(lines,lines_count,line);
     }
@@ -562,12 +616,18 @@ short add_custom_clms_to_script(char ***lines,int *lines_count,struct LEVEL *lvl
 {
     int i;
     struct DK_CUSTOM_CLM *cclm;
+    struct COLUMN_REC *clm_rec;
     char *line;
     line=(char *)malloc(LINEMSG_SIZE*sizeof(char));
     for (i=0; i < lvl->cust_clm_count; i++)
     {
       cclm = lvl->cust_clm[i];
-      sprintf(line,"%s(%d,%d,...)",custom_column_cmdtext,cclm->sx,cclm->sy);
+      clm_rec = cclm->rec;
+      sprintf(line,"%s(%d,%d,%d,%d,%d,0x%03x,0x%03x,0x%03x,0x%03x,0x%03x,0x%03x,0x%03x,0x%03x,0x%03x)",
+          custom_column_cmdtext,cclm->sx,cclm->sy,
+          cclm->wib_val,clm_rec->lintel,clm_rec->orientation,clm_rec->base,
+          clm_rec->c[0],clm_rec->c[1],clm_rec->c[2],clm_rec->c[3],
+          clm_rec->c[4],clm_rec->c[5],clm_rec->c[6],clm_rec->c[7]);
       text_file_linecp_add(lines,lines_count,line);
     }
     free(line);
@@ -584,6 +644,21 @@ char *get_orientation_shortname(unsigned short orient)
        return (char *)cmd_orient_shortnames[orient];
      else
        return "unkn";
+}
+
+/*
+ * Returns next orientation constant
+ */
+unsigned short get_orientation_next(unsigned short orient)
+{
+     int array_count=sizeof(orient_constants)/sizeof(unsigned short);
+    //find the constant in proper array
+    int idx=arr_ushort_pos(orient_constants,orient,array_count);
+    if ((idx<0)||(idx+1>=array_count))
+        idx=0;
+    else
+        idx++;
+    return orient_constants[idx];
 }
 
 /*

@@ -13,6 +13,51 @@
 #include "obj_things.h"
 #include "graffiti.h"
 
+static void (*custom_columns_gen [CUST_CLM_GEN_MAX_INDEX+1])(struct COLUMN_REC *clm_recs[9],
+        unsigned char *,unsigned char *, unsigned char **)={
+     create_columns_slb_rock,create_columns_slb_gold,              //00
+     create_columns_slb_fulldirt,create_columns_slb_earth,
+     create_columns_slb_torchdirt,
+     create_columns_slb_walldrape,create_columns_slb_walltorch,
+     create_columns_slb_wallwtwins,create_columns_slb_wallwwoman,
+     create_columns_slb_wallpairshr,
+     create_columns_slb_path,create_columns_slb_claimed,           //0a
+     create_columns_slb_lava,create_columns_slb_water,
+     create_columns_slb_portal,create_columns_slb_treasure,
+     create_columns_slb_library,create_columns_slb_prison,
+     create_columns_slb_torture,create_columns_slb_training,
+     create_columns_slb_dungheart,create_columns_slb_workshop,     //14
+     create_columns_slb_scavenger,create_columns_slb_temple,
+     create_columns_slb_graveyard,create_columns_slb_hatchery,
+     create_columns_slb_lair,create_columns_slb_barracks,          //1a
+     create_columns_slb_doorwood,create_columns_slb_doorbrace,
+     create_columns_slb_dooriron,create_columns_slb_doormagic,
+     create_columns_slb_bridge,create_columns_slb_gems,            //20
+     create_columns_slb_guardpost,
+     };
+
+const char *custom_columns_fullnames[CUST_CLM_GEN_MAX_INDEX+1]={
+     "Standard Rock","Standard Gold",              //00
+     "Unaffected earth","Standard earth",
+     SLB_TORCHDIRT_LTEXT,
+     SLB_WALLDRAPE_LTEXT,SLB_WALLTORCH_LTEXT,
+     SLB_WALLWTWINS_LTEXT,SLB_WALLWWOMAN_LTEXT,
+     SLB_WALLPAIRSHR_LTEXT,
+     "Standard path",SLB_CLAIMED_LTEXT,           //0A
+     "Standard lava","Standard water",
+     SLB_PORTAL_LTEXT,SLB_TREASURE_LTEXT,
+     SLB_LIBRARY_LTEXT,SLB_PRISON_LTEXT,
+     SLB_TORTURE_LTEXT,SLB_TRAINING_LTEXT,
+     SLB_DUNGHEART_LTEXT,SLB_WORKSHOP_LTEXT,     //14
+     SLB_SCAVENGER_LTEXT,SLB_TEMPLE_LTEXT,
+     SLB_GRAVEYARD_LTEXT,SLB_HATCHERY_LTEXT,
+     SLB_LAIR_LTEXT,SLB_BARRACKS_LTEXT,          //1A
+     SLB_DOORWOOD_LTEXT,SLB_DOORBRACE_LTEXT,
+     SLB_DOORIRON_LTEXT,SLB_DOORMAGIC_LTEXT,
+     SLB_BRIDGE_LTEXT,"Standard gems",            //20
+     SLB_GUARDPOST_LTEXT,
+     };
+
 //const unsigned short wib_columns_static[]={
 //};
 
@@ -351,6 +396,12 @@ unsigned short get_clm_entry_solid(const unsigned char *clmentry)
     return (unsigned short)clmentry[3]+(clmentry[4]<<8);
 }
 
+short clm_rec_copy(struct COLUMN_REC *dest_rec,const struct COLUMN_REC *src_rec)
+{
+    memcpy(dest_rec,src_rec,sizeof(struct COLUMN_REC));
+    return true;
+}
+
 /*
  * Verifies values in the CLM entry.
  */
@@ -361,7 +412,7 @@ short clm_verify_entry(const unsigned char *clmentry, char *err_msg)
   get_clm_entry(clm_rec, clmentry);
   int i;
   for (i=0;i<8;i++)
-    if (clm_rec->c[i]>CLM_BOX_MAX_INDEX)
+    if (clm_rec->c[i]>CUBE_MAX_INDEX)
     {
         sprintf(err_msg,"Cube entry %d too large",i);
         return VERIF_WARN;
@@ -382,6 +433,9 @@ short clm_verify_entry(const unsigned char *clmentry, char *err_msg)
   return VERIF_OK;
 }
 
+/*
+ * Returns if the column should be animated (contains water or lava, or similar)
+ */
 short column_wib_animate(unsigned int clm)
 {
     int array_count=sizeof(wib_columns_animate)/sizeof(unsigned short);
@@ -436,6 +490,27 @@ unsigned short column_wib_entry(struct COLUMN_REC *clm_rec,
     if (anim_this&&anim_west&&anim_north&&anim_nw)
       return COLUMN_WIB_ANIMATE;
     return COLUMN_WIB_SKEW;
+}
+
+/*
+ * Returns custom column type name as text
+ */
+char *get_custom_column_fullname(unsigned short idx)
+{
+    int types_count=sizeof(custom_columns_fullnames)/sizeof(char *);
+    if (idx<types_count)
+      return (char *)custom_columns_fullnames[idx];
+    else
+      return "unknown(?!)";
+}
+
+/*
+ * Executes custom column filling function with given index
+ */
+short fill_custom_column_data(unsigned short idx,struct COLUMN_REC *clm_recs[9],
+        unsigned char *surr_slb,unsigned char *surr_own, unsigned char **surr_tng)
+{
+    custom_columns_gen[idx](clm_recs,surr_slb,surr_own,surr_tng);
 }
 
 /*
@@ -3227,12 +3302,12 @@ void fill_column_dungheart_pillar(struct COLUMN_REC *clm_rec, unsigned char owne
         0x080 , 0x052, 0x048, 0x049, 0x04a, 0x049, 0x17f, 0x1aa);
     switch (owner)
     {
-    case PLAYER0:    clm_rec->c[7]=CLM_BOX_EYEDROCKRED; break;
-    case PLAYER1:    clm_rec->c[7]=CLM_BOX_EYEDROCKBLUE; break;
-    case PLAYER2:    clm_rec->c[7]=CLM_BOX_EYEDROCKGREEN; break;
-    case PLAYER3:    clm_rec->c[7]=CLM_BOX_EYEDROCKYELLOW; break;
-    case PLAYER_GOOD:clm_rec->c[7]=CLM_BOX_EYEDROCKWHITE; break;
-    default:         clm_rec->c[7]=CLM_BOX_EYEDROCKBLINK; break;
+    case PLAYER0:    clm_rec->c[7]=CUBE_EYEDROCKRED; break;
+    case PLAYER1:    clm_rec->c[7]=CUBE_EYEDROCKBLUE; break;
+    case PLAYER2:    clm_rec->c[7]=CUBE_EYEDROCKGREEN; break;
+    case PLAYER3:    clm_rec->c[7]=CUBE_EYEDROCKYELLOW; break;
+    case PLAYER_GOOD:clm_rec->c[7]=CUBE_EYEDROCKWHITE; break;
+    default:         clm_rec->c[7]=CUBE_EYEDROCKBLINK; break;
     }
 }
 
@@ -3294,12 +3369,12 @@ void fill_column_portal_inside_cntr(struct COLUMN_REC *clm_rec, unsigned char ow
          0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x089+4, 0);
     switch (owner)
     {
-    case PLAYER0:    clm_rec->c[6]=CLM_BOX_EYEDROCKRED; break;
-    case PLAYER1:    clm_rec->c[6]=CLM_BOX_EYEDROCKBLUE; break;
-    case PLAYER2:    clm_rec->c[6]=CLM_BOX_EYEDROCKGREEN; break;
-    case PLAYER3:    clm_rec->c[6]=CLM_BOX_EYEDROCKYELLOW; break;
-    case PLAYER_GOOD:clm_rec->c[6]=CLM_BOX_EYEDROCKWHITE; break;
-    default:         clm_rec->c[6]=CLM_BOX_EYEDROCKBLINK; break;
+    case PLAYER0:    clm_rec->c[6]=CUBE_EYEDROCKRED; break;
+    case PLAYER1:    clm_rec->c[6]=CUBE_EYEDROCKBLUE; break;
+    case PLAYER2:    clm_rec->c[6]=CUBE_EYEDROCKGREEN; break;
+    case PLAYER3:    clm_rec->c[6]=CUBE_EYEDROCKYELLOW; break;
+    case PLAYER_GOOD:clm_rec->c[6]=CUBE_EYEDROCKWHITE; break;
+    default:         clm_rec->c[6]=CUBE_EYEDROCKBLINK; break;
     }
 }
 

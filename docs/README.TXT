@@ -107,6 +107,14 @@ Version: 0.54a
  Support of all rooms completed
  Graffiti support renewed
  Created ADI file format, its reading and writing
+Version: 0.55a
+ Fixed hanging when F7 (quick load) pressed
+ Graffiti orientation can now be changed with 'a'
+ Graffiti can now be oriented for view from top
+ Extended help system and help file
+ Corrected white spaces treatment inside map.ini file
+ Height of graffiti/thing can be changed with '[' and ']'
+ New, experimental "manual columns" function
 TODO before beta:
  Auto creating room things
 

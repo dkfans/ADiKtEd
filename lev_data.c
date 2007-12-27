@@ -635,6 +635,7 @@ short level_free()
   result&=level_free_apt(lvl);
   result&=level_free_tng(lvl);
   result&=level_free_txt(lvl);
+  result&=level_free_graffiti(lvl);
   return result;
 }
 
@@ -1063,7 +1064,6 @@ void free_map(void)
 {
     level_free();
     level_clear(lvl);
-    free_graffiti();
 }
 
 char *get_thing(struct LEVEL *lvl,unsigned int x,unsigned int y,unsigned int num)
@@ -1341,7 +1341,7 @@ short get_object_type(struct LEVEL *lvl, unsigned int x, unsigned int y, unsigne
     return OBJECT_TYPE_NONE;
 }
 
-char *get_object(struct LEVEL *lvl,unsigned int x,unsigned int y,unsigned int z)
+unsigned char *get_object(struct LEVEL *lvl,unsigned int x,unsigned int y,unsigned int z)
 {
     //Preparing array bounds
     int arr_entries_x=MAP_SIZE_X*MAP_SUBNUM_X;

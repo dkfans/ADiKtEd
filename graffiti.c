@@ -16,7 +16,7 @@
 /*
  * Frees the whole graffiti structure
  */
-void free_graffiti(struct LEVEL *lvl)
+short level_free_graffiti(struct LEVEL *lvl)
 {
     int i;
     for (i=lvl->graffiti_count-1; i>=0 ; i--)
@@ -89,91 +89,25 @@ void graffiti_del(struct LEVEL *lvl,unsigned int num)
              (graff_max_idx)*sizeof(struct DK_GRAFFITI *));
 }
 
+/*
+ * Creates a new graffiti and fills its all properties.
+ * The graffiti is not added to LEVEL structure.
+ */
 struct DK_GRAFFITI *create_graffiti(int tx, int ty, char *text, int orient)
 {
-    //Preparing array bounds
-    int arr_entries_x=MAP_SIZE_X*MAP_SUBNUM_X;
-    int arr_entries_y=MAP_SIZE_Y*MAP_SUBNUM_Y;
-
     tx%=MAP_SIZE_X;
     ty%=MAP_SIZE_Y;
-
     if (text==NULL) return NULL;
-
-    int i;
-    int l;
-    l = strlen(text);
-    //Computing graffiti length in subtiles
-    int subtl_len=0;
-    for (i=0; i<l; i++)
-    {
-      //The zero index in every chars[] entry is number of column
-      //needed for this character. The "+1" is required
-      // to make space between letters
-      subtl_len+=chars[(unsigned char)text[i]][0]+1;
-      int graf_end_subtl_x,graf_end_subtl_y;
-      switch (orient)
-      {
-      case ORIENT_NS:
-      case ORIENT_SN:
-          graf_end_subtl_x=tx*3;
-          graf_end_subtl_y=ty*3+subtl_len;
-          break;
-      case ORIENT_WE:
-      case ORIENT_EW:
-          graf_end_subtl_x=tx*3+subtl_len;
-          graf_end_subtl_y=ty*3;
-          break;
-      default:
-          graf_end_subtl_x=tx*3;
-          graf_end_subtl_y=ty*3;
-          break;
-      }
-      //If we've exceeded map space - truncate the graffiti
-      if ((graf_end_subtl_x > arr_entries_x)||(graf_end_subtl_y > arr_entries_y))
-      {
-        l=i;
-        break;
-      }
-    }
-    // Remove space after last character
-    subtl_len--;
-    // If there's not a single char to process (string empty at start,
-    // or truncated before) - exit
-    if (l<1) return NULL;
-    //We will need string length in tiles
-    int tiles_len=(subtl_len/3) + ((subtl_len%3)>0);
-    if (tiles_len<1) return NULL;
     struct DK_GRAFFITI *graf;
     //Filling graffiti structure
     graf = (struct DK_GRAFFITI *)malloc(sizeof(struct DK_GRAFFITI));
     if (graf==NULL) die("Cannot alloc memory for graffiti item");
     graf->tx=tx;
     graf->ty=ty;
-    graf->orient=orient;
     graf->font=GRAFF_FONT_ADICLSSC;
-    graf->height=0;
     graf->cube=0x0184;
-    graf->text = (char *)malloc((l+1)*sizeof(char));
-    strncpy(graf->text,text,l);
-    graf->text[l]='\0';
-    switch (orient)
-    {
-      case ORIENT_NS:
-      case ORIENT_SN:
-           graf->fin_tx = tx;
-           graf->fin_ty = ty+tiles_len-1;
-           break;
-      case ORIENT_WE:
-      case ORIENT_EW:
-           graf->fin_tx = tx+tiles_len-1;
-           graf->fin_ty = ty;
-           break;
-      default:
-           graf->fin_tx = tx+tiles_len-1;
-           graf->fin_ty = ty+tiles_len-1;
-           break;
-    }
+    graf->text = strdup(text);
+    set_graffiti_orientation(graf,orient);
     return graf;
 }
 
@@ -183,10 +117,6 @@ struct DK_GRAFFITI *create_graffiti(int tx, int ty, char *text, int orient)
  */
 int graffiti_add_obj(struct LEVEL *lvl,struct DK_GRAFFITI *graf)
 {
-    //Preparing array bounds
-    int arr_entries_x=MAP_SIZE_X*MAP_SUBNUM_X;
-    int arr_entries_y=MAP_SIZE_Y*MAP_SUBNUM_Y;
-
     if ((lvl==NULL)||(graf==NULL)) return -1;
 
     int graf_idx=lvl->graffiti_count;
@@ -196,6 +126,148 @@ int graffiti_add_obj(struct LEVEL *lvl,struct DK_GRAFFITI *graf)
     lvl->graffiti[graf_idx]=graf;
     lvl->graffiti_count=graf_idx+1;
     return graf_idx;
+}
+
+/*
+ * Sets orientation of given graffiti, updating its dimensions and height.
+ * Graffiti don't have to be in the LEVEL structure, but must have
+ * tx,ty,font and text properties set.
+ */
+short set_graffiti_orientation(struct DK_GRAFFITI *graf,unsigned short orient)
+{
+    if ((graf==NULL)||(graf->text==NULL)) return false;
+    //Preparing array bounds
+    int arr_entries_x=MAP_SIZE_X*MAP_SUBNUM_X;
+    int arr_entries_y=MAP_SIZE_Y*MAP_SUBNUM_Y;
+    int i;
+    int l;
+    l = strlen(graf->text);
+    //Computing graffiti length in subtiles
+    int subtl_len=0;
+    for (i=0; i<l; i++)
+    {
+      //The zero index in every chars[] entry is number of column
+      //needed for this character. The "+1" is required
+      // to make space between letters
+      subtl_len+=chars[(unsigned char)graf->text[i]][0]+1;
+      int graf_end_subtl_x,graf_end_subtl_y;
+      switch (orient)
+      {
+      case ORIENT_NS:
+      case ORIENT_SN:
+          graf_end_subtl_x=graf->tx*3;
+          graf_end_subtl_y=graf->ty*3+subtl_len;
+          break;
+      case ORIENT_WE:
+      case ORIENT_EW:
+          graf_end_subtl_x=graf->tx*3+subtl_len;
+          graf_end_subtl_y=graf->ty*3;
+          break;
+      case ORIENT_TNS:
+      case ORIENT_TSN:
+          graf_end_subtl_x=graf->tx*3;
+          graf_end_subtl_y=graf->ty*3+subtl_len;
+          break;
+      case ORIENT_TWE:
+      case ORIENT_TEW:
+          graf_end_subtl_x=graf->tx*3+subtl_len;
+          graf_end_subtl_y=graf->ty*3;
+          break;
+      default:
+          graf_end_subtl_x=graf->tx*3;
+          graf_end_subtl_y=graf->ty*3;
+          break;
+      }
+      //If we've exceeded map space - truncate the graffiti displayed
+      //(but keep the text in real length)
+      if ((graf_end_subtl_x > arr_entries_x)||(graf_end_subtl_y > arr_entries_y))
+      {
+        l=i;
+        break;
+      }
+    }
+    // Remove space after last character
+    subtl_len--;
+    //We will need string length in tiles
+    int tiles_len=(subtl_len/3) + ((subtl_len%3)>0);
+    if (tiles_len<1) tiles_len=1;
+    // Getting graffiti height - in subtiles and tiles
+    int txt_height=get_graffiti_cube_height(graf->font,graf->text);
+    int txt_tile_height=(txt_height/3)+((txt_height%3)>0);
+    //Now we can set the graffiti size and orientation
+    graf->orient=orient;
+    int graf_h=6-txt_height;
+    if ((graf_h<0)||(graf_h>7))
+      graf_h=0;
+    switch (orient)
+    {
+      case ORIENT_NS:
+      case ORIENT_SN:
+           graf->fin_tx = graf->tx;
+           graf->fin_ty = graf->ty+tiles_len-1;
+           graf->height=graf_h;
+           break;
+      case ORIENT_WE:
+      case ORIENT_EW:
+           graf->fin_tx = graf->tx+tiles_len-1;
+           graf->fin_ty = graf->ty;
+           graf->height=graf_h;
+           break;
+      case ORIENT_TNS:
+      case ORIENT_TSN:
+           graf->fin_tx = graf->tx+txt_tile_height-1;
+           graf->fin_ty = graf->ty+tiles_len-1;
+           if (slab_is_tall(get_tile_slab(lvl,graf->tx,graf->ty)))
+             graf->height=4;
+           else
+             graf->height=0;
+           break;
+      case ORIENT_TWE:
+      case ORIENT_TEW:
+           graf->fin_tx = graf->tx+tiles_len-1;
+           graf->fin_ty = graf->ty+txt_tile_height-1;
+           if (slab_is_tall(get_tile_slab(lvl,graf->tx,graf->ty)))
+             graf->height=4;
+           else
+             graf->height=0;
+           break;
+      default:
+           graf->fin_tx = graf->tx+tiles_len-1;
+           graf->fin_ty = graf->ty+tiles_len-1;
+           graf->height=graf_h;
+           break;
+    }
+    return true;
+}
+
+/*
+ * Sets new height to the graffiti; makes sure the parameter will be
+ * in appropiate range. Returns the new height set for graffiti.
+ */
+int set_graffiti_height(struct DK_GRAFFITI *graf,int height)
+{
+    if (graf==NULL) return 0;
+    int height_max;
+    switch (graf->orient)
+    {
+      case ORIENT_NS:
+      case ORIENT_SN:
+      case ORIENT_WE:
+      case ORIENT_EW:
+           height_max=7-get_graffiti_cube_height(graf->font,graf->text);
+           break;
+      case ORIENT_TNS:
+      case ORIENT_TSN:
+      case ORIENT_TWE:
+      case ORIENT_TEW:
+      default:
+           height_max=7;
+           break;
+    }
+    if (height<0) height=0;
+    if (height>height_max) height=height_max;
+    graf->height=height;
+    return height;
 }
 
 /*
@@ -226,6 +298,30 @@ void graffiti_update_columns(struct LEVEL *lvl,int graf_idx)
     graf=get_graffiti(lvl, graf_idx);
     if (graf==NULL) return;
     update_datclm_for_square(lvl,graf->tx,graf->fin_tx,graf->ty,graf->fin_ty);
+}
+
+/*
+* Updates CLM entries, removing graffiti from them.
+*/
+void graffiti_clear_from_columns(struct LEVEL *lvl,int graf_idx)
+{
+    if (graf_idx<0) return;
+    struct DK_GRAFFITI *graf;
+    graf=get_graffiti(lvl, graf_idx);
+    if (graf==NULL) return;
+    int tx,fin_tx,ty,fin_ty;
+    //Setting graffiti coords to off-screen
+    tx=graf->tx;graf->tx=MAP_SIZE_X;
+    fin_tx=graf->fin_tx;graf->fin_tx=MAP_SIZE_X;
+    ty=graf->ty;graf->ty=MAP_SIZE_Y;
+    fin_ty=graf->fin_ty;graf->fin_ty=MAP_SIZE_Y;
+    //Updating
+    update_datclm_for_square(lvl,tx,fin_tx,ty,fin_ty);
+    //Setting the coords back
+    graf->tx=tx;
+    graf->fin_tx=fin_tx;
+    graf->ty=ty;
+    graf->fin_ty=fin_ty;
 }
 
 struct DK_GRAFFITI *get_graffiti(struct LEVEL *lvl, int graf_idx)
@@ -266,9 +362,19 @@ int compute_graffiti_subtl_length(unsigned short font,char *text)
 }
 
 /*
+ * Returns graffiti height, in cubes (or subtiles).
+ */
+int get_graffiti_cube_height(unsigned short font,char *text)
+{
+    //highly simplified - for now...
+    //DODO: compute height of every char in text, then select the largest.
+    return fontheight;
+}
+
+/*
  * Draws graffiti on given columns array. Returns num of changed entries.
  */
-int draw_graffiti_on_slab(struct COLUMN_REC *clm_recs[9],struct LEVEL *lvl, int tx, int ty)
+int place_graffiti_on_slab(struct COLUMN_REC *clm_recs[9],struct LEVEL *lvl, int tx, int ty)
 {
     static const int dy[4][3]={{0,1,2}, {2,2,2}, {2,1,0}, {0,0,0}};
     static const int dx[4][3]={{0,0,0}, {0,1,2}, {2,2,2}, {2,1,0}};
@@ -289,29 +395,109 @@ int draw_graffiti_on_slab(struct COLUMN_REC *clm_recs[9],struct LEVEL *lvl, int 
       int graf_subtl_start;
       // Get short access to orientation, and make sure it won't exceed
       // dx[][]/dy[][] array
-      unsigned short or=((graf->orient%4));
-      switch (or)
+      short orient_top=false;
+      switch (graf->orient)
       {
+      case ORIENT_TNS: orient_top=true;
       case ORIENT_NS: graf_subtl_start=ty*3-base_sy; break;
-      case ORIENT_SN: graf_subtl_start=(base_sy+subtl_len)-ty*3; break;
+      case ORIENT_TSN: orient_top=true;
+      case ORIENT_SN: graf_subtl_start=(base_sy+subtl_len-1)-ty*3; break;
+      case ORIENT_TWE: orient_top=true;
       case ORIENT_WE: graf_subtl_start=tx*3-base_sx; break;
-      case ORIENT_EW: graf_subtl_start=(base_sx+subtl_len)-tx*3; break;
+      case ORIENT_TEW: orient_top=true;
+      case ORIENT_EW: graf_subtl_start=(base_sx+subtl_len-1)-tx*3; break;
       default: graf_subtl_start=0; break;
       }
-      for (i=0; i<3; i++)
+      if (orient_top)
       {
+        int subtl_h=get_graffiti_cube_height(graf->font,graf->text);
+        int graf_subtl_h_st;
+        switch (graf->orient)
+        {
+        case ORIENT_TNS: graf_subtl_h_st=tx*3-base_sx; break;
+        case ORIENT_TSN: graf_subtl_h_st=(base_sx+subtl_h-1)-(tx+1)*3; break;
+        case ORIENT_TWE: graf_subtl_h_st=(base_sy+subtl_h-1)-(ty+1)*3; break;
+        case ORIENT_TEW: graf_subtl_h_st=ty*3-base_sy; break;
+        default: graf_subtl_h_st=0; break;
+        }
+        for (i=0; i<3; i++)
+        {
+          int k;
+          int graf_subtl=graf_subtl_start+i;
+          for (k=0; k<3; k++)
+          {
+            int subtl;
+            switch (graf->orient)
+            {
+            case ORIENT_TNS: subtl=i*3 + k; break;
+            case ORIENT_TSN: subtl=(2-i)*3 + (2-k); break;
+            case ORIENT_TWE: subtl=(2-k)*3 + i; break;
+            case ORIENT_TEW: subtl=k*3 + (2-i); break;
+            default: subtl=0; break;
+            }
+            int graf_subtl_h=graf_subtl_h_st+k;
+            short modified=place_graffiti_on_clm_top(clm_recs[subtl],graf->font,
+                  graf->height,graf->text,graf_subtl,graf_subtl_h,graf->cube);
+            if (modified) mod_clms++;
+          }
+        }
+      } else
+      {
+        unsigned short or=((graf->orient%4));
+        for (i=0; i<3; i++)
+        {
           int subtl=dy[or][i]*3 + dx[or][i];
           int graf_subtl=graf_subtl_start+i;
-          short modified=draw_graffiti_on_column(clm_recs[subtl],graf->font,
-                graf->text,graf_subtl,graf->cube);
+          short modified=place_graffiti_on_column(clm_recs[subtl],graf->font,
+                graf->height,graf->text,graf_subtl,graf->cube);
           if (modified) mod_clms++;
+        }
       }
     }
     return mod_clms;
 }
 
-short draw_graffiti_on_column(struct COLUMN_REC *clm_rec,unsigned short font,
-        char *text,int graf_subtl,unsigned short cube)
+short place_graffiti_on_clm_top(struct COLUMN_REC *clm_rec,unsigned short font,
+        unsigned short height,char *text,int graf_subtl,int graf_subtl_h,
+        unsigned short cube)
+{
+    if ((clm_rec==NULL)||(text==NULL)||(strlen(text)<1)) return false;
+    int i;
+    int l = strlen(text);
+    int text_pos=0; //position of the character to print inside text
+    int clm_pos=0; //index of the current column in the current character
+    i=0;//temporary column counter
+    for (text_pos=0; text_pos<l; text_pos++)
+    {
+        //The zero index in every chars[] entry is number of column
+        //needed for this character.
+        int chr_clms_count=chars[(unsigned char)(text[text_pos])][0]+1;
+        if ((i<=graf_subtl)&&(i+chr_clms_count>graf_subtl))
+        {
+            //clm_pos starts with 1, not with 0 (because chars[][0] is
+            // the number of columns in letter)
+            clm_pos=graf_subtl-i+1;
+            break;
+        }
+        i+=chr_clms_count;
+    }
+    //Check if we've found the right position
+    if (text_pos>=l) return false;
+    unsigned char *char_data=chars[(unsigned char)text[text_pos]];
+    // Check if this is empty column (space between letters)
+    if ((clm_pos<=0)||(clm_pos>char_data[0])) return false;
+    unsigned char clm_mask=char_data[clm_pos];
+    if ((clm_mask>>graf_subtl_h)&0x01)
+    {
+        if (height<8) clm_rec->c[height]=cube;
+    }
+    clm_rec->solid=compute_clm_rec_solid(clm_rec);
+    clm_rec->height=compute_clm_rec_height(clm_rec);
+    return true;
+}
+
+short place_graffiti_on_column(struct COLUMN_REC *clm_rec,unsigned short font,
+        unsigned short height,char *text,int graf_subtl,unsigned short cube)
 {
     if ((clm_rec==NULL)||(text==NULL)||(strlen(text)<1)) return false;
     int i;
@@ -342,7 +528,10 @@ short draw_graffiti_on_column(struct COLUMN_REC *clm_rec,unsigned short font,
     for (i=0;i<8;i++)
     {
         if ((clm_mask>>i)&0x01)
-            clm_rec->c[i]=cube;
+        {
+            int idx=i+height;
+            if ((idx>=0)&&(idx<8)) clm_rec->c[idx]=cube;
+        }
     }
     clm_rec->solid=compute_clm_rec_solid(clm_rec);
     clm_rec->height=compute_clm_rec_height(clm_rec);

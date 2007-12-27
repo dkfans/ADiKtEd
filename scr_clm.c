@@ -62,8 +62,10 @@ void actions_mdclm(int key)
           message_info("Updated DAT/CLM/W?B entries of slab %d,%d.",sx/3,sy/3);
           break;
         case 'm': // manual-set mode
-          //TODO: display slab selection screen
-          message_info("Sorry, function unfinished.");
+          start_list(lvl,MD_CCLM);
+          break;
+        case 'b': // cube mode
+          start_list(lvl,MD_CUBE);
           break;
         default:
           message_info("Unrecognized clm key code: %d",key);
@@ -75,7 +77,7 @@ void actions_mdclm(int key)
 /*
  * Action function - start the column mode.
  */
-short start_mdclm()
+short start_mdclm(struct LEVEL *lvl)
 {
     scrmode->mode=MD_CLM;
     return true;
@@ -129,7 +131,7 @@ int display_dat_subtiles(int scr_row, int scr_col,int ty,int tx)
 /*
  * Draws screen for the column mode.
  */
-void draw_mdclm(void)
+void draw_mdclm()
 {
     draw_map_area(lvl,true,true,false);
     if (mapmode->panel_mode!=PV_MODE)
@@ -139,7 +141,7 @@ void draw_mdclm(void)
     draw_map_cursor(lvl,true,true,false);
 }
 
-void draw_mdclm_panel(void)
+void draw_mdclm_panel()
 {
     int tx, ty;
     tx = mapmode->screenx+mapmode->mapx;

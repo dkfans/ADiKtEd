@@ -10,6 +10,7 @@
 
 struct LEVEL;
 struct COLUMN_REC;
+struct DK_CUSTOM_CLM;
 
 void set_clm_ent_idx(struct LEVEL *lvl, int num, unsigned int use, int permanent,
         int lintel, int height, unsigned int solid, int base, int orientation,
@@ -50,8 +51,16 @@ unsigned short get_subtile_column_solid(struct LEVEL *lvl, int sx, int sy);
 // Custom columns support; graffiti are also custom columns
 short slab_has_custom_columns(struct LEVEL *lvl, int tx, int ty);
 int update_custom_columns_for_slab(struct COLUMN_REC *clm_recs[9],struct LEVEL *lvl, int tx, int ty);
-int cust_col_nidx(struct LEVEL *lvl, int tx, int ty,int num);
-int draw_cust_clms_on_slab(struct COLUMN_REC *clm_recs[9],struct LEVEL *lvl, int tx, int ty);
+int cust_col_idx(struct LEVEL *lvl, int tx, int ty);
+int cust_col_subtl_idx(struct LEVEL *lvl, int sx, int sy);
+int cust_col_idx_next(struct LEVEL *lvl, int tx, int ty,int prev_idx);
+int place_cust_clms_on_slab(struct COLUMN_REC *clm_recs[9],struct LEVEL *lvl, int tx, int ty);
+struct DK_CUSTOM_CLM *get_cust_col(struct LEVEL *lvl, int ccol_idx);
+struct COLUMN_REC *get_cust_col_rec(struct LEVEL *lvl, int ccol_idx);
+struct DK_CUSTOM_CLM *create_cust_col(int sx, int sy);
+int cust_col_add_obj(struct LEVEL *lvl,struct DK_CUSTOM_CLM *ccol);
+int cust_col_add_or_update(struct LEVEL *lvl,struct DK_CUSTOM_CLM **ccol);
+void cust_col_del(struct LEVEL *lvl,unsigned int num);
 
 // This one is special - put in separate file
 void add_permanent_columns(struct LEVEL *lvl);

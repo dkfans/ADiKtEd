@@ -24,15 +24,33 @@
 #include "obj_column.h"
 #include "lev_data.h"
 
-static void (*actions [])(int)={actions_mdslab, actions_mdtng, actions_crtre,
-     actions_itemt, actions_help, actions_mdclm, actions_scrpt, actions_textr};
+static void (*actions [MODES_COUNT])(int)={
+     actions_mdslab, actions_mdtng, actions_crtre, actions_itemt,
+     actions_help, actions_mdclm, actions_scrpt, actions_mdtextr,
+     actions_mdcclm, actions_mdcube};
+
+// Drawing functions for modes. You can fill new entries
+// with "draw_mdempty" till you create proper draw function.
+static void (*mddraw [MODES_COUNT])()={
+     draw_mdslab, draw_mdtng, draw_crtre, draw_itemt,
+     draw_help, draw_mdclm, draw_scrpt, draw_mdtextr,
+     draw_mdcclm, draw_mdcube};
+
+static void (*mdend [MODES_COUNT])()={
+     end_mdslab, end_mdtng, end_list, end_list,
+     end_help, end_mdclm, end_scrpt, end_list,
+     end_list, end_list};
 
 // Max. 5 chars mode names
-const char *modenames[]={"Slab", "Thing", "Crtr",
-     "Item", "Help", "Clmn","Scrpt","Textr"};
+const char *modenames[MODES_COUNT]={
+     "Slab", "Thing", "Crtr", "Item",
+     "Help", "Clmn", "Scrpt", "Textr",
+     "CClm", "CCube"};
 // longer mode names
-const char *longmodenames[]={"slab", "thing", "add creature",
-    "add item", "help", "column","script","texture"};
+const char *longmodenames[MODES_COUNT]={
+     "slab", "thing", "add creature","add item",
+     "help", "column", "script", "texture",
+     "cust.column","cust.cubes"};
 
 SCRMODE_DATA *scrmode;
 MAPMODE_DATA *mapmode;
@@ -173,45 +191,29 @@ void draw_levscr(struct LEVEL *lvl)
     int ty=mapmode->screeny+mapmode->mapy;
     set_cursor_pos(all_rows-1, 0);
     screen_setcolor(PRINT_COLOR_LGREY_ON_BLACK);
-    if (graffiti_idx(lvl,tx,ty)>=0)
-    {
-      char *graf_txt;
-      graf_txt=(char *)malloc(LINEMSG_SIZE*sizeof(char));
-      strncpy(graf_txt,get_graffiti_text(lvl,graffiti_idx(lvl,tx,ty)),LINEMSG_SIZE-1);
-      graf_txt[LINEMSG_SIZE-1]=0;
-      message_info("Graffiti: %s",graf_txt);
-      free(graf_txt);
-    }
     screen_printf_toeol(message_get());
-
-    switch (scrmode->mode)
-    {
-    case MD_SLB:
-      draw_mdslab();
-      break;
-    case MD_TNG:
-      draw_mdtng();
-      break;
-    case MD_CRTR:
-      draw_crtre();
-      break;
-    case MD_ITMT:
-      draw_itemt();
-      break;
-    case MD_HELP:
-      draw_help();
-      break;
-    case MD_SCRP:
-      draw_scrpt();
-      break;
-    case MD_CLM:
-      draw_mdclm();
-      break;
-    default:
-      break;
-    }
+    mddraw[scrmode->mode%MODES_COUNT]();
     set_cursor_pos(all_rows-1, all_cols-1);
     screen_refresh();
+}
+
+/*
+ * Draws screen for new modes which do not have real drawing function yet.
+ */
+void draw_mdempty()
+{
+    int tx,ty;
+    tx=mapmode->mapx+mapmode->screenx;
+    ty=mapmode->mapy+mapmode->screeny;
+    draw_map_area(lvl,true,false,false);
+    int scr_row=0;
+    int scr_col=scrmode->cols+3;
+    set_cursor_pos(scr_row++, scr_col);
+    screen_printf("This mode is unfinished.");
+    set_cursor_pos(scr_row++, scr_col);
+    screen_printf("No drawing function yet.");
+    scr_row++;
+    scr_row=display_mode_keyhelp(scr_row,scr_col,scrmode->mode);
 }
 
 /*
@@ -333,9 +335,6 @@ int get_draw_map_tile_color(struct LEVEL *lvl,int tx,int ty,short special)
 unsigned char simplify_map_slab(unsigned char slab)
 {
   if (slab==SLAB_TYPE_ROCK) return SLAB_TYPE_ROCK;
-//  if (slab==SLAB_TYPE_LAVA) return SLAB_TYPE_LAVA;
-//  if (slab==SLAB_TYPE_WATER) return SLAB_TYPE_WATER;
-//  if (slab_is_wealth(slab)) return SLAB_TYPE_GOLD;
   if (slab_is_tall(slab)) return SLAB_TYPE_EARTH;
   return SLAB_TYPE_CLAIMED;
 }
@@ -389,11 +388,17 @@ void draw_map_area(struct LEVEL *lvl,short show_ground,short show_rooms,short sh
             {
               char out_ch;
               int g;
+              short has_ccol;
               if (show_rooms)
+              {
                   g = graffiti_idx(lvl,tx,ty);
-              else
+                  has_ccol = slab_has_custom_columns(lvl,tx,ty);
+              } else
+              {
                   g = -1;
-              screen_setcolor(get_draw_map_tile_color(lvl,tx,ty,(g>=0)));
+                  has_ccol = false;
+              }
+              screen_setcolor(get_draw_map_tile_color(lvl,tx,ty,has_ccol));
               out_ch=get_draw_map_tile_char(lvl,tx,ty,show_ground,show_rooms,show_things,(g>=0));
               screen_printchr(out_ch);
             } else
@@ -469,47 +474,25 @@ int display_mode_keyhelp(int scr_row, int scr_col,int mode)
  */
 int change_mode(int new_mode)
 {
-  switch (scrmode->mode)
-  {
-  case MD_SLB:
-       end_mdslab();
-       break;
-  case MD_TNG:
-       end_mdtng();
-       break;
-  case MD_CRTR:
-  case MD_ITMT:
-  case MD_TXTR:
-       end_list();
-       break;
-  case MD_HELP:
-       end_help();
-       break;
-  case MD_CLM:
-       end_mdclm();
-       break;
-  case MD_SCRP:
-       end_scrpt();
-       break;
-  }
+  mdend[scrmode->mode%MODES_COUNT]();
   switch (new_mode)
   {
   case MD_SLB:
-       start_mdslab();
+       start_mdslab(lvl);
        break;
   case MD_TNG:
-       start_mdtng();
+       start_mdtng(lvl);
        break;
   case MD_CRTR:
   case MD_ITMT:
   case MD_TXTR:
-       start_list(new_mode);;
+       start_list(lvl,new_mode);
        break;
   case MD_HELP:
-       start_help();
+       start_help(lvl);
        break;
   case MD_CLM:
-       start_mdclm();
+       start_mdclm(lvl);
        break;
   case MD_SCRP:
        start_scrpt(lvl);
@@ -524,7 +507,8 @@ int change_mode(int new_mode)
 short is_simple_mode(int mode)
 {
     if ((scrmode->mode==MD_HELP) || (scrmode->mode==MD_CRTR) ||
-        (scrmode->mode==MD_ITMT) || (scrmode->mode==MD_TXTR) )
+        (scrmode->mode==MD_ITMT) || (scrmode->mode==MD_TXTR) ||
+        (scrmode->mode==MD_CCLM) || (scrmode->mode==MD_CUBE) )
       return true;
     return false;
 }
@@ -556,7 +540,7 @@ void proc_key(void)
     {
     case KEY_F1:
       if (scrmode->mode != MD_HELP)
-        start_help();
+        start_help(lvl);
         break;
     case KEY_CTRL_Q:
       if (!is_simple_mode(scrmode->mode))
@@ -691,8 +675,10 @@ void proc_key(void)
       }
       break;
     default:
+      {
         //Sending the action to a function corresponding to actual screen
-        actions[scrmode->mode](g);
+        actions[scrmode->mode%MODES_COUNT](g);
+      };break;
     }
 }
 

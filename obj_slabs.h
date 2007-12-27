@@ -53,6 +53,42 @@
 #define PLAYER_UNSET           0x05
 #define PLAYER_ALL             0x06  //used in scripts only
 
+#define SLB_UNKN_LTEXT "Unknown slab"
+#define SLB_ROCK_LTEXT "Rock"
+#define SLB_GOLD_LTEXT "Gold"
+#define SLB_EARTH_LTEXT "Earth"
+#define SLB_TORCHDIRT_LTEXT "Torch plate earth"
+#define SLB_WALLDRAPE_LTEXT "Wall with drape"
+#define SLB_WALLTORCH_LTEXT "Wall with torch"
+#define SLB_WALLWTWINS_LTEXT "Wall with twins"
+#define SLB_WALLWWOMAN_LTEXT "Wall with woman"
+#define SLB_WALLPAIRSHR_LTEXT "Wall w/pair shag."
+#define SLB_PATH_LTEXT "Path"
+#define SLB_CLAIMED_LTEXT "Claimed ground"
+#define SLB_LAVA_LTEXT "Lava"
+#define SLB_WATER_LTEXT "Water"
+#define SLB_PORTAL_LTEXT "Entrance"
+#define SLB_TREASURE_LTEXT "Treasure room"
+#define SLB_LIBRARY_LTEXT "Library"
+#define SLB_PRISON_LTEXT "Prison"
+#define SLB_TORTURE_LTEXT "Torture chamber"
+#define SLB_TRAINING_LTEXT "Training room"
+#define SLB_DUNGHEART_LTEXT "Dungeon heart"
+#define SLB_WORKSHOP_LTEXT "Workshop"
+#define SLB_SCAVENGER_LTEXT "Scavenger room"
+#define SLB_TEMPLE_LTEXT "Temple"
+#define SLB_GRAVEYARD_LTEXT "Graveyard"
+#define SLB_HATCHERY_LTEXT "Hatchery"
+#define SLB_LAIR_LTEXT "Lair"
+#define SLB_BARRACKS_LTEXT "Barracks"
+#define SLB_DOORWOOD_LTEXT "Wooden door"
+#define SLB_DOORBRACE_LTEXT "Braced door"
+#define SLB_DOORIRON_LTEXT "Iron door"
+#define SLB_DOORMAGIC_LTEXT "Magic door"
+#define SLB_BRIDGE_LTEXT "Bridge"
+#define SLB_GEMS_LTEXT "Gems"
+#define SLB_GUARDPOST_LTEXT "Guard post"
+
 struct LEVEL;
 
 short slab_is_central(struct LEVEL *lvl,int x,int y);
@@ -77,7 +113,7 @@ short slab_is_clmabl(unsigned char slab_type);
 short slab_is_claimedgnd(unsigned char slab_type);
 short slab_needs_adjacent_torch(unsigned char slab_type);
 short slab_verify_entry(unsigned char slab_type, char *err_msg);
-
+char *get_slab_fullname(unsigned short slb_type);
 
 char *get_owner_type_fullname(unsigned char own_idx);
 unsigned char get_owner_next(unsigned char plyr_idx);

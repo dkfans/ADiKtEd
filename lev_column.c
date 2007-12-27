@@ -586,7 +586,7 @@ short clm_entry_is_used(unsigned int clmidx)
  */
 short slab_has_custom_columns(struct LEVEL *lvl, int tx, int ty)
 {
-    if (cust_col_nidx(lvl,tx,ty,0)>=0)
+    if (cust_col_idx(lvl,tx,ty)>=0)
         return true;
     if (graffiti_idx(lvl,tx,ty)>=0)
         return true;
@@ -600,10 +600,10 @@ short slab_has_custom_columns(struct LEVEL *lvl, int tx, int ty)
 int update_custom_columns_for_slab(struct COLUMN_REC *clm_recs[9],struct LEVEL *lvl, int tx, int ty)
 {
     int mod_clms=0;
-    if (cust_col_nidx(lvl,tx,ty,0)>=0)
-        mod_clms+=draw_cust_clms_on_slab(clm_recs,lvl,tx,ty);
+    if (cust_col_idx(lvl,tx,ty)>=0)
+        mod_clms+=place_cust_clms_on_slab(clm_recs,lvl,tx,ty);
     if (graffiti_idx(lvl,tx,ty)>=0)
-        mod_clms+=draw_graffiti_on_slab(clm_recs,lvl,tx,ty);
+        mod_clms+=place_graffiti_on_slab(clm_recs,lvl,tx,ty);
     return mod_clms;
 }
 
@@ -611,31 +611,35 @@ int update_custom_columns_for_slab(struct COLUMN_REC *clm_recs[9],struct LEVEL *
  * Draws custom columns on given columns array. Returns num of changed entries.
  * draws only the cust_col, no graffiti.
  */
-int draw_cust_clms_on_slab(struct COLUMN_REC *clm_recs[9],struct LEVEL *lvl, int tx, int ty)
+int place_cust_clms_on_slab(struct COLUMN_REC *clm_recs[9],struct LEVEL *lvl, int tx, int ty)
 {
     int mod_clms=0;
-    //TODO
+    int i,k;
+    for (k=0;k<3;k++)
+    {
+      int sy=ty*3+k;
+      for (i=0;i<3;i++)
+      {
+          int sx=tx*3+i;
+          int ccol_idx=cust_col_subtl_idx(lvl,sx,sy);
+          if (ccol_idx>=0)
+          {
+            struct COLUMN_REC *cclm_rec;
+            cclm_rec=get_cust_col_rec(lvl,ccol_idx);
+            clm_rec_copy(clm_recs[k*3+i],cclm_rec);
+            mod_clms++;
+          }
+      }
+    }
     return mod_clms;
 }
 
 /*
- * Returns index of 'num'th custom column at given tile, or -1 if not found.
+ * Returns index of first custom column at given tile, or -1 if not found.
  */
-int cust_col_nidx(struct LEVEL *lvl, int tx, int ty,int num)
+int cust_col_idx(struct LEVEL *lvl, int tx, int ty)
 {
-    int i;
-    int n=0;
-    struct DK_CUSTOM_CLM *ccol;
-    for (i=0; i < lvl->cust_clm_count; i++)
-    {
-      ccol = lvl->cust_clm[i];
-      if (((ccol->sx/3)==tx) && ((ccol->sy/3)==ty))
-      {
-          if (n==num) return i;
-          n++;
-      }
-    }
-    return -1;
+    return cust_col_idx_next(lvl, tx, ty,-1);
 }
 
 /*
@@ -656,3 +660,121 @@ int cust_col_idx_next(struct LEVEL *lvl, int tx, int ty,int prev_idx)
     }
     return -1;
 }
+
+/*
+ * Returns index of a custom column at given subtile, or -1 if not found.
+ * Note that on one subtile, only one custom column may exist.
+ */
+int cust_col_subtl_idx(struct LEVEL *lvl, int sx, int sy)
+{
+    int i;
+    struct DK_CUSTOM_CLM *ccol;
+    for (i=0; i < lvl->cust_clm_count; i++)
+    {
+      ccol = lvl->cust_clm[i];
+      if (((ccol->sx)==sx) && ((ccol->sy)==sy))
+        return i;
+    }
+    return -1;
+}
+
+struct DK_CUSTOM_CLM *get_cust_col(struct LEVEL *lvl, int ccol_idx)
+{
+    if ((ccol_idx<0)||(ccol_idx>=lvl->cust_clm_count)) return NULL;
+    return lvl->cust_clm[ccol_idx];
+}
+
+struct COLUMN_REC *get_cust_col_rec(struct LEVEL *lvl, int ccol_idx)
+{
+    if ((ccol_idx<0)||(ccol_idx>=lvl->cust_clm_count)) return NULL;
+    struct DK_CUSTOM_CLM *ccol=lvl->cust_clm[ccol_idx];
+    if (ccol==NULL) return NULL;
+    return ccol->rec;
+}
+
+/*
+ * Adds custom column object to level data, without filling the column
+ * nor updating slabs.
+ */
+int cust_col_add_obj(struct LEVEL *lvl,struct DK_CUSTOM_CLM *ccol)
+{
+    if ((lvl==NULL)||(ccol==NULL)) return -1;
+    int ccol_idx=lvl->cust_clm_count;
+    lvl->cust_clm = (struct DK_CUSTOM_CLM **)realloc (lvl->cust_clm,
+                     (ccol_idx+1)*sizeof(struct DK_CUSTOM_CLM *));
+    if (lvl->cust_clm==NULL) die("Cannot alloc memory for custom columns array");
+    lvl->cust_clm[ccol_idx]=ccol;
+    lvl->cust_clm_count=ccol_idx+1;
+    return ccol_idx;
+}
+
+/*
+ * Adds custom column object to level data, or updates existing custom column.
+ * Also updates the real level DAT/CLM entries where the column is put.
+ */
+int cust_col_add_or_update(struct LEVEL *lvl,struct DK_CUSTOM_CLM **ccol)
+{
+    int idx;
+    //Check if we already have the column at this place
+    idx=cust_col_subtl_idx(lvl, (*ccol)->sx, (*ccol)->sy);
+    if (idx<0)
+        return cust_col_add_obj(lvl,*ccol);
+    //If we have - update it
+    struct DK_CUSTOM_CLM *ccol_old;
+    ccol_old=get_cust_col(lvl,idx);
+    free(ccol_old->rec);
+    ccol_old->rec=(*ccol)->rec;
+    free(*ccol);
+    *ccol=ccol_old;
+    return idx;
+}
+
+/*
+ * Creates a new custom column and fills its properties.
+ * The new object is not added to LEVEL structure.
+ */
+struct DK_CUSTOM_CLM *create_cust_col(int sx, int sy)
+{
+    //Preparing array bounds
+    int arr_entries_x=MAP_SIZE_X*MAP_SUBNUM_X;
+    int arr_entries_y=MAP_SIZE_Y*MAP_SUBNUM_Y;
+    sx%=arr_entries_x;
+    sy%=arr_entries_y;
+    struct DK_CUSTOM_CLM *ccol;
+    //Filling graffiti structure
+    ccol = (struct DK_CUSTOM_CLM *)malloc(sizeof(struct DK_CUSTOM_CLM));
+    if (ccol==NULL) die("Cannot alloc memory for custom column item");
+    ccol->sx=sx;
+    ccol->sy=sy;
+    ccol->wib_val=COLUMN_WIB_SKEW;
+    ccol->rec=create_column_rec();
+    return ccol;
+}
+
+/*
+ * Removes custom column from level and frees its memory
+ */
+void cust_col_del(struct LEVEL *lvl,unsigned int num)
+{
+    int i;
+    if ((lvl==NULL)||(num>=lvl->cust_clm_count))
+      return;
+    struct DK_CUSTOM_CLM *ccol;
+    ccol=lvl->cust_clm[num];
+    int ccol_max_idx=lvl->cust_clm_count-1;
+    for (i=num; i < ccol_max_idx; i++)
+    {
+      lvl->cust_clm[i]=lvl->cust_clm[i+1];
+    }
+    //Decrease the count by one
+    lvl->cust_clm_count=ccol_max_idx;
+    //Decrease amount of allocated memory, or free the block
+    lvl->cust_clm = (struct DK_CUSTOM_CLM **)realloc(lvl->cust_clm,
+             (ccol_max_idx)*sizeof(struct DK_CUSTOM_CLM *));
+    if (ccol!=NULL)
+    {
+      free_column_rec(ccol->rec);
+      free(ccol);
+    }
+}
+
