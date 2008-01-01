@@ -538,7 +538,9 @@ short write_tng(struct LEVEL *lvl,char *fname)
       message_error("Can't open \"%s\" for writing", fname);
       return false;
     }
+    //Header
     write_short_le_file(fp, lvl->tng_total_count);
+    //Entries
     for (cy=0; cy < arr_entries_y; cy++)
       for (cx=0; cx < arr_entries_x; cx++)
           for (k=0; k < get_thing_subnums(lvl,cx,cy); k++)
@@ -900,6 +902,77 @@ short write_def_clm_source(struct LEVEL *lvl,char *fname)
         }
       }
     free_column_rec(clm_rec);
+    fclose (fp);
+    return true;
+}
+
+/*
+ * Utility function for reverse engineering the TNG format
+ */
+short write_def_tng_source(struct LEVEL *lvl,char *fname)
+{
+    FILE *fp;
+    int i,k;
+    fp = fopen (fname, "w");
+    if (!fp)
+    {
+      message_error("Can't open \"%s\" for writing", fname);
+      return false;
+    }
+
+    //Preparing array bounds
+    int arr_entries_x=MAP_SIZE_X*MAP_SUBNUM_X;
+    int arr_entries_y=MAP_SIZE_Y*MAP_SUBNUM_Y;
+    int cx,cy;
+    for (cy=0; cy < arr_entries_y; cy++)
+      for (cx=0; cx < arr_entries_x; cx++)
+          for (k=0; k < get_thing_subnums(lvl,cx,cy); k++)
+          {
+            unsigned char *thing=get_thing(lvl,cx,cy,k);
+            int spos_x=get_thing_tilepos_x(thing);
+            int spos_y=get_thing_tilepos_y(thing);
+            int sen_tl=get_thing_sensitile(thing);
+            if ( (sen_tl!=((spos_x/3-1)+(spos_y/3-1)*85)) &&
+                 (sen_tl!=((spos_x/3-1)+(spos_y/3+0)*85)) &&
+                 (sen_tl!=((spos_x/3-1)+(spos_y/3+1)*85)) &&
+                 (sen_tl!=((spos_x/3+0)+(spos_y/3-1)*85)) &&
+                 (sen_tl!=((spos_x/3+0)+(spos_y/3+0)*85)) &&
+                 (sen_tl!=((spos_x/3+0)+(spos_y/3+1)*85)) &&
+                 (sen_tl!=((spos_x/3+1)+(spos_y/3-1)*85)) &&
+                 (sen_tl!=((spos_x/3+1)+(spos_y/3+0)*85)) &&
+                 (sen_tl!=((spos_x/3+1)+(spos_y/3+1)*85)) )
+            {
+              int tl_x=spos_x/MAP_SUBNUM_X;
+              int tl_y=spos_y/MAP_SUBNUM_Y;
+              fprintf(fp,"stl %3d,%3d tl %2d,%2d", spos_x, spos_y,
+                  tl_x, tl_y);
+              fprintf(fp," s %d,%d", spos_x-tl_x*MAP_SUBNUM_X, spos_y-tl_y*MAP_SUBNUM_Y);
+              fprintf(fp," stlpos %3d,%3d",
+              get_thing_subtpos_x(thing), get_thing_subtpos_y(thing));
+              fprintf(fp," alt %3d altstl %d",
+                get_thing_subtpos_h(thing),get_thing_tilepos_h(thing));
+              fprintf(fp," typ %5s",get_thing_type_shortname(get_thing_type(thing)));
+              fprintf(fp," knd %s",get_item_subtype_fullname(get_thing_subtype(thing)));
+              fprintf(fp,"\n");
+/*          fprintf(fp,"COLUMN(%4d,%5d,%2d,%2d,%2d, 0x%02x, 0x%03x,%2d,",
+           i,(unsigned short)(clm_rec->use), clm_rec->permanent, clm_rec->lintel,
+           clm_rec->height, clm_rec->solid, clm_rec->base, clm_rec->orientation);
+            fprintf(fp,"    0x%03x, 0x%03x, 0x%03x, 0x%03x, 0x%03x, 0x%03x, 0x%03x, 0x%03x) u=%d u0=%d\n",
+              clm_rec->c[0],clm_rec->c[1],clm_rec->c[2],clm_rec->c[3],
+              clm_rec->c[4],clm_rec->c[5],clm_rec->c[6],clm_rec->c[7],
+              lvl->clm_utilize[i],(unsigned short)(clm_rec->use-(lvl->clm_utilize[i])));*/
+              for (i=0; i < SIZEOF_DK_TNG_REC; i++)
+              {
+                  fprintf(fp,"  %02X", (unsigned int)thing[i]);
+              }
+              fprintf(fp,"\n");
+              for (i=0; i < SIZEOF_DK_TNG_REC; i++)
+              {
+                  fprintf(fp," %3d", (unsigned int)thing[i]);
+              }
+              fprintf(fp,"\n\n");
+            }
+          }
     fclose (fp);
     return true;
 }

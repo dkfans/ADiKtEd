@@ -19,9 +19,12 @@ enum adikt_workmode
   MD_TXTR   = 0x007,
   MD_CCLM   = 0x008,
   MD_CUBE   = 0x009,
+  MD_SLBL   = 0x00a,
 };
 
-#define MODES_COUNT 10
+#define MODES_COUNT 11
+
+#define TNGDAT_ROWS 8
 
 enum adikt_panel_viewmode
 {
@@ -31,12 +34,12 @@ enum adikt_panel_viewmode
 
 
 
-typedef struct {
+struct CLIPBOARD {
     int dtype;
     unsigned char *data;
-  } CLIPBOARD;
+  };
 
-typedef struct {
+struct SCRMODE_DATA {
     // Amount of width on right, reserved for key and info
     int keycols;
     // main program working mode
@@ -45,11 +48,11 @@ typedef struct {
     // (the one without status lines at bottom and info text at right)
     int rows;
     int cols;
-    CLIPBOARD *clipbrd;
+    struct CLIPBOARD *clipbrd;
     int clip_count;
-  } SCRMODE_DATA;
+  };
 
-typedef struct {
+struct MAPMODE_DATA {
     //Marking variables
     short mark;
     int markx, marky;
@@ -70,13 +73,13 @@ typedef struct {
     int subtl_y;
     //What is drawn on the right panel
     short panel_mode;
-  } MAPMODE_DATA;
+  };
 
 extern const char *modenames[];
 extern const char *longmodenames[];
 
-extern SCRMODE_DATA *scrmode;
-extern MAPMODE_DATA *mapmode;
+extern struct SCRMODE_DATA *scrmode;
+extern struct MAPMODE_DATA *mapmode;
 
 extern unsigned int *automated_commands;
 // indicates if the main program loop should end
@@ -101,7 +104,7 @@ int change_mode(int new_mode);
 void draw_forced_panel(struct LEVEL *lvl, short panel_mode);
 
 //Clipboard support - lower level
-CLIPBOARD *get_clipboard_object(int idx);
+struct CLIPBOARD *get_clipboard_object(int idx);
 unsigned char *get_clipboard_slab(int idx);
 unsigned char *get_clipboard_datlst(int idx);
 unsigned char *get_clipboard_column(int idx);
@@ -114,13 +117,13 @@ int add_clipboard_any(char *obj,int obj_type);
 int put_clipboard_any(char *obj,int obj_type);
 void clear_clipboard();
 
-
 //Lower level functions
-void clear_scrmode(SCRMODE_DATA *scrmode);
-void clear_mapmode(MAPMODE_DATA *mapmode);
+void clear_scrmode(struct SCRMODE_DATA *scrmode);
+void clear_mapmode(struct MAPMODE_DATA *mapmode);
 
 void display_tngdat(void);
 int display_mode_keyhelp(int scr_row, int scr_col,int mode);
+void draw_mdempty();
 
 void show_cursor(char cur);
 char *mode_status(int mode);

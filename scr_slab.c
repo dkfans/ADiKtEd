@@ -21,7 +21,7 @@
 
 // Variables
 
-MDSLAB_DATA *mdslab;
+struct MDSLAB_DATA *mdslab;
 
 //Slab keys
 char *slbkey;
@@ -32,7 +32,7 @@ char *slbkey;
 short init_mdslab(void)
 {
     //Creating mdslab variable
-    mdslab=(MDSLAB_DATA *)malloc(sizeof(MDSLAB_DATA));
+    mdslab=(struct MDSLAB_DATA *)malloc(sizeof(struct MDSLAB_DATA));
     if (mdslab==NULL)
      die("init_mdslab: Cannot allocate memory.");
     //Initialize keys for displaying and putting slabs
@@ -63,6 +63,9 @@ void actions_mdslab(int key)
         int ty=mapmode->mapy+mapmode->screeny;
         switch (key)
         {
+        case KEY_ENTER:
+          start_mdslbl(lvl);
+          break;
         case 'u': // Update all things/dat/clm/w?b
           update_slab_owners(lvl);
           update_datclm_for_whole_map(lvl);
@@ -172,7 +175,7 @@ void actions_mdslab(int key)
           default:
             if ((key < mdslab->placenkeys) && (mdslab->placekeys[key]!=255))
             {
-              slb_place_room(mdslab->placekeys[key]);
+              slb_place_room(lvl,mapmode,mdslab->placekeys[key]);
               if (mapmode->paintmode)
                 mapmode->paintroom=mdslab->placekeys[key];
             } else
@@ -211,7 +214,7 @@ void slbposcheck(void)
     if (mapmode->paintmode)
     {
       if (mapmode->paintroom != 255)
-          slb_place_room(mapmode->paintroom);
+          slb_place_room(lvl,mapmode,mapmode->paintroom);
       if (mapmode->paintown >= 0)
           change_ownership ((char)(mapmode->paintown));
     }
@@ -222,41 +225,42 @@ void slbposcheck(void)
  * Places complete room, including things and CLM update
  * (these updates can be disabled).
  */
-void slb_place_room(unsigned char room)
+void slb_place_room(struct LEVEL *lvl,struct MAPMODE_DATA *mapmode,unsigned char room)
 {
-    int tx=mapmode->screenx+mapmode->mapx;
-    int ty=mapmode->screeny+mapmode->mapy;
-
-    // Sanity check, almost certainly unneeded
-    if ((tx >= MAP_SIZE_X) || (tx >= MAP_SIZE_Y) ||
-        (tx < 0) || (ty < 0))
-      return;
-    int x, y;
-    unsigned char oldslb;
-    if (!mapmode->mark)
+    int markr,markb;
+    int markl,markt;
+    if (mapmode->mark)
     {
-      oldslb = get_tile_slab(lvl,tx,ty);
-      set_tile_slab(lvl,tx,ty,room);
-      if (obj_auto_update)
-        update_obj_for_square_radius1(lvl,tx,ty);
-      if (datclm_auto_update)
-        update_datclm_for_square_radius1(lvl,tx,ty);
+      markr=mapmode->markr;
+      markb=mapmode->markb;
+      markl=mapmode->markl;
+      markt=mapmode->markt;
+    } else
+    {
+      markr=mapmode->screenx+mapmode->mapx;
+      markb=mapmode->screeny+mapmode->mapy;
+      markl=markr;
+      markt=markb;
+    }
+    // Sanity check, almost certainly unneeded
+    if ((markr>MAP_MAXINDEX_X) || (markb>MAP_MAXINDEX_Y) ||
+       (markl<0) || (markt<0))
+    {
+      message_error("Map coordinates out of bounds");
       return;
     }
-    // And another - this time for marking mode
-    if ((mapmode->markr>MAP_MAXINDEX_X) || (mapmode->markb>MAP_MAXINDEX_Y) ||
-       (mapmode->markl<0) || (mapmode->markt<0))
-      return;
-    for (x=mapmode->markl; x <= mapmode->markr; x++)
-      for (y=mapmode->markt; y <= mapmode->markb; y++)
+    int tile_x,tile_y;
+    for (tile_x=markl; tile_x<=markr; tile_x++)
+      for (tile_y=markt; tile_y<=markb; tile_y++)
       {
-          oldslb = get_tile_slab(lvl,x,y);
-          set_tile_slab(lvl,x,y,room);
+//          unsigned char oldslb;
+//          oldslb = get_tile_slab(lvl,tile_x,tile_y);
+          set_tile_slab(lvl,tile_x,tile_y,room);
       }
     if (obj_auto_update)
-      update_obj_for_square(lvl, mapmode->markl-1, mapmode->markr+1, mapmode->markt-1, mapmode->markb+1);
+      update_obj_for_square(lvl, markl-1, markr+1, markt-1, markb+1);
     if (datclm_auto_update)
-      update_datclm_for_square(lvl, mapmode->markl-1, mapmode->markr+1, mapmode->markt-1, mapmode->markb+1);
+      update_datclm_for_square(lvl, markl-1, markr+1, markt-1, markb+1);
     mapmode->mark=false;
 }
 
@@ -456,14 +460,17 @@ void draw_mdslab()
       {
         scr_row=display_graffiti(lvl,scr_row,scr_col,graff_idx);
       }
-      scr_row++;
-      set_cursor_pos(scr_row++, scr_col);
-      unsigned short slb_type=get_tile_slab(lvl,tx,ty);
-      screen_setcolor(PRINT_COLOR_LGREY_ON_BLACK);
-      screen_printf("Slab: ");
-      screen_setcolor(PRINT_COLOR_WHITE_ON_BLACK);
-      screen_printf("%s",get_slab_fullname(slb_type));
-      display_tngdat();
+      if (scrmode->rows >= scr_row+TNGDAT_ROWS+3)
+      {
+        set_cursor_pos(scrmode->rows-TNGDAT_ROWS-2, scr_col);
+        unsigned short slb_type=get_tile_slab(lvl,tx,ty);
+        screen_setcolor(PRINT_COLOR_LGREY_ON_BLACK);
+        screen_printf(".slb entry:%3d ",slb_type);
+        screen_setcolor(PRINT_COLOR_WHITE_ON_BLACK);
+        screen_printf("%s",get_slab_fullname(slb_type));
+      }
+      if (scrmode->rows >= scr_row+TNGDAT_ROWS)
+        display_tngdat();
     }
     draw_map_cursor(lvl,true,true,false);
 }

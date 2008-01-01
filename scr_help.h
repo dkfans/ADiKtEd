@@ -31,6 +31,8 @@ typedef struct {
     char **cclmkey;
     int cubekeyrows;
     char **cubekey;
+    int slblkeyrows;
+    char **slblkey;
     int slbrows;
     char **slb;
     int tngrows;
@@ -47,6 +49,8 @@ typedef struct {
     char **cclm;
     int cuberows;
     char **cube;
+    int slblrows;
+    char **slbl;
     int tiprows;
     char **tips;
     int compassrows;

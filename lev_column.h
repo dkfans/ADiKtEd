@@ -8,6 +8,16 @@
 #ifndef ADIKT_LEVCOLMN_H
 #define ADIKT_LEVCOLMN_H
 
+#define INF_STANDARD_LTEXT "Standard - the one with walls as in Adikted description"
+#define INF_ANCIENT_LTEXT  "Ancient - brighter walls with Aztec drawings"
+#define INF_WINTER_LTEXT   "Winter - walls with snow and ice drawings"
+#define INF_SNAKE_LTEXT    "Snake key - walls with key of life and snake"
+#define INF_FACE_LTEXT     "Stone face - rough walls with red eyed face on"
+#define INF_BRESTS_LTEXT   "Big breasts - walls with bigger breasts than standard"
+#define INF_RGANCNT_LTEXT  "Rough Ancient - ancient theme with rougher earth"
+#define INF_SKULL_LTEXT    "Skull - brighter walls with skulls on"
+#define INF_MAX_INDEX 7
+
 struct LEVEL;
 struct COLUMN_REC;
 struct DK_CUSTOM_CLM;
@@ -57,10 +67,14 @@ int cust_col_idx_next(struct LEVEL *lvl, int tx, int ty,int prev_idx);
 int place_cust_clms_on_slab(struct COLUMN_REC *clm_recs[9],struct LEVEL *lvl, int tx, int ty);
 struct DK_CUSTOM_CLM *get_cust_col(struct LEVEL *lvl, int ccol_idx);
 struct COLUMN_REC *get_cust_col_rec(struct LEVEL *lvl, int ccol_idx);
+unsigned short get_cust_col_wib_entry(struct LEVEL *lvl, int ccol_idx);
 struct DK_CUSTOM_CLM *create_cust_col(int sx, int sy);
 int cust_col_add_obj(struct LEVEL *lvl,struct DK_CUSTOM_CLM *ccol);
 int cust_col_add_or_update(struct LEVEL *lvl,struct DK_CUSTOM_CLM **ccol);
 void cust_col_del(struct LEVEL *lvl,unsigned int num);
+
+//INF file and textures
+char *get_texture_fullname(unsigned short inf_type);
 
 // This one is special - put in separate file
 void add_permanent_columns(struct LEVEL *lvl);

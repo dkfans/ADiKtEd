@@ -275,20 +275,20 @@ short set_thing_level(unsigned char *thing,unsigned char lev_num)
 /*
  * For some things, this is a number of tile (not subtile) at wchich the thing is
  */
-unsigned short get_thing_tilenum(unsigned char *thing)
+unsigned short get_thing_sensitile(unsigned char *thing)
 {
-    if (thing==NULL) return 0;
+    if (thing==NULL) return THING_SENSITILE_NONE;
     return (unsigned short)((thing[12]<<8)+thing[11]);
 }
 
 /*
- * For some things, this is a number of tile (not subtile) at wchich the thing is
+ * For some things, this is a number of tile (not subtile) at which the thing is
  */
-short set_thing_tilenum(unsigned char *thing,unsigned short til_num)
+short set_thing_sensitile(unsigned char *thing,unsigned short til_num)
 {
     if (thing==NULL) return false;
-    thing[12]=(til_num>>8);
-    thing[11]=til_num%255;
+    thing[12]=(til_num>>8)&255;
+    thing[11]=til_num&255;
     return true;
 }
 
@@ -487,8 +487,14 @@ unsigned char *create_thing_copy(unsigned int sx, unsigned int sy,unsigned char 
     thing = create_thing_empty();
     int i;
     memcpy(thing,src,SIZEOF_DK_TNG_REC);
+    unsigned char stype_idx=get_thing_subtype(thing);
     set_thing_subtpos(thing,((sx%MAP_SUBNUM_X)*0x40+0x40),((sy%MAP_SUBNUM_Y)*0x40+0x40));
     set_thing_tilepos(thing,(unsigned char)sx,(unsigned char)sy);
+    if (stype_idx==THING_TYPE_ROOMEFFECT)
+      set_thing_sensitile(thing,compute_roomeffect_sensitile(lvl,thing));
+    //TODO: create function for updating item sensitile
+    if (stype_idx==THING_TYPE_ITEM)
+      set_thing_sensitile(thing,THING_SENSITILE_NONE);
     return thing;
 }
 
@@ -499,48 +505,12 @@ unsigned char *create_item(unsigned int sx, unsigned int sy, unsigned char stype
 {
     unsigned char *thing;
     thing = create_thing(sx,sy);
+    int tx=sx/MAP_SUBNUM_X;
+    int ty=sy/MAP_SUBNUM_Y;
     set_thing_type(thing,THING_TYPE_ITEM);
     set_thing_subtype(thing,stype_idx);
-    set_thing_owner(thing,get_tile_owner(lvl,sx/MAP_SUBNUM_X,sy/MAP_SUBNUM_Y));
-    return thing;
-}
-
-/*
- * Creates a new thing of type room effect
- */
-unsigned char *create_roomeffect(unsigned int sx, unsigned int sy, unsigned char stype_idx)
-{
-    unsigned char *thing;
-    thing = create_thing(sx,sy);
-    set_thing_type(thing,THING_TYPE_ROOMEFFECT);
-    set_thing_subtype(thing,stype_idx);
-    set_thing_owner(thing,get_tile_owner(lvl,sx/MAP_SUBNUM_X,sy/MAP_SUBNUM_Y));
-    return thing;
-}
-
-/*
- * Creates a new thing of type creature
- */
-unsigned char *create_creature(unsigned int sx, unsigned int sy, unsigned char stype_idx)
-{
-    unsigned char *thing;
-    thing = create_thing(sx,sy);
-    set_thing_type(thing,THING_TYPE_CREATURE);
-    set_thing_subtype(thing,stype_idx);
-    set_thing_owner(thing,get_tile_owner(lvl,sx/MAP_SUBNUM_X,sy/MAP_SUBNUM_Y));
-    return thing;
-}
-
-/*
- * Creates a new thing of type trap
- */
-unsigned char *create_trap(unsigned int sx, unsigned int sy, unsigned char stype_idx)
-{
-    unsigned char *thing;
-    thing = create_thing(sx,sy);
-    set_thing_type(thing,THING_TYPE_TRAP);
-    set_thing_subtype(thing,stype_idx);
-    set_thing_owner(thing,get_tile_owner(lvl,sx/MAP_SUBNUM_X,sy/MAP_SUBNUM_Y));
+    set_thing_owner(thing,get_tile_owner(lvl,tx,ty));
+    set_thing_sensitile(thing,THING_SENSITILE_NONE); //Default associated tile is none
     return thing;
 }
 
@@ -549,12 +519,20 @@ unsigned char *create_trap(unsigned int sx, unsigned int sy, unsigned char stype
  */
 short is_spellbook(unsigned char *thing)
 {
-     int array_count=sizeof(items_spellbooks)/sizeof(unsigned char);
     //All spells are items
     if (get_thing_type(thing) != THING_TYPE_ITEM)
       return false;
-    //and they are listed in items_spellbooks array
-    char *pos=memchr(items_spellbooks,get_thing_subtype(thing),array_count);
+    return is_spellbook_stype(get_thing_subtype(thing));
+}
+
+/*
+ * Returns if the thing is a spellbook
+ */
+short is_spellbook_stype(unsigned char stype_idx)
+{
+     int array_count=sizeof(items_spellbooks)/sizeof(unsigned char);
+    //these are listed in items_spellbooks array
+    char *pos=memchr(items_spellbooks,stype_idx,array_count);
     if (pos!=NULL) return true;
     return false;
 }
@@ -592,12 +570,20 @@ unsigned char get_spellbook_prev(unsigned char stype_idx)
  */
 short is_dngspecbox(unsigned char *thing)
 {
-     int array_count=sizeof(items_specboxes)/sizeof(unsigned char);
     //All specials are items
     if (get_thing_type(thing) != THING_TYPE_ITEM)
       return false;
-    //and they are listed in items_specboxes array
-    char *pos=memchr(items_specboxes,get_thing_subtype(thing),array_count);
+    return is_dngspecbox_stype(get_thing_subtype(thing));
+}
+
+/*
+ * Returns if the thing subtype represents a dungeon special box
+ */
+short is_dngspecbox_stype(unsigned char stype_idx)
+{
+     int array_count=sizeof(items_specboxes)/sizeof(unsigned char);
+    //these are listed in items_specboxes array
+    char *pos=memchr(items_specboxes,stype_idx,array_count);
     if (pos!=NULL) return true;
     return false;
 }
@@ -635,12 +621,20 @@ unsigned char get_dngspecbox_prev(unsigned char stype_idx)
  */
 short is_crtrlair(unsigned char *thing)
 {
-     int array_count=sizeof(items_crtrlairs)/sizeof(unsigned char);
     //All lairs are items
     if (get_thing_type(thing) != THING_TYPE_ITEM)
       return false;
-    //and they are listed in items_crtrlairs array
-    char *pos=memchr(items_crtrlairs,get_thing_subtype(thing),array_count);
+    return is_crtrlair_stype(get_thing_subtype(thing));
+}
+
+/*
+ * Returns if the thing subtype represents a creature lair
+ */
+short is_crtrlair_stype(unsigned char stype_idx)
+{
+     int array_count=sizeof(items_crtrlairs)/sizeof(unsigned char);
+    //these are listed in items_crtrlairs array
+    char *pos=memchr(items_crtrlairs,stype_idx,array_count);
     if (pos!=NULL) return true;
     return false;
 }
@@ -678,12 +672,20 @@ unsigned char get_crtrlair_prev(unsigned char stype_idx)
  */
 short is_trapbox(unsigned char *thing)
 {
-     int array_count=sizeof(items_trapbxs)/sizeof(unsigned char);
     //All traps are items
     if (get_thing_type(thing) != THING_TYPE_ITEM)
       return false;
-    //and they are listed in items_traps array
-    char *pos=memchr(items_trapbxs,get_thing_subtype(thing),array_count);
+    return is_trapbox_stype(get_thing_subtype(thing));
+}
+
+/*
+ * Returns if the thing subtype represents a trap box
+ */
+short is_trapbox_stype(unsigned char stype_idx)
+{
+     int array_count=sizeof(items_trapbxs)/sizeof(unsigned char);
+    //these are listed in items_trapbxs array
+    char *pos=memchr(items_trapbxs,stype_idx,array_count);
     if (pos!=NULL) return true;
     return false;
 }
@@ -873,12 +875,20 @@ unsigned char get_roomeffect_prev(unsigned char stype_idx)
  */
 short is_statue(unsigned char *thing)
 {
-     int array_count=sizeof(items_statues)/sizeof(unsigned char);
     //All statues are items
     if (get_thing_type(thing) != THING_TYPE_ITEM)
       return false;
-    //and they are listed in items_statues array
-    char *pos=memchr(items_statues,get_thing_subtype(thing),array_count);
+    return is_statue_stype(get_thing_subtype(thing));
+}
+
+/*
+ * Returns if the thing subtype represents a statue
+ */
+short is_statue_stype(unsigned char stype_idx)
+{
+     int array_count=sizeof(items_statues)/sizeof(unsigned char);
+    //these are listed in items_statues array
+    char *pos=memchr(items_statues,stype_idx,array_count);
     if (pos!=NULL) return true;
     return false;
 }
@@ -916,12 +926,20 @@ unsigned char get_statue_prev(unsigned char stype_idx)
  */
 short is_furniture(unsigned char *thing)
 {
-     int array_count=sizeof(items_furniture)/sizeof(unsigned char);
     //All furniture are items
     if (get_thing_type(thing) != THING_TYPE_ITEM)
       return false;
-    //and they are listed in items_furniture array
-    char *pos=memchr(items_furniture,get_thing_subtype(thing),array_count);
+    is_furniture_stype(get_thing_subtype(thing));
+}
+
+/*
+ * Returns if the thing subtype represents a furniture
+ */
+short is_furniture_stype(unsigned char stype_idx)
+{
+     int array_count=sizeof(items_furniture)/sizeof(unsigned char);
+    //these are listed in items_furniture array
+    char *pos=memchr(items_furniture,stype_idx,array_count);
     if (pos!=NULL) return true;
     return false;
 }
@@ -955,16 +973,24 @@ unsigned char get_furniture_prev(unsigned char stype_idx)
 }
 
 /*
- * Returns if the thing is a furniture
+ * Returns if the thing is a food
  */
 short is_food(unsigned char *thing)
 {
-     int array_count=sizeof(items_food)/sizeof(unsigned char);
     //All food are items
     if (get_thing_type(thing) != THING_TYPE_ITEM)
       return false;
-    //and they are listed in items_food array
-    char *pos=memchr(items_food,get_thing_subtype(thing),array_count);
+    return is_food_stype(get_thing_subtype(thing));
+}
+
+/*
+ * Returns if the subtype is a food
+ */
+short is_food_stype(unsigned char stype_idx)
+{
+     int array_count=sizeof(items_food)/sizeof(unsigned char);
+    //these are listed in items_food array
+    char *pos=memchr(items_food,stype_idx,array_count);
     if (pos!=NULL) return true;
     return false;
 }
@@ -999,12 +1025,17 @@ unsigned char get_food_prev(unsigned char stype_idx)
 
 short is_gold(unsigned char *thing)
 {
-     int array_count=sizeof(items_gold)/sizeof(unsigned char);
     //All are items
     if (get_thing_type(thing) != THING_TYPE_ITEM)
       return false;
-    //and they are listed in items_gold array
-    char *pos=memchr(items_gold,get_thing_subtype(thing),array_count);
+    return is_gold_stype(get_thing_subtype(thing));
+}
+
+short is_gold_stype(unsigned char stype_idx)
+{
+     int array_count=sizeof(items_gold)/sizeof(unsigned char);
+    //these they are listed in items_gold array
+    char *pos=memchr(items_gold,stype_idx,array_count);
     if (pos!=NULL) return true;
     return false;
 }
@@ -1042,12 +1073,17 @@ unsigned char get_gold_prev(unsigned char stype_idx)
  */
 short is_torch(unsigned char *thing)
 {
-     int array_count=sizeof(items_torches)/sizeof(unsigned char);
     //All torches are items
     if (get_thing_type(thing) != THING_TYPE_ITEM)
       return false;
-    //and they are listed in items_torches array
-    char *pos=memchr(items_torches,get_thing_subtype(thing),array_count);
+    return is_torch_stype(get_thing_subtype(thing));
+}
+
+short is_torch_stype(unsigned char stype_idx)
+{
+    int array_count=sizeof(items_torches)/sizeof(unsigned char);
+    //all such objects must be listed in the correct array
+    char *pos=memchr(items_torches,stype_idx,array_count);
     if (pos!=NULL) return true;
     return false;
 }
@@ -1957,7 +1993,7 @@ short item_verify(unsigned char *thing, char *err_msg)
     case ITEM_CATEGR_WRKSHOPBOX:
     case ITEM_CATEGR_PWHNDEFFCT:
     case ITEM_CATEGR_LIGHTS:
-      return VERIF_OK;
+      break;
     case ITEM_CATEGR_NULL:
       sprintf(err_msg,"Null item subtype (%d)",(int)stype_idx);
       return VERIF_WARN;
@@ -1965,6 +2001,30 @@ short item_verify(unsigned char *thing, char *err_msg)
       sprintf(err_msg,"Unknown item subtype (%d)",(int)stype_idx);
       return VERIF_WARN;
   }
+  int sen_tl;
+  sen_tl=get_thing_sensitile(thing);
+  int sx,sy;
+  sx=get_thing_tilepos_x(thing);
+  sy=get_thing_tilepos_y(thing);
+  int tx,ty;
+  tx=sx/MAP_SUBNUM_X;
+  ty=sy/MAP_SUBNUM_Y;
+  if (sen_tl!=THING_SENSITILE_NONE)
+  {
+      // Generate warning if sensitile coordinates are wrong.
+      // Ignore such error for items which usually have it wrongly set.
+      int sen_tlx,sen_tly;
+      sen_tlx=sen_tl%MAP_SIZE_X;
+      sen_tly=sen_tl/MAP_SIZE_Y;
+      if (((tx<sen_tlx-1)||(tx>sen_tlx+1)||
+           (ty<sen_tly-1)||(ty>sen_tly+1)) &&
+           (stype_idx!=ITEM_SUBTYPE_SPINNKEY))
+      {
+          sprintf(err_msg,"Item has wrong sensitive tile number");
+          return VERIF_WARN;
+      }
+  }
+  return VERIF_OK;
 }
 
 short creature_verify(unsigned char *thing, char *err_msg)
@@ -1985,6 +2045,29 @@ short roomeffect_verify(unsigned char *thing, char *err_msg)
   {
       sprintf(err_msg,"Unknown room effect subtype (%d)",(int)stype_idx);
       return VERIF_WARN;
+  }
+  int sen_tl;
+  sen_tl=get_thing_sensitile(thing);
+  int sx,sy;
+  sx=get_thing_tilepos_x(thing);
+  sy=get_thing_tilepos_y(thing);
+  int tx,ty;
+  tx=sx/MAP_SUBNUM_X;
+  ty=sy/MAP_SUBNUM_Y;
+  if (sen_tl!=THING_SENSITILE_NONE)
+  {
+      // Generate warning if sensitile coordinates are wrong.
+      // Ignore such error for effects which usually have it wrongly set.
+      int sen_tlx,sen_tly;
+      sen_tlx=sen_tl%MAP_SIZE_X;
+      sen_tly=sen_tl/MAP_SIZE_X;
+      if (((tx<sen_tlx-1)||(tx>sen_tlx+1)||
+           (ty<sen_tly-1)||(ty>sen_tly+1)) &&
+           (stype_idx!=ROOMEFC_SUBTP_ENTRICE))
+      {
+          sprintf(err_msg,"Room effect has wrong sensitive tile number");
+          return VERIF_WARN;
+      }
   }
   return VERIF_OK;
 }
@@ -2014,9 +2097,9 @@ short trap_verify(unsigned char *thing, char *err_msg)
 short thing_verify(unsigned char *thing, char *err_msg)
 {
   short result;
-  int pos_h=(unsigned char)get_thing_tilepos_h(thing);
-  int pos_x=(unsigned char)get_thing_tilepos_x(thing);
-  int pos_y=(unsigned char)get_thing_tilepos_y(thing);
+  int pos_h=get_thing_tilepos_h(thing);
+  int pos_x=get_thing_tilepos_x(thing);
+  int pos_y=get_thing_tilepos_y(thing);
   if ((pos_h>=MAP_SUBNUM_H)||(pos_x>=MAP_SUBTOTAL_X)||(pos_y>=MAP_SUBTOTAL_Y))
   {
     sprintf(err_msg,"Thing position (%d,%d,%d) invalid",pos_x,pos_y,pos_h);

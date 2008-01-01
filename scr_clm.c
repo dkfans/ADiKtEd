@@ -57,10 +57,17 @@ void actions_mdclm(int key)
           message_info("All DAT/CLM/W?B entries updated.");
           break;
         case 'a': // update dat/clm/w?b of selected tile
-          //TODO: add 'enable autoupdate' function
-          update_datclm_for_slab(lvl, sx/3,sy/3);
-          message_info("Updated DAT/CLM/W?B entries of slab %d,%d.",sx/3,sy/3);
-          break;
+          {//TODO: add 'enable autoupdate' function
+            int ccol_idx=cust_col_idx_next(lvl,sx/3,sy/3,-1);
+            while (ccol_idx>=0)
+            {
+                cust_col_del(lvl,ccol_idx);
+                ccol_idx=cust_col_idx_next(lvl,sx/3,sy/3,-1);
+            }
+            update_datclm_for_slab(lvl, sx/3,sy/3);
+            update_tile_wib_entries(lvl,sx/3,sy/3);
+            message_info("Updated DAT/CLM/W?B entries of slab %d,%d.",sx/3,sy/3);
+          };break;
         case 'm': // manual-set mode
           start_list(lvl,MD_CCLM);
           break;

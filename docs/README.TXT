@@ -115,6 +115,14 @@ Version: 0.55a
  Corrected white spaces treatment inside map.ini file
  Height of graffiti/thing can be changed with '[' and ']'
  New, experimental "manual columns" function
+Version: 0.56a
+ Some corrections in "manual columns"
+ Texture change function under ctrl+e
+ Enter key displays list of slabs
+ Verification ('v') of things extended
+ Items and room effects have now "sensitive tile"
+ Added computing "sensitive tile" for torches and room effects
+ Fixed some display problems if Adikted window is small
 TODO before beta:
  Auto creating room things
 

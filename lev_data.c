@@ -645,6 +645,11 @@ short level_verify(struct LEVEL *lvl, char *actn_name)
   strcpy(err_msg,"Unknown error");
   short result=VERIF_OK;
   short nres;
+
+//Warn: This is for testing/debugging
+//write_def_clm_source(lvl,"aaa");
+//write_def_tng_source(lvl,"aaa");
+
   if (result!=VERIF_ERROR)
   {
     nres=level_verify_struct(lvl,err_msg);

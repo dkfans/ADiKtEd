@@ -13,11 +13,20 @@ typedef void (*cr_tng_func)(struct LEVEL *lvl, int tx, int ty,
 short things_verify(struct LEVEL *lvl, char *err_msg);
 
 unsigned char *create_door(struct LEVEL *lvl, unsigned int sx, unsigned int sy, unsigned char stype_idx);
+unsigned char *create_roomeffect(unsigned int sx, unsigned int sy, unsigned char stype_idx);
+unsigned char *create_creature(unsigned int sx, unsigned int sy, unsigned char stype_idx);
+unsigned char *create_trap(unsigned int sx, unsigned int sy, unsigned char stype_idx);
+unsigned char *create_item_adv(struct LEVEL *lvl, unsigned int sx, unsigned int sy, unsigned char stype_idx);
+
+//Lower level functions, used by create_item_adv
 unsigned char *create_torch(struct LEVEL *lvl, unsigned int sx, unsigned int sy,  unsigned char stype_idx);
+unsigned char *create_doorkey(struct LEVEL *lvl, unsigned int sx, unsigned int sy,  unsigned char stype_idx);
 
 short set_door_lock(struct LEVEL *lvl, unsigned char *thing, unsigned char nlock);
 unsigned char get_door_lock(unsigned char *thing);
 unsigned char compute_door_orientation(struct LEVEL *lvl, unsigned char *thing);
+unsigned short compute_torch_sensitile(struct LEVEL *lvl, unsigned char *thing);
+unsigned short compute_roomeffect_sensitile(struct LEVEL *lvl, unsigned char *thing);
 
 void update_obj_for_square(struct LEVEL *lvl, int tx_first, int tx_last,
     int ty_first, int ty_last);

@@ -27,6 +27,13 @@
 #define KEY_F11        0x20b
 #define KEY_F12        0x20c
 #define KEY_ESCAPE     27
+#define KEY_CTRL_A      1
+#define KEY_CTRL_B      2
+#define KEY_CTRL_C      3
+#define KEY_CTRL_D      4
+#define KEY_CTRL_E      5
+#define KEY_CTRL_F      6
+#define KEY_CTRL_G      7  //Abort key
 #define KEY_CTRL_H      8  //same as Backspace
 #define KEY_CTRL_I      9  //same as Tab
 #define KEY_CTRL_J     10

@@ -14,6 +14,12 @@
 #include "obj_things.h"
 #include "graffiti.h"
 
+const char *inf_texture_fullnames[]={
+      INF_STANDARD_LTEXT,INF_ANCIENT_LTEXT,INF_WINTER_LTEXT,
+      INF_SNAKE_LTEXT,INF_FACE_LTEXT,INF_BRESTS_LTEXT,
+      INF_RGANCNT_LTEXT,INF_SKULL_LTEXT,
+      };
+
 // True means DAT/CLM/WIB are updated automatically
 short datclm_auto_update=true;
 
@@ -351,8 +357,6 @@ void clm_utilize_inc(struct LEVEL *lvl, int clmidx)
  */
 short columns_verify(struct LEVEL *lvl, char *err_msg)
 {
-//Warn: This is for testing/debugging
-//write_def_clm_source(lvl,"aaa");
     //Preparing array bounds
     int arr_entries_x=MAP_SIZE_X*MAP_SUBNUM_X;
     int arr_entries_y=MAP_SIZE_Y*MAP_SUBNUM_Y;
@@ -416,12 +420,19 @@ void update_tile_wib_entries(struct LEVEL *lvl, int tx, int ty)
   for (k=0;k<MAP_SUBNUM_Y;k++)
     for (i=0;i<MAP_SUBNUM_X;i++)
     {
-      get_subtile_column_rec(lvl, clm_rec_nw, tx*MAP_SUBNUM_X+i-1, ty*MAP_SUBNUM_Y+k-1);
-      get_subtile_column_rec(lvl, clm_rec_n, tx*MAP_SUBNUM_X+i, ty*MAP_SUBNUM_Y+k-1);
-      get_subtile_column_rec(lvl, clm_rec_w, tx*MAP_SUBNUM_X+i-1, ty*MAP_SUBNUM_Y+k);
-      get_subtile_column_rec(lvl, clm_rec, tx*MAP_SUBNUM_X+i, ty*MAP_SUBNUM_Y+k);
       short wib_entry;
-      wib_entry=column_wib_entry(clm_rec,clm_rec_n,clm_rec_w,clm_rec_nw);
+      int ccol_idx=cust_col_subtl_idx(lvl,tx*MAP_SUBNUM_X+i,ty*MAP_SUBNUM_Y+k);
+      if (ccol_idx>=0)
+      {
+        wib_entry=get_cust_col_wib_entry(lvl,ccol_idx);
+      } else
+      {
+        get_subtile_column_rec(lvl, clm_rec_nw, tx*MAP_SUBNUM_X+i-1, ty*MAP_SUBNUM_Y+k-1);
+        get_subtile_column_rec(lvl, clm_rec_n, tx*MAP_SUBNUM_X+i, ty*MAP_SUBNUM_Y+k-1);
+        get_subtile_column_rec(lvl, clm_rec_w, tx*MAP_SUBNUM_X+i-1, ty*MAP_SUBNUM_Y+k);
+        get_subtile_column_rec(lvl, clm_rec, tx*MAP_SUBNUM_X+i, ty*MAP_SUBNUM_Y+k);
+        wib_entry=column_wib_entry(clm_rec,clm_rec_n,clm_rec_w,clm_rec_nw);
+      }
       set_subtl_wib(lvl, tx*MAP_SUBNUM_X+i, ty*MAP_SUBNUM_Y+k, wib_entry);
     }
   free_column_rec(clm_rec);
@@ -692,6 +703,14 @@ struct COLUMN_REC *get_cust_col_rec(struct LEVEL *lvl, int ccol_idx)
     return ccol->rec;
 }
 
+unsigned short get_cust_col_wib_entry(struct LEVEL *lvl, int ccol_idx)
+{
+    if ((ccol_idx<0)||(ccol_idx>=lvl->cust_clm_count)) return COLUMN_WIB_SKEW;
+    struct DK_CUSTOM_CLM *ccol=lvl->cust_clm[ccol_idx];
+    if (ccol==NULL) return COLUMN_WIB_SKEW;
+    return ccol->wib_val;
+}
+
 /*
  * Adds custom column object to level data, without filling the column
  * nor updating slabs.
@@ -714,18 +733,29 @@ int cust_col_add_obj(struct LEVEL *lvl,struct DK_CUSTOM_CLM *ccol)
  */
 int cust_col_add_or_update(struct LEVEL *lvl,struct DK_CUSTOM_CLM **ccol)
 {
+    if ((lvl==NULL)||(ccol==NULL)||(*ccol==NULL)) return -1;
     int idx;
+    int sx=(*ccol)->sx;
+    int sy=(*ccol)->sy;
     //Check if we already have the column at this place
-    idx=cust_col_subtl_idx(lvl, (*ccol)->sx, (*ccol)->sy);
+    idx=cust_col_subtl_idx(lvl,sx,sy);
     if (idx<0)
-        return cust_col_add_obj(lvl,*ccol);
+    {
+        idx=cust_col_add_obj(lvl,*ccol);
+        update_datclm_for_slab(lvl,sx/3,sy/3);
+        update_tile_wib_entries(lvl,sx/3,sy/3);
+        return idx;
+    }
     //If we have - update it
     struct DK_CUSTOM_CLM *ccol_old;
     ccol_old=get_cust_col(lvl,idx);
     free(ccol_old->rec);
     ccol_old->rec=(*ccol)->rec;
+    ccol_old->wib_val=(*ccol)->wib_val;
     free(*ccol);
     *ccol=ccol_old;
+    update_datclm_for_slab(lvl,sx/3,sy/3);
+    update_tile_wib_entries(lvl,sx/3,sy/3);
     return idx;
 }
 
@@ -778,3 +808,14 @@ void cust_col_del(struct LEVEL *lvl,unsigned int num)
     }
 }
 
+/*
+ * Returns texture type name string
+ */
+char *get_texture_fullname(unsigned short inf_type)
+{
+     int types_count=sizeof(inf_texture_fullnames)/sizeof(char *);
+     if (inf_type<types_count)
+       return (char *)inf_texture_fullnames[inf_type];
+     else
+       return "unknown(?!)";
+}

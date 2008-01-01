@@ -37,7 +37,7 @@ short things_verify(struct LEVEL *lvl, char *err_msg)
           short result=thing_verify(thing,child_err_msg);
           if (result!=VERIF_OK)
           {
-            sprintf(err_msg,"%s at slab %d,%d.",child_err_msg,i/MAP_SUBNUM_X, j/MAP_SUBNUM_Y);
+            sprintf(err_msg,"%s at slab %d,%d.",child_err_msg,i/MAP_SUBNUM_X,j/MAP_SUBNUM_Y);
             return result;
           }
         }
@@ -73,9 +73,7 @@ short set_door_lock(struct LEVEL *lvl, unsigned char *thing, unsigned char nlock
     {
         if (thing_key==NULL)
         {
-          thing_key = create_item(sx,sy,ITEM_SUBTYPE_SPINNKEY);
-          //TODO: set the spinning key properties (height, other?)
-          set_thing_tilepos_h(thing,5);
+          thing_key = create_doorkey(lvl,sx,sy,ITEM_SUBTYPE_SPINNKEY);
           thing_add(lvl,thing_key);
         }
     }
@@ -116,6 +114,65 @@ unsigned char compute_door_orientation(struct LEVEL *lvl, unsigned char *thing)
       else
         return DOOR_ORIENT_NSPASS;
     }
+}
+
+/*
+ * Returns an acceptable value of sensitive tile for torch
+ */
+unsigned short compute_torch_sensitile(struct LEVEL *lvl, unsigned char *thing)
+{
+    unsigned short sx=get_thing_tilepos_x(thing);
+    unsigned short sy=get_thing_tilepos_y(thing);
+    int tx=sx/MAP_SUBNUM_X;
+    int ty=sy/MAP_SUBNUM_Y;
+    int ntx=tx+(int)(sx%MAP_SUBNUM_X)-1;
+    int nty=ty+(int)(sy%MAP_SUBNUM_Y)-1;
+    if (ntx<0) ntx=0;
+    if (ntx>=MAP_SIZE_X) ntx=MAP_MAXINDEX_X;
+    if (nty<0) nty=0;
+    if (nty>=MAP_SIZE_X) nty=MAP_MAXINDEX_X;
+    if ((ntx==tx)&&(nty==ty))
+        return ty*MAP_SIZE_X+tx;
+    unsigned char slab;
+    // Trying fo find torch wall around
+    // First - try to put it in X axis
+    slab=get_tile_slab(lvl,ntx,ty);
+    if (slab_needs_adjacent_torch(slab))
+        return ty*MAP_SIZE_X+ntx;
+    //Now in Y axis
+    slab=get_tile_slab(lvl,tx,nty);
+    if (slab_needs_adjacent_torch(slab))
+        return nty*MAP_SIZE_X+tx;
+    //Now in XY corner
+    slab=get_tile_slab(lvl,ntx,nty);
+    if (slab_needs_adjacent_torch(slab))
+        return nty*MAP_SIZE_X+ntx;
+    // No torch wall - searching for any tall slab
+    // First - try to put it in X axis
+    slab=get_tile_slab(lvl,ntx,ty);
+    if (slab_is_tall(slab))
+        return ty*MAP_SIZE_X+ntx;
+    //Now in Y axis
+    slab=get_tile_slab(lvl,tx,nty);
+    if (slab_is_tall(slab))
+        return nty*MAP_SIZE_X+tx;
+    //Now in XY corner
+    slab=get_tile_slab(lvl,ntx,nty);
+    if (slab_is_tall(slab))
+        return nty*MAP_SIZE_X+ntx;
+    return THING_SENSITILE_NONE;
+}
+
+/*
+ * Returns an acceptable value of sensitive tile for room effect
+ */
+unsigned short compute_roomeffect_sensitile(struct LEVEL *lvl, unsigned char *thing)
+{
+    unsigned short sx=get_thing_tilepos_x(thing);
+    unsigned short sy=get_thing_tilepos_y(thing);
+    int tx=sx/MAP_SUBNUM_X;
+    int ty=sy/MAP_SUBNUM_Y;
+    return ty*MAP_SIZE_X+tx;
 }
 
 /*
@@ -161,6 +218,110 @@ unsigned char *create_torch(struct LEVEL *lvl, unsigned int sx, unsigned int sy,
     if ((sy%MAP_SUBNUM_Y)==2)
       sub_y=0x0c0;
     set_thing_subtpos(thing,sub_x,sub_y);
+    unsigned short sensitile=compute_torch_sensitile(lvl,thing);
+    set_thing_sensitile(thing,sensitile);
+    return thing;
+}
+
+unsigned char *create_doorkey(struct LEVEL *lvl, unsigned int sx, unsigned int sy,  unsigned char stype_idx)
+{
+    unsigned char *thing;
+    thing = create_thing(sx,sy);
+    int tx=sx/MAP_SUBNUM_X;
+    int ty=sy/MAP_SUBNUM_Y;
+    set_thing_type(thing,THING_TYPE_ITEM);
+    set_thing_subtype(thing,stype_idx);
+    set_thing_owner(thing,get_tile_owner(lvl,tx,ty));
+    set_thing_tilepos_h(thing,4);
+    set_thing_subtpos_h(thing,0x000);
+    set_thing_subtpos(thing,0x080,0x080);
+    //Note: in most DK maps, sensitile is set to 0, but I believe it is an error
+    unsigned short sensitile=ty*MAP_SIZE_X+tx;
+    set_thing_sensitile(thing,sensitile);
+    return thing;
+}
+
+/*
+ * Creates a new thing of type room effect
+ */
+unsigned char *create_roomeffect(unsigned int sx, unsigned int sy, unsigned char stype_idx)
+{
+    unsigned char *thing;
+    thing = create_thing(sx,sy);
+    set_thing_type(thing,THING_TYPE_ROOMEFFECT);
+    set_thing_subtype(thing,stype_idx);
+    set_thing_owner(thing,get_tile_owner(lvl,sx/MAP_SUBNUM_X,sy/MAP_SUBNUM_Y));
+    unsigned short sensitile=compute_roomeffect_sensitile(lvl,thing);
+    set_thing_sensitile(thing,sensitile);
+    return thing;
+}
+
+/*
+ * Creates a new thing of type creature
+ */
+unsigned char *create_creature(unsigned int sx, unsigned int sy, unsigned char stype_idx)
+{
+    unsigned char *thing;
+    thing = create_thing(sx,sy);
+    set_thing_type(thing,THING_TYPE_CREATURE);
+    set_thing_subtype(thing,stype_idx);
+    set_thing_owner(thing,get_tile_owner(lvl,sx/MAP_SUBNUM_X,sy/MAP_SUBNUM_Y));
+    return thing;
+}
+
+/*
+ * Creates a new thing of type trap
+ */
+unsigned char *create_trap(unsigned int sx, unsigned int sy, unsigned char stype_idx)
+{
+    unsigned char *thing;
+    thing = create_thing(sx,sy);
+    set_thing_type(thing,THING_TYPE_TRAP);
+    set_thing_subtype(thing,stype_idx);
+    set_thing_owner(thing,get_tile_owner(lvl,sx/MAP_SUBNUM_X,sy/MAP_SUBNUM_Y));
+    return thing;
+}
+
+/*
+ * Creates a new thing of type item. Advanced version - uses one of specialized
+ * functions to create the item.
+ */
+unsigned char *create_item_adv(struct LEVEL *lvl, unsigned int sx, unsigned int sy, unsigned char stype_idx)
+{
+    unsigned char *thing;
+    int tx=sx/MAP_SUBNUM_X;
+    int ty=sy/MAP_SUBNUM_Y;
+    if (is_torch_stype(stype_idx))
+    {
+        thing=create_torch(lvl,sx,sy,stype_idx);
+    } else
+    if (stype_idx==ITEM_SUBTYPE_HEROGATE)
+    {
+        thing=create_item(sx,sy,stype_idx);
+        set_thing_owner(thing,PLAYER_GOOD);
+        //Hero gate must be numbered
+        //TODO: stats should be changed in thing_add
+        lvl->stats.hero_gates_count++;
+        //TODO: make better gate numbering (like for action points)
+        set_thing_level(thing,(char)(-lvl->stats.hero_gates_count));
+    } else
+    if (stype_idx==ITEM_SUBTYPE_DNHEART)
+    {
+        thing=create_item(sx,sy,stype_idx);
+        set_thing_tilepos_h(thing,3); // Raise it up a bit
+    } else
+    if (stype_idx==ITEM_SUBTYPE_SPINNKEY)
+    {
+        thing=create_doorkey(lvl,sx,sy,stype_idx);
+    } else
+    {
+        thing=create_item(sx,sy,stype_idx);
+        if (is_room_thing(thing))
+        {
+          unsigned short sensitile=ty*MAP_SIZE_X+tx;
+          set_thing_sensitile(thing,sensitile);
+        }
+    }
     return thing;
 }
 

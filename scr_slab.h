@@ -8,13 +8,14 @@
 // Variables
 
 struct LEVEL;
+struct MAPMODE_DATA;
 
-typedef struct {
+struct MDSLAB_DATA {
     unsigned char *placekeys;
     int placenkeys;
-  } MDSLAB_DATA;
+  };
 
-extern MDSLAB_DATA *mdslab;
+extern struct MDSLAB_DATA *mdslab;
 
 //Slab mode keys export
 extern char *slbkey;
@@ -38,7 +39,7 @@ void free_mdslab_keys();
 //Functions - internal
 void slbposcheck(void);
 void change_ownership(unsigned char purchaser);
-void slb_place_room(unsigned char room);
+void slb_place_room(struct LEVEL *lvl,struct MAPMODE_DATA *mapmode,unsigned char room);
 void slb_place_graffiti(struct LEVEL *lvl,int tx, int ty,unsigned short orient);
 void slb_next_graffiti_orient(struct LEVEL *lvl,int graf_idx);
 

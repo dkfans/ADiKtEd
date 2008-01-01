@@ -38,13 +38,13 @@ static void (*custom_columns_gen [CUST_CLM_GEN_MAX_INDEX+1])(struct COLUMN_REC *
 
 const char *custom_columns_fullnames[CUST_CLM_GEN_MAX_INDEX+1]={
      "Standard Rock","Standard Gold",              //00
-     "Unaffected earth","Standard earth",
+     "Unaffected Earth","Standard Earth",
      SLB_TORCHDIRT_LTEXT,
      SLB_WALLDRAPE_LTEXT,SLB_WALLTORCH_LTEXT,
      SLB_WALLWTWINS_LTEXT,SLB_WALLWWOMAN_LTEXT,
      SLB_WALLPAIRSHR_LTEXT,
-     "Standard path",SLB_CLAIMED_LTEXT,           //0A
-     "Standard lava","Standard water",
+     "Standard Path",SLB_CLAIMED_LTEXT,           //0A
+     "Standard Lava","Standard Water",
      SLB_PORTAL_LTEXT,SLB_TREASURE_LTEXT,
      SLB_LIBRARY_LTEXT,SLB_PRISON_LTEXT,
      SLB_TORTURE_LTEXT,SLB_TRAINING_LTEXT,
@@ -54,7 +54,7 @@ const char *custom_columns_fullnames[CUST_CLM_GEN_MAX_INDEX+1]={
      SLB_LAIR_LTEXT,SLB_BARRACKS_LTEXT,          //1A
      SLB_DOORWOOD_LTEXT,SLB_DOORBRACE_LTEXT,
      SLB_DOORIRON_LTEXT,SLB_DOORMAGIC_LTEXT,
-     SLB_BRIDGE_LTEXT,"Standard gems",            //20
+     SLB_BRIDGE_LTEXT,"Standard Gems",            //20
      SLB_GUARDPOST_LTEXT,
      };
 

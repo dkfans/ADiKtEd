@@ -27,33 +27,33 @@
 static void (*actions [MODES_COUNT])(int)={
      actions_mdslab, actions_mdtng, actions_crtre, actions_itemt,
      actions_help, actions_mdclm, actions_scrpt, actions_mdtextr,
-     actions_mdcclm, actions_mdcube};
+     actions_mdcclm, actions_mdcube, actions_mdslbl};
 
 // Drawing functions for modes. You can fill new entries
 // with "draw_mdempty" till you create proper draw function.
 static void (*mddraw [MODES_COUNT])()={
      draw_mdslab, draw_mdtng, draw_crtre, draw_itemt,
      draw_help, draw_mdclm, draw_scrpt, draw_mdtextr,
-     draw_mdcclm, draw_mdcube};
+     draw_mdcclm, draw_mdcube, draw_mdslbl};
 
 static void (*mdend [MODES_COUNT])()={
      end_mdslab, end_mdtng, end_list, end_list,
      end_help, end_mdclm, end_scrpt, end_list,
-     end_list, end_list};
+     end_list, end_list, end_list};
 
 // Max. 5 chars mode names
 const char *modenames[MODES_COUNT]={
      "Slab", "Thing", "Crtr", "Item",
      "Help", "Clmn", "Scrpt", "Textr",
-     "CClm", "CCube"};
+     "CClm", "CCube", "SlbLs",};
 // longer mode names
 const char *longmodenames[MODES_COUNT]={
      "slab", "thing", "add creature","add item",
      "help", "column", "script", "texture",
-     "cust.column","cust.cubes"};
+     "cust.column","cust.cubes","slab list"};
 
-SCRMODE_DATA *scrmode;
-MAPMODE_DATA *mapmode;
+struct SCRMODE_DATA *scrmode;
+struct MAPMODE_DATA *mapmode;
 
 //Automated commands - allow sending multiple commands to the program.
 //Used by command line parameters
@@ -79,11 +79,11 @@ void init_levscr_basics(void)
     screen_enabled=true;
     input_enabled=true;
     //Creating and clearing screen mode info variable
-    scrmode=(SCRMODE_DATA *)malloc(sizeof(SCRMODE_DATA));
+    scrmode=(struct SCRMODE_DATA *)malloc(sizeof(struct SCRMODE_DATA));
     if (scrmode==NULL)
      die("init_levscr: Cannot allocate memory.");
     clear_scrmode(scrmode);
-    mapmode=(MAPMODE_DATA *)malloc(sizeof(MAPMODE_DATA));
+    mapmode=(struct MAPMODE_DATA *)malloc(sizeof(struct MAPMODE_DATA));
     if (mapmode==NULL)
      die("init_levscr: Cannot allocate memory.");
     clear_mapmode(mapmode);
@@ -119,7 +119,7 @@ void init_levscr_modes(void)
     init_mdslab();
 }
 
-void clear_scrmode(SCRMODE_DATA *scrmode)
+void clear_scrmode(struct SCRMODE_DATA *scrmode)
 {
     scrmode->keycols=40;
     scrmode->mode=MD_SLB;
@@ -130,7 +130,7 @@ void clear_scrmode(SCRMODE_DATA *scrmode)
     scrmode->clip_count=0;
 }
 
-void clear_mapmode(MAPMODE_DATA *mapmode)
+void clear_mapmode(struct MAPMODE_DATA *mapmode)
 {
     mapmode->mark=false;
     mapmode->paintmode=false;
@@ -293,6 +293,7 @@ char *mode_status(int mode)
       break;
     case MD_ITMT:
     case MD_TXTR:
+    case MD_SLBL:
       sprintf (buffer, "   (Selecting type)");
       break;
     default:
@@ -442,20 +443,18 @@ void show_cursor(char cur)
 
 void display_tngdat(void)
 {
-    int all_rows=get_screen_rows();
-    int all_cols=get_screen_cols();
     int tx, ty;
     tx = mapmode->screenx+mapmode->mapx;
     ty = mapmode->screeny+mapmode->mapy;
-    if (all_rows > 7)
+    if (scrmode->rows > TNGDAT_ROWS)
     {
       int scr_col=scrmode->cols+3;
       if (dat_view_mode!=0)
       {
-        display_dat_subtiles(all_rows-10,scr_col,ty,tx);
+        display_dat_subtiles(scrmode->rows-TNGDAT_ROWS,scr_col,ty,tx);
         scr_col+=17;
       }
-      display_tng_subtiles(all_rows-10,scr_col,ty,tx);
+      display_tng_subtiles(scrmode->rows-TNGDAT_ROWS,scr_col,ty,tx);
 
     }
 }
@@ -485,8 +484,13 @@ int change_mode(int new_mode)
        break;
   case MD_CRTR:
   case MD_ITMT:
-  case MD_TXTR:
        start_list(lvl,new_mode);
+       break;
+  case MD_TXTR:
+       start_mdtextr(lvl);
+       break;
+  case MD_SLBL:
+       start_mdslbl(lvl);
        break;
   case MD_HELP:
        start_help(lvl);
@@ -508,7 +512,8 @@ short is_simple_mode(int mode)
 {
     if ((scrmode->mode==MD_HELP) || (scrmode->mode==MD_CRTR) ||
         (scrmode->mode==MD_ITMT) || (scrmode->mode==MD_TXTR) ||
-        (scrmode->mode==MD_CCLM) || (scrmode->mode==MD_CUBE) )
+        (scrmode->mode==MD_CCLM) || (scrmode->mode==MD_CUBE) ||
+        (scrmode->mode==MD_SLBL) )
       return true;
     return false;
 }
@@ -541,12 +546,15 @@ void proc_key(void)
     case KEY_F1:
       if (scrmode->mode != MD_HELP)
         start_help(lvl);
-        break;
+      break;
     case KEY_CTRL_Q:
       if (!is_simple_mode(scrmode->mode))
+      {
           finished=true;
-      else
-        actions[scrmode->mode](KEY_CTRL_Q); // Grotty but it'll work
+          break;
+      }
+      message_info("You can't quit from here.");
+//      actions[scrmode->mode%MODES_COUNT](KEY_CTRL_Q); // Grotty but it'll work
       break;
     case KEY_CTRL_L:
       if (is_simple_mode(scrmode->mode))
@@ -674,6 +682,16 @@ void proc_key(void)
         change_mode(MD_SCRP);
       }
       break;
+    case KEY_CTRL_E:
+      if (is_simple_mode(scrmode->mode))
+      {
+        message_info("You can't change texture from here.");
+      } else
+      {
+        start_mdtextr(lvl);
+      }
+      break;
+
     default:
       {
         //Sending the action to a function corresponding to actual screen
@@ -862,7 +880,7 @@ void curposcheck(void)
  * Objects are action points, lights and things.
  * If cannot find, returns NULL.
  */
-CLIPBOARD *get_clipboard_object(int idx)
+struct CLIPBOARD *get_clipboard_object(int idx)
 {
     if (idx<0) return NULL;
     int cidx=-1;
@@ -942,7 +960,7 @@ int add_clipboard_any(char *obj,int obj_type)
 {
     if (obj==NULL) return 0;
     int obj_idx=scrmode->clip_count;
-    scrmode->clipbrd=realloc(scrmode->clipbrd,(obj_idx+1)*sizeof(CLIPBOARD));
+    scrmode->clipbrd=realloc(scrmode->clipbrd,(obj_idx+1)*sizeof(struct CLIPBOARD));
     if (scrmode->clipbrd==NULL)
         die("add_clipboard_any: Cannot allocate clipboard memory");
     scrmode->clip_count=obj_idx+1;

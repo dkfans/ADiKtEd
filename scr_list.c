@@ -18,6 +18,8 @@
 #include "scr_thing.h"
 #include "obj_things.h"
 #include "obj_column.h"
+#include "obj_slabs.h"
+#include "lev_things.h"
 #include "lev_column.h"
 
 // Variables
@@ -101,11 +103,7 @@ void actions_itemt(int key)
           message_info("Adding thing cancelled");
           break;
         case KEY_ENTER:
-          thing = create_item(sx, sy,list->pos+1);
-          set_thing_owner(thing,get_tile_owner(lvl,mapmode->mapx+mapmode->screenx,mapmode->mapy+mapmode->screeny));
-          thing_add(lvl,thing);
-          // Show the new thing
-          mdtng->vistng[mapmode->subtl_x][mapmode->subtl_y]=get_object_subtl_last(lvl,sx,sy,OBJECT_TYPE_THING);
+          tng_makeitem(sx,sy,list->pos+1);
           end_list();
           message_info("Item added");
           break;
@@ -133,7 +131,7 @@ void actions_mdtextr(int key)
           message_info("Texture change cancelled");
           break;
         case KEY_ENTER:
-          //TODO
+          lvl->inf=list->pos;
           end_list();
           message_info("Texture changed");
           break;
@@ -223,6 +221,34 @@ void actions_mdcube(int key)
 }
 
 /*
+ * Covers actions from slab list screen.
+ */
+void actions_mdslbl(int key)
+{
+    message_release();
+    if (!actions_list(key))
+    {
+      switch (key)
+      {
+        case KEY_TAB:
+        case KEY_DEL:
+        case KEY_ESCAPE:
+          end_list();
+          message_info("Slab change cancelled");
+          break;
+        case KEY_ENTER:
+          slb_place_room(lvl,mapmode,list->pos);
+          end_list();
+          message_info("New slab placed");
+          break;
+        default:
+          message_info("Unrecognized slab list key code: %d",key);
+          speaker_beep();
+      }
+    }
+}
+
+/*
  * Covers actions from all screens with numbered list.
  */
 short actions_list(int key)
@@ -274,14 +300,39 @@ short actions_list(int key)
 short start_list(struct LEVEL *lvl,int lstmode)
 {
     list->prevmode=scrmode->mode;
-    list->y=0; //the first visible row
     list->pos=0; // selected item position (rel. to screen top)
+    //These parameters will be reset to proper values on redraw
+    list->y=0; //the first visible row
     list->items=8; //number of items in the list
     list->cols=2; //number of columns in the item list
     scrmode->mode=lstmode;
     message_info("Use arrow keys and page up/down to move, "
       "enter to choose.");
     return true;
+}
+
+/*
+ * Action function - start texture selection mode.
+ */
+short start_mdtextr(struct LEVEL *lvl)
+{
+    short result;
+    result=start_list(lvl,MD_TXTR);
+    list->pos=lvl->inf;
+    return result;
+}
+
+/*
+ * Action function - start slab list mode.
+ */
+short start_mdslbl(struct LEVEL *lvl)
+{
+    int tx=mapmode->mapx+mapmode->screenx;
+    int ty=mapmode->mapy+mapmode->screeny;
+    short result;
+    result=start_list(lvl,MD_SLBL);
+    list->pos=get_tile_slab(lvl,tx,ty);
+    return result;
 }
 
 /*
@@ -370,8 +421,7 @@ void draw_itemt()
 
 void draw_mdtextr()
 {
-    draw_mdempty();
-//    draw_numbered_list(get_item_subtype_fullname,1,ITEM_SUBTYPE_SPELLARMG,18);
+    draw_numbered_list(get_texture_fullname,0,INF_MAX_INDEX,55);
     set_cursor_pos(get_screen_rows()-1, 17);
 }
 
@@ -385,5 +435,11 @@ void draw_mdcube()
 {
     draw_mdempty();
 //    draw_numbered_list(get_item_subtype_fullname,1,ITEM_SUBTYPE_SPELLARMG,18);
+    set_cursor_pos(get_screen_rows()-1, 17);
+}
+
+void draw_mdslbl()
+{
+    draw_numbered_list(get_slab_fullname,0,SLAB_TYPE_GUARDPOST,17);
     set_cursor_pos(get_screen_rows()-1, 17);
 }

@@ -26,6 +26,7 @@ void free_list(void);
 //Functions - start and stop
 short start_list(struct LEVEL *lvl,int lstmode);
 void end_list(void);
+short start_mdtextr(struct LEVEL *lvl);
 
 //Functions - actions and screen
 void draw_crtre();
@@ -38,6 +39,8 @@ void draw_mdcclm();
 void actions_mdcclm(int key);
 void draw_mdcube();
 void actions_mdcube(int key);
+void draw_mdslbl();
+void actions_mdslbl(int key);
 
 //Functions - lower level
 short actions_list(int key);

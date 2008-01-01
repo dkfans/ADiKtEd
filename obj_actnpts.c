@@ -108,7 +108,7 @@ short set_actnpt_number(unsigned char *actnpt,unsigned short apt_num)
 {
     if (actnpt==NULL) return 0;
     actnpt[7]=(apt_num>>8);
-    actnpt[6]=apt_num%255;
+    actnpt[6]=apt_num&255;
 }
 
 /*

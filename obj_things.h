@@ -239,6 +239,10 @@
 #define DOOR_PASS_UNLOCKED     0x00
 #define DOOR_PASS_LOCKED       0x01
 
+//Other defines
+#define THING_SENSITILE_NONE   0x0ffff
+
+
 struct LEVEL;
 
 extern short obj_auto_update;
@@ -266,8 +270,8 @@ short set_thing_subtpos_h(unsigned char *thing,unsigned char pos_h);
 short set_thing_subtpos(unsigned char *thing,unsigned char pos_x,unsigned char pos_y);
 unsigned char get_thing_level(unsigned char *thing);
 short set_thing_level(unsigned char *thing,unsigned char lev_num);
-unsigned short get_thing_tilenum(unsigned char *thing);
-short set_thing_tilenum(unsigned char *thing,unsigned short til_num);
+unsigned short get_thing_sensitile(unsigned char *thing);
+short set_thing_sensitile(unsigned char *thing,unsigned short til_num);
 
 unsigned char get_door_orientation(unsigned char *thing);
 short set_door_orientation(unsigned char *thing,unsigned char orient);
@@ -276,20 +280,21 @@ unsigned char *create_thing_empty();
 unsigned char *create_thing(unsigned int sx, unsigned int sy);
 unsigned char *create_thing_copy(unsigned int sx, unsigned int sy,unsigned char *src);
 unsigned char *create_item(unsigned int sx, unsigned int sy, unsigned char stype_idx);
-unsigned char *create_roomeffect(unsigned int sx, unsigned int sy, unsigned char stype_idx);
-unsigned char *create_creature(unsigned int sx, unsigned int sy, unsigned char stype_idx);
-unsigned char *create_trap(unsigned int sx, unsigned int sy, unsigned char stype_idx);
 
 short is_spellbook(unsigned char *thing);
+short is_spellbook_stype(unsigned char stype_idx);
 unsigned char get_spellbook_next(unsigned char stype_idx);
 unsigned char get_spellbook_prev(unsigned char stype_idx);
 short is_dngspecbox(unsigned char *thing);
+short is_dngspecbox_stype(unsigned char stype_idx);
 unsigned char get_dngspecbox_next(unsigned char stype_idx);
 unsigned char get_dngspecbox_prev(unsigned char stype_idx);
 short is_crtrlair(unsigned char *thing);
+short is_crtrlair_stype(unsigned char stype_idx);
 unsigned char get_crtrlair_next(unsigned char stype_idx);
 unsigned char get_crtrlair_prev(unsigned char stype_idx);
 short is_trapbox(unsigned char *thing);
+short is_trapbox_stype(unsigned char stype_idx);
 unsigned char get_trapbox_next(unsigned char stype_idx);
 unsigned char get_trapbox_prev(unsigned char stype_idx);
 short is_trap(unsigned char *thing);
@@ -305,23 +310,28 @@ short is_roomeffect(unsigned char *thing);
 unsigned char get_roomeffect_next(unsigned char stype_idx);
 unsigned char get_roomeffect_prev(unsigned char stype_idx);
 short is_statue(unsigned char *thing);
+short is_statue_stype(unsigned char stype_idx);
 unsigned char get_statue_next(unsigned char stype_idx);
 unsigned char get_statue_prev(unsigned char stype_idx);
 short is_furniture(unsigned char *thing);
+short is_furniture_stype(unsigned char stype_idx);
 unsigned char get_furniture_next(unsigned char stype_idx);
 unsigned char get_furniture_prev(unsigned char stype_idx);
 short is_food(unsigned char *thing);
+short is_food_stype(unsigned char stype_idx);
 unsigned char get_food_next(unsigned char stype_idx);
 unsigned char get_food_prev(unsigned char stype_idx);
 short is_gold(unsigned char *thing);
+short is_gold_stype(unsigned char stype_idx);
 unsigned char get_gold_next(unsigned char stype_idx);
 unsigned char get_gold_prev(unsigned char stype_idx);
 short is_torch(unsigned char *thing);
+short is_torch_stype(unsigned char stype_idx);
 unsigned char get_torch_next(unsigned char stype_idx);
 unsigned char get_torch_prev(unsigned char stype_idx);
 short is_herogate(unsigned char *thing);
 short is_dnheart(unsigned char *thing);
-short is_room_thing (unsigned char *thing);
+short is_room_thing(unsigned char *thing);
 short is_clmaffective_thing(unsigned char *thing);
 
 int get_item_category(unsigned char stype_idx);

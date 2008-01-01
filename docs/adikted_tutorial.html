@@ -81,8 +81,8 @@ around with it.
 <ol>
 <li>As you may have guessed (or tried already), using the arrow keys
 moves the cursor around. However, if you want to go a long way, this
-can take a long time. Use home/end/page up/page down to move faster.
-On some operating systems, pressing ctrl with any movement key
+can take a long time. Use home/end/page&nbsp;up/page&nbsp;down to move faster.
+On some operating systems, pressing <b>ctrl</b> with any movement key
 will make it go further too. Note you can see exactly where you are
 with the "Position" indicator on the dividing line at the bottom.</li>
 
@@ -123,45 +123,45 @@ grey on black.</li>
 <li>The information area should give you an idea of what to press to
 get specific tiles... basically you press the key it shows you!
 There is one exception to this, which is graffiti. We'll come onto
-that later. Also, where it says h:heart, that doesn't mean the
+that later. Also, where it says <b>h</b>:heart, that doesn't mean the
 dungeon heart itself, it means the heart pedestal. You need to place
-the actual heart itself separately (more on that later, too).
-</li><li>Create a few small rooms, and put walls round them. Leave a path
+the actual heart itself separately (more on that later, too).</li>
+
+<li>Create a few small rooms, and put walls round them. Leave a path
 of claimed land (spaces) to get from room to room though! It's often
 easiest to create the rooms themselves first, then say who owns them
-later.
-</li><li>Tip: Create a portal by pressing E. This has been missed off the
-key for the moment - I'll fix it in the next release.
-</li></ol>
+later.</li>
+
+</ol>
 
 <h3>Marking</h3>
 <ol>
 <li>If you created any large rooms, you may have found it fairly
 timeconsuming. There must be a quicker way... it's a pretty big map,
 after all! Well, of course, having said that, there's <b>bound</b>
-to be. It's called marking, and you do it like this:
-</li><li>Find a spare bit of earth where you might want to create a big
-room... a large lair maybe.
-</li><li>Press ctrl+space. On the dividing line, it should tell you that
-you're now marking, and on the message line it will say, "Mark mode
-on".
-</li><li>Move around a bit... a white rectangle should appear between the
-cursor and where you first pressed ctrl+space.
-</li><li>Mark out a nice big area... you want your creatures to have lots
-of room, don't you?
-</li><li>Press L, and the white rectangle should be replaced by a lots of
-lair tiles.
-</li><li>If you've put the new lair over earth, it will be unowned... you
+to be. It's called marking, and you do it like this:</li>
+<li>Find a spare bit of earth where you might want to create a big
+room... a large lair maybe.</li>
+<li>Press <b>ctrl+space</b>. On the dividing line, it should tell you that
+you're now marking, and on the message line it will say,
+"Mark mode on".</li>
+<li>Move around a bit... a white rectangle should appear between the
+cursor and where you first pressed <b>ctrl+space</b>.</li>
+<li>Mark out a nice big area... you want your creatures to have lots
+of room, don't you?</li>
+<li>Press <b>L</b>, and the white rectangle should be replaced by a lots of
+lair tiles.</li>
+<li>If you've put the new lair over earth, it will be unowned... you
 need to set the ownership on the whole lot. Again, you can use mark
-mode. Press ctrl+space again.
-</li><li>Move around so the rectangle covers the whole lair, and press 0.
-Surprise surprise, the lair should now be white on a red background.
-</li><li>Tip: If you ever start marking then want to stop, press
-ctrl+space again.
-</li><li>Tip: You can save lots of time by laying out a lot of dungeon,
-then marking the whole area to be owned by a player. You won't
-accidentally own rocks or earth, so don't worry!
-</li></ol>
+mode. Press <b>ctrl+space</b> again.</li>
+<li>Move around so the rectangle covers the whole lair, and press <b>0</b>.
+Surprise surprise, the lair should now be white on a red background.</li>
+<li>Tip: If you ever start marking then want to stop, press
+<b>ctrl+space</b> again.</li>
+<li>Tip: You can save lots of time by laying out a lot of dungeon,
+then marking the whole area to be owned by a player. The ownership
+of rocks or earth will be reverted when saving, so don't worry!</li>
+</ol>
 
 <h3>Painting</h3>
 <ol>
@@ -173,7 +173,7 @@ What you could really do with is being able to just move the cursor
 around, leaving a trail of walls behind...
 </li><li>Move to the edge of the lair, where you want to start laying a
 wall.
-</li><li>Press z. On the dividing line and message lines, there will now
+</li><li>Press <b>z</b>. On the dividing line and message lines, there will now
 be indications that you're painting. Try moving around...
 </li><li>Nothing's happening! Don't worry, this isn't a bug... you
 haven't told the editor what you want to paint with. Move back to
@@ -274,14 +274,19 @@ number it is, for use when you write your level script.
 You want to delete them, don't you? Well, move over a square with a
 thing in, highlight it and press delete. Hey presto, it vanishes.
 Get rid of all the things you've created so far, except the dungeon
-heart.
-</li><li>Pressing u will update the things in the level - this makes sure 
-that all the training posts, torturers, torches etc are in the right
-place. Don't worry about it too much - Adikted does an automatic
-update when you save the level, so you only need to concentrate on
-the things you put down yourself.
-</li><li>Press tab to get out of thing mode.
-</li></ol>
+heart.</li>
+<li>Pressing <b>u</b> will update the graphic and things in the level
+- this makes sure that all the training posts, torturers, torches etc
+are in the right place.
+Don't worry about it too much - Adikted does an automatic update when
+you're changing the level. But if you see some graphic errors,
+or the Official Editor acts strangely, you can update the level
+to make everything work right. The automatic update may be disabled
+to speed-up Adikted - in this case you should update the map before
+saving.</li>
+<li>Press tab to get out of thing mode.</li>
+</ol>
+
 <h3>Graffiti</h3>
 <ol>
 <li>Now onto a special feature of Adikted - graffiti. Fancy writing
@@ -297,15 +302,15 @@ for example if it has WE (west-east) orientation, it will only
 be visible from south. To see the text from both sides, you have to
 create two graffiti items with oposite orientation (like WE and EW).</li>
 <li>You can change graffiti orientation with <b>a</b>.
-It's quite a nice effect, but I'd recommend using it sparingly.</li>
+The graffiti is quite a nice effect, but I'd recommend using it sparingly.</li>
 </ol>
 
 <h3>Ready to go!</h3>
 <ol>
 <li>You know how to use Adikted to edit levels now. Create a small
 level (you really only need a dungeon heart, and maybe try another
-room).
-</li><li>Finished already? That was quick... press ctrl+s to save your
+room).</li>
+<li>Finished already? That was quick... press ctrl+s to save your
 level. Adikted will ask you for a filename. I recommend saving it in
 a temporary file first - I usually use newmap - rather than saving
 straight over the original DK files to start with. If there's

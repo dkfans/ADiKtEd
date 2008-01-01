@@ -46,8 +46,8 @@ void free_mdtng(void)
 void change_visited_tile()
 {
     int i,j;
-    for (i=0; i < 3; i++)
-      for (j=0; j < 3; j++)
+    for (i=0; i<3; i++)
+      for (j=0; j<3; j++)
         mdtng->vistng[i][j]=0;
 }
 
@@ -155,7 +155,7 @@ void actions_mdtng(int key)
         case 'y' : // Create thing from clipboard
           if (scrmode->clip_count>0)
           {
-            CLIPBOARD *clip_itm;
+            struct CLIPBOARD *clip_itm;
             clip_itm=get_clipboard_object(0);
             if (clip_itm==NULL)
             {
@@ -169,7 +169,7 @@ void actions_mdtng(int key)
                 // Make sure the coordinates are preserved for objects
                 //TODO: place this condition where creating new thing, not only here
                 if (get_thing_subtpos_y(thing)==1)
-                    set_thing_tilenum(thing,MAP_SIZE_X*(mapmode->mapy+mapmode->screeny)+(mapmode->mapx+mapmode->screenx));
+                    set_thing_sensitile(thing,MAP_SIZE_X*(mapmode->mapy+mapmode->screeny)+(mapmode->mapx+mapmode->screenx));
                 thing_add(lvl,thing);
                 message_info("Thing pasted from clipboard at subtile %d,%d",sx,sy);
                 mdtng->vistng[mapmode->subtl_x][mapmode->subtl_y]=get_object_subtl_last(lvl,sx,sy,OBJECT_TYPE_THING);
@@ -646,12 +646,29 @@ int display_thing(unsigned char *thing, int x, int y)
     screen_printf("Position within subtile: %3d, %3d",
               get_thing_subtpos_x(thing), get_thing_subtpos_y(thing));
     set_cursor_pos(y++, x);
-    screen_printf("Thing type: %s",get_thing_type_fullname(get_thing_type(thing)));
+    unsigned char type_idx=get_thing_type(thing);
+    screen_printf("Thing type: %s",get_thing_type_fullname(type_idx));
     set_cursor_pos(y++, x);
     screen_printf("Altitude: %3d within subtile %d",
         get_thing_subtpos_h(thing),get_thing_tilepos_h(thing));
+    if ((type_idx==THING_TYPE_ROOMEFFECT)||(type_idx==THING_TYPE_ITEM))
+    {
+        set_cursor_pos(y++, x);
+        int sen_tl=get_thing_sensitile(thing);
+        screen_printf("Sensitive tile:");
+        if (sen_tl==THING_SENSITILE_NONE)
+        {
+            screen_printf(" none");
+        } else
+        {
+            int sen_tlx,sen_tly;
+            sen_tlx=sen_tl%MAP_SIZE_X;
+            sen_tly=sen_tl/MAP_SIZE_X;
+            screen_printf(" %3d, %3d", sen_tlx, sen_tly);
+        }
+    }
 
-    switch (get_thing_type(thing))
+    switch (type_idx)
     {
     // Creature
     case THING_TYPE_CREATURE:
@@ -710,7 +727,7 @@ int display_thing(unsigned char *thing, int x, int y)
       set_cursor_pos(y++, x);
       screen_printf("Unrecognized thing!");
       set_cursor_pos(y++, x);
-      screen_printf("Type: %d", (unsigned int)get_thing_type(thing));
+      screen_printf("Type index: %d", (unsigned int)type_idx);
     };break;
     }
     return y;
@@ -811,38 +828,44 @@ int display_obj_stats(int scr_row, int scr_col)
     screen_printf("Cust.clms:%4d",lvl->cust_clm_count);
     set_cursor_pos(scr_row++, scr_col);
     screen_printf("Things on map:%4d",lvl->tng_total_count);
-    set_cursor_pos(scr_row, scr_col1);
-    screen_printf("Creatures:%6d",lvl->stats.creatures_count);
-    set_cursor_pos(scr_row++, scr_col2);
-    screen_printf("Traps:%4d",lvl->stats.traps_count);
-    set_cursor_pos(scr_row, scr_col1);
-    screen_printf("Room Effcts:%4d",lvl->stats.roomeffects_count);
-    set_cursor_pos(scr_row++, scr_col2);
-    screen_printf("Doors:%4d",lvl->stats.doors_count);
-    set_cursor_pos(scr_row++, scr_col1);
-    screen_printf("Items:%4d",lvl->stats.items_count);
-    set_cursor_pos(scr_row++, scr_col);
-    screen_printf("%s","Detailed items");
-    set_cursor_pos(scr_row, scr_col2);
-    screen_printf("Hero gats:%4d",lvl->stats.hero_gates_count);
-    set_cursor_pos(scr_row++, scr_col1);
-    screen_printf("Dung hearts:%4d",lvl->stats.dn_hearts_count);
-    set_cursor_pos(scr_row, scr_col2);
-    screen_printf("Torches:%6d",lvl->stats.torches_count);
-    set_cursor_pos(scr_row++, scr_col1);
-    screen_printf("Dn specials:%4d",lvl->stats.dng_specboxes_count);
-    set_cursor_pos(scr_row, scr_col2);
-    screen_printf("Statues:%6d",lvl->stats.statues_count);
-    set_cursor_pos(scr_row++, scr_col1);
-    screen_printf("Spell books:%4d",lvl->stats.spellbooks_count);
-    set_cursor_pos(scr_row, scr_col2);
-    screen_printf("Gold tngs:%4d",lvl->stats.gold_things_count);
-    set_cursor_pos(scr_row++, scr_col1);
-    screen_printf("Creatr lairs:%3d",lvl->stats.crtr_lairs_count);
-    set_cursor_pos(scr_row, scr_col2);
-    screen_printf("Furniture:%4d",lvl->stats.furniture_count);
-    set_cursor_pos(scr_row++, scr_col1);
-    screen_printf("Room things:%4d",lvl->stats.room_things_count);
+    if (scrmode->rows >= scr_row+TNGDAT_ROWS+3)
+    {
+      set_cursor_pos(scr_row, scr_col1);
+      screen_printf("Creatures:%6d",lvl->stats.creatures_count);
+      set_cursor_pos(scr_row++, scr_col2);
+      screen_printf("Traps:%4d",lvl->stats.traps_count);
+      set_cursor_pos(scr_row, scr_col1);
+      screen_printf("Room Effcts:%4d",lvl->stats.roomeffects_count);
+      set_cursor_pos(scr_row++, scr_col2);
+      screen_printf("Doors:%4d",lvl->stats.doors_count);
+      set_cursor_pos(scr_row++, scr_col1);
+      screen_printf("Items:%4d",lvl->stats.items_count);
+    }
+    if (scrmode->rows >= scr_row+TNGDAT_ROWS+6)
+    {
+      set_cursor_pos(scr_row++, scr_col);
+      screen_printf("%s","Detailed items");
+      set_cursor_pos(scr_row, scr_col2);
+      screen_printf("Hero gats:%4d",lvl->stats.hero_gates_count);
+      set_cursor_pos(scr_row++, scr_col1);
+      screen_printf("Dung hearts:%4d",lvl->stats.dn_hearts_count);
+      set_cursor_pos(scr_row, scr_col2);
+      screen_printf("Torches:%6d",lvl->stats.torches_count);
+      set_cursor_pos(scr_row++, scr_col1);
+      screen_printf("Dn specials:%4d",lvl->stats.dng_specboxes_count);
+      set_cursor_pos(scr_row, scr_col2);
+      screen_printf("Statues:%6d",lvl->stats.statues_count);
+      set_cursor_pos(scr_row++, scr_col1);
+      screen_printf("Spell books:%4d",lvl->stats.spellbooks_count);
+      set_cursor_pos(scr_row, scr_col2);
+      screen_printf("Gold tngs:%4d",lvl->stats.gold_things_count);
+      set_cursor_pos(scr_row++, scr_col1);
+      screen_printf("Creatr lairs:%3d",lvl->stats.crtr_lairs_count);
+      set_cursor_pos(scr_row, scr_col2);
+      screen_printf("Furniture:%4d",lvl->stats.furniture_count);
+      set_cursor_pos(scr_row++, scr_col1);
+      screen_printf("Room things:%4d",lvl->stats.room_things_count);
+    }
     return scr_row;
 }
 
@@ -943,29 +966,7 @@ int get_tng_display_color(short obj_type,unsigned char obj_owner,short marked)
 void tng_makeitem(int sx,int sy,unsigned char stype_idx)
 {
     unsigned char *thing;
-    if (stype_idx==ITEM_SUBTYPE_TORCH)
-    {
-        thing=create_torch(lvl,sx,sy,stype_idx);
-    } else
-    if (stype_idx==ITEM_SUBTYPE_HEROGATE)
-    {
-        thing=create_item(sx,sy,stype_idx);
-        set_thing_owner(thing,PLAYER_GOOD);
-        //Hero gate must be numbered
-        //TODO: stats should be changed in thing_add
-        lvl->stats.hero_gates_count++;
-        //TODO: make better gate numbering (like for action points)
-        set_thing_level(thing,(char)(-lvl->stats.hero_gates_count));
-    } else
-    if (stype_idx==ITEM_SUBTYPE_DNHEART)
-    {
-        thing=create_item(sx,sy,stype_idx);
-        set_thing_tilepos_h(thing,3); // Raise it up a bit
-    } else
-    {
-        thing=create_item(sx,sy,stype_idx);
-    }
-
+    thing=create_item_adv(lvl,sx,sy,stype_idx);
     thing_add(lvl,thing);
     mdtng->vistng[mapmode->subtl_x][mapmode->subtl_y]=get_object_subtl_last(lvl,sx,sy,OBJECT_TYPE_THING);
 }
