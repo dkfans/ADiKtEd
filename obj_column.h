@@ -75,7 +75,7 @@
 
 #define CUBE_MAX_INDEX         511
 
-#define CUST_CLM_GEN_MAX_INDEX  34
+#define CUST_CLM_GEN_MAX_INDEX  35
 
 //WIB entry values
 #define COLUMN_WIB_STATIC      0x00
@@ -357,6 +357,11 @@ void create_columns_slb_barracks_inside(struct COLUMN_REC *clm_recs[9],
 
 void create_columns_slb_door_floor(struct COLUMN_REC *clm_recs[9],
         unsigned char *surr_slb,unsigned char *surr_own, unsigned char **surr_tng);
+
+//User columns - used only in "manual columns" function, not as standard ones
+void create_columns_slb_thingems_path(struct COLUMN_REC *clm_recs[9],
+        unsigned char *surr_slb,unsigned char *surr_own, unsigned char **surr_tng);
+
 
 // Functions for preparing single CoLuMns
 void fill_column_rock(struct COLUMN_REC *clm_rec, unsigned char owner);

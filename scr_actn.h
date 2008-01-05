@@ -130,7 +130,8 @@ char *mode_status(int mode);
 short is_simple_mode(int mode);
 
 void mark_check(void);
-int get_draw_map_tile_color(struct LEVEL *lvl,int tx,int ty,short special);
+int get_draw_map_tile_color(struct LEVEL *lvl,int tx,int ty,short special,short darken);
+int get_screen_color_owned(unsigned char owner,short marked,short darken);
 void draw_map_area(struct LEVEL *lvl,short show_ground,short show_rooms,short show_things);
 int get_draw_map_tile_char(struct LEVEL *lvl,int tx,int ty,
     short show_ground,short show_rooms,short show_things,short force_at);

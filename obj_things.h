@@ -273,6 +273,7 @@ short set_thing_level(unsigned char *thing,unsigned char lev_num);
 unsigned short get_thing_sensitile(unsigned char *thing);
 short set_thing_sensitile(unsigned char *thing,unsigned short til_num);
 
+short switch_thing_subtype(unsigned char *thing,short forward);
 unsigned char get_door_orientation(unsigned char *thing);
 short set_door_orientation(unsigned char *thing,unsigned char orient);
 
@@ -329,8 +330,17 @@ short is_torch(unsigned char *thing);
 short is_torch_stype(unsigned char stype_idx);
 unsigned char get_torch_next(unsigned char stype_idx);
 unsigned char get_torch_prev(unsigned char stype_idx);
+short is_heartflame(unsigned char *thing);
+short is_heartflame_stype(unsigned char stype_idx);
+unsigned char get_heartflame_next(unsigned char stype_idx);
+unsigned char get_heartflame_prev(unsigned char stype_idx);
+short is_lit_thing(unsigned char *thing);
+short is_lit_thing_stype(unsigned char stype_idx);
+unsigned char get_lit_thing_next(unsigned char stype_idx);
+unsigned char get_lit_thing_prev(unsigned char stype_idx);
 short is_herogate(unsigned char *thing);
 short is_dnheart(unsigned char *thing);
+short is_doorkey(unsigned char *thing);
 short is_room_thing(unsigned char *thing);
 short is_clmaffective_thing(unsigned char *thing);
 

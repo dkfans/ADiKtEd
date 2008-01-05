@@ -15,6 +15,7 @@ enum borderStyle {bsSingle,bsDouble,bsSolid};
 #define PRINT_COLOR_WHITE_ON_BLACK    5
 #define PRINT_COLOR_LMAGENT_ON_BLACK  7
 #define PRINT_COLOR_LBLUE_ON_BLACK    31
+#define PRINT_COLOR_LGREEN_ON_BLACK   32
 #define PRINT_COLOR_LCYAN_ON_BLACK    34
 #define PRINT_COLOR_RED_ON_WHITE      9
 
@@ -29,6 +30,20 @@ enum borderStyle {bsSingle,bsDouble,bsSolid};
 #define PRINT_COLOR_GREEN_ON_WHITE    22
 #define PRINT_COLOR_YELLOW_ON_LGREY   23
 #define PRINT_COLOR_CYAN_ON_WHITE     24
+#define PRINT_COLOR_MAGENT_ON_LGREY   47
+#define PRINT_COLOR_BLUE_ON_WHITE     48
+#define PRINT_COLOR_BROWN_ON_WHITE    49
+
+#define PRINT_COLOR_LMAGENT_ON_RED    50
+#define PRINT_COLOR_LMAGENT_ON_BLUE   51
+#define PRINT_COLOR_LMAGENT_ON_GREEN  52
+#define PRINT_COLOR_LMAGENT_ON_BROWN  53
+#define PRINT_COLOR_LMAGENT_ON_CYAN   54
+#define PRINT_COLOR_GREY_ON_RED       55
+#define PRINT_COLOR_GREY_ON_BLUE      56
+#define PRINT_COLOR_GREY_ON_GREEN     57
+#define PRINT_COLOR_GREY_ON_BROWN     58
+#define PRINT_COLOR_GREY_ON_CYAN      59
     
 void set_cursor_visibility(short val);
 int get_screen_rows();

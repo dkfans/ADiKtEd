@@ -151,8 +151,8 @@ void screen_init(void)
     // Used in dat display
     SLtt_set_color (30,"Keeper 0","brightred","black");
     SLtt_set_color (PRINT_COLOR_LBLUE_ON_BLACK,"Keeper 1","brightblue", "black");
-    SLtt_set_color (33,"Keeper 2","brightgreen", "black");
-    SLtt_set_color (33,"Keeper 3","yellow", "black");
+    SLtt_set_color (PRINT_COLOR_LGREEN_ON_BLACK,"Keeper 2","brightgreen", "black");
+    SLtt_set_color (PRINT_COLOR_YELLOW_ON_BLACK,"Keeper 3","yellow", "black");
     SLtt_set_color (PRINT_COLOR_LCYAN_ON_BLACK,"Keeper 4","brightcyan","black");
     SLtt_set_color (35,"Unclaimed", "lightgray", "black");
     SLtt_set_color (36,"Blank","lightgray","black");
@@ -163,6 +163,22 @@ void screen_init(void)
     SLtt_set_color (44,"Keeper 4","white","cyan");
     SLtt_set_color (45,"Unclaimed","black","lightgray");
     SLtt_set_color (46,"Blank","black","lightgray");
+
+    SLtt_set_color (PRINT_COLOR_BLUE_ON_WHITE  ,"Keeper 1","blue", "white");
+    SLtt_set_color (PRINT_COLOR_BROWN_ON_WHITE,"Keeper 3","brown", "white");
+
+    SLtt_set_color (PRINT_COLOR_LMAGENT_ON_RED,  "Keeper 0","brightmagenta","red");
+    SLtt_set_color (PRINT_COLOR_LMAGENT_ON_BLUE, "Keeper 1","brightmagenta","blue");
+    SLtt_set_color (PRINT_COLOR_LMAGENT_ON_GREEN,"Keeper 2","brightmagenta","green");
+    SLtt_set_color (PRINT_COLOR_LMAGENT_ON_BROWN,"Keeper 3","brightmagenta","brown");
+    SLtt_set_color (PRINT_COLOR_LMAGENT_ON_CYAN, "Keeper 4","brightmagenta","cyan");
+    SLtt_set_color (PRINT_COLOR_MAGENT_ON_LGREY, "spec1", "magenta", "lightgray");
+
+    SLtt_set_color (PRINT_COLOR_GREY_ON_RED,  "Keeper 0","grey","red");
+    SLtt_set_color (PRINT_COLOR_GREY_ON_BLUE, "Keeper 1","grey","blue");
+    SLtt_set_color (PRINT_COLOR_GREY_ON_GREEN,"Keeper 2","grey","green");
+    SLtt_set_color (PRINT_COLOR_GREY_ON_BROWN,"Keeper 3","grey","brown");
+    SLtt_set_color (PRINT_COLOR_GREY_ON_CYAN, "Keeper 4","grey","cyan");
 
     screen_initied=true;
 }

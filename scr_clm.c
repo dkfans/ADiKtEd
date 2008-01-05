@@ -54,7 +54,7 @@ void actions_mdclm(int key)
         case 'u': // Update all things/dat/clm/w?b
           update_slab_owners(lvl);
           update_datclm_for_whole_map(lvl);
-          message_info("All DAT/CLM/W?B entries updated.");
+          message_info("DAT/CLM/W?B entries updated.");
           break;
         case 'a': // update dat/clm/w?b of selected tile
           {//TODO: add 'enable autoupdate' function

@@ -115,6 +115,8 @@ short slab_needs_adjacent_torch(unsigned char slab_type);
 short slab_verify_entry(unsigned char slab_type, char *err_msg);
 char *get_slab_fullname(unsigned short slb_type);
 
+short subtl_is_near_tall_slab(struct LEVEL *lvl,unsigned int sx,unsigned int sy);
+
 char *get_owner_type_fullname(unsigned char own_idx);
 unsigned char get_owner_next(unsigned char plyr_idx);
 unsigned char get_owner_prev(unsigned char plyr_idx);

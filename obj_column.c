@@ -13,7 +13,7 @@
 #include "obj_things.h"
 #include "graffiti.h"
 
-static void (*custom_columns_gen [CUST_CLM_GEN_MAX_INDEX+1])(struct COLUMN_REC *clm_recs[9],
+static void (*custom_columns_gen [])(struct COLUMN_REC *clm_recs[9],
         unsigned char *,unsigned char *, unsigned char **)={
      create_columns_slb_rock,create_columns_slb_gold,              //00
      create_columns_slb_fulldirt,create_columns_slb_earth,
@@ -34,9 +34,10 @@ static void (*custom_columns_gen [CUST_CLM_GEN_MAX_INDEX+1])(struct COLUMN_REC *
      create_columns_slb_dooriron,create_columns_slb_doormagic,
      create_columns_slb_bridge,create_columns_slb_gems,            //20
      create_columns_slb_guardpost,
+     create_columns_slb_thingems_path,
      };
 
-const char *custom_columns_fullnames[CUST_CLM_GEN_MAX_INDEX+1]={
+const char *custom_columns_fullnames[]={
      "Standard Rock","Standard Gold",              //00
      "Unaffected Earth","Standard Earth",
      SLB_TORCHDIRT_LTEXT,
@@ -56,6 +57,7 @@ const char *custom_columns_fullnames[CUST_CLM_GEN_MAX_INDEX+1]={
      SLB_DOORIRON_LTEXT,SLB_DOORMAGIC_LTEXT,
      SLB_BRIDGE_LTEXT,"Standard Gems",            //20
      SLB_GUARDPOST_LTEXT,
+     "Thin gems on path",
      };
 
 //const unsigned short wib_columns_static[]={
@@ -959,8 +961,6 @@ void create_columns_slb_walltorch(struct COLUMN_REC *clm_recs[9],
   int i;
   for (i=0;i<4;i++)
   {
-// the old way - delete when automake tng is done
-//  if (slab_is_room(surr_slb[IDIR_SOUTH])||slab_is_space(surr_slb[IDIR_SOUTH]))
     unsigned char *thing=surr_tng[dir_a[i]];
     if ((thing!=NULL)&&(is_torch(thing)))
     {
@@ -1229,6 +1229,19 @@ void create_columns_slb_gems(struct COLUMN_REC *clm_recs[9],
    }
   //Switch corner columns near lava,water,...
   modify_frail_columns(clm_recs,surr_slb,surr_own,surr_tng);
+}
+
+void create_columns_slb_thingems_path(struct COLUMN_REC *clm_recs[9],
+        unsigned char *surr_slb,unsigned char *surr_own, unsigned char **surr_tng)
+{
+  int i,k;
+  for (i=0;i<3;i++)
+   for (k=0;k<3;k++)
+   {
+     fill_column_path(clm_recs[k*3+i],surr_own[IDIR_CENTR]);
+   }
+  fill_column_gem(clm_recs[IDIR_CENTR],surr_own[IDIR_CENTR]);
+  modify_liquid_surrounding(clm_recs, surr_slb, 0, 0x02e, 0x02f);
 }
 
 void create_columns_slb_portal(struct COLUMN_REC *clm_recs[9],

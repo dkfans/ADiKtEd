@@ -69,7 +69,7 @@ void actions_mdslab(int key)
         case 'u': // Update all things/dat/clm/w?b
           update_slab_owners(lvl);
           update_datclm_for_whole_map(lvl);
-          message_info("DAT/CLM/W?B entries updated");
+          message_info("All DAT/CLM/W?B entries updated.");
           break;
         case 'v': // Verify whole map
           level_verify(lvl,NULL);
@@ -108,7 +108,6 @@ void actions_mdslab(int key)
             message_error("Nothing to delete");
           break;
         case 'a': // Change graffiti orientation
-//            slb_place_graffiti(lvl,tx,ty,ORIENT_WE);
             slb_next_graffiti_orient(lvl,graffiti_idx(lvl,tx,ty));
           break;
         case 'd': // Add/view graffiti down
@@ -121,7 +120,7 @@ void actions_mdslab(int key)
         case '4':
         case '5':
             mapmode->paintown=key-'0';
-            change_ownership ((char)(key-'0'));
+            change_ownership((char)(key-'0'));
             message_info("Slab owner changed");
             break;
         case '[':
@@ -216,7 +215,7 @@ void slbposcheck(void)
       if (mapmode->paintroom != 255)
           slb_place_room(lvl,mapmode,mapmode->paintroom);
       if (mapmode->paintown >= 0)
-          change_ownership ((char)(mapmode->paintown));
+          change_ownership((char)(mapmode->paintown));
     }
 }
 
@@ -261,6 +260,8 @@ void slb_place_room(struct LEVEL *lvl,struct MAPMODE_DATA *mapmode,unsigned char
       update_obj_for_square(lvl, markl-1, markr+1, markt-1, markb+1);
     if (datclm_auto_update)
       update_datclm_for_square(lvl, markl-1, markr+1, markt-1, markb+1);
+    if (obj_auto_update)
+      update_obj_subpos_and_height_for_square(lvl, markl-1, markr+1, markt-1, markb+1);
     mapmode->mark=false;
 }
 
@@ -278,8 +279,12 @@ void change_ownership(unsigned char purchaser)
     if (!mapmode->mark)
     {
       set_tile_owner(lvl,tx,ty,purchaser);
+      if (obj_auto_update)
+        update_obj_for_square_radius1(lvl,tx,ty);
       if (datclm_auto_update)
         update_datclm_for_square_radius1(lvl,tx,ty);
+      if (obj_auto_update)
+        update_obj_subpos_and_height_for_square_radius1(lvl,tx,ty);
       return;
     }
     // another sanity check - this time for marking mode
@@ -289,8 +294,12 @@ void change_ownership(unsigned char purchaser)
     for (tx=mapmode->markl; tx<=mapmode->markr; tx++)
       for (ty=mapmode->markt; ty<=mapmode->markb; ty++)
           set_tile_owner(lvl,tx,ty,purchaser);
+    if (obj_auto_update)
+      update_obj_for_square(lvl, mapmode->markl-1, mapmode->markr+1, mapmode->markt-1, mapmode->markb+1);
     if (datclm_auto_update)
       update_datclm_for_square(lvl, mapmode->markl-1, mapmode->markr+1, mapmode->markt-1, mapmode->markb+1);
+    if (obj_auto_update)
+      update_obj_subpos_and_height_for_square(lvl, mapmode->markl-1, mapmode->markr+1, mapmode->markt-1, mapmode->markb+1);
     mapmode->mark=false;
 }
 
@@ -423,8 +432,6 @@ void init_mdslab_keys()
     slbkey[SLAB_TYPE_DOORBRACE2]='b';
     slbkey[SLAB_TYPE_DOORIRON2]='i';
     slbkey[SLAB_TYPE_DOORMAGIC2]='m';
-// Old way - delete pending
-//    static char got[]="#$./^\\&*()- =~E?t?l?P?O?T?h?W?S?e?g?H?L?B?wwbbiimm?%!G";
 }
 
 /*

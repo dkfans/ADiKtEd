@@ -80,35 +80,30 @@ void actions_mdtng(int key)
           break;
         case 'b' : // create spell
           tng_makeitem(sx,sy,ITEM_SUBTYPE_SPELLHOE);
-          message_info("Added spell");
           break;
         case 'h' : // Add Dungeon heart
           tng_makeitem(sx,sy,ITEM_SUBTYPE_DNHEART);
-          message_info("Added Dungeon heart");
           break;
         case 'H' : // Add hero gate
           tng_makeitem(sx,sy,ITEM_SUBTYPE_HEROGATE);
-          message_info("Added hero gate");
           break;
         case 'd': // Dungeon special
           tng_makeitem(sx,sy,ITEM_SUBTYPE_SPREVMAP);
-          message_info("Added dungeon special");
           break;
         case 'g': // Gold
           tng_makeitem(sx,sy,ITEM_SUBTYPE_GOLDCHEST);
-          message_info("Added gold chest");
           break;
         case 'G': // Gold
           tng_makeitem(sx,sy,ITEM_SUBTYPE_GOLD);
-          message_info("Added gold");
           break;
         case 'f': // Food
           tng_makeitem(sx,sy,ITEM_SUBTYPE_CHICKNSTB);
-          message_info("Added food (chicken)");
           break;
         case 'r' : // create torch
           tng_makeitem(sx,sy,ITEM_SUBTYPE_TORCH);
-          message_info("Added torch");
+          break;
+        case 'T' : // Create trap box
+          tng_makeitem(sx,sy,ITEM_SUBTYPE_TBBOULDER);
           break;
         case 'e': // Add room effect
           thing = create_roomeffect(sx, sy, ROOMEFC_SUBTP_DRIPWTR);
@@ -166,10 +161,6 @@ void actions_mdtng(int key)
             {
             case OBJECT_TYPE_THING:
                 thing = create_thing_copy(sx,sy,clip_itm->data);
-                // Make sure the coordinates are preserved for objects
-                //TODO: place this condition where creating new thing, not only here
-                if (get_thing_subtpos_y(thing)==1)
-                    set_thing_sensitile(thing,MAP_SIZE_X*(mapmode->mapy+mapmode->screeny)+(mapmode->mapx+mapmode->screenx));
                 thing_add(lvl,thing);
                 message_info("Thing pasted from clipboard at subtile %d,%d",sx,sy);
                 mdtng->vistng[mapmode->subtl_x][mapmode->subtl_y]=get_object_subtl_last(lvl,sx,sy,OBJECT_TYPE_THING);
@@ -194,10 +185,12 @@ void actions_mdtng(int key)
           {
             message_error("Can't create object: clipboard is empty");
           };break;
-        case 'u': // Update all things/dat/clm/w?b
+        case 'u': // Update all things
           update_slab_owners(lvl);
-          update_datclm_for_whole_map(lvl);
-          message_info("DAT/CLM/W?B entries updated");
+          update_obj_for_whole_map(lvl);
+          update_obj_subpos_and_height_for_whole_map(lvl);
+          message_info("Auto-maintained TNG entries updated");
+          change_visited_tile();
           break;
         case 'v': // Verify whole map
           level_verify(lvl,NULL);
@@ -207,10 +200,6 @@ void actions_mdtng(int key)
           thing_add(lvl,thing);
           message_info("Added trap");
           mdtng->vistng[mapmode->subtl_x][mapmode->subtl_y]=get_object_subtl_last(lvl,sx,sy,OBJECT_TYPE_THING);
-          break;
-        case 'T' : // Create trap box
-          tng_makeitem(sx,sy,ITEM_SUBTYPE_TBBOULDER);
-          message_info("Added trap box");
           break;
         case 'l' : // Lock / unlock a door
           {
@@ -294,55 +283,15 @@ void actions_mdtng(int key)
               if (is_creature(thing))
               {
                 if (get_thing_level(thing)<9)
+                {
                   set_thing_level(thing,get_thing_level(thing)+1);
+                  message_info("Creature level increased.");
+                } else
+                message_error("Creature level limit reached.");
               } else
-              if (is_trap(thing))
+              if (switch_thing_subtype(thing,true))
               {
-                  set_thing_subtype(thing,get_trap_next(get_thing_subtype(thing)));
-              } else
-              if (is_dngspecbox(thing))
-              {
-                  set_thing_subtype(thing,get_dngspecbox_next(get_thing_subtype(thing)));
-              } else
-              if (is_spellbook(thing))
-              {
-                  set_thing_subtype(thing,get_spellbook_next(get_thing_subtype(thing)));
-              } else
-              if (is_trapbox(thing))
-              {
-                  set_thing_subtype(thing,get_trapbox_next(get_thing_subtype(thing)));
-              } else
-              if (is_crtrlair(thing))
-              {
-                  set_thing_subtype(thing,get_crtrlair_next(get_thing_subtype(thing)));
-              } else
-              if (is_roomeffect(thing))
-              {
-                  set_thing_subtype(thing,get_roomeffect_next(get_thing_subtype(thing)));
-              } else
-              if (is_door(thing))
-              {
-                  set_thing_subtype(thing,get_door_next(get_thing_subtype(thing)));
-              } else
-              if (is_statue(thing))
-              {
-                  set_thing_subtype(thing,get_statue_next(get_thing_subtype(thing)));
-              } else
-              if (is_furniture(thing))
-              {
-                  set_thing_subtype(thing,get_furniture_next(get_thing_subtype(thing)));
-              } else
-              if (is_food(thing))
-              {
-                  set_thing_subtype(thing,get_food_next(get_thing_subtype(thing)));
-              } else
-              if (is_gold(thing))
-              {
-                  set_thing_subtype(thing,get_gold_next(get_thing_subtype(thing)));
-              } else
-              if (is_torch(thing))
-              {
-                  set_thing_subtype(thing,get_torch_next(get_thing_subtype(thing)));
+                  message_info("Item type switched to next.");
               } else
                   message_error("This item has no level nor type.");
               break;
@@ -362,55 +311,15 @@ void actions_mdtng(int key)
               if (is_creature(thing))
               {
                 if (get_thing_level(thing)>0)
+                {
                   set_thing_level(thing,get_thing_level(thing)-1);
+                  message_info("Creature level decreased.");
+                } else
+                message_error("Creature level limit reached.");
               } else
-              if (is_trap(thing))
+              if (switch_thing_subtype(thing,false))
               {
-                  set_thing_subtype(thing,get_trap_prev(get_thing_subtype(thing)));
-              } else
-              if (is_dngspecbox(thing))
-              {
-                  set_thing_subtype(thing,get_dngspecbox_prev(get_thing_subtype(thing)));
-              } else
-              if (is_spellbook(thing))
-              {
-                  set_thing_subtype(thing,get_spellbook_prev(get_thing_subtype(thing)));
-              } else
-              if (is_trapbox(thing))
-              {
-                  set_thing_subtype(thing,get_trapbox_prev(get_thing_subtype(thing)));
-              } else
-              if (is_crtrlair(thing))
-              {
-                  set_thing_subtype(thing,get_crtrlair_prev(get_thing_subtype(thing)));
-              } else
-              if (is_roomeffect(thing))
-              {
-                  set_thing_subtype(thing,get_roomeffect_prev(get_thing_subtype(thing)));
-              } else
-              if (is_door(thing))
-              {
-                  set_thing_subtype(thing,get_door_prev(get_thing_subtype(thing)));
-              } else
-              if (is_statue(thing))
-              {
-                  set_thing_subtype(thing,get_statue_prev(get_thing_subtype(thing)));
-              } else
-              if (is_furniture(thing))
-              {
-                  set_thing_subtype(thing,get_furniture_prev(get_thing_subtype(thing)));
-              } else
-              if (is_food(thing))
-              {
-                  set_thing_subtype(thing,get_food_prev(get_thing_subtype(thing)));
-              } else
-              if (is_gold(thing))
-              {
-                  set_thing_subtype(thing,get_gold_prev(get_thing_subtype(thing)));
-              } else
-              if (is_torch(thing))
-              {
-                  set_thing_subtype(thing,get_torch_prev(get_thing_subtype(thing)));
+                  message_info("Item type switched to previous.");
               } else
                   message_error("This item has no level nor type.");
               break;
@@ -716,11 +625,19 @@ int display_thing(unsigned char *thing, int x, int y)
     case THING_TYPE_ITEM:
     {
       set_cursor_pos(y++, x);
-      screen_printf("Kind: %s",get_item_subtype_fullname(get_thing_subtype(thing)));
+      unsigned char stype_idx=get_thing_subtype(thing);
+      screen_printf("Kind: %s",get_item_subtype_fullname(stype_idx));
+      if (stype_idx==ITEM_SUBTYPE_HEROGATE)
+      {
+          unsigned int cnum=-(char)get_thing_level(thing);
+          set_cursor_pos(y-1, x+20);
+          screen_printf("Number: %d", cnum);
+      }
       set_cursor_pos(y++, x);
       screen_printf("Owner: %s", get_owner_type_fullname(get_thing_owner(thing)));
       set_cursor_pos(y++, x);
       screen_printf("Category: %s",get_item_category_fullname(get_thing_subtype(thing)));
+
     };break;
     default:
     {
@@ -947,19 +864,19 @@ int display_tng_subtiles(int scr_row, int scr_col,int ty,int tx)
 int get_tng_display_color(short obj_type,unsigned char obj_owner,short marked)
 {
     int col;
-    if (marked)
-      col=PRINT_COLOR_WHITE_ON_RED;
-    else
-      col=PRINT_COLOR_LGREY_ON_BLACK;
     switch (obj_type)
     {
+    // Things that can be owned
+    case OBJECT_TYPE_THING:
+        return get_screen_color_owned(obj_owner,marked,false);
+    // Things with no owner
     case OBJECT_TYPE_ACTNPT:
     case OBJECT_TYPE_STLIGHT:
-        return col+35;
-    case OBJECT_TYPE_THING:
-        return col+30+obj_owner;
     default:
-        return col+36;
+        if (marked)
+          return PRINT_COLOR_BLACK_ON_LGREY;
+        else
+          return PRINT_COLOR_LGREY_ON_BLACK;
     }
 }
 
@@ -967,8 +884,14 @@ void tng_makeitem(int sx,int sy,unsigned char stype_idx)
 {
     unsigned char *thing;
     thing=create_item_adv(lvl,sx,sy,stype_idx);
+    if (thing==NULL)
+    {
+        message_error("Cannot create thing");
+        return;
+    }
     thing_add(lvl,thing);
     mdtng->vistng[mapmode->subtl_x][mapmode->subtl_y]=get_object_subtl_last(lvl,sx,sy,OBJECT_TYPE_THING);
+    message_info("Item added: %s",get_item_subtype_fullname(stype_idx));
 }
 
 void tng_change_height(struct LEVEL *lvl, unsigned int sx, unsigned int sy,unsigned int z,int delta_height)
@@ -981,23 +904,27 @@ void tng_change_height(struct LEVEL *lvl, unsigned int sx, unsigned int sy,unsig
         message_error("Cannot find object");
         return;
     }
+    int tile_limit;
     switch (obj_type)
     {
     case OBJECT_TYPE_STLIGHT:
       height=get_stlight_tilepos_h(obj);
       subheight=get_stlight_subtpos_h(obj)+delta_height;
+      tile_limit=MAP_SUBNUM_H;
       break;
     case OBJECT_TYPE_ACTNPT:
-      message_error("Action points have no height");
-      return;
+      height=get_actnpt_tile_range(obj);
+      subheight=get_actnpt_subt_range(obj)+delta_height;
+      tile_limit=MAP_SIZE_X/2;
+      break;
     case OBJECT_TYPE_THING:
       height=get_thing_tilepos_h(obj);
       subheight=get_thing_subtpos_h(obj)+delta_height;
+      tile_limit=MAP_SUBNUM_H;
       break;
     default:
       message_error("Cannot recognize object");
       return;
-      break;
     }
     while (subheight<0)
     {
@@ -1009,26 +936,30 @@ void tng_change_height(struct LEVEL *lvl, unsigned int sx, unsigned int sy,unsig
         height++;
         subheight-=256;
     }
-    if (height>=MAP_SUBNUM_H)
+    if (height>=tile_limit)
     {
-        height=MAP_SUBNUM_H-1;
+        height=tile_limit-1;
         subheight=255;
-        message_error("Object height limit reached");
+        message_error("Max parameter value reached");
     } else
     if (height<0)
     {
         height=0;
         subheight=0;
-        message_error("Object height limit reached");
+        message_error("Min parameter value reached");
     } else
     {
-        message_info("Object height adjusted");
+        message_info("Object parameter adjusted");
     }
     switch (obj_type)
     {
     case OBJECT_TYPE_STLIGHT:
       set_stlight_tilepos_h(obj,height);
       set_stlight_subtpos_h(obj,subheight);
+      break;
+    case OBJECT_TYPE_ACTNPT:
+      set_actnpt_tile_range(obj,height);
+      set_actnpt_subt_range(obj,subheight);
       break;
     case OBJECT_TYPE_THING:
       set_thing_tilepos_h(obj,height);

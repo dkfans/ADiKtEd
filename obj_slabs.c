@@ -368,3 +368,40 @@ char *get_slab_fullname(unsigned short slb_type)
      else
        return "unknown(?!)";
 }
+
+short subtl_is_near_tall_slab(struct LEVEL *lvl,unsigned int sx,unsigned int sy)
+{
+    int tx=sx/MAP_SUBNUM_X;
+    int ty=sy/MAP_SUBNUM_Y;
+    int subtl_x=sx%MAP_SUBNUM_X;
+    int subtl_y=sy%MAP_SUBNUM_Y;
+    unsigned char slab;
+    const int sub_val[]=  {0, 2};
+    const int til_delta[]={-1,1};
+    int i,k;
+    // Edges
+    for (i=0;i<2;i++)
+    {
+      if (subtl_x==sub_val[i])
+      {
+        slab=get_tile_slab(lvl,tx+til_delta[i],ty);
+        if (slab_is_tall(slab)) return true;
+      }
+      if (subtl_y==sub_val[i])
+      {
+        slab=get_tile_slab(lvl,tx,ty+til_delta[i]);
+        if (slab_is_tall(slab)) return true;
+      }
+    }
+    // Corners
+    for (k=0;k<2;k++)
+      for (i=0;i<2;i++)
+      {
+        if ((subtl_x==sub_val[i])&&(subtl_y==sub_val[k]))
+        {
+          slab=get_tile_slab(lvl,tx+til_delta[i],ty+til_delta[k]);
+          if (slab_is_tall(slab)) return true;
+        }
+      }
+    return false;
+}

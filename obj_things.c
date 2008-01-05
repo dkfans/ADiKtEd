@@ -9,6 +9,7 @@
 #include "globals.h"
 #include "lev_data.h"
 #include "obj_slabs.h"
+#include "lev_things.h"
 
 const char *thing_fullnames[]={"Nothing", "Item/decoration", "unknown 2",
     "unknown 3", "unknown 4", "Creature", "unknown 6", "Room effect",
@@ -97,6 +98,13 @@ const unsigned char items_food[]={
 const unsigned char items_torches[]={
       ITEM_SUBTYPE_TORCHUN, ITEM_SUBTYPE_TORCH, };
 
+const unsigned char items_heartflames[]={
+      ITEM_SUBTYPE_HEARTFLMR, ITEM_SUBTYPE_HEARTFLMB, ITEM_SUBTYPE_HEARTFLMG,
+      ITEM_SUBTYPE_HEARTFLMY,};
+
+const unsigned char items_litthings[]={
+      ITEM_SUBTYPE_TORCH, ITEM_SUBTYPE_CANDLSTCK,};
+
 const unsigned char creatr_types[]={
       CREATR_SUBTP_WIZRD,CREATR_SUBTP_BARBARIN,CREATR_SUBTP_ARCHER,
       CREATR_SUBTP_MONK,CREATR_SUBTP_DWAFT,CREATR_SUBTP_KNIGHT,
@@ -117,6 +125,30 @@ const unsigned char door_types[]={
 const unsigned char roomefct_types[]={
       ROOMEFC_SUBTP_LAVA,ROOMEFC_SUBTP_DRIPWTR,ROOMEFC_SUBTP_ROCKFAL,
       ROOMEFC_SUBTP_ENTRICE,ROOMEFC_SUBTP_DRYICE
+      };
+
+const is_thing_subtype thing_subtype_tests[]={
+      is_spellbook, is_dngspecbox, is_crtrlair,
+      is_trapbox,   is_trap,       is_creature,
+      is_door,      is_roomeffect, is_statue,
+      is_food,      is_gold,       is_torch,
+      is_heartflame,is_furniture,
+      };
+
+const thing_subtype_switch thing_subtype_next[]={
+      get_spellbook_next, get_dngspecbox_next, get_crtrlair_next,
+      get_trapbox_next,   get_trap_next,       get_creature_next,
+      get_door_next,      get_roomeffect_next, get_statue_next,
+      get_food_next,      get_gold_next,       get_torch_next,
+      get_heartflame_next,get_furniture_next,
+      };
+
+const thing_subtype_switch thing_subtype_prev[]={
+      get_spellbook_prev, get_dngspecbox_prev, get_crtrlair_prev,
+      get_trapbox_prev,   get_trap_prev,       get_creature_prev,
+      get_door_prev,      get_roomeffect_prev, get_statue_prev,
+      get_food_prev,      get_gold_prev,       get_torch_prev,
+      get_heartflame_prev,get_furniture_prev,
       };
 
 // True means TNG/APT/LGT are updated automatically
@@ -302,6 +334,31 @@ short set_door_orientation(unsigned char *thing,unsigned char orient)
 {
     if (thing==NULL) return false;
     thing[13]=orient;
+    return true;
+}
+
+short switch_thing_subtype(unsigned char *thing,short forward)
+{
+    if (thing==NULL) return false;
+    int func_count=sizeof(thing_subtype_tests)/sizeof(is_thing_subtype);
+    int i;
+    for (i=0;i<func_count;i++)
+      if (thing_subtype_tests[i](thing))
+      {
+        unsigned char stype_idx=get_thing_subtype(thing);
+        unsigned char stype_new;
+        if (forward)
+          stype_new=thing_subtype_next[i](stype_idx);
+        else
+          stype_new=thing_subtype_prev[i](stype_idx);
+        if (stype_new!=stype_idx)
+        {
+          set_thing_subtype(thing,stype_new);
+          return true;
+        }
+        return false;
+      }
+    return false;
 }
 
 char *get_thing_type_fullname(unsigned short type_idx)
@@ -347,13 +404,22 @@ unsigned char get_usual_thing_slab(unsigned char *thing)
         case ROOMEFC_SUBTP_LAVA:
             return SLAB_TYPE_LAVA;
         case ROOMEFC_SUBTP_DRIPWTR:
-            return SLAB_TYPE_WATER;
+            //return SLAB_TYPE_WATER;
+            //Changed because this is sometimes placed as "user-made effect"
+            // (usually on lava)
+            return SLAB_TYPE_CLAIMED;
         case ROOMEFC_SUBTP_ROCKFAL:
             return SLAB_TYPE_PATH;
         case ROOMEFC_SUBTP_ENTRICE:
-            return SLAB_TYPE_PORTAL;
+            //return SLAB_TYPE_PORTAL;
+            //Changed because this is sometimes placed as "user-made effect"
+            // (usually on hero gates)
+            return SLAB_TYPE_CLAIMED;
         case ROOMEFC_SUBTP_DRYICE:
-            return SLAB_TYPE_GRAVEYARD;
+            //return SLAB_TYPE_GRAVEYARD;
+            //Changed because this is sometimes placed as "user-made effect"
+            //(on dyngeon specials and in other places)
+            return SLAB_TYPE_CLAIMED;
         }
       };break;
   case THING_TYPE_DOOR:
@@ -388,6 +454,8 @@ unsigned char get_usual_item_slab(unsigned char stype_idx)
       return SLAB_TYPE_HATCHERY;
   case ITEM_CATEGR_CREATLAIR:
       return SLAB_TYPE_LAIR;
+  case ITEM_CATEGR_LIGHTS:
+      return SLAB_TYPE_CLAIMED;
   case ITEM_CATEGR_ROOMEQUIP:
     {
     //TODO: validate when all rooms will be done
@@ -410,9 +478,11 @@ unsigned char get_usual_item_slab(unsigned char stype_idx)
         case ITEM_SUBTYPE_BARREL:
         case ITEM_SUBTYPE_HEROGATE:
           return SLAB_TYPE_CLAIMED;
-        case ITEM_SUBTYPE_TEMPLESTA:
         case ITEM_SUBTYPE_TEMPLESPN:
           return SLAB_TYPE_TEMPLE;
+        case ITEM_SUBTYPE_TEMPLESTA:
+          //Part of a temple, but also used in hero teritory
+          return SLAB_TYPE_CLAIMED;
         case ITEM_SUBTYPE_PRISONBAR:
           return SLAB_TYPE_PRISONCASE;
         case ITEM_SUBTYPE_SCAVNGEYE:
@@ -487,13 +557,14 @@ unsigned char *create_thing_copy(unsigned int sx, unsigned int sy,unsigned char 
     thing = create_thing_empty();
     int i;
     memcpy(thing,src,SIZEOF_DK_TNG_REC);
+    unsigned char type_idx=get_thing_type(thing);
     unsigned char stype_idx=get_thing_subtype(thing);
     set_thing_subtpos(thing,((sx%MAP_SUBNUM_X)*0x40+0x40),((sy%MAP_SUBNUM_Y)*0x40+0x40));
     set_thing_tilepos(thing,(unsigned char)sx,(unsigned char)sy);
-    if (stype_idx==THING_TYPE_ROOMEFFECT)
+    if (type_idx==THING_TYPE_ROOMEFFECT)
       set_thing_sensitile(thing,compute_roomeffect_sensitile(lvl,thing));
     //TODO: create function for updating item sensitile
-    if (stype_idx==THING_TYPE_ITEM)
+    if (type_idx==THING_TYPE_ITEM)
       set_thing_sensitile(thing,THING_SENSITILE_NONE);
     return thing;
 }
@@ -929,7 +1000,7 @@ short is_furniture(unsigned char *thing)
     //All furniture are items
     if (get_thing_type(thing) != THING_TYPE_ITEM)
       return false;
-    is_furniture_stype(get_thing_subtype(thing));
+    return is_furniture_stype(get_thing_subtype(thing));
 }
 
 /*
@@ -1116,6 +1187,60 @@ unsigned char get_torch_prev(unsigned char stype_idx)
     return *pos;
 }
 
+/*
+ * Returns if the thing is a heartflame
+ */
+short is_heartflame(unsigned char *thing)
+{
+    //All heartflames are items
+    if (get_thing_type(thing) != THING_TYPE_ITEM)
+      return false;
+    return is_heartflame_stype(get_thing_subtype(thing));
+}
+
+short is_heartflame_stype(unsigned char stype_idx)
+{
+    int array_count=sizeof(items_heartflames)/sizeof(unsigned char);
+    //all such objects must be listed in the correct array
+    char *pos=memchr(items_heartflames,stype_idx,array_count);
+    if (pos!=NULL) return true;
+    return false;
+}
+
+/*
+ * Returns subtype of a next heartflame
+ */
+unsigned char get_heartflame_next(unsigned char stype_idx)
+{
+    unsigned char *arr=(unsigned char *)items_heartflames;
+    int sizeof_arr=sizeof(items_heartflames);
+    int sizeof_itm=sizeof(unsigned char);
+    int array_count=sizeof_arr/sizeof_itm;
+    //find the item in array
+    unsigned char *pos=memchr(arr,stype_idx,array_count);
+    if (pos!=NULL) pos+=sizeof_itm;
+    if ((pos<arr)||(pos>=arr+sizeof_arr))
+      pos=arr;
+    return *pos;
+}
+
+/*
+ * Returns subtype of a previous heartflame
+ */
+unsigned char get_heartflame_prev(unsigned char stype_idx)
+{
+    unsigned char *arr=(unsigned char *)items_heartflames;
+    int sizeof_arr=sizeof(items_heartflames);
+    int sizeof_itm=sizeof(unsigned char);
+    int array_count=sizeof_arr/sizeof_itm;
+    //find the item in array
+    unsigned char *pos=memchr(arr,stype_idx,array_count);
+    if (pos!=NULL) pos-=sizeof_itm;
+    if ((pos<arr)||(pos>=arr+sizeof_arr))
+      pos=arr+(array_count-1)*sizeof_itm;
+    return *pos;
+}
+
 short is_herogate(unsigned char *thing)
 {
   if (get_thing_type(thing)==THING_TYPE_ITEM)
@@ -1132,13 +1257,25 @@ short is_dnheart(unsigned char *thing)
     return false;
 }
 
+short is_doorkey(unsigned char *thing)
+{
+  if (get_thing_type(thing)==THING_TYPE_ITEM)
+  if (get_thing_subtype(thing)==ITEM_SUBTYPE_SPINNKEY)
+        return true;
+    return false;
+}
+
 short is_room_thing(unsigned char *thing)
 {
   switch (get_thing_type(thing))
   {
   case THING_TYPE_ROOMEFFECT:
-      if (get_thing_subtype(thing)==ROOMEFC_SUBTP_ENTRICE) // Entrance ice room effect
+      switch (get_thing_subtype(thing))
+      {
+      case ROOMEFC_SUBTP_ENTRICE:  // Entrance ice room effect
+      case ROOMEFC_SUBTP_DRYICE:   //Graveyard dry ice
         return true;
+      }
       return false;
   case THING_TYPE_DOOR:
       return true;
@@ -1159,6 +1296,61 @@ short is_room_thing(unsigned char *thing)
     return false;
   }
 }
+
+/*
+ * Returns true if the thing has a light (is lit thing)
+ */
+short is_lit_thing(unsigned char *thing)
+{
+    if (get_thing_type(thing) == THING_TYPE_ITEM)
+      return is_lit_thing_stype(get_thing_subtype(thing));
+    return false;
+}
+
+short is_lit_thing_stype(unsigned char stype_idx)
+{
+    int array_count=sizeof(items_litthings)/sizeof(unsigned char);
+    //all such objects must be listed in the correct array
+    char *pos=memchr(items_litthings,stype_idx,array_count);
+    if (pos!=NULL) return true;
+    return false;
+}
+
+/*
+ * Returns subtype of a next lit thing
+ */
+unsigned char get_lit_thing_next(unsigned char stype_idx)
+{
+    unsigned char *arr=(unsigned char *)items_litthings;
+    int sizeof_arr=sizeof(items_litthings);
+    int sizeof_itm=sizeof(unsigned char);
+    int array_count=sizeof_arr/sizeof_itm;
+    //find the item in array
+    unsigned char *pos=memchr(arr,stype_idx,array_count);
+    if (pos!=NULL) pos+=sizeof_itm;
+    if ((pos<arr)||(pos>=arr+sizeof_arr))
+      pos=arr;
+    return *pos;
+}
+
+/*
+ * Returns subtype of a previous lit thing
+ */
+unsigned char get_lit_thing_prev(unsigned char stype_idx)
+{
+    unsigned char *arr=(unsigned char *)items_litthings;
+    int sizeof_arr=sizeof(items_litthings);
+    int sizeof_itm=sizeof(unsigned char);
+    int array_count=sizeof_arr/sizeof_itm;
+    //find the item in array
+    unsigned char *pos=memchr(arr,stype_idx,array_count);
+    if (pos!=NULL) pos-=sizeof_itm;
+    if ((pos<arr)||(pos>=arr+sizeof_arr))
+      pos=arr+(array_count-1)*sizeof_itm;
+    return *pos;
+}
+
+
 
 /*
  * Returns true if the thing has affect on CLM entries
@@ -1739,7 +1931,6 @@ int get_item_category(unsigned char stype_idx)
 
         case ITEM_SUBTYPE_DNHEART:
         case ITEM_SUBTYPE_HEROGATE:
-        case ITEM_SUBTYPE_BARREL:
         case ITEM_SUBTYPE_TEMPLESTA:
         case ITEM_SUBTYPE_TEMPLESPN:
         case ITEM_SUBTYPE_ANVIL:
@@ -1871,6 +2062,7 @@ int get_item_category(unsigned char stype_idx)
         case ITEM_SUBTYPE_POTION1:
         case ITEM_SUBTYPE_POTION2:
         case ITEM_SUBTYPE_POTION3:
+        case ITEM_SUBTYPE_BARREL:
         case ITEM_SUBTYPE_SPINNKEY:
         case ITEM_SUBTYPE_ARMOUR: 
           return ITEM_CATEGR_VARIOUS;

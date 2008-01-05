@@ -2,9 +2,9 @@ Adikted Dungeon Keeper Map Editor
 ------------------------------
 
 Note - there is now a tutorial available for Adikted, at
-http://www.yoda.arachsys.com/dk/tutorial.html. A text
-version of this is also within this distribution, called
-tutorial.txt. You may wish to print this out.
+http://www.yoda.arachsys.com/dk/tutorial.html.
+A version of this is also within this distribution,
+called adikted_tutorial.html. You may wish to print this out.
 
 Here's the Win32 version executable. Just put all the
 files in the same directory, edit map.ini as appropriate (don't
@@ -123,8 +123,17 @@ Version: 0.56a
  Items and room effects have now "sensitive tile"
  Added computing "sensitive tile" for torches and room effects
  Fixed some display problems if Adikted window is small
-TODO before beta:
- Auto creating room things
+Version: 0.60b
+ Some corrections in screen colors
+ Better statistics counting and numbering of hero gates
+ Auto creating room things for all rooms
+ Auto creating dungeon heart thing (one per player)
+ Auto creating torches
+ Updating owner now results in TNG update
+ The '[' and ']' keys now works on action points
+TODO before final:
+ Fixations in room things parameters (height,other)
+ Reinforced walls for various rooms
 
 Author:
 Jon Skeet, skeet@pobox.com

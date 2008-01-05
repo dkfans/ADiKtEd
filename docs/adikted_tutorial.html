@@ -31,7 +31,7 @@ graphic-based editor.</p>
 
 <p>This tutorial will guide you through creating a new level.</p>
 
-<p>Please note that it was last renewed on version 0.53a, and if you're using
+<p>Please note that it was last renewed on version 0.55a, and if you're using
 different version, there may be differences in commands and view.
 You can always download the newest version from
 <a href="https://sourceforge.net/project/showfiles.php?group_id=212954">Adikted project at SourceForge</a>.</p>
@@ -81,16 +81,32 @@ around with it.
 <ol>
 <li>As you may have guessed (or tried already), using the arrow keys
 moves the cursor around. However, if you want to go a long way, this
-can take a long time. Use home/end/page&nbsp;up/page&nbsp;down to move faster.
+can take a long time. Use <b>home</b>/<b>end</b>/<b>page&nbsp;up</b>/<b>page&nbsp;down</b>
+to move faster.
 On some operating systems, pressing <b>ctrl</b> with any movement key
 will make it go further too. Note you can see exactly where you are
 with the "Position" indicator on the dividing line at the bottom.</li>
+<div class="clearright"></div>
 
-<li>When the cursor reaches the edge of the map area, moving it
+<li><div class="rightfloatbox"><img src="dk_adikted_tutorial_screensize.png"/></div>
+When the cursor reaches the edge of the map area, moving it
 further will scroll the map. Try moving around until you've seen the
 whole border. The furthest you can go in each direction is 84, so
 the bottom right hand corner of the map is 84,84.
 </li>
+
+<li>On some lame operating systems, you can't resize the ADiKtEd window
+to see more of the map tiles. If you're using Ms&nbsp;Windows, and you
+wish ADiKtEd window bo be bigger, click on the icon on its window title&nbsp;bar
+and press "Properties". Now go to the "Layout" tab, as shown on the image.
+If you think your screen is big enough to let you see the whole map,
+enter the window size: Width=125, Height=87. Make sure that "Screen buffer size"
+values are identical to those in "Window size", then press OK, and confirm
+that you want to modify the shortcut to keep the new size every time you
+run ADiKtEd. If there is not enough space, but you want to view the whole map
+anyway, you can switch to "Font" tab of the "Properties" window, and select
+font size "6x8".</li>
+
 </ol>
 
 <h3>Placing tiles</h3>
@@ -119,16 +135,16 @@ tiles to remind you of this. This means you should place something before
 you own it. Pressing <b>5</b> also "unclaims" something. If you move back over the
 <b>t</b>, and press <b>5</b>, then move away, it will have gone back to being
 grey on black.</li>
+<div class="clearright"></div>
 
-<li>The information area should give you an idea of what to press to
+<li><div class="rightfloatbox"><img src="dk_adikted_tutorial_legend.png"/></div>
+The information area should give you an idea of what to press to
 get specific tiles... basically you press the key it shows you!
 There is one exception to this, which is graffiti. We'll come onto
-that later. Also, where it says <b>h</b>:heart, that doesn't mean the
-dungeon heart itself, it means the heart pedestal. You need to place
-the actual heart itself separately (more on that later, too).</li>
+that later.</li>
 
 <li>Create a few small rooms, and put walls round them. Leave a path
-of claimed land (spaces) to get from room to room though! It's often
+of claimed land (<b>spaces</b>) to get from room to room though! It's often
 easiest to create the rooms themselves first, then say who owns them
 later.</li>
 
@@ -140,24 +156,34 @@ later.</li>
 timeconsuming. There must be a quicker way... it's a pretty big map,
 after all! Well, of course, having said that, there's <b>bound</b>
 to be. It's called marking, and you do it like this:</li>
+
 <li>Find a spare bit of earth where you might want to create a big
 room... a large lair maybe.</li>
-<li>Press <b>ctrl+space</b>. On the dividing line, it should tell you that
+
+<div class="clearright"></div>
+
+<li><div class="rightfloatbox"><img src="dk_adikted_tutorial_marking.png"/></div>
+Press <b>ctrl+space</b>. On the dividing line, it should tell you that
 you're now marking, and on the message line it will say,
 "Mark mode on".</li>
+
 <li>Move around a bit... a white rectangle should appear between the
 cursor and where you first pressed <b>ctrl+space</b>.</li>
 <li>Mark out a nice big area... you want your creatures to have lots
 of room, don't you?</li>
+
 <li>Press <b>L</b>, and the white rectangle should be replaced by a lots of
 lair tiles.</li>
+
 <li>If you've put the new lair over earth, it will be unowned... you
 need to set the ownership on the whole lot. Again, you can use mark
 mode. Press <b>ctrl+space</b> again.</li>
+
 <li>Move around so the rectangle covers the whole lair, and press <b>0</b>.
 Surprise surprise, the lair should now be white on a red background.</li>
 <li>Tip: If you ever start marking then want to stop, press
 <b>ctrl+space</b> again.</li>
+
 <li>Tip: You can save lots of time by laying out a lot of dungeon,
 then marking the whole area to be owned by a player. The ownership
 of rocks or earth will be reverted when saving, so don't worry!</li>
@@ -170,121 +196,156 @@ round the lair. You <b>could</b> mark out a long thin rectangle for
 each wall, but that would be a bit of a pain - you need to do each
 one twice, remember - once for the wall, once for the ownership.
 What you could really do with is being able to just move the cursor
-around, leaving a trail of walls behind...
-</li><li>Move to the edge of the lair, where you want to start laying a
-wall.
-</li><li>Press <b>z</b>. On the dividing line and message lines, there will now
-be indications that you're painting. Try moving around...
-</li><li>Nothing's happening! Don't worry, this isn't a bug... you
+around, leaving a trail of walls behind...</li>
+
+<li>Move to the edge of the lair, where you want to start laying a
+wall.</li>
+
+<div class="clearright"></div>
+
+<li><div class="rightfloatbox"><img src="dk_adikted_tutorial_painting.png"/></div>
+Press <b>z</b>. On the dividing line and message lines, there will now
+be indications that you're painting. Try moving around...</li>
+
+<li>Nothing's happening! Don't worry, this isn't a bug... you
 haven't told the editor what you want to paint with. Move back to
-where you want to start laying the wall, and we'll try again.
-</li><li>Press *, and start moving around again. Lo and behold, a trail
-of walls will be left.
-</li><li>"What about ownership?" I hear you cry. Good point. The walls
+where you want to start laying the wall, and we'll try again.</li>
+
+<li>Press <b>*</b>, and start moving around again. Lo and behold, a trail
+of walls will be left.</li>
+
+<li>"What about ownership?" I hear you cry. Good point. The walls
 you're laying at the moment are unowned - not a good state of
-affairs. So press 0 and try moving around again.
-</li><li>Made the wall? Good stuff... now you want to put down the
-paintbrush. Press z again, and you'll stop painting.
-</li><li>"What if I want to change walls during painting?" No problem.
+affairs. So press <b>0</b> and try moving around again.</li>
+
+<li>Made the wall? Good stuff... now you want to put down the
+paintbrush. Press <b>z</b> again, and you'll stop painting.</li>
+
+<li>"What if I want to change walls during painting?" No problem.
 Just press a different key - you can paint with any of the normal
 tiles, and any of the ownerships. Try painting a corridor from the
-lair to the rest of your dungeon.
-</li><li>Note that pressing home/end/page up/page down, or ctrl and the
-arrow keys in paint mode won't lay a trail, as the cursor just jumps
-from one place to another.
-</li><li>Create a few more rooms, until you're fairly happy with your
-dungeon layout.
-</li></ol>
+lair to the rest of your dungeon.</li>
+
+<li>Note that pressing <b>home</b>/<b>end</b>/<b>page&nbsp;up</b>/<b>page&nbsp;down</b>,
+or <b>ctrl</b> and the <b>arrow keys</b> in paint mode won't lay a trail,
+as the cursor just jumpsfrom one place to another.</li>
+
+<li>Create a few more rooms, until you're fairly happy with your
+dungeon layout.</li>
+</ol>
 
 <h3>Things</h3>
 <ol>
 <li>Now, everyone knows there's more to Dungeon Keeper than rooms.
 What about creatures, gold, spells, torches, etc? Well, it's time to
-introduce you to "thing mode". Press tab.
-</li><li>The background colours will have stayed the same, but just about
-everything else will have changed. There will probably be some 1s
-around, but nothing else. The key on the right will have vanished,
+introduce you to "thing&nbsp;mode". Press <b>tab</b>.</li>
+
+<li>The background colours will have stayed the same, but just about
+everything else will have changed. Slabs will be simplified and
+only show <b>#</b> and <b>.</b>, but other characters, as <b>r</b>
+and <b>1</b>s will appear. The key on the right will have changed,
 and a rectangle will have appeared under the ".tng entries" section
-in the information area.
-</li><li>Explanation time: where there are numbers, there are "things".
+in the information area.</li>
+
+<li>Explanation time: where there are numbers or letters, there are "things".
 "Things" are objects of various different natures: spell books,
 creatures, gold, dry ice effects, traps - a whole lot of stuff. You
-can find out the details of these by moving over them.
-</li><li>If there aren't any numbers on the screen, press tab again to go
-back to slab mode. Draw out a big training room (and own it), then
-press tab to go back into thing mode.
-</li><li>Move over a square with a number on, and have a look at the
-information area.
-</li><li>In the ".tng entries" section there will be the word "thing"
-somewhere. You want to highlight that. If it's already within the
+can find out the details of these by moving over them.</li>
+
+<li>If there aren't any numbers or letters on the screen, press
+<b>tab</b> again to go back to slab mode. Draw out a big training room
+(and own it), then press <b>tab</b> to go back into thing mode.</li>
+
+<li>Move over a square with a number on, and have a look at the
+information area.</li>
+
+<li>In the ".tng&nbsp;entries" section there will be a short word somewhere.
+If you're on the training room, it will probably say "Trinr".
+You want to highlight that. If it's already within the
 white rectangle, you've got it already and there will be a whole
 load of other information. Either way, you need to learn how to move
-the highlighter around.
-</li><li>Make sure num-lock is on. Now use the number pad 1-9. You will
-see the rectangle will move to the place corresponding to the key
+the highlighter around.</li>
+
+<li>Make sure <b>num-lock</b> is on. Now use the number pad <b>1</b>-<b>9</b>.
+You will see the rectangle will move to the place corresponding to the key
 you press. Have a play around for a minute, then highlight the word
-"thing".
-</li><li>There should be some information in the top half of the
+you see there.</li>
+
+<li>There should be some information in the top half of the
 information panel. You can ignore the three lines of hex digits at
 the top - they're for detailed hackery, and probably won't concern
 you. Similarly, the position information may not interest you, but
 the rest should come in handy. You'll be able to see what kind of
 object you're looking at, and any other useful stuff about it.
-Different objects can be altered in different ways:
-</li><li>Doors: go back into slab mode (with tab), and place a door. Come
+Different objects can be altered in different ways:</li>
+
+<li>Doors: go back into slab mode (with tab), and place a door. Come
 back into thing mode, and take a look. It should tell you what type
-of door you placed, and that's it's unlocked. Press l to lock it -
-pressing l again will unlock it.
-</li><li>Creatures: Stay on the door you've just created, and press c. A
-list of creatures will come up. Type in the number of one of them,
+of door you placed, and that's it's unlocked. Press <b>l</b> to lock it -
+pressing <b>l</b> again will unlock it.</li>
+
+<li>Creatures: Stay on the door you've just created, and press <b>c</b>.
+A list of creatures will come up. Select one of them,
 then press return. A short name for the creature will come up in the
 highlighted spot, and the information will change. Also, there'll be
 a couple of numbers in brackets just below the highlighter. That
 shows which thing you're looking at on that subtile (each tile has
-nine subtiles), and how many things there are there. Press / to
+nine subtiles), and how many things there are there. Press <b>/</b> to
 change back to the door, and you'll see that's thing no. 1 (assuming
-there was nothing there beforehand).
-</li><li>Press / again to cycle through to the creature again. You can
-now change the creature's level by pressing s and x. Try it.
-</li><li>Dungeon specials: change the position of the highlighter to any 
-empty spot (just for convenience) and press d. A "reveal map"
-dungeon special will come up. Press s and x to change which dungeon
-special the thing is.
-</li><li>Spell books: Press b to create a spellbook. The first one will
-be the Hand of Evil spell. Press s and x to change to a different
-spell.
-</li><li>Gold: Press g to create a pot of gold worth 500, or G to create
-one worth only 250.
-</li><li>Traps: Press t to create a trap. Again, press s and x to change
-the trap type.
-</li><li>Trap boxes: Press T to create a trap box (to be picked up by
-your imps). Use s and x to change the type.
-</li><li>Hero gate: Press H to create a hero gate.
-</li><li>Dungeon heart: Go back into slab mode, and move to your dungeon
-heart pedestal. Now go back into thing mode and press h to create a
-dungeon heart. It will automatically be at the right height, so long
-as you put it centrally on a pedestal - ie on a tile surrounded by
-other dungeon heart pedestal tiles. This sounds more complicated
-than it is - usually you'll just want to create a 3x3 pedestal, and
-put the heart in the centre.
-</li><li>Action points: Action points are used by the level script. Press
-a to add an action point - the information panel will tell you which
-number it is, for use when you write your level script.
-</li><li>"Aargh! Now I've got loads of things all over the place!" Right.
+there was nothing there beforehand).</li>
+
+<li>Press <b>/</b> again to cycle through to the creature again. You can
+now change the creature's level by pressing <b>s</b> and <b>x</b>.
+ Try it.</li>
+
+<li>Dungeon specials: change the position of the highlighter to any 
+empty spot (just for convenience) and press <b>d</b>. A "reveal map"
+dungeon special will come up. Press <b>s</b> and <b>x</b> to change
+which dungeon special the thing is.</li>
+
+<li>Spell books: Press <b>b</b> to create a spellbook. The first one will
+be the Hand of Evil spell. Press <b>s</b> and <b>x</b> to change
+to a different spell.</li>
+
+<li>Gold: Press <b>g</b> to create a pot of gold worth 500, or <b>G</b> to create
+one worth only 250. You can also use <b>s</b> and <b>x</b> to change
+the value.</li>
+
+<li>Traps: Press <b>t</b> to create a trap. Again, press <b>s</b> and <b>x</b>
+to change the trap type.</li>
+
+<li>Trap boxes: Press <b>T</b> to create a trap box (to be picked up by
+your imps). Use <b>s</b> and <b>x</b> to change the type.</li>
+
+<li>Hero gate: Press <b>H</b> to create a hero gate.</li>
+
+<li>Dungeon heart: If you will create a 3x3 heart room in "Slab mode",
+the "dungeon heart thing" will be placed automatically at center.
+If you wish to make a smaller heart pedestal, or place it in some
+specific place of large pedestal, you can use <b>h</b> in thing
+mode to place dungeon heart.</li>
+
+<li>Action points: Action points are used by the level script. Press
+<b>a</b> to add an action point - the information panel will tell you which
+number it is, for use when you write your level script.</li>
+
+<li>"Aargh! Now I've got loads of things all over the place!" Right.
 You want to delete them, don't you? Well, move over a square with a
-thing in, highlight it and press delete. Hey presto, it vanishes.
-Get rid of all the things you've created so far, except the dungeon
-heart.</li>
-<li>Pressing <b>u</b> will update the graphic and things in the level
-- this makes sure that all the training posts, torturers, torches etc
-are in the right place.
+thing in, highlight it and press <b>delete</b>. Hey presto, it vanishes.
+Get rid of all the things you've created so far.</li>
+
+<li>Pressing <b>u</b> will update the graphic (if in Slab mode) or
+things (if in Thing mode) in the level - this makes sure every slab
+looks like it should, or that all the training posts, torturers,
+torches etc are in the right place.
 Don't worry about it too much - Adikted does an automatic update when
 you're changing the level. But if you see some graphic errors,
 or the Official Editor acts strangely, you can update the level
 to make everything work right. The automatic update may be disabled
 to speed-up Adikted - in this case you should update the map before
 saving.</li>
-<li>Press tab to get out of thing mode.</li>
+
+<li>Press <b>tab</b> to get out of thing mode.</li>
 </ol>
 
 <h3>Graffiti</h3>
@@ -310,40 +371,56 @@ The graffiti is quite a nice effect, but I'd recommend using it sparingly.</li>
 <li>You know how to use Adikted to edit levels now. Create a small
 level (you really only need a dungeon heart, and maybe try another
 room).</li>
-<li>Finished already? That was quick... press ctrl+s to save your
+
+<li>Finished already? That was quick... press <b>ctrl+s</b> to save your
 level. Adikted will ask you for a filename. I recommend saving it in
 a temporary file first - I usually use newmap - rather than saving
 straight over the original DK files to start with. If there's
 anything wrong with the dungeon, such as the human player not having
 a dungeon heart, Adikted will warn you with a beep and a message,
-but still save the level.
-</li><li>Press ctrl+q to quit (just q on older versions).
-</li><li>If you want to edit the level again, type "map newmap"
-(replacing "newmap" with whatever you called your level). Your level
-should appear in all its glory. Edit it until you're happy. Save and
-quit again.
-</li><li>Now copy your level files over to the levels directory, with a
-command like this:<br>
-<tt>copy newmap.* c:\games\keeper\levels\map00001.*</tt><br>
-I recommend using level 1, as it's easy to get to.
-</li><li>Fire up Dungeon Keeper, and you're ready to go... press Start
-New Game (if you copied it over level 1) and see what happens. It
-may well instantly say you've won the game - that's 'cos you haven't
-changed the level script. I'll deal with that in a different
+but still save the level.</li>
+
+<li>Press <b>ctrl+q</b> to quit.</li>
+
+<li>If you want to edit the level again, type "map newmap"
+(replacing "newmap" with whatever you called your level).
+Your level should appear in all its glory.
+Edit it until you're happy. Save and quit again.</li>
+
+<li>Now copy your level files over to the levels directory, with a
+command like this:<br/>
+<tt>copy newmap.* c:\games\keeper\levels\map00001.*</tt><br/>
+I recommend using level 1, as it's easy to get to.</li>
+
+<li>Fire up Dungeon Keeper, and you're ready to go... press Start
+New Game (if you copied it over level 1) and see what happens.
+It may well instantly say you've won the game - that's 'cos you haven't
+changed the level script. The script would require a different
 tutorial... it doesn't really matter as far as Adikted is concerned
-though.
-</li><li>You're now ready to go back and design a proper level to fox all
+though. To learn about the script, check Official Editor documentation.</li>
+
+<li>You're now ready to go back and design a proper level to fox all
 your friends. Remember, you can press F1 at (almost!) any time in Adikted and
-get help for whichever mode you're in. Good luck, and I hope you 
-enjoy using Adikted!
-</li><li>Tip: Use ctrl+l to load a level within Adikted, and ctrl+n to
-start a new level.
-</li></ol>
+get help for whichever mode you're in. Inside the help, you will find many
+options that are not mentioned in this tutorial - don't forget to check it.
+Good luck, and I hope you enjoy using Adikted!</li>
+
+<li>Tip: Use <b>ctrl+l</b> to load a level within Adikted, and <b>ctrl+n</b> to
+start a new level.</li>
+
+<li>Tip: Use <b>ctrl+r</b> to automatically generate a level background.</li>
+
+</ol>
 <p>
-Please send any comments to 
+Original author:
 <a href="mailto:skeet@pobox.com">skeet@pobox.com</a>
-<br>
-<a href="http://www.yoda.arachsys.com/dk/index.html">Back</a> to the Dungeon Keeper Extras page.
+<br/>
+Second developer:
+<a href="mailto:mefistotelis@gmail.com">mefistotelis@gmail.com</a>
+<br/>
+<a href="https://sourceforge.net/projects/adikted/">ADiKtEd project page at SourceForge</a>
+<br/>
+<a href="http://www.yoda.arachsys.com/dk/index.html">Dungeon Keeper Extras page</a>
 </p>
 </body>
 </html>

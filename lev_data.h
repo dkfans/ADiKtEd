@@ -64,6 +64,9 @@
 #define ORIENT_TWE        0x05
 #define ORIENT_TSN        0x06
 #define ORIENT_TEW        0x07
+
+extern const int idir_subtl_x[];
+extern const int idir_subtl_y[];
  
 //Font - for graffiti
 #define GRAFF_FONT_NONE        0x00
@@ -207,7 +210,7 @@ unsigned int get_stlight_subnums(struct LEVEL *lvl,unsigned int x,unsigned int y
 
 short get_object_type(struct LEVEL *lvl, unsigned int x, unsigned int y, unsigned int z);
 unsigned char *get_object(struct LEVEL *lvl,unsigned int x,unsigned int y,unsigned int z);
-void object_del(struct LEVEL *lvl,unsigned int x,unsigned int y,unsigned int z);
+void object_del(struct LEVEL *lvl,unsigned int sx,unsigned int sy,unsigned int z);
 unsigned int get_object_subnums(struct LEVEL *lvl,unsigned int x,unsigned int y);
 unsigned int get_object_tilnums(struct LEVEL *lvl,unsigned int x,unsigned int y);
 int get_object_subtl_last(struct LEVEL *lvl,unsigned int x,unsigned int y,short obj_type);
@@ -224,7 +227,8 @@ unsigned char get_tile_slab(struct LEVEL *lvl, unsigned int tx, unsigned int ty)
 void set_tile_slab(struct LEVEL *lvl, unsigned int tx, unsigned int ty, unsigned char nval);
 
 void update_level_stats(struct LEVEL *lvl);
-void update_thing_stats(struct LEVEL *lvl);
+void update_things_stats(struct LEVEL *lvl);
+void update_thing_stats(struct LEVEL *lvl,unsigned char *thing,short change);
 
 extern struct LEVEL *lvl;
 

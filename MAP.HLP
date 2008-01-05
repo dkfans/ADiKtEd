@@ -126,7 +126,7 @@ create two graffiti items with oposite orientation (like WE and EW).
 You can put the graffiti lower or higher (\ychange height\s) using
 '\w[\s' and '\w]\s' keys.
 
-To \yupdate\s the dungeon things/dat/clm, press '\wu\s'.
+To \yupdate\s the dungeon dat/clm/w?b (but not things), press '\wu\s'.
 To toggle \yautomatic update\s of things/dat/clm, press \wctrl+u\s.
 To switch into \y"thing" mode\s, press \wtab\s.
 To switch into \y"column" mode\s, press '\wc\s'.
@@ -198,7 +198,7 @@ Press \wy\s to \ypaste\s a thing from the clipboard into the highlighted spot.
 Press \w1\s-\w9\s to change the \yhighlighted "thing" slot\s - using the number
 pad with num lock on makes this easier. If a slot has more than one
 thing on it, the number of things will appear in brackets beneath
-the slot. Press \w/\s to \ycycle through things\s on the highlighted slot.
+the slot. Press '\w/\s' to \ycycle through things\s on the highlighted slot.
 
 Press \wc\s to \ycreate a new creature\s in the highlighted slot. The new
 creature will be owned by whoever owns the tile (although the
@@ -218,18 +218,21 @@ be owned by the owner of the tile.
 
 Press \wH\s to create a \yhero gate\s. It will be owned by \Cplayer 4\s (Avatar).
 
-Press \wu\s to \yupdate\s the dungeon. This will make sure all room objects
-(training posts, spikes, torturers, etc) are placed appropriately,
-as well as updating the .clm and .dat values.
+Press '\wu\s' to \yupdate\s the dungeon. This will make sure all room objects
+(training posts, spikes, torturers, etc) are placed appropriately.
+Only things will be updated, the .clm and .dat values will stay intact.
+You must press '\wu\s' in slab mode to update them.
 
 Press \wt\s to create a \ytrap\s (change the type using \ws\s and \wx\s).
 
 Press \wT\s to create a \ytrap box\s (a non-placed trap). Change the type
 using \ws\s and \wx\s.
 
-Press \we\s to create \yroom effect\s (change the type using \ws\s and \wx\s).
+Press \we\s to create \yroom effect\s (change the type using '\ws\s' and '\wx\s').
 
 Press \wL\s to create \ystatic light\s.
+
+Press \wa\s to create \yaction point\s. Change its rage with '\w[\s' and '\w]\s'.
 
 Press \wi\s to create \yany item\s. Allows you to choose item to place from
 full list. You can use it for items which has no associated key,
@@ -245,7 +248,8 @@ Press \wS\s and \wX\s to \ychange type\s of a highlighted creature.
 Press \wo\s to \ychange owner\s of a highlighted thing or creature. The
 ownership cycles through the players (and "unclaimed").
 
-Press '\w[\s' and '\w]\s' to \ychange height/altitude\s of highlighted object.
+Press '\w[\s' and '\w]\s' to \ychange height/altitude\s of highlighted object,
+or range of selected action point.
 
 Press \wl\s to \ylock/unlock\s a highlighted door.
 
@@ -273,9 +277,9 @@ All columns of the current slab will be re-created, and the program
 will be set to always re-create columns for this slab automatically.
 This will delete all manual columns on the slab.
 
-Press \wu\s to \yupdate\s the dungeon. This will make sure all room objects
-(training posts, spikes, torturers, etc) are placed appropriately,
-as well as updating the .clm and .dat values.
+Press '\wu\s' to \yupdate\s the dungeon. This will update the .clm and .dat values,
+but .tng entries will stay unchanged. Press '\wu\s' in thing mode to update .tng
+entries.
 
 Press \wm\s to \ymanually set\s all columns for the selected slab using
 one of the Adikted generation functions. The column will no longer

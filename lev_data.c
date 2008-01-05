@@ -13,6 +13,16 @@
 #include "obj_things.h"
 #include "obj_column.h"
 
+const int idir_subtl_x[]={
+    0, 1, 2,
+    0, 1, 2,
+    0, 1, 2,};
+
+const int idir_subtl_y[]={
+    0, 0, 0,
+    1, 1, 1,
+    2, 2, 2,};
+
 struct LEVEL *lvl=NULL;
 
 /*
@@ -810,12 +820,6 @@ short level_verify_logic(struct LEVEL *lvl, char *err_msg)
     int arr_entries_x=MAP_SIZE_X*MAP_SUBNUM_X;
     int arr_entries_y=MAP_SIZE_Y*MAP_SUBNUM_Y;
     int i, j, k;
-
-    //Array for storing players heart count
-    int hearts[PLAYERS_COUNT];
-    for (i=0; i < PLAYERS_COUNT; i++)
-      hearts[i]=0;
-
     for (i=0; i < arr_entries_y; i++)
     {
       for (j=0; j < arr_entries_x; j++)
@@ -825,17 +829,6 @@ short level_verify_logic(struct LEVEL *lvl, char *err_msg)
         {
           unsigned char *thing = get_thing(lvl,i,j,k);
           unsigned char type_idx=get_thing_type(thing);
-          if (is_dnheart(thing))
-          {
-            if (get_thing_owner(thing)>=PLAYERS_COUNT-1) // Orphan heart
-            {
-              sprintf(err_msg,"Unowned dungeon heart on slab %d,%d.",i/MAP_SUBNUM_X, j/MAP_SUBNUM_Y);
-              return VERIF_WARN;
-            } else
-            {
-              hearts[get_thing_owner(thing)]++;
-            }
-          }
 //          if ((type_idx==THING_TYPE_ITEM))
           {
             int pos_h=(unsigned short)get_thing_tilepos_h(thing);
@@ -868,17 +861,29 @@ short level_verify_logic(struct LEVEL *lvl, char *err_msg)
         
       }
     }
+
+    //Array for storing players heart count
+    int hearts[PLAYERS_COUNT];
+    for (i=0; i < PLAYERS_COUNT; i++)
+      hearts[i]=0;
+    owned_things_count(hearts,lvl,THING_TYPE_ITEM,ITEM_SUBTYPE_DNHEART);
+
+    if (hearts[PLAYER_UNSET]>0)
+    {
+        sprintf(err_msg,"Found %d unowned dungeon heart things.",hearts[PLAYER_UNSET]);
+        return VERIF_WARN;
+    }
     for (i=0; i < PLAYERS_COUNT; i++)
     {
       if (hearts[i]>1)
       {
-        sprintf(err_msg,"Player %d owns %d dungeon hearts.",i, hearts[i]);
+        sprintf(err_msg,"Player %d owns %d dungeon heart things.",i, hearts[i]);
         return VERIF_WARN;
       }
     }
     if (hearts[0]==0)
     {
-        sprintf(err_msg,"Human player doesn't have a dungeon heart.");
+        sprintf(err_msg,"Human player doesn't have a dungeon heart thing.");
         return VERIF_WARN;
     }
   return VERIF_OK;
@@ -1087,6 +1092,7 @@ char *get_thing(struct LEVEL *lvl,unsigned int x,unsigned int y,unsigned int num
 
 /*
  * Adds a thing to the structure. Returns its index in structure.
+ * Also updates statistics.
  */
 int thing_add(struct LEVEL *lvl,unsigned char *thing)
 {
@@ -1109,6 +1115,7 @@ int thing_add(struct LEVEL *lvl,unsigned char *thing)
       die("thing_add: Out of memory");
     int new_idx=lvl->tng_subnums[x][y]-1;
     lvl->tng_lookup[x][y][new_idx]=thing;
+    update_thing_stats(lvl,thing,1);
     return new_idx;
 }
 
@@ -1132,6 +1139,7 @@ void thing_del(struct LEVEL *lvl,unsigned int x, unsigned int y, unsigned int nu
 /*
  * Removes given thing from the LEVEL structure, updates counter variables.
  * Does not frees memory allocated for the thing - just drops the pointers.
+ * Updates thing statistics.
  */
 void thing_drop(struct LEVEL *lvl,unsigned int x, unsigned int y, unsigned int num)
 {
@@ -1144,6 +1152,9 @@ void thing_drop(struct LEVEL *lvl,unsigned int x, unsigned int y, unsigned int n
     if (num >= lvl->tng_subnums[x][y])
       return;
     lvl->tng_total_count--;
+    unsigned char *thing;
+    thing = lvl->tng_lookup[x][y][num];
+    update_thing_stats(lvl,thing,-1);
     for (i=num; i < lvl->tng_subnums[x][y]-1; i++)
       lvl->tng_lookup[x][y][i]=lvl->tng_lookup[x][y][i+1];
     lvl->tng_subnums[x][y]--;
@@ -1366,30 +1377,33 @@ unsigned char *get_object(struct LEVEL *lvl,unsigned int x,unsigned int y,unsign
     return NULL;
 }
 
-void object_del(struct LEVEL *lvl,unsigned int x,unsigned int y,unsigned int z)
+/*
+ * Deletes object with given coordinates and index.
+ */
+void object_del(struct LEVEL *lvl,unsigned int sx,unsigned int sy,unsigned int z)
 {
     //Preparing array bounds
     int arr_entries_x=MAP_SIZE_X*MAP_SUBNUM_X;
     int arr_entries_y=MAP_SIZE_Y*MAP_SUBNUM_Y;
     //Bounding indices
-    x%=arr_entries_x;
-    y%=arr_entries_y;
-    int tng_num=lvl->tng_subnums[x][y];
+    sx%=arr_entries_x;
+    sy%=arr_entries_y;
+    int tng_num=lvl->tng_subnums[sx][sy];
     if (z<tng_num)
     {
-      thing_del(lvl,x,y,z);
+      thing_del(lvl,sx,sy,z);
       return;
     }
-    int apt_num=lvl->apt_subnums[x][y];
+    int apt_num=lvl->apt_subnums[sx][sy];
     if (z<(tng_num+apt_num))
     {
-      actnpt_del(lvl,x,y,z-tng_num);
+      actnpt_del(lvl,sx,sy,z-tng_num);
       return;
     }
-    int lgt_num=lvl->lgt_subnums[x][y];
+    int lgt_num=lvl->lgt_subnums[sx][sy];
     if (z<(tng_num+apt_num+lgt_num))
     {
-      stlight_del(lvl,x,y,z-tng_num-apt_num);
+      stlight_del(lvl,sx,sy,z-tng_num-apt_num);
       return;
     }
 }
@@ -1512,33 +1526,16 @@ void set_tile_slab(struct LEVEL *lvl, unsigned int tx, unsigned int ty, unsigned
 void update_level_stats(struct LEVEL *lvl)
 {
      update_clm_utilize_counters(lvl);
-     update_thing_stats(lvl);
+     update_things_stats(lvl);
 }
 
-void update_thing_stats(struct LEVEL *lvl)
+void update_things_stats(struct LEVEL *lvl)
 {
     //Preparing array bounds
     int arr_entries_x=MAP_SIZE_X*MAP_SUBNUM_X;
     int arr_entries_y=MAP_SIZE_Y*MAP_SUBNUM_Y;
-
-    //Clearing related stats variables
-    lvl->stats.creatures_count=0;
-    lvl->stats.roomeffects_count=0;
-    lvl->stats.traps_count=0;
-    lvl->stats.doors_count=0;
-    lvl->stats.items_count=0;
-    // Stats for various items
-    lvl->stats.hero_gates_count=0;
-    lvl->stats.dn_hearts_count=0;
-    lvl->stats.spellbooks_count=0;
-    lvl->stats.dng_specboxes_count=0;
-    lvl->stats.crtr_lairs_count=0;
-    lvl->stats.statues_count=0;
-    lvl->stats.torches_count=0;
-    lvl->stats.gold_things_count=0;
-    lvl->stats.room_things_count=0;
-    lvl->stats.furniture_count=0;
-
+    //Clearing previous stats
+    level_clear_stats(lvl);
     //Sweeping through structures
     int i, j, k;
     for (i=0; i < arr_entries_y; i++)
@@ -1549,47 +1546,52 @@ void update_thing_stats(struct LEVEL *lvl)
         for (k=0; k <things_count ; k++)
         {
           unsigned char *thing = get_thing(lvl,i,j,k);
-          if (thing==NULL) continue;
+          update_thing_stats(lvl,thing,1);
+        }
+      }
+    }
+}
+
+void update_thing_stats(struct LEVEL *lvl,unsigned char *thing,short change)
+{
+          if (thing==NULL) return;
           unsigned char type_idx=get_thing_type(thing);
           switch (type_idx)
           {
           case THING_TYPE_CREATURE:
-              lvl->stats.creatures_count++;
+              lvl->stats.creatures_count+=change;
               break;
           case THING_TYPE_ROOMEFFECT:
-              lvl->stats.roomeffects_count++;
+              lvl->stats.roomeffects_count+=change;
               break;
           case THING_TYPE_TRAP:
-              lvl->stats.traps_count++;
+              lvl->stats.traps_count+=change;
               break;
           case THING_TYPE_DOOR:
-              lvl->stats.doors_count++;
+              lvl->stats.doors_count+=change;
               break;
           case THING_TYPE_ITEM:
-              lvl->stats.items_count++;
+              lvl->stats.items_count+=change;
               break;
           }
           if (is_herogate(thing))
-              lvl->stats.hero_gates_count++;
+              lvl->stats.hero_gates_count+=change;
           if (is_dnheart(thing))
-              lvl->stats.dn_hearts_count++;
+              lvl->stats.dn_hearts_count+=change;
           if (is_spellbook(thing))
-              lvl->stats.spellbooks_count++;
+              lvl->stats.spellbooks_count+=change;
           if (is_dngspecbox(thing))
-              lvl->stats.dng_specboxes_count++;
+              lvl->stats.dng_specboxes_count+=change;
           if (is_crtrlair(thing))
-              lvl->stats.crtr_lairs_count++;
+              lvl->stats.crtr_lairs_count+=change;
           if (is_statue(thing))
-              lvl->stats.statues_count++;
+              lvl->stats.statues_count+=change;
           if (is_torch(thing))
-              lvl->stats.torches_count++;
+              lvl->stats.torches_count+=change;
           if (is_gold(thing))
-              lvl->stats.gold_things_count++;
+              lvl->stats.gold_things_count+=change;
           if (is_room_thing(thing))
-              lvl->stats.room_things_count++;
+              lvl->stats.room_things_count+=change;
           if (is_furniture(thing))
-              lvl->stats.furniture_count++;
-        }
-      }
-    }
+              lvl->stats.furniture_count+=change;
 }

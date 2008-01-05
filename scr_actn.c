@@ -310,24 +310,92 @@ char *mode_status(int mode)
  * Returns color in which the specified tile should be drawn.
  * The color depends on tile owner, but also marking mode.
  */
-int get_draw_map_tile_color(struct LEVEL *lvl,int tx,int ty,short special)
+int get_draw_map_tile_color(struct LEVEL *lvl,int tx,int ty,short special,short darken)
 {
     int g;
-    if ((tx<0)||(tx>=MAP_SIZE_X)) return 16;
-    if ((ty<0)||(ty>=MAP_SIZE_Y)) return 16;
+    if ((tx<0)||(tx>=MAP_SIZE_X)) return PRINT_COLOR_GREY_ON_BLACK;
+    if ((ty<0)||(ty>=MAP_SIZE_Y)) return PRINT_COLOR_GREY_ON_BLACK;
+    int own=get_tile_owner(lvl,tx,ty);
+    short marked=((mapmode->mark) && (tx>=mapmode->markl) && (tx<=mapmode->markr)
+                        && (ty>=mapmode->markt) && (ty<=mapmode->markb));
     int col;
     if (special)
     {
-        col=7;
+      if (marked)
+        return PRINT_COLOR_MAGENT_ON_LGREY;
+      else
+      {
+        switch (own)
+        {
+        case PLAYER0:return PRINT_COLOR_LMAGENT_ON_RED;
+        case PLAYER1:return PRINT_COLOR_LMAGENT_ON_BLUE;
+        case PLAYER2:return PRINT_COLOR_LMAGENT_ON_GREEN;
+        case PLAYER3:return PRINT_COLOR_LMAGENT_ON_BROWN;
+        case PLAYER_GOOD:return PRINT_COLOR_LMAGENT_ON_CYAN;
+        default:
+        case PLAYER_UNSET:
+              return PRINT_COLOR_LMAGENT_ON_BLACK;
+        }
+      }
     } else
     {
-        col = get_tile_owner(lvl,tx,ty)+10;
+      return get_screen_color_owned(own,marked,darken);
     }
-    // Are we marking?
-    if ((mapmode->mark) && (tx>=mapmode->markl) && (tx<=mapmode->markr)
-                        && (ty>=mapmode->markt) && (ty<=mapmode->markb))
-        col+=10;
-    return col;
+}
+
+int get_screen_color_owned(unsigned char owner,short marked,short darken)
+{
+
+    if (marked)
+    {
+        switch (owner)
+        {
+        case PLAYER0:return PRINT_COLOR_RED_ON_WHITE;
+        case PLAYER1:return PRINT_COLOR_BLUE_ON_WHITE;
+        case PLAYER2:return PRINT_COLOR_GREEN_ON_WHITE;
+        case PLAYER3:return PRINT_COLOR_BROWN_ON_WHITE;
+        case PLAYER_GOOD:return PRINT_COLOR_CYAN_ON_WHITE;
+        default:
+        case PLAYER_UNSET:return PRINT_COLOR_BLACK_ON_LGREY;
+        }
+    } else
+    {
+        switch (owner)
+        {
+        case PLAYER0:
+            if (darken)
+              return PRINT_COLOR_GREY_ON_RED;
+            else
+              return PRINT_COLOR_WHITE_ON_RED;
+        case PLAYER1:
+            if (darken)
+              return PRINT_COLOR_GREY_ON_BLUE;
+            else
+              return PRINT_COLOR_WHITE_ON_BLUE;
+        case PLAYER2:
+            if (darken)
+              return PRINT_COLOR_GREY_ON_GREEN;
+            else
+              return PRINT_COLOR_WHITE_ON_GREEN;
+        case PLAYER3:
+            if (darken)
+              return PRINT_COLOR_GREY_ON_BROWN;
+            else
+              return PRINT_COLOR_WHITE_ON_BROWN;
+        case PLAYER_GOOD:
+            if (darken)
+              return PRINT_COLOR_GREY_ON_CYAN;
+            else
+              return PRINT_COLOR_WHITE_ON_CYAN;
+        default:
+        case PLAYER_UNSET:
+            if (darken)
+              return PRINT_COLOR_GREY_ON_BLACK;
+            else
+              return PRINT_COLOR_LGREY_ON_BLACK;
+        }
+    }
+
 }
 
 /*
@@ -390,16 +458,20 @@ void draw_map_area(struct LEVEL *lvl,short show_ground,short show_rooms,short sh
               char out_ch;
               int g;
               short has_ccol;
+              short darken;
               if (show_rooms)
               {
                   g = graffiti_idx(lvl,tx,ty);
                   has_ccol = slab_has_custom_columns(lvl,tx,ty);
+                  unsigned char slab=get_tile_slab(lvl,tx,ty);
+                  darken=(slab==SLAB_TYPE_ROCK)||(slab==SLAB_TYPE_LAVA);
               } else
               {
                   g = -1;
                   has_ccol = false;
+                  darken=(get_object_tilnums(lvl,tx,ty)==0);
               }
-              screen_setcolor(get_draw_map_tile_color(lvl,tx,ty,has_ccol));
+              screen_setcolor(get_draw_map_tile_color(lvl,tx,ty,has_ccol,darken));
               out_ch=get_draw_map_tile_char(lvl,tx,ty,show_ground,show_rooms,show_things,(g>=0));
               screen_printchr(out_ch);
             } else
