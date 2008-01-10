@@ -48,6 +48,8 @@ short init_help(void)
     help->cubekey=NULL;
     help->slblkeyrows=0;
     help->slblkey=NULL;
+    help->srchkeyrows=0;
+    help->srchkey=NULL;
     help->slbrows=0;
     help->slb=NULL;
     help->tngrows=0;
@@ -66,6 +68,10 @@ short init_help(void)
     help->cube=NULL;
     help->slblrows=0;
     help->slbl=NULL;
+    help->srchrows=0;
+    help->srch=NULL;
+    help->rwrkrows=0;
+    help->rwrk=NULL;
     help->tiprows=0;
     help->tips=NULL;
     help->compassrows=0;
@@ -183,7 +189,9 @@ char ***match_title(char *title, int n)
             "txtrkeyhelp", "cclmkeyhelp", //14,15
             "cubekeyhelp",                //16
             "slblhelp", "slblkeyhelp",    //17,18
-            "compass", NULL};             //19
+            "srchhelp", "srchkeyhelp",    //19,20
+            "rwrkhelp",                   //21
+            "compass", NULL};             //22
     int i=0;
 
     while (titles[i] && strcmp (titles[i], title))
@@ -268,6 +276,18 @@ char ***match_title(char *title, int n)
       return &(help->slblkey);
       case 19:
       if (n!=-1)
+          help->srchrows=n;
+      return &(help->srch);
+      case 20:
+      if (n!=-1)
+          help->srchkeyrows=n;
+      return &(help->srchkey);
+      case 21:
+      if (n!=-1)
+          help->rwrkrows=n;
+      return &(help->rwrk);
+      case 22:
+      if (n!=-1)
           help->compassrows=n;
       return &(help->compass);
       default :
@@ -323,6 +343,14 @@ short start_help(struct LEVEL *lvl)
       case MD_SLBL:
         help->rows=help->slblrows;
         help->text=help->slbl;
+        break;
+      case MD_SRCH:
+        help->rows=help->srchrows;
+        help->text=help->srch;
+        break;
+      case MD_RWRK:
+        help->rows=help->rwrkrows;
+        help->text=help->rwrk;
         break;
       default:
         help->rows=0;
@@ -515,8 +543,13 @@ short init_key_help(int mode)
         help->rows=help->slblkeyrows;
         help->text=help->slblkey;
         break;
+      case MD_SRCH:
+        help->rows=help->srchkeyrows;
+        help->text=help->srchkey;
+        break;
       case MD_CLM:
       case MD_SCRP:
+      case MD_RWRK:
       default:
         help->rows=0;
         help->text=NULL;

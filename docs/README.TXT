@@ -131,9 +131,18 @@ Version: 0.60b
  Auto creating torches
  Updating owner now results in TNG update
  The '[' and ']' keys now works on action points
+Version: 0.63b
+ Added changing range of lights/effects with '-' and '+'
+ The last column (which has no slab attached) is updated as rock
+ Some of the load/save functions rewritten and fixed
+ WLB files are now maintained and updated properly
+ Loading/saving of FLG files
+ FLG entries are maintained quite good
+ Added room-specific reinforced walls
+ Added searching for objects (ctrl+f)
+ Added rework mode (undocumented - for reworking only)
 TODO before final:
  Fixations in room things parameters (height,other)
- Reinforced walls for various rooms
 
 Author:
 Jon Skeet, skeet@pobox.com

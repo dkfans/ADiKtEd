@@ -41,5 +41,6 @@ char get_thing_char(int x, int y);
 int get_tng_display_color(short obj_type,unsigned char obj_owner,short marked);
 void tng_makeitem(int sx,int sy,unsigned char stype_idx);
 void tng_change_height(struct LEVEL *lvl, unsigned int sx, unsigned int sy,unsigned int z,int delta_height);
+void tng_change_range(struct LEVEL *lvl, unsigned int sx, unsigned int sy,unsigned int z,int delta_range);
 
 #endif // ADIKT_SCRTHING_H

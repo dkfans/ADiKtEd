@@ -68,7 +68,7 @@ void actions_crtre(int key)
           break;
         case KEY_ENTER:
           thing = create_creature(sx,sy,list->pos+1);
-          set_thing_tilepos_h(thing,1);
+          set_thing_subtile_h(thing,1);
           set_thing_owner(thing,get_tile_owner(lvl,mapmode->mapx+mapmode->screenx,mapmode->mapy+mapmode->screeny));
           thing_add(lvl,thing);
           // Show the new thing
@@ -243,6 +243,51 @@ void actions_mdslbl(int key)
           break;
         default:
           message_info("Unrecognized slab list key code: %d",key);
+          speaker_beep();
+      }
+    }
+}
+
+/*
+ * Covers actions from object search screen.
+ */
+void actions_mdsrch(int key)
+{
+    message_release();
+    if (!actions_list(key))
+    {
+      switch (key)
+      {
+        case KEY_TAB:
+        case KEY_DEL:
+        case KEY_ESCAPE:
+          end_list();
+          message_info("Object search cancelled");
+          break;
+        case KEY_ENTER:
+          end_list();
+          if (list->pos==0)
+          {
+            clear_highlight(mapmode);
+          }
+          int tx=-1;
+          int ty=-1;
+          int num_found=0;
+          unsigned char *obj;
+          while (ty<MAP_SIZE_Y)
+          {
+            obj=find_next_object_on_map(lvl,&tx,&ty,list->pos);
+            if (obj!=NULL)
+            {
+              set_tile_highlight(mapmode,tx,ty,PRINT_COLOR_LRED_ON_YELLOW);
+              num_found++;
+            } else
+            { break; }
+          } 
+          message_info("Matching objects found: %d",num_found);
+          break;
+        default:
+          message_info("Unrecognized object search key code: %d",key);
           speaker_beep();
       }
     }
@@ -441,5 +486,12 @@ void draw_mdcube()
 void draw_mdslbl()
 {
     draw_numbered_list(get_slab_fullname,0,SLAB_TYPE_GUARDPOST,17);
+    set_cursor_pos(get_screen_rows()-1, 17);
+}
+
+void draw_mdsrch()
+{
+    draw_mdempty();
+    draw_numbered_list(get_search_objtype_name,0,get_search_objtype_count()-1,18);
     set_cursor_pos(get_screen_rows()-1, 17);
 }

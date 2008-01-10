@@ -229,7 +229,6 @@ void actions_mdtng(int key)
                   message_error("Only things can be locked.");
               break;
             }
-          //TODO: should we update the CLM ?
           };break;
         case 'o' : // Change ownership of creature/trap/special/spell
           {
@@ -344,6 +343,20 @@ void actions_mdtng(int key)
             int visiting_z=mdtng->vistng[mapmode->subtl_x][mapmode->subtl_y];
             tng_change_height(lvl,sx,sy, visiting_z,+64);
           };break;
+
+        case '-' :
+        case '_' :
+          {
+            int visiting_z=mdtng->vistng[mapmode->subtl_x][mapmode->subtl_y];
+            tng_change_range(lvl,sx,sy,visiting_z,-64);
+          };break;
+        case '=' :
+        case '+' :
+          {
+            int visiting_z=mdtng->vistng[mapmode->subtl_x][mapmode->subtl_y];
+            tng_change_range(lvl,sx,sy, visiting_z,+64);
+          };break;
+
         case KEY_DEL: // delete
           {
             int visiting_z=mdtng->vistng[mapmode->subtl_x][mapmode->subtl_y];
@@ -547,8 +560,8 @@ int display_thing(unsigned char *thing, int x, int y)
     }
     y++;
     set_cursor_pos(y++, x);
-    int tpos_x=get_thing_tilepos_x(thing);
-    int tpos_y=get_thing_tilepos_y(thing);
+    int tpos_x=get_thing_subtile_x(thing);
+    int tpos_y=get_thing_subtile_y(thing);
     screen_printf("Subtile: %3d,%3d (Tile: %2d, %2d)", tpos_x, tpos_y,
               tpos_x/MAP_SUBNUM_X, tpos_y/MAP_SUBNUM_Y);
     set_cursor_pos(y++, x);
@@ -559,7 +572,7 @@ int display_thing(unsigned char *thing, int x, int y)
     screen_printf("Thing type: %s",get_thing_type_fullname(type_idx));
     set_cursor_pos(y++, x);
     screen_printf("Altitude: %3d within subtile %d",
-        get_thing_subtpos_h(thing),get_thing_tilepos_h(thing));
+        get_thing_subtpos_h(thing),get_thing_subtile_h(thing));
     if ((type_idx==THING_TYPE_ROOMEFFECT)||(type_idx==THING_TYPE_ITEM))
     {
         set_cursor_pos(y++, x);
@@ -619,7 +632,7 @@ int display_thing(unsigned char *thing, int x, int y)
       screen_printf("Kind: %s",get_roomeffect_subtype_fullname(get_thing_subtype(thing)));
       set_cursor_pos(y++, x);
       screen_printf("Range: %3d subtiles and %3d",
-          0,0);//get_thing_tile_range(thing),get_thing_subt_range(thing));  TODO
+          get_thing_range_subtile(thing),get_thing_range_subtpos(thing));
     };break;
     // Object
     case THING_TYPE_ITEM:
@@ -673,8 +686,8 @@ int display_action_point (unsigned char *actnpt, int x, int y)
     set_cursor_pos(y++, x);
     screen_printf("Action point number %d:", get_actnpt_number(actnpt));
     set_cursor_pos(y++, x);
-    int subtlpos_x=get_actnpt_tilepos_x(actnpt);
-    int subtlpos_y=get_actnpt_tilepos_y(actnpt);
+    int subtlpos_x=get_actnpt_subtile_x(actnpt);
+    int subtlpos_y=get_actnpt_subtile_y(actnpt);
     screen_printf("Subtile: %3d,%3d (Tile: %2d, %2d)", subtlpos_x, subtlpos_y,
         subtlpos_x/3, subtlpos_y/3);
     set_cursor_pos(y++, x);
@@ -682,7 +695,7 @@ int display_action_point (unsigned char *actnpt, int x, int y)
         get_actnpt_subtpos_x(actnpt), get_actnpt_subtpos_y(actnpt));
     set_cursor_pos(y++, x);
     screen_printf("Range: %3d subtiles and %3d",
-        get_actnpt_tile_range(actnpt),get_actnpt_subt_range(actnpt));
+        get_actnpt_range_subtile(actnpt),get_actnpt_range_subtpos(actnpt));
     return y;
 }
 
@@ -709,8 +722,8 @@ int display_static_light(unsigned char *stlight, int x, int y)
     set_cursor_pos(y++, x);
     screen_printf("Static light");
     set_cursor_pos(y++, x);
-    int subtlpos_x=get_stlight_tilepos_x(stlight);
-    int subtlpos_y=get_stlight_tilepos_y(stlight);
+    int subtlpos_x=get_stlight_subtile_x(stlight);
+    int subtlpos_y=get_stlight_subtile_y(stlight);
     screen_printf("Subtile: %3d,%3d (Tile: %2d, %2d)", subtlpos_x, subtlpos_y,
         subtlpos_x/3, subtlpos_y/3);
     set_cursor_pos(y++, x);
@@ -718,10 +731,10 @@ int display_static_light(unsigned char *stlight, int x, int y)
         (unsigned int)get_stlight_subtpos_x(stlight), (unsigned int)get_stlight_subtpos_y(stlight));
     set_cursor_pos(y++, x);
     screen_printf("Altitude: %3d within subtile %d",
-        (unsigned int)get_stlight_subtpos_h(stlight),(unsigned int)get_stlight_tilepos_h(stlight));
+        (unsigned int)get_stlight_subtpos_h(stlight),(unsigned int)get_stlight_subtile_h(stlight));
     set_cursor_pos(y++, x);
     screen_printf("Range: %3d subtiles and %d",
-        (unsigned int)get_stlight_tile_range(stlight),(unsigned int)get_stlight_subt_range(stlight));
+        (unsigned int)get_stlight_range_subtile(stlight),(unsigned int)get_stlight_range_subtpos(stlight));
     set_cursor_pos(y++, x);
     screen_printf("Intensivity: %3d",(unsigned int)get_stlight_intensivity(stlight));
     return y;
@@ -908,17 +921,17 @@ void tng_change_height(struct LEVEL *lvl, unsigned int sx, unsigned int sy,unsig
     switch (obj_type)
     {
     case OBJECT_TYPE_STLIGHT:
-      height=get_stlight_tilepos_h(obj);
+      height=get_stlight_subtile_h(obj);
       subheight=get_stlight_subtpos_h(obj)+delta_height;
       tile_limit=MAP_SUBNUM_H;
       break;
     case OBJECT_TYPE_ACTNPT:
-      height=get_actnpt_tile_range(obj);
-      subheight=get_actnpt_subt_range(obj)+delta_height;
+      height=get_actnpt_range_subtile(obj);
+      subheight=get_actnpt_range_subtpos(obj)+delta_height;
       tile_limit=MAP_SIZE_X/2;
       break;
     case OBJECT_TYPE_THING:
-      height=get_thing_tilepos_h(obj);
+      height=get_thing_subtile_h(obj);
       subheight=get_thing_subtpos_h(obj)+delta_height;
       tile_limit=MAP_SUBNUM_H;
       break;
@@ -954,16 +967,90 @@ void tng_change_height(struct LEVEL *lvl, unsigned int sx, unsigned int sy,unsig
     switch (obj_type)
     {
     case OBJECT_TYPE_STLIGHT:
-      set_stlight_tilepos_h(obj,height);
+      set_stlight_subtile_h(obj,height);
       set_stlight_subtpos_h(obj,subheight);
       break;
     case OBJECT_TYPE_ACTNPT:
-      set_actnpt_tile_range(obj,height);
-      set_actnpt_subt_range(obj,subheight);
+      set_actnpt_range_subtile(obj,height);
+      set_actnpt_range_subtpos(obj,subheight);
       break;
     case OBJECT_TYPE_THING:
-      set_thing_tilepos_h(obj,height);
+      set_thing_subtile_h(obj,height);
       set_thing_subtpos_h(obj,subheight);
+      break;
+    }
+}
+
+void tng_change_range(struct LEVEL *lvl, unsigned int sx, unsigned int sy,unsigned int z,int delta_range)
+{
+    unsigned char *obj=get_object(lvl,sx,sy,z);
+    short obj_type=get_object_type(lvl,sx,sy,z);
+    int rng,subrng;
+    if (obj==NULL)
+    {
+        message_error("Cannot find object");
+        return;
+    }
+    int tile_limit;
+    switch (obj_type)
+    {
+    case OBJECT_TYPE_STLIGHT:
+      rng=get_stlight_range_subtile(obj);
+      subrng=get_stlight_range_subtpos(obj)+delta_range;
+      tile_limit=MAP_SIZE_X/4;
+      break;
+    case OBJECT_TYPE_ACTNPT:
+      rng=get_actnpt_range_subtile(obj);
+      subrng=get_actnpt_range_subtpos(obj)+delta_range;
+      tile_limit=MAP_SIZE_X/4;
+      break;
+    case OBJECT_TYPE_THING:
+      rng=get_thing_range_subtile(obj);
+      subrng=get_thing_range_subtpos(obj)+delta_range;
+      tile_limit=MAP_SIZE_X/4;
+      break;
+    default:
+      message_error("Cannot recognize object");
+      return;
+    }
+    while (subrng<0)
+    {
+        rng--;
+        subrng+=256;
+    }
+    while (subrng>255)
+    {
+        rng++;
+        subrng-=256;
+    }
+    if (rng>=tile_limit)
+    {
+        rng=tile_limit-1;
+        subrng=255;
+        message_error("Max parameter value reached");
+    } else
+    if (rng<0)
+    {
+        rng=0;
+        subrng=0;
+        message_error("Min parameter value reached");
+    } else
+    {
+        message_info("Object parameter adjusted");
+    }
+    switch (obj_type)
+    {
+    case OBJECT_TYPE_STLIGHT:
+      set_stlight_range_subtile(obj,rng);
+      set_stlight_range_subtpos(obj,subrng);
+      break;
+    case OBJECT_TYPE_ACTNPT:
+      set_actnpt_range_subtile(obj,rng);
+      set_actnpt_range_subtpos(obj,subrng);
+      break;
+    case OBJECT_TYPE_THING:
+      set_thing_range_subtile(obj,rng);
+      set_thing_range_subtpos(obj,subrng);
       break;
     }
 }

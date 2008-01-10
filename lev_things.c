@@ -14,6 +14,24 @@
 #include "obj_things.h"
 #include "lev_column.h"
 
+const is_thing_subtype search_tngtype_func[]={
+      is_spellbook,is_dngspecbox,is_crtrlair,
+      is_trapbox,is_trap,is_creature,
+      is_door,is_roomeffect,is_statue,
+      is_furniture,is_food,is_gold,
+      is_torch,is_heartflame,is_lit_thing,
+      is_herogate,is_dnheart,is_doorkey,
+      };
+
+const char *search_tngtype_names[]={
+      "Spell books","Dung.Specials","Creature lairs",
+      "Trap boxes","Deployed traps","Creatures",
+      "Deployed doors","Room effects","Statues",
+      "Furniture items","Food (chickens)","Gold things",
+      "Torches","Heart flames","Lit things",
+      "Hero gates","Dungeon hearts","Door keys",
+};
+
 /*
  * Verifies thing types and parameters. Returns VERIF_ERROR,
  * VERIF_WARN or VERIF_OK
@@ -47,14 +65,75 @@ short things_verify(struct LEVEL *lvl, char *err_msg)
   return VERIF_OK;
 }
 
+char *get_search_tngtype_name(unsigned short idx)
+{
+     int count=sizeof(search_tngtype_names)/sizeof(char *);
+     if (idx<count)
+       return (char *)search_tngtype_names[idx];
+     else
+       return "unknown(?!)";
+}
+
+is_thing_subtype get_search_tngtype_func(unsigned short idx)
+{
+     int count=sizeof(search_tngtype_func)/sizeof(is_thing_subtype);
+     if ((idx<count)&&(search_tngtype_func[idx]!=NULL))
+       return search_tngtype_func[idx];
+     else
+       return NULL;
+}
+
+char *get_search_objtype_name(unsigned short idx)
+{
+    const int count=3;
+    if (idx>=count)
+      return get_search_tngtype_name(idx-count);
+    switch (idx)
+    {
+    case 0: return "Clear results";
+    case 1: return "Action points";
+    case 2: return "Static lights";
+    }
+}
+
+/*
+ * Finds next object of type matching to srch_idx value. Returns the object and
+ * sets its coordinates (tx,ty). If not found, returns NULL.
+ */
+unsigned char *find_next_object_on_map(struct LEVEL *lvl, int *tx, int *ty, unsigned short srch_idx)
+{
+    const int count=3;
+    if (srch_idx>=count)
+    {
+      is_thing_subtype check_func=get_search_tngtype_func(srch_idx-count);
+      return find_next_thing_on_map(lvl,tx,ty,check_func);
+    }
+    switch (srch_idx)
+    {
+    //TODO: find the action point and static light
+    case 1: return find_next_actnpt_on_map(lvl,tx,ty);
+    case 2: return find_next_stlight_on_map(lvl,tx,ty);
+    case 0:
+    default:
+        return NULL;
+    }
+}
+
+unsigned short get_search_objtype_count()
+{
+     unsigned short count=3;
+     count+=sizeof(search_tngtype_func)/sizeof(is_thing_subtype);
+     return count;
+}
+
 /*
  * Sets lock state for the given door; creates/deletes spinning key thing.
  */
 short set_door_lock(struct LEVEL *lvl, unsigned char *thing, unsigned char nlock)
 {
     if (thing==NULL) return false;
-    unsigned short sx=get_thing_tilepos_x(thing);
-    unsigned short sy=get_thing_tilepos_y(thing);
+    unsigned short sx=get_thing_subtile_x(thing);
+    unsigned short sy=get_thing_subtile_y(thing);
     unsigned char *thing_key=NULL;
     unsigned int tng_num=get_thing_subnums(lvl,sx,sy);
     while (tng_num>0)
@@ -95,21 +174,21 @@ unsigned char get_door_lock(unsigned char *thing)
  */
 unsigned char compute_door_orientation(struct LEVEL *lvl, unsigned char *thing)
 {
-    unsigned short tx=get_thing_tilepos_x(thing)/MAP_SUBNUM_X;
-    unsigned short ty=get_thing_tilepos_y(thing)/MAP_SUBNUM_Y;
+    unsigned short tx=get_thing_subtile_x(thing)/MAP_SUBNUM_X;
+    unsigned short ty=get_thing_subtile_y(thing)/MAP_SUBNUM_Y;
     // Check the previous orientation - if it matches, then it is preferred
     if (get_door_orientation(thing)==DOOR_ORIENT_NSPASS)
     {
-      unsigned char slab_e=get_tile_slab(lvl, tx+1, ty);
-      unsigned char slab_w=get_tile_slab(lvl, tx-1, ty);
+      unsigned short slab_e=get_tile_slab(lvl, tx+1, ty);
+      unsigned short slab_w=get_tile_slab(lvl, tx-1, ty);
       if (slab_is_tall(slab_e)&&slab_is_tall(slab_w))
         return DOOR_ORIENT_NSPASS;
       else
         return DOOR_ORIENT_EWPASS;
     } else
     {
-      unsigned char slab_n=get_tile_slab(lvl, tx, ty-1);
-      unsigned char slab_s=get_tile_slab(lvl, tx, ty+1);
+      unsigned short slab_n=get_tile_slab(lvl, tx, ty-1);
+      unsigned short slab_s=get_tile_slab(lvl, tx, ty+1);
       if (slab_is_tall(slab_n)&&slab_is_tall(slab_s))
         return DOOR_ORIENT_EWPASS;
       else
@@ -201,7 +280,7 @@ unsigned char *find_lit_thing_on_square_radius1(struct LEVEL *lvl, int tx, int t
         if ((i>=0) && (k>=0) && (i<MAP_SIZE_X) && (k<MAP_SIZE_Y))
         {
           unsigned char *thing;
-          thing=find_thing_on_tile(lvl,is_lit_thing,i,k);
+          thing=find_thing_on_tile(lvl,i,k,is_lit_thing);
           if (thing!=NULL) return thing;
         }
       }
@@ -209,22 +288,103 @@ unsigned char *find_lit_thing_on_square_radius1(struct LEVEL *lvl, int tx, int t
 }
 
 /*
- * Tries to find a thing that contains a light (lit thing)
+ * Tries to find a thing which matches given check function
  * on given slab. If no such thing, returns NULL.
+ * Finds only first thing on a tile.
  */
-unsigned char *find_thing_on_tile(struct LEVEL *lvl,is_thing_subtype check_func, int tx, int ty)
+unsigned char *find_thing_on_tile(struct LEVEL *lvl, int tx, int ty, is_thing_subtype check_func)
 {
     int sx, sy, i;
     for (sx=tx*3; sx < tx*3+3; sx++)
       for (sy=ty*3; sy < ty*3+3; sy++)
-          for (i=get_thing_subnums(lvl,sx,sy)-1; i >=0; i--)
+      {
+          int count=get_thing_subnums(lvl,sx,sy);
+          for (i=0; i <count; i++)
           {
             unsigned char *thing;
             thing=get_thing(lvl,sx,sy,i);
             if (check_func(thing))
               return thing;
           }
+      }
     return NULL;
+}
+
+/*
+ * Tries to find a thing that contains thing which matches given check function.
+ * on all slabs AFTER the given slab. If no such thing, returns NULL.
+ * Returns only one matching thing on one slab.
+ * passing -1 in coordinate argument means to start search with 0.
+ */
+unsigned char *find_next_thing_on_map(struct LEVEL *lvl, int *tx, int *ty, is_thing_subtype check_func)
+{
+  if (check_func==NULL) return NULL;
+  if ((*ty)<0) {(*tx)=-1;(*ty)=0;};
+  if ((*tx)<0) (*tx)=-1;
+  do {
+      //Switching coords to next map tile
+      (*tx)++;
+      while (*tx>=MAP_SIZE_X)
+      {
+        (*tx)-=MAP_SIZE_X;
+        (*ty)++;
+      }
+      //Searching in that tile
+      unsigned char *thing;
+      thing=find_thing_on_tile(lvl,*tx,*ty,check_func);
+      if (thing!=NULL) return thing;
+  } while ((*ty)<MAP_SIZE_Y);
+  return NULL;
+}
+
+unsigned char *find_next_actnpt_on_map(struct LEVEL *lvl, int *tx, int *ty)
+{
+  if ((*ty)<0) {(*tx)=-1;(*ty)=0;};
+  if ((*tx)<0) (*tx)=-1;
+  do {
+      //Switching coords to next map tile
+      (*tx)++;
+      while ((*tx)>=MAP_SIZE_X)
+      {
+        (*tx)-=MAP_SIZE_X;
+        (*ty)++;
+      }
+      //Searching in that tile
+      unsigned char *actnpt;
+      int sx,sy;
+      for (sx=(*tx)*3;sx<(*tx)*3+3;sx++)
+        for (sy=(*ty)*3;sy<(*ty)*3+3;sy++)
+        {
+          actnpt=get_actnpt(lvl,sx,sy,0);
+          if (actnpt!=NULL) return actnpt;
+        }
+  } while ((*ty)<MAP_SIZE_Y);
+  return NULL;
+}
+
+unsigned char *find_next_stlight_on_map(struct LEVEL *lvl, int *tx, int *ty)
+{
+  if ((*ty)<0) {(*tx)=-1;(*ty)=0;};
+  if ((*tx)<0) (*tx)=-1;
+  do {
+      //Switching coords to next map tile
+      (*tx)++;
+      while ((*tx)>=MAP_SIZE_X)
+      {
+        (*tx)-=MAP_SIZE_X;
+        (*ty)++;
+      }
+      //Searching in that tile
+      unsigned char *stlight;
+      int sx,sy;
+      for (sx=(*tx)*3;sx<(*tx)*3+3;sx++)
+        for (sy=(*ty)*3;sy<(*ty)*3+3;sy++)
+        {
+          stlight=get_stlight(lvl,sx,sy,0);
+          if (stlight!=NULL) return stlight;
+        }
+  } while ((*ty)<MAP_SIZE_Y);
+  return NULL;
 }
 
 /*
@@ -232,8 +392,8 @@ unsigned char *find_thing_on_tile(struct LEVEL *lvl,is_thing_subtype check_func,
  */
 unsigned short compute_torch_sensitile(struct LEVEL *lvl, unsigned char *thing)
 {
-    unsigned short sx=get_thing_tilepos_x(thing);
-    unsigned short sy=get_thing_tilepos_y(thing);
+    unsigned short sx=get_thing_subtile_x(thing);
+    unsigned short sy=get_thing_subtile_y(thing);
     int tx=sx/MAP_SUBNUM_X;
     int ty=sy/MAP_SUBNUM_Y;
     int ntx=tx+(int)(sx%MAP_SUBNUM_X)-1;
@@ -244,7 +404,7 @@ unsigned short compute_torch_sensitile(struct LEVEL *lvl, unsigned char *thing)
     if (nty>=MAP_SIZE_X) nty=MAP_MAXINDEX_X;
     if ((ntx==tx)&&(nty==ty))
         return ty*MAP_SIZE_X+tx;
-    unsigned char slab;
+    unsigned short slab;
     // Trying fo find torch wall around
     // First - try to put it in X axis
     slab=get_tile_slab(lvl,ntx,ty);
@@ -279,11 +439,33 @@ unsigned short compute_torch_sensitile(struct LEVEL *lvl, unsigned char *thing)
  */
 unsigned short compute_roomeffect_sensitile(struct LEVEL *lvl, unsigned char *thing)
 {
-    unsigned short sx=get_thing_tilepos_x(thing);
-    unsigned short sy=get_thing_tilepos_y(thing);
+    unsigned short sx=get_thing_subtile_x(thing);
+    unsigned short sy=get_thing_subtile_y(thing);
     int tx=sx/MAP_SUBNUM_X;
     int ty=sy/MAP_SUBNUM_Y;
     return ty*MAP_SIZE_X+tx;
+}
+
+/*
+ * Returns an acceptable value of sensitive tile for item thing
+ */
+unsigned short compute_item_sensitile(struct LEVEL *lvl, unsigned char *thing)
+{
+    if (is_torch(thing))
+        return compute_torch_sensitile(lvl,thing);
+    else
+    if (is_gold(thing))
+        return THING_SENSITILE_NONE;
+    else
+    switch (get_thing_subtype(thing))
+    default:
+    {
+        unsigned short sx=get_thing_subtile_x(thing);
+        unsigned short sy=get_thing_subtile_y(thing);
+        int tx=sx/MAP_SUBNUM_X;
+        int ty=sy/MAP_SUBNUM_Y;
+        return ty*MAP_SIZE_X+tx;
+    }
 }
 
 /*
@@ -298,7 +480,7 @@ unsigned char *create_door(struct LEVEL *lvl, unsigned int sx, unsigned int sy, 
     set_thing_owner(thing,get_tile_owner(lvl,sx/MAP_SUBNUM_X,sy/MAP_SUBNUM_Y));
     //This will be updated in update_tile_things_subpos_and_height
     set_thing_subtpos(thing,128,128);
-    set_thing_tilepos_h(thing,5);
+    set_thing_subtile_h(thing,5);
     set_door_orientation(thing,compute_door_orientation(lvl,thing));
     //Set default lock state
     set_thing_level(thing,DOOR_PASS_UNLOCKED);
@@ -334,7 +516,7 @@ unsigned char *create_torch(struct LEVEL *lvl, unsigned int sx, unsigned int sy,
       subpos_h=0;
     }
     set_thing_subtpos(thing,sub_x,sub_y);
-    set_thing_tilepos_h(thing,subtl_h);
+    set_thing_subtile_h(thing,subtl_h);
     set_thing_subtpos_h(thing,subpos_h);
     //Sensitive tile
     unsigned short sensitile=compute_torch_sensitile(lvl,thing);
@@ -352,7 +534,7 @@ unsigned char *create_doorkey(struct LEVEL *lvl, unsigned int sx, unsigned int s
     set_thing_subtype(thing,stype_idx);
     set_thing_owner(thing,get_tile_owner(lvl,tx,ty));
     //This will be updated in update_tile_things_subpos_and_height
-    set_thing_tilepos_h(thing,4);
+    set_thing_subtile_h(thing,4);
     set_thing_subtpos_h(thing,0x000);
     set_thing_subtpos(thing,0x080,0x080);
     //Note: in most DK maps, sensitile is set to 0, but I believe it is an error
@@ -425,7 +607,7 @@ unsigned char *create_item_adv(struct LEVEL *lvl, unsigned int sx, unsigned int 
     if (stype_idx==ITEM_SUBTYPE_DNHEART)
     {
         thing=create_item(sx,sy,stype_idx);
-        set_thing_tilepos_h(thing,3); // Raise it up a bit
+        set_thing_subtile_h(thing,3); // Raise it up a bit
         set_thing_sensitile(thing,THING_SENSITILE_NONE);
     } else
     if (stype_idx==ITEM_SUBTYPE_PRISONBAR)
@@ -496,7 +678,7 @@ void update_obj_for_square(struct LEVEL *lvl, int tx_first, int tx_last,
 void update_clmaffective_obj_for_slab(struct LEVEL *lvl, int tx, int ty)
 {
     remove_misplaced_objs_on_slab(lvl,tx,ty);
-    unsigned char slab=get_tile_slab(lvl,tx,ty);
+    unsigned short slab=get_tile_slab(lvl,tx,ty);
     if (slab_is_room(slab))
     {
       update_room_things_on_slab(lvl,tx,ty);
@@ -516,7 +698,7 @@ void update_clmaffective_obj_for_slab(struct LEVEL *lvl, int tx, int ty)
  */
 void remove_misplaced_objs_on_slab(struct LEVEL *lvl, int tx, int ty)
 {
-    unsigned char slab=get_tile_slab(lvl,tx,ty);
+    unsigned short slab=get_tile_slab(lvl,tx,ty);
     int sx, sy, i;
     for (sx=tx*3; sx < tx*3+3; sx++)
       for (sy=ty*3; sy < ty*3+3; sy++)
@@ -541,7 +723,7 @@ void remove_misplaced_objs_on_slab(struct LEVEL *lvl, int tx, int ty)
  */
 void update_room_things_on_slab(struct LEVEL *lvl, int tx, int ty)
 {
-  unsigned char slab=get_tile_slab(lvl,tx,ty);
+  unsigned short slab=get_tile_slab(lvl,tx,ty);
   switch (slab)
   {
     case SLAB_TYPE_PORTAL:
@@ -621,7 +803,7 @@ void update_room_things_on_slab(struct LEVEL *lvl, int tx, int ty)
 void update_door_things_on_slab(struct LEVEL *lvl, int tx, int ty)
 {
   unsigned char door_subtype;
-  unsigned char slab=get_tile_slab(lvl,tx,ty);
+  unsigned short slab=get_tile_slab(lvl,tx,ty);
   switch (slab)
   {
     case SLAB_TYPE_DOORWOOD1:
@@ -675,7 +857,7 @@ void update_door_things_on_slab(struct LEVEL *lvl, int tx, int ty)
     // and if we found one, modify its parameters
     {
       set_thing_subtype(thing,door_subtype);
-      set_thing_tilepos(thing,tx*MAP_SUBNUM_X+1,ty*MAP_SUBNUM_Y+1);
+      set_thing_subtile(thing,tx*MAP_SUBNUM_X+1,ty*MAP_SUBNUM_Y+1);
       set_door_lock(lvl, thing, get_door_lock(thing));
       set_door_orientation(thing,compute_door_orientation(lvl,thing));
     }
@@ -701,7 +883,7 @@ void update_torch_things_near_slab(struct LEVEL *lvl, int tx, int ty)
     int cur_tx,cur_ty;
     cur_tx=tx+idir_subtl_x[i]-1;
     cur_ty=ty+idir_subtl_y[i]-1;
-    unsigned char slab;
+    unsigned short slab;
     slab=get_tile_slab(lvl,cur_tx,cur_ty);
     allow_torch[i]=slab_is_short(slab);
     if (slab==SLAB_TYPE_LAVA)
@@ -736,7 +918,7 @@ void create_things_slb_room(cr_tng_func cr_floor,cr_tng_func cr_edge,
   unsigned char *surr_slb=(unsigned char *)malloc(9*sizeof(unsigned char));
   unsigned char *surr_own=(unsigned char *)malloc(9*sizeof(unsigned char));
   get_slab_surround(surr_slb,surr_own,NULL,tx,ty);
-  unsigned char slab=surr_slb[IDIR_CENTR];
+  unsigned short slab=surr_slb[IDIR_CENTR];
   unsigned char ownr=surr_own[IDIR_CENTR];
   //Checking if completely surrounded
   if ((surr_slb[IDIR_NORTH]==slab)&&(surr_own[IDIR_NORTH]==ownr) &&
@@ -821,7 +1003,7 @@ void create_things_slb_room_simple(cr_tng_func cr_any,
   unsigned char *surr_slb=(unsigned char *)malloc(9*sizeof(unsigned char));
   unsigned char *surr_own=(unsigned char *)malloc(9*sizeof(unsigned char));
   get_slab_surround(surr_slb,surr_own,NULL,tx,ty);
-  unsigned char slab=surr_slb[IDIR_CENTR];
+  unsigned short slab=surr_slb[IDIR_CENTR];
   unsigned char ownr=surr_own[IDIR_CENTR];
   //Very simple...
   cr_any(lvl,tx,ty,surr_slb,surr_own);
@@ -1211,7 +1393,7 @@ void update_things_slb_guardpost_floor(struct LEVEL *lvl, int tx, int ty,
 void update_things_slb_prison(struct LEVEL *lvl, int tx, int ty,
         unsigned char *surr_slb,unsigned char *surr_own)
 {
-  unsigned char slab=surr_slb[IDIR_CENTR];
+  unsigned short slab=surr_slb[IDIR_CENTR];
   unsigned char ownr=surr_own[IDIR_CENTR];
   unsigned char pris_bars[9];
   int i;
@@ -1340,8 +1522,8 @@ short update_thing_subpos_and_height(unsigned short *clm_height,unsigned char *t
     if (thing==NULL) return false;
     unsigned char stype_idx=get_thing_subtype(thing);
     int sx, sy, i;
-    sx=get_thing_tilepos_x(thing);
-    sy=get_thing_tilepos_y(thing);
+    sx=get_thing_subtile_x(thing);
+    sy=get_thing_subtile_y(thing);
     //Setting things parameters
     if (is_door(thing))
     {
@@ -1352,7 +1534,7 @@ short update_thing_subpos_and_height(unsigned short *clm_height,unsigned char *t
         if (subtl_h<4) { subtl_h=4; subpos_h=0; }
         if (subtl_h>7) { subtl_h=7; subpos_h=255; }
         set_thing_subtpos(thing,sub_x,sub_y);
-        set_thing_tilepos_h(thing,subtl_h);
+        set_thing_subtile_h(thing,subtl_h);
         set_thing_subtpos_h(thing,subpos_h);
     } else
     if (is_doorkey(thing))
@@ -1364,7 +1546,7 @@ short update_thing_subpos_and_height(unsigned short *clm_height,unsigned char *t
         if (subtl_h<1) { subtl_h=1; subpos_h=0; }
         if (subtl_h>7) { subtl_h=7; subpos_h=255; }
         set_thing_subtpos(thing,sub_x,sub_y);
-        set_thing_tilepos_h(thing,subtl_h);
+        set_thing_subtile_h(thing,subtl_h);
         set_thing_subtpos_h(thing,subpos_h);
     } else
     if (is_heartflame(thing))
@@ -1376,7 +1558,7 @@ short update_thing_subpos_and_height(unsigned short *clm_height,unsigned char *t
         if (subtl_h<1) { subtl_h=1; subpos_h=0; }
         if (subtl_h>7) { subtl_h=7; subpos_h=255; }
         set_thing_subtpos(thing,sub_x,sub_y);
-        set_thing_tilepos_h(thing,subtl_h);
+        set_thing_subtile_h(thing,subtl_h);
         set_thing_subtpos_h(thing,subpos_h);
     } else
     if (is_torch(thing))
@@ -1409,7 +1591,7 @@ short update_thing_subpos_and_height(unsigned short *clm_height,unsigned char *t
       if (subtl_h<2) { subtl_h=2; subpos_h=0; }
       if (subtl_h>7) { subtl_h=7; subpos_h=255; }
       set_thing_subtpos(thing,sub_x,sub_y);
-      set_thing_tilepos_h(thing,subtl_h);
+      set_thing_subtile_h(thing,subtl_h);
       set_thing_subtpos_h(thing,subpos_h);
     }
     return true;

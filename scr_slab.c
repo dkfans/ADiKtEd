@@ -84,6 +84,11 @@ void actions_mdslab(int key)
           start_mdclm(lvl);
           message_info("Column mode activated");
           break;
+        case 'r':
+          end_mdslab();
+          start_mdrwrk(lvl);
+          message_info("Rework mode activated");
+          break;
         case KEY_CTRL_SPACE:
           if (mapmode->mark)
           {

@@ -15,6 +15,12 @@ typedef void (*cr_tng_func)(struct LEVEL *lvl, int tx, int ty,
 
 short things_verify(struct LEVEL *lvl, char *err_msg);
 
+char *get_search_tngtype_name(unsigned short idx);
+is_thing_subtype get_search_tngtype_func(unsigned short idx);
+char *get_search_objtype_name(unsigned short idx);
+unsigned short get_search_objtype_count();
+unsigned char *find_next_object_on_map(struct LEVEL *lvl, int *tx, int *ty, unsigned short srch_idx);
+
 unsigned char *create_door(struct LEVEL *lvl, unsigned int sx, unsigned int sy, unsigned char stype_idx);
 unsigned char *create_roomeffect(unsigned int sx, unsigned int sy, unsigned char stype_idx);
 unsigned char *create_creature(unsigned int sx, unsigned int sy, unsigned char stype_idx);
@@ -33,7 +39,10 @@ unsigned short compute_roomeffect_sensitile(struct LEVEL *lvl, unsigned char *th
 short owned_things_count(int *count,struct LEVEL *lvl,
     unsigned char type_idx,unsigned char stype_idx);
 unsigned char *find_lit_thing_on_square_radius1(struct LEVEL *lvl, int tx, int ty);
-unsigned char *find_thing_on_tile(struct LEVEL *lvl,is_thing_subtype check_func, int tx, int ty);
+unsigned char *find_thing_on_tile(struct LEVEL *lvl, int tx, int ty, is_thing_subtype check_func);
+unsigned char *find_next_thing_on_map(struct LEVEL *lvl, int *tx, int *ty, is_thing_subtype check_func);
+unsigned char *find_next_actnpt_on_map(struct LEVEL *lvl, int *tx, int *ty);
+unsigned char *find_next_stlight_on_map(struct LEVEL *lvl, int *tx, int *ty);
 
 // Updating objects functions
 void update_obj_for_square(struct LEVEL *lvl, int tx_first, int tx_last,

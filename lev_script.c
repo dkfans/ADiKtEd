@@ -252,6 +252,7 @@ const char orient_tpew_cmdtext[]="ORIENT_TOPEW";
 
 const char font_none_cmdtext[]="FONT_NONE";
 const char font_adiclssc_cmdtext[]="FONT_ADICLSSC";
+const char font_adisize8_cmdtext[]="FONT_ADISIZE8";
 
 //Command arrays
 
@@ -270,11 +271,15 @@ const char *cmd_orient_arr[]={
         orient_tpsn_cmdtext,orient_tpew_cmdtext,                    //0x006,0x007
         };
 
+const char *cmd_font_arr[]={
+        font_none_cmdtext,font_adiclssc_cmdtext,font_adisize8_cmdtext,   //0x000,0x001,0x002
+        };
+
 const char *cmd_orient_shortnames[]={
         "NS","WE","SN","EW","TpNS","TpWE","TpSN","TpEW" };
 
 const char *cmd_font_longnames[]={
-        "none","Classic" };
+        "none","Classic","Size 8" };
 
 short script_param_to_int(int *val,char *param)
 {
@@ -372,8 +377,7 @@ short execute_adikted_command(struct LEVEL *lvl,struct DK_SCRIPT_COMMAND *cmd,ch
        int orient;
        orient=orient_cmd_index(cmd->params[3]);
        int font;
-       //TODO: make different fonts support
-       font=GRAFF_FONT_ADICLSSC;//font_cmd_index(cmd->params[4]);
+       font=font_cmd_index(cmd->params[4]);
        if (orient<0) orient=ORIENT_NS;
        if (font<0) font=GRAFF_FONT_ADICLSSC;
        int i,textlen;
@@ -519,6 +523,27 @@ const char *orient_cmd_text(int cmdidx)
     return cmd_orient_arr[cmdidx];
 }
 
+int font_cmd_index(char *cmdtext)
+{
+    if ((cmdtext==NULL)||(strlen(cmdtext)<2)) return -1;
+    int i=0;
+    int array_count=sizeof(cmd_font_arr)/sizeof(char *);
+    while (i<array_count)
+    {
+      if (strcmp(cmd_font_arr[i],cmdtext)==0)
+        return i;
+      i++;
+    }
+    return -1;
+}
+
+const char *font_cmd_text(int cmdidx)
+{
+    int array_count=sizeof(cmd_font_arr)/sizeof(char *);
+    if ((cmdidx<0)||(cmdidx>=array_count)) return "X";
+    return cmd_font_arr[cmdidx];
+}
+
 /*
  * Clears values in given DK_SCRIPT_COMMAND without deallocating memory
  */
@@ -604,7 +629,7 @@ short add_graffiti_to_script(char ***lines,int *lines_count,struct LEVEL *lvl)
       }
       graftxt[graf_len]='\0';
       sprintf(line,"%s(%d,%d,%d,%s,%s,0x%03x,%s)",graffiti_cmdtext,graf->tx,graf->ty,graf->height,
-                orient_cmd_text(graf->orient),font_adiclssc_cmdtext,graf->cube,graftxt);
+                orient_cmd_text(graf->orient),font_cmd_text(graf->font),graf->cube,graftxt);
       text_file_linecp_add(lines,lines_count,line);
     }
     free(line);

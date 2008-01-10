@@ -111,14 +111,16 @@ struct LEVEL {
     //map file name (for saving)
     char *savfname;
     //Slab file - tile type definitions, size MAP_SIZE_Y x MAP_SIZE_X
-    unsigned char **slb;
-    //Owners file - tile owner index, size MAP_SIZE_Y x MAP_SIZE_X
+    unsigned short **slb;
+    //Owners file - subtile owner index, size arr_entries_y+1 x arr_entries_x+1
     unsigned char **own;
-    //Vibration file - subtile animation indices, size arr_entries_y x arr_entries_x
+    //Vibration file - subtile animation indices, size arr_entries_y+1 x arr_entries_x+1
     unsigned char **wib;
     //WLB file - some additional info about water and lava tiles,
     // size MAP_SIZE_Y x MAP_SIZE_X, not always present
     unsigned char **wlb;
+    //Flag file - size arr_entries_y+1 x arr_entries_x+1
+    unsigned short **flg;
     //Column file - constant-size array of entries used for displaying tiles,
     // size COLUMN_ENTRIES x SIZEOF_DK_CLM_REC
     unsigned char **clm;
@@ -150,12 +152,10 @@ struct LEVEL {
 
     unsigned short **tng_apt_lgt_nums;    // Number of all objects in a tile
 
-    // Exceptionally grotty hack - we never need the actual data
-    // stored in the .dat file, only what the high and low bytes should
-    // be. So long as we remember this when we generate the "standard"
-    // dungeon things, we'll be fine
-    unsigned char **dat_low;
-    unsigned char **dat_high;
+    // DAT file contains indices of columns for each subtile
+    // Its content stores a graphic for whole map
+    // Size arr_entries_y+1 x arr_entries_x+1 (there is single rock column at end)
+    unsigned short **dat;
 
     // Elements that are not part of DK levels, but are importand for Adikted
     // Level statistics
@@ -218,13 +218,23 @@ void update_object_owners(struct LEVEL *lvl);
 
 short get_subtl_wib(struct LEVEL *lvl, unsigned int sx, unsigned int sy);
 void set_subtl_wib(struct LEVEL *lvl, unsigned int sx, unsigned int sy, short nval);
+
 short get_tile_wlb(struct LEVEL *lvl, unsigned int tx, unsigned int ty);
 void set_tile_wlb(struct LEVEL *lvl, unsigned int tx, unsigned int ty, short nval);
 
 unsigned char get_tile_owner(struct LEVEL *lvl, unsigned int tx, unsigned int ty);
 void set_tile_owner(struct LEVEL *lvl, unsigned int tx, unsigned int ty, unsigned char nval);
-unsigned char get_tile_slab(struct LEVEL *lvl, unsigned int tx, unsigned int ty);
-void set_tile_slab(struct LEVEL *lvl, unsigned int tx, unsigned int ty, unsigned char nval);
+unsigned char get_subtl_owner(struct LEVEL *lvl, unsigned int sx, unsigned int sy);
+void set_subtl_owner(struct LEVEL *lvl, unsigned int sx, unsigned int sy, unsigned char nval);
+
+unsigned short get_tile_slab(struct LEVEL *lvl, unsigned int tx, unsigned int ty);
+void set_tile_slab(struct LEVEL *lvl, unsigned int tx, unsigned int ty, unsigned short nval);
+
+unsigned int get_dat_val(struct LEVEL *lvl, unsigned int sx, unsigned int sy);
+void set_dat_val(struct LEVEL *lvl, int sx, int sy, unsigned int d);
+
+unsigned short get_subtl_flg(struct LEVEL *lvl, unsigned int sx, unsigned int sy);
+void set_subtl_flg(struct LEVEL *lvl, unsigned int sx, unsigned int sy,unsigned short nval);
 
 void update_level_stats(struct LEVEL *lvl);
 void update_things_stats(struct LEVEL *lvl);

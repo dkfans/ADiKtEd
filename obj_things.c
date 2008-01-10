@@ -11,6 +11,31 @@
 #include "obj_slabs.h"
 #include "lev_things.h"
 
+/*
+Thing data block:
+0x00 thing_subtpos_x
+0x01 thing_subtile_x
+0x02 thing_subtpos_y
+0x03 thing_subtile_y
+0x04 thing_subtpos_h
+0x05 thing_subtile_h
+0x06 thing_type
+0x07 thing_subtype
+0x08 thing_owner
+0x09 thing_range_subtpos
+0x0a thing_range_subtile
+0x0b \
+0x0c thing_sensitile
+0x0d door_orientation
+0x0e thing_level
+0x0f
+0x10
+0x11
+0x12
+0x13
+0x14
+*/
+
 const char *thing_fullnames[]={"Nothing", "Item/decoration", "unknown 2",
     "unknown 3", "unknown 4", "Creature", "unknown 6", "Room effect",
     "Trap", "Door"};
@@ -194,32 +219,32 @@ short set_thing_owner(unsigned char *thing,unsigned char ownr_idx)
     return true;
 }
 
-unsigned char get_thing_tilepos_x(unsigned char *thing)
+unsigned char get_thing_subtile_x(unsigned char *thing)
 {
     if (thing==NULL) return 0;
     return (unsigned char)thing[1];
 }
 
-short set_thing_tilepos_x(unsigned char *thing,unsigned char pos_x)
+short set_thing_subtile_x(unsigned char *thing,unsigned char pos_x)
 {
     if (thing==NULL) return 0;
     thing[1]=pos_x;
 }
 
-unsigned char get_thing_tilepos_y(unsigned char *thing)
+unsigned char get_thing_subtile_y(unsigned char *thing)
 {
     if (thing==NULL) return 0;
     return (unsigned char)thing[3];
 }
 
-short set_thing_tilepos_y(unsigned char *thing,unsigned char pos_y)
+short set_thing_subtile_y(unsigned char *thing,unsigned char pos_y)
 {
     if (thing==NULL) return false;
     thing[3]=pos_y;
     return true;
 }
 
-short set_thing_tilepos(unsigned char *thing,unsigned char pos_x,unsigned char pos_y)
+short set_thing_subtile(unsigned char *thing,unsigned char pos_x,unsigned char pos_y)
 {
     if (thing==NULL) return false;
     thing[1]=pos_x;
@@ -227,13 +252,13 @@ short set_thing_tilepos(unsigned char *thing,unsigned char pos_x,unsigned char p
     return true;
 }
 
-unsigned char get_thing_tilepos_h(unsigned char *thing)
+unsigned char get_thing_subtile_h(unsigned char *thing)
 {
     if (thing==NULL) return 0;
     return (char)thing[5];
 }
 
-short set_thing_tilepos_h(unsigned char *thing,unsigned char pos_h)
+short set_thing_subtile_h(unsigned char *thing,unsigned char pos_h)
 {
     if (thing==NULL) return false;
     thing[5]=pos_h;
@@ -284,6 +309,32 @@ short set_thing_subtpos_h(unsigned char *thing,unsigned char pos_h)
 {
     if (thing==NULL) return false;
     thing[4]=pos_h;
+    return true;
+}
+
+unsigned char get_thing_range_subtpos(unsigned char *thing)
+{
+    if (thing==NULL) return 0x80;
+    return (char)thing[9];
+}
+
+short set_thing_range_subtpos(unsigned char *thing,unsigned char rng)
+{
+    if (thing==NULL) return false;
+    thing[9]=rng;
+    return true;
+}
+
+unsigned char get_thing_range_subtile(unsigned char *thing)
+{
+    if (thing==NULL) return 0x80;
+    return (char)thing[10];
+}
+
+short set_thing_range_subtile(unsigned char *thing,unsigned char rng)
+{
+    if (thing==NULL) return false;
+    thing[10]=rng;
     return true;
 }
 
@@ -534,8 +585,8 @@ unsigned char *create_thing(unsigned int sx, unsigned int sy)
     for (i=0; i < SIZEOF_DK_TNG_REC; i++)
       thing[i]=0;
     set_thing_subtpos(thing,((sx%MAP_SUBNUM_X)*0x40+0x40),((sy%MAP_SUBNUM_Y)*0x40+0x40));
-    set_thing_tilepos(thing,(unsigned char)sx,(unsigned char)sy);
-    set_thing_tilepos_h(thing,1); // Default height is floor height
+    set_thing_subtile(thing,(unsigned char)sx,(unsigned char)sy);
+    set_thing_subtile_h(thing,1); // Default height is floor height
     // Setting the owner
     set_thing_owner(thing,PLAYER_UNSET);
     return thing;
@@ -560,12 +611,11 @@ unsigned char *create_thing_copy(unsigned int sx, unsigned int sy,unsigned char 
     unsigned char type_idx=get_thing_type(thing);
     unsigned char stype_idx=get_thing_subtype(thing);
     set_thing_subtpos(thing,((sx%MAP_SUBNUM_X)*0x40+0x40),((sy%MAP_SUBNUM_Y)*0x40+0x40));
-    set_thing_tilepos(thing,(unsigned char)sx,(unsigned char)sy);
+    set_thing_subtile(thing,(unsigned char)sx,(unsigned char)sy);
     if (type_idx==THING_TYPE_ROOMEFFECT)
       set_thing_sensitile(thing,compute_roomeffect_sensitile(lvl,thing));
-    //TODO: create function for updating item sensitile
     if (type_idx==THING_TYPE_ITEM)
-      set_thing_sensitile(thing,THING_SENSITILE_NONE);
+      set_thing_sensitile(thing,compute_item_sensitile(lvl,thing));
     return thing;
 }
 
@@ -2196,8 +2246,8 @@ short item_verify(unsigned char *thing, char *err_msg)
   int sen_tl;
   sen_tl=get_thing_sensitile(thing);
   int sx,sy;
-  sx=get_thing_tilepos_x(thing);
-  sy=get_thing_tilepos_y(thing);
+  sx=get_thing_subtile_x(thing);
+  sy=get_thing_subtile_y(thing);
   int tx,ty;
   tx=sx/MAP_SUBNUM_X;
   ty=sy/MAP_SUBNUM_Y;
@@ -2241,8 +2291,8 @@ short roomeffect_verify(unsigned char *thing, char *err_msg)
   int sen_tl;
   sen_tl=get_thing_sensitile(thing);
   int sx,sy;
-  sx=get_thing_tilepos_x(thing);
-  sy=get_thing_tilepos_y(thing);
+  sx=get_thing_subtile_x(thing);
+  sy=get_thing_subtile_y(thing);
   int tx,ty;
   tx=sx/MAP_SUBNUM_X;
   ty=sy/MAP_SUBNUM_Y;
@@ -2289,9 +2339,9 @@ short trap_verify(unsigned char *thing, char *err_msg)
 short thing_verify(unsigned char *thing, char *err_msg)
 {
   short result;
-  int pos_h=get_thing_tilepos_h(thing);
-  int pos_x=get_thing_tilepos_x(thing);
-  int pos_y=get_thing_tilepos_y(thing);
+  int pos_h=get_thing_subtile_h(thing);
+  int pos_x=get_thing_subtile_x(thing);
+  int pos_y=get_thing_subtile_y(thing);
   if ((pos_h>=MAP_SUBNUM_H)||(pos_x>=MAP_SUBTOTAL_X)||(pos_y>=MAP_SUBTOTAL_Y))
   {
     sprintf(err_msg,"Thing position (%d,%d,%d) invalid",pos_x,pos_y,pos_h);

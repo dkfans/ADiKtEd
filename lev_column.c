@@ -132,10 +132,19 @@ void update_datclm_for_whole_map(struct LEVEL *lvl)
     for (k=0;k<MAP_SIZE_Y;k++)
       for (i=0;i<MAP_SIZE_X;i++)
           update_datclm_for_slab(lvl, i, k);
+    //Setting the 'last column' entries
+    update_dat_last_column(lvl,SLAB_TYPE_ROCK);
     // updating WIB (animation) entries
     for (k=0;k<MAP_SIZE_Y;k++)
       for (i=0;i<MAP_SIZE_X;i++)
           update_tile_wib_entries(lvl,i,k);
+    // updating WLB and FLG entries
+    for (k=0;k<MAP_SIZE_Y;k++)
+      for (i=0;i<MAP_SIZE_X;i++)
+      {
+          update_tile_wlb_entry(lvl,i,k);
+          update_tile_flg_entries(lvl,i,k);
+      }
     update_clm_utilize_counters(lvl);
 }
 
@@ -159,6 +168,16 @@ void update_datclm_for_square_radius1(struct LEVEL *lvl, int tx, int ty)
         if ((i>=0) && (k>=0) && (i<MAP_SIZE_X) && (k<MAP_SIZE_Y))
           update_tile_wib_entries(lvl,i,k);
       }
+    // updating WLB and FLG entries
+    for (k=ty-2;k<=ty+2;k++)
+      for (i=tx-2;i<=tx+2;i++)
+      {
+        if ((i>=0) && (k>=0) && (i<MAP_SIZE_X) && (k<MAP_SIZE_Y))
+        {
+          update_tile_wlb_entry(lvl,i,k);
+          update_tile_flg_entries(lvl,i,k);
+        }
+      }
 }
 
 /*
@@ -180,6 +199,16 @@ void update_datclm_for_square(struct LEVEL *lvl, int tx_first, int tx_last,
       {
         if ((i>=0) && (k>=0) && (i<MAP_SIZE_X) && (k<MAP_SIZE_Y))
           update_tile_wib_entries(lvl,i,k);
+      }
+    // updating WLB and FLG entries
+    for (k=ty_first-1;k<=ty_last+1;k++)
+      for (i=tx_first-1;i<=tx_last+1;i++)
+      {
+        if ((i>=0) && (k>=0) && (i<MAP_SIZE_X) && (k<MAP_SIZE_Y))
+        {
+          update_tile_wlb_entry(lvl,i,k);
+          update_tile_flg_entries(lvl,i,k);
+        }
       }
 }
 
@@ -297,6 +326,14 @@ void get_slab_surround(unsigned char *surr_slb,unsigned char *surr_own,
  */
 void set_new_datclm_values(struct LEVEL *lvl, int tx, int ty, struct COLUMN_REC *clm_recs[9])
 {
+  int i;
+  for (i=0;i<9;i++)
+  {
+      int sx=tx*MAP_SUBNUM_X+idir_subtl_x[i];
+      int sy=ty*MAP_SUBNUM_Y+idir_subtl_y[i];
+      set_new_datclm_entry(lvl,sx,sy,clm_recs[i]);
+  }
+/*
   int i,k;
   //Updating previously used columns
   for (k=0;k<MAP_SUBNUM_Y;k++)
@@ -321,6 +358,26 @@ void set_new_datclm_values(struct LEVEL *lvl, int tx, int ty, struct COLUMN_REC 
   set_dat(lvl,tx,ty, dat_entries[IDIR_NW],   dat_entries[IDIR_NORTH], dat_entries[IDIR_NE],
                      dat_entries[IDIR_WEST], dat_entries[IDIR_CENTR], dat_entries[IDIR_EAST],
                      dat_entries[IDIR_SW],   dat_entries[IDIR_SOUTH], dat_entries[IDIR_SE]);
+*/
+}
+
+/*
+ * Retrieves index for given column (possibly adds new column to LEVEL structure)
+ * then uses it to update the (sx,sy) subtile. Properly updates USE/UTILIZE information
+ * for both old and new columns.
+ */
+void set_new_datclm_entry(struct LEVEL *lvl, int sx, int sy, struct COLUMN_REC *clm_rec)
+{
+  unsigned int clmidx;
+  clmidx=get_dat_subtile(lvl, sx, sy);
+  clm_utilize_dec(lvl,clmidx);
+  // Saving column, retrieving DAT index
+  //and updating 'utilize' counter
+  int dat_entry;
+  dat_entry=column_find_or_create(lvl,clm_rec);
+  clm_utilize_inc(lvl,dat_entry);
+  // Saving DAT index
+  set_dat_subtile(lvl,sx,sy,dat_entry);
 }
 
 /*
@@ -390,12 +447,12 @@ void update_clm_utilize_counters(struct LEVEL *lvl)
       lvl->clm_utilize[clmidx]=0;
   }
   //Preparing array bounds
-  int arr_entries_x=MAP_SIZE_X*MAP_SUBNUM_X;
-  int arr_entries_y=MAP_SIZE_Y*MAP_SUBNUM_Y;
+  int dat_entries_x=MAP_SIZE_X*MAP_SUBNUM_X+1;
+  int dat_entries_y=MAP_SIZE_Y*MAP_SUBNUM_Y+1;
   //Now count "utilize" of all columns
   int cx,cy;
-  for (cy=0; cy < arr_entries_y; cy++)
-    for (cx=0; cx < arr_entries_x; cx++)
+  for (cy=0; cy < dat_entries_y; cy++)
+    for (cx=0; cx < dat_entries_x; cx++)
     {
       clmidx=get_dat_subtile(lvl, cx, cy);
       if ((clmidx>=0)&&(clmidx<COLUMN_ENTRIES))
@@ -441,6 +498,104 @@ void update_tile_wib_entries(struct LEVEL *lvl, int tx, int ty)
   free_column_rec(clm_rec_nw);
 }
 
+/*
+ * Updates WLB entry for given tile
+ */
+void update_tile_wlb_entry(struct LEVEL *lvl, int tx, int ty)
+{
+  unsigned short wlb_val;
+  unsigned short slab;
+  slab=get_tile_slab(lvl,tx,ty);
+  if (slab==SLAB_TYPE_LAVA)
+    wlb_val=TILE_WLB_LAVA;
+  else
+  if (slab==SLAB_TYPE_WATER)
+    wlb_val=TILE_WLB_WATER;
+  else
+    wlb_val=TILE_WLB_SOLID;
+  set_tile_wlb(lvl,tx,ty,wlb_val);
+}
+
+/*
+ * Updates FLG entries for all subtiles of given tile
+ */
+void update_tile_flg_entries(struct LEVEL *lvl, int tx, int ty)
+{
+  unsigned short slab;
+  slab=get_tile_slab(lvl,tx,ty);
+  unsigned char owner;
+  owner=get_tile_owner(lvl,tx,ty);
+  int i,k;
+  for (k=0;k<MAP_SUBNUM_Y;k++)
+    for (i=0;i<MAP_SUBNUM_X;i++)
+    {
+      int sx=tx*MAP_SUBNUM_X+i;
+      int sy=ty*MAP_SUBNUM_Y+k;
+      //Checking if we're on slab type corner
+      short corner=true;
+      int crnr_x;
+      int crnr_y;
+      // the corners is FLG are strange - marked from inside, not outside
+      if ((k==0)&&(i==0))
+      {
+        crnr_x=1;crnr_y=1;
+      } else
+      if ((k==2)&&(i==0))
+      {
+        crnr_x=1;crnr_y=-1;
+      } else
+      if ((k==0)&&(i==2))
+      {
+        crnr_x=-1;crnr_y=1;
+      } else
+      if ((k==2)&&(i==2))
+      {
+        crnr_x=-1;crnr_y=-1;
+      } else
+      { //If no corner - set the value to compare with the same tile
+        crnr_x=0;crnr_y=0;
+      }
+      if (((slab==get_tile_slab(lvl,tx+crnr_x,ty))&&(owner==get_tile_owner(lvl,tx+crnr_x,ty))) ||
+          ((slab==get_tile_slab(lvl,tx,ty+crnr_y))&&(owner==get_tile_owner(lvl,tx,ty+crnr_y))))
+        corner=false;
+      unsigned short flg_val;
+      flg_val=compute_flg_for_tile(slab,corner);
+      set_subtl_flg(lvl,sx,sy,flg_val);
+    }
+}
+
+unsigned short compute_flg_for_tile(unsigned short slab,short corner)
+{
+  if (slab_is_wall(slab))
+    return 0x0c0;
+  if (slab_is_room(slab))
+  {
+    if (corner)
+      return 0x054;
+    else
+      return 0x016;
+  }
+  if (slab_is_door(slab))
+  {
+    if (corner)
+      return 0x002;
+    else
+      return 0x140;
+  }
+  if (slab_is_short(slab))
+    return 0x002;
+  if (slab_is_wealth(slab))
+    return 0x041;
+  switch (slab)
+  {
+  case SLAB_TYPE_EARTH:
+  case SLAB_TYPE_TORCHDIRT:
+    return 0x060;
+  default:
+    return 0x0d0;
+  }
+}
+ 
 /*
  * Returns a column entry from column on given subtile;
  * On error returns NULL
@@ -492,7 +647,6 @@ unsigned short get_subtile_column_solid(struct LEVEL *lvl, int sx, int sy)
   return get_clm_entry_solid(clmentry);
 }
 
-
 /*
  * Sets a DAT value for one subtile. (cx,cy) is a subtile position to fill,
  * d is a column index that we want put on this subtile.
@@ -500,14 +654,9 @@ unsigned short get_subtile_column_solid(struct LEVEL *lvl, int sx, int sy)
  */
 void set_dat_subtile(struct LEVEL *lvl, int sx, int sy, int d)
 {
-    //Preparing array bounds
-    int arr_entries_x=MAP_SIZE_X*MAP_SUBNUM_X;
-    int arr_entries_y=MAP_SIZE_Y*MAP_SUBNUM_Y;
-    if ((sx<0)||(sy<0)||(sx>=arr_entries_x)||(sy>=arr_entries_y)) return;
     unsigned int val;
     val = 0x10000-d;
-    lvl->dat_high[sx][sy]=(val>>8)&255;
-    lvl->dat_low[sx][sy]=val&255;
+    set_dat_val(lvl,sx,sy,val);
 }
 
 /*
@@ -516,16 +665,10 @@ void set_dat_subtile(struct LEVEL *lvl, int sx, int sy, int d)
  */
 unsigned int get_dat_subtile(struct LEVEL *lvl, unsigned int sx, unsigned int sy)
 {          
-    //Preparing array bounds
-    int arr_entries_x=MAP_SIZE_X*MAP_SUBNUM_X;
-    int arr_entries_y=MAP_SIZE_Y*MAP_SUBNUM_Y;
-    if ((lvl->dat_high==NULL)||(lvl->dat_low==NULL)) return 0;
-    if ((sx>=arr_entries_x)||(sy>=arr_entries_y)) return 0;
-    unsigned char high=lvl->dat_high[sx][sy];
-    unsigned char low=lvl->dat_low[sx][sy];
-    unsigned int subtl;
-    subtl=0x10000-((high<<8)+low);
-    return subtl&0x0ffff;
+    unsigned int val;
+    val=0x10000-get_dat_val(lvl,sx,sy);
+    //The AND will make sure that value "0" from get_dat_val returns as 0.
+    return val&0x0ffff;
 }
 
 /*
@@ -563,12 +706,12 @@ void set_dat_unif (struct LEVEL *lvl, int x, int y, int d)
 short dat_verify(struct LEVEL *lvl, char *err_msg)
 {
     //Preparing array bounds
-    int arr_entries_x=MAP_SIZE_X*MAP_SUBNUM_X;
-    int arr_entries_y=MAP_SIZE_Y*MAP_SUBNUM_Y;
+    int dat_entries_x=MAP_SIZE_X*MAP_SUBNUM_X+1;
+    int dat_entries_y=MAP_SIZE_Y*MAP_SUBNUM_Y+1;
     //Sweeping through DAT entries
     int i, k;
-    for (k=0; k<arr_entries_y; k++)
-      for (i=0; i<arr_entries_x; i++)
+    for (k=0; k<dat_entries_y; k++)
+      for (i=0; i<dat_entries_x; i++)
       {
           int dat_idx=get_dat_subtile(lvl, i, k);
           if ((dat_idx<0)||(dat_idx>=COLUMN_ENTRIES))
@@ -590,6 +733,39 @@ short clm_entry_is_used(unsigned int clmidx)
     if (clmentry==NULL) return false;
     unsigned int permanent=get_clm_entry_permanent(clmentry);
     return (lvl->clm_utilize[clmidx]>0)||(permanent);
+}
+
+short update_dat_last_column(struct LEVEL *lvl, unsigned short slab)
+{
+  //Preparing array bounds
+  int dat_entries_x=MAP_SIZE_X*MAP_SUBNUM_X+1;
+  int dat_entries_y=MAP_SIZE_Y*MAP_SUBNUM_Y+1;
+  //Retrieving parameters from LEVEL structure - the slab and its surrounding
+  unsigned char *surr_slb=(unsigned char *)malloc(9*sizeof(unsigned char));
+  unsigned char *surr_own=(unsigned char *)malloc(9*sizeof(unsigned char));
+  unsigned char **surr_tng=(unsigned char **)malloc(9*sizeof(unsigned char *));
+  get_slab_surround(surr_slb,surr_own,surr_tng,MAP_SIZE_X,MAP_SIZE_Y);
+  surr_slb[IDIR_CENTR]=slab;
+  int i;
+  // Creating CoLuMn for each subtile
+  struct COLUMN_REC *clm_recs[9];
+  for (i=0;i<9;i++)
+    clm_recs[i]=create_column_rec();
+  create_columns_for_slab(clm_recs,surr_slb,surr_own,surr_tng);
+  //Use the columns to set DAT/CLM entries in LEVEL
+  int sx, sy;
+  sx=dat_entries_x-1;
+  for (sy=0; sy<dat_entries_y; sy++)
+      set_new_datclm_entry(lvl,sx,sy,clm_recs[(sy%MAP_SUBNUM_Y)*MAP_SUBNUM_X]);
+  sy=dat_entries_y-1;
+  for (sx=0; sx<dat_entries_x; sx++)
+      set_new_datclm_entry(lvl,sx,sy,clm_recs[sx%MAP_SUBNUM_X]);
+  // Flushing dynamic data
+  for (i=0;i<9;i++)
+    free_column_rec(clm_recs[i]);
+  free(surr_slb);
+  free(surr_own);
+  free(surr_tng);
 }
 
 /*
@@ -744,6 +920,8 @@ int cust_col_add_or_update(struct LEVEL *lvl,struct DK_CUSTOM_CLM **ccol)
         idx=cust_col_add_obj(lvl,*ccol);
         update_datclm_for_slab(lvl,sx/3,sy/3);
         update_tile_wib_entries(lvl,sx/3,sy/3);
+        update_tile_wlb_entry(lvl,sx/3,sy/3);
+        update_tile_flg_entries(lvl,sx/3,sy/3);
         return idx;
     }
     //If we have - update it

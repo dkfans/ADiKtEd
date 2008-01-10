@@ -34,7 +34,7 @@ static void (*custom_columns_gen [])(struct COLUMN_REC *clm_recs[9],
      create_columns_slb_dooriron,create_columns_slb_doormagic,
      create_columns_slb_bridge,create_columns_slb_gems,            //20
      create_columns_slb_guardpost,
-     create_columns_slb_thingems_path,
+     create_columns_slb_thingems_path,create_columns_slb_rock_gndlev,
      };
 
 const char *custom_columns_fullnames[]={
@@ -57,7 +57,7 @@ const char *custom_columns_fullnames[]={
      SLB_DOORIRON_LTEXT,SLB_DOORMAGIC_LTEXT,
      SLB_BRIDGE_LTEXT,"Standard Gems",            //20
      SLB_GUARDPOST_LTEXT,
-     "Thin gems on path",
+     "Thin gems on path","Ground level rock",
      };
 
 //const unsigned short wib_columns_static[]={
@@ -521,7 +521,7 @@ short fill_custom_column_data(unsigned short idx,struct COLUMN_REC *clm_recs[9],
 void create_columns_for_slab(struct COLUMN_REC *clm_recs[9],
         unsigned char *surr_slb,unsigned char *surr_own, unsigned char **surr_tng)
 {
-  unsigned char slab=surr_slb[IDIR_CENTR];
+  unsigned short slab=surr_slb[IDIR_CENTR];
   switch (slab)
   {
     case SLAB_TYPE_ROCK:
@@ -787,7 +787,7 @@ void create_columns_slb_torchdirt(struct COLUMN_REC *clm_recs[9],
     if ((thing!=NULL)&&(is_torch(thing)))
     {
         //Add the torch plate at same height where the torch thing is
-        unsigned short height=get_thing_tilepos_h(thing);
+        unsigned short height=get_thing_subtile_h(thing);
         if (get_thing_subtpos_h(thing)>127) height++;
         clm_recs[dir_a[i]]->c[height%8]=0x018;
         has_torches=true;
@@ -911,6 +911,134 @@ void create_columns_slb_wallbrick(struct COLUMN_REC *clm_recs[9], short *allow_r
 }
 
 /*
+ * If some of the walls are next to room, fills the columns with room relief.
+ * Modifies allow_relief setting the modified columns to false.
+ */
+void fill_columns_slb_roomrelief(struct COLUMN_REC *clm_recs[9], short *allow_relief,
+        unsigned char *surr_slb,unsigned char *surr_own, unsigned char **surr_tng)
+{
+  const unsigned short dir_a[]={IDIR_NW,   IDIR_NW,   IDIR_NE,   IDIR_SW};
+  const unsigned short dir_b[]={IDIR_WEST, IDIR_NORTH,IDIR_EAST, IDIR_SOUTH};
+  const unsigned short dir_c[]={IDIR_SW,   IDIR_NE,   IDIR_SE,   IDIR_SE};
+  int i;
+  for (i=0;i<4;i++)
+  {
+    unsigned short slab=surr_slb[dir_b[i]];
+    if ((allow_relief[dir_b[i]])&&(slab_is_room(slab)))
+    {
+      //TODO: set edge and corner properly
+      short corner=false;
+      short edge=false;
+      if (fill_side_columns_room_relief(clm_recs[dir_a[i]],clm_recs[dir_b[i]],
+          clm_recs[dir_c[i]],slab,surr_own[IDIR_CENTR],corner,edge))
+        allow_relief[dir_b[i]]=false;
+    }
+  }
+}
+
+/*
+ * Fills columns with relief specific for given room. Returns false if given room
+ * has no its own wall, or given slab is not room. 'corner' indicates
+ * that a room corner columns should be used. 'edge' means that the wall
+ * ends after or before these columns.
+ */
+short fill_side_columns_room_relief(struct COLUMN_REC *clm_reca,struct COLUMN_REC *clm_recb,
+    struct COLUMN_REC *clm_recc,unsigned short room_slab,unsigned char owner, short corner, short edge)
+{
+  //Note: we're using fill_column_wall_drapebrick to save CLM space.
+  //TODO: make corner and edge support
+  switch (room_slab)
+  {
+  case SLAB_TYPE_PORTAL:
+    place_column_wall_portal_a(clm_reca,owner);
+    place_column_wall_portal_b(clm_recb,owner);
+    place_column_wall_portal_a(clm_recc,owner);
+    return true;
+  case SLAB_TYPE_TREASURE:
+    fill_column_wall_drapebrick_a(clm_reca,owner);
+    place_column_wall_treasure_a(clm_reca,owner);
+    fill_column_wall_drapebrick_b(clm_recb,owner);
+    place_column_wall_treasure_b(clm_recb,owner);
+    fill_column_wall_drapebrick_c(clm_recc,owner);
+    place_column_wall_treasure_c(clm_recc,owner);
+    return true;
+  case SLAB_TYPE_LIBRARY:
+    fill_column_wall_drapebrick_a(clm_reca,owner);
+    place_column_wall_library_a(clm_reca,owner);
+    fill_column_wall_drapebrick_b(clm_recb,owner);
+    place_column_wall_library_b(clm_recb,owner);
+    fill_column_wall_drapebrick_c(clm_recc,owner);
+    place_column_wall_library_c(clm_recc,owner);
+    return true;
+  case SLAB_TYPE_PRISONCASE:
+    place_column_wall_prison_a(clm_reca,owner);
+    place_column_wall_prison_b(clm_recb,owner);
+    place_column_wall_prison_c(clm_recc,owner);
+    return true;
+  case SLAB_TYPE_TORTURE:
+    place_column_wall_torture_a(clm_reca,owner);
+    place_column_wall_torture_b(clm_recb,owner);
+    place_column_wall_torture_c(clm_recc,owner);
+    return true;
+  case SLAB_TYPE_TRAINING:
+    fill_column_wall_drapebrick_a(clm_reca,owner);
+    place_column_wall_training_a(clm_reca,owner);
+    fill_column_wall_drapebrick_b(clm_recb,owner);
+    place_column_wall_training_b(clm_recb,owner);
+    fill_column_wall_drapebrick_c(clm_recc,owner);
+    place_column_wall_training_c(clm_recc,owner);
+    return true;
+  case SLAB_TYPE_WORKSHOP:
+    place_column_wall_workshop_a(clm_reca,owner);
+    place_column_wall_workshop_b(clm_recb,owner);
+    place_column_wall_workshop_c(clm_recc,owner);
+    return true;
+  case SLAB_TYPE_SCAVENGER:
+    fill_column_wall_drapebrick_a(clm_reca,owner);
+    place_column_wall_scavenger_a(clm_reca,owner);
+    fill_column_wall_drapebrick_b(clm_recb,owner);
+    place_column_wall_scavenger_b(clm_recb,owner);
+    fill_column_wall_drapebrick_c(clm_recc,owner);
+    place_column_wall_scavenger_c(clm_recc,owner);
+    return true;
+  case SLAB_TYPE_TEMPLE:
+    place_column_wall_temple_a(clm_reca,owner);
+    place_column_wall_temple_b(clm_recb,owner);
+    place_column_wall_temple_c(clm_recc,owner);
+    return true;
+  case SLAB_TYPE_GRAVEYARD:
+    fill_column_wall_drapebrick_a(clm_reca,owner);
+    place_column_wall_graveyard_a(clm_reca,owner);
+    fill_column_wall_drapebrick_b(clm_recb,owner);
+    place_column_wall_graveyard_b(clm_recb,owner);
+    fill_column_wall_drapebrick_c(clm_recc,owner);
+    place_column_wall_graveyard_c(clm_recc,owner);
+    return true;
+  case SLAB_TYPE_HATCHERY:
+    fill_column_wall_drapebrick_a(clm_reca,owner);
+    place_column_wall_hatchery_a(clm_reca,owner);
+    fill_column_wall_drapebrick_b(clm_recb,owner);
+    place_column_wall_hatchery_b(clm_recb,owner);
+    fill_column_wall_drapebrick_c(clm_recc,owner);
+    place_column_wall_hatchery_c(clm_recc,owner);
+    return true;
+  case SLAB_TYPE_LAIR:
+    place_column_wall_lair_b(clm_recb,owner);
+    return true;
+  case SLAB_TYPE_BARRACKS:
+    place_column_wall_barracks_a(clm_reca,owner);
+    place_column_wall_barracks_b(clm_recb,owner);
+    place_column_wall_barracks_c(clm_recc,owner);
+    return true;
+  case SLAB_TYPE_DUNGHEART:
+  case SLAB_TYPE_BRIDGE:
+  case SLAB_TYPE_GUARDPOST:
+  default:
+    return false;
+  }
+}
+
+/*
  * Creates wall with small drape at top
  */
 void create_columns_slb_walldrape(struct COLUMN_REC *clm_recs[9],
@@ -920,30 +1048,20 @@ void create_columns_slb_walldrape(struct COLUMN_REC *clm_recs[9],
   //only four of its values will be used
   short allow_relief[9];
   create_columns_slb_wallbrick(clm_recs,allow_relief,surr_slb,surr_own,surr_tng);
+  fill_columns_slb_roomrelief(clm_recs,allow_relief,surr_slb,surr_own,surr_tng);
   //If there's enought place for drape - draw it
-  if (allow_relief[IDIR_NORTH])
+  const unsigned short dir_a[]={IDIR_NW,   IDIR_NW,   IDIR_NE,   IDIR_SW};
+  const unsigned short dir_b[]={IDIR_WEST, IDIR_NORTH,IDIR_EAST, IDIR_SOUTH};
+  const unsigned short dir_c[]={IDIR_SW,   IDIR_NE,   IDIR_SE,   IDIR_SE};
+  int i;
+  for (i=0;i<4;i++)
   {
-    fill_column_wall_drapebrick_a(clm_recs[IDIR_NW],    surr_own[IDIR_CENTR]);
-    fill_column_wall_drapebrick_b(clm_recs[IDIR_NORTH], surr_own[IDIR_CENTR]);
-    fill_column_wall_drapebrick_c(clm_recs[IDIR_NE],    surr_own[IDIR_CENTR]);
-  }
-  if (allow_relief[IDIR_SOUTH])
-  {
-    fill_column_wall_drapebrick_a(clm_recs[IDIR_SW],    surr_own[IDIR_CENTR]);
-    fill_column_wall_drapebrick_b(clm_recs[IDIR_SOUTH], surr_own[IDIR_CENTR]);
-    fill_column_wall_drapebrick_c(clm_recs[IDIR_SE],    surr_own[IDIR_CENTR]);
-  }
-  if (allow_relief[IDIR_EAST])
-  {
-    fill_column_wall_drapebrick_a(clm_recs[IDIR_NE],    surr_own[IDIR_CENTR]);
-    fill_column_wall_drapebrick_b(clm_recs[IDIR_EAST],  surr_own[IDIR_CENTR]);
-    fill_column_wall_drapebrick_c(clm_recs[IDIR_SE],    surr_own[IDIR_CENTR]);
-  }
-  if (allow_relief[IDIR_WEST])
-  {
-    fill_column_wall_drapebrick_a(clm_recs[IDIR_NW],    surr_own[IDIR_CENTR]);
-    fill_column_wall_drapebrick_b(clm_recs[IDIR_WEST],  surr_own[IDIR_CENTR]);
-    fill_column_wall_drapebrick_c(clm_recs[IDIR_SW],    surr_own[IDIR_CENTR]);
+    if (allow_relief[dir_b[i]])
+    {
+      fill_column_wall_drapebrick_a(clm_recs[dir_a[i]], surr_own[IDIR_CENTR]);
+      fill_column_wall_drapebrick_b(clm_recs[dir_b[i]], surr_own[IDIR_CENTR]);
+      fill_column_wall_drapebrick_c(clm_recs[dir_c[i]], surr_own[IDIR_CENTR]);
+    }
   }
 }
 
@@ -965,12 +1083,13 @@ void create_columns_slb_walltorch(struct COLUMN_REC *clm_recs[9],
     if ((thing!=NULL)&&(is_torch(thing)))
     {
         //Add the torch plate at same height where the torch thing is
-        unsigned short height=get_thing_tilepos_h(thing);
+        unsigned short height=get_thing_subtile_h(thing);
         if (get_thing_subtpos_h(thing)>127) height++;
         clm_recs[dir_a[i]]->c[height%8]=0x077;
+        allow_relief[dir_a[i]]=false;
     }
   }
-
+  fill_columns_slb_roomrelief(clm_recs,allow_relief,surr_slb,surr_own,surr_tng);
 }
 
 void create_columns_slb_wallwtwins(struct COLUMN_REC *clm_recs[9],
@@ -980,6 +1099,7 @@ void create_columns_slb_wallwtwins(struct COLUMN_REC *clm_recs[9],
   //only four of its values will be used
   short allow_relief[9];
   create_columns_slb_wallbrick(clm_recs,allow_relief,surr_slb,surr_own,surr_tng);
+  fill_columns_slb_roomrelief(clm_recs,allow_relief,surr_slb,surr_own,surr_tng);
   //If there's enought place for drape - draw it
   if (allow_relief[IDIR_NORTH])
   {
@@ -1013,6 +1133,7 @@ void create_columns_slb_wallwwoman(struct COLUMN_REC *clm_recs[9],
   //only four of its values will be used
   short allow_relief[9];
   create_columns_slb_wallbrick(clm_recs,allow_relief,surr_slb,surr_own,surr_tng);
+  fill_columns_slb_roomrelief(clm_recs,allow_relief,surr_slb,surr_own,surr_tng);
   //If there's enought place for drape - draw it
   if (allow_relief[IDIR_NORTH])
   {
@@ -1047,6 +1168,7 @@ void create_columns_slb_wallpairshr(struct COLUMN_REC *clm_recs[9],
   //only four of its values will be used
   short allow_relief[9];
   create_columns_slb_wallbrick(clm_recs,allow_relief,surr_slb,surr_own,surr_tng);
+  fill_columns_slb_roomrelief(clm_recs,allow_relief,surr_slb,surr_own,surr_tng);
   //If there's enought place for drape - draw it
   if (allow_relief[IDIR_NORTH])
   {
@@ -1403,7 +1525,8 @@ void create_columns_slb_doorwood(struct COLUMN_REC *clm_recs[9],
 
 void place_column_doorwood_a(struct COLUMN_REC *clm_rec, unsigned char owner)
 {
-  unsigned int pos=1;
+  int pos=1;
+  if (pos<0) pos=0;
   if (pos>4) pos=4;
   clm_rec->c[pos+0]=0x169;
   clm_rec->c[pos+1]=0x166;
@@ -1423,7 +1546,8 @@ void place_column_doorwood_a(struct COLUMN_REC *clm_rec, unsigned char owner)
 
 void place_column_doorwood_b(struct COLUMN_REC *clm_rec, unsigned char owner)
 {
-  unsigned int pos=1;
+  int pos=1;
+  if (pos<0) pos=0;
   if (pos>4) pos=4;
   clm_rec->c[pos+0]=0x169;
   clm_rec->c[pos+1]=0x166;
@@ -1443,7 +1567,8 @@ void place_column_doorwood_b(struct COLUMN_REC *clm_rec, unsigned char owner)
 
 void place_column_doorwood_c(struct COLUMN_REC *clm_rec, unsigned char owner)
 {
-  unsigned int pos=1;
+  int pos=1;
+  if (pos<0) pos=0;
   if (pos>4) pos=4;
   clm_rec->c[pos+0]=0x16b;
   clm_rec->c[pos+1]=0x168;
@@ -1483,7 +1608,8 @@ void create_columns_slb_doorbrace(struct COLUMN_REC *clm_recs[9],
 
 void place_column_doorbrace_a(struct COLUMN_REC *clm_rec, unsigned char owner)
 {
-  unsigned int pos=1;
+  int pos=1;
+  if (pos<0) pos=0;
   if (pos>4) pos=4;
   clm_rec->c[pos+0]=0x172;
   clm_rec->c[pos+1]=0x16f;
@@ -1503,7 +1629,8 @@ void place_column_doorbrace_a(struct COLUMN_REC *clm_rec, unsigned char owner)
 
 void place_column_doorbrace_b(struct COLUMN_REC *clm_rec, unsigned char owner)
 {
-  unsigned int pos=1;
+  int pos=1;
+  if (pos<0) pos=0;
   if (pos>4) pos=4;
   clm_rec->c[pos+0]=0x173;
   clm_rec->c[pos+1]=0x170;
@@ -1523,7 +1650,8 @@ void place_column_doorbrace_b(struct COLUMN_REC *clm_rec, unsigned char owner)
 
 void place_column_doorbrace_c(struct COLUMN_REC *clm_rec, unsigned char owner)
 {
-  unsigned int pos=1;
+  int pos=1;
+  if (pos<0) pos=0;
   if (pos>4) pos=4;
   clm_rec->c[pos+0]=0x174;
   clm_rec->c[pos+1]=0x171;
@@ -1563,7 +1691,8 @@ void create_columns_slb_dooriron(struct COLUMN_REC *clm_recs[9],
 
 void place_column_dooriron_a(struct COLUMN_REC *clm_rec, unsigned char owner)
 {
-  unsigned int pos=1;
+  int pos=1;
+  if (pos<0) pos=0;
   if (pos>4) pos=4;
   clm_rec->c[pos+0]=0x17b;
   clm_rec->c[pos+1]=0x178;
@@ -1583,7 +1712,8 @@ void place_column_dooriron_a(struct COLUMN_REC *clm_rec, unsigned char owner)
 
 void place_column_dooriron_b(struct COLUMN_REC *clm_rec, unsigned char owner)
 {
-  unsigned int pos=1;
+  int pos=1;
+  if (pos<0) pos=0;
   if (pos>4) pos=4;
   clm_rec->c[pos+0]=0x17c;
   clm_rec->c[pos+1]=0x179;
@@ -1603,7 +1733,8 @@ void place_column_dooriron_b(struct COLUMN_REC *clm_rec, unsigned char owner)
 
 void place_column_dooriron_c(struct COLUMN_REC *clm_rec, unsigned char owner)
 {
-  unsigned int pos=1;
+  int pos=1;
+  if (pos<0) pos=0;
   if (pos>4) pos=4;
   clm_rec->c[pos+0]=0x17d;
   clm_rec->c[pos+1]=0x17a;
@@ -1643,7 +1774,8 @@ void create_columns_slb_doormagic(struct COLUMN_REC *clm_recs[9],
 
 void place_column_doormagic_a(struct COLUMN_REC *clm_rec, unsigned char owner)
 {
-  unsigned int pos=1;
+  int pos=1;
+  if (pos<0) pos=0;
   if (pos>4) pos=4;
   clm_rec->c[pos+0]=0x12e;
   clm_rec->c[pos+1]=0x12b;
@@ -1663,7 +1795,8 @@ void place_column_doormagic_a(struct COLUMN_REC *clm_rec, unsigned char owner)
 
 void place_column_doormagic_b(struct COLUMN_REC *clm_rec, unsigned char owner)
 {
-  unsigned int pos=1;
+  int pos=1;
+  if (pos<0) pos=0;
   if (pos>4) pos=4;
   clm_rec->c[pos+0]=0x12d;
   clm_rec->c[pos+1]=0x12a;
@@ -1683,7 +1816,8 @@ void place_column_doormagic_b(struct COLUMN_REC *clm_rec, unsigned char owner)
 
 void place_column_doormagic_c(struct COLUMN_REC *clm_rec, unsigned char owner)
 {
-  unsigned int pos=1;
+  int pos=1;
+  if (pos<0) pos=0;
   if (pos>4) pos=4;
   clm_rec->c[pos+0]=0x12c;
   clm_rec->c[pos+1]=0x129;
@@ -1810,7 +1944,7 @@ short modify_liquid_surrounding_advncd(struct COLUMN_REC *clm_recs[9],
   const unsigned short dir_a[]={IDIR_WEST, IDIR_NORTH, IDIR_EAST, IDIR_SOUTH};
   const unsigned short dir_b[]={IDIR_NORTH, IDIR_EAST, IDIR_SOUTH, IDIR_WEST};
   const unsigned short dir_c[]={IDIR_NW, IDIR_NE, IDIR_SE, IDIR_SW};
-  unsigned char slab=surr_slb[IDIR_CENTR];
+  unsigned short slab=surr_slb[IDIR_CENTR];
   unsigned char ownr=surr_own[IDIR_CENTR];
   //initial tests
   if ((liq_level<0)||(liq_level>7)) return false;
@@ -1866,7 +2000,7 @@ short modify_liquid_surrounding_advncd(struct COLUMN_REC *clm_recs[9],
  */
 unsigned short *get_room_corner_direction_indices(unsigned char *surr_slb,unsigned char *surr_own)
 {
-    unsigned char slab=surr_slb[IDIR_CENTR];
+    unsigned short slab=surr_slb[IDIR_CENTR];
     unsigned char ownr=surr_own[IDIR_CENTR];
     if (((surr_slb[IDIR_EAST]==slab)&&(surr_own[IDIR_EAST]==ownr) &&
        (surr_slb[IDIR_SE]==slab)&&(surr_own[IDIR_SE]==ownr) &&
@@ -1905,7 +2039,7 @@ unsigned short *get_room_corner_direction_indices(unsigned char *surr_slb,unsign
  */
 unsigned short *get_room_edge_direction_indices(unsigned char *surr_slb,unsigned char *surr_own)
 {
-    unsigned char slab=surr_slb[IDIR_CENTR];
+    unsigned short slab=surr_slb[IDIR_CENTR];
     unsigned char ownr=surr_own[IDIR_CENTR];
 
   if (((surr_slb[IDIR_NORTH]==slab)&&(surr_own[IDIR_NORTH]==ownr) &&
@@ -1957,7 +2091,7 @@ void create_columns_slb_room(cr_clm_func cr_floor,cr_clm_func cr_edge,
         cr_clm_func cr_corner,cr_clm_func cr_inside,cr_clm_func cr_nearinsd,
         struct COLUMN_REC *clm_recs[9], unsigned char *surr_slb,unsigned char *surr_own, unsigned char **surr_tng)
 {
-  unsigned char slab=surr_slb[IDIR_CENTR];
+  unsigned short slab=surr_slb[IDIR_CENTR];
   unsigned char ownr=surr_own[IDIR_CENTR];
   //Checking if completely surrounded
   if ((surr_slb[IDIR_NORTH]==slab)&&(surr_own[IDIR_NORTH]==ownr) &&
@@ -2134,7 +2268,7 @@ void create_columns_slb_dungheart_nearinsd(struct COLUMN_REC *clm_recs[9],
   //Raise the center a little bit
   place_column_univ_stair(clm_recs[IDIR_CENTR], surr_own[IDIR_CENTR]);
   int i;
-  unsigned char slab=surr_slb[IDIR_CENTR];
+  unsigned short slab=surr_slb[IDIR_CENTR];
   unsigned char ownr=surr_own[IDIR_CENTR];
   //corner columns
   for (i=0;i<4;i++)
@@ -2170,7 +2304,7 @@ void create_columns_slb_portal_floor(struct COLUMN_REC *clm_recs[9],
   const unsigned short dir_a[]={IDIR_WEST, IDIR_NORTH, IDIR_EAST, IDIR_SOUTH};
   const unsigned short dir_b[]={IDIR_NORTH, IDIR_EAST, IDIR_SOUTH, IDIR_WEST};
   const unsigned short dir_c[]={IDIR_NW, IDIR_NE, IDIR_SE, IDIR_SW};
-  unsigned char slab=surr_slb[IDIR_CENTR];
+  unsigned short slab=surr_slb[IDIR_CENTR];
   unsigned char ownr=surr_own[IDIR_CENTR];
   //Center
   fill_column_portal_floor(clm_recs[IDIR_CENTR], surr_own[IDIR_CENTR]);
@@ -2243,7 +2377,7 @@ void create_columns_slb_temple_edge(struct COLUMN_REC *clm_recs[9],
   const unsigned short dir_c[]={IDIR_NW, IDIR_NE, IDIR_SE, IDIR_SW};
   const unsigned short dir_d[]={IDIR_SOUTH, IDIR_WEST, IDIR_NORTH, IDIR_EAST};
   const unsigned short dir_e[]={IDIR_EAST, IDIR_SOUTH, IDIR_WEST, IDIR_NORTH};
-  unsigned char slab=surr_slb[IDIR_CENTR];
+  unsigned short slab=surr_slb[IDIR_CENTR];
   unsigned char ownr=surr_own[IDIR_CENTR];
   //Temple edge is like its floor,
   //but it is higher by one cube from inside.
@@ -2292,7 +2426,7 @@ void create_columns_slb_hatchery_floor(struct COLUMN_REC *clm_recs[9],
   const unsigned short dir_a[]={IDIR_WEST, IDIR_NORTH, IDIR_EAST, IDIR_SOUTH};
   const unsigned short dir_b[]={IDIR_NORTH, IDIR_EAST, IDIR_SOUTH, IDIR_WEST};
   const unsigned short dir_c[]={IDIR_NW, IDIR_NE, IDIR_SE, IDIR_SW};
-  unsigned char slab=surr_slb[IDIR_CENTR];
+  unsigned short slab=surr_slb[IDIR_CENTR];
   unsigned char ownr=surr_own[IDIR_CENTR];
   //Center
   fill_column_hatchery_inside(clm_recs[IDIR_CENTR], surr_own[IDIR_CENTR]);
@@ -2360,7 +2494,7 @@ void create_columns_slb_lair_floor(struct COLUMN_REC *clm_recs[9],
   const unsigned short dir_a[]={IDIR_WEST, IDIR_NORTH, IDIR_EAST, IDIR_SOUTH};
   const unsigned short dir_b[]={IDIR_NORTH, IDIR_EAST, IDIR_SOUTH, IDIR_WEST};
   const unsigned short dir_c[]={IDIR_NW, IDIR_NE, IDIR_SE, IDIR_SW};
-  unsigned char slab=surr_slb[IDIR_CENTR];
+  unsigned short slab=surr_slb[IDIR_CENTR];
   unsigned char ownr=surr_own[IDIR_CENTR];
   //Center
   fill_column_lair_inside(clm_recs[IDIR_CENTR], surr_own[IDIR_CENTR]);
@@ -2486,7 +2620,7 @@ void create_columns_slb_graveyard_floor(struct COLUMN_REC *clm_recs[9],
   const unsigned short dir_a[]={IDIR_WEST, IDIR_NORTH, IDIR_EAST, IDIR_SOUTH};
   const unsigned short dir_b[]={IDIR_NORTH, IDIR_EAST, IDIR_SOUTH, IDIR_WEST};
   const unsigned short dir_c[]={IDIR_NW, IDIR_NE, IDIR_SE, IDIR_SW};
-  unsigned char slab=surr_slb[IDIR_CENTR];
+  unsigned short slab=surr_slb[IDIR_CENTR];
   unsigned char ownr=surr_own[IDIR_CENTR];
   //Center
   fill_column_graveyard_inside(clm_recs[IDIR_CENTR], surr_own[IDIR_CENTR]);
@@ -2781,7 +2915,7 @@ void create_columns_slb_prison_floor(struct COLUMN_REC *clm_recs[9],
   const unsigned short dir_a[]={IDIR_WEST, IDIR_NORTH, IDIR_EAST, IDIR_SOUTH};
   const unsigned short dir_b[]={IDIR_NORTH, IDIR_EAST, IDIR_SOUTH, IDIR_WEST};
   const unsigned short dir_c[]={IDIR_NW, IDIR_NE, IDIR_SE, IDIR_SW};
-  unsigned char slab=surr_slb[IDIR_CENTR];
+  unsigned short slab=surr_slb[IDIR_CENTR];
   unsigned char ownr=surr_own[IDIR_CENTR];
   //Center
   fill_column_prison_inside(clm_recs[IDIR_CENTR], surr_own[IDIR_CENTR]);
@@ -2967,6 +3101,17 @@ void create_columns_slb_bridge(struct COLUMN_REC *clm_recs[9],
     int i;
     for (i=0;i<9;i++)
       fill_column_bridge_inside(clm_recs[i], surr_own[IDIR_CENTR]);
+}
+
+void create_columns_slb_rock_gndlev(struct COLUMN_REC *clm_recs[9],
+        unsigned char *surr_slb,unsigned char *surr_own, unsigned char **surr_tng)
+{
+  int i,k;
+  for (i=0;i<3;i++)
+   for (k=0;k<3;k++)
+   {
+     fill_column_rock_gndlev(clm_recs[k*3+i],surr_own[IDIR_CENTR]);
+   }
 }
 
 void fill_column_rock(struct COLUMN_REC *clm_rec, unsigned char owner)
@@ -3264,7 +3409,7 @@ void place_column_library_bookcase_c(struct COLUMN_REC *clm_rec, unsigned char o
 
 void place_column_temple_pillar(struct COLUMN_REC *clm_rec, unsigned char owner)
 {
-  unsigned int pos=clm_rec->height-1;
+  int pos=clm_rec->height-1;
   if (pos<0) pos=0;
   if (pos>1) pos=1;
   clm_rec->c[pos+0]=0x122;
@@ -3286,7 +3431,7 @@ void fill_column_temple_floor(struct COLUMN_REC *clm_rec, unsigned char owner)
 
 void place_column_temple_corner(struct COLUMN_REC *clm_rec, unsigned char owner)
 {
-  unsigned int pos=clm_rec->height-1;
+  int pos=clm_rec->height-1;
   if (pos<0) pos=0;
   if (pos>7) pos=7;
   clm_rec->c[pos]=0x122;
@@ -3296,7 +3441,8 @@ void place_column_temple_corner(struct COLUMN_REC *clm_rec, unsigned char owner)
 
 void place_column_temple_edge(struct COLUMN_REC *clm_rec, unsigned char owner)
 {
-  unsigned int pos=clm_rec->height;
+  int pos=clm_rec->height;
+  if (pos<0) pos=0;
   if (pos>7) pos=7;
   clm_rec->c[pos]=0x122;
   clm_rec->solid=compute_clm_rec_solid(clm_rec);
@@ -3334,7 +3480,7 @@ void fill_column_dungheart_inside(struct COLUMN_REC *clm_rec, unsigned char owne
 void place_column_univ_stair(struct COLUMN_REC *clm_rec, unsigned char owner)
 {
   int pos=clm_rec->height-1;
-  if (pos<0) pos=clm_rec->height;
+  if (pos<0) pos=0;
   if (pos>6) pos=6;
   clm_rec->c[pos+1]=clm_rec->c[pos+0];
   clm_rec->c[pos+0]=0x019 +rnd(5);
@@ -3344,7 +3490,8 @@ void place_column_univ_stair(struct COLUMN_REC *clm_rec, unsigned char owner)
 
 void place_column_dungheart_raise(struct COLUMN_REC *clm_rec, unsigned char owner)
 {
-  unsigned int pos=clm_rec->height;
+  int pos=clm_rec->height;
+  if (pos<0) pos=0;
   if (pos>6) pos=6;
   clm_rec->c[pos+0]=0x052;
   clm_rec->c[pos+1]=0x04d;
@@ -3423,7 +3570,7 @@ void fill_column_graveyard_inside(struct COLUMN_REC *clm_rec, unsigned char owne
 
 void place_column_barracks_raise(struct COLUMN_REC *clm_rec, unsigned char owner)
 {
-  unsigned int pos=clm_rec->height;
+  int pos=clm_rec->height;
   if (pos>7) pos=7;
   if (pos<1) pos=1;
   clm_rec->c[pos-1]=0x183;
@@ -3529,3 +3676,485 @@ void fill_column_bridge_inside(struct COLUMN_REC *clm_rec, unsigned char owner)
          0x1b8, 0x0, 0x0, 0x0, 0x0, 0, 0, 0);
 }
 
+void fill_column_rock_gndlev(struct COLUMN_REC *clm_rec, unsigned char owner)
+{
+     fill_column_rec_simp(clm_rec, 0, 0x01d,
+         0x02d, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0);
+}
+
+void place_column_wall_drape_a(struct COLUMN_REC *clm_rec, unsigned char owner)
+{
+  int pos=clm_rec->height-1;
+  if (pos<0) pos=0;
+  if (pos>7) pos=7;
+    switch (owner)
+    {
+    case PLAYER0:    clm_rec->c[pos+0]=0x0a0; break;
+    case PLAYER1:    clm_rec->c[pos+0]=0x19a; break;
+    case PLAYER2:    clm_rec->c[pos+0]=0x19d; break;
+    case PLAYER3:    clm_rec->c[pos+0]=0x1a0; break;
+    case PLAYER_GOOD:clm_rec->c[pos+0]=0x1a3; break;
+    default:         clm_rec->c[pos+0]=0x04d; break;
+    }
+  clm_rec->solid=compute_clm_rec_solid(clm_rec);
+  clm_rec->height=compute_clm_rec_height(clm_rec);
+}
+
+void place_column_wall_drape_b(struct COLUMN_REC *clm_rec, unsigned char owner)
+{
+  int pos=clm_rec->height-1;
+  if (pos<0) pos=0;
+  if (pos>7) pos=7;
+  switch (owner)
+  {
+  case PLAYER0:    clm_rec->c[4]=0x0a1; break;
+  case PLAYER1:    clm_rec->c[4]=0x19b; break;
+  case PLAYER2:    clm_rec->c[4]=0x19e; break;
+  case PLAYER3:    clm_rec->c[4]=0x1a1; break;
+  case PLAYER_GOOD:clm_rec->c[4]=0x1a4; break;
+  default:         clm_rec->c[4]=0x04d; break;
+  }
+  clm_rec->solid=compute_clm_rec_solid(clm_rec);
+  clm_rec->height=compute_clm_rec_height(clm_rec);
+}
+
+void place_column_wall_drape_c(struct COLUMN_REC *clm_rec, unsigned char owner)
+{
+  int pos=clm_rec->height-1;
+  if (pos<0) pos=0;
+  if (pos>7) pos=7;
+  switch (owner)
+  {
+  case PLAYER0:    clm_rec->c[4]=0x0a2; break;
+  case PLAYER1:    clm_rec->c[4]=0x19c; break;
+  case PLAYER2:    clm_rec->c[4]=0x19f; break;
+  case PLAYER3:    clm_rec->c[4]=0x1a2; break;
+  case PLAYER_GOOD:clm_rec->c[4]=0x1a5; break;
+  default:         clm_rec->c[4]=0x04d; break;
+  }
+  clm_rec->solid=compute_clm_rec_solid(clm_rec);
+  clm_rec->height=compute_clm_rec_height(clm_rec);
+}
+
+void place_column_wall_portal_a(struct COLUMN_REC *clm_rec, unsigned char owner)
+{
+  int pos=clm_rec->height-4;
+  if (pos<0) pos=0;
+  if (pos>4) pos=4;
+  clm_rec->c[pos+0]=0x098;
+  clm_rec->c[pos+1]=0x097;
+  clm_rec->c[pos+2]=0x096;
+  clm_rec->c[pos+3]=0x095;
+  clm_rec->solid=compute_clm_rec_solid(clm_rec);
+  clm_rec->height=compute_clm_rec_height(clm_rec);
+}
+
+void place_column_wall_portal_b(struct COLUMN_REC *clm_rec, unsigned char owner)
+{
+  int pos=clm_rec->height-4;
+  if (pos<0) pos=0;
+  if (pos>4) pos=4;
+  clm_rec->c[pos+0]=0x04b;
+  clm_rec->c[pos+1]=0x04b;
+  clm_rec->c[pos+2]=0x04b;
+  clm_rec->c[pos+3]=0x04b;
+  clm_rec->solid=compute_clm_rec_solid(clm_rec);
+  clm_rec->height=compute_clm_rec_height(clm_rec);
+}
+
+void place_column_wall_treasure_a(struct COLUMN_REC *clm_rec, unsigned char owner)
+{
+  int pos=clm_rec->height-3;
+  if (pos<0) pos=0;
+  if (pos>6) pos=6;
+  clm_rec->c[pos+0]=0x09c;
+  clm_rec->c[pos+1]=0x099;
+  clm_rec->solid=compute_clm_rec_solid(clm_rec);
+  clm_rec->height=compute_clm_rec_height(clm_rec);
+}
+
+void place_column_wall_treasure_b(struct COLUMN_REC *clm_rec, unsigned char owner)
+{
+  int pos=clm_rec->height-3;
+  if (pos<0) pos=0;
+  if (pos>6) pos=6;
+  clm_rec->c[pos+0]=0x09d;
+  clm_rec->c[pos+1]=0x09a;
+  clm_rec->solid=compute_clm_rec_solid(clm_rec);
+  clm_rec->height=compute_clm_rec_height(clm_rec);
+}
+
+void place_column_wall_treasure_c(struct COLUMN_REC *clm_rec, unsigned char owner)
+{
+  int pos=clm_rec->height-3;
+  if (pos<0) pos=0;
+  if (pos>6) pos=6;
+  clm_rec->c[pos+0]=0x09e;
+  clm_rec->c[pos+1]=0x09b;
+  clm_rec->solid=compute_clm_rec_solid(clm_rec);
+  clm_rec->height=compute_clm_rec_height(clm_rec);
+}
+
+void place_column_wall_training_a(struct COLUMN_REC *clm_rec, unsigned char owner)
+{
+  int pos=clm_rec->height-4;
+  if (pos<0) pos=0;
+  if (pos>5) pos=5;
+  clm_rec->c[pos+0]=0x053;
+  clm_rec->c[pos+1]=0x0f5;
+  clm_rec->c[pos+2]=0x0f2;
+  clm_rec->solid=compute_clm_rec_solid(clm_rec);
+  clm_rec->height=compute_clm_rec_height(clm_rec);
+}
+
+void place_column_wall_training_b(struct COLUMN_REC *clm_rec, unsigned char owner)
+{
+  int pos=clm_rec->height-4;
+  if (pos<0) pos=0;
+  if (pos>5) pos=5;
+  clm_rec->c[pos+0]=0x0fb;
+  clm_rec->c[pos+1]=0x0f6;
+  clm_rec->c[pos+2]=0x0f3;
+  clm_rec->solid=compute_clm_rec_solid(clm_rec);
+  clm_rec->height=compute_clm_rec_height(clm_rec);
+}
+
+void place_column_wall_training_c(struct COLUMN_REC *clm_rec, unsigned char owner)
+{
+  int pos=clm_rec->height-4;
+  if (pos<0) pos=0;
+  if (pos>5) pos=5;
+  clm_rec->c[pos+0]=0x051;
+  clm_rec->c[pos+1]=0x0f7;
+  clm_rec->c[pos+2]=0x0f4;
+  clm_rec->solid=compute_clm_rec_solid(clm_rec);
+  clm_rec->height=compute_clm_rec_height(clm_rec);
+}
+
+void place_column_wall_library_a(struct COLUMN_REC *clm_rec, unsigned char owner)
+{
+  int pos=clm_rec->height-3;
+  if (pos<0) pos=0;
+  if (pos>6) pos=6;
+  clm_rec->c[pos+0]=0x0ab;
+  clm_rec->c[pos+1]=0x0a8;
+  clm_rec->solid=compute_clm_rec_solid(clm_rec);
+  clm_rec->height=compute_clm_rec_height(clm_rec);
+}
+
+void place_column_wall_library_b(struct COLUMN_REC *clm_rec, unsigned char owner)
+{
+  int pos=clm_rec->height-3;
+  if (pos<0) pos=0;
+  if (pos>6) pos=6;
+  clm_rec->c[pos+0]=0x0ac;
+  clm_rec->c[pos+1]=0x0a9;
+  clm_rec->solid=compute_clm_rec_solid(clm_rec);
+  clm_rec->height=compute_clm_rec_height(clm_rec);
+}
+
+void place_column_wall_library_c(struct COLUMN_REC *clm_rec, unsigned char owner)
+{
+  int pos=clm_rec->height-3;
+  if (pos<0) pos=0;
+  if (pos>6) pos=6;
+  clm_rec->c[pos+0]=0x0ad;
+  clm_rec->c[pos+1]=0x0aa;
+  clm_rec->solid=compute_clm_rec_solid(clm_rec);
+  clm_rec->height=compute_clm_rec_height(clm_rec);
+}
+
+void place_column_wall_scavenger_a(struct COLUMN_REC *clm_rec, unsigned char owner)
+{
+  int pos=clm_rec->height-3;
+  if (pos<0) pos=0;
+  if (pos>6) pos=6;
+  clm_rec->c[pos+0]=0x112;
+  clm_rec->c[pos+1]=0x10f;
+  clm_rec->solid=compute_clm_rec_solid(clm_rec);
+  clm_rec->height=compute_clm_rec_height(clm_rec);
+}
+
+void place_column_wall_scavenger_b(struct COLUMN_REC *clm_rec, unsigned char owner)
+{
+  int pos=clm_rec->height-3;
+  if (pos<0) pos=0;
+  if (pos>6) pos=6;
+  clm_rec->c[pos+0]=0x113;
+  clm_rec->c[pos+1]=0x110;
+  clm_rec->solid=compute_clm_rec_solid(clm_rec);
+  clm_rec->height=compute_clm_rec_height(clm_rec);
+}
+
+void place_column_wall_scavenger_c(struct COLUMN_REC *clm_rec, unsigned char owner)
+{
+  int pos=clm_rec->height-3;
+  if (pos<0) pos=0;
+  if (pos>6) pos=6;
+  clm_rec->c[pos+0]=0x114;
+  clm_rec->c[pos+1]=0x111;
+  clm_rec->solid=compute_clm_rec_solid(clm_rec);
+  clm_rec->height=compute_clm_rec_height(clm_rec);
+}
+
+void place_column_wall_graveyard_a(struct COLUMN_REC *clm_rec, unsigned char owner)
+{
+  int pos=clm_rec->height-4;
+  if (pos<0) pos=0;
+  if (pos>5) pos=5;
+  clm_rec->c[pos+0]=0x1b3;
+  clm_rec->c[pos+1]=0x1b2;
+  clm_rec->c[pos+2]=0x050;
+  clm_rec->solid=compute_clm_rec_solid(clm_rec);
+  clm_rec->height=compute_clm_rec_height(clm_rec);
+}
+
+void place_column_wall_graveyard_b(struct COLUMN_REC *clm_rec, unsigned char owner)
+{
+  int pos=clm_rec->height-4;
+  if (pos<0) pos=0;
+  if (pos>5) pos=5;
+  clm_rec->c[pos+0]=0x098;
+  clm_rec->c[pos+1]=0x097;
+  clm_rec->c[pos+2]=0x096;
+  clm_rec->solid=compute_clm_rec_solid(clm_rec);
+  clm_rec->height=compute_clm_rec_height(clm_rec);
+}
+
+void place_column_wall_graveyard_c(struct COLUMN_REC *clm_rec, unsigned char owner)
+{
+  int pos=clm_rec->height-4;
+  if (pos<0) pos=0;
+  if (pos>5) pos=5;
+  clm_rec->c[pos+0]=0x1b3;
+  clm_rec->c[pos+1]=0x1b2;
+  clm_rec->c[pos+2]=0x04f;
+  clm_rec->solid=compute_clm_rec_solid(clm_rec);
+  clm_rec->height=compute_clm_rec_height(clm_rec);
+}
+
+void place_column_wall_lair_b(struct COLUMN_REC *clm_rec, unsigned char owner)
+{
+  int pos=clm_rec->height-4;
+  if (pos<0) pos=0;
+  if (pos>4) pos=4;
+  clm_rec->c[pos+0]=0x016;
+  clm_rec->c[pos+1]=0x014;
+  clm_rec->c[pos+2]=0x013;
+  clm_rec->c[pos+3]=0x011;
+  clm_rec->solid=compute_clm_rec_solid(clm_rec);
+  clm_rec->height=compute_clm_rec_height(clm_rec);
+}
+
+void place_column_wall_workshop_a(struct COLUMN_REC *clm_rec, unsigned char owner)
+{
+  int pos=clm_rec->height-3;
+  if (pos<0) pos=0;
+  if (pos>6) pos=6;
+  clm_rec->c[pos+0]=0x102;
+  clm_rec->c[pos+1]=0x0ff;
+  clm_rec->solid=compute_clm_rec_solid(clm_rec);
+  clm_rec->height=compute_clm_rec_height(clm_rec);
+}
+
+void place_column_wall_workshop_b(struct COLUMN_REC *clm_rec, unsigned char owner)
+{
+  int pos=clm_rec->height-3;
+  if (pos<0) pos=0;
+  if (pos>6) pos=6;
+  clm_rec->c[pos+0]=0x103;
+  clm_rec->c[pos+1]=0x100;
+  clm_rec->solid=compute_clm_rec_solid(clm_rec);
+  clm_rec->height=compute_clm_rec_height(clm_rec);
+}
+
+void place_column_wall_workshop_c(struct COLUMN_REC *clm_rec, unsigned char owner)
+{
+  int pos=clm_rec->height-3;
+  if (pos<0) pos=0;
+  if (pos>6) pos=6;
+  clm_rec->c[pos+0]=0x104;
+  clm_rec->c[pos+1]=0x101;
+  clm_rec->solid=compute_clm_rec_solid(clm_rec);
+  clm_rec->height=compute_clm_rec_height(clm_rec);
+}
+
+void place_column_wall_prison_a(struct COLUMN_REC *clm_rec, unsigned char owner)
+{
+  int pos=clm_rec->height-3;
+  if (pos<0) pos=0;
+  if (pos>6) pos=6;
+  clm_rec->c[pos+0]=0x0e4;
+  clm_rec->c[pos+1]=0x0e1;
+  clm_rec->solid=compute_clm_rec_solid(clm_rec);
+  clm_rec->height=compute_clm_rec_height(clm_rec);
+}
+
+void place_column_wall_prison_b(struct COLUMN_REC *clm_rec, unsigned char owner)
+{
+  int pos=clm_rec->height-3;
+  if (pos<0) pos=0;
+  if (pos>6) pos=6;
+  clm_rec->c[pos+0]=0x0e5;
+  clm_rec->c[pos+1]=0x0e2;
+  clm_rec->solid=compute_clm_rec_solid(clm_rec);
+  clm_rec->height=compute_clm_rec_height(clm_rec);
+}
+
+void place_column_wall_prison_c(struct COLUMN_REC *clm_rec, unsigned char owner)
+{
+  int pos=clm_rec->height-3;
+  if (pos<0) pos=0;
+  if (pos>6) pos=6;
+  clm_rec->c[pos+0]=0x0e6;
+  clm_rec->c[pos+1]=0x0e3;
+  clm_rec->solid=compute_clm_rec_solid(clm_rec);
+  clm_rec->height=compute_clm_rec_height(clm_rec);
+}
+
+void place_column_wall_torture_a(struct COLUMN_REC *clm_rec, unsigned char owner)
+{
+  int pos=clm_rec->height-3;
+  if (pos<0) pos=0;
+  if (pos>5) pos=5;
+  clm_rec->c[pos+0]=0x0ee;
+  clm_rec->c[pos+1]=0x0eb;
+  clm_rec->c[pos+2]=0x0e8;
+  clm_rec->solid=compute_clm_rec_solid(clm_rec);
+  clm_rec->height=compute_clm_rec_height(clm_rec);
+}
+
+void place_column_wall_torture_b(struct COLUMN_REC *clm_rec, unsigned char owner)
+{
+  int pos=clm_rec->height-3;
+  if (pos<0) pos=0;
+  if (pos>5) pos=5;
+  clm_rec->c[pos+0]=0x0ef;
+  clm_rec->c[pos+1]=0x0ec;
+  clm_rec->c[pos+2]=0x0e9;
+  clm_rec->solid=compute_clm_rec_solid(clm_rec);
+  clm_rec->height=compute_clm_rec_height(clm_rec);
+}
+
+void place_column_wall_torture_c(struct COLUMN_REC *clm_rec, unsigned char owner)
+{
+  int pos=clm_rec->height-3;
+  if (pos<0) pos=0;
+  if (pos>5) pos=5;
+  clm_rec->c[pos+0]=0x0f0;
+  clm_rec->c[pos+1]=0x0ed;
+  clm_rec->c[pos+2]=0x0ea;
+  clm_rec->solid=compute_clm_rec_solid(clm_rec);
+  clm_rec->height=compute_clm_rec_height(clm_rec);
+}
+
+void place_column_wall_barracks_a(struct COLUMN_REC *clm_rec, unsigned char owner)
+{
+  int pos=clm_rec->height-3;
+  if (pos<0) pos=0;
+  if (pos>5) pos=5;
+  clm_rec->c[pos+0]=0x18b;
+  clm_rec->c[pos+1]=0x188;
+  clm_rec->c[pos+2]=0x185;
+  clm_rec->solid=compute_clm_rec_solid(clm_rec);
+  clm_rec->height=compute_clm_rec_height(clm_rec);
+}
+
+void place_column_wall_barracks_b(struct COLUMN_REC *clm_rec, unsigned char owner)
+{
+  int pos=clm_rec->height-3;
+  if (pos<0) pos=0;
+  if (pos>5) pos=5;
+  clm_rec->c[pos+0]=0x18c;
+  clm_rec->c[pos+1]=0x189;
+  clm_rec->c[pos+2]=0x186;
+  clm_rec->solid=compute_clm_rec_solid(clm_rec);
+  clm_rec->height=compute_clm_rec_height(clm_rec);
+}
+
+void place_column_wall_barracks_c(struct COLUMN_REC *clm_rec, unsigned char owner)
+{
+  int pos=clm_rec->height-3;
+  if (pos<0) pos=0;
+  if (pos>5) pos=5;
+  clm_rec->c[pos+0]=0x18d;
+  clm_rec->c[pos+1]=0x18a;
+  clm_rec->c[pos+2]=0x187;
+  clm_rec->solid=compute_clm_rec_solid(clm_rec);
+  clm_rec->height=compute_clm_rec_height(clm_rec);
+}
+
+void place_column_wall_temple_a(struct COLUMN_REC *clm_rec, unsigned char owner)
+{
+  int pos=clm_rec->height-4;
+  if (pos<0) pos=0;
+  if (pos>4) pos=4;
+  clm_rec->c[pos+0]=0x122;
+  clm_rec->c[pos+1]=0x135;
+  clm_rec->c[pos+2]=0x132;
+  clm_rec->c[pos+3]=0x12f;
+  clm_rec->solid=compute_clm_rec_solid(clm_rec);
+  clm_rec->height=compute_clm_rec_height(clm_rec);
+}
+
+void place_column_wall_temple_b(struct COLUMN_REC *clm_rec, unsigned char owner)
+{
+  int pos=clm_rec->height-4;
+  if (pos<0) pos=0;
+  if (pos>4) pos=4;
+  clm_rec->c[pos+0]=0x122;
+  clm_rec->c[pos+1]=0x136;
+  clm_rec->c[pos+2]=0x133;
+  clm_rec->c[pos+3]=0x130;
+  clm_rec->solid=compute_clm_rec_solid(clm_rec);
+  clm_rec->height=compute_clm_rec_height(clm_rec);
+}
+
+void place_column_wall_temple_c(struct COLUMN_REC *clm_rec, unsigned char owner)
+{
+  int pos=clm_rec->height-4;
+  if (pos<0) pos=0;
+  if (pos>4) pos=4;
+  clm_rec->c[pos+0]=0x122;
+  clm_rec->c[pos+1]=0x137;
+  clm_rec->c[pos+2]=0x134;
+  clm_rec->c[pos+3]=0x131;
+  clm_rec->solid=compute_clm_rec_solid(clm_rec);
+  clm_rec->height=compute_clm_rec_height(clm_rec);
+}
+
+void place_column_wall_hatchery_a(struct COLUMN_REC *clm_rec, unsigned char owner)
+{
+  int pos=clm_rec->height-4;
+  if (pos<0) pos=0;
+  if (pos>5) pos=5;
+  clm_rec->c[pos+0]=0x155;
+  clm_rec->c[pos+1]=0x152;
+  clm_rec->c[pos+2]=0x14f;
+  clm_rec->solid=compute_clm_rec_solid(clm_rec);
+  clm_rec->height=compute_clm_rec_height(clm_rec);
+}
+
+void place_column_wall_hatchery_b(struct COLUMN_REC *clm_rec, unsigned char owner)
+{
+  int pos=clm_rec->height-4;
+  if (pos<0) pos=0;
+  if (pos>5) pos=5;
+  clm_rec->c[pos+0]=0x156;
+  clm_rec->c[pos+1]=0x153;
+  clm_rec->c[pos+2]=0x150;
+  clm_rec->solid=compute_clm_rec_solid(clm_rec);
+  clm_rec->height=compute_clm_rec_height(clm_rec);
+}
+
+void place_column_wall_hatchery_c(struct COLUMN_REC *clm_rec, unsigned char owner)
+{
+  int pos=clm_rec->height-4;
+  if (pos<0) pos=0;
+  if (pos>5) pos=5;
+  clm_rec->c[pos+0]=0x157;
+  clm_rec->c[pos+1]=0x154;
+  clm_rec->c[pos+2]=0x151;
+  clm_rec->solid=compute_clm_rec_solid(clm_rec);
+  clm_rec->height=compute_clm_rec_height(clm_rec);
+}

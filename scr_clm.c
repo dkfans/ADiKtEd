@@ -57,15 +57,19 @@ void actions_mdclm(int key)
           message_info("DAT/CLM/W?B entries updated.");
           break;
         case 'a': // update dat/clm/w?b of selected tile
-          {//TODO: add 'enable autoupdate' function
+          {
+            //Deleting custom columns - to enable auto-update
             int ccol_idx=cust_col_idx_next(lvl,sx/3,sy/3,-1);
             while (ccol_idx>=0)
             {
                 cust_col_del(lvl,ccol_idx);
                 ccol_idx=cust_col_idx_next(lvl,sx/3,sy/3,-1);
             }
+            //Updating
             update_datclm_for_slab(lvl, sx/3,sy/3);
             update_tile_wib_entries(lvl,sx/3,sy/3);
+            update_tile_wlb_entry(lvl,sx/3,sy/3);
+            update_tile_flg_entries(lvl,sx/3,sy/3);
             message_info("Updated DAT/CLM/W?B entries of slab %d,%d.",sx/3,sy/3);
           };break;
         case 'm': // manual-set mode
@@ -117,7 +121,8 @@ int display_dat_subtiles(int scr_row, int scr_col,int ty,int tx)
             int sx=tx*3+i;
             set_cursor_pos(scr_row, scr_col+i*5);
             
-            if ((i==mapmode->subtl_x) && (k==mapmode->subtl_y) && (scrmode->mode==MD_CLM))
+            if ((i==mapmode->subtl_x) && (k==mapmode->subtl_y) &&
+             ((scrmode->mode==MD_CLM)||(scrmode->mode==MD_RWRK)) )
                 color=PRINT_COLOR_BLACK_ON_LGREY;
             else
                 color=PRINT_COLOR_LGREY_ON_BLACK;
@@ -126,9 +131,7 @@ int display_dat_subtiles(int scr_row, int scr_col,int ty,int tx)
                 screen_printf("%4u",
                         (unsigned int)get_dat_subtile(lvl,sx,sy));
             else
-                screen_printf("%02X%02X",
-                        (unsigned int)(lvl->dat_high[sx][sy]),
-                        (unsigned int)(lvl->dat_low[sx][sy]));
+                screen_printf("%04X",(unsigned int)get_dat_val(lvl,sx,sy));
         }
         scr_row+=2;
     }
@@ -161,10 +164,12 @@ void draw_mdclm_panel()
     clmentry = lvl->clm[clm_idx%COLUMN_ENTRIES];
     int pos_y;
     pos_y=display_column(clmentry, clm_idx,0,scrmode->cols+3);
-    set_cursor_pos(pos_y++, scrmode->cols+3);
-    screen_printf_toeol("WIB animate: %03X", get_subtl_wib(lvl,sx,sy));
-//    set_cursor_pos(pos_y++, scrmode->cols+3);
-//    screen_printf("WLB tile info: %03X", get_subtl_wlb(lvl, tx, ty));
+    set_cursor_pos(pos_y-3, scrmode->cols+23);
+    screen_printf_toeol("WIB anim.: %03X", get_subtl_wib(lvl,sx,sy));
+    set_cursor_pos(pos_y-2, scrmode->cols+23);
+    screen_printf("Tile WLB:  %03X", get_tile_wlb(lvl, tx, ty));
+    set_cursor_pos(pos_y-1, scrmode->cols+23);
+    screen_printf("Subtl.FLG: %03X", get_subtl_flg(lvl,sx,sy));
     display_tngdat();
 }
 

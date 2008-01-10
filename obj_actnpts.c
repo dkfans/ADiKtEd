@@ -12,44 +12,44 @@
 #include "lev_data.h"
 #include "obj_slabs.h"
 
-unsigned char get_actnpt_tilepos_x(unsigned char *actnpt)
+unsigned char get_actnpt_subtile_x(unsigned char *actnpt)
 {
     if (actnpt==NULL) return 0;
     return actnpt[1];
 }
 
-short set_actnpt_tilepos_x(unsigned char *actnpt,unsigned char pos_x)
+short set_actnpt_subtile_x(unsigned char *actnpt,unsigned char pos_x)
 {
     if (actnpt==NULL) return 0;
     actnpt[1]=pos_x;
 }
 
-unsigned char get_actnpt_tilepos_y(unsigned char *actnpt)
+unsigned char get_actnpt_subtile_y(unsigned char *actnpt)
 {
     if (actnpt==NULL) return 0;
     return actnpt[3];
 }
 
-short set_actnpt_tilepos_y(unsigned char *actnpt,unsigned char pos_y)
+short set_actnpt_subtile_y(unsigned char *actnpt,unsigned char pos_y)
 {
     if (actnpt==NULL) return 0;
     actnpt[3]=pos_y;
 }
 
-short set_actnpt_tilepos(unsigned char *actnpt,unsigned char pos_x,unsigned char pos_y)
+short set_actnpt_subtile(unsigned char *actnpt,unsigned char pos_x,unsigned char pos_y)
 {
     if (actnpt==NULL) return 0;
     actnpt[1]=pos_x;
     actnpt[3]=pos_y;
 }
 
-unsigned char get_actnpt_tile_range(unsigned char *actnpt)
+unsigned char get_actnpt_range_subtile(unsigned char *actnpt)
 {
     if (actnpt==NULL) return 0;
     return actnpt[5];
 }
 
-short set_actnpt_tile_range(unsigned char *actnpt,unsigned char rng_tl)
+short set_actnpt_range_subtile(unsigned char *actnpt,unsigned char rng_tl)
 {
     if (actnpt==NULL) return 0;
     actnpt[5]=rng_tl;
@@ -86,13 +86,13 @@ short set_actnpt_subtpos(unsigned char *actnpt,unsigned char pos_x,unsigned char
     actnpt[2]=pos_y;
 }
 
-unsigned char get_actnpt_subt_range(unsigned char *actnpt)
+unsigned char get_actnpt_range_subtpos(unsigned char *actnpt)
 {
     if (actnpt==NULL) return 0;
     return actnpt[4];
 }
 
-short set_actnpt_subt_range(unsigned char *actnpt,unsigned char rng_st)
+short set_actnpt_range_subtpos(unsigned char *actnpt,unsigned char rng_st)
 {
     if (actnpt==NULL) return 0;
     actnpt[4]=rng_st;
@@ -132,9 +132,9 @@ unsigned char *create_actnpt(struct LEVEL *lvl, unsigned int sx, unsigned int sy
     for (i=0; i < SIZEOF_DK_APT_REC; i++)
       actnpt[i]=0;
     set_actnpt_subtpos(actnpt,0x80,0x80);
-    set_actnpt_tilepos(actnpt,(unsigned char)sx,(unsigned char)sy);
+    set_actnpt_subtile(actnpt,(unsigned char)sx,(unsigned char)sy);
     set_actnpt_number(actnpt,get_free_acttnpt_number(lvl));
-    set_actnpt_tile_range(actnpt,1);
+    set_actnpt_range_subtile(actnpt,1);
     return actnpt;
 }
 
@@ -157,7 +157,7 @@ unsigned char *create_actnpt_copy(unsigned int sx, unsigned int sy,unsigned char
       die ("create_actnpt: Out of memory.");
     memcpy(actnpt,src,SIZEOF_DK_APT_REC);
     set_actnpt_subtpos(actnpt,0x80,0x80);
-    set_actnpt_tilepos(actnpt,(unsigned char)sx,(unsigned char)sy);
+    set_actnpt_subtile(actnpt,(unsigned char)sx,(unsigned char)sy);
     return actnpt;
 }
 
@@ -195,44 +195,44 @@ unsigned short get_free_acttnpt_number(struct LEVEL *lvl)
     return new_num;
 }
 
-unsigned char get_stlight_tilepos_x(unsigned char *stlight)
+unsigned char get_stlight_subtile_x(unsigned char *stlight)
 {
     if (stlight==NULL) return 0;
     return (unsigned char)stlight[11];
 }
 
-short set_stlight_tilepos_x(unsigned char *stlight,unsigned char pos_x)
+short set_stlight_subtile_x(unsigned char *stlight,unsigned char pos_x)
 {
     if (stlight==NULL) return 0;
     stlight[11]=pos_x;
 }
 
-unsigned char get_stlight_tilepos_y(unsigned char *stlight)
+unsigned char get_stlight_subtile_y(unsigned char *stlight)
 {
     if (stlight==NULL) return 0;
     return (unsigned char)stlight[13];
 }
 
-short set_stlight_tilepos_y(unsigned char *stlight,unsigned char pos_y)
+short set_stlight_subtile_y(unsigned char *stlight,unsigned char pos_y)
 {
     if (stlight==NULL) return 0;
     stlight[13]=pos_y;
 }
 
-short set_stlight_tilepos(unsigned char *stlight,unsigned char pos_x,unsigned char pos_y)
+short set_stlight_subtile(unsigned char *stlight,unsigned char pos_x,unsigned char pos_y)
 {
     if (stlight==NULL) return 0;
     stlight[11]=pos_x;
     stlight[13]=pos_y;
 }
 
-unsigned char get_stlight_tilepos_h(unsigned char *stlight)
+unsigned char get_stlight_subtile_h(unsigned char *stlight)
 {
     if (stlight==NULL) return 0;
     return stlight[15];
 }
 
-short set_stlight_tilepos_h(unsigned char *stlight,unsigned char pos_h)
+short set_stlight_subtile_h(unsigned char *stlight,unsigned char pos_h)
 {
     if (stlight==NULL) return 0;
     stlight[15]=pos_h;
@@ -281,25 +281,25 @@ short set_stlight_subtpos_h(unsigned char *stlight,unsigned char pos_h)
     stlight[14]=pos_h;
 }
 
-unsigned char get_stlight_tile_range(unsigned char *stlight)
+unsigned char get_stlight_range_subtile(unsigned char *stlight)
 {
     if (stlight==NULL) return 0;
     return stlight[1];
 }
 
-short set_stlight_tile_range(unsigned char *stlight,unsigned char rng_tl)
+short set_stlight_range_subtile(unsigned char *stlight,unsigned char rng_tl)
 {
     if (stlight==NULL) return 0;
     stlight[1]=rng_tl;
 }
 
-unsigned char get_stlight_subt_range(unsigned char *stlight)
+unsigned char get_stlight_range_subtpos(unsigned char *stlight)
 {
     if (stlight==NULL) return 0;
     return stlight[0];
 }
 
-short set_stlight_subt_range(unsigned char *stlight,unsigned char rng_st)
+short set_stlight_range_subtpos(unsigned char *stlight,unsigned char rng_st)
 {
     if (stlight==NULL) return 0;
     stlight[0]=rng_st;
@@ -337,10 +337,10 @@ unsigned char *create_stlight(unsigned int sx, unsigned int sy)
     for (i=0; i < SIZEOF_DK_LGT_REC; i++)
       stlight[i]=0;
     set_stlight_subtpos(stlight,((sx%MAP_SUBNUM_X)*0x40+0x40),((sy%MAP_SUBNUM_Y)*0x40+0x40));
-    set_stlight_tilepos(stlight,(unsigned char)sx,(unsigned char)sy);
-    set_stlight_tilepos_h(stlight,5);
-    set_stlight_tile_range(stlight,0x010);
-    set_stlight_subt_range(stlight,0);
+    set_stlight_subtile(stlight,(unsigned char)sx,(unsigned char)sy);
+    set_stlight_subtile_h(stlight,5);
+    set_stlight_range_subtile(stlight,0x010);
+    set_stlight_range_subtpos(stlight,0);
     set_stlight_intensivity(stlight,0x020);
     //Other parameters - no idea what they mean, but seem to be constant
     stlight[18]=0x0ff;
@@ -368,6 +368,6 @@ unsigned char *create_stlight_copy(unsigned int sx, unsigned int sy,unsigned cha
     int i;
     memcpy(stlight,src,SIZEOF_DK_LGT_REC);
     set_stlight_subtpos(stlight,((sx%MAP_SUBNUM_X)*0x40+0x40),((sy%MAP_SUBNUM_Y)*0x40+0x40));
-    set_stlight_tilepos(stlight,(unsigned char)sx,(unsigned char)sy);
+    set_stlight_subtile(stlight,(unsigned char)sx,(unsigned char)sy);
     return stlight;
 }

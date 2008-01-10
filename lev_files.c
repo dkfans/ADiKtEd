@@ -13,6 +13,7 @@
 #include "bulcommn.h"
 #include "scr_actn.h"
 #include "obj_column.h"
+#include "lev_data.h"
 
 short load_subtile(unsigned char **dest,
                         char *fname, int length, int x, int y,
@@ -69,34 +70,26 @@ unsigned char **load_subtile_malloc(char *fname, int length,
 }
 
 
-int load_tng(struct LEVEL *lvl,char *fname)
+short load_tng(struct LEVEL *lvl,char *fname)
 {
     struct memory_file mem;
     int tng_num;
     int i, j;
     unsigned char *thing;
-    
     mem = read_file (fname);
     if (mem.len < SIZEOF_DK_TNG_HEADER)
       return false;
-    
+    //Read the header    
     tng_num = read_short_le_buf(mem.content);
-
     // Check everything's cushty
     if (mem.len != tng_num*SIZEOF_DK_TNG_REC+SIZEOF_DK_TNG_HEADER)
       return false;
-
+    //Read tng entries
     for (i=0; i < tng_num; i++)
     {
       unsigned char *thing = create_thing_empty();
       int offs=SIZEOF_DK_TNG_REC*i+SIZEOF_DK_TNG_HEADER;
       memcpy(thing, mem.content+offs, SIZEOF_DK_TNG_REC);
-      //Counting hero gates
-      if (get_thing_type(thing) == THING_TYPE_ITEM)
-      {
-        if (get_thing_subtype(thing) == ITEM_SUBTYPE_HEROGATE)
-          lvl->stats.hero_gates_count++;
-      }
       thing_add(lvl,thing);
     }
     if (tng_num != lvl->tng_total_count)
@@ -133,7 +126,7 @@ short load_clm(struct LEVEL *lvl,char *fname)
  * Loads the APT file fname, fills LEVEL apt entries
  * This _must_ be called _after_ tng_* are set up
  */
-int load_apt (struct LEVEL *lvl,char *fname)
+short load_apt(struct LEVEL *lvl,char *fname)
 {
     struct memory_file mem;
     int i;
@@ -142,11 +135,8 @@ int load_apt (struct LEVEL *lvl,char *fname)
     mem = read_file (fname);
     if (mem.len < SIZEOF_DK_APT_HEADER)
       return false;
-    
     if (lvl->apt_lookup==NULL)
       return false;
-    
-    lvl->apt_total_count=0;
     long apt_num;
     apt_num = read_long_le_buf(mem.content+0);
     // Check everything's cushty
@@ -180,25 +170,104 @@ short load_inf(struct LEVEL *lvl,char *fname)
 
 short load_wib(struct LEVEL *lvl,char *fname)
 {
-    return load_subtile(lvl->wib, fname, 65536, 255, 255, 256, 1, 0, 1, 0);
+    //Preparing array bounds
+    const int dat_entries_x=MAP_SIZE_X*MAP_SUBNUM_X+1;
+    const int dat_entries_y=MAP_SIZE_Y*MAP_SUBNUM_Y+1;
+    //Loading the file
+    struct memory_file mem;
+    mem = read_file(fname);
+    if ((mem.len!=dat_entries_x*dat_entries_y))
+      return false;
+    //Reading WIB entries
+    int sx, sy;
+    unsigned long addr;
+    for (sy=0; sy<dat_entries_y; sy++)
+    {
+      addr = sy*dat_entries_x;
+      for (sx=0; sx<dat_entries_x; sx++)
+      {
+          set_subtl_wib(lvl,sx,sy,mem.content[addr+sx]);
+      }
+    }
+    free(mem.content);
+    return true;
+  // Old way
+  //return load_subtile(lvl->wib, fname, 65536, arr_entries_x, arr_entries_y,256, 1, 0, 1, 0);
 }
 
 short load_slb(struct LEVEL *lvl,char *fname)
 {
-    return load_subtile(lvl->slb, fname, 14450, MAP_SIZE_Y, MAP_SIZE_X, 170, 1, 0, 2, 0);
+    //Reading file
+    struct memory_file mem;
+    mem = read_file(fname);
+    if ((mem.len!=2*MAP_SIZE_X*MAP_SIZE_Y))
+      return false;
+    //Loading the entries
+    int i, k;
+    unsigned long addr=0;
+    for (i=0; i<MAP_SIZE_Y; i++)
+    {
+      addr = 2*MAP_SIZE_X*i;
+      for (k=0; k<MAP_SIZE_X; k++)
+          set_tile_slab(lvl,k,i,read_short_le_buf(mem.content+addr+k*2));
+    }
+    free(mem.content);
+    return true;
+    //The old way - left as an antic
+    //return load_subtile(, fname, 14450, MAP_SIZE_Y, MAP_SIZE_X,170, 1, 0, 2, 0);
 }
 
 short load_own(struct LEVEL *lvl,char *fname)
 {
-    return load_subtile(lvl->own, fname, 65536, MAP_SIZE_Y, MAP_SIZE_X, 256, 3, 0, 3, 0); 
+    //Preparing array bounds
+    int dat_entries_x=MAP_SIZE_X*MAP_SUBNUM_X+1;
+    int dat_entries_y=MAP_SIZE_Y*MAP_SUBNUM_Y+1;
+    //Loading the file
+    struct memory_file mem;
+    mem = read_file(fname);
+    if ((mem.len!=dat_entries_x*dat_entries_y))
+      return false;
+    //Reading entries
+    int sx, sy;
+    unsigned long addr;
+    for (sy=0; sy<dat_entries_y; sy++)
+    {
+      addr = sy*dat_entries_x;
+      for (sx=0; sx<dat_entries_x; sx++)
+      {
+          set_subtl_owner(lvl,sx,sy,mem.content[addr+sx]);
+      }
+    }
+    free(mem.content);
+    return true;
+    //Old way
+    //return load_subtile(lvl->own, fname, 65536, MAP_SIZE_Y, MAP_SIZE_X,256, 3, 0, 3, 0); 
 }
 
 short load_dat(struct LEVEL *lvl,char *fname)
 {
-    short result;
-    result=load_subtile((unsigned char **)(lvl->dat_low), fname, 131072, 255, 255, 512, 1, 0, 2, 0);
-    result&=load_subtile((unsigned char **)(lvl->dat_high), fname, 131072, 255, 255, 512, 1, 0, 2, 1);
-    return result;
+    //Preparing array bounds
+    const int dat_entries_x=MAP_SIZE_X*MAP_SUBNUM_X+1;
+    const int dat_entries_y=MAP_SIZE_Y*MAP_SUBNUM_Y+1;
+    const unsigned int line_len=2*dat_entries_x;
+    //Loading the file
+    struct memory_file mem;
+    mem = read_file(fname);
+    if ((mem.len!=line_len*dat_entries_y))
+      return false;
+    //Reading DAT entries
+    int sx, sy;
+    unsigned long addr;
+    for (sy=0; sy<dat_entries_y; sy++)
+    {
+      addr = sy*line_len;
+      for (sx=0; sx<dat_entries_x; sx++)
+      {
+          set_dat_val(lvl,sx,sy,read_short_le_buf(mem.content+addr+sx*2));
+      }
+    }
+    free(mem.content);
+    return true;
 }
 
 short load_txt(struct LEVEL *lvl,char *fname)
@@ -283,6 +352,7 @@ short load_lgt(struct LEVEL *lvl,char *fname)
 /*
  * Loads WLB file.
  * WLB seems to be unused by the game, but are always written by BF editor.
+ * DK loads this file when starting a level.
  */
 short load_wlb(struct LEVEL *lvl,char *fname)
 {
@@ -296,9 +366,39 @@ short load_wlb(struct LEVEL *lvl,char *fname)
       for (j=0;j<MAP_SIZE_X;j++)
       {
         int mempos=i*MAP_SIZE_X+j;
-        lvl->wlb[i][j]=mem.content[mempos];
+        lvl->wlb[j][i]=mem.content[mempos];
       }
     free (mem.content);
+    return true;
+}
+
+/*
+ * Loads the FLG file.
+ * These seems to have small priority, but DK loads it when starting a level.
+ */
+short load_flg(struct LEVEL *lvl,char *fname)
+{
+    //Preparing array bounds
+    const int dat_entries_x=MAP_SIZE_X*MAP_SUBNUM_X+1;
+    const int dat_entries_y=MAP_SIZE_Y*MAP_SUBNUM_Y+1;
+    const unsigned int line_len=2*dat_entries_x;
+    //Loading the file
+    struct memory_file mem;
+    mem = read_file(fname);
+    if ((mem.len!=line_len*dat_entries_y))
+      return false;
+    //Reading entries
+    int sx, sy;
+    unsigned long addr;
+    for (sy=0; sy<dat_entries_y; sy++)
+    {
+      addr = sy*line_len;
+      for (sx=0; sx<dat_entries_x; sx++)
+      {
+          set_subtl_flg(lvl,sx,sy,read_short_le_buf(mem.content+addr+sx*2));
+      }
+    }
+    free(mem.content);
     return true;
 }
 
@@ -369,8 +469,7 @@ short write_slb(struct LEVEL *lvl,char *fname)
     {
       for (i=0; i < MAP_SIZE_X; i++)
       {
-          fputc (lvl->slb[i][k], fp);
-          fputc (0, fp);
+          write_short_le_file(fp,get_tile_slab(lvl,i,k));
       }
     }
     fclose (fp);
@@ -379,31 +478,26 @@ short write_slb(struct LEVEL *lvl,char *fname)
 
 short write_own(struct LEVEL *lvl,char *fname)
 {
+    //Preparing array bounds
+    const int dat_entries_x=MAP_SIZE_X*MAP_SUBNUM_X+1;
+    const int dat_entries_y=MAP_SIZE_Y*MAP_SUBNUM_Y+1;
+    //Opening
     FILE *fp;
-    int i, j, k, l;
     fp = fopen (fname, "wb");
     if (!fp)
     {
       message_error("Can't open \"%s\" for writing", fname);
       return false;
     }
-    for (i=0; i < MAP_SIZE_Y; i++)
+    //Writing data
+    int sx,sy;
+    for (sy=0; sy<dat_entries_y; sy++)
     {
-      // Write each line 3 times
-      for (k=0; k < 3; k++)
+      for (sx=0; sx<dat_entries_x; sx++)
       {
-          for (j=0; j < MAP_SIZE_X; j++)
-          {
-            // Write each character 3 times
-            for (l=0; l < 3; l++)
-                fputc (lvl->own[j][i], fp);
-          }
-          fputc (0, fp);
+          fputc (get_subtl_owner(lvl,sx,sy), fp);
       }
     }
-    // Fill the rest with junk :)
-    for (i=0; i < 256; i++)
-      fputc (0, fp);
     fclose (fp);
     return true;
 }
@@ -411,30 +505,53 @@ short write_own(struct LEVEL *lvl,char *fname)
 short write_dat(struct LEVEL *lvl,char *fname)
 {
     //Preparing array bounds
-    int arr_entries_x=MAP_SIZE_X*MAP_SUBNUM_X;
-    int arr_entries_y=MAP_SIZE_Y*MAP_SUBNUM_Y;
+    const int dat_entries_x=MAP_SIZE_X*MAP_SUBNUM_X+1;
+    const int dat_entries_y=MAP_SIZE_Y*MAP_SUBNUM_Y+1;
+    const unsigned int line_len=2*dat_entries_x;
 
     FILE *fp;
-    int i, j;
     fp = fopen (fname, "wb");
     if (!fp)
     {
       message_error("Can't open \"%s\" for writing", fname);
       return false;
     }
-    for (i=0; i < arr_entries_y; i++)
+    //Writing data
+    int sx,sy;
+    for (sy=0; sy<dat_entries_y; sy++)
     {
-      for (j=0; j < arr_entries_x; j++)
+      for (sx=0; sx<dat_entries_x; sx++)
       {
-          fputc (lvl->dat_low[j][i], fp);
-          fputc (lvl->dat_high[j][i], fp);
+          write_short_le_file(fp,get_dat_val(lvl,sx,sy));
       }
-      fputc (0, fp);
-      fputc (0, fp);
     }
-    // Fill the rest with zeros
-    for (i=0; i < 512; i++)
-      fputc (0, fp);
+    fclose (fp);
+    return true;
+}
+
+short write_flg(struct LEVEL *lvl,char *fname)
+{
+    //Preparing array bounds
+    const int dat_entries_x=MAP_SIZE_X*MAP_SUBNUM_X+1;
+    const int dat_entries_y=MAP_SIZE_Y*MAP_SUBNUM_Y+1;
+    const unsigned int line_len=2*dat_entries_x;
+
+    FILE *fp;
+    fp = fopen (fname, "wb");
+    if (!fp)
+    {
+      message_error("Can't open \"%s\" for writing", fname);
+      return false;
+    }
+    //Writing data
+    int sx,sy;
+    for (sy=0; sy<dat_entries_y; sy++)
+    {
+      for (sx=0; sx<dat_entries_x; sx++)
+      {
+          write_short_le_file(fp,get_subtl_flg(lvl,sx,sy));
+      }
+    }
     fclose (fp);
     return true;
 }
@@ -463,8 +580,8 @@ short write_clm(struct LEVEL *lvl,char *fname)
 short write_wib(struct LEVEL *lvl,char *fname)
 {
     //Preparing array bounds
-    int arr_entries_x=MAP_SIZE_X*MAP_SUBNUM_X;
-    int arr_entries_y=MAP_SIZE_Y*MAP_SUBNUM_Y;
+    int dat_entries_x=MAP_SIZE_X*MAP_SUBNUM_X+1;
+    int dat_entries_y=MAP_SIZE_Y*MAP_SUBNUM_Y+1;
 
     FILE *fp;
     fp = fopen (fname, "wb");
@@ -474,15 +591,11 @@ short write_wib(struct LEVEL *lvl,char *fname)
       return false;
     }
     int i, j;
-    for (i=0; i < arr_entries_y; i++)
+    for (i=0; i < dat_entries_y; i++)
     {
-      for (j=0; j < arr_entries_x; j++)
-          fputc (lvl->wib[j][i], fp);
-      fputc (0, fp);
+      for (j=0; j<dat_entries_x; j++)
+          fputc (get_subtl_wib(lvl,j,i), fp);
     }
-    // Fill the rest with zeros
-    for (i=0; i < 256; i++)
-      fputc (0, fp);
     fclose (fp);
     return true;
 }
@@ -626,7 +739,7 @@ short write_wlb(struct LEVEL *lvl,char *fname)
     for (i=0; i < MAP_SIZE_Y; i++)
     {
       for (j=0; j < MAP_SIZE_X; j++)
-          fputc(lvl->wlb[i][j], fp);
+          fputc(lvl->wlb[j][i], fp);
     }
     fclose(fp);
     return true;
@@ -661,11 +774,14 @@ short write_text_file(char **lines,int lines_count,char *fname)
       message_error("Can't open \"%s\" for writing", fname);
       return false;
     }
-    for (i=0;i<lines_count;i++)
+    int last_line=lines_count-1;
+    for (i=0;i<last_line;i++)
     {
       fputs(lines[i],fp);
       fputs("\n",fp);
     }
+    if (last_line>=0)
+      fputs(lines[last_line],fp);
     fclose(fp);
     return true;
 }
@@ -709,6 +825,8 @@ short save_map(struct LEVEL *lvl)
     result&=write_lgt(lvl,fnames);
     sprintf (fnames, "%s.wlb", lvl->savfname);
     result&=write_wlb(lvl,fnames);
+    sprintf (fnames, "%s.flg", lvl->savfname);
+    result&=write_flg(lvl,fnames);
     sprintf (fnames, "%s.adi", lvl->savfname);
     result&=write_adi_script(lvl,fnames);
     if ((result)&&(strlen(lvl->fname)<1))
@@ -796,6 +914,12 @@ short load_map(struct LEVEL *lvl)
     //WLBs are not very importand, and may even not exist,
     // so ignore any error when loading them
     load_wlb(lvl,fnames);
+  }    
+  if (result)
+  {
+    sprintf (fnames, "%s.flg", lvl->fname);
+    //FLGs are not very importand, so ignore any error when loading
+    load_flg(lvl,fnames);
   }    
   if (result)
   {
@@ -929,8 +1053,8 @@ short write_def_tng_source(struct LEVEL *lvl,char *fname)
           for (k=0; k < get_thing_subnums(lvl,cx,cy); k++)
           {
             unsigned char *thing=get_thing(lvl,cx,cy,k);
-            int spos_x=get_thing_tilepos_x(thing);
-            int spos_y=get_thing_tilepos_y(thing);
+            int spos_x=get_thing_subtile_x(thing);
+            int spos_y=get_thing_subtile_y(thing);
             int sen_tl=get_thing_sensitile(thing);
             if ( (sen_tl!=((spos_x/3-1)+(spos_y/3-1)*85)) &&
                  (sen_tl!=((spos_x/3-1)+(spos_y/3+0)*85)) &&
@@ -950,7 +1074,7 @@ short write_def_tng_source(struct LEVEL *lvl,char *fname)
               fprintf(fp," stlpos %3d,%3d",
               get_thing_subtpos_x(thing), get_thing_subtpos_y(thing));
               fprintf(fp," alt %3d altstl %d",
-                get_thing_subtpos_h(thing),get_thing_tilepos_h(thing));
+                get_thing_subtpos_h(thing),get_thing_subtile_h(thing));
               fprintf(fp," typ %5s",get_thing_type_shortname(get_thing_type(thing)));
               fprintf(fp," knd %s",get_item_subtype_fullname(get_thing_subtype(thing)));
               fprintf(fp,"\n");

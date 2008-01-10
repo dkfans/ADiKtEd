@@ -20,9 +20,11 @@ enum adikt_workmode
   MD_CCLM   = 0x008,
   MD_CUBE   = 0x009,
   MD_SLBL   = 0x00a,
+  MD_RWRK   = 0x00b,
+  MD_SRCH   = 0x00c,
 };
 
-#define MODES_COUNT 11
+#define MODES_COUNT 13
 
 #define TNGDAT_ROWS 8
 
@@ -68,6 +70,8 @@ struct MAPMODE_DATA {
     int mapy;
     // Variables for drawing the mark rectangle
     int markl, markr, markt, markb;
+    // And highlighted squares
+    int **hilight;
     // Which subtile is being considered in thing and data modes
     int subtl_x;
     int subtl_y;
@@ -135,5 +139,9 @@ int get_screen_color_owned(unsigned char owner,short marked,short darken);
 void draw_map_area(struct LEVEL *lvl,short show_ground,short show_rooms,short show_things);
 int get_draw_map_tile_char(struct LEVEL *lvl,int tx,int ty,
     short show_ground,short show_rooms,short show_things,short force_at);
+
+int get_tile_highlight(struct MAPMODE_DATA *mapmode, unsigned int tx, unsigned int ty);
+void set_tile_highlight(struct MAPMODE_DATA *mapmode, unsigned int tx, unsigned int ty, int nval);
+void clear_highlight(struct MAPMODE_DATA *mapmode);
 
 #endif // ADIKT_SCRACTN_H

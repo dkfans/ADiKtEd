@@ -34,7 +34,7 @@ short columns_verify(struct LEVEL *lvl, char *err_msg);
 
 unsigned int get_dat_subtile(struct LEVEL *lvl, unsigned int sx, unsigned int sy);
 void set_dat_subtile(struct LEVEL *lvl, int sx, int sy, int d);
-void set_dat (struct LEVEL *lvl,int x, int y, int tl, int tm, int tr,
+void set_dat(struct LEVEL *lvl,int x, int y, int tl, int tm, int tr,
         int ml, int mm, int mr, int bl, int bm, int br);
 void set_dat_unif (struct LEVEL *lvl, int x, int y, int d);
 short dat_verify(struct LEVEL *lvl, char *err_msg);
@@ -45,13 +45,18 @@ void update_datclm_for_square(struct LEVEL *lvl, int tx_first, int tx_last,
     int ty_first, int ty_last);
 void update_datclm_for_slab(struct LEVEL *lvl, int tx, int ty);
 void set_new_datclm_values(struct LEVEL *lvl, int tx, int ty, struct COLUMN_REC *clm_recs[9]);
+void set_new_datclm_entry(struct LEVEL *lvl, int sx, int sy, struct COLUMN_REC *clm_rec);
 void update_clm_utilize_counters(struct LEVEL *lvl);
 void get_slab_surround(unsigned char *surr_slb,unsigned char *surr_own,unsigned char **surr_tng,int x, int y);
 void clm_utilize_dec(struct LEVEL *lvl, int clmidx);
 void clm_utilize_inc(struct LEVEL *lvl, int clmidx);
 short clm_entry_is_used(unsigned int clmidx);
+short update_dat_last_column(struct LEVEL *lvl, unsigned short slab);
 
 void update_tile_wib_entries(struct LEVEL *lvl, int tx, int ty);
+void update_tile_wlb_entry(struct LEVEL *lvl, int tx, int ty);
+void update_tile_flg_entries(struct LEVEL *lvl, int tx, int ty);
+unsigned short compute_flg_for_tile(unsigned short slab,short corner);
 
 unsigned char *get_subtile_column(struct LEVEL *lvl, int sx, int sy);
 short get_subtile_column_rec(struct LEVEL *lvl, struct COLUMN_REC *clm_rec, int sx, int sy);

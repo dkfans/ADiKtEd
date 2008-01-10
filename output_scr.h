@@ -44,6 +44,8 @@ enum borderStyle {bsSingle,bsDouble,bsSolid};
 #define PRINT_COLOR_GREY_ON_GREEN     57
 #define PRINT_COLOR_GREY_ON_BROWN     58
 #define PRINT_COLOR_GREY_ON_CYAN      59
+
+#define PRINT_COLOR_LRED_ON_YELLOW    60
     
 void set_cursor_visibility(short val);
 int get_screen_rows();

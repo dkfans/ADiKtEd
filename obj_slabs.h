@@ -94,25 +94,25 @@ struct LEVEL;
 short slab_is_central(struct LEVEL *lvl,int x,int y);
 short slabs_verify(struct LEVEL *lvl, char *err_msg);
 
-int slab_siblings_oftype(struct LEVEL *lvl,int x,int y,unsigned char slab_type);
+int slab_siblings_oftype(struct LEVEL *lvl,int x,int y,unsigned short slab_type);
 void slab_draw_smear(struct LEVEL *lvl,int startx,int starty,int startr,
-                     int endx,int endy,int endr,int bend,unsigned char slab_type);
-void slab_draw_circle(struct LEVEL *lvl,int x,int y,int rad,unsigned char slab_type);
+                     int endx,int endy,int endr,int bend,unsigned short slab_type);
+void slab_draw_circle(struct LEVEL *lvl,int x,int y,int rad,unsigned short slab_type);
 
-short slab_is_short(unsigned char slab_type);
-short slab_is_door(unsigned char slab_type);
-short slab_is_room(unsigned char slab_type);
-short slab_is_wall(unsigned char slab_type);
-short slab_is_wealth(unsigned char slab_type);
-short slab_is_space(unsigned char slab_type);
-short slab_is_tall_unclmabl(unsigned char slab_type);
-short slab_is_tall(unsigned char slab_type);
-short slab_is_short_clmabl(unsigned char slab_type);
-short slab_is_short_unclmabl(unsigned char slab_type);
-short slab_is_clmabl(unsigned char slab_type);
-short slab_is_claimedgnd(unsigned char slab_type);
-short slab_needs_adjacent_torch(unsigned char slab_type);
-short slab_verify_entry(unsigned char slab_type, char *err_msg);
+short slab_is_short(unsigned short slab_type);
+short slab_is_door(unsigned short slab_type);
+short slab_is_room(unsigned short slab_type);
+short slab_is_wall(unsigned short slab_type);
+short slab_is_wealth(unsigned short slab_type);
+short slab_is_space(unsigned short slab_type);
+short slab_is_tall_unclmabl(unsigned short slab_type);
+short slab_is_tall(unsigned short slab_type);
+short slab_is_short_clmabl(unsigned short slab_type);
+short slab_is_short_unclmabl(unsigned short slab_type);
+short slab_is_clmabl(unsigned short slab_type);
+short slab_is_claimedgnd(unsigned short slab_type);
+short slab_needs_adjacent_torch(unsigned short slab_type);
+short slab_verify_entry(unsigned short slab_type, char *err_msg);
 char *get_slab_fullname(unsigned short slb_type);
 
 short subtl_is_near_tall_slab(struct LEVEL *lvl,unsigned int sx,unsigned int sy);

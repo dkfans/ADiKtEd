@@ -90,7 +90,6 @@ graphic has been altered by user. These tiles may look like something
 else that they really are, or may have user-modifications. User
 can make such tiles by placing graffiti or using manual columns.
 
-
 To \ychange the ownership\s of a tile, press a number key from \w0\s to \w5\s; \w0\s
 for \Rplayer 0\s, etc, and \w5\s for unclaimed. 
 
@@ -248,8 +247,12 @@ Press \wS\s and \wX\s to \ychange type\s of a highlighted creature.
 Press \wo\s to \ychange owner\s of a highlighted thing or creature. The
 ownership cycles through the players (and "unclaimed").
 
-Press '\w[\s' and '\w]\s' to \ychange height/altitude\s of highlighted object,
-or range of selected action point.
+Press '\w[\s' and '\w]\s' to \ychange height/altitude\s of highlighted object.
+Please note that ADiKtEd will allow you to place things inside of
+solid columns, so be careful.
+
+Press '\w-\s' and '\w+\s' to \ychange range\s of highlighted object. This
+has effects mainly on action points, static lights and room effects.
 
 Press \wl\s to \ylock/unlock\s a highlighted door.
 
@@ -257,6 +260,7 @@ Press \wdelete\s to \yremove "thing"\s in the highlighted spot.
 
 To switch back to \yslab mode\s, press \wtab\s.
 To switch into \yscript mode\s, press \wctrl+t\s.
+To search for objects and highlight them, press \wctrl+f\s.
 To \yquit\s, press \wctrl+q\s.
 To \ysave\s, press \wctrl+s\s. To save on last saved file name, press \wF5\s.
 
@@ -298,9 +302,11 @@ To \ysave\s, press \wctrl+s\s.
 [tips]
 There is no escape from the reaper.
 Even the salamander sometimes burns.
-You can autogenerate random maps with ctrl+r.
-Press F1 to view help for the current work mode.
 Escape where? To the dungeon?
+You should think before pressing buttons...
+You can autogenerate random maps with ctrl+r.
+Want to make map faster? Use ctrl+r to generate it.
+Press F1 to view help for the current work mode.
 To exit, press ctrl+q. To get help, press F1.
 To fix map for the official editor, press u.
 Random maps will generate faster if you press ctrl+u.
@@ -308,6 +314,10 @@ When you place a slab, the 3x3 square is auto-updated.
 To verify the map integrity and rules, press v.
 Want to know where north is? Then press ctrl+p.
 To see directions as they are in the game, press ctrl+p.
+To locate specials, press ctrl+f and select them.
+You can highlight all creatures by pressing ctrl+f.
+To highlight all action points, press ctrl+f.
+You can find a specific object using ctrl+f.
 [scrphelp]
 Script editor help:
 
@@ -351,6 +361,41 @@ This works exactly like the slab keys in slab mode,
 but you can also select one of unknown slab values from here.
 
 To cancel selection and exit, press \wesc\s or \wtab\s.
+[srchhelp]
+Search mode help:
+
+Select the type of object you wish to find with \arrows\s
+and \wpage up/down\s, then press \wenter\. All matching objects
+will be highlighted and easy to find.
+
+Making multiple searches can make multiple types highlighted.
+The highlight will not disappear until you enter search mode
+again and press "Clear results".
+
+Objects created after the search will not be highlighted.
+Places where the object was deleted after search will still
+be highlighted untill you clear results.
+
+[srchkeyhelp]
+Search mode:
+
+Select the type of object
+you wish to find.
+
+Slabs containing matching
+objects will be highlighted,
+and will stay this way until
+you clear the results.
+[rwrkhelp]
+Rework mode help:
+
+This mode is for map format reworking only.
+You can't edit anything here.
+You can only view raw contentof various game files:
+
+\wo\swn, \ws\slb, w\wi\sb, w\wl\sb, \wf\slg,...
+
+To back to slab mode, press \wesc\s or \wtab\s.
 [compass]
                   *
 \b /\\~~~~~~~~~~~~~~~\s|\b~~~~~~~~~~~~~~~/\\

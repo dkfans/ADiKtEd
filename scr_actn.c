@@ -19,38 +19,44 @@
 #include "scr_clm.h"
 #include "scr_list.h"
 #include "scr_txted.h"
+#include "scr_rwrk.h"
 #include "obj_slabs.h"
 #include "obj_things.h"
 #include "obj_column.h"
 #include "lev_data.h"
 
-static void (*actions [MODES_COUNT])(int)={
+static void (*actions [])(int)={
      actions_mdslab, actions_mdtng, actions_crtre, actions_itemt,
      actions_help, actions_mdclm, actions_scrpt, actions_mdtextr,
-     actions_mdcclm, actions_mdcube, actions_mdslbl};
+     actions_mdcclm, actions_mdcube, actions_mdslbl, actions_mdrwrk,
+     actions_mdsrch,};
 
 // Drawing functions for modes. You can fill new entries
 // with "draw_mdempty" till you create proper draw function.
-static void (*mddraw [MODES_COUNT])()={
+static void (*mddraw [])()={
      draw_mdslab, draw_mdtng, draw_crtre, draw_itemt,
      draw_help, draw_mdclm, draw_scrpt, draw_mdtextr,
-     draw_mdcclm, draw_mdcube, draw_mdslbl};
+     draw_mdcclm, draw_mdcube, draw_mdslbl, draw_mdrwrk,
+     draw_mdsrch,};
 
-static void (*mdend [MODES_COUNT])()={
+static void (*mdend [])()={
      end_mdslab, end_mdtng, end_list, end_list,
      end_help, end_mdclm, end_scrpt, end_list,
-     end_list, end_list, end_list};
+     end_list, end_list, end_list, end_mdrwrk,
+     end_list,};
 
 // Max. 5 chars mode names
-const char *modenames[MODES_COUNT]={
+const char *modenames[]={
      "Slab", "Thing", "Crtr", "Item",
      "Help", "Clmn", "Scrpt", "Textr",
-     "CClm", "CCube", "SlbLs",};
+     "CClm", "CCube", "SlbLs","Rewrk",
+     "Srch"};
 // longer mode names
-const char *longmodenames[MODES_COUNT]={
+const char *longmodenames[]={
      "slab", "thing", "add creature","add item",
      "help", "column", "script", "texture",
-     "cust.column","cust.cubes","slab list"};
+     "cust.column","cust.cubes","slab list","rework",
+     "search",};
 
 struct SCRMODE_DATA *scrmode;
 struct MAPMODE_DATA *mapmode;
@@ -86,6 +92,18 @@ void init_levscr_basics(void)
     mapmode=(struct MAPMODE_DATA *)malloc(sizeof(struct MAPMODE_DATA));
     if (mapmode==NULL)
      die("init_levscr: Cannot allocate memory.");
+    { //allocating mapmode sub-structures
+      int i;
+      mapmode->hilight = (int **)malloc(MAP_SIZE_Y*sizeof(int *));
+      if (mapmode->hilight==NULL)
+          die("init_levscr: Out of memory");
+      for (i=0; i < MAP_SIZE_Y; i++)
+      {
+        mapmode->hilight[i] = (int *)malloc(MAP_SIZE_X*sizeof(int));
+        if (mapmode->hilight[i]==NULL)
+          die("init_levscr: Out of memory");
+      }
+    }
     clear_mapmode(mapmode);
     int i;
     automated_commands=malloc(READ_BUFSIZE*sizeof(unsigned int));
@@ -117,6 +135,8 @@ void init_levscr_modes(void)
     // initialize slab mode
     //(this includes slbkey required for all screens containing map)
     init_mdslab();
+    //Init rework mode
+    init_mdrwrk();
 }
 
 void clear_scrmode(struct SCRMODE_DATA *scrmode)
@@ -143,6 +163,7 @@ void clear_mapmode(struct MAPMODE_DATA *mapmode)
     mapmode->subtl_x=1;
     mapmode->subtl_y=1;
     mapmode->panel_mode=PV_MODE;
+    clear_highlight(mapmode);
 }
 
 void free_levscr(void)
@@ -154,12 +175,50 @@ void free_levscr(void)
     free_mdclm();
     free_mdtng();
     free_mdslab();
+    free_mdrwrk();
     // Main screen variables
     free(automated_commands);
+    //Freeing mapmode structure
+    if (mapmode->hilight!=NULL)
+    {
+      int i;
+      for (i=0; i<MAP_SIZE_Y; i++)
+          free(mapmode->hilight[i]);
+      free(mapmode->hilight);
+    }
     free(mapmode);
     free(scrmode);
     // Shutting down screen support
     screen_done();
+}
+
+/*
+ * Gets highlight color of a tile.
+ */
+int get_tile_highlight(struct MAPMODE_DATA *mapmode, unsigned int tx, unsigned int ty)
+{
+    if (mapmode->hilight==NULL) return 0;
+    //Bounding position
+    if ((tx>=MAP_SIZE_X)||(ty>=MAP_SIZE_Y)) return 0;
+    return mapmode->hilight[tx][ty];
+}
+
+/*
+ * Sets a new value to highlight color.
+ */
+void set_tile_highlight(struct MAPMODE_DATA *mapmode, unsigned int tx, unsigned int ty, int nval)
+{
+    //Bounding position
+    if ((tx>=MAP_SIZE_X)||(ty>=MAP_SIZE_Y)) return;
+    mapmode->hilight[tx][ty]=nval;
+}
+
+void clear_highlight(struct MAPMODE_DATA *mapmode)
+{
+    int i,k;
+    for (k=0;k<MAP_SIZE_Y;k++)
+      for (i=0;i<MAP_SIZE_X;i++)
+        mapmode->hilight[i][k]=0;
 }
 
 /*
@@ -294,6 +353,7 @@ char *mode_status(int mode)
     case MD_ITMT:
     case MD_TXTR:
     case MD_SLBL:
+    case MD_SRCH:
       sprintf (buffer, "   (Selecting type)");
       break;
     default:
@@ -315,6 +375,9 @@ int get_draw_map_tile_color(struct LEVEL *lvl,int tx,int ty,short special,short 
     int g;
     if ((tx<0)||(tx>=MAP_SIZE_X)) return PRINT_COLOR_GREY_ON_BLACK;
     if ((ty<0)||(ty>=MAP_SIZE_Y)) return PRINT_COLOR_GREY_ON_BLACK;
+    //If highlighted - nothing more matters
+    int hilight=get_tile_highlight(mapmode,tx,ty);
+    if (hilight>0) return hilight;
     int own=get_tile_owner(lvl,tx,ty);
     short marked=((mapmode->mark) && (tx>=mapmode->markl) && (tx<=mapmode->markr)
                         && (ty>=mapmode->markt) && (ty<=mapmode->markb));
@@ -401,7 +464,7 @@ int get_screen_color_owned(unsigned char owner,short marked,short darken)
 /*
  * Reduces slab to basic type, for displaying map without rooms
  */
-unsigned char simplify_map_slab(unsigned char slab)
+unsigned char simplify_map_slab(unsigned short slab)
 {
   if (slab==SLAB_TYPE_ROCK) return SLAB_TYPE_ROCK;
   if (slab_is_tall(slab)) return SLAB_TYPE_EARTH;
@@ -414,7 +477,7 @@ unsigned char simplify_map_slab(unsigned char slab)
 int get_draw_map_tile_char(struct LEVEL *lvl,int tx,int ty,short show_ground,short show_rooms,short show_things,short force_at)
 {
     char out_ch;
-    unsigned char slab;
+    unsigned short slab;
     if (show_things)
       out_ch=get_thing_char(tx,ty);
     else
@@ -463,7 +526,7 @@ void draw_map_area(struct LEVEL *lvl,short show_ground,short show_rooms,short sh
               {
                   g = graffiti_idx(lvl,tx,ty);
                   has_ccol = slab_has_custom_columns(lvl,tx,ty);
-                  unsigned char slab=get_tile_slab(lvl,tx,ty);
+                  unsigned short slab=get_tile_slab(lvl,tx,ty);
                   darken=(slab==SLAB_TYPE_ROCK)||(slab==SLAB_TYPE_LAVA);
               } else
               {
@@ -556,6 +619,7 @@ int change_mode(int new_mode)
        break;
   case MD_CRTR:
   case MD_ITMT:
+  case MD_SRCH:
        start_list(lvl,new_mode);
        break;
   case MD_TXTR:
@@ -585,7 +649,7 @@ short is_simple_mode(int mode)
     if ((scrmode->mode==MD_HELP) || (scrmode->mode==MD_CRTR) ||
         (scrmode->mode==MD_ITMT) || (scrmode->mode==MD_TXTR) ||
         (scrmode->mode==MD_CCLM) || (scrmode->mode==MD_CUBE) ||
-        (scrmode->mode==MD_SLBL) )
+        (scrmode->mode==MD_SLBL) || (scrmode->mode==MD_SRCH) )
       return true;
     return false;
 }
@@ -667,7 +731,7 @@ void proc_key(void)
           message_error("Map name is empty, cannot load last loaded.");
       break;
     case KEY_CTRL_S:
-      if ((scrmode->mode==MD_HELP) || (scrmode->mode==MD_CRTR) || (scrmode->mode==MD_ITMT))
+      if (is_simple_mode(scrmode->mode))
       {
         message_info("You can't save from here.");
         break;
@@ -752,6 +816,15 @@ void proc_key(void)
       } else
       {
         change_mode(MD_SCRP);
+      }
+      break;
+    case KEY_CTRL_F:
+      if (is_simple_mode(scrmode->mode))
+      {
+        message_info("You can't search from this mode.");
+      } else
+      {
+        change_mode(MD_SRCH);
       }
       break;
     case KEY_CTRL_E:

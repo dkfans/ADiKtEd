@@ -75,12 +75,17 @@
 
 #define CUBE_MAX_INDEX         511
 
-#define CUST_CLM_GEN_MAX_INDEX  35
+#define CUST_CLM_GEN_MAX_INDEX  36
 
 //WIB entry values
 #define COLUMN_WIB_STATIC      0x00
 #define COLUMN_WIB_SKEW        0x01
 #define COLUMN_WIB_ANIMATE     0x02
+
+//WLB entry values
+#define TILE_WLB_SOLID       0x00
+#define TILE_WLB_LAVA        0x01
+#define TILE_WLB_WATER       0x02
 
 struct COLUMN_REC {
     unsigned int use;
@@ -235,6 +240,10 @@ unsigned short *get_room_edge_direction_indices(unsigned char *surr_slb,unsigned
 
 void create_columns_slb_wallbrick(struct COLUMN_REC *clm_recs[9], short *allow_relief,
         unsigned char *surr_slb,unsigned char *surr_own, unsigned char **surr_tng);
+void fill_columns_slb_roomrelief(struct COLUMN_REC *clm_recs[9], short *allow_relief,
+        unsigned char *surr_slb,unsigned char *surr_own, unsigned char **surr_tng);
+short fill_side_columns_room_relief(struct COLUMN_REC *clm_reca,struct COLUMN_REC *clm_recb,
+    struct COLUMN_REC *clm_recc,unsigned short room_slab,unsigned char owner, short corner, short edge);
 
 void create_columns_slb_room(cr_clm_func cr_floor,cr_clm_func cr_edge,
         cr_clm_func cr_corner,cr_clm_func cr_inside,cr_clm_func cr_nearinsd,
@@ -361,7 +370,8 @@ void create_columns_slb_door_floor(struct COLUMN_REC *clm_recs[9],
 //User columns - used only in "manual columns" function, not as standard ones
 void create_columns_slb_thingems_path(struct COLUMN_REC *clm_recs[9],
         unsigned char *surr_slb,unsigned char *surr_own, unsigned char **surr_tng);
-
+void create_columns_slb_rock_gndlev(struct COLUMN_REC *clm_recs[9],
+        unsigned char *surr_slb,unsigned char *surr_own, unsigned char **surr_tng);
 
 // Functions for preparing single CoLuMns
 void fill_column_rock(struct COLUMN_REC *clm_rec, unsigned char owner);
@@ -381,6 +391,8 @@ void fill_column_claimedgnd_surr(struct COLUMN_REC *clm_rec, unsigned char owner
 void fill_column_claimedgnd_nearwater(struct COLUMN_REC *clm_rec, unsigned char owner);
 void fill_column_claimedgnd_nearlava(struct COLUMN_REC *clm_rec, unsigned char owner);
 
+void fill_column_rock_gndlev(struct COLUMN_REC *clm_rec, unsigned char owner);
+
 void fill_column_wall_centr(struct COLUMN_REC *clm_rec, unsigned char owner);
 void fill_column_wall_cobblestones(struct COLUMN_REC *clm_rec, unsigned char owner);
 void place_column_wall_cobblestones_mk(struct COLUMN_REC *clm_rec, unsigned char owner);
@@ -399,6 +411,47 @@ void fill_column_wall_womanbrick_c(struct COLUMN_REC *clm_rec, unsigned char own
 void fill_column_wall_pairshrbrick_a(struct COLUMN_REC *clm_rec, unsigned char owner);
 void fill_column_wall_pairshrbrick_b(struct COLUMN_REC *clm_rec, unsigned char owner);
 void fill_column_wall_pairshrbrick_c(struct COLUMN_REC *clm_rec, unsigned char owner);
+
+void place_column_wall_drape_a(struct COLUMN_REC *clm_rec, unsigned char owner);
+void place_column_wall_drape_b(struct COLUMN_REC *clm_rec, unsigned char owner);
+void place_column_wall_drape_c(struct COLUMN_REC *clm_rec, unsigned char owner);
+
+void place_column_wall_portal_a(struct COLUMN_REC *clm_rec, unsigned char owner);
+void place_column_wall_portal_b(struct COLUMN_REC *clm_rec, unsigned char owner);
+void place_column_wall_treasure_a(struct COLUMN_REC *clm_rec, unsigned char owner);
+void place_column_wall_treasure_b(struct COLUMN_REC *clm_rec, unsigned char owner);
+void place_column_wall_treasure_c(struct COLUMN_REC *clm_rec, unsigned char owner);
+void place_column_wall_training_a(struct COLUMN_REC *clm_rec, unsigned char owner);
+void place_column_wall_training_b(struct COLUMN_REC *clm_rec, unsigned char owner);
+void place_column_wall_training_c(struct COLUMN_REC *clm_rec, unsigned char owner);
+void place_column_wall_library_a(struct COLUMN_REC *clm_rec, unsigned char owner);
+void place_column_wall_library_b(struct COLUMN_REC *clm_rec, unsigned char owner);
+void place_column_wall_library_c(struct COLUMN_REC *clm_rec, unsigned char owner);
+void place_column_wall_scavenger_a(struct COLUMN_REC *clm_rec, unsigned char owner);
+void place_column_wall_scavenger_b(struct COLUMN_REC *clm_rec, unsigned char owner);
+void place_column_wall_scavenger_c(struct COLUMN_REC *clm_rec, unsigned char owner);
+void place_column_wall_graveyard_a(struct COLUMN_REC *clm_rec, unsigned char owner);
+void place_column_wall_graveyard_b(struct COLUMN_REC *clm_rec, unsigned char owner);
+void place_column_wall_graveyard_c(struct COLUMN_REC *clm_rec, unsigned char owner);
+void place_column_wall_lair_b(struct COLUMN_REC *clm_rec, unsigned char owner);
+void place_column_wall_workshop_a(struct COLUMN_REC *clm_rec, unsigned char owner);
+void place_column_wall_workshop_b(struct COLUMN_REC *clm_rec, unsigned char owner);
+void place_column_wall_workshop_c(struct COLUMN_REC *clm_rec, unsigned char owner);
+void place_column_wall_prison_a(struct COLUMN_REC *clm_rec, unsigned char owner);
+void place_column_wall_prison_b(struct COLUMN_REC *clm_rec, unsigned char owner);
+void place_column_wall_prison_c(struct COLUMN_REC *clm_rec, unsigned char owner);
+void place_column_wall_torture_a(struct COLUMN_REC *clm_rec, unsigned char owner);
+void place_column_wall_torture_b(struct COLUMN_REC *clm_rec, unsigned char owner);
+void place_column_wall_torture_c(struct COLUMN_REC *clm_rec, unsigned char owner);
+void place_column_wall_barracks_a(struct COLUMN_REC *clm_rec, unsigned char owner);
+void place_column_wall_barracks_b(struct COLUMN_REC *clm_rec, unsigned char owner);
+void place_column_wall_barracks_c(struct COLUMN_REC *clm_rec, unsigned char owner);
+void place_column_wall_temple_a(struct COLUMN_REC *clm_rec, unsigned char owner);
+void place_column_wall_temple_b(struct COLUMN_REC *clm_rec, unsigned char owner);
+void place_column_wall_temple_c(struct COLUMN_REC *clm_rec, unsigned char owner);
+void place_column_wall_hatchery_a(struct COLUMN_REC *clm_rec, unsigned char owner);
+void place_column_wall_hatchery_b(struct COLUMN_REC *clm_rec, unsigned char owner);
+void place_column_wall_hatchery_c(struct COLUMN_REC *clm_rec, unsigned char owner);
 
 void place_column_doorwood_a(struct COLUMN_REC *clm_rec, unsigned char owner);
 void place_column_doorwood_b(struct COLUMN_REC *clm_rec, unsigned char owner);

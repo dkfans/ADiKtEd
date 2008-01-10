@@ -1,7 +1,7 @@
 [Project]
 FileName=map.dev
 Name=adikted
-UnitCount=49
+UnitCount=51
 Type=1
 Ver=1
 ObjFiles=
@@ -33,7 +33,7 @@ CompilerSettings=00000000000000000000e0
 Major=0
 Minor=5
 Release=0
-Build=2574
+Build=2738
 LanguageID=1033
 CharsetID=1252
 CompanyName=
@@ -529,6 +529,26 @@ BuildCmd=
 
 [Unit49]
 FileName=lev_script.c
+CompileCpp=0
+Folder=adikted
+Compile=1
+Link=1
+Priority=1000
+OverrideBuildCmd=0
+BuildCmd=
+
+[Unit50]
+FileName=scr_rwrk.h
+CompileCpp=0
+Folder=adikted
+Compile=1
+Link=1
+Priority=1000
+OverrideBuildCmd=0
+BuildCmd=
+
+[Unit51]
+FileName=scr_rwrk.c
 CompileCpp=0
 Folder=adikted
 Compile=1

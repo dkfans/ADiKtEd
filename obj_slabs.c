@@ -109,14 +109,26 @@ unsigned char get_owner_prev(unsigned char plyr_idx)
  */
 void update_slab_owners(struct LEVEL *lvl)
 {
+    //Preparing array bounds
+    int dat_entries_x=MAP_SIZE_X*MAP_SUBNUM_X+1;
+    int dat_entries_y=MAP_SIZE_Y*MAP_SUBNUM_Y+1;
+    //Resetting owners on tiles
     int tx, ty;    
     for (ty=0; ty<MAP_SIZE_Y; ty++)
       for (tx=0; tx<MAP_SIZE_X; tx++)
       {
-        unsigned char slb=get_tile_slab(lvl, tx, ty);
+        unsigned short slb=get_tile_slab(lvl, tx, ty);
         if (!slab_is_clmabl(slb))
           set_tile_owner(lvl,tx,ty,PLAYER_UNSET);
       }
+    //Resetting the last column
+    int sx, sy;
+    sx=dat_entries_x-1;
+    for (sy=0; sy<dat_entries_y; sy++)
+      set_subtl_owner(lvl,sx,sy,PLAYER_UNSET);
+    sy=dat_entries_y-1;
+    for (sx=0; sx<dat_entries_x; sx++)
+      set_subtl_owner(lvl,sx,sy,PLAYER_UNSET);
 }
 
 /*
@@ -134,17 +146,19 @@ char *get_owner_type_fullname(unsigned char own_idx)
 /*
  * Says whether a slab is surrounded by the same things
  */
-short slab_is_central(struct LEVEL *lvl,int x,int y)
+short slab_is_central(struct LEVEL *lvl,int tx,int ty)
 {
     // Can't be central if it is on map edge
-    if ((x<=0) || (y<=0) || (x>=MAP_MAXINDEX_X) || (y>=MAP_MAXINDEX_Y))
+    if ((tx<=0) || (ty<=0) || (tx>=MAP_MAXINDEX_X) || (ty>=MAP_MAXINDEX_Y))
       return false;
     //Preparing variables
     int i, j;
+    unsigned short slab=get_tile_slab(lvl,tx,ty);
+    unsigned char owner=get_tile_owner(lvl,tx,ty);
     //Sweeping and comparing slab type and owner
-    for (i=x-1; i<=x+1; i++)
-      for (j=y-1; j<=y+1; j++)
-        if ((lvl->slb[x][y]!=lvl->slb[i][j])||(lvl->own[x][y]!=lvl->own[i][j]))
+    for (i=tx-1; i<=tx+1; i++)
+      for (j=ty-1; j<=ty+1; j++)
+        if ((slab!=get_tile_slab(lvl,i,j))||(owner!=get_tile_owner(lvl,i,j)))
           return false;
     return true;
 }
@@ -160,7 +174,7 @@ short slabs_verify(struct LEVEL *lvl, char *err_msg)
   for (i=1; i < MAP_MAXINDEX_Y; i++)
     for (j=1; j < MAP_MAXINDEX_X; j++)
     {
-      result=slab_verify_entry(lvl->slb[i][j],err_msg);
+      result=slab_verify_entry(get_tile_slab(lvl,i,j),err_msg);
       if (result!=VERIF_OK)
         return result;
     }
@@ -172,7 +186,7 @@ short slabs_verify(struct LEVEL *lvl, char *err_msg)
  * Says how many slabs of given type are in 3x3 area surrounding given slab,
  * and including it; returns 0..9;
  */
-int slab_siblings_oftype(struct LEVEL *lvl,int x,int y,unsigned char slab_type)
+int slab_siblings_oftype(struct LEVEL *lvl,int x,int y,unsigned short slab_type)
 {
     int amount=0;
     //Preparing variables
@@ -182,13 +196,13 @@ int slab_siblings_oftype(struct LEVEL *lvl,int x,int y,unsigned char slab_type)
       for (j=y-1; j<=y+1; j++)
       {
       if ((i>=0) && (j>=0) && (i<MAP_SIZE_X) && (j<MAP_SIZE_Y))
-        if (lvl->slb[i][j]==slab_type)
+        if (get_tile_slab(lvl,i,j)==slab_type)
           amount++;
       }
     return amount;
 }
 
-short slab_is_room(unsigned char slab_type)
+short slab_is_room(unsigned short slab_type)
 {
      int array_count=sizeof(slabs_rooms)/sizeof(unsigned short);
     //All rooms are listed in slabs_rooms array
@@ -197,7 +211,7 @@ short slab_is_room(unsigned char slab_type)
     return false;
 }
 
-short slab_is_door(unsigned char slab_type)
+short slab_is_door(unsigned short slab_type)
 {
      int array_count=sizeof(slabs_doors)/sizeof(unsigned short);
     //All doors are listed in slabs_doors array
@@ -206,7 +220,7 @@ short slab_is_door(unsigned char slab_type)
     return false;
 }
 
-short slab_is_wall(unsigned char slab_type)
+short slab_is_wall(unsigned short slab_type)
 {
      int array_count=sizeof(slabs_walls)/sizeof(unsigned short);
     //All walls are listed in slabs_walls array
@@ -215,7 +229,7 @@ short slab_is_wall(unsigned char slab_type)
     return false;
 }
 
-short slab_is_wealth(unsigned char slab_type)
+short slab_is_wealth(unsigned short slab_type)
 {
      int array_count=sizeof(slabs_wealth)/sizeof(unsigned short);
     int idx=arr_ushort_pos(slabs_wealth,slab_type,array_count);
@@ -223,7 +237,7 @@ short slab_is_wealth(unsigned char slab_type)
     return false;
 }
 
-short slab_is_space(unsigned char slab_type)
+short slab_is_space(unsigned short slab_type)
 {
      int array_count=sizeof(slabs_space)/sizeof(unsigned short);
     //All such things are listed in slabs_space array
@@ -232,7 +246,7 @@ short slab_is_space(unsigned char slab_type)
     return false;
 }
 
-short slab_is_tall_unclmabl(unsigned char slab_type)
+short slab_is_tall_unclmabl(unsigned short slab_type)
 {
      int array_count=sizeof(slabs_tall_unclmabl)/sizeof(unsigned short);
     //All such things are listed in slabs_tall_unclmabl array
@@ -241,7 +255,7 @@ short slab_is_tall_unclmabl(unsigned char slab_type)
     return false;
 }
 
-short slab_is_short_unclmabl(unsigned char slab_type)
+short slab_is_short_unclmabl(unsigned short slab_type)
 {
      int array_count=sizeof(slabs_short_unclmabl)/sizeof(unsigned short);
     //All such things are listed in slabs_space array
@@ -250,7 +264,7 @@ short slab_is_short_unclmabl(unsigned char slab_type)
     return false;
 }
 
-short slab_is_short(unsigned char slab_type)
+short slab_is_short(unsigned short slab_type)
 {
     //Rooms are short
     if (slab_is_room(slab_type)) return true;
@@ -259,14 +273,14 @@ short slab_is_short(unsigned char slab_type)
     return false;
 }
 
-short slab_is_tall(unsigned char slab_type)
+short slab_is_tall(unsigned short slab_type)
 {
     if (slab_is_tall_unclmabl(slab_type)) return true;
     if (slab_is_wall(slab_type)) return true;
     return false;
 }
 
-short slab_is_short_clmabl(unsigned char slab_type)
+short slab_is_short_clmabl(unsigned short slab_type)
 {
     //Rooms are short and usually claimed
     if (slab_is_room(slab_type)) return true;
@@ -276,21 +290,21 @@ short slab_is_short_clmabl(unsigned char slab_type)
     return false;
 }
 
-short slab_is_claimedgnd(unsigned char slab_type)
+short slab_is_claimedgnd(unsigned short slab_type)
 {
     if (slab_is_door(slab_type)) return true;
     if (slab_type==SLAB_TYPE_CLAIMED) return true;
     return false;
 }
 
-short slab_is_clmabl(unsigned char slab_type)
+short slab_is_clmabl(unsigned short slab_type)
 {
     if (slab_is_short_unclmabl(slab_type)) return false;
     if (slab_is_tall_unclmabl(slab_type)) return false;
     return true;
 }
 
-short slab_needs_adjacent_torch(unsigned char slab_type)
+short slab_needs_adjacent_torch(unsigned short slab_type)
 {
     if (slab_type==SLAB_TYPE_TORCHDIRT) return true;
     if (slab_type==SLAB_TYPE_WALLTORCH) return true;
@@ -301,7 +315,7 @@ short slab_needs_adjacent_torch(unsigned char slab_type)
  * Draws a smear of selected slab on the map
  */
 void slab_draw_smear(struct LEVEL *lvl,int startx,int starty,int startr,
-                     int endx,int endy,int endr,int bend,unsigned char slab_type)
+                     int endx,int endy,int endr,int bend,unsigned short slab_type)
 {
     int dist_x=(startx-endx);
     int dist_y=(starty-endy);
@@ -325,7 +339,7 @@ void slab_draw_smear(struct LEVEL *lvl,int startx,int starty,int startr,
     }
 }
 
-void slab_draw_circle(struct LEVEL *lvl,int x,int y,int rad,unsigned char slab_type)
+void slab_draw_circle(struct LEVEL *lvl,int x,int y,int rad,unsigned short slab_type)
 {
      int i,j;
      int cx,cy;
@@ -338,7 +352,7 @@ void slab_draw_circle(struct LEVEL *lvl,int x,int y,int rad,unsigned char slab_t
          {
            int crad=floor(sqrt(i*i+j*j)+0.5);
            if (crad<rad)
-             lvl->slb[cx][cy]=slab_type;
+             set_tile_slab(lvl,cx,cy,slab_type);
          }
        }
 }
@@ -346,7 +360,7 @@ void slab_draw_circle(struct LEVEL *lvl,int x,int y,int rad,unsigned char slab_t
 /*
  * Verifies values in the SLB entry.
  */
-short slab_verify_entry(unsigned char slab_type, char *err_msg)
+short slab_verify_entry(unsigned short slab_type, char *err_msg)
 {
     if (slab_is_door(slab_type)) return VERIF_OK;
     if (slab_is_room(slab_type)) return VERIF_OK;
@@ -375,7 +389,7 @@ short subtl_is_near_tall_slab(struct LEVEL *lvl,unsigned int sx,unsigned int sy)
     int ty=sy/MAP_SUBNUM_Y;
     int subtl_x=sx%MAP_SUBNUM_X;
     int subtl_y=sy%MAP_SUBNUM_Y;
-    unsigned char slab;
+    unsigned short slab;
     const int sub_val[]=  {0, 2};
     const int til_delta[]={-1,1};
     int i,k;

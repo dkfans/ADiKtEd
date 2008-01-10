@@ -207,6 +207,8 @@ const char *adikted_cmd_text(int cmdidx);
 int orient_cmd_index(char *cmdtext);
 const char *orient_cmd_text(int cmdidx);
 unsigned short get_orientation_next(unsigned short orient);
+int font_cmd_index(char *cmdtext);
+const char *font_cmd_text(int cmdidx);
 
 //Other lower level functions
 short script_command_param_add(struct DK_SCRIPT_COMMAND *cmd,char *param);

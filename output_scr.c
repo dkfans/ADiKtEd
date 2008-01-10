@@ -180,6 +180,8 @@ void screen_init(void)
     SLtt_set_color (PRINT_COLOR_GREY_ON_BROWN,"Keeper 3","grey","brown");
     SLtt_set_color (PRINT_COLOR_GREY_ON_CYAN, "Keeper 4","grey","cyan");
 
+    SLtt_set_color (PRINT_COLOR_LRED_ON_YELLOW, "Highlight","brightred","yellow");
+
     screen_initied=true;
 }
 
