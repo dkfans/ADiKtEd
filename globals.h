@@ -16,11 +16,11 @@
 #include <time.h>
 
 #if defined(unix) && !defined(GO32)
-# include <unistd.h>
-# include <signal.h>
+#include <unistd.h>
+#include <signal.h>
 #include <sys/ioctl.h>
 #include <termios.h>
-#elseif defined(MSDOS)
+#elif defined(MSDOS)
 #include <dos.h>
 #include <process.h>
 #endif
@@ -57,6 +57,10 @@
 #define VERIF_OK      1
 #define VERIF_WARN    2
 
+#if defined(unix) && !defined(GO32)
+extern volatile int safe_update, update_required;
+#endif
+
 struct memory_file
 {
     long len;
@@ -70,8 +74,11 @@ extern char *filebase;
 
 // The way DAT entries are shown
 extern short dat_view_mode;
+extern short show_obj_range;
 
 // True means DAT/CLM/WIB are updated automatically
 extern short datclm_auto_update;
+// True means TNG/LGT/APTs are updated automatically
+extern short obj_auto_update;
 
 #endif // ADIKT_GLOBALS_H

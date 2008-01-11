@@ -166,21 +166,40 @@ void screen_init(void)
 
     SLtt_set_color (PRINT_COLOR_BLUE_ON_WHITE  ,"Keeper 1","blue", "white");
     SLtt_set_color (PRINT_COLOR_BROWN_ON_WHITE,"Keeper 3","brown", "white");
+    SLtt_set_color (PRINT_COLOR_MAGENT_ON_LGREY, "spec1", "magenta", "lightgray");
+    SLtt_set_color (PRINT_COLOR_LMAGENT_ON_GREY, "spec2", "brightmagenta", "gray");
+
 
     SLtt_set_color (PRINT_COLOR_LMAGENT_ON_RED,  "Keeper 0","brightmagenta","red");
     SLtt_set_color (PRINT_COLOR_LMAGENT_ON_BLUE, "Keeper 1","brightmagenta","blue");
     SLtt_set_color (PRINT_COLOR_LMAGENT_ON_GREEN,"Keeper 2","brightmagenta","green");
     SLtt_set_color (PRINT_COLOR_LMAGENT_ON_BROWN,"Keeper 3","brightmagenta","brown");
     SLtt_set_color (PRINT_COLOR_LMAGENT_ON_CYAN, "Keeper 4","brightmagenta","cyan");
-    SLtt_set_color (PRINT_COLOR_MAGENT_ON_LGREY, "spec1", "magenta", "lightgray");
-
     SLtt_set_color (PRINT_COLOR_GREY_ON_RED,  "Keeper 0","grey","red");
     SLtt_set_color (PRINT_COLOR_GREY_ON_BLUE, "Keeper 1","grey","blue");
     SLtt_set_color (PRINT_COLOR_GREY_ON_GREEN,"Keeper 2","grey","green");
     SLtt_set_color (PRINT_COLOR_GREY_ON_BROWN,"Keeper 3","grey","brown");
     SLtt_set_color (PRINT_COLOR_GREY_ON_CYAN, "Keeper 4","grey","cyan");
 
+    SLtt_set_color (PRINT_COLOR_LMAGENT_ON_LRED,  "Keeper 0","brightmagenta","brightred");
+    SLtt_set_color (PRINT_COLOR_LMAGENT_ON_LBLUE, "Keeper 1","brightmagenta","brightblue");
+    SLtt_set_color (PRINT_COLOR_LMAGENT_ON_LGREEN,"Keeper 2","brightmagenta","brightgreen");
+    SLtt_set_color (PRINT_COLOR_LMAGENT_ON_YELLOW,"Keeper 3","brightmagenta","yellow");
+    SLtt_set_color (PRINT_COLOR_LMAGENT_ON_LCYAN, "Keeper 4","brightmagenta","brightcyan");
+    SLtt_set_color (PRINT_COLOR_GREY_ON_LRED,  "Keeper 0","grey","brightred");
+    SLtt_set_color (PRINT_COLOR_GREY_ON_LBLUE, "Keeper 1","grey","brightblue");
+    SLtt_set_color (PRINT_COLOR_GREY_ON_LGREEN,"Keeper 2","grey","brightgreen");
+    SLtt_set_color (PRINT_COLOR_GREY_ON_YELLOW,"Keeper 3","grey","yellow");
+    SLtt_set_color (PRINT_COLOR_GREY_ON_LCYAN, "Keeper 4","grey","brightcyan");
+    SLtt_set_color (PRINT_COLOR_WHITE_ON_LRED,  "Keeper 0","white","brightred");
+    SLtt_set_color (PRINT_COLOR_WHITE_ON_LBLUE, "Keeper 1","white","brightblue");
+    SLtt_set_color (PRINT_COLOR_WHITE_ON_LGREEN,"Keeper 2","white","brightgreen");
+    SLtt_set_color (PRINT_COLOR_WHITE_ON_YELLOW,"Keeper 3","white","yellow");
+    SLtt_set_color (PRINT_COLOR_WHITE_ON_LCYAN, "Keeper 4","white","brightcyan");
+
     SLtt_set_color (PRINT_COLOR_LRED_ON_YELLOW, "Highlight","brightred","yellow");
+    SLtt_set_color (PRINT_COLOR_LGREY_ON_GREY, "Brighened unowned","lightgray","gray");
+    SLtt_set_color (PRINT_COLOR_WHITE_ON_GREY, "Brighened","white","gray");
 
     screen_initied=true;
 }
@@ -270,7 +289,7 @@ int sigwinch (int sigtype)
     if (safe_update)
       screen_reinit_and_update();
     else
-      update_required = TRUE;
+      update_required = true;
     signal (SIGWINCH, (void *) sigwinch);
     return 0;
 }
@@ -281,7 +300,7 @@ int sigwinch (int sigtype)
  * Should be called when program window size changes.
  * Automatically run on UNIX systems by sigwinch().
  */
-void screen_reinit_and_update(void) 
+void screen_reinit_and_update(void)
 {
     if (!screen_initied) return;
     SLsmg_reset_smg();

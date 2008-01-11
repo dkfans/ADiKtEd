@@ -55,6 +55,15 @@ short set_actnpt_range_subtile(unsigned char *actnpt,unsigned char rng_tl)
     actnpt[5]=rng_tl;
 }
 
+/*
+ * Returns range as subliles*256+subtl_pos
+ */
+unsigned int get_actnpt_range_adv(unsigned char *actnpt)
+{
+    return ((unsigned int)get_actnpt_range_subtile(actnpt)<<8)+
+        get_actnpt_range_subtpos(actnpt);
+}
+
 unsigned char get_actnpt_subtpos_x(unsigned char *actnpt)
 {
     if (actnpt==NULL) return 0;
@@ -303,6 +312,15 @@ short set_stlight_range_subtpos(unsigned char *stlight,unsigned char rng_st)
 {
     if (stlight==NULL) return 0;
     stlight[0]=rng_st;
+}
+
+/*
+ * Returns range as subliles*256+subtl_pos
+ */
+unsigned int get_stlight_range_adv(unsigned char *stlight)
+{
+    return ((unsigned int)get_stlight_range_subtile(stlight)<<8)+
+        get_stlight_range_subtpos(stlight);
 }
 
 unsigned char get_stlight_intensivity(unsigned char *stlight)

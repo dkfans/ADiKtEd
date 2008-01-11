@@ -245,41 +245,40 @@
 
 struct LEVEL;
 
-extern short obj_auto_update;
-
-unsigned char get_thing_type(unsigned char *thing);
+unsigned char get_thing_type(const unsigned char *thing);
 short set_thing_type(unsigned char *thing,unsigned char type_idx);
-unsigned char get_thing_subtype(unsigned char *thing);
+unsigned char get_thing_subtype(const unsigned char *thing);
 short set_thing_subtype(unsigned char *thing,unsigned char stype_idx);
-unsigned char get_thing_owner(unsigned char *thing);
+unsigned char get_thing_owner(const unsigned char *thing);
 short set_thing_owner(unsigned char *thing,unsigned char plyr_idx);
 
-unsigned char get_thing_subtile_x(unsigned char *thing);
+unsigned char get_thing_subtile_x(const unsigned char *thing);
 short set_thing_subtile_x(unsigned char *thing,unsigned char pos_x);
-unsigned char get_thing_subtile_y(unsigned char *thing);
+unsigned char get_thing_subtile_y(const unsigned char *thing);
 short set_thing_subtile_y(unsigned char *thing,unsigned char pos_y);
-unsigned char get_thing_subtile_h(unsigned char *thing);
+unsigned char get_thing_subtile_h(const unsigned char *thing);
 short set_thing_subtile_h(unsigned char *thing,unsigned char pos_h);
 short set_thing_subtile(unsigned char *thing,unsigned char pos_x,unsigned char pos_y);
-unsigned char get_thing_subtpos_x(unsigned char *thing);
+unsigned char get_thing_subtpos_x(const unsigned char *thing);
 short set_thing_subtpos_x(unsigned char *thing,unsigned char pos_x);
-unsigned char get_thing_subtpos_y(unsigned char *thing);
+unsigned char get_thing_subtpos_y(const unsigned char *thing);
 short set_thing_subtpos_y(unsigned char *thing,unsigned char pos_y);
-unsigned char get_thing_subtpos_h(unsigned char *thing);
+unsigned char get_thing_subtpos_h(const unsigned char *thing);
 short set_thing_subtpos_h(unsigned char *thing,unsigned char pos_h);
 short set_thing_subtpos(unsigned char *thing,unsigned char pos_x,unsigned char pos_y);
-unsigned char get_thing_level(unsigned char *thing);
+unsigned char get_thing_level(const unsigned char *thing);
 short set_thing_level(unsigned char *thing,unsigned char lev_num);
-unsigned short get_thing_sensitile(unsigned char *thing);
+unsigned short get_thing_sensitile(const unsigned char *thing);
 short set_thing_sensitile(unsigned char *thing,unsigned short til_num);
 
 short switch_thing_subtype(unsigned char *thing,short forward);
-unsigned char get_door_orientation(unsigned char *thing);
+unsigned char get_door_orientation(const unsigned char *thing);
 short set_door_orientation(unsigned char *thing,unsigned char orient);
-unsigned char get_thing_range_subtpos(unsigned char *thing);
+unsigned char get_thing_range_subtpos(const unsigned char *thing);
 short set_thing_range_subtpos(unsigned char *thing,unsigned char rng);
-unsigned char get_thing_range_subtile(unsigned char *thing);
+unsigned char get_thing_range_subtile(const unsigned char *thing);
 short set_thing_range_subtile(unsigned char *thing,unsigned char rng);
+unsigned int get_thing_range_adv(const unsigned char *thing);
 
 unsigned char *create_thing_empty();
 unsigned char *create_thing(unsigned int sx, unsigned int sy);
@@ -351,6 +350,7 @@ short is_clmaffective_thing(unsigned char *thing);
 int get_item_category(unsigned char stype_idx);
 unsigned char get_usual_item_slab(unsigned char stype_idx);
 unsigned char get_usual_thing_slab(unsigned char *thing);
+short subtl_in_thing_range(const unsigned char *thing,unsigned int sx,unsigned int sy);
 
 char *get_thing_type_fullname(unsigned short type_idx);
 char *get_thing_type_shortname(unsigned short type_idx);

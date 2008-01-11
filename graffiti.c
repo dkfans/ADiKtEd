@@ -41,9 +41,9 @@ int graffiti_idx(struct LEVEL *lvl, int tx, int ty)
  * the one after prev_idx; or -1 if not found.
  * To get first graffiti, prev_idx must be -1.
  */
-int graffiti_idx_next(struct LEVEL *lvl, int tx, int ty,int prev_idx)
+int graffiti_idx_next(struct LEVEL *lvl, int tx, int ty, int prev_idx)
 {
-    if (prev_idx<-1) return -1;
+    if (prev_idx < -1) return -1;
     int i;
     struct DK_GRAFFITI *graf;
     for (i=prev_idx+1; i < lvl->graffiti_count; i++)

@@ -21,6 +21,7 @@
 
 // Variables
 
+short show_obj_range=true;
 MDTNG_DATA *mdtng;
 
 /*
@@ -110,18 +111,21 @@ void actions_mdtng(int key)
           thing_add(lvl,thing);
           message_info("Added room effect");
           mdtng->vistng[mapmode->subtl_x][mapmode->subtl_y]=get_object_subtl_last(lvl,sx,sy,OBJECT_TYPE_THING);
+          set_brighten_for_thing(mapmode,thing);
           break;
         case 'a' : // Add action point
           thing = create_actnpt(lvl, sx, sy);
           actnpt_add(lvl,thing);
           message_info("Added action point %d",(unsigned int)get_actnpt_number(thing));
           mdtng->vistng[mapmode->subtl_x][mapmode->subtl_y]=get_object_subtl_last(lvl,sx,sy,OBJECT_TYPE_ACTNPT);
+          set_brighten_for_actnpt(mapmode,thing);
           break;
         case 'L' : // Add static light
           thing = create_stlight(sx, sy);
           stlight_add(lvl,thing);
           message_info("Added static light");
           mdtng->vistng[mapmode->subtl_x][mapmode->subtl_y]=get_object_subtl_last(lvl,sx,sy,OBJECT_TYPE_STLIGHT);
+          set_brighten_for_stlight(mapmode,thing);
           break;
         case 'k' : // Copy thing to clipboard
           {
@@ -163,11 +167,13 @@ void actions_mdtng(int key)
                 thing = create_thing_copy(sx,sy,clip_itm->data);
                 thing_add(lvl,thing);
                 message_info("Thing pasted from clipboard at subtile %d,%d",sx,sy);
+                set_brighten_for_thing(mapmode,thing);
                 mdtng->vistng[mapmode->subtl_x][mapmode->subtl_y]=get_object_subtl_last(lvl,sx,sy,OBJECT_TYPE_THING);
                 break;
             case OBJECT_TYPE_ACTNPT:
                 thing = create_actnpt_copy(sx,sy,clip_itm->data);
                 actnpt_add(lvl,thing);
+                set_brighten_for_actnpt(mapmode,thing);
                 message_info("Action point pasted from clipboard at subtile %d,%d",sx,sy);
                 mdtng->vistng[mapmode->subtl_x][mapmode->subtl_y]=get_object_subtl_last(lvl,sx,sy,OBJECT_TYPE_ACTNPT);
                 break;
@@ -175,6 +181,7 @@ void actions_mdtng(int key)
                 thing = create_stlight_copy(sx,sy,clip_itm->data);
                 stlight_add(lvl,thing);
                 message_info("Static light pasted from clipboard at subtile %d,%d",sx,sy);
+                set_brighten_for_stlight(mapmode,thing);
                 mdtng->vistng[mapmode->subtl_x][mapmode->subtl_y]=get_object_subtl_last(lvl,sx,sy,OBJECT_TYPE_STLIGHT);
                 break;
             default:
@@ -190,6 +197,7 @@ void actions_mdtng(int key)
           update_obj_for_whole_map(lvl);
           update_obj_subpos_and_height_for_whole_map(lvl);
           message_info("Auto-maintained TNG entries updated");
+          update_brighten(lvl,mapmode);
           change_visited_tile();
           break;
         case 'v': // Verify whole map
@@ -366,14 +374,17 @@ void actions_mdtng(int key)
             case OBJECT_TYPE_STLIGHT:
               object_del(lvl,sx,sy, visiting_z);
               message_info_force("Static light deleted.");
+              update_brighten(lvl,mapmode);
               break;
             case OBJECT_TYPE_ACTNPT:
               object_del(lvl,sx,sy, visiting_z);
               message_info_force("Action point deleted.");
+              update_brighten(lvl,mapmode);
               break;
             case OBJECT_TYPE_THING:
               object_del(lvl,sx,sy, visiting_z);
               message_info_force("Thing deleted.");
+              update_brighten(lvl,mapmode);
               break;
             default:
               message_error("Nothing to delete.");
@@ -401,6 +412,7 @@ short start_mdtng(struct LEVEL *lvl)
 {
     mapmode->mark=false;
     change_visited_tile();
+    update_brighten(lvl,mapmode);
     scrmode->mode=MD_TNG;
     return true;
 }
@@ -881,7 +893,7 @@ int get_tng_display_color(short obj_type,unsigned char obj_owner,short marked)
     {
     // Things that can be owned
     case OBJECT_TYPE_THING:
-        return get_screen_color_owned(obj_owner,marked,false);
+        return get_screen_color_owned(obj_owner,marked,false,false);
     // Things with no owner
     case OBJECT_TYPE_ACTNPT:
     case OBJECT_TYPE_STLIGHT:
@@ -973,6 +985,7 @@ void tng_change_height(struct LEVEL *lvl, unsigned int sx, unsigned int sy,unsig
     case OBJECT_TYPE_ACTNPT:
       set_actnpt_range_subtile(obj,height);
       set_actnpt_range_subtpos(obj,subheight);
+      set_brighten_for_actnpt(mapmode,obj);
       break;
     case OBJECT_TYPE_THING:
       set_thing_subtile_h(obj,height);
@@ -1043,14 +1056,26 @@ void tng_change_range(struct LEVEL *lvl, unsigned int sx, unsigned int sy,unsign
     case OBJECT_TYPE_STLIGHT:
       set_stlight_range_subtile(obj,rng);
       set_stlight_range_subtpos(obj,subrng);
+      if (delta_range>0)
+          set_brighten_for_stlight(mapmode,obj);
+      else
+          update_brighten(lvl,mapmode);
       break;
     case OBJECT_TYPE_ACTNPT:
       set_actnpt_range_subtile(obj,rng);
       set_actnpt_range_subtpos(obj,subrng);
+      if (delta_range>0)
+          set_brighten_for_actnpt(mapmode,obj);
+      else
+          update_brighten(lvl,mapmode);
       break;
     case OBJECT_TYPE_THING:
       set_thing_range_subtile(obj,rng);
       set_thing_range_subtpos(obj,subrng);
+      if (delta_range>0)
+          set_brighten_for_thing(mapmode,obj);
+      else
+          update_brighten(lvl,mapmode);
       break;
     }
 }

@@ -9,6 +9,7 @@
 #include "input_kb.h"
 
 #include "globals.h"
+#include "output_scr.h"
 #include <slang.h>
 
 short input_initied=false;
@@ -22,18 +23,18 @@ unsigned int get_key (void)
     unsigned int ret;
 #if defined(unix) && !defined(GO32)
     if (update_required)
-      update();
+      screen_reinit_and_update();
     safe_update = true;
 #endif
     ret = SLkp_getkey();
 #if defined(unix) && !defined(GO32)
-    safe_update = FALSE;
+    safe_update = false;
 #endif
     return ret;
 }
 
 /*
- * Get a string, in the "minibuffer". Return TRUE on success, FALSE
+ * Get a string, in the "minibuffer". Return true on success, false
  * on break. Possibly syntax-highlight the entered string for
  * backslash-escapes, depending on the "highlight" parameter.
  */
@@ -55,12 +56,12 @@ int get_str (char *prompt, char *buf)
       SLsmg_refresh();
 #if defined(unix) && !defined(GO32)
       if (update_required)
-          update();
-      safe_update = TRUE;
+          screen_reinit_and_update();
+      safe_update = true;
 #endif
       c = SLang_getkey();
 #if defined(unix) && !defined(GO32)
-      safe_update = FALSE;
+      safe_update = false;
 #endif
       if ((c == KEY_ENTER)&&(len>0))
       {
@@ -70,9 +71,9 @@ int get_str (char *prompt, char *buf)
       else if ((c == KEY_ESCAPE) || (c == 7))
       {
         message_error("User break of input");
-          SLKeyBoard_Quit=0;
-        SLang_set_error(0);
-          return false;
+        SLKeyBoard_Quit=0;
+        SLang_restart(1);
+        return false;
       }
       
       if (c >= 32 && c <= 126)

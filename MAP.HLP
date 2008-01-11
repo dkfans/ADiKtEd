@@ -173,14 +173,17 @@ To cancel, press \wtab\s or \wdelete\s.
 "Thing" mode help:
 
 Move around as in slab mode.
-The ownership backgrounds are as in slab mode, but the map slabs view
-is simplified - you won't see all the different items from slab mode,
-but only three background terrain types: '#' for rock, '.' for earth,
-walls, gold etc, and ' ' for path, lava, water etc.
+The ownership backgrounds are similar to slab mode, but some
+background colors are brighter - these are tiles within range
+of action points, room effects and static lights. The map slabs
+view is simplified - you won't see all the different items from
+slab mode, but only three background terrain types:
+'#' for rock, '.' for earth, walls, gold etc (tall slabs),
+and ' ' for path, lava, water etc (ground level slabs).
 
 Instead, you will see numbers and letters representing amount and type
 of objects contained in every map tile. If a tile contains more than
-one object, or one object which has no related letter, a digit 0..9
+one object, or one object which has no related letter, a digit 1..9
 will appear. If a tile has more than 9 objects on it, it will be shown
 as a "+". Moving over a tile shows the details of the objects on that
 tile.
@@ -231,7 +234,7 @@ Press \we\s to create \yroom effect\s (change the type using '\ws\s' and '\wx\s'
 
 Press \wL\s to create \ystatic light\s.
 
-Press \wa\s to create \yaction point\s. Change its rage with '\w[\s' and '\w]\s'.
+Press \wa\s to create \yaction point\s. Change its range with '\w-\s' and '\w+\s'.
 
 Press \wi\s to create \yany item\s. Allows you to choose item to place from
 full list. You can use it for items which has no associated key,
@@ -375,7 +378,6 @@ again and press "Clear results".
 Objects created after the search will not be highlighted.
 Places where the object was deleted after search will still
 be highlighted untill you clear results.
-
 [srchkeyhelp]
 Search mode:
 

@@ -20,6 +20,7 @@ is_thing_subtype get_search_tngtype_func(unsigned short idx);
 char *get_search_objtype_name(unsigned short idx);
 unsigned short get_search_objtype_count();
 unsigned char *find_next_object_on_map(struct LEVEL *lvl, int *tx, int *ty, unsigned short srch_idx);
+short subtl_in_roomeffect_range(struct LEVEL *lvl,unsigned int sx,unsigned int sy);
 
 unsigned char *create_door(struct LEVEL *lvl, unsigned int sx, unsigned int sy, unsigned char stype_idx);
 unsigned char *create_roomeffect(unsigned int sx, unsigned int sy, unsigned char stype_idx);

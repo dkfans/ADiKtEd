@@ -13,11 +13,10 @@ const char config_filename[]="map.ini";
 
 void read_init(void)
 {
-    // Do something else here
 #if defined(unix) && !defined(GO32)
-    filebase="levels";
+    filebase="."SEPARATOR"levels";
 #else
-    filebase="levels";
+    filebase="."SEPARATOR"levels";
 #endif
     char buffer[READ_BUFSIZE];
     char *p;
@@ -68,9 +67,13 @@ void read_init(void)
             spacepos=-1;
           }
       }
-      if (!strcmp(buffer, "dat_view_mode"))
+      if (!strcmp(buffer, "SHOW_OBJ_RANGE"))
+          show_obj_range=atoi(p);
+      else
+      if (!strcmp(buffer, "DAT_VIEW_MODE"))
           dat_view_mode=atoi(p);
-      if (!strcmp(buffer, "filebase"))
+      else
+      if (!strcmp(buffer, "LEVELS_PATH"))
       {
           filebase=strdup(p);
           l = strlen (filebase);
@@ -118,6 +121,11 @@ void get_command_line_options(int argc, char **argv)
         if (strcmp(comnd+1,"ds")==0)
         {
           disable_sounds=true;
+        } else
+        if (strcmp(comnd+1,"du")==0)
+        {
+          datclm_auto_update=false;
+          obj_auto_update=false;
         } else
         if (strcmp(comnd+1,"dvid")==0)
         {

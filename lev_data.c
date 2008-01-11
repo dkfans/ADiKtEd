@@ -8,6 +8,7 @@
 
 #include "lev_data.h"
 
+#include <math.h>
 #include "globals.h"
 #include "obj_slabs.h"
 #include "obj_things.h"

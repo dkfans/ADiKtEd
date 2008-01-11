@@ -32,8 +32,12 @@ where:
   -q  Quits Adikted after the tasks from previous parameters have been
           completed. Useful for automated work.
   -ds  Disable all sounds. Makes Adikted silent, and less annoying.
+  -du  Disable auto updates of both DAT/CLM/W?B and TNG/LGT/APT.
+          With this, generating maps and starting new one will be very
+          fast, but the update must be triggered manually before
+          saving a map.
   -dvid  Disable showing anything on screen. Screen is not initied
-         nor refreshed. Usefull if you want only run some commands
+         nor refreshed. Useful if you want only run some commands
          and quit.
   -dinp  Disable keyboard input. Adikted will exit after executing
           all comands given in parameters. For users it works just
@@ -55,82 +59,14 @@ file newmap.txt, which will get picked up in the copy command above).
 
 Press F1 for help.
 
-Version: 0.42b
- Quit changed to ctrl+q
- Added load (ctrl+l) and new map (ctrl+n)
-Version: 0.47b
- Fixed to allow compilation under new SLang
- Win32 version
- Fixed coord checking when placing a building
- Fixed keyboard codes to be more platform-independent
-Version: 0.48b
- Added definitions of more objects, ie. creature lairs
- Added hero gate counting and numbering
- Some of code rewritten to be more clear
-Version: 0.49b
- The way of interpreting user-typed map names is now unified
- All memory allocation routines checked and rewritten
- Fixed problem with automatic deletion of DHeart on saving
- Added some very beginnings of random map generator (ctrl+r)
-Version: 0.49b
- The random map generator has been extended
- Added loading and saving of INF,TXT,LGT and WLB files
- Re-added updating of DAT and CLM (but not TNG) when saving
-Version: 0.50b
- Most of the TNG support code rewritten completely
- Renewed "creature" screen (adding creatures)
- New item screen (allows adding ANY item available in the game)
- Create room effect function (e key in "thing" mode)
-Version: 0.51b
- Enhanced map verification function (press v in slab mode)
- Completely rewritten CLM/DAT support (it was lot of work...)
-Version: 0.51a
- New, dynamic CLM generation
- Completely new functions to geneate map graphic (DAT/CLM entries)
- Written support of all terrain types, but no rooms
- No automatic 'thing' generation
- Graffiti not working due to DAT support changes
- Project moved back to alpha state
-Version: 0.52a
- Added support of Dungeon Heart, Portal, Library, Temple
- Some fixups and expansions in TNG support
- Added some command line parameters
- Rewritten screen refreshing, new look of Thing mode
- Help file format extended
- Clipboard can now copy action points and static lights
- More items can be switched to similar using s/x
-Version: 0.53a
- Compass view under ctrl+p
- Added support of Hatchery, Lair, Graveyard, Barracks, Train room
- Better function for generating rooms surrounded by lava/water
-Version: 0.54a
- Support of all rooms completed
- Graffiti support renewed
- Created ADI file format, its reading and writing
-Version: 0.55a
- Fixed hanging when F7 (quick load) pressed
- Graffiti orientation can now be changed with 'a'
- Graffiti can now be oriented for view from top
- Extended help system and help file
- Corrected white spaces treatment inside map.ini file
- Height of graffiti/thing can be changed with '[' and ']'
- New, experimental "manual columns" function
-Version: 0.56a
- Some corrections in "manual columns"
- Texture change function under ctrl+e
- Enter key displays list of slabs
- Verification ('v') of things extended
- Items and room effects have now "sensitive tile"
- Added computing "sensitive tile" for torches and room effects
- Fixed some display problems if Adikted window is small
-Version: 0.60b
- Some corrections in screen colors
- Better statistics counting and numbering of hero gates
- Auto creating room things for all rooms
- Auto creating dungeon heart thing (one per player)
- Auto creating torches
- Updating owner now results in TNG update
- The '[' and ']' keys now works on action points
+TODO before final:
+ Fixations in room things parameters (height,other)
+Version: 0.66b
+ Range of items which have such property is now visible in thing mode
+ Option to disable objects range visibility in INI file
+ INI file commands updated
+ Fixed compile errors and makefile for Linux systems
+ Added "-du" command line option
 Version: 0.63b
  Added changing range of lights/effects with '-' and '+'
  The last column (which has no slab attached) is updated as rock
@@ -141,11 +77,86 @@ Version: 0.63b
  Added room-specific reinforced walls
  Added searching for objects (ctrl+f)
  Added rework mode (undocumented - for reworking only)
-TODO before final:
- Fixations in room things parameters (height,other)
+Version: 0.60b
+ Some corrections in screen colors
+ Better statistics counting and numbering of hero gates
+ Auto creating room things for all rooms
+ Auto creating dungeon heart thing (one per player)
+ Auto creating torches
+ Updating owner now results in TNG update
+ The '[' and ']' keys now works on action points
+Version: 0.56a
+ Some corrections in "manual columns"
+ Texture change function under ctrl+e
+ Enter key displays list of slabs
+ Verification ('v') of things extended
+ Items and room effects have now "sensitive tile"
+ Added computing "sensitive tile" for torches and room effects
+ Fixed some display problems if Adikted window is small
+Version: 0.55a
+ Fixed hanging when F7 (quick load) pressed
+ Graffiti orientation can now be changed with 'a'
+ Graffiti can now be oriented for view from top
+ Extended help system and help file
+ Corrected white spaces treatment inside map.ini file
+ Height of graffiti/thing can be changed with '[' and ']'
+ New, experimental "manual columns" function
+Version: 0.54a
+ Support of all rooms completed
+ Graffiti support renewed
+ Created ADI file format, its reading and writing
+Version: 0.53a
+ Compass view under ctrl+p
+ Added support of Hatchery, Lair, Graveyard, Barracks, Train room
+ Better function for generating rooms surrounded by lava/water
+Version: 0.52a
+ Added support of Dungeon Heart, Portal, Library, Temple
+ Some fixups and expansions in TNG support
+ Added some command line parameters
+ Rewritten screen refreshing, new look of Thing mode
+ Help file format extended
+ Clipboard can now copy action points and static lights
+ More items can be switched to similar using s/x
+Version: 0.51a
+ New, dynamic CLM generation
+ Completely new functions to geneate map graphic (DAT/CLM entries)
+ Written support of all terrain types, but no rooms
+ No automatic 'thing' generation
+ Graffiti not working due to DAT support changes
+ Project moved back to alpha state
+Version: 0.51b
+ Enhanced map verification function (press v in slab mode)
+ Completely rewritten CLM/DAT support (it was lot of work...)
+Version: 0.50b
+ Most of the TNG support code rewritten completely
+ Renewed "creature" screen (adding creatures)
+ New item screen (allows adding ANY item available in the game)
+ Create room effect function (e key in "thing" mode)
+Version: 0.49b
+ The random map generator has been extended
+ Added loading and saving of INF,TXT,LGT and WLB files
+ Re-added updating of DAT and CLM (but not TNG) when saving
+Version: 0.48b
+ The way of interpreting user-typed map names is now unified
+ All memory allocation routines checked and rewritten
+ Fixed problem with automatic deletion of DHeart on saving
+ Added some very beginnings of random map generator (ctrl+r)
+Version: 0.47b
+ Added definitions of more objects, ie. creature lairs
+ Added hero gate counting and numbering
+ Some of code rewritten to be more clear
+Version: 0.46b
+ Fixed to allow compilation under new SLang
+ Win32 version
+ Fixed coord checking when placing a building
+ Fixed keyboard codes to be more platform-independent
+Version: 0.42b
+ Quit changed to ctrl+q
+ Added load (ctrl+l) and new map (ctrl+n)
 
 Author:
-Jon Skeet, skeet@pobox.com
+ Jon Skeet, skeet@pobox.com
 
-Dev-C++ IDE version, fixations:
-Tomasz Lis
+Dev-C++ IDE version,
+rewritten most of the code:
+ Tomasz Lis

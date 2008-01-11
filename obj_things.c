@@ -5,12 +5,12 @@
  *
  */
 
+#include <math.h>
 #include "obj_things.h"
 #include "globals.h"
 #include "lev_data.h"
 #include "obj_slabs.h"
 #include "lev_things.h"
-
 /*
 Thing data block:
 0x00 thing_subtpos_x
@@ -179,7 +179,7 @@ const thing_subtype_switch thing_subtype_prev[]={
 // True means TNG/APT/LGT are updated automatically
 short obj_auto_update=true;
 
-unsigned char get_thing_type(unsigned char *thing)
+unsigned char get_thing_type(const unsigned char *thing)
 {
     if (thing==NULL) return THING_TYPE_NONE;
     return thing[6];
@@ -192,7 +192,7 @@ short set_thing_type(unsigned char *thing,unsigned char type_idx)
     return true;
 }
 
-unsigned char get_thing_subtype(unsigned char *thing)
+unsigned char get_thing_subtype(const unsigned char *thing)
 {
     if (thing==NULL) return ITEM_SUBTYPE_NULL;
     return thing[7];
@@ -205,7 +205,7 @@ short set_thing_subtype(unsigned char *thing,unsigned char stype_idx)
     return true;
 }
 
-unsigned char get_thing_owner(unsigned char *thing)
+unsigned char get_thing_owner(const unsigned char *thing)
 {
     if (thing==NULL) return PLAYER_UNSET;
     if (thing[8]>=PLAYERS_COUNT) return PLAYER_UNSET;
@@ -219,7 +219,7 @@ short set_thing_owner(unsigned char *thing,unsigned char ownr_idx)
     return true;
 }
 
-unsigned char get_thing_subtile_x(unsigned char *thing)
+unsigned char get_thing_subtile_x(const unsigned char *thing)
 {
     if (thing==NULL) return 0;
     return (unsigned char)thing[1];
@@ -231,7 +231,7 @@ short set_thing_subtile_x(unsigned char *thing,unsigned char pos_x)
     thing[1]=pos_x;
 }
 
-unsigned char get_thing_subtile_y(unsigned char *thing)
+unsigned char get_thing_subtile_y(const unsigned char *thing)
 {
     if (thing==NULL) return 0;
     return (unsigned char)thing[3];
@@ -252,7 +252,7 @@ short set_thing_subtile(unsigned char *thing,unsigned char pos_x,unsigned char p
     return true;
 }
 
-unsigned char get_thing_subtile_h(unsigned char *thing)
+unsigned char get_thing_subtile_h(const unsigned char *thing)
 {
     if (thing==NULL) return 0;
     return (char)thing[5];
@@ -265,7 +265,7 @@ short set_thing_subtile_h(unsigned char *thing,unsigned char pos_h)
     return true;
 }
 
-unsigned char get_thing_subtpos_x(unsigned char *thing)
+unsigned char get_thing_subtpos_x(const unsigned char *thing)
 {
     if (thing==NULL) return 128;
     return (char)thing[0];
@@ -278,7 +278,7 @@ short set_thing_subtpos_x(unsigned char *thing,unsigned char pos_x)
     return true;
 }
 
-unsigned char get_thing_subtpos_y(unsigned char *thing)
+unsigned char get_thing_subtpos_y(const unsigned char *thing)
 {
     if (thing==NULL) return 0x80;
     return (char)thing[2];
@@ -299,7 +299,7 @@ short set_thing_subtpos(unsigned char *thing,unsigned char pos_x,unsigned char p
     return true;
 }
 
-unsigned char get_thing_subtpos_h(unsigned char *thing)
+unsigned char get_thing_subtpos_h(const unsigned char *thing)
 {
     if (thing==NULL) return 0x80;
     return (char)thing[4];
@@ -312,7 +312,7 @@ short set_thing_subtpos_h(unsigned char *thing,unsigned char pos_h)
     return true;
 }
 
-unsigned char get_thing_range_subtpos(unsigned char *thing)
+unsigned char get_thing_range_subtpos(const unsigned char *thing)
 {
     if (thing==NULL) return 0x80;
     return (char)thing[9];
@@ -325,7 +325,7 @@ short set_thing_range_subtpos(unsigned char *thing,unsigned char rng)
     return true;
 }
 
-unsigned char get_thing_range_subtile(unsigned char *thing)
+unsigned char get_thing_range_subtile(const unsigned char *thing)
 {
     if (thing==NULL) return 0x80;
     return (char)thing[10];
@@ -339,10 +339,32 @@ short set_thing_range_subtile(unsigned char *thing,unsigned char rng)
 }
 
 /*
+ * Returns range for any thing, as subtiles*256+within_subtile
+ */
+unsigned int get_thing_range_adv(const unsigned char *thing)
+{
+  switch(get_thing_type(thing))
+  {
+    case THING_TYPE_ITEM:
+      return (1<<8);
+    case THING_TYPE_CREATURE:
+      return (4<<8);
+    case THING_TYPE_ROOMEFFECT:
+      return ((unsigned int)get_thing_range_subtile(thing)<<8)+get_thing_range_subtpos(thing);
+    case THING_TYPE_TRAP:
+      return (4<<8);
+    case THING_TYPE_DOOR:
+      return (4<<8);
+    default:
+      return 0;
+  }
+}
+
+/*
  * Level is used as creature param, but also for numbering hero gates
  * and door lock state
  */
-unsigned char get_thing_level(unsigned char *thing)
+unsigned char get_thing_level(const unsigned char *thing)
 {
     if (thing==NULL) return 0;
     return thing[14];
@@ -358,7 +380,7 @@ short set_thing_level(unsigned char *thing,unsigned char lev_num)
 /*
  * For some things, this is a number of tile (not subtile) at wchich the thing is
  */
-unsigned short get_thing_sensitile(unsigned char *thing)
+unsigned short get_thing_sensitile(const unsigned char *thing)
 {
     if (thing==NULL) return THING_SENSITILE_NONE;
     return (unsigned short)((thing[12]<<8)+thing[11]);
@@ -375,7 +397,7 @@ short set_thing_sensitile(unsigned char *thing,unsigned short til_num)
     return true;
 }
 
-unsigned char get_door_orientation(unsigned char *thing)
+unsigned char get_door_orientation(const unsigned char *thing)
 {
     if (thing==NULL) return DOOR_ORIENT_NSPASS;
     return thing[13];
@@ -2363,4 +2385,19 @@ short thing_verify(unsigned char *thing, char *err_msg)
       sprintf(err_msg,"Unknown thing type (%d)",(int)get_thing_type(thing));
       return VERIF_WARN;
   }
+}
+
+/*
+ * Returns TRUE if subtile with given coordinates is within range of
+ * given thing.
+ */
+short subtl_in_thing_range(const unsigned char *thing,unsigned int sx,unsigned int sy)
+{
+  if (thing==NULL) return false;
+  float pos_x=(float)get_thing_subtile_x(thing);
+  float pos_y=(float)get_thing_subtile_y(thing);
+  unsigned int rng=get_thing_range_adv(thing);
+  float distance=sqrt(pow(pos_x-(float)sx,2)+pow(pos_y-(float)sy,2))*256.0;
+  if (distance<=rng) return true;
+  return false;
 }

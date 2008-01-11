@@ -70,8 +70,10 @@ struct MAPMODE_DATA {
     int mapy;
     // Variables for drawing the mark rectangle
     int markl, markr, markt, markb;
-    // And highlighted squares
+    // Highlighted squares
     int **hilight;
+    // Brightened squares
+    int **brighten;
     // Which subtile is being considered in thing and data modes
     int subtl_x;
     int subtl_y;
@@ -134,8 +136,8 @@ char *mode_status(int mode);
 short is_simple_mode(int mode);
 
 void mark_check(void);
-int get_draw_map_tile_color(struct LEVEL *lvl,int tx,int ty,short special,short darken);
-int get_screen_color_owned(unsigned char owner,short marked,short darken);
+int get_draw_map_tile_color(struct LEVEL *lvl,int tx,int ty,short special,short darken_fg,short brighten_bg);
+int get_screen_color_owned(unsigned char owner,short marked,short darken_fg,short brighten_bg);
 void draw_map_area(struct LEVEL *lvl,short show_ground,short show_rooms,short show_things);
 int get_draw_map_tile_char(struct LEVEL *lvl,int tx,int ty,
     short show_ground,short show_rooms,short show_things,short force_at);
@@ -143,5 +145,15 @@ int get_draw_map_tile_char(struct LEVEL *lvl,int tx,int ty,
 int get_tile_highlight(struct MAPMODE_DATA *mapmode, unsigned int tx, unsigned int ty);
 void set_tile_highlight(struct MAPMODE_DATA *mapmode, unsigned int tx, unsigned int ty, int nval);
 void clear_highlight(struct MAPMODE_DATA *mapmode);
+
+short get_tile_brighten(struct MAPMODE_DATA *mapmode, unsigned int tx, unsigned int ty);
+void set_tile_brighten(struct MAPMODE_DATA *mapmode, unsigned int tx, unsigned int ty, short nval);
+void clear_brighten(struct MAPMODE_DATA *mapmode);
+void update_brighten(struct LEVEL *lvl,struct MAPMODE_DATA *mapmode);
+void set_brighten_for_thing(struct MAPMODE_DATA *mapmode,unsigned char *thing);
+void set_brighten_for_actnpt(struct MAPMODE_DATA *mapmode,unsigned char *actnpt);
+void set_brighten_for_stlight(struct MAPMODE_DATA *mapmode,unsigned char *stlight);
+void set_brighten_for_range(struct MAPMODE_DATA *mapmode,
+    unsigned int pos_x,unsigned int pos_y,unsigned int rng);
 
 #endif // ADIKT_SCRACTN_H

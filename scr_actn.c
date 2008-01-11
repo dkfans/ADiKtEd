@@ -8,6 +8,7 @@
 
 #include "scr_actn.h"
 
+#include <math.h>
 #include "globals.h"
 #include "var_utils.h"
 #include "graffiti.h"
@@ -103,6 +104,15 @@ void init_levscr_basics(void)
         if (mapmode->hilight[i]==NULL)
           die("init_levscr: Out of memory");
       }
+      mapmode->brighten = (int **)malloc(MAP_SIZE_Y*sizeof(int *));
+      if (mapmode->brighten==NULL)
+          die("init_levscr: Out of memory");
+      for (i=0; i < MAP_SIZE_Y; i++)
+      {
+        mapmode->brighten[i] = (int *)malloc(MAP_SIZE_X*sizeof(int));
+        if (mapmode->brighten[i]==NULL)
+          die("init_levscr: Out of memory");
+      }
     }
     clear_mapmode(mapmode);
     int i;
@@ -164,6 +174,7 @@ void clear_mapmode(struct MAPMODE_DATA *mapmode)
     mapmode->subtl_y=1;
     mapmode->panel_mode=PV_MODE;
     clear_highlight(mapmode);
+    clear_brighten(mapmode);
 }
 
 void free_levscr(void)
@@ -213,12 +224,131 @@ void set_tile_highlight(struct MAPMODE_DATA *mapmode, unsigned int tx, unsigned 
     mapmode->hilight[tx][ty]=nval;
 }
 
+/*
+ * Returns if a tile should be brightened.
+ */
+short get_tile_brighten(struct MAPMODE_DATA *mapmode, unsigned int tx, unsigned int ty)
+{
+    if (mapmode->brighten==NULL) return false;
+    //Bounding position
+    if ((tx>=MAP_SIZE_X)||(ty>=MAP_SIZE_Y)) return false;
+    return mapmode->brighten[tx][ty];
+}
+
+/*
+ * Sets a new value to brighten array.
+ */
+void set_tile_brighten(struct MAPMODE_DATA *mapmode, unsigned int tx, unsigned int ty, short nval)
+{
+    //Bounding position
+    if ((tx>=MAP_SIZE_X)||(ty>=MAP_SIZE_Y)) return;
+    mapmode->brighten[tx][ty]=nval;
+}
+
 void clear_highlight(struct MAPMODE_DATA *mapmode)
 {
     int i,k;
     for (k=0;k<MAP_SIZE_Y;k++)
       for (i=0;i<MAP_SIZE_X;i++)
         mapmode->hilight[i][k]=0;
+}
+
+void clear_brighten(struct MAPMODE_DATA *mapmode)
+{
+    int i,k;
+    for (k=0;k<MAP_SIZE_Y;k++)
+      for (i=0;i<MAP_SIZE_X;i++)
+        mapmode->brighten[i][k]=false;
+}
+
+void update_brighten(struct LEVEL *lvl,struct MAPMODE_DATA *mapmode)
+{
+    //Estimating number of objects we'll have to compute
+    unsigned int ranged_obj=lvl->lgt_total_count+lvl->apt_total_count+
+        lvl->tng_total_count/6;
+    //If this may take more than second, display information
+    if (ranged_obj>96)
+      popup_show("Updating object ranges for whole map","Sweeping through all objects can take some time. Please wait...");
+    const int arr_entries_x=MAP_SIZE_X*MAP_SUBNUM_X;
+    const int arr_entries_y=MAP_SIZE_Y*MAP_SUBNUM_Y;
+    clear_brighten(mapmode);
+    if (!show_obj_range) return;
+    int curr_sx, curr_sy, i;
+    for (curr_sx=0; curr_sx < arr_entries_x; curr_sx++)
+      for (curr_sy=0; curr_sy < arr_entries_y; curr_sy++)
+      {
+          int last_obj=get_thing_subnums(lvl,curr_sx,curr_sy)-1;
+          for (i=last_obj; i>=0; i--)
+          {
+            unsigned char *thing=get_thing(lvl,curr_sx,curr_sy,i);
+            if (is_roomeffect(thing))
+            {
+              set_brighten_for_thing(mapmode,thing);
+            }
+          }
+          last_obj=get_actnpt_subnums(lvl,curr_sx,curr_sy)-1;
+          for (i=last_obj; i>=0; i--)
+          {
+            unsigned char *obj=get_actnpt(lvl,curr_sx,curr_sy,i);
+            set_brighten_for_actnpt(mapmode,obj);
+          }
+          last_obj=get_stlight_subnums(lvl,curr_sx,curr_sy)-1;
+          for (i=last_obj; i>=0; i--)
+          {
+            unsigned char *obj=get_stlight(lvl,curr_sx,curr_sy,i);
+            set_brighten_for_stlight(mapmode,obj);
+          }
+      }
+}
+
+void set_brighten_for_thing(struct MAPMODE_DATA *mapmode,unsigned char *thing)
+{
+  if (thing==NULL) return;
+  if (!show_obj_range) return;
+  set_brighten_for_range(mapmode,get_thing_subtile_x(thing),
+      get_thing_subtile_y(thing),get_thing_range_adv(thing));
+}
+
+void set_brighten_for_actnpt(struct MAPMODE_DATA *mapmode,unsigned char *actnpt)
+{
+  if (actnpt==NULL) return;
+  if (!show_obj_range) return;
+  set_brighten_for_range(mapmode,get_actnpt_subtile_x(actnpt),
+      get_actnpt_subtile_y(actnpt),get_actnpt_range_adv(actnpt));
+}
+
+void set_brighten_for_stlight(struct MAPMODE_DATA *mapmode,unsigned char *stlight)
+{
+  if (stlight==NULL) return;
+  if (!show_obj_range) return;
+  set_brighten_for_range(mapmode,get_stlight_subtile_x(stlight),
+      get_stlight_subtile_y(stlight),get_stlight_range_adv(stlight));
+}
+
+void set_brighten_for_range(struct MAPMODE_DATA *mapmode,
+    unsigned int pos_x,unsigned int pos_y,unsigned int rng)
+{
+  unsigned int til_rng=rng/MAP_SUBNUM_X+((rng%MAP_SUBNUM_X)>0);
+  int tx_start,tx_end;
+  tx_start=(pos_x/MAP_SUBNUM_X)-til_rng;
+  tx_end=(pos_x/MAP_SUBNUM_X)+til_rng+1;
+  if (tx_start<0) tx_start=0;
+  if (tx_end>MAP_SIZE_X) tx_end=MAP_SIZE_X;
+  int ty_start,ty_end;
+  ty_start=(pos_y/MAP_SUBNUM_Y)-til_rng;
+  ty_end=pos_y/MAP_SUBNUM_Y+til_rng+1;
+  if (ty_start<0) ty_start=0;
+  if (ty_end>MAP_SIZE_Y) ty_end=MAP_SIZE_Y;
+  unsigned int tx,ty;
+  for (tx=tx_start;tx<tx_end;tx++)
+    for (ty=ty_start;ty<ty_end;ty++)
+    {
+      float sx=tx*MAP_SUBNUM_X+1;
+      float sy=ty*MAP_SUBNUM_Y+1;
+      float distance=sqrt(pow((float)pos_x-sx,2)+pow((float)pos_y-sy,2))*256.0;
+      if (distance<=rng)
+        mapmode->brighten[tx][ty]=true;
+    }
 }
 
 /*
@@ -370,7 +500,7 @@ char *mode_status(int mode)
  * Returns color in which the specified tile should be drawn.
  * The color depends on tile owner, but also marking mode.
  */
-int get_draw_map_tile_color(struct LEVEL *lvl,int tx,int ty,short special,short darken)
+int get_draw_map_tile_color(struct LEVEL *lvl,int tx,int ty,short special,short darken_fg,short brighten_bg)
 {
     int g;
     if ((tx<0)||(tx>=MAP_SIZE_X)) return PRINT_COLOR_GREY_ON_BLACK;
@@ -390,23 +520,46 @@ int get_draw_map_tile_color(struct LEVEL *lvl,int tx,int ty,short special,short 
       {
         switch (own)
         {
-        case PLAYER0:return PRINT_COLOR_LMAGENT_ON_RED;
-        case PLAYER1:return PRINT_COLOR_LMAGENT_ON_BLUE;
-        case PLAYER2:return PRINT_COLOR_LMAGENT_ON_GREEN;
-        case PLAYER3:return PRINT_COLOR_LMAGENT_ON_BROWN;
-        case PLAYER_GOOD:return PRINT_COLOR_LMAGENT_ON_CYAN;
+        case PLAYER0:
+          if (brighten_bg)
+            return PRINT_COLOR_LMAGENT_ON_LRED;
+          else
+            return PRINT_COLOR_LMAGENT_ON_RED;
+        case PLAYER1:
+          if (brighten_bg)
+            return PRINT_COLOR_LMAGENT_ON_LBLUE;
+          else
+            return PRINT_COLOR_LMAGENT_ON_BLUE;
+        case PLAYER2:
+          if (brighten_bg)
+            return PRINT_COLOR_LMAGENT_ON_LGREEN;
+          else
+            return PRINT_COLOR_LMAGENT_ON_GREEN;
+        case PLAYER3:
+          if (brighten_bg)
+            return PRINT_COLOR_LMAGENT_ON_YELLOW;
+          else
+            return PRINT_COLOR_LMAGENT_ON_BROWN;
+        case PLAYER_GOOD:
+          if (brighten_bg)
+            return PRINT_COLOR_LMAGENT_ON_LCYAN;
+          else
+            return PRINT_COLOR_LMAGENT_ON_CYAN;
         default:
         case PLAYER_UNSET:
-              return PRINT_COLOR_LMAGENT_ON_BLACK;
+          if (brighten_bg)
+            return PRINT_COLOR_LMAGENT_ON_GREY;
+          else
+            return PRINT_COLOR_LMAGENT_ON_BLACK;
         }
       }
     } else
     {
-      return get_screen_color_owned(own,marked,darken);
+      return get_screen_color_owned(own,marked,darken_fg,brighten_bg);
     }
 }
 
-int get_screen_color_owned(unsigned char owner,short marked,short darken)
+int get_screen_color_owned(unsigned char owner,short marked,short darken_fg,short brighten_bg)
 {
 
     if (marked)
@@ -426,36 +579,90 @@ int get_screen_color_owned(unsigned char owner,short marked,short darken)
         switch (owner)
         {
         case PLAYER0:
-            if (darken)
+          if (brighten_bg)
+          {
+            if (darken_fg)
+              return PRINT_COLOR_GREY_ON_LRED;
+            else
+              return PRINT_COLOR_WHITE_ON_LRED;
+          } else
+          {
+            if (darken_fg)
               return PRINT_COLOR_GREY_ON_RED;
             else
               return PRINT_COLOR_WHITE_ON_RED;
+          }
         case PLAYER1:
-            if (darken)
+          if (brighten_bg)
+          {
+            if (darken_fg)
+              return PRINT_COLOR_GREY_ON_LBLUE;
+            else
+              return PRINT_COLOR_WHITE_ON_LBLUE;
+          } else
+          {
+            if (darken_fg)
               return PRINT_COLOR_GREY_ON_BLUE;
             else
               return PRINT_COLOR_WHITE_ON_BLUE;
+          }
         case PLAYER2:
-            if (darken)
+          if (brighten_bg)
+          {
+            if (darken_fg)
+              return PRINT_COLOR_GREY_ON_LGREEN;
+            else
+              return PRINT_COLOR_WHITE_ON_LGREEN;
+          } else
+          {
+            if (darken_fg)
               return PRINT_COLOR_GREY_ON_GREEN;
             else
               return PRINT_COLOR_WHITE_ON_GREEN;
+          }
         case PLAYER3:
-            if (darken)
+          if (brighten_bg)
+          {
+            if (darken_fg)
+              return PRINT_COLOR_GREY_ON_YELLOW;
+            else
+              return PRINT_COLOR_WHITE_ON_YELLOW;
+          } else
+          {
+            if (darken_fg)
               return PRINT_COLOR_GREY_ON_BROWN;
             else
               return PRINT_COLOR_WHITE_ON_BROWN;
+          }
         case PLAYER_GOOD:
-            if (darken)
+          if (brighten_bg)
+          {
+            if (darken_fg)
+              return PRINT_COLOR_GREY_ON_LCYAN;
+            else
+              return PRINT_COLOR_WHITE_ON_LCYAN;
+          } else
+          {
+            if (darken_fg)
               return PRINT_COLOR_GREY_ON_CYAN;
             else
               return PRINT_COLOR_WHITE_ON_CYAN;
+          }
         default:
         case PLAYER_UNSET:
-            if (darken)
+          if (brighten_bg)
+          {
+            if (darken_fg)
+              return PRINT_COLOR_LGREY_ON_GREY;
+            else
+              return PRINT_COLOR_WHITE_ON_GREY;
+          } else
+          {
+            if (darken_fg)
               return PRINT_COLOR_GREY_ON_BLACK;
             else
               return PRINT_COLOR_LGREY_ON_BLACK;
+          }
         }
     }
 
@@ -521,20 +728,28 @@ void draw_map_area(struct LEVEL *lvl,short show_ground,short show_rooms,short sh
               char out_ch;
               int g;
               short has_ccol;
-              short darken;
+              short darken_fg;
+              short brighten_bg;
               if (show_rooms)
               {
                   g = graffiti_idx(lvl,tx,ty);
                   has_ccol = slab_has_custom_columns(lvl,tx,ty);
                   unsigned short slab=get_tile_slab(lvl,tx,ty);
-                  darken=(slab==SLAB_TYPE_ROCK)||(slab==SLAB_TYPE_LAVA);
+                  darken_fg=(slab==SLAB_TYPE_ROCK)||(slab==SLAB_TYPE_LAVA);
               } else
               {
                   g = -1;
                   has_ccol = false;
-                  darken=(get_object_tilnums(lvl,tx,ty)==0);
+                  darken_fg=(get_object_tilnums(lvl,tx,ty)==0);
               }
-              screen_setcolor(get_draw_map_tile_color(lvl,tx,ty,has_ccol,darken));
+              if (show_things)
+              {
+                  brighten_bg=get_tile_brighten(mapmode,tx,ty);
+              } else
+              {
+                  brighten_bg=false;
+              }
+              screen_setcolor(get_draw_map_tile_color(lvl,tx,ty,has_ccol,darken_fg,brighten_bg));
               out_ch=get_draw_map_tile_char(lvl,tx,ty,show_ground,show_rooms,show_things,(g>=0));
               screen_printchr(out_ch);
             } else

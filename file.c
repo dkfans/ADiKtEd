@@ -15,7 +15,8 @@ struct memory_file read_file (char *iname);
 
 /*
  * Read a file, possibly compressed, and decompress it if necessary.
- * Warning: it may destroy the file name from input variable
+ * Warning: it may destroy the file name from input variable,
+ * so if you wish to use iname, make a copy for this function.
  */
 struct memory_file read_file (char *iname)
 {
@@ -24,10 +25,11 @@ struct memory_file read_file (char *iname)
     void *packed, *unpacked;
     char buffer[LINEMSG_SIZE];
     struct memory_file ret;
+    char *ifname;
 
     ifp = fopen(iname, "rb");
     //Prepare "short" filename - no path, max. 32 chars
-    char *ifname=strrchr(iname,'\\');
+    ifname=strrchr(iname,'\\');
     if (ifname==NULL)
         ifname=iname;
     if (strlen(ifname) > 31)

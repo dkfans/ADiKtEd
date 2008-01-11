@@ -41,8 +41,8 @@ short things_verify(struct LEVEL *lvl, char *err_msg)
     char child_err_msg[LINEMSG_SIZE];
     strcpy(child_err_msg,"Unknown error");
     //Preparing array bounds
-    int arr_entries_x=MAP_SIZE_X*MAP_SUBNUM_X;
-    int arr_entries_y=MAP_SIZE_Y*MAP_SUBNUM_Y;
+    const int arr_entries_x=MAP_SIZE_X*MAP_SUBNUM_X;
+    const int arr_entries_y=MAP_SIZE_Y*MAP_SUBNUM_Y;
     //Sweeping through things
     int i, j, k;
     for (i=0; i < arr_entries_y; i++)
@@ -202,8 +202,8 @@ unsigned char compute_door_orientation(struct LEVEL *lvl, unsigned char *thing)
 unsigned short get_free_herogate_number(struct LEVEL *lvl)
 {
     //Preparing array bounds
-    int arr_entries_x=MAP_SIZE_X*MAP_SUBNUM_X;
-    int arr_entries_y=MAP_SIZE_Y*MAP_SUBNUM_Y;
+    const int arr_entries_x=MAP_SIZE_X*MAP_SUBNUM_X;
+    const int arr_entries_y=MAP_SIZE_Y*MAP_SUBNUM_Y;
     int k;
     int used_size=lvl->stats.hero_gates_count+16;
     unsigned char *used=malloc(used_size*sizeof(unsigned char));
@@ -242,8 +242,8 @@ short owned_things_count(int *count,struct LEVEL *lvl,
     unsigned char type_idx,unsigned char stype_idx)
 {
     //Preparing array bounds
-    int arr_entries_x=MAP_SIZE_X*MAP_SUBNUM_X;
-    int arr_entries_y=MAP_SIZE_Y*MAP_SUBNUM_Y;
+    const int arr_entries_x=MAP_SIZE_X*MAP_SUBNUM_X;
+    const int arr_entries_y=MAP_SIZE_Y*MAP_SUBNUM_Y;
     int i,j,k;
     for (i=0; i < arr_entries_y; i++)
       for (j=0; j < arr_entries_x; j++)
@@ -1617,3 +1617,26 @@ void remove_noncrucial_room_things(int tx, int ty)
      }
 }
 
+/*
+ * Returns TRUE if subtile with given coordinates is within range of
+ * any room effect on map.
+ */
+short subtl_in_roomeffect_range(struct LEVEL *lvl,unsigned int sx,unsigned int sy)
+{
+    const int arr_entries_x=MAP_SIZE_X*MAP_SUBNUM_X;
+    const int arr_entries_y=MAP_SIZE_Y*MAP_SUBNUM_Y;
+    int curr_sx, curr_sy, i;
+    for (curr_sx=0; curr_sx < arr_entries_x; curr_sx++)
+      for (curr_sy=0; curr_sy < arr_entries_y; curr_sy++)
+      {
+          int last_thing=get_thing_subnums(lvl,curr_sx,curr_sy)-1;
+          for (i=last_thing; i>=0; i--)
+          {
+            char *thing=get_thing(lvl,curr_sx,curr_sy,i);
+            if (is_roomeffect(thing))
+              if (subtl_in_thing_range(thing,sx,sy))
+                return true;
+          }
+      }
+    return false;
+}

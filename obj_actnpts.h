@@ -20,6 +20,7 @@ unsigned char get_actnpt_subtpos_y(unsigned char *actnpt);
 short set_actnpt_subtpos_y(unsigned char *actnpt,unsigned char pos_y);
 unsigned char get_actnpt_range_subtpos(unsigned char *actnpt);
 short set_actnpt_range_subtpos(unsigned char *actnpt,unsigned char rng_st);
+unsigned int get_actnpt_range_adv(unsigned char *actnpt);
 short set_actnpt_subtpos(unsigned char *actnpt,unsigned char pos_x,unsigned char pos_y);
 unsigned short get_actnpt_number(unsigned char *actnpt);
 short set_actnpt_number(unsigned char *actnpt,unsigned short apt_num);
@@ -46,6 +47,7 @@ unsigned char get_stlight_range_subtile(unsigned char *stlight);
 short set_stlight_range_subtile(unsigned char *stlight,unsigned char rng_tl);
 unsigned char get_stlight_range_subtpos(unsigned char *stlight);
 short set_stlight_range_subtpos(unsigned char *stlight,unsigned char rng_st);
+unsigned int get_stlight_range_adv(unsigned char *stlight);
 unsigned char get_stlight_intensivity(unsigned char *stlight);
 short set_stlight_intensivity(unsigned char *stlight,unsigned char intens);
 
