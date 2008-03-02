@@ -11,6 +11,7 @@ struct LEVEL;
 
 typedef struct {
     int vistng[3][3]; // Which number are we looking at on each subtile
+    short obj_ranges_changed;
   } MDTNG_DATA;
 
 extern MDTNG_DATA *mdtng;

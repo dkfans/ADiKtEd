@@ -71,6 +71,7 @@ extern const int idir_subtl_y[];
 //Font - for graffiti
 #define GRAFF_FONT_NONE        0x00
 #define GRAFF_FONT_ADICLSSC    0x01
+#define GRAFF_FONT_ADISIZE8    0x02
 
 struct DK_GRAFFITI {
     int tx;
@@ -84,7 +85,13 @@ struct DK_GRAFFITI {
     unsigned short cube;
   };
 
-typedef struct {
+struct DK_SCRIPT {
+    struct DK_SCRIPT_COMMAND **list;
+    char **txt;  // The whole script stored as txt
+    int lines_count;
+};
+
+struct LEVSTATS {
     //Things strats
     int creatures_count;
     int roomeffects_count;
@@ -103,7 +110,10 @@ typedef struct {
     int furniture_count;
     //Various stats
     int room_things_count;
-  } LEVSTATS;
+    //Stats on objects adding/removal
+    int things_removed;
+    int things_added;
+  };
 
 struct LEVEL {
     //map file name (for loading)
@@ -132,8 +142,7 @@ struct LEVEL {
     unsigned char inf;
     //Script text - a text file containing level parameters as editable script;
     // number of lines and file size totally variable
-    char **txt;
-    unsigned int txt_lines_count;
+    struct DK_SCRIPT script;
 
     //our objects - apt, tng and lgt
 
@@ -159,16 +168,18 @@ struct LEVEL {
 
     // Elements that are not part of DK levels, but are importand for Adikted
     // Level statistics
-    LEVSTATS stats;
+    struct LEVSTATS stats;
     // Custom columns definition
-    struct DK_CUSTOM_CLM **cust_clm;
+    // There can be only one custom column on each subtile.
+    // The lookup array size is arr_entries_y+1 x arr_entries_x+1
+    struct DK_CUSTOM_CLM ***cust_clm_lookup; // Index to cust.columns, by subtile
     unsigned int cust_clm_count;
     struct DK_GRAFFITI **graffiti;
     unsigned int graffiti_count;
   };
 
 // creates object for storing map
-short level_init();
+short level_init(struct LEVEL **lvl_ptr);
 // frees object for storing map
 short level_deinit();
 
@@ -188,7 +199,7 @@ short actnpts_verify(struct LEVEL *lvl, char *err_msg);
 short level_verify_logic(struct LEVEL *lvl, char *err_msg);
 void start_new_map(struct LEVEL *lvl);
 void generate_random_map(struct LEVEL *lvl);
-void generate_slab_bkgnd_default(struct LEVEL *lvl);
+void generate_slab_bkgnd_default(struct LEVEL *lvl,unsigned short def_slab);
 void generate_slab_bkgnd_random(struct LEVEL *lvl);
 void free_map(void);
 

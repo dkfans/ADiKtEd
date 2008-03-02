@@ -207,6 +207,7 @@ short start_mdslab(struct LEVEL *lvl)
 void end_mdslab()
 {
     mapmode->mark=false;
+    mapmode->paintmode=false;
     mapmode->panel_mode=PV_MODE;
 }
 

@@ -5,8 +5,8 @@ CPP  = g++.exe
 CC   = gcc.exe
 WINDRES = windres.exe
 RES  = map_private.res
-OBJ  = dernc.o file.o graffiti.o main.o input_kb.o scr_help.o var_utils.o output_scr.o scr_thing.o graffiti_font.o bulcommn.o lev_data.o lev_files.o obj_slabs.o obj_things.o obj_column.o obj_actnpts.o lev_things.o lev_column.o obj_column_per.o scr_list.o scr_slab.o scr_clm.o scr_actn.o scr_txted.o lev_script.o scr_rwrk.o $(RES)
-LINKOBJ  = dernc.o file.o graffiti.o main.o input_kb.o scr_help.o var_utils.o output_scr.o scr_thing.o graffiti_font.o bulcommn.o lev_data.o lev_files.o obj_slabs.o obj_things.o obj_column.o obj_actnpts.o lev_things.o lev_column.o obj_column_per.o scr_list.o scr_slab.o scr_clm.o scr_actn.o scr_txted.o lev_script.o scr_rwrk.o $(RES)
+OBJ  = dernc.o file.o graffiti.o main.o input_kb.o scr_help.o var_utils.o output_scr.o scr_thing.o graffiti_font.o bulcommn.o lev_data.o lev_files.o obj_slabs.o obj_things.o obj_column.o obj_actnpts.o lev_things.o lev_column.o obj_column_per.o scr_list.o scr_slab.o scr_clm.o scr_actn.o scr_txted.o lev_script.o scr_rwrk.o scr_cube.o $(RES)
+LINKOBJ  = dernc.o file.o graffiti.o main.o input_kb.o scr_help.o var_utils.o output_scr.o scr_thing.o graffiti_font.o bulcommn.o lev_data.o lev_files.o obj_slabs.o obj_things.o obj_column.o obj_actnpts.o lev_things.o lev_column.o obj_column_per.o scr_list.o scr_slab.o scr_clm.o scr_actn.o scr_txted.o lev_script.o scr_rwrk.o scr_cube.o $(RES)
 LIBS =  -L"D:/ProgsNT/Dev-Cpp/lib" ../../../ProgsNT/Dev-Cpp/lib/libslang.a  -march=pentium-mmx 
 INCS =  -I"D:/ProgsNT/Dev-Cpp/include" 
 CXXINCS =  -I"D:/ProgsNT/Dev-Cpp/lib/gcc/mingw32/3.4.2/include"  -I"D:/ProgsNT/Dev-Cpp/include/c++/3.4.2/backward"  -I"D:/ProgsNT/Dev-Cpp/include/c++/3.4.2/mingw32"  -I"D:/ProgsNT/Dev-Cpp/include/c++/3.4.2"  -I"D:/ProgsNT/Dev-Cpp/include" 
@@ -106,6 +106,9 @@ lev_script.o: lev_script.c
 
 scr_rwrk.o: scr_rwrk.c
 	$(CC) -c scr_rwrk.c -o scr_rwrk.o $(CFLAGS)
+
+scr_cube.o: scr_cube.c
+	$(CC) -c scr_cube.c -o scr_cube.o $(CFLAGS)
 
 map_private.res: map_private.rc 
 	$(WINDRES) -i map_private.rc --input-format=rc -o map_private.res -O coff 

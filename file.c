@@ -29,7 +29,7 @@ struct memory_file read_file (char *iname)
 
     ifp = fopen(iname, "rb");
     //Prepare "short" filename - no path, max. 32 chars
-    ifname=strrchr(iname,'\\');
+    ifname=strrchr(iname,SEPARATOR[0]);
     if (ifname==NULL)
         ifname=iname;
     if (strlen(ifname) > 31)

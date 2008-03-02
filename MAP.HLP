@@ -397,6 +397,10 @@ You can only view raw contentof various game files:
 
 \wo\swn, \ws\slb, w\wi\sb, w\wl\sb, \wf\slg,...
 
+To generate utility map for testing cube values,
+press \wb\s and enter the first cube. There are
+511 cubes in the game.
+
 To back to slab mode, press \wesc\s or \wtab\s.
 [compass]
                   *

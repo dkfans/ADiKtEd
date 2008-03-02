@@ -1,5 +1,5 @@
 /*
- * font.c
+ * graffiti_font.c
  *
  * Defines font for the graffiti module, for painting grafitties on walls.
  *
@@ -7,250 +7,153 @@
 
 #include "globals.h"
 
-#ifdef LARGE_FONT_DEF
+const unsigned char font_any_chnull[] = {0,0x00};
 
-static unsigned char notdef[] =
-    {8, 0x55, 0xAA, 0x55, 0xAA, 0x55, 0xAA, 0x55, 0xAA };
-static unsigned char char32[] =
-    {8, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
-static unsigned char char33[] =
-    {8, 0x00, 0x00, 0x00, 0x7a, 0x00, 0x00, 0x00, 0x00 };
-static unsigned char char34[] =
-    {8, 0x00, 0x00, 0x60, 0x00, 0x00, 0x60, 0x00, 0x00 };
-static unsigned char char35[] =
-    {8, 0x00, 0x24, 0x7e, 0x24, 0x24, 0x7e, 0x24, 0x00 };
-static unsigned char char36[] =
-    {8, 0x00, 0x00, 0x3a, 0x2a, 0x7f, 0x2a, 0x2e, 0x00 };
-static unsigned char char37[] =
-    {8, 0x00, 0x62, 0x64, 0x08, 0x10, 0x26, 0x46, 0x00 };
-static unsigned char char38[] =
-    {8, 0x00, 0x04, 0x2a, 0x52, 0x2a, 0x04, 0x0a, 0x00 };
-static unsigned char char39[] =
-    {8, 0x00, 0x00, 0x00, 0x20, 0x40, 0x00, 0x00, 0x00 };
-static unsigned char char40[] =
-    {8, 0x00, 0x00, 0x00, 0x00, 0x3c, 0x42, 0x00, 0x00 };
-static unsigned char char41[] =
-    {8, 0x00, 0x00, 0x42, 0x3c, 0x00, 0x00, 0x00, 0x00 };
-static unsigned char char42[] =
-    {8, 0x00, 0x00, 0x08, 0x2a, 0x1c, 0x2a, 0x08, 0x00 };
-static unsigned char char43[] =
-    {8, 0x00, 0x00, 0x08, 0x08, 0x3e, 0x08, 0x08, 0x00 };
-static unsigned char char44[] =
-    {8, 0x00, 0x00, 0x00, 0x01, 0x06, 0x00, 0x00, 0x00 };
-static unsigned char char45[] =
-    {8, 0x00, 0x00, 0x08, 0x08, 0x08, 0x08, 0x08, 0x00 };
-static unsigned char char46[] =
-    {8, 0x00, 0x00, 0x00, 0x06, 0x06, 0x00, 0x00, 0x00 };
-static unsigned char char47[] =
-    {8, 0x00, 0x00, 0x02, 0x04, 0x08, 0x10, 0x20, 0x00 };
-static unsigned char char48[] =
-    {8, 0x00, 0x3c, 0x46, 0x4a, 0x52, 0x62, 0x3c, 0x00 };
-static unsigned char char49[] =
-    {8, 0x00, 0x00, 0x22, 0x42, 0x7e, 0x02, 0x02, 0x00 };
-static unsigned char char50[] =
-    {8, 0x00, 0x26, 0x4a, 0x4a, 0x4a, 0x4a, 0x32, 0x00 };
-static unsigned char char51[] =
-    {8, 0x00, 0x24, 0x42, 0x42, 0x52, 0x52, 0x2c, 0x00 };
-static unsigned char char52[] =
-    {8, 0x00, 0x0c, 0x14, 0x24, 0x7e, 0x04, 0x04, 0x00 };
-static unsigned char char53[] =
-    {8, 0x00, 0x74, 0x52, 0x52, 0x52, 0x52, 0x4c, 0x00 };
-static unsigned char char54[] =
-    {8, 0x00, 0x3c, 0x52, 0x52, 0x52, 0x52, 0x0c, 0x00 };
-static unsigned char char55[] =
-    {8, 0x00, 0x40, 0x40, 0x46, 0x48, 0x50, 0x60, 0x00 };
-static unsigned char char56[] =
-    {8, 0x00, 0x2c, 0x52, 0x52, 0x52, 0x52, 0x2c, 0x00 };
-static unsigned char char57[] =
-    {8, 0x00, 0x30, 0x4a, 0x4a, 0x4a, 0x4a, 0x3c, 0x00 };
-static unsigned char char58[] =
-    {8, 0x00, 0x00, 0x00, 0x12, 0x00, 0x00, 0x00, 0x00 };
-static unsigned char char59[] =
-    {8, 0x00, 0x00, 0x01, 0x26, 0x00, 0x00, 0x00, 0x00 };
-static unsigned char char60[] =
-    {8, 0x00, 0x00, 0x00, 0x08, 0x14, 0x22, 0x00, 0x00 };
-static unsigned char char61[] =
-    {8, 0x00, 0x00, 0x14, 0x14, 0x14, 0x14, 0x14, 0x00 };
-static unsigned char char62[] =
-    {8, 0x00, 0x00, 0x00, 0x22, 0x14, 0x08, 0x00, 0x00 };
-static unsigned char char63[] =
-    {8, 0x00, 0x20, 0x40, 0x40, 0x4a, 0x50, 0x20, 0x00 };
-static unsigned char char64[] =
-    {8, 0x00, 0x3c, 0x42, 0x5a, 0x6a, 0x5a, 0x38, 0x00 };
-static unsigned char char65[] =
-    {8, 0x00, 0x3e, 0x48, 0x48, 0x48, 0x48, 0x3e, 0x00 };
-static unsigned char char66[] =
-    {8, 0x00, 0x7e, 0x52, 0x52, 0x52, 0x52, 0x2c, 0x00 };
-static unsigned char char67[] =
-    {8, 0x00, 0x3c, 0x42, 0x42, 0x42, 0x42, 0x24, 0x00 };
-static unsigned char char68[] =
-    {8, 0x00, 0x7e, 0x42, 0x42, 0x42, 0x24, 0x18, 0x00 };
-static unsigned char char69[] =
-    {8, 0x00, 0x7e, 0x52, 0x52, 0x52, 0x52, 0x42, 0x00 };
-static unsigned char char70[] =
-    {8, 0x00, 0x7e, 0x50, 0x50, 0x50, 0x50, 0x40, 0x00 };
-static unsigned char char71[] =
-    {8, 0x00, 0x3c, 0x42, 0x42, 0x4a, 0x4a, 0x2c, 0x00 };
-static unsigned char char72[] =
-    {8, 0x00, 0x7e, 0x10, 0x10, 0x10, 0x10, 0x7e, 0x00 };
-static unsigned char char73[] =
-    {8, 0x00, 0x00, 0x42, 0x42, 0x7e, 0x42, 0x42, 0x00 };
-static unsigned char char74[] =
-    {8, 0x00, 0x0c, 0x02, 0x02, 0x02, 0x02, 0x7c, 0x00 };
-static unsigned char char75[] =
-    {8, 0x00, 0x7e, 0x10, 0x10, 0x28, 0x44, 0x02, 0x00 };
-static unsigned char char76[] =
-    {8, 0x00, 0x7e, 0x02, 0x02, 0x02, 0x02, 0x02, 0x00 };
-static unsigned char char77[] =
-    {8, 0x00, 0x7e, 0x20, 0x10, 0x10, 0x20, 0x7e, 0x00 };
-static unsigned char char78[] =
-    {8, 0x00, 0x7e, 0x20, 0x10, 0x08, 0x04, 0x7e, 0x00 };
-static unsigned char char79[] =
-    {8, 0x00, 0x3c, 0x42, 0x42, 0x42, 0x42, 0x3c, 0x00 };
-static unsigned char char80[] =
-    {8, 0x00, 0x7e, 0x48, 0x48, 0x48, 0x48, 0x30, 0x00 };
-static unsigned char char81[] =
-    {8, 0x00, 0x3c, 0x42, 0x4a, 0x46, 0x42, 0x3c, 0x00 };
-static unsigned char char82[] =
-    {8, 0x00, 0x7e, 0x48, 0x48, 0x48, 0x4e, 0x30, 0x00 };
-static unsigned char char83[] =
-    {8, 0x00, 0x24, 0x52, 0x52, 0x52, 0x52, 0x0c, 0x00 };
-static unsigned char char84[] =
-    {8, 0x40, 0x40, 0x40, 0x7e, 0x40, 0x40, 0x40, 0x00 };
-static unsigned char char85[] =
-    {8, 0x00, 0x7c, 0x02, 0x02, 0x02, 0x02, 0x7c, 0x00 };
-static unsigned char char86[] =
-    {8, 0x00, 0x78, 0x04, 0x02, 0x02, 0x04, 0x78, 0x00 };
-static unsigned char char87[] =
-    {8, 0x00, 0x7c, 0x02, 0x04, 0x04, 0x02, 0x7c, 0x00 };
-static unsigned char char88[] =
-    {8, 0x00, 0x42, 0x24, 0x18, 0x18, 0x24, 0x42, 0x00 };
-static unsigned char char89[] =
-    {8, 0x40, 0x20, 0x10, 0x0e, 0x10, 0x20, 0x40, 0x00 };
-static unsigned char char90[] =
-    {8, 0x00, 0x42, 0x46, 0x4a, 0x52, 0x62, 0x42, 0x00 };
-static unsigned char char91[] =
-    {8, 0x00, 0x00, 0x00, 0x00, 0x7e, 0x42, 0x42, 0x00 };
-static unsigned char char92[] =
-    {8, 0x00, 0x20, 0x10, 0x08, 0x04, 0x02, 0x00, 0x00 };
-static unsigned char char93[] =
-    {8, 0x00, 0x42, 0x42, 0x7e, 0x00, 0x00, 0x00, 0x00 };
-static unsigned char char94[] =
-    {8, 0x00, 0x10, 0x20, 0x7e, 0x20, 0x10, 0x00, 0x00 };
-static unsigned char char95[] =
-    {8, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01 };
-static unsigned char char96[] =
-    {8, 0x00, 0x12, 0x3e, 0x52, 0x52, 0x42, 0x22, 0x00 };
-static unsigned char char97[] =
-    {8, 0x00, 0x04, 0x2a, 0x2a, 0x2a, 0x1e, 0x00, 0x00 };
-static unsigned char char98[] =
-    {8, 0x00, 0x00, 0x7e, 0x12, 0x12, 0x12, 0x0c, 0x00 };
-static unsigned char char99[] =
-    {8, 0x00, 0x00, 0x1c, 0x22, 0x22, 0x22, 0x00, 0x00 };
-static unsigned char char100[] =
-    {8, 0x00, 0x0c, 0x12, 0x12, 0x12, 0x7e, 0x00, 0x00 };
-static unsigned char char101[] =
-    {8, 0x00, 0x1c, 0x2a, 0x2a, 0x2a, 0x12, 0x00, 0x00 };
-static unsigned char char102[] =
-    {8, 0x00, 0x00, 0x00, 0x3e, 0x50, 0x40, 0x00, 0x00 };
-static unsigned char char103[] =
-    {8, 0x00, 0x18, 0x25, 0x25, 0x25, 0x3e, 0x00, 0x00 };
-static unsigned char char104[] =
-    {8, 0x00, 0x7e, 0x10, 0x10, 0x10, 0x0e, 0x00, 0x00 };
-static unsigned char char105[] =
-    {8, 0x00, 0x00, 0x12, 0x5e, 0x02, 0x00, 0x00, 0x00 };
-static unsigned char char106[] =
-    {8, 0x00, 0x00, 0x02, 0x01, 0x01, 0x5e, 0x00, 0x00 };
-static unsigned char char107[] =
-    {8, 0x00, 0x00, 0x7e, 0x18, 0x24, 0x02, 0x00, 0x00 };
-static unsigned char char108[] =
-    {8, 0x00, 0x00, 0x00, 0x7c, 0x02, 0x02, 0x00, 0x00 };
-static unsigned char char109[] =
-    {8, 0x00, 0x3e, 0x20, 0x1e, 0x20, 0x1e, 0x00, 0x00 };
-static unsigned char char110[] =
-    {8, 0x00, 0x3e, 0x20, 0x20, 0x20, 0x1e, 0x00, 0x00 };
-static unsigned char char111[] =
-    {8, 0x00, 0x1c, 0x22, 0x22, 0x22, 0x1c, 0x00, 0x00 };
-static unsigned char char112[] =
-    {8, 0x00, 0x3f, 0x24, 0x24, 0x24, 0x18, 0x00, 0x00 };
-static unsigned char char113[] =
-    {8, 0x00, 0x18, 0x24, 0x24, 0x24, 0x3f, 0x01, 0x00 };
-static unsigned char char114[] =
-    {8, 0x00, 0x00, 0x1e, 0x20, 0x20, 0x20, 0x00, 0x00 };
-static unsigned char char115[] =
-    {8, 0x00, 0x12, 0x2a, 0x2a, 0x2a, 0x04, 0x00, 0x00 };
-static unsigned char char116[] =
-    {8, 0x00, 0x00, 0x20, 0x7c, 0x22, 0x02, 0x00, 0x00 };
-static unsigned char char117[] =
-    {8, 0x00, 0x3c, 0x02, 0x02, 0x02, 0x3c, 0x00, 0x00 };
-static unsigned char char118[] =
-    {8, 0x00, 0x30, 0x0c, 0x02, 0x0c, 0x30, 0x00, 0x00 };
-static unsigned char char119[] =
-    {8, 0x00, 0x3c, 0x02, 0x1c, 0x02, 0x3c, 0x00, 0x00 };
-static unsigned char char120[] =
-    {8, 0x00, 0x22, 0x14, 0x08, 0x14, 0x22, 0x00, 0x00 };
-static unsigned char char121[] =
-    {8, 0x00, 0x38, 0x05, 0x05, 0x05, 0x3e, 0x00, 0x00 };
-static unsigned char char122[] =
-    {8, 0x00, 0x22, 0x26, 0x2a, 0x32, 0x22, 0x00, 0x00 };
-static unsigned char char123[] =
-    {8, 0x00, 0x00, 0x10, 0x10, 0x6e, 0x42, 0x42, 0x00 };
-static unsigned char char124[] =
-    {8, 0x00, 0x00, 0x00, 0x00, 0x7e, 0x00, 0x00, 0x00 };
-static unsigned char char125[] =
-    {8, 0x00, 0x42, 0x42, 0x6e, 0x10, 0x10, 0x00, 0x00 };
-static unsigned char char126[] =
-    {8, 0x00, 0x00, 0x20, 0x40, 0x20, 0x40, 0x00, 0x00 };
+#define f8(c,a1,a2,a3,a4,a5,a6,a7,a8) const static unsigned char font_adisize8_ch##c[] = {8,0x##a1,0x##a2,0x##a3,0x##a4,0x##a5,0x##a6,0x##a7,0x##a8}
 
-int fontheight=8;
-unsigned char *chars[] = {
-    notdef,  notdef,  notdef,  notdef,  notdef,  notdef,  notdef, // 00
-    notdef,  notdef,  notdef,  notdef,  notdef,  notdef,  notdef, // 08
-    notdef,  notdef,  notdef,  notdef,  notdef,  notdef,  notdef, // 10
-    notdef,  notdef,  notdef,  notdef,  notdef,  notdef,  notdef, // 18
-    notdef,  notdef,  notdef,  notdef,  char32,  char33,  char34, // 20
-    char35,  char36,  char37,  char38,  char39,  char40,  char41, // 28
-    char42,  char43,  char44,  char45,  char46,  char47,  char48, // 30
-    char49,  char50,  char51,  char52,  char53,  char54,  char55,
-    char56,  char57,  char58,  char59,  char60,  char61,  char62, // 40
-    char63,  char64,  char65,  char66,  char67,  char68,  char69,
-    char70,  char71,  char72,  char73,  char74,  char75,  char76, // 50
-    char77,  char78,  char79,  char80,  char81,  char82,  char83,
-    char84,  char85,  char86,  char87,  char88,  char89,  char90, // 60
-    char91,  char92,  char93,  char94,  char95,  char96,  char97,
-    char98,  char99,  char100, char101, char102, char103, char104,// 70
-    char105, char106, char107, char108, char109, char110, char111,
-    char112, char113, char114, char115, char116, char117, char118,// 80
-    char119, char120, char121, char122, char123, char124, char125,
-    char126, notdef,  notdef,  notdef,  notdef,  notdef,  notdef, // 90
-    notdef,  notdef,  notdef,  notdef   notdef,  notdef,  notdef,
-    notdef,  notdef,  notdef,  notdef,  notdef,  notdef,  notdef, // a0
-    notdef,  notdef,  notdef,  notdef,  notdef,  notdef,  notdef,
-    notdef,  notdef,  notdef,  notdef,  notdef,  notdef,  notdef, // b0
-    notdef,  notdef,  notdef,  notdef,  notdef,  notdef,  notdef,
-    notdef,  notdef,  notdef,  notdef,  notdef,  notdef,  notdef, // c0
-    notdef,  notdef,  notdef,  notdef,  notdef,  notdef,  notdef,
-    notdef,  notdef,  notdef,  notdef,  notdef,  notdef,  notdef, // d0
-    notdef,  notdef,  notdef,  notdef,  notdef,  notdef,  notdef,
-    notdef,  notdef,  notdef,  notdef,  notdef,  notdef,  notdef, // e0
-    notdef,  notdef,  notdef,  notdef,  notdef,  notdef,  notdef,
-    notdef,  notdef,  notdef,  notdef,  notdef,  notdef,  notdef, // f0
-    notdef,  notdef,  notdef,  notdef,  notdef,  notdef,  notdef,
-    notdef,  notdef,  notdef,  notdef,  notdef,  notdef,  notdef,
-    notdef,  notdef,  notdef,  notdef,  notdef,  notdef,  notdef,
-    notdef,  notdef,  notdef,  notdef,  notdef,  notdef,  notdef,
-    notdef,  notdef,  notdef,  notdef,  notdef,  notdef,  notdef,
-    notdef,  notdef,  notdef,  notdef,  
-    
+f8(notdef,55,AA,55,AA,55,AA,55,AA);
+
+f8(32,00,00,00,00,00,00,00,00);
+f8(33,00,00,00,7a,00,00,00,00);
+f8(34,00,00,60,00,00,60,00,00);
+f8(35,00,24,7e,24,24,7e,24,00);
+f8(36,00,00,3a,2a,7f,2a,2e,00);
+f8(37,00,62,64,08,10,26,46,00);
+f8(38,00,04,2a,52,2a,04,0a,00);
+f8(39,00,00,00,20,40,00,00,00);
+f8(40,00,00,00,00,3c,42,00,00);
+f8(41,00,00,42,3c,00,00,00,00);
+f8(42,00,00,08,2a,1c,2a,08,00);
+f8(43,00,00,08,08,3e,08,08,00);
+f8(44,00,00,00,01,06,00,00,00);
+f8(45,00,00,08,08,08,08,08,00);
+f8(46,00,00,00,06,06,00,00,00);
+f8(47,00,00,02,04,08,10,20,00);
+f8(48,00,3c,46,4a,52,62,3c,00);
+f8(49,00,00,22,42,7e,02,02,00);
+f8(50,00,26,4a,4a,4a,4a,32,00);
+f8(51,00,24,42,42,52,52,2c,00);
+f8(52,00,0c,14,24,7e,04,04,00);
+f8(53,00,74,52,52,52,52,4c,00);
+f8(54,00,3c,52,52,52,52,0c,00);
+f8(55,00,40,40,46,48,50,60,00);
+f8(56,00,2c,52,52,52,52,2c,00);
+f8(57,00,30,4a,4a,4a,4a,3c,00);
+f8(58,00,00,00,12,00,00,00,00);
+f8(59,00,00,01,26,00,00,00,00);
+f8(60,00,00,00,08,14,22,00,00);
+f8(61,00,00,14,14,14,14,14,00);
+f8(62,00,00,00,22,14,08,00,00);
+f8(63,00,20,40,40,4a,50,20,00);
+f8(64,00,3c,42,5a,6a,5a,38,00);
+f8(65,00,3e,48,48,48,48,3e,00);
+f8(66,00,7e,52,52,52,52,2c,00);
+f8(67,00,3c,42,42,42,42,24,00);
+f8(68,00,7e,42,42,42,24,18,00);
+f8(69,00,7e,52,52,52,52,42,00);
+f8(70,00,7e,50,50,50,50,40,00);
+f8(71,00,3c,42,42,4a,4a,2c,00);
+f8(72,00,7e,10,10,10,10,7e,00);
+f8(73,00,00,42,42,7e,42,42,00);
+f8(74,00,0c,02,02,02,02,7c,00);
+f8(75,00,7e,10,10,28,44,02,00);
+f8(76,00,7e,02,02,02,02,02,00);
+f8(77,00,7e,20,10,10,20,7e,00);
+f8(78,00,7e,20,10,08,04,7e,00);
+f8(79,00,3c,42,42,42,42,3c,00);
+f8(80,00,7e,48,48,48,48,30,00);
+f8(81,00,3c,42,4a,46,42,3c,00);
+f8(82,00,7e,48,48,48,4e,30,00);
+f8(83,00,24,52,52,52,52,0c,00);
+f8(84,40,40,40,7e,40,40,40,00);
+f8(85,00,7c,02,02,02,02,7c,00);
+f8(86,00,78,04,02,02,04,78,00);
+f8(87,00,7c,02,04,04,02,7c,00);
+f8(88,00,42,24,18,18,24,42,00);
+f8(89,40,20,10,0e,10,20,40,00);
+f8(90,00,42,46,4a,52,62,42,00);
+f8(91,00,00,00,00,7e,42,42,00);
+f8(92,00,20,10,08,04,02,00,00);
+f8(93,00,42,42,7e,00,00,00,00);
+f8(94,00,10,20,7e,20,10,00,00);
+f8(95,01,01,01,01,01,01,01,01);
+f8(96,00,12,3e,52,52,42,22,00);
+f8(97,00,04,2a,2a,2a,1e,00,00);
+f8(98,00,00,7e,12,12,12,0c,00);
+f8(99,00,00,1c,22,22,22,00,00);
+f8(100,00,0c,12,12,12,7e,00,00);
+f8(101,00,1c,2a,2a,2a,12,00,00);
+f8(102,00,00,00,3e,50,40,00,00);
+f8(103,00,18,25,25,25,3e,00,00);
+f8(104,00,7e,10,10,10,0e,00,00);
+f8(105,00,00,12,5e,02,00,00,00);
+f8(106,00,00,02,01,01,5e,00,00);
+f8(107,00,00,7e,18,24,02,00,00);
+f8(108,00,00,00,7c,02,02,00,00);
+f8(109,00,3e,20,1e,20,1e,00,00);
+f8(110,00,3e,20,20,20,1e,00,00);
+f8(111,00,1c,22,22,22,1c,00,00);
+f8(112,00,3f,24,24,24,18,00,00);
+f8(113,00,18,24,24,24,3f,01,00);
+f8(114,00,00,1e,20,20,20,00,00);
+f8(115,00,12,2a,2a,2a,04,00,00);
+f8(116,00,00,20,7c,22,02,00,00);
+f8(117,00,3c,02,02,02,3c,00,00);
+f8(118,00,30,0c,02,0c,30,00,00);
+f8(119,00,3c,02,1c,02,3c,00,00);
+f8(120,00,22,14,08,14,22,00,00);
+f8(121,00,38,05,05,05,3e,00,00);
+f8(122,00,22,26,2a,32,22,00,00);
+f8(123,00,00,10,10,6e,42,42,00);
+f8(124,00,00,00,00,7e,00,00,00);
+f8(125,00,42,42,6e,10,10,00,00);
+f8(126,00,00,20,40,20,40,00,00);
+
+const int font_adisize8_height=8;
+const unsigned char *font_adisize8_chars[] = {
+    font_adisize8_chnotdef,font_adisize8_chnotdef,font_adisize8_chnotdef,font_adisize8_chnotdef,font_adisize8_chnotdef,font_adisize8_chnotdef,font_adisize8_chnotdef, // 00
+    font_adisize8_chnotdef,font_adisize8_chnotdef,font_adisize8_chnotdef,font_adisize8_chnotdef,font_adisize8_chnotdef,font_adisize8_chnotdef,font_adisize8_chnotdef, // 08
+    font_adisize8_chnotdef,font_adisize8_chnotdef,font_adisize8_chnotdef,font_adisize8_chnotdef,font_adisize8_chnotdef,font_adisize8_chnotdef,font_adisize8_chnotdef, // 10
+    font_adisize8_chnotdef,font_adisize8_chnotdef,font_adisize8_chnotdef,font_adisize8_chnotdef,font_adisize8_chnotdef,font_adisize8_chnotdef,font_adisize8_chnotdef, // 18
+    font_adisize8_chnotdef,font_adisize8_chnotdef,font_adisize8_chnotdef,font_adisize8_chnotdef,font_adisize8_ch32    ,font_adisize8_ch33    ,font_adisize8_ch34, // 20
+    font_adisize8_ch35    ,font_adisize8_ch36    ,font_adisize8_ch37    ,font_adisize8_ch38    ,font_adisize8_ch39    ,font_adisize8_ch40    ,font_adisize8_ch41, // 28
+    font_adisize8_ch42    ,font_adisize8_ch43    ,font_adisize8_ch44    ,font_adisize8_ch45    ,font_adisize8_ch46    ,font_adisize8_ch47    ,font_adisize8_ch48, // 30
+    font_adisize8_ch49    ,font_adisize8_ch50    ,font_adisize8_ch51    ,font_adisize8_ch52    ,font_adisize8_ch53    ,font_adisize8_ch54    ,font_adisize8_ch55,
+    font_adisize8_ch56    ,font_adisize8_ch57    ,font_adisize8_ch58    ,font_adisize8_ch59    ,font_adisize8_ch60    ,font_adisize8_ch61    ,font_adisize8_ch62, // 40
+    font_adisize8_ch63    ,font_adisize8_ch64    ,font_adisize8_ch65    ,font_adisize8_ch66    ,font_adisize8_ch67    ,font_adisize8_ch68    ,font_adisize8_ch69,
+    font_adisize8_ch70    ,font_adisize8_ch71    ,font_adisize8_ch72    ,font_adisize8_ch73    ,font_adisize8_ch74    ,font_adisize8_ch75    ,font_adisize8_ch76, // 50
+    font_adisize8_ch77    ,font_adisize8_ch78    ,font_adisize8_ch79    ,font_adisize8_ch80    ,font_adisize8_ch81    ,font_adisize8_ch82    ,font_adisize8_ch83,
+    font_adisize8_ch84    ,font_adisize8_ch85    ,font_adisize8_ch86    ,font_adisize8_ch87    ,font_adisize8_ch88    ,font_adisize8_ch89    ,font_adisize8_ch90,     // 60
+    font_adisize8_ch91    ,font_adisize8_ch92    ,font_adisize8_ch93    ,font_adisize8_ch94    ,font_adisize8_ch95    ,font_adisize8_ch96    ,font_adisize8_ch97,
+    font_adisize8_ch98    ,font_adisize8_ch99    ,font_adisize8_ch100   ,font_adisize8_ch101   ,font_adisize8_ch102   ,font_adisize8_ch103   ,font_adisize8_ch104,    // 70
+    font_adisize8_ch105   ,font_adisize8_ch106   ,font_adisize8_ch107   ,font_adisize8_ch108   ,font_adisize8_ch109   ,font_adisize8_ch110   ,font_adisize8_ch111,
+    font_adisize8_ch112   ,font_adisize8_ch113   ,font_adisize8_ch114   ,font_adisize8_ch115   ,font_adisize8_ch116   ,font_adisize8_ch117   ,font_adisize8_ch118,    // 80
+    font_adisize8_ch119   ,font_adisize8_ch120   ,font_adisize8_ch121   ,font_adisize8_ch122   ,font_adisize8_ch123   ,font_adisize8_ch124   ,font_adisize8_ch125,
+    font_adisize8_ch126   ,font_adisize8_chnotdef,font_adisize8_chnotdef,font_adisize8_chnotdef,font_adisize8_chnotdef,font_adisize8_chnotdef,font_adisize8_chnotdef, // 90
+    font_adisize8_chnotdef,font_adisize8_chnotdef,font_adisize8_chnotdef,font_adisize8_chnotdef,font_adisize8_chnotdef,font_adisize8_chnotdef,font_adisize8_chnotdef,
+    font_adisize8_chnotdef,font_adisize8_chnotdef,font_adisize8_chnotdef,font_adisize8_chnotdef,font_adisize8_chnotdef,font_adisize8_chnotdef,font_adisize8_chnotdef, // a0
+    font_adisize8_chnotdef,font_adisize8_chnotdef,font_adisize8_chnotdef,font_adisize8_chnotdef,font_adisize8_chnotdef,font_adisize8_chnotdef,font_adisize8_chnotdef,
+    font_adisize8_chnotdef,font_adisize8_chnotdef,font_adisize8_chnotdef,font_adisize8_chnotdef,font_adisize8_chnotdef,font_adisize8_chnotdef,font_adisize8_chnotdef, // b0
+    font_adisize8_chnotdef,font_adisize8_chnotdef,font_adisize8_chnotdef,font_adisize8_chnotdef,font_adisize8_chnotdef,font_adisize8_chnotdef,font_adisize8_chnotdef,
+    font_adisize8_chnotdef,font_adisize8_chnotdef,font_adisize8_chnotdef,font_adisize8_chnotdef,font_adisize8_chnotdef,font_adisize8_chnotdef,font_adisize8_chnotdef, // c0
+    font_adisize8_chnotdef,font_adisize8_chnotdef,font_adisize8_chnotdef,font_adisize8_chnotdef,font_adisize8_chnotdef,font_adisize8_chnotdef,font_adisize8_chnotdef,
+    font_adisize8_chnotdef,font_adisize8_chnotdef,font_adisize8_chnotdef,font_adisize8_chnotdef,font_adisize8_chnotdef,font_adisize8_chnotdef,font_adisize8_chnotdef, // d0
+    font_adisize8_chnotdef,font_adisize8_chnotdef,font_adisize8_chnotdef,font_adisize8_chnotdef,font_adisize8_chnotdef,font_adisize8_chnotdef,font_adisize8_chnotdef,
+    font_adisize8_chnotdef,font_adisize8_chnotdef,font_adisize8_chnotdef,font_adisize8_chnotdef,font_adisize8_chnotdef,font_adisize8_chnotdef,font_adisize8_chnotdef, // e0
+    font_adisize8_chnotdef,font_adisize8_chnotdef,font_adisize8_chnotdef,font_adisize8_chnotdef,font_adisize8_chnotdef,font_adisize8_chnotdef,font_adisize8_chnotdef,
+    font_adisize8_chnotdef,font_adisize8_chnotdef,font_adisize8_chnotdef,font_adisize8_chnotdef,font_adisize8_chnotdef,font_adisize8_chnotdef,font_adisize8_chnotdef, // f0
+    font_adisize8_chnotdef,font_adisize8_chnotdef,font_adisize8_chnotdef,font_adisize8_chnotdef,font_adisize8_chnotdef,font_adisize8_chnotdef,font_adisize8_chnotdef,
 };
 
-#else
+#undef f8
 
-#define f1(c,a1) static unsigned char ch##c[] = {1,0x##a1}
-#define f2(c,a1,a2) static unsigned char ch##c[] = {2,0x##a1,0x##a2}
-#define f3(c,a1,a2,a3) static unsigned char ch##c[] = {3,0x##a1,0x##a2,0x##a3}
-#define f4(c,a1,a2,a3,a4) static unsigned char ch##c[] = {4,0x##a1,0x##a2,0x##a3,0x##a4}
-#define f5(c,a1,a2,a3,a4,a5) static unsigned char ch##c[] = {5,0x##a1,0x##a2,0x##a3,0x##a4,0x##a5}
+//Defining "Adikted classic" font
+
+#define f1(c,a1) const static unsigned char font_adiclssc_ch##c[] = {1,0x##a1}
+#define f2(c,a1,a2) const static unsigned char font_adiclssc_ch##c[] = {2,0x##a1,0x##a2}
+#define f3(c,a1,a2,a3) const static unsigned char font_adiclssc_ch##c[] = {3,0x##a1,0x##a2,0x##a3}
+#define f4(c,a1,a2,a3,a4) const static unsigned char font_adiclssc_ch##c[] = {4,0x##a1,0x##a2,0x##a3,0x##a4}
+#define f5(c,a1,a2,a3,a4,a5) const static unsigned char font_adiclssc_ch##c[] = {5,0x##a1,0x##a2,0x##a3,0x##a4,0x##a5}
 
 f4(A,f,14,14,f);
 f4(B,1f,15,15,a);
@@ -304,40 +207,46 @@ f4(atsign,e,11,1d,d);
 
 f3(notdef,15,a,15);
 
-int fontheight=6;
-unsigned char *chars[] = {
-    chnotdef,chnotdef,chnotdef,chnotdef,chnotdef,chnotdef,chnotdef,chnotdef,   // 00
-    chnotdef,chnotdef,chnotdef,chnotdef,chnotdef,chnotdef,chnotdef,chnotdef,   // 08
-    chnotdef,chnotdef,chnotdef,chnotdef,chnotdef,chnotdef,chnotdef,chnotdef,   // 10
-    chnotdef,chnotdef,chnotdef,chnotdef,chnotdef,chnotdef,chnotdef,chnotdef,   // 18
-    chspace ,chexclam,chdblqt ,chnotdef,chnotdef,chnotdef,chnotdef,chcquote,   // 20
-    chnotdef,chnotdef,chnotdef,chnotdef,chcomma ,chnotdef,chperiod,chnotdef,   // 28
-    ch0     ,ch1     ,ch2     ,ch3     ,ch4     ,ch5     ,ch6     ,ch7     ,   // 30
-    ch8     ,ch9     ,chcolon ,chsemi  ,chnotdef,chnotdef,chnotdef,chquery ,   // 38
-    chatsign,chA     ,chB     ,chC     ,chD     ,chE     ,chF     ,chG     ,   // 40
-    chH     ,chI     ,chJ     ,chK     ,chL     ,chM     ,chN     ,chO     ,   // 48
-    chP     ,chQ     ,chR     ,chS     ,chT     ,chU     ,chV     ,chW     ,   // 50
-    chX     ,chY     ,chZ     ,chnotdef,chnotdef,chnotdef,chnotdef,chnotdef,   // 58
-    choquote,chA     ,chB     ,chC     ,chD     ,chE     ,chF     ,chG     ,   // 60
-    chH     ,chI     ,chJ     ,chK     ,chL     ,chM     ,chN     ,chO     ,   // 68
-    chP     ,chQ     ,chR     ,chS     ,chT     ,chU     ,chV     ,chW     ,   // 70
-    chX     ,chY     ,chZ     ,chnotdef,chnotdef,chnotdef,chnotdef,chnotdef,   // 78
-    chnotdef,chnotdef,chnotdef,chnotdef,chnotdef,chnotdef,chnotdef,chnotdef,   // 80
-    chnotdef,chnotdef,chnotdef,chnotdef,chnotdef,chnotdef,chnotdef,chnotdef,   // 88
-    chnotdef,chnotdef,chnotdef,chnotdef,chnotdef,chnotdef,chnotdef,chnotdef,   // 90
-    chnotdef,chnotdef,chnotdef,chnotdef,chnotdef,chnotdef,chnotdef,chnotdef,   // 98
-    chnotdef,chnotdef,chnotdef,chnotdef,chnotdef,chnotdef,chnotdef,chnotdef,   // A0
-    chnotdef,chnotdef,chnotdef,chnotdef,chnotdef,chnotdef,chnotdef,chnotdef,   // A8
-    chnotdef,chnotdef,chnotdef,chnotdef,chnotdef,chnotdef,chnotdef,chnotdef,   // B0
-    chnotdef,chnotdef,chnotdef,chnotdef,chnotdef,chnotdef,chnotdef,chnotdef,   // B8
-    chnotdef,chnotdef,chnotdef,chnotdef,chnotdef,chnotdef,chnotdef,chnotdef,   // C0
-    chnotdef,chnotdef,chnotdef,chnotdef,chnotdef,chnotdef,chnotdef,chnotdef,   // C8
-    chnotdef,chnotdef,chnotdef,chnotdef,chnotdef,chnotdef,chnotdef,chnotdef,   // D0
-    chnotdef,chnotdef,chnotdef,chnotdef,chnotdef,chnotdef,chnotdef,chnotdef,   // D8
-    chnotdef,chnotdef,chnotdef,chnotdef,chnotdef,chnotdef,chnotdef,chnotdef,   // E0
-    chnotdef,chnotdef,chnotdef,chnotdef,chnotdef,chnotdef,chnotdef,chnotdef,   // E8
-    chnotdef,chnotdef,chnotdef,chnotdef,chnotdef,chnotdef,chnotdef,chnotdef,   // F0
-    chnotdef,chnotdef,chnotdef,chnotdef,chnotdef,chnotdef,chnotdef,chnotdef,   // F8
+const int font_adiclssc_height=6;
+
+const unsigned char *font_adiclssc_chars[] = {
+    font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,   // 00
+    font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,   // 08
+    font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,   // 10
+    font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,   // 18
+    font_adiclssc_chspace ,font_adiclssc_chexclam,font_adiclssc_chdblqt ,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chcquote,   // 20
+    font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chcomma ,font_adiclssc_chnotdef,font_adiclssc_chperiod,font_adiclssc_chnotdef,   // 28
+    font_adiclssc_ch0     ,font_adiclssc_ch1     ,font_adiclssc_ch2     ,font_adiclssc_ch3     ,font_adiclssc_ch4     ,font_adiclssc_ch5     ,font_adiclssc_ch6     ,font_adiclssc_ch7     ,   // 30
+    font_adiclssc_ch8     ,font_adiclssc_ch9     ,font_adiclssc_chcolon ,font_adiclssc_chsemi  ,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chquery ,   // 38
+    font_adiclssc_chatsign,font_adiclssc_chA     ,font_adiclssc_chB     ,font_adiclssc_chC     ,font_adiclssc_chD     ,font_adiclssc_chE     ,font_adiclssc_chF     ,font_adiclssc_chG     ,   // 40
+    font_adiclssc_chH     ,font_adiclssc_chI     ,font_adiclssc_chJ     ,font_adiclssc_chK     ,font_adiclssc_chL     ,font_adiclssc_chM     ,font_adiclssc_chN     ,font_adiclssc_chO     ,   // 48
+    font_adiclssc_chP     ,font_adiclssc_chQ     ,font_adiclssc_chR     ,font_adiclssc_chS     ,font_adiclssc_chT     ,font_adiclssc_chU     ,font_adiclssc_chV     ,font_adiclssc_chW     ,   // 50
+    font_adiclssc_chX     ,font_adiclssc_chY     ,font_adiclssc_chZ     ,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,   // 58
+    font_adiclssc_choquote,font_adiclssc_chA     ,font_adiclssc_chB     ,font_adiclssc_chC     ,font_adiclssc_chD     ,font_adiclssc_chE     ,font_adiclssc_chF     ,font_adiclssc_chG     ,   // 60
+    font_adiclssc_chH     ,font_adiclssc_chI     ,font_adiclssc_chJ     ,font_adiclssc_chK     ,font_adiclssc_chL     ,font_adiclssc_chM     ,font_adiclssc_chN     ,font_adiclssc_chO     ,   // 68
+    font_adiclssc_chP     ,font_adiclssc_chQ     ,font_adiclssc_chR     ,font_adiclssc_chS     ,font_adiclssc_chT     ,font_adiclssc_chU     ,font_adiclssc_chV     ,font_adiclssc_chW     ,   // 70
+    font_adiclssc_chX     ,font_adiclssc_chY     ,font_adiclssc_chZ     ,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,   // 78
+    font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,   // 80
+    font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,   // 88
+    font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,   // 90
+    font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,   // 98
+    font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,   // A0
+    font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,   // A8
+    font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,   // B0
+    font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,   // B8
+    font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,   // C0
+    font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,   // C8
+    font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,   // D0
+    font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,   // D8
+    font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,   // E0
+    font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,   // E8
+    font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,   // F0
+    font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,   // F8
 };
 
-#endif
+// Cleanup
+#undef f1
+#undef f2
+#undef f3
+#undef f4
+#undef f5

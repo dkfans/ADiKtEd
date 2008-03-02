@@ -28,14 +28,20 @@ short place_graffiti_on_clm_top(struct COLUMN_REC *clm_rec,unsigned short font,
         unsigned short height,char *text,int graf_subtl,int graf_subtl_h,
         unsigned short cube);
 int compute_graffiti_subtl_length(unsigned short font,char *text);
-int get_graffiti_cube_height(unsigned short font,char *text);
 void graffiti_update_columns(struct LEVEL *lvl,int graf_idx);
 void graffiti_clear_from_columns(struct LEVEL *lvl,int graf_idx);
 short set_graffiti_orientation(struct DK_GRAFFITI *graf,unsigned short orient);
 int set_graffiti_height(struct DK_GRAFFITI *graf,int height);
 
+int get_graffiti_cube_height(unsigned short font,char *text);
+const unsigned char *get_font_char(unsigned short font,char chr);
+
+
 // Import the font from graffiti_font.c
-extern unsigned char *chars[];
-extern int fontheight;
+extern const unsigned char font_any_chnull[];
+extern const unsigned char *font_adiclssc_chars[];
+extern const int font_adiclssc_height;
+extern const unsigned char *font_adisize8_chars[];
+extern const int font_adisize8_height;
 
 #endif // ADIKT_GRAFFITI_H

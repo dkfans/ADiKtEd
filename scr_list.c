@@ -168,7 +168,7 @@ void actions_mdcclm(int key)
             for (k=0;k<3;k++)
               for (i=0;i<3;i++)
               {
-                cclm_recs[k*3+i]=create_cust_col(tx*3+i,ty*3+k);
+                cclm_recs[k*3+i]=create_cust_col();
                 clm_recs[k*3+i]=cclm_recs[k*3+i]->rec;
               }
             //Retrieving parameters from LEVEL structure - the slab and its surrounding
@@ -180,41 +180,13 @@ void actions_mdcclm(int key)
             for (k=0;k<3;k++)
               for (i=0;i<3;i++)
               {
-                cust_col_add_or_update(lvl,&cclm_recs[k*3+i]);
+                cust_col_add_or_update(lvl,tx*3+i,ty*3+k,cclm_recs[k*3+i]);
               }
             end_list();
             message_info("Custom columns set");
           };break;
         default:
           message_info("Unrecognized custom columns key code: %d",key);
-          speaker_beep();
-      }
-    }
-}
-
-/*
- * Covers actions from custom cubes screen.
- */
-void actions_mdcube(int key)
-{
-    message_release();
-    if (!actions_list(key))
-    {
-      switch (key)
-      {
-        case KEY_TAB:
-        case KEY_DEL:
-        case KEY_ESCAPE:
-          end_list();
-          message_info("Customization cancelled");
-          break;
-        case KEY_ENTER:
-          //TODO
-          end_list();
-          message_info("Column cubes set");
-          break;
-        default:
-          message_info("Unrecognized custom cubes key code: %d",key);
           speaker_beep();
       }
     }
@@ -473,13 +445,6 @@ void draw_mdtextr()
 void draw_mdcclm()
 {
     draw_numbered_list(get_custom_column_fullname,0,CUST_CLM_GEN_MAX_INDEX,18);
-    set_cursor_pos(get_screen_rows()-1, 17);
-}
-
-void draw_mdcube()
-{
-    draw_mdempty();
-//    draw_numbered_list(get_item_subtype_fullname,1,ITEM_SUBTYPE_SPELLARMG,18);
     set_cursor_pos(get_screen_rows()-1, 17);
 }
 

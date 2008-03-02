@@ -110,7 +110,6 @@ unsigned char *find_next_object_on_map(struct LEVEL *lvl, int *tx, int *ty, unsi
     }
     switch (srch_idx)
     {
-    //TODO: find the action point and static light
     case 1: return find_next_actnpt_on_map(lvl,tx,ty);
     case 2: return find_next_stlight_on_map(lvl,tx,ty);
     case 0:
@@ -609,6 +608,13 @@ unsigned char *create_item_adv(struct LEVEL *lvl, unsigned int sx, unsigned int 
         thing=create_item(sx,sy,stype_idx);
         set_thing_subtile_h(thing,3); // Raise it up a bit
         set_thing_sensitile(thing,THING_SENSITILE_NONE);
+    } else
+    if (is_heartflame_stype(stype_idx))
+    {
+        thing=create_item(sx,sy,stype_idx);
+        set_thing_subtile_h(thing,2); // That is where heart flames should be
+        unsigned short sensitile=ty*MAP_SIZE_X+tx;
+        set_thing_sensitile(thing,sensitile);
     } else
     if (stype_idx==ITEM_SUBTYPE_PRISONBAR)
     {

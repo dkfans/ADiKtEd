@@ -139,6 +139,7 @@ short set_graffiti_orientation(struct DK_GRAFFITI *graf,unsigned short orient)
     //Preparing array bounds
     int arr_entries_x=MAP_SIZE_X*MAP_SUBNUM_X;
     int arr_entries_y=MAP_SIZE_Y*MAP_SUBNUM_Y;
+    unsigned short font=graf->font;
     int i;
     int l;
     l = strlen(graf->text);
@@ -149,33 +150,33 @@ short set_graffiti_orientation(struct DK_GRAFFITI *graf,unsigned short orient)
       //The zero index in every chars[] entry is number of column
       //needed for this character. The "+1" is required
       // to make space between letters
-      subtl_len+=chars[(unsigned char)graf->text[i]][0]+1;
+      subtl_len+=get_font_char(font,graf->text[i])[0]+1;
       int graf_end_subtl_x,graf_end_subtl_y;
       switch (orient)
       {
       case ORIENT_NS:
       case ORIENT_SN:
-          graf_end_subtl_x=graf->tx*3;
-          graf_end_subtl_y=graf->ty*3+subtl_len;
+          graf_end_subtl_x=graf->tx*MAP_SUBNUM_X;
+          graf_end_subtl_y=graf->ty*MAP_SUBNUM_Y+subtl_len;
           break;
       case ORIENT_WE:
       case ORIENT_EW:
-          graf_end_subtl_x=graf->tx*3+subtl_len;
-          graf_end_subtl_y=graf->ty*3;
+          graf_end_subtl_x=graf->tx*MAP_SUBNUM_X+subtl_len;
+          graf_end_subtl_y=graf->ty*MAP_SUBNUM_Y;
           break;
       case ORIENT_TNS:
       case ORIENT_TSN:
-          graf_end_subtl_x=graf->tx*3;
-          graf_end_subtl_y=graf->ty*3+subtl_len;
+          graf_end_subtl_x=graf->tx*MAP_SUBNUM_X;
+          graf_end_subtl_y=graf->ty*MAP_SUBNUM_Y+subtl_len;
           break;
       case ORIENT_TWE:
       case ORIENT_TEW:
-          graf_end_subtl_x=graf->tx*3+subtl_len;
-          graf_end_subtl_y=graf->ty*3;
+          graf_end_subtl_x=graf->tx*MAP_SUBNUM_X+subtl_len;
+          graf_end_subtl_y=graf->ty*MAP_SUBNUM_Y;
           break;
       default:
-          graf_end_subtl_x=graf->tx*3;
-          graf_end_subtl_y=graf->ty*3;
+          graf_end_subtl_x=graf->tx*MAP_SUBNUM_X;
+          graf_end_subtl_y=graf->ty*MAP_SUBNUM_Y;
           break;
       }
       //If we've exceeded map space - truncate the graffiti displayed
@@ -189,11 +190,11 @@ short set_graffiti_orientation(struct DK_GRAFFITI *graf,unsigned short orient)
     // Remove space after last character
     subtl_len--;
     //We will need string length in tiles
-    int tiles_len=(subtl_len/3) + ((subtl_len%3)>0);
+    int tiles_len=(subtl_len/MAP_SUBNUM_X) + ((subtl_len%MAP_SUBNUM_X)>0);
     if (tiles_len<1) tiles_len=1;
     // Getting graffiti height - in subtiles and tiles
     int txt_height=get_graffiti_cube_height(graf->font,graf->text);
-    int txt_tile_height=(txt_height/3)+((txt_height%3)>0);
+    int txt_tile_height=(txt_height/MAP_SUBNUM_X)+((txt_height%MAP_SUBNUM_X)>0);
     //Now we can set the graffiti size and orientation
     graf->orient=orient;
     int graf_h=6-txt_height;
@@ -341,6 +342,7 @@ int compute_graffiti_subtl_length(unsigned short font,char *text)
     switch (font)
     {
     case GRAFF_FONT_ADICLSSC:
+    case GRAFF_FONT_ADISIZE8:
          break;
     case GRAFF_FONT_NONE:
     default:
@@ -354,7 +356,7 @@ int compute_graffiti_subtl_length(unsigned short font,char *text)
         //The zero index in every chars[] entry is number of column
         //needed for this character. The "+1" is required
         // to make space between letters
-        subtl_len+=chars[(unsigned char)text[i]][0]+1;
+        subtl_len+=get_font_char(font,text[i])[0]+1;
     }
     // Remove space after last char
     subtl_len--;
@@ -367,8 +369,29 @@ int compute_graffiti_subtl_length(unsigned short font,char *text)
 int get_graffiti_cube_height(unsigned short font,char *text)
 {
     //highly simplified - for now...
-    //DODO: compute height of every char in text, then select the largest.
-    return fontheight;
+    //TODO: compute height of every char in text, then select the largest.
+  switch (font)
+  {
+  case GRAFF_FONT_ADICLSSC:
+    return font_adiclssc_height;
+  case GRAFF_FONT_ADISIZE8:
+    return font_adisize8_height;
+  default:
+    return 0;
+  }
+}
+
+const unsigned char *get_font_char(unsigned short font,char chr)
+{
+  switch (font)
+  {
+  case GRAFF_FONT_ADICLSSC:
+    return font_adiclssc_chars[(unsigned char)chr];
+  case GRAFF_FONT_ADISIZE8:
+    return font_adisize8_chars[(unsigned char)chr];
+  default:
+    return font_any_chnull;
+  }
 }
 
 /*
@@ -387,8 +410,8 @@ int place_graffiti_on_slab(struct COLUMN_REC *clm_recs[9],struct LEVEL *lvl, int
       if (graf==NULL) continue;
       //Setting some local variables
       int i;
-      int base_sx=graf->tx*3;
-      int base_sy=graf->ty*3;
+      int base_sx=graf->tx*MAP_SUBNUM_X;
+      int base_sy=graf->ty*MAP_SUBNUM_Y;
       //Counting graffiti length in subtiles
       int subtl_len=compute_graffiti_subtl_length(graf->font,graf->text);
       //Starting part of the graffiti
@@ -399,13 +422,13 @@ int place_graffiti_on_slab(struct COLUMN_REC *clm_recs[9],struct LEVEL *lvl, int
       switch (graf->orient)
       {
       case ORIENT_TNS: orient_top=true;
-      case ORIENT_NS: graf_subtl_start=ty*3-base_sy; break;
+      case ORIENT_NS: graf_subtl_start=ty*MAP_SUBNUM_Y-base_sy; break;
       case ORIENT_TSN: orient_top=true;
-      case ORIENT_SN: graf_subtl_start=(base_sy+subtl_len-1)-ty*3; break;
+      case ORIENT_SN: graf_subtl_start=(base_sy+subtl_len-1)-ty*MAP_SUBNUM_Y; break;
       case ORIENT_TWE: orient_top=true;
-      case ORIENT_WE: graf_subtl_start=tx*3-base_sx; break;
+      case ORIENT_WE: graf_subtl_start=tx*MAP_SUBNUM_X-base_sx; break;
       case ORIENT_TEW: orient_top=true;
-      case ORIENT_EW: graf_subtl_start=(base_sx+subtl_len-1)-tx*3; break;
+      case ORIENT_EW: graf_subtl_start=(base_sx+subtl_len-1)-tx*MAP_SUBNUM_X; break;
       default: graf_subtl_start=0; break;
       }
       if (orient_top)
@@ -414,25 +437,25 @@ int place_graffiti_on_slab(struct COLUMN_REC *clm_recs[9],struct LEVEL *lvl, int
         int graf_subtl_h_st;
         switch (graf->orient)
         {
-        case ORIENT_TNS: graf_subtl_h_st=tx*3-base_sx; break;
-        case ORIENT_TSN: graf_subtl_h_st=(base_sx+subtl_h-1)-(tx+1)*3; break;
-        case ORIENT_TWE: graf_subtl_h_st=(base_sy+subtl_h-1)-(ty+1)*3; break;
-        case ORIENT_TEW: graf_subtl_h_st=ty*3-base_sy; break;
+        case ORIENT_TNS: graf_subtl_h_st=tx*MAP_SUBNUM_X-base_sx; break;
+        case ORIENT_TSN: graf_subtl_h_st=(base_sx+subtl_h-1)-(tx+1)*MAP_SUBNUM_X; break;
+        case ORIENT_TWE: graf_subtl_h_st=(base_sy+subtl_h-1)-(ty+1)*MAP_SUBNUM_Y; break;
+        case ORIENT_TEW: graf_subtl_h_st=ty*MAP_SUBNUM_Y-base_sy; break;
         default: graf_subtl_h_st=0; break;
         }
-        for (i=0; i<3; i++)
+        for (i=0; i<MAP_SUBNUM_X; i++)
         {
           int k;
           int graf_subtl=graf_subtl_start+i;
-          for (k=0; k<3; k++)
+          for (k=0; k<MAP_SUBNUM_Y; k++)
           {
             int subtl;
             switch (graf->orient)
             {
-            case ORIENT_TNS: subtl=i*3 + k; break;
-            case ORIENT_TSN: subtl=(2-i)*3 + (2-k); break;
-            case ORIENT_TWE: subtl=(2-k)*3 + i; break;
-            case ORIENT_TEW: subtl=k*3 + (2-i); break;
+            case ORIENT_TNS: subtl=i*MAP_SUBNUM_X + k; break;
+            case ORIENT_TSN: subtl=(2-i)*MAP_SUBNUM_X + (2-k); break;
+            case ORIENT_TWE: subtl=(2-k)*MAP_SUBNUM_X + i; break;
+            case ORIENT_TEW: subtl=k*MAP_SUBNUM_X + (2-i); break;
             default: subtl=0; break;
             }
             int graf_subtl_h=graf_subtl_h_st+k;
@@ -444,9 +467,9 @@ int place_graffiti_on_slab(struct COLUMN_REC *clm_recs[9],struct LEVEL *lvl, int
       } else
       {
         unsigned short or=((graf->orient%4));
-        for (i=0; i<3; i++)
+        for (i=0; i<MAP_SUBNUM_X; i++)
         {
-          int subtl=dy[or][i]*3 + dx[or][i];
+          int subtl=dy[or][i]*MAP_SUBNUM_X + dx[or][i];
           int graf_subtl=graf_subtl_start+i;
           short modified=place_graffiti_on_column(clm_recs[subtl],graf->font,
                 graf->height,graf->text,graf_subtl,graf->cube);
@@ -471,7 +494,7 @@ short place_graffiti_on_clm_top(struct COLUMN_REC *clm_rec,unsigned short font,
     {
         //The zero index in every chars[] entry is number of column
         //needed for this character.
-        int chr_clms_count=chars[(unsigned char)(text[text_pos])][0]+1;
+        int chr_clms_count=get_font_char(font,text[text_pos])[0]+1;
         if ((i<=graf_subtl)&&(i+chr_clms_count>graf_subtl))
         {
             //clm_pos starts with 1, not with 0 (because chars[][0] is
@@ -483,7 +506,7 @@ short place_graffiti_on_clm_top(struct COLUMN_REC *clm_rec,unsigned short font,
     }
     //Check if we've found the right position
     if (text_pos>=l) return false;
-    unsigned char *char_data=chars[(unsigned char)text[text_pos]];
+    const unsigned char *char_data=get_font_char(font,text[text_pos]);
     // Check if this is empty column (space between letters)
     if ((clm_pos<=0)||(clm_pos>char_data[0])) return false;
     unsigned char clm_mask=char_data[clm_pos];
@@ -509,7 +532,7 @@ short place_graffiti_on_column(struct COLUMN_REC *clm_rec,unsigned short font,
     {
         //The zero index in every chars[] entry is number of column
         //needed for this character.
-        int chr_clms_count=chars[(unsigned char)(text[text_pos])][0]+1;
+        int chr_clms_count=get_font_char(font,text[text_pos])[0]+1;
         if ((i<=graf_subtl)&&(i+chr_clms_count>graf_subtl))
         {
             //clm_pos starts with 1, not with 0 (because chars[][0] is
@@ -521,7 +544,7 @@ short place_graffiti_on_column(struct COLUMN_REC *clm_rec,unsigned short font,
     }
     //Check if we've found the right position
     if (text_pos>=l) return false;
-    unsigned char *char_data=chars[(unsigned char)text[text_pos]];
+    const unsigned char *char_data=get_font_char(font,text[text_pos]);
     // Check if this is empty column (space between letters)
     if ((clm_pos<=0)||(clm_pos>char_data[0])) return false;
     unsigned char clm_mask=char_data[clm_pos];

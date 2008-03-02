@@ -86,6 +86,8 @@ void read_init(void)
 
 void get_command_line_options(int argc, char **argv)
 {
+// Note: Automated commands are now just keys inserted into keyboard input buffer.
+// in the future, this should be a script generated using input parameters
     int cmnds_count=0;
     short get_msgout_fname=false;
     short get_savout_fname=false;
@@ -170,12 +172,13 @@ void get_command_line_options(int argc, char **argv)
  */
 int main(int argc, char **argv)
 {
+    struct LEVEL *lvl;
     //Allocate and set basic configuration variables
     init_levscr_basics();
     // Initialize the message displaying and storing
     init_messages();
     // create object for storing map
-    level_init();
+    level_init(&lvl);
     // read configuration file
     read_init();
     // Interpreting command line parameters
@@ -185,6 +188,7 @@ int main(int argc, char **argv)
     // Load a map, or start new one
     if (strlen(lvl->fname)>0)
     {
+      popup_show("Loading map","Reading map files. Please wait...");
       load_map(lvl);
     } else
     {

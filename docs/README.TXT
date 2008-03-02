@@ -8,8 +8,8 @@ called adikted_tutorial.html. You may wish to print this out.
 
 Here's the Win32 version executable. Just put all the
 files in the same directory, edit map.ini as appropriate (don't
-worry about changing datmode, that just changes the way round the
-bytes on the .dat display are shown), and run it.
+worry about changing DAT_VIEW_MODE, that just changes the way round
+the bytes on the .dat display are shown), and run it.
 Usage: map [mapfile] [-m <logfile>] [-v] [-r] [-n] -s [mapfile] [-q]
 where:
   mapfile  Specifies filename (eg newmap), or just map number
@@ -61,6 +61,17 @@ Press F1 for help.
 
 TODO before final:
  Fixations in room things parameters (height,other)
+Version: 0.68b
+ Script handling changed
+ More script commands are recognized (but still not all)
+ Heart flames are placed at proper height
+Version: 0.67b
+ More cube values are defined (invisible for end users)
+ Some corrections in Column mode
+ Custom columns function completely rewritten (speed optimized)
+ Test map generation function, for recognizing cubes
+ Map is loaded anyway if script loading fails
+ Information after updating TNG is more detailed
 Version: 0.66b
  Range of items which have such property is now visible in thing mode
  Option to disable objects range visibility in INI file

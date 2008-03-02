@@ -77,8 +77,9 @@ short start_scrpt(struct LEVEL *lvl)
 {
     editor->prevmode=scrmode->mode;
     editor->y=0;
-    editor->rows=lvl->txt_lines_count;
-    editor->text=lvl->txt;
+    editor->rows=lvl->script.lines_count;
+    editor->text=lvl->script.txt;
+    editor->script_cmds=lvl->script.list;
     scrmode->mode=MD_SCRP;
     return true;
 }
@@ -88,8 +89,9 @@ short start_scrpt(struct LEVEL *lvl)
  */
 void end_scrpt()
 {
-    lvl->txt=editor->text;
-    lvl->txt_lines_count=editor->rows;
+    lvl->script.txt=editor->text;
+    lvl->script.lines_count=editor->rows;
+    lvl->script.list=editor->script_cmds;
     editor->y=0;
     editor->rows=0;
     editor->text=NULL;

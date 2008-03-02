@@ -58,6 +58,7 @@
 #define VERIF_WARN    2
 
 #if defined(unix) && !defined(GO32)
+// Externs for updating console on resize
 extern volatile int safe_update, update_required;
 #endif
 

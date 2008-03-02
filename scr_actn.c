@@ -21,6 +21,7 @@
 #include "scr_list.h"
 #include "scr_txted.h"
 #include "scr_rwrk.h"
+#include "scr_cube.h"
 #include "obj_slabs.h"
 #include "obj_things.h"
 #include "obj_column.h"
@@ -44,7 +45,7 @@ static void (*mdend [])()={
      end_mdslab, end_mdtng, end_list, end_list,
      end_help, end_mdclm, end_scrpt, end_list,
      end_list, end_list, end_list, end_mdrwrk,
-     end_list,};
+     end_mdcube,};
 
 // Max. 5 chars mode names
 const char *modenames[]={
@@ -142,6 +143,8 @@ void init_levscr_modes(void)
     init_mdclm();
     // init modes - create thing structures
     init_mdtng();
+    // init modes - create cubes structures
+    init_mdcube();
     // initialize slab mode
     //(this includes slbkey required for all screens containing map)
     init_mdslab();
@@ -182,6 +185,7 @@ void free_levscr(void)
     // free modes
     free_help();
     free_list();
+    free_mdcube();
     free_scrpt();
     free_mdclm();
     free_mdtng();
@@ -345,7 +349,7 @@ void set_brighten_for_range(struct MAPMODE_DATA *mapmode,
     {
       float sx=tx*MAP_SUBNUM_X+1;
       float sy=ty*MAP_SUBNUM_Y+1;
-      float distance=sqrt(pow((float)pos_x-sx,2)+pow((float)pos_y-sy,2))*256.0;
+      float distance=sqrt(pow((float)pos_x-sx,2)+pow((float)pos_y-sy,2))*256.f;
       if (distance<=rng)
         mapmode->brighten[tx][ty]=true;
     }
@@ -840,6 +844,9 @@ int change_mode(int new_mode)
   case MD_TXTR:
        start_mdtextr(lvl);
        break;
+  case MD_CUBE:
+       start_mdcube(lvl);
+       break;
   case MD_SLBL:
        start_mdslbl(lvl);
        break;
@@ -920,13 +927,11 @@ void proc_key(void)
         {
           free_map();
           load_map(lvl);
+          clear_highlight(mapmode);
           change_mode(scrmode->mode);
           message_info("Map \"%s\" loaded", lvl->fname);
         } else
           message_error("Map loading cancelled");
-      } else
-      {
-        speaker_beep();
       }
       break;
     case KEY_F7:
@@ -940,6 +945,7 @@ void proc_key(void)
           popup_show("Reloading map","Reading map files. Please wait...");
           free_map();
           load_map(lvl);
+          clear_highlight(mapmode);
           change_mode(scrmode->mode);
           message_info("Map \"%s\" reloaded", lvl->fname);
       } else
@@ -960,9 +966,6 @@ void proc_key(void)
           message_info("Map \"%s\" saved", lvl->savfname);
         } else
           message_error("Map saving cancelled");
-      } else
-      {
-        speaker_beep();
       }
       break;
     case KEY_F5:
@@ -990,6 +993,7 @@ void proc_key(void)
       popup_show("Clearing map","Generating empty map. Please wait...");
       free_map();
       start_new_map(lvl);
+      clear_highlight(mapmode);
       change_mode(scrmode->mode);
       message_info_force("New map started");
       break;
@@ -1002,6 +1006,7 @@ void proc_key(void)
       popup_show("Randomizing map","Generating random map. Please wait...");
       free_map();
       generate_random_map(lvl);
+      clear_highlight(mapmode);
       change_mode(scrmode->mode);
       message_info_force("Map generation completed");
       break;

@@ -59,12 +59,7 @@ void actions_mdclm(int key)
         case 'a': // update dat/clm/w?b of selected tile
           {
             //Deleting custom columns - to enable auto-update
-            int ccol_idx=cust_col_idx_next(lvl,sx/3,sy/3,-1);
-            while (ccol_idx>=0)
-            {
-                cust_col_del(lvl,ccol_idx);
-                ccol_idx=cust_col_idx_next(lvl,sx/3,sy/3,-1);
-            }
+            cust_cols_del_for_tile(lvl,sx/3,sy/3);
             //Updating
             update_datclm_for_slab(lvl, sx/3,sy/3);
             update_tile_wib_entries(lvl,sx/3,sy/3);
@@ -76,7 +71,7 @@ void actions_mdclm(int key)
           start_list(lvl,MD_CCLM);
           break;
         case 'b': // cube mode
-          start_list(lvl,MD_CUBE);
+          start_mdcube(lvl);
           break;
         default:
           message_info("Unrecognized clm key code: %d",key);
@@ -190,18 +185,18 @@ int display_column(unsigned char *clmentry,int clm_idx, int scr_row, int scr_col
     screen_printf("Solid mask: %04X", clm_rec->solid);
     set_cursor_pos(scr_row++, scr_col2);
     screen_printf("Height: %X", clm_rec->height);
-    set_cursor_pos(scr_row, scr_col);
-    screen_printf("Base block: %03X", clm_rec->base);
-    set_cursor_pos(scr_row++, scr_col2);
-    screen_printf("Permanent: %d", clm_rec->permanent);
     set_cursor_pos(scr_row, scr_col2);
+    screen_printf("Permanent: %d", clm_rec->permanent);
+    set_cursor_pos(scr_row+1, scr_col2);
     screen_printf("Orientation: %02X", clm_rec->orientation);
     int i;
-    for (i=0; i < 8; i++)
+    for (i=7; i>=0; i--)
     {
       set_cursor_pos(scr_row++, scr_col);
-      screen_printf("Cube %d: %03X", i, clm_rec->c[i]);
+      screen_printf("Cube %d:  %03X", i, clm_rec->c[i]);
     }
+    set_cursor_pos(scr_row++, scr_col);
+    screen_printf("Base bl: %03X", clm_rec->base);
     free_column_rec(clm_rec);
     return scr_row;
 }

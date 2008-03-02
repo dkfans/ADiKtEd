@@ -42,5 +42,6 @@ void draw_rework_map_area(struct LEVEL *lvl,RWRK_DATA *mdrwrk);
 int get_rework_map_tile_char(struct LEVEL *lvl,int sx,int sy,unsigned short view);
 
 //Functions - internal
+void place_cube_test(struct LEVEL *lvl,int tx,int ty,unsigned short cube);
 
 #endif // ADIKT_SCRRWRK_H

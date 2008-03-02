@@ -14,6 +14,7 @@ typedef struct {
     int y;
     int rows;
     char **text;
+    struct DK_SCRIPT_COMMAND **script_cmds;
   } TXTED_DATA;
 
 extern TXTED_DATA *editor;

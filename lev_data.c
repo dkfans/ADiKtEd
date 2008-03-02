@@ -13,6 +13,7 @@
 #include "obj_slabs.h"
 #include "obj_things.h"
 #include "obj_column.h"
+#include "lev_script.h"
 
 const int idir_subtl_x[]={
     0, 1, 2,
@@ -30,9 +31,10 @@ struct LEVEL *lvl=NULL;
  * creates object for storing one level; allocates memory and inits
  * the values to zero; drops any previous pointers without deallocating;
  */
-short level_init()
+short level_init(struct LEVEL **lvl_ptr)
 {
     lvl=(struct LEVEL *)malloc(sizeof(struct LEVEL));
+    *lvl_ptr=lvl;
     if (lvl==NULL)
         die("level_init: Out of memory");
     // map file name
@@ -186,6 +188,18 @@ short level_init()
         die("level_init: Out of memory");
     }
   }
+  { //allocating cust.columns structures
+    lvl->cust_clm_lookup= (struct DK_CUSTOM_CLM ***)malloc(dat_entries_y*sizeof(struct DK_CUSTOM_CLM **));
+    if (lvl->cust_clm_lookup==NULL)
+        die("level_init: Out of memory");
+    int i;
+    for (i=0; i < dat_entries_y; i++)
+    {
+      lvl->cust_clm_lookup[i]= (struct DK_CUSTOM_CLM **)malloc(dat_entries_x*sizeof(struct DK_CUSTOM_CLM *));
+      if (lvl->cust_clm_lookup[i]==NULL)
+        die("level_init: Out of memory");
+    }
+  }
   return level_clear(lvl);
 }
 
@@ -333,6 +347,9 @@ short level_clear_stats(struct LEVEL *lvl)
     lvl->stats.furniture_count=0;
     //Various stats
     lvl->stats.room_things_count=0;
+    //Stats on objects adding/removal
+    lvl->stats.things_removed=0;
+    lvl->stats.things_added=0;
     return true;
 }
 
@@ -389,15 +406,22 @@ short level_clear_other(struct LEVEL *lvl)
     lvl->inf=0x00;
 
     // TXT script file
-    lvl->txt=NULL;
-    lvl->txt_lines_count=0;
+    lvl->script.list=NULL;
+    lvl->script.txt=NULL;
+    lvl->script.lines_count=0;
 
     // The Adikted-custom elements
-    lvl->cust_clm=NULL;
+    if (lvl->cust_clm_lookup!=NULL)
+    {
+      for (i=0; i < dat_entries_y; i++)
+      {
+        if (lvl->cust_clm_lookup[i]!=NULL)
+          memset(lvl->cust_clm_lookup[i],0,dat_entries_x*sizeof(struct DK_CUSTOM_CLM  *));
+      }
+    }
     lvl->cust_clm_count=0;
     lvl->graffiti=NULL;
     lvl->graffiti_count=0;
-
     return true;
 }
 
@@ -550,6 +574,17 @@ short level_deinit()
       free(lvl->wlb);
     }
 
+    //Freeing cust.columns structure
+    if (lvl->cust_clm_lookup!=NULL)
+    {
+      int i;
+      for (i=0; i<dat_entries_y; i++)
+          free(lvl->cust_clm_lookup[i]);
+      free (lvl->cust_clm_lookup);
+    }
+    
+    //TODO: free graffiti
+
     free(lvl->fname);
     free(lvl->savfname);
 
@@ -620,13 +655,16 @@ short level_free_apt(struct LEVEL *lvl)
  */
 short level_free_txt(struct LEVEL *lvl)
 {
-  int idx=lvl->txt_lines_count;
+  int idx=lvl->script.lines_count;
   while (idx>0)
   {
     idx--;
-    free(lvl->txt[idx]);
+    free(lvl->script.txt[idx]);
+    free(lvl->script.list[idx]);
   }
-  free(lvl->txt);
+  free(lvl->script.txt);
+  free(lvl->script.list);
+  lvl->script.lines_count=0;
   return true;
 }
 
@@ -679,11 +717,6 @@ short level_verify(struct LEVEL *lvl, char *actn_name)
   strcpy(err_msg,"Unknown error");
   short result=VERIF_OK;
   short nres;
-
-//Warn: This is for testing/debugging
-//write_def_clm_source(lvl,"aaa");
-//write_def_tng_source(lvl,"aaa");
-
   if (result!=VERIF_ERROR)
   {
     nres=level_verify_struct(lvl,err_msg);
@@ -712,6 +745,11 @@ short level_verify(struct LEVEL *lvl, char *actn_name)
   if (result!=VERIF_ERROR)
   {
     nres=dat_verify(lvl,err_msg);
+    if (nres!=VERIF_OK) result=nres;
+  }
+  if (result!=VERIF_ERROR)
+  {
+    nres=txt_verify(lvl,err_msg);
     if (nres!=VERIF_OK) result=nres;
   }
   if (result!=VERIF_ERROR)
@@ -915,17 +953,17 @@ short level_verify_logic(struct LEVEL *lvl, char *err_msg)
 
 /*
  * Fills SLB/OWN structure with "default" background,
- * unowned earth surrounded by rock.
+ * unowned "def_slab" surrounded by rock.
  * DAT/CLM values are not updated here.
  */
-void generate_slab_bkgnd_default(struct LEVEL *lvl)
+void generate_slab_bkgnd_default(struct LEVEL *lvl,unsigned short def_slab)
 {
-    // Filling the map with SLAB_TYPE_EARTH
+    // Filling the map with def_slab
     int i,j;
     for (i=1; i < MAP_MAXINDEX_Y; i++)
       for (j=1; j < MAP_MAXINDEX_X; j++)
       {
-          set_tile_slab(lvl,i,j,SLAB_TYPE_EARTH); // Digable dirt
+          set_tile_slab(lvl,i,j,def_slab);
           set_tile_owner(lvl,i,j,PLAYER_UNSET); //=5, simply ;)
       }
     // Impenetrable rock
@@ -964,6 +1002,26 @@ void generate_slab_bkgnd_random(struct LEVEL *lvl)
 {
 // TODO: check if there are not closed regions of earth, link them with
 // earth corridors
+//HOW:
+//1. Create array MAP_SIZE_X x MAP_SIZE_Y of unsigned short, maybe call it "slab_group"?
+//2. Find an earth slab, start at map center, check at larger radius (rectangle) until found
+//3. Mark the found slab as group 1
+//4. From the marked slab, extend the radius and mark slabs which have
+//   a neightbour alreadey marked; repeat until map edge reached
+// Note: use only 4 base directions for checking neightbour slabs
+//5. Sweep through whole map and mark slabs which have
+//   a neightbour alreadey marked; count the slabs marked in every sweep
+//6. Finish sweeping when count=0
+//7. Sweep through whole map searching for unmarked earth slab. If found,
+//   mark it with last_group+1 (=2 at first sweep)
+//8. Repeat 5. and 6.
+//9. Repeat 7 and 8 until no unmarked earth slab found
+//10. Create array of unsigned int with size=last_group+1. Fill it with MAP_SIZE_X's
+//11. Sweep through all slabs, and for every which has index>1 find the shortest way
+//    to slab from group with smaller index (use one of four basic directions only).
+//    Write it in array.
+//12. Sweep throufg all slabs again and fill the shortest ways to slabs with dirt/water/lava
+//13. Free the two allocaded arrays
     int i,j,k,l;
     // Filling the map with SLAB_TYPE_EARTH
     for (i=1; i < MAP_MAXINDEX_Y; i++)
@@ -1084,7 +1142,7 @@ void start_new_map(struct LEVEL *lvl)
     int arr_entries_x=MAP_SIZE_X*MAP_SUBNUM_X;
     int arr_entries_y=MAP_SIZE_Y*MAP_SUBNUM_Y;
 
-    generate_slab_bkgnd_default(lvl);
+    generate_slab_bkgnd_default(lvl,SLAB_TYPE_EARTH);
 
     // CLM should be empty, add permanent entries
     add_permanent_columns(lvl);
@@ -1713,4 +1771,8 @@ void update_thing_stats(struct LEVEL *lvl,unsigned char *thing,short change)
               lvl->stats.room_things_count+=change;
           if (is_furniture(thing))
               lvl->stats.furniture_count+=change;
+          if (change>0)
+              lvl->stats.things_added+=change;
+          else
+              lvl->stats.things_removed-=change;
 }

@@ -66,17 +66,16 @@ unsigned short get_subtile_column_solid(struct LEVEL *lvl, int sx, int sy);
 // Custom columns support; graffiti are also custom columns
 short slab_has_custom_columns(struct LEVEL *lvl, int tx, int ty);
 int update_custom_columns_for_slab(struct COLUMN_REC *clm_recs[9],struct LEVEL *lvl, int tx, int ty);
-int cust_col_idx(struct LEVEL *lvl, int tx, int ty);
-int cust_col_subtl_idx(struct LEVEL *lvl, int sx, int sy);
-int cust_col_idx_next(struct LEVEL *lvl, int tx, int ty,int prev_idx);
 int place_cust_clms_on_slab(struct COLUMN_REC *clm_recs[9],struct LEVEL *lvl, int tx, int ty);
-struct DK_CUSTOM_CLM *get_cust_col(struct LEVEL *lvl, int ccol_idx);
-struct COLUMN_REC *get_cust_col_rec(struct LEVEL *lvl, int ccol_idx);
-unsigned short get_cust_col_wib_entry(struct LEVEL *lvl, int ccol_idx);
-struct DK_CUSTOM_CLM *create_cust_col(int sx, int sy);
-int cust_col_add_obj(struct LEVEL *lvl,struct DK_CUSTOM_CLM *ccol);
-int cust_col_add_or_update(struct LEVEL *lvl,struct DK_CUSTOM_CLM **ccol);
-void cust_col_del(struct LEVEL *lvl,unsigned int num);
+short cust_col_add_or_update(struct LEVEL *lvl,int sx,int sy,struct DK_CUSTOM_CLM *ccol);
+int cust_cols_num_on_tile(struct LEVEL *lvl, int tx, int ty);
+struct DK_CUSTOM_CLM *get_cust_col(struct LEVEL *lvl, int sx, int sy);
+struct COLUMN_REC *get_cust_col_rec(struct LEVEL *lvl, int sx, int sy);
+unsigned short get_cust_col_wib_entry(struct LEVEL *lvl, int sx, int sy);
+short set_cust_col(struct LEVEL *lvl,int sx,int sy,struct DK_CUSTOM_CLM *ccol);
+struct DK_CUSTOM_CLM *create_cust_col();
+short cust_col_del(struct LEVEL *lvl, int sx, int sy);
+int cust_cols_del_for_tile(struct LEVEL *lvl, int tx, int ty);
 
 //INF file and textures
 char *get_texture_fullname(unsigned short inf_type);

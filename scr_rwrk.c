@@ -15,6 +15,9 @@
 #include "obj_slabs.h"
 #include "obj_column.h"
 #include "lev_data.h"
+#include "lev_files.h"
+#include "lev_column.h"
+#include "obj_actnpts.h"
 
 RWRK_DATA *mdrwrk;
 
@@ -45,6 +48,7 @@ void free_mdrwrk(void)
 void actions_mdrwrk(int key)
 {
     int sx, sy;
+    static char usrinput[READ_BUFSIZE];
     sx = (mapmode->mapx+mapmode->screenx)*3+mapmode->subtl_x;
     sy = (mapmode->mapy+mapmode->screeny)*3+mapmode->subtl_y;
     message_release();
@@ -76,6 +80,41 @@ void actions_mdrwrk(int key)
         case 'f':
           mdrwrk->view=RVM_FLG;
           break;
+        case 'c':
+          write_def_clm_source(lvl,"adi_clm.log");
+          message_info("Column log file written.");
+          break;
+        case 't':
+          write_def_tng_source(lvl,"adi_tng.log");
+          message_info("Things log file written.");
+          break;
+        case 'b':
+          if (get_str("Enter starting cube index: ", usrinput))
+          {
+            int st_cube=0;
+            sscanf(usrinput,"%d",&st_cube);
+            int i,k;
+            popup_show("Generating cube test map","The process can take some time. Please wait...");
+            short auto_upd_memory=datclm_auto_update;
+            datclm_auto_update=false;
+            generate_slab_bkgnd_default(lvl,SLAB_TYPE_PATH);
+            const int size_x=6;
+            const int size_y=5;
+            const int limit_x=(MAP_SIZE_X-1)/size_x;
+            const int limit_y=(MAP_SIZE_Y-1)/size_y;
+            for (k=0;k<limit_y;k++)
+              for (i=0;i<limit_x;i++)
+              {
+                unsigned short cube=(st_cube+k*limit_x+i);
+                if (cube<512)
+                  place_cube_test(lvl,i*size_x+1,k*size_y+1,cube);
+              }
+            datclm_auto_update=auto_upd_memory;
+            if (datclm_auto_update)
+              update_datclm_for_whole_map(lvl);
+            message_info("Cube test map created.");
+          }
+          break;
         default:
           message_info("Unrecognized rewrk key code: %d",key);
           speaker_beep();
@@ -100,6 +139,63 @@ void end_mdrwrk()
     mapmode->panel_mode=PV_MODE;
     scrmode->mode=MD_SLB;
     message_info("Returned to Slab mode.");
+}
+
+void place_cube_test(struct LEVEL *lvl,int tx,int ty,unsigned short cube)
+{
+    struct DK_CUSTOM_CLM *cclm_rec;
+    struct COLUMN_REC *clm_rec;
+    const int clr_x=5;
+    const int clr_y=2;
+    int i,k;
+    //Drawing the empty ground
+    for (k=0;k<MAP_SUBNUM_Y*clr_y;k++)
+      for (i=0;i<MAP_SUBNUM_X*clr_x;i++)
+      {
+          cclm_rec=create_cust_col();
+          clm_rec=cclm_rec->rec;
+          fill_column_rec_simp(clm_rec, 0, 0,
+              0, 0, 0, 0, 0, 0x0, 0x0, 0x0);
+          cust_col_add_or_update(lvl,tx*3+i,ty*3+k,cclm_rec);
+      }
+    for (k=0;k<clr_y;k++)
+      for (i=0;i<clr_x;i++)
+        remove_noncrucial_room_things(tx+i,ty+k);
+    // Single cube
+    cclm_rec=create_cust_col();
+    clm_rec=cclm_rec->rec;
+    fill_column_rec_simp(clm_rec, 0, 0,
+        0, cube, 0, 0, 0, 0x0, 0x0, 0x0);
+    cust_col_add_or_update(lvl,(tx+0)*MAP_SUBNUM_X+1,(ty+1)*MAP_SUBNUM_Y+1,cclm_rec);
+    //Drawing the cube column
+    cclm_rec=create_cust_col();
+    clm_rec=cclm_rec->rec;
+    fill_column_rec_simp(clm_rec, 0, cube,
+        cube, cube, cube, cube, cube, 0x0, 0x0, 0x0);
+    cust_col_add_or_update(lvl,(tx+2)*MAP_SUBNUM_X,(ty+1)*MAP_SUBNUM_Y+1,cclm_rec);
+    //Adding static light
+    unsigned char *stlight;
+    stlight = create_stlight((tx+2)*MAP_SUBNUM_X,(ty+1)*MAP_SUBNUM_Y+1);
+    set_stlight_subtile_h(stlight,7);
+    stlight_add(lvl,stlight);
+    //Drawing the whole cube tile
+    for (k=0;k<MAP_SUBNUM_Y;k++)
+      for (i=0;i<MAP_SUBNUM_X;i++)
+      {
+          cclm_rec=create_cust_col();
+          clm_rec=cclm_rec->rec;
+          fill_column_rec_simp(clm_rec, 0, cube,
+              cube, cube, cube, cube, cube, 0x0, 0x0, 0x0);
+          cust_col_add_or_update(lvl,(tx+3)*MAP_SUBNUM_X+i,(ty+1)*MAP_SUBNUM_Y+k,cclm_rec);
+      }
+    
+    //Drawing description
+    char cubestr[8];
+    sprintf(cubestr,"%03x",(int)cube);
+    int graf_idx;
+    graf_idx=graffiti_add(lvl,tx,ty+2,0,cubestr,GRAFF_FONT_ADICLSSC,ORIENT_TWE,0x0184);
+    if (graf_idx<0) return;
+    //graffiti_update_columns(lvl,graf_idx);
 }
 
 /*

@@ -38,9 +38,9 @@ unsigned int get_key (void)
  * on break. Possibly syntax-highlight the entered string for
  * backslash-escapes, depending on the "highlight" parameter.
  */
-int get_str (char *prompt, char *buf) 
+int get_str(char *prompt, char *buf) 
 {
-    int maxlen = 79 - strlen(prompt);  // limit to 80 - who cares? :)
+    int maxlen = LINEMSG_SIZE - strlen(prompt) - 1;  // limit to LINEMSG_SIZE
     int len = 0;
     int c;
 
@@ -87,7 +87,7 @@ int get_str (char *prompt, char *buf)
       if (((c == 127) || (c == KEY_BACKSP)) && len > 0)
           len--;
 
-      if (c == 'U'-'@')             /* ^U kill line */
+      if (c == 'U'-'@')             // ^U kill line
           len = 0;
     }
 }

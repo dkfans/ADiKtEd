@@ -33,6 +33,7 @@ short init_mdtng(void)
     mdtng=(MDTNG_DATA *)malloc(sizeof(MDTNG_DATA));
     if (mdtng==NULL)
      die("init_mdtng: Cannot allocate memory.");
+    mdtng->obj_ranges_changed=true;
     return true;
 }
 
@@ -47,8 +48,8 @@ void free_mdtng(void)
 void change_visited_tile()
 {
     int i,j;
-    for (i=0; i<3; i++)
-      for (j=0; j<3; j++)
+    for (i=0; i<MAP_SUBNUM_X; i++)
+      for (j=0; j<MAP_SUBNUM_Y; j++)
         mdtng->vistng[i][j]=0;
 }
 
@@ -59,8 +60,8 @@ void actions_mdtng(int key)
 {
     int sx, sy;
     unsigned char *thing;
-    sx = (mapmode->mapx+mapmode->screenx)*3+mapmode->subtl_x;
-    sy = (mapmode->mapy+mapmode->screeny)*3+mapmode->subtl_y;
+    sx = (mapmode->mapx+mapmode->screenx)*MAP_SUBNUM_X+mapmode->subtl_x;
+    sy = (mapmode->mapy+mapmode->screeny)*MAP_SUBNUM_Y+mapmode->subtl_y;
     message_release();
     
     if (!cursor_actions(key))
@@ -193,13 +194,17 @@ void actions_mdtng(int key)
             message_error("Can't create object: clipboard is empty");
           };break;
         case 'u': // Update all things
+          { //Storing stats on objects adding/removal
+          int prev_tng_rmv=lvl->stats.things_removed;
+          int prev_tng_add=lvl->stats.things_added;
           update_slab_owners(lvl);
           update_obj_for_whole_map(lvl);
           update_obj_subpos_and_height_for_whole_map(lvl);
-          message_info("Auto-maintained TNG entries updated");
-          update_brighten(lvl,mapmode);
+          message_info("Auto-maintained TNG entries updated, %u added, %u removed.",
+              lvl->stats.things_added-prev_tng_add,lvl->stats.things_removed-prev_tng_rmv);
+          mdtng->obj_ranges_changed=true;
           change_visited_tile();
-          break;
+          };break;
         case 'v': // Verify whole map
           level_verify(lvl,NULL);
           break;
@@ -374,17 +379,17 @@ void actions_mdtng(int key)
             case OBJECT_TYPE_STLIGHT:
               object_del(lvl,sx,sy, visiting_z);
               message_info_force("Static light deleted.");
-              update_brighten(lvl,mapmode);
+              mdtng->obj_ranges_changed=true;
               break;
             case OBJECT_TYPE_ACTNPT:
               object_del(lvl,sx,sy, visiting_z);
               message_info_force("Action point deleted.");
-              update_brighten(lvl,mapmode);
+              mdtng->obj_ranges_changed=true;
               break;
             case OBJECT_TYPE_THING:
               object_del(lvl,sx,sy, visiting_z);
               message_info_force("Thing deleted.");
-              update_brighten(lvl,mapmode);
+              mdtng->obj_ranges_changed=true;
               break;
             default:
               message_error("Nothing to delete.");
@@ -412,7 +417,7 @@ short start_mdtng(struct LEVEL *lvl)
 {
     mapmode->mark=false;
     change_visited_tile();
-    update_brighten(lvl,mapmode);
+    mdtng->obj_ranges_changed=true;
     scrmode->mode=MD_TNG;
     return true;
 }
@@ -430,6 +435,11 @@ void end_mdtng()
  */
 void draw_mdtng()
 {
+    if (mdtng->obj_ranges_changed)
+    {
+      update_brighten(lvl,mapmode);
+      mdtng->obj_ranges_changed=false;
+    }
     draw_map_area(lvl,true,false,true);
     if (mapmode->panel_mode!=PV_MODE)
       draw_forced_panel(lvl,mapmode->panel_mode);
@@ -442,8 +452,8 @@ void draw_mdtng()
 void draw_mdtng_panel()
 {
     int sx, sy;
-    sx = (mapmode->screenx+mapmode->mapx)*3+mapmode->subtl_x;
-    sy = (mapmode->screeny+mapmode->mapy)*3+mapmode->subtl_y;
+    sx = (mapmode->screenx+mapmode->mapx)*MAP_SUBNUM_X+mapmode->subtl_x;
+    sy = (mapmode->screeny+mapmode->mapy)*MAP_SUBNUM_Y+mapmode->subtl_y;
     int k=0;
     short obj_type=get_object_type(lvl,sx,sy,mdtng->vistng[mapmode->subtl_x][mapmode->subtl_y]);
     char *obj=get_object(lvl,sx,sy,mdtng->vistng[mapmode->subtl_x][mapmode->subtl_y]);
@@ -478,11 +488,11 @@ char get_thing_char (int x, int y)
       {
         int i,k;
         short obj_type;
-        for (k=0;k<3;k++)
+        for (k=0;k<MAP_SUBNUM_Y;k++)
         {
-          for (i=0;i<3;i++)
+          for (i=0;i<MAP_SUBNUM_X;i++)
           {
-            obj_type=get_object_type(lvl,3*x+i,3*y+k,0);
+            obj_type=get_object_type(lvl,MAP_SUBNUM_X*x+i,MAP_SUBNUM_Y*y+k,0);
             if (obj_type!=OBJECT_TYPE_NONE) break;
           }
           if (obj_type!=OBJECT_TYPE_NONE) break;
@@ -496,7 +506,7 @@ char get_thing_char (int x, int y)
         case OBJECT_TYPE_THING:
           {
             unsigned char *thing;
-            thing=get_thing(lvl,x*3+i,y*3+k,0);
+            thing=get_thing(lvl,x*MAP_SUBNUM_X+i,y*MAP_SUBNUM_Y+k,0);
             switch (get_thing_type(thing))
             {
             case THING_TYPE_CREATURE:
@@ -701,7 +711,7 @@ int display_action_point (unsigned char *actnpt, int x, int y)
     int subtlpos_x=get_actnpt_subtile_x(actnpt);
     int subtlpos_y=get_actnpt_subtile_y(actnpt);
     screen_printf("Subtile: %3d,%3d (Tile: %2d, %2d)", subtlpos_x, subtlpos_y,
-        subtlpos_x/3, subtlpos_y/3);
+        subtlpos_x/MAP_SUBNUM_X, subtlpos_y/MAP_SUBNUM_Y);
     set_cursor_pos(y++, x);
     screen_printf("Position within subtile: %3d, %3d",
         get_actnpt_subtpos_x(actnpt), get_actnpt_subtpos_y(actnpt));
@@ -737,7 +747,7 @@ int display_static_light(unsigned char *stlight, int x, int y)
     int subtlpos_x=get_stlight_subtile_x(stlight);
     int subtlpos_y=get_stlight_subtile_y(stlight);
     screen_printf("Subtile: %3d,%3d (Tile: %2d, %2d)", subtlpos_x, subtlpos_y,
-        subtlpos_x/3, subtlpos_y/3);
+        subtlpos_x/MAP_SUBNUM_X, subtlpos_y/MAP_SUBNUM_Y);
     set_cursor_pos(y++, x);
     screen_printf("Position within subtile: %3d, %3d",
         (unsigned int)get_stlight_subtpos_x(stlight), (unsigned int)get_stlight_subtpos_y(stlight));
@@ -820,12 +830,12 @@ int display_tng_subtiles(int scr_row, int scr_col,int ty,int tx)
     unsigned char *thing;
     int entry_size=6;
     scr_row+=2;
-    for (k=0; k<3; k++)
+    for (k=0; k<MAP_SUBNUM_Y; k++)
     {
-        int sy=ty*3+k;
-        for (i=0; i<3; i++)
+        int sy=ty*MAP_SUBNUM_Y+k;
+        for (i=0; i<MAP_SUBNUM_X; i++)
         {
-            int sx=tx*3+i;
+            int sx=tx*MAP_SUBNUM_X+i;
             screen_setcolor(PRINT_COLOR_LGREY_ON_BLACK);
             set_cursor_pos(scr_row+1, scr_col+i*entry_size);
             unsigned int obj_num=get_object_subnums(lvl,sx,sy);
@@ -1010,17 +1020,17 @@ void tng_change_range(struct LEVEL *lvl, unsigned int sx, unsigned int sy,unsign
     case OBJECT_TYPE_STLIGHT:
       rng=get_stlight_range_subtile(obj);
       subrng=get_stlight_range_subtpos(obj)+delta_range;
-      tile_limit=MAP_SIZE_X/4;
+      tile_limit=MAP_SIZE_X/2;
       break;
     case OBJECT_TYPE_ACTNPT:
       rng=get_actnpt_range_subtile(obj);
       subrng=get_actnpt_range_subtpos(obj)+delta_range;
-      tile_limit=MAP_SIZE_X/4;
+      tile_limit=MAP_SIZE_X/2;
       break;
     case OBJECT_TYPE_THING:
       rng=get_thing_range_subtile(obj);
       subrng=get_thing_range_subtpos(obj)+delta_range;
-      tile_limit=MAP_SIZE_X/4;
+      tile_limit=MAP_SIZE_X/2;
       break;
     default:
       message_error("Cannot recognize object");
@@ -1059,7 +1069,7 @@ void tng_change_range(struct LEVEL *lvl, unsigned int sx, unsigned int sy,unsign
       if (delta_range>0)
           set_brighten_for_stlight(mapmode,obj);
       else
-          update_brighten(lvl,mapmode);
+          mdtng->obj_ranges_changed=true;
       break;
     case OBJECT_TYPE_ACTNPT:
       set_actnpt_range_subtile(obj,rng);
@@ -1067,7 +1077,7 @@ void tng_change_range(struct LEVEL *lvl, unsigned int sx, unsigned int sy,unsign
       if (delta_range>0)
           set_brighten_for_actnpt(mapmode,obj);
       else
-          update_brighten(lvl,mapmode);
+          mdtng->obj_ranges_changed=true;
       break;
     case OBJECT_TYPE_THING:
       set_thing_range_subtile(obj,rng);
@@ -1075,7 +1085,7 @@ void tng_change_range(struct LEVEL *lvl, unsigned int sx, unsigned int sy,unsign
       if (delta_range>0)
           set_brighten_for_thing(mapmode,obj);
       else
-          update_brighten(lvl,mapmode);
+          mdtng->obj_ranges_changed=true;
       break;
     }
 }

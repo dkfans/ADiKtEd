@@ -9,7 +9,9 @@
 
 #define ERR_NONE         0x000
 #define ERR_FILE_NFOUND  0x001
-#define ERR_FILE_BADDATA 0x002
+#define ERR_FILE_TOOSMLL 0x002
+#define ERR_FILE_BADDATA 0x003
+#define ERR_INTERNAL     0x004
 
 short save_map(struct LEVEL *lvl);
 
