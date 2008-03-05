@@ -23,6 +23,7 @@ int arr_ushort_pos(const unsigned short *arr,unsigned short slab_type,int array_
 
 short set_msglog_fname(char *fname);
 short format_map_fname(char *fname, char *usrinput);
+short format_data_fname(char **fullname, const char *format, ...);
 
 int rnd(int range);
 

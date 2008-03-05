@@ -62,16 +62,19 @@
 extern volatile int safe_update, update_required;
 #endif
 
+// header for file.c
+
 struct memory_file
 {
     long len;
     unsigned char *content;
 };
 
-struct memory_file read_file (char *iname);
+struct memory_file read_file(char *iname);
 
 // File handling variables
-extern char *filebase;
+extern char *levels_path;
+extern char *data_path;
 
 // The way DAT entries are shown
 extern short dat_view_mode;

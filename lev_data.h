@@ -203,11 +203,11 @@ void generate_slab_bkgnd_default(struct LEVEL *lvl,unsigned short def_slab);
 void generate_slab_bkgnd_random(struct LEVEL *lvl);
 void free_map(void);
 
-char *get_thing(struct LEVEL *lvl,unsigned int x,unsigned int y,unsigned int num);
+char *get_thing(const struct LEVEL *lvl,unsigned int x,unsigned int y,unsigned int num);
 int thing_add(struct LEVEL *lvl,unsigned char *thing);
 void thing_del(struct LEVEL *lvl,unsigned int x,unsigned int y,unsigned int num);
 void thing_drop(struct LEVEL *lvl,unsigned int x, unsigned int y, unsigned int num);
-unsigned int get_thing_subnums(struct LEVEL *lvl,unsigned int x,unsigned int y);
+unsigned int get_thing_subnums(const struct LEVEL *lvl,unsigned int x,unsigned int y);
 
 char *get_actnpt(struct LEVEL *lvl,unsigned int x,unsigned int y,unsigned int num);
 void actnpt_add(struct LEVEL *lvl,unsigned char *actnpt);
@@ -233,15 +233,15 @@ void set_subtl_wib(struct LEVEL *lvl, unsigned int sx, unsigned int sy, short nv
 short get_tile_wlb(struct LEVEL *lvl, unsigned int tx, unsigned int ty);
 void set_tile_wlb(struct LEVEL *lvl, unsigned int tx, unsigned int ty, short nval);
 
-unsigned char get_tile_owner(struct LEVEL *lvl, unsigned int tx, unsigned int ty);
+unsigned char get_tile_owner(const struct LEVEL *lvl, unsigned int tx, unsigned int ty);
 void set_tile_owner(struct LEVEL *lvl, unsigned int tx, unsigned int ty, unsigned char nval);
-unsigned char get_subtl_owner(struct LEVEL *lvl, unsigned int sx, unsigned int sy);
+unsigned char get_subtl_owner(const struct LEVEL *lvl, unsigned int sx, unsigned int sy);
 void set_subtl_owner(struct LEVEL *lvl, unsigned int sx, unsigned int sy, unsigned char nval);
 
-unsigned short get_tile_slab(struct LEVEL *lvl, unsigned int tx, unsigned int ty);
+unsigned short get_tile_slab(const struct LEVEL *lvl, unsigned int tx, unsigned int ty);
 void set_tile_slab(struct LEVEL *lvl, unsigned int tx, unsigned int ty, unsigned short nval);
 
-unsigned int get_dat_val(struct LEVEL *lvl, unsigned int sx, unsigned int sy);
+unsigned int get_dat_val(const struct LEVEL *lvl, const unsigned int sx, const unsigned int sy);
 void set_dat_val(struct LEVEL *lvl, int sx, int sy, unsigned int d);
 
 unsigned short get_subtl_flg(struct LEVEL *lvl, unsigned int sx, unsigned int sy);
@@ -249,7 +249,7 @@ void set_subtl_flg(struct LEVEL *lvl, unsigned int sx, unsigned int sy,unsigned 
 
 void update_level_stats(struct LEVEL *lvl);
 void update_things_stats(struct LEVEL *lvl);
-void update_thing_stats(struct LEVEL *lvl,unsigned char *thing,short change);
+void update_thing_stats(struct LEVEL *lvl,const unsigned char *thing,short change);
 
 extern struct LEVEL *lvl;
 

@@ -5,20 +5,12 @@
 #include "obj_slabs.h"
 #include "obj_things.h"
 
-
-char *filebase;
-
-// 0 for no view,, 1 for byte data, 2 for column idx
-short dat_view_mode=0;
-
-struct memory_file read_file (char *iname);
-
 /*
  * Read a file, possibly compressed, and decompress it if necessary.
  * Warning: it may destroy the file name from input variable,
  * so if you wish to use iname, make a copy for this function.
  */
-struct memory_file read_file (char *iname)
+struct memory_file read_file(char *iname)
 {
     FILE *ifp;
     long plen, ulen;

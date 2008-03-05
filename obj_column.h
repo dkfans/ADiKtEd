@@ -368,6 +368,7 @@ unsigned short compute_clm_rec_solid(const struct COLUMN_REC *clm_rec);
 unsigned short compute_clm_rec_height(const struct COLUMN_REC *clm_rec);
 unsigned short get_clm_entry_height(const unsigned char *clmentry);
 unsigned short get_clm_entry_solid(const unsigned char *clmentry);
+unsigned short get_clm_entry_topcube(const unsigned char *clmentry);
 short clm_verify_entry(const unsigned char *clmentry, char *err_msg);
 
 char *get_custom_column_fullname(unsigned short idx);

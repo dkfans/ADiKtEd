@@ -601,7 +601,7 @@ unsigned short compute_flg_for_tile(unsigned short slab,short corner)
  * Returns a column entry from column on given subtile;
  * On error returns NULL
  */
-unsigned char *get_subtile_column(struct LEVEL *lvl, int sx, int sy)
+unsigned char *get_subtile_column(const struct LEVEL *lvl, int sx, int sy)
 {
   if (lvl->clm==NULL)
     return NULL;
@@ -616,7 +616,7 @@ unsigned char *get_subtile_column(struct LEVEL *lvl, int sx, int sy)
  * Fills a column entry with values from column on given subtile;
  * On error returns false and fills clm_rec with rock
  */
-short get_subtile_column_rec(struct LEVEL *lvl, struct COLUMN_REC *clm_rec, int sx, int sy)
+short get_subtile_column_rec(const struct LEVEL *lvl, struct COLUMN_REC *clm_rec, int sx, int sy)
 {
   unsigned char *clmentry;
   clmentry=get_subtile_column(lvl,sx,sy);
@@ -664,7 +664,7 @@ void set_dat_subtile(struct LEVEL *lvl, int sx, int sy, int d)
  * Returns a DAT entry for one subtile. (cx,cy) is a subtile position we want
  * to probe, function returns a column index.
  */
-unsigned int get_dat_subtile(struct LEVEL *lvl, unsigned int sx, unsigned int sy)
+unsigned int get_dat_subtile(const struct LEVEL *lvl, const unsigned int sx, const unsigned int sy)
 {          
     unsigned int val;
     val=0x10000-get_dat_val(lvl,sx,sy);

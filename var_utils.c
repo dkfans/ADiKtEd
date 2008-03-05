@@ -17,6 +17,9 @@ char *message;
 short message_is_warn;
 FILE *msgout_fp;
 
+char *levels_path;
+char *data_path;
+
 void strip_crlf(char *string_in)
 {
     int i;
@@ -159,9 +162,9 @@ short format_map_fname(char *fname, char *usrinput)
           // If there are no dots or separators, maybe it's a number of map, not filename
           {
           if (atoi(usrinput))
-              sprintf (fname, "%s"SEPARATOR"map%.5d", filebase, atoi(usrinput));
+              sprintf (fname, "%s"SEPARATOR"map%.5d", levels_path, atoi(usrinput));
           else
-              sprintf(fname, "%s"SEPARATOR"%s", filebase, usrinput);
+              sprintf(fname, "%s"SEPARATOR"%s", levels_path, usrinput);
           }
     } else
         // File is with path
@@ -169,6 +172,22 @@ short format_map_fname(char *fname, char *usrinput)
         sprintf(fname, "%s", usrinput);
     }
     if (strlen(fname)>0) return true;
+    return false;
+}
+
+short format_data_fname(char **fullname, const char *format, ...)
+{
+    va_list val;
+    va_start(val, format);
+    char *file = (char *)malloc(DISKPATH_SIZE*sizeof(char));
+    vsprintf(file, format, val);
+    va_end(val);
+    *fullname = (char *)malloc(strlen(file)+strlen(data_path)+4);
+    if (*fullname==NULL)
+      die ("format_data_fname: Out of memory.");
+    sprintf(*fullname, "%s"SEPARATOR"%s", data_path, file);
+    free(file);
+    if (strlen(*fullname)>strlen(data_path)) return true;
     return false;
 }
 

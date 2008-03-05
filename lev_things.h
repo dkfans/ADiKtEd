@@ -7,8 +7,8 @@
 
 struct LEVEL;
 
-typedef short (*is_thing_subtype)(unsigned char *thing);
-typedef unsigned char (*thing_subtype_switch)(unsigned char stype_idx);
+typedef short (*is_thing_subtype)(const unsigned char *thing);
+typedef unsigned char (*thing_subtype_switch)(const unsigned char stype_idx);
 
 typedef void (*cr_tng_func)(struct LEVEL *lvl, int tx, int ty,
         unsigned char *surr_slb,unsigned char *surr_own);

@@ -529,6 +529,23 @@ unsigned short get_clm_entry_solid(const unsigned char *clmentry)
     return (unsigned short)clmentry[3]+(clmentry[4]<<8);
 }
 
+/*
+ * Returns most top nonzero cube entry.
+ */
+unsigned short get_clm_entry_topcube(const unsigned char *clmentry)
+{
+    unsigned short cube=0;
+    int i=7;
+    while ((cube==0)&&(i>=0))
+    {
+          cube = clmentry[2*i+8]+(clmentry[2*i+9]<<8);
+          i--;
+    }
+    if (cube==0)
+        cube = clmentry[5]+(clmentry[6]<<8);
+    return cube;
+}
+
 short clm_rec_copy(struct COLUMN_REC *dest_rec,const struct COLUMN_REC *src_rec)
 {
     memcpy(dest_rec,src_rec,sizeof(struct COLUMN_REC));

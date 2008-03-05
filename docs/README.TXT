@@ -61,6 +61,8 @@ Press F1 for help.
 
 TODO before final:
  Fixations in room things parameters (height,other)
+Version: 0.69b
+ Added bitmap miniature making (ctrl+b)
 Version: 0.68b
  Script handling changed
  More script commands are recognized (but still not all)

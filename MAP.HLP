@@ -125,6 +125,11 @@ create two graffiti items with oposite orientation (like WE and EW).
 You can put the graffiti lower or higher (\ychange height\s) using
 '\w[\s' and '\w]\s' keys.
 
+To \ycreate BMP\s miniature of the whole map, use \wctrl+b\s.
+The status line will tell you where the output file is written.
+This function requires some of DK data files to work. Be warned - 
+it is wise to save your work before creating miniature.
+
 To \yupdate\s the dungeon dat/clm/w?b (but not things), press '\wu\s'.
 To toggle \yautomatic update\s of things/dat/clm, press \wctrl+u\s.
 To switch into \y"thing" mode\s, press \wtab\s.

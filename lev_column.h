@@ -32,7 +32,7 @@ int column_find_or_create(struct LEVEL *lvl,struct COLUMN_REC *clm_rec);
 int column_get_free_index(struct LEVEL *lvl);
 short columns_verify(struct LEVEL *lvl, char *err_msg);
 
-unsigned int get_dat_subtile(struct LEVEL *lvl, unsigned int sx, unsigned int sy);
+unsigned int get_dat_subtile(const struct LEVEL *lvl, const unsigned int sx, const unsigned int sy);
 void set_dat_subtile(struct LEVEL *lvl, int sx, int sy, int d);
 void set_dat(struct LEVEL *lvl,int x, int y, int tl, int tm, int tr,
         int ml, int mm, int mr, int bl, int bm, int br);
@@ -58,8 +58,8 @@ void update_tile_wlb_entry(struct LEVEL *lvl, int tx, int ty);
 void update_tile_flg_entries(struct LEVEL *lvl, int tx, int ty);
 unsigned short compute_flg_for_tile(unsigned short slab,short corner);
 
-unsigned char *get_subtile_column(struct LEVEL *lvl, int sx, int sy);
-short get_subtile_column_rec(struct LEVEL *lvl, struct COLUMN_REC *clm_rec, int sx, int sy);
+unsigned char *get_subtile_column(const struct LEVEL *lvl, int sx, int sy);
+short get_subtile_column_rec(const struct LEVEL *lvl, struct COLUMN_REC *clm_rec, int sx, int sy);
 unsigned short get_subtile_column_height(struct LEVEL *lvl, int sx, int sy);
 unsigned short get_subtile_column_solid(struct LEVEL *lvl, int sx, int sy);
 

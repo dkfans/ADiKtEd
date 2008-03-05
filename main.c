@@ -14,10 +14,11 @@ const char config_filename[]="map.ini";
 void read_init(void)
 {
 #if defined(unix) && !defined(GO32)
-    filebase="."SEPARATOR"levels";
+    levels_path="."SEPARATOR"levels";
 #else
-    filebase="."SEPARATOR"levels";
+    levels_path="."SEPARATOR"levels";
 #endif
+    data_path="."SEPARATOR"data";
     char buffer[READ_BUFSIZE];
     char *p;
     int l;
@@ -68,18 +69,28 @@ void read_init(void)
           }
       }
       if (!strcmp(buffer, "SHOW_OBJ_RANGE"))
+      {
           show_obj_range=atoi(p);
-      else
+      } else
       if (!strcmp(buffer, "DAT_VIEW_MODE"))
+      {
           dat_view_mode=atoi(p);
-      else
+      } else
       if (!strcmp(buffer, "LEVELS_PATH"))
       {
-          filebase=strdup(p);
-          l = strlen (filebase);
+          levels_path=strdup(p);
+          l = strlen(levels_path);
           if (l)
-            if (filebase[l-1]==SEPARATOR[0])
-                filebase[l-1]=0;
+            if (levels_path[l-1]==SEPARATOR[0])
+                levels_path[l-1]=0;
+      } else
+      if (!strcmp(buffer, "DATA_PATH"))
+      {
+          data_path=strdup(p);
+          l = strlen(data_path);
+          if (l)
+            if (data_path[l-1]==SEPARATOR[0])
+                data_path[l-1]=0;
       }
     }
 }

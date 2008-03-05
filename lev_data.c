@@ -1179,7 +1179,7 @@ void free_map(void)
     level_clear(lvl);
 }
 
-char *get_thing(struct LEVEL *lvl,unsigned int x,unsigned int y,unsigned int num)
+char *get_thing(const struct LEVEL *lvl,unsigned int x,unsigned int y,unsigned int num)
 {
     //Preparing array bounds
     unsigned int arr_entries_x=MAP_SIZE_X*MAP_SUBNUM_X;
@@ -1266,14 +1266,13 @@ void thing_drop(struct LEVEL *lvl,unsigned int x, unsigned int y, unsigned int n
                         lvl->tng_subnums[x][y]*sizeof(char *));
 }
 
-unsigned int get_thing_subnums(struct LEVEL *lvl,unsigned int x,unsigned int y)
+unsigned int get_thing_subnums(const struct LEVEL *lvl,unsigned int x,unsigned int y)
 {
     //Preparing array bounds
     unsigned int arr_entries_x=MAP_SIZE_X*MAP_SUBNUM_X;
     unsigned int arr_entries_y=MAP_SIZE_Y*MAP_SUBNUM_Y;
     //Bounding position
-    x %= arr_entries_x;
-    y %= arr_entries_y;
+    if ((x>=arr_entries_x)||(y>=arr_entries_y)) return 0;
     return lvl->tng_subnums[x][y];
 }
 
@@ -1589,7 +1588,7 @@ void set_tile_wlb(struct LEVEL *lvl, unsigned int tx, unsigned int ty, short nva
     lvl->wlb[tx][ty]=nval;
 }
 
-unsigned char get_subtl_owner(struct LEVEL *lvl, unsigned int sx, unsigned int sy)
+unsigned char get_subtl_owner(const struct LEVEL *lvl, unsigned int sx, unsigned int sy)
 {
     //Preparing array bounds
     const unsigned int dat_entries_x=MAP_SIZE_X*MAP_SUBNUM_X+1;
@@ -1610,7 +1609,7 @@ void set_subtl_owner(struct LEVEL *lvl, unsigned int sx, unsigned int sy, unsign
     lvl->own[sx][sy]=nval;
 }
 
-unsigned char get_tile_owner(struct LEVEL *lvl, unsigned int tx, unsigned int ty)
+unsigned char get_tile_owner(const struct LEVEL *lvl, unsigned int tx, unsigned int ty)
 {
     return get_subtl_owner(lvl,tx*MAP_SUBNUM_X+1,ty*MAP_SUBNUM_Y+1);
 }
@@ -1623,7 +1622,7 @@ void set_tile_owner(struct LEVEL *lvl, unsigned int tx, unsigned int ty, unsigne
         set_subtl_owner(lvl,tx*MAP_SUBNUM_X+subtl_x,ty*MAP_SUBNUM_Y+subtl_y,nval);
 }
 
-unsigned short get_tile_slab(struct LEVEL *lvl, unsigned int tx, unsigned int ty)
+unsigned short get_tile_slab(const struct LEVEL *lvl, unsigned int tx, unsigned int ty)
 {
     if (lvl->slb==NULL) return SLAB_TYPE_ROCK;
     //Bounding position
@@ -1645,7 +1644,7 @@ void set_tile_slab(struct LEVEL *lvl, unsigned int tx, unsigned int ty, unsigned
  * Returns raw DAT value value for one subtile.
  * Warning: the USE variable of every column is unaffected by this function.
  */
-unsigned int get_dat_val(struct LEVEL *lvl, unsigned int sx, unsigned int sy)
+unsigned int get_dat_val(const struct LEVEL *lvl, const unsigned int sx, const unsigned int sy)
 {
     //Preparing array bounds
     const int dat_entries_x=MAP_SIZE_X*MAP_SUBNUM_X+1;
@@ -1729,7 +1728,7 @@ void update_things_stats(struct LEVEL *lvl)
     }
 }
 
-void update_thing_stats(struct LEVEL *lvl,unsigned char *thing,short change)
+void update_thing_stats(struct LEVEL *lvl,const unsigned char *thing,short change)
 {
           if (thing==NULL) return;
           unsigned char type_idx=get_thing_type(thing);

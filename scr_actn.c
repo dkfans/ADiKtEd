@@ -73,6 +73,9 @@ short finished;
 short screen_enabled;
 short input_enabled;
 
+// 0 for no view,, 1 for byte data, 2 for column idx
+short dat_view_mode=0;
+
 /*
  * Initializes basic structures and dynamic variables, which may be needed
  * on parameters reading process. Only the basic structures are inited here.
@@ -787,6 +790,10 @@ void draw_map_cursor(struct LEVEL *lvl,short show_ground,short show_rooms,short 
     show_cursor(out_ch);
 }
 
+/*
+ * Shows map cursor at position from mapmode; the cursor is a character
+ * same as in the current map background written in different colors.
+ */
 void show_cursor(char cur)
 {
     set_cursor_pos(mapmode->screeny, mapmode->screenx);
@@ -813,6 +820,10 @@ void display_tngdat(void)
     }
 }
     
+/*
+ * Displays key help for given mode. Key help is visible on right
+ * panel in some work modes.
+ */
 int display_mode_keyhelp(int scr_row, int scr_col,int mode)
 {
     if (!init_key_help(mode)) return 0;
@@ -1045,6 +1056,16 @@ void proc_key(void)
       } else
       {
         change_mode(MD_SRCH);
+      }
+      break;
+    case KEY_CTRL_B:
+      if (is_simple_mode(scrmode->mode))
+      {
+        message_info("You can't generate BMP from this mode.");
+      } else
+      {
+        popup_show("Generating bitmap","Creating and writing BMP file. Please wait...");
+        generate_map_bitmap_mapfname(lvl);
       }
       break;
     case KEY_CTRL_E:

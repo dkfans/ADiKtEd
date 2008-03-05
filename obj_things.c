@@ -5,8 +5,9 @@
  *
  */
 
-#include <math.h>
 #include "obj_things.h"
+
+#include <math.h>
 #include "globals.h"
 #include "lev_data.h"
 #include "obj_slabs.h"
@@ -660,7 +661,7 @@ unsigned char *create_item(unsigned int sx, unsigned int sy, unsigned char stype
 /*
  * Returns if the thing is a spellbook
  */
-short is_spellbook(unsigned char *thing)
+short is_spellbook(const unsigned char *thing)
 {
     //All spells are items
     if (get_thing_type(thing) != THING_TYPE_ITEM)
@@ -671,7 +672,7 @@ short is_spellbook(unsigned char *thing)
 /*
  * Returns if the thing is a spellbook
  */
-short is_spellbook_stype(unsigned char stype_idx)
+short is_spellbook_stype(const unsigned char stype_idx)
 {
      int array_count=sizeof(items_spellbooks)/sizeof(unsigned char);
     //these are listed in items_spellbooks array
@@ -683,7 +684,7 @@ short is_spellbook_stype(unsigned char stype_idx)
 /*
  * Returns subtype of a next spellbook
  */
-unsigned char get_spellbook_next(unsigned char stype_idx)
+unsigned char get_spellbook_next(const unsigned char stype_idx)
 {
      int array_count=sizeof(items_spellbooks)/sizeof(unsigned char);
     //find the spell in items_spellbooks array
@@ -697,7 +698,7 @@ unsigned char get_spellbook_next(unsigned char stype_idx)
 /*
  * Returns subtype of a previous spellbook
  */
-unsigned char get_spellbook_prev(unsigned char stype_idx)
+unsigned char get_spellbook_prev(const unsigned char stype_idx)
 {
      int array_count=sizeof(items_spellbooks)/sizeof(unsigned char);
     //find the spell in items_spellbooks array
@@ -711,7 +712,7 @@ unsigned char get_spellbook_prev(unsigned char stype_idx)
 /*
  * Returns if the thing is a dungeon special box
  */
-short is_dngspecbox(unsigned char *thing)
+short is_dngspecbox(const unsigned char *thing)
 {
     //All specials are items
     if (get_thing_type(thing) != THING_TYPE_ITEM)
@@ -722,7 +723,7 @@ short is_dngspecbox(unsigned char *thing)
 /*
  * Returns if the thing subtype represents a dungeon special box
  */
-short is_dngspecbox_stype(unsigned char stype_idx)
+short is_dngspecbox_stype(const unsigned char stype_idx)
 {
      int array_count=sizeof(items_specboxes)/sizeof(unsigned char);
     //these are listed in items_specboxes array
@@ -734,7 +735,7 @@ short is_dngspecbox_stype(unsigned char stype_idx)
 /*
  * Returns subtype of a next dungeon special box
  */
-unsigned char get_dngspecbox_next(unsigned char stype_idx)
+unsigned char get_dngspecbox_next(const unsigned char stype_idx)
 {
      int array_count=sizeof(items_specboxes)/sizeof(unsigned char);
     //find the special in items_specboxes array
@@ -748,7 +749,7 @@ unsigned char get_dngspecbox_next(unsigned char stype_idx)
 /*
  * Returns subtype of a previous dungeon special box
  */
-unsigned char get_dngspecbox_prev(unsigned char stype_idx)
+unsigned char get_dngspecbox_prev(const unsigned char stype_idx)
 {
      int array_count=sizeof(items_specboxes)/sizeof(unsigned char);
     //find the special in items_specboxes array
@@ -762,7 +763,7 @@ unsigned char get_dngspecbox_prev(unsigned char stype_idx)
 /*
  * Returns if the thing is a creature lair
  */
-short is_crtrlair(unsigned char *thing)
+short is_crtrlair(const unsigned char *thing)
 {
     //All lairs are items
     if (get_thing_type(thing) != THING_TYPE_ITEM)
@@ -773,7 +774,7 @@ short is_crtrlair(unsigned char *thing)
 /*
  * Returns if the thing subtype represents a creature lair
  */
-short is_crtrlair_stype(unsigned char stype_idx)
+short is_crtrlair_stype(const unsigned char stype_idx)
 {
      int array_count=sizeof(items_crtrlairs)/sizeof(unsigned char);
     //these are listed in items_crtrlairs array
@@ -785,7 +786,7 @@ short is_crtrlair_stype(unsigned char stype_idx)
 /*
  * Returns subtype of a next creature lair
  */
-unsigned char get_crtrlair_next(unsigned char stype_idx)
+unsigned char get_crtrlair_next(const unsigned char stype_idx)
 {
      int array_count=sizeof(items_crtrlairs)/sizeof(unsigned char);
     //find the lair in items_crtrlairs array
@@ -799,7 +800,7 @@ unsigned char get_crtrlair_next(unsigned char stype_idx)
 /*
  * Returns subtype of a previous creature lair
  */
-unsigned char get_crtrlair_prev(unsigned char stype_idx)
+unsigned char get_crtrlair_prev(const unsigned char stype_idx)
 {
      int array_count=sizeof(items_crtrlairs)/sizeof(unsigned char);
     //find the lair in items_crtrlairs array
@@ -813,7 +814,7 @@ unsigned char get_crtrlair_prev(unsigned char stype_idx)
 /*
  * Returns if the thing is a trap box
  */
-short is_trapbox(unsigned char *thing)
+short is_trapbox(const unsigned char *thing)
 {
     //All traps are items
     if (get_thing_type(thing) != THING_TYPE_ITEM)
@@ -824,7 +825,7 @@ short is_trapbox(unsigned char *thing)
 /*
  * Returns if the thing subtype represents a trap box
  */
-short is_trapbox_stype(unsigned char stype_idx)
+short is_trapbox_stype(const unsigned char stype_idx)
 {
      int array_count=sizeof(items_trapbxs)/sizeof(unsigned char);
     //these are listed in items_trapbxs array
@@ -836,7 +837,7 @@ short is_trapbox_stype(unsigned char stype_idx)
 /*
  * Returns subtype of a next trap box
  */
-unsigned char get_trapbox_next(unsigned char stype_idx)
+unsigned char get_trapbox_next(const unsigned char stype_idx)
 {
      int array_count=sizeof(items_trapbxs)/sizeof(unsigned char);
     //find the trap box in items_trapbxs array
@@ -850,7 +851,7 @@ unsigned char get_trapbox_next(unsigned char stype_idx)
 /*
  * Returns subtype of a previous trap box
  */
-unsigned char get_trapbox_prev(unsigned char stype_idx)
+unsigned char get_trapbox_prev(const unsigned char stype_idx)
 {
      int array_count=sizeof(items_trapbxs)/sizeof(unsigned char);
     //find the trap box in items_trapbxs array
@@ -864,7 +865,7 @@ unsigned char get_trapbox_prev(unsigned char stype_idx)
 /*
  * Returns if the thing is a deployed trap
  */
-short is_trap(unsigned char *thing)
+short is_trap(const unsigned char *thing)
 {
     if (get_thing_type(thing) == THING_TYPE_TRAP)
       return true;
@@ -874,7 +875,7 @@ short is_trap(unsigned char *thing)
 /*
  * Returns subtype of a next deployed trap
  */
-unsigned char get_trap_next(unsigned char stype_idx)
+unsigned char get_trap_next(const unsigned char stype_idx)
 {
      int array_count=sizeof(items_traps)/sizeof(unsigned char);
     //find the trap in items_traps array
@@ -888,7 +889,7 @@ unsigned char get_trap_next(unsigned char stype_idx)
 /*
  * Returns subtype of a previous deployed trap
  */
-unsigned char get_trap_prev(unsigned char stype_idx)
+unsigned char get_trap_prev(const unsigned char stype_idx)
 {
      int array_count=sizeof(items_traps)/sizeof(unsigned char);
     //find the trap in items_traps array
@@ -902,7 +903,7 @@ unsigned char get_trap_prev(unsigned char stype_idx)
 /*
  * Returns if the thing is a creature
  */
-short is_creature(unsigned char *thing)
+short is_creature(const unsigned char *thing)
 {
     if (get_thing_type(thing) == THING_TYPE_CREATURE)
       return true;
@@ -912,7 +913,7 @@ short is_creature(unsigned char *thing)
 /*
  * Returns subtype of a next creature kind
  */
-unsigned char get_creature_next(unsigned char stype_idx)
+unsigned char get_creature_next(const unsigned char stype_idx)
 {
      int array_count=sizeof(creatr_types)/sizeof(unsigned char);
     //find the creature in creatr_types array
@@ -926,7 +927,7 @@ unsigned char get_creature_next(unsigned char stype_idx)
 /*
  * Returns subtype of a previous creature kind
  */
-unsigned char get_creature_prev(unsigned char stype_idx)
+unsigned char get_creature_prev(const unsigned char stype_idx)
 {
      int array_count=sizeof(creatr_types)/sizeof(unsigned char);
     //find the creature in creatr_types array
@@ -940,7 +941,7 @@ unsigned char get_creature_prev(unsigned char stype_idx)
 /*
  * Returns if the thing is a door
  */
-short is_door(unsigned char *thing)
+short is_door(const unsigned char *thing)
 {
     if (get_thing_type(thing) == THING_TYPE_DOOR)
       return true;
@@ -950,7 +951,7 @@ short is_door(unsigned char *thing)
 /*
  * Returns subtype of a next door type
  */
-unsigned char get_door_next(unsigned char stype_idx)
+unsigned char get_door_next(const unsigned char stype_idx)
 {
      int array_count=sizeof(door_types)/sizeof(unsigned char);
     //find the door in door_types array
@@ -964,7 +965,7 @@ unsigned char get_door_next(unsigned char stype_idx)
 /*
  * Returns subtype of a previous door type
  */
-unsigned char get_door_prev(unsigned char stype_idx)
+unsigned char get_door_prev(const unsigned char stype_idx)
 {
      int array_count=sizeof(door_types)/sizeof(unsigned char);
     //find the door in door_types array
@@ -978,7 +979,7 @@ unsigned char get_door_prev(unsigned char stype_idx)
 /*
  * Returns if the thing is a room effect
  */
-short is_roomeffect(unsigned char *thing)
+short is_roomeffect(const unsigned char *thing)
 {
     if (get_thing_type(thing) == THING_TYPE_ROOMEFFECT)
       return true;
@@ -988,7 +989,7 @@ short is_roomeffect(unsigned char *thing)
 /*
  * Returns subtype of a next room effect type
  */
-unsigned char get_roomeffect_next(unsigned char stype_idx)
+unsigned char get_roomeffect_next(const unsigned char stype_idx)
 {
      int array_count=sizeof(roomefct_types)/sizeof(unsigned char);
     //find the effect in roomefct_types array
@@ -1002,7 +1003,7 @@ unsigned char get_roomeffect_next(unsigned char stype_idx)
 /*
  * Returns subtype of a previous room effect type
  */
-unsigned char get_roomeffect_prev(unsigned char stype_idx)
+unsigned char get_roomeffect_prev(const unsigned char stype_idx)
 {
      int array_count=sizeof(roomefct_types)/sizeof(unsigned char);
     //find the effect in roomefct_types array
@@ -1016,7 +1017,7 @@ unsigned char get_roomeffect_prev(unsigned char stype_idx)
 /*
  * Returns if the thing is a statue
  */
-short is_statue(unsigned char *thing)
+short is_statue(const unsigned char *thing)
 {
     //All statues are items
     if (get_thing_type(thing) != THING_TYPE_ITEM)
@@ -1027,7 +1028,7 @@ short is_statue(unsigned char *thing)
 /*
  * Returns if the thing subtype represents a statue
  */
-short is_statue_stype(unsigned char stype_idx)
+short is_statue_stype(const unsigned char stype_idx)
 {
      int array_count=sizeof(items_statues)/sizeof(unsigned char);
     //these are listed in items_statues array
@@ -1039,7 +1040,7 @@ short is_statue_stype(unsigned char stype_idx)
 /*
  * Returns subtype of a next statue
  */
-unsigned char get_statue_next(unsigned char stype_idx)
+unsigned char get_statue_next(const unsigned char stype_idx)
 {
      int array_count=sizeof(items_statues)/sizeof(unsigned char);
     //find the statue in items_statues array
@@ -1053,7 +1054,7 @@ unsigned char get_statue_next(unsigned char stype_idx)
 /*
  * Returns subtype of a previous statue
  */
-unsigned char get_statue_prev(unsigned char stype_idx)
+unsigned char get_statue_prev(const unsigned char stype_idx)
 {
      int array_count=sizeof(items_statues)/sizeof(unsigned char);
     //find the statue in items_statues array
@@ -1067,7 +1068,7 @@ unsigned char get_statue_prev(unsigned char stype_idx)
 /*
  * Returns if the thing is a furniture
  */
-short is_furniture(unsigned char *thing)
+short is_furniture(const unsigned char *thing)
 {
     //All furniture are items
     if (get_thing_type(thing) != THING_TYPE_ITEM)
@@ -1078,7 +1079,7 @@ short is_furniture(unsigned char *thing)
 /*
  * Returns if the thing subtype represents a furniture
  */
-short is_furniture_stype(unsigned char stype_idx)
+short is_furniture_stype(const unsigned char stype_idx)
 {
      int array_count=sizeof(items_furniture)/sizeof(unsigned char);
     //these are listed in items_furniture array
@@ -1090,7 +1091,7 @@ short is_furniture_stype(unsigned char stype_idx)
 /*
  * Returns subtype of a next furniture
  */
-unsigned char get_furniture_next(unsigned char stype_idx)
+unsigned char get_furniture_next(const unsigned char stype_idx)
 {
      int array_count=sizeof(items_furniture)/sizeof(unsigned char);
     //find the furniture in items_furniture array
@@ -1104,7 +1105,7 @@ unsigned char get_furniture_next(unsigned char stype_idx)
 /*
  * Returns subtype of a previous furniture
  */
-unsigned char get_furniture_prev(unsigned char stype_idx)
+unsigned char get_furniture_prev(const unsigned char stype_idx)
 {
      int array_count=sizeof(items_furniture)/sizeof(unsigned char);
     //find the furniture in items_furniture array
@@ -1118,7 +1119,7 @@ unsigned char get_furniture_prev(unsigned char stype_idx)
 /*
  * Returns if the thing is a food
  */
-short is_food(unsigned char *thing)
+short is_food(const unsigned char *thing)
 {
     //All food are items
     if (get_thing_type(thing) != THING_TYPE_ITEM)
@@ -1129,7 +1130,7 @@ short is_food(unsigned char *thing)
 /*
  * Returns if the subtype is a food
  */
-short is_food_stype(unsigned char stype_idx)
+short is_food_stype(const unsigned char stype_idx)
 {
      int array_count=sizeof(items_food)/sizeof(unsigned char);
     //these are listed in items_food array
@@ -1141,7 +1142,7 @@ short is_food_stype(unsigned char stype_idx)
 /*
  * Returns subtype of a next food
  */
-unsigned char get_food_next(unsigned char stype_idx)
+unsigned char get_food_next(const unsigned char stype_idx)
 {
      int array_count=sizeof(items_food)/sizeof(unsigned char);
     //find the food in items_food array
@@ -1155,7 +1156,7 @@ unsigned char get_food_next(unsigned char stype_idx)
 /*
  * Returns subtype of a previous food
  */
-unsigned char get_food_prev(unsigned char stype_idx)
+unsigned char get_food_prev(const unsigned char stype_idx)
 {
      int array_count=sizeof(items_food)/sizeof(unsigned char);
     //find the food in items_food array
@@ -1166,7 +1167,7 @@ unsigned char get_food_prev(unsigned char stype_idx)
     return *pos;
 }
 
-short is_gold(unsigned char *thing)
+short is_gold(const unsigned char *thing)
 {
     //All are items
     if (get_thing_type(thing) != THING_TYPE_ITEM)
@@ -1174,7 +1175,7 @@ short is_gold(unsigned char *thing)
     return is_gold_stype(get_thing_subtype(thing));
 }
 
-short is_gold_stype(unsigned char stype_idx)
+short is_gold_stype(const unsigned char stype_idx)
 {
      int array_count=sizeof(items_gold)/sizeof(unsigned char);
     //these they are listed in items_gold array
@@ -1186,7 +1187,7 @@ short is_gold_stype(unsigned char stype_idx)
 /*
  * Returns subtype of a next gold
  */
-unsigned char get_gold_next(unsigned char stype_idx)
+unsigned char get_gold_next(const unsigned char stype_idx)
 {
      int array_count=sizeof(items_gold)/sizeof(unsigned char);
     //find the gold in items_gold array
@@ -1200,7 +1201,7 @@ unsigned char get_gold_next(unsigned char stype_idx)
 /*
  * Returns subtype of a previous gold
  */
-unsigned char get_gold_prev(unsigned char stype_idx)
+unsigned char get_gold_prev(const unsigned char stype_idx)
 {
      int array_count=sizeof(items_gold)/sizeof(unsigned char);
     //find the gold in items_gold array
@@ -1214,7 +1215,7 @@ unsigned char get_gold_prev(unsigned char stype_idx)
 /*
  * Returns if the thing is a torch
  */
-short is_torch(unsigned char *thing)
+short is_torch(const unsigned char *thing)
 {
     //All torches are items
     if (get_thing_type(thing) != THING_TYPE_ITEM)
@@ -1222,7 +1223,7 @@ short is_torch(unsigned char *thing)
     return is_torch_stype(get_thing_subtype(thing));
 }
 
-short is_torch_stype(unsigned char stype_idx)
+short is_torch_stype(const unsigned char stype_idx)
 {
     int array_count=sizeof(items_torches)/sizeof(unsigned char);
     //all such objects must be listed in the correct array
@@ -1234,7 +1235,7 @@ short is_torch_stype(unsigned char stype_idx)
 /*
  * Returns subtype of a next torch
  */
-unsigned char get_torch_next(unsigned char stype_idx)
+unsigned char get_torch_next(const unsigned char stype_idx)
 {
      int array_count=sizeof(items_torches)/sizeof(unsigned char);
     //find the torch in items_torches array
@@ -1248,7 +1249,7 @@ unsigned char get_torch_next(unsigned char stype_idx)
 /*
  * Returns subtype of a previous torch
  */
-unsigned char get_torch_prev(unsigned char stype_idx)
+unsigned char get_torch_prev(const unsigned char stype_idx)
 {
      int array_count=sizeof(items_torches)/sizeof(unsigned char);
     //find the torch in items_torches array
@@ -1262,7 +1263,7 @@ unsigned char get_torch_prev(unsigned char stype_idx)
 /*
  * Returns if the thing is a heartflame
  */
-short is_heartflame(unsigned char *thing)
+short is_heartflame(const unsigned char *thing)
 {
     //All heartflames are items
     if (get_thing_type(thing) != THING_TYPE_ITEM)
@@ -1270,7 +1271,7 @@ short is_heartflame(unsigned char *thing)
     return is_heartflame_stype(get_thing_subtype(thing));
 }
 
-short is_heartflame_stype(unsigned char stype_idx)
+short is_heartflame_stype(const unsigned char stype_idx)
 {
     int array_count=sizeof(items_heartflames)/sizeof(unsigned char);
     //all such objects must be listed in the correct array
@@ -1282,7 +1283,7 @@ short is_heartflame_stype(unsigned char stype_idx)
 /*
  * Returns subtype of a next heartflame
  */
-unsigned char get_heartflame_next(unsigned char stype_idx)
+unsigned char get_heartflame_next(const unsigned char stype_idx)
 {
     unsigned char *arr=(unsigned char *)items_heartflames;
     int sizeof_arr=sizeof(items_heartflames);
@@ -1299,7 +1300,7 @@ unsigned char get_heartflame_next(unsigned char stype_idx)
 /*
  * Returns subtype of a previous heartflame
  */
-unsigned char get_heartflame_prev(unsigned char stype_idx)
+unsigned char get_heartflame_prev(const unsigned char stype_idx)
 {
     unsigned char *arr=(unsigned char *)items_heartflames;
     int sizeof_arr=sizeof(items_heartflames);
@@ -1313,7 +1314,7 @@ unsigned char get_heartflame_prev(unsigned char stype_idx)
     return *pos;
 }
 
-short is_herogate(unsigned char *thing)
+short is_herogate(const unsigned char *thing)
 {
   if (get_thing_type(thing)==THING_TYPE_ITEM)
   if (get_thing_subtype(thing)==ITEM_SUBTYPE_HEROGATE)
@@ -1321,7 +1322,7 @@ short is_herogate(unsigned char *thing)
     return false;
 }
 
-short is_dnheart(unsigned char *thing)
+short is_dnheart(const unsigned char *thing)
 {
   if (get_thing_type(thing)==THING_TYPE_ITEM)
   if (get_thing_subtype(thing)==ITEM_SUBTYPE_DNHEART)
@@ -1329,7 +1330,7 @@ short is_dnheart(unsigned char *thing)
     return false;
 }
 
-short is_doorkey(unsigned char *thing)
+short is_doorkey(const unsigned char *thing)
 {
   if (get_thing_type(thing)==THING_TYPE_ITEM)
   if (get_thing_subtype(thing)==ITEM_SUBTYPE_SPINNKEY)
@@ -1337,7 +1338,15 @@ short is_doorkey(unsigned char *thing)
     return false;
 }
 
-short is_room_thing(unsigned char *thing)
+short is_trainpost(const unsigned char *thing)
+{
+  if (get_thing_type(thing)==THING_TYPE_ITEM)
+  if (get_thing_subtype(thing)==ITEM_SUBTYPE_TRAINPOST)
+        return true;
+    return false;
+}
+
+short is_room_thing(const unsigned char *thing)
 {
   switch (get_thing_type(thing))
   {
@@ -1372,14 +1381,14 @@ short is_room_thing(unsigned char *thing)
 /*
  * Returns true if the thing has a light (is lit thing)
  */
-short is_lit_thing(unsigned char *thing)
+short is_lit_thing(const unsigned char *thing)
 {
     if (get_thing_type(thing) == THING_TYPE_ITEM)
       return is_lit_thing_stype(get_thing_subtype(thing));
     return false;
 }
 
-short is_lit_thing_stype(unsigned char stype_idx)
+short is_lit_thing_stype(const unsigned char stype_idx)
 {
     int array_count=sizeof(items_litthings)/sizeof(unsigned char);
     //all such objects must be listed in the correct array
@@ -1391,7 +1400,7 @@ short is_lit_thing_stype(unsigned char stype_idx)
 /*
  * Returns subtype of a next lit thing
  */
-unsigned char get_lit_thing_next(unsigned char stype_idx)
+unsigned char get_lit_thing_next(const unsigned char stype_idx)
 {
     unsigned char *arr=(unsigned char *)items_litthings;
     int sizeof_arr=sizeof(items_litthings);
@@ -1408,7 +1417,7 @@ unsigned char get_lit_thing_next(unsigned char stype_idx)
 /*
  * Returns subtype of a previous lit thing
  */
-unsigned char get_lit_thing_prev(unsigned char stype_idx)
+unsigned char get_lit_thing_prev(const unsigned char stype_idx)
 {
     unsigned char *arr=(unsigned char *)items_litthings;
     int sizeof_arr=sizeof(items_litthings);
@@ -1428,7 +1437,7 @@ unsigned char get_lit_thing_prev(unsigned char stype_idx)
  * Returns true if the thing has affect on CLM entries
  * and should be passed to CLM generation routine
  */
-short is_clmaffective_thing(unsigned char *thing)
+short is_clmaffective_thing(const unsigned char *thing)
 {
   switch (get_thing_type(thing))
   {
@@ -1456,7 +1465,7 @@ short is_clmaffective_thing(unsigned char *thing)
  * Returns if the object is crucial for the game. Such object
  * is not easily removed by the automatic placers.
  */
-short is_crucial_thing(unsigned char *thing)
+short is_crucial_thing(const unsigned char *thing)
 {
   switch (get_thing_type(thing))
   {
@@ -1476,7 +1485,7 @@ short is_crucial_thing(unsigned char *thing)
 /*
  * Returns item type name as text
  */
-char *get_item_subtype_fullname(unsigned short stype_idx)
+char *get_item_subtype_fullname(const unsigned short stype_idx)
 {
       switch (stype_idx)
       {
