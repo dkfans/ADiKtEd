@@ -128,6 +128,10 @@ const unsigned char items_heartflames[]={
       ITEM_SUBTYPE_HEARTFLMR, ITEM_SUBTYPE_HEARTFLMB, ITEM_SUBTYPE_HEARTFLMG,
       ITEM_SUBTYPE_HEARTFLMY,};
 
+const unsigned char items_poles[]={
+      ITEM_SUBTYPE_GURDFLAGR,ITEM_SUBTYPE_GURDFLAGB,ITEM_SUBTYPE_GURDFLAGG,
+      ITEM_SUBTYPE_GURDFLAGY,ITEM_SUBTYPE_FLAGPOST,ITEM_SUBTYPE_PRISONBAR,};
+
 const unsigned char items_litthings[]={
       ITEM_SUBTYPE_TORCH, ITEM_SUBTYPE_CANDLSTCK,};
 
@@ -158,7 +162,7 @@ const is_thing_subtype thing_subtype_tests[]={
       is_trapbox,   is_trap,       is_creature,
       is_door,      is_roomeffect, is_statue,
       is_food,      is_gold,       is_torch,
-      is_heartflame,is_furniture,
+      is_heartflame,is_pole,       is_furniture,
       };
 
 const thing_subtype_switch thing_subtype_next[]={
@@ -166,7 +170,7 @@ const thing_subtype_switch thing_subtype_next[]={
       get_trapbox_next,   get_trap_next,       get_creature_next,
       get_door_next,      get_roomeffect_next, get_statue_next,
       get_food_next,      get_gold_next,       get_torch_next,
-      get_heartflame_next,get_furniture_next,
+      get_heartflame_next,get_pole_next,       get_furniture_next,
       };
 
 const thing_subtype_switch thing_subtype_prev[]={
@@ -174,7 +178,7 @@ const thing_subtype_switch thing_subtype_prev[]={
       get_trapbox_prev,   get_trap_prev,       get_creature_prev,
       get_door_prev,      get_roomeffect_prev, get_statue_prev,
       get_food_prev,      get_gold_prev,       get_torch_prev,
-      get_heartflame_prev,get_furniture_prev,
+      get_heartflame_prev,get_pole_prev,       get_furniture_prev,
       };
 
 // True means TNG/APT/LGT are updated automatically
@@ -1304,6 +1308,60 @@ unsigned char get_heartflame_prev(const unsigned char stype_idx)
 {
     unsigned char *arr=(unsigned char *)items_heartflames;
     int sizeof_arr=sizeof(items_heartflames);
+    int sizeof_itm=sizeof(unsigned char);
+    int array_count=sizeof_arr/sizeof_itm;
+    //find the item in array
+    unsigned char *pos=memchr(arr,stype_idx,array_count);
+    if (pos!=NULL) pos-=sizeof_itm;
+    if ((pos<arr)||(pos>=arr+sizeof_arr))
+      pos=arr+(array_count-1)*sizeof_itm;
+    return *pos;
+}
+
+/*
+ * Returns if the thing is a flag pole or prison bar
+ */
+short is_pole(const unsigned char *thing)
+{
+    //All heartflames are items
+    if (get_thing_type(thing) != THING_TYPE_ITEM)
+      return false;
+    return is_pole_stype(get_thing_subtype(thing));
+}
+
+short is_pole_stype(const unsigned char stype_idx)
+{
+    int array_count=sizeof(items_poles)/sizeof(unsigned char);
+    //all such objects must be listed in the correct array
+    char *pos=memchr(items_poles,stype_idx,array_count);
+    if (pos!=NULL) return true;
+    return false;
+}
+
+/*
+ * Returns subtype of a next heartflame
+ */
+unsigned char get_pole_next(const unsigned char stype_idx)
+{
+    unsigned char *arr=(unsigned char *)items_poles;
+    int sizeof_arr=sizeof(items_poles);
+    int sizeof_itm=sizeof(unsigned char);
+    int array_count=sizeof_arr/sizeof_itm;
+    //find the item in array
+    unsigned char *pos=memchr(arr,stype_idx,array_count);
+    if (pos!=NULL) pos+=sizeof_itm;
+    if ((pos<arr)||(pos>=arr+sizeof_arr))
+      pos=arr;
+    return *pos;
+}
+
+/*
+ * Returns subtype of a previous pole
+ */
+unsigned char get_pole_prev(const unsigned char stype_idx)
+{
+    unsigned char *arr=(unsigned char *)items_poles;
+    int sizeof_arr=sizeof(items_poles);
     int sizeof_itm=sizeof(unsigned char);
     int array_count=sizeof_arr/sizeof_itm;
     //find the item in array

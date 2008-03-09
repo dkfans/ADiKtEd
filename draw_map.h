@@ -64,6 +64,8 @@ struct MAPDRAW_DATA {
     short rescale;
 };
 
+extern short bitmap_rescale;
+
 short generate_map_bitmap(const char *bmpfname,const struct LEVEL *lvl,const short rescale);
 short generate_map_bitmap_mapfname(struct LEVEL *lvl);
 

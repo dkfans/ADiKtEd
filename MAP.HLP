@@ -82,7 +82,7 @@ from full list, press \wenter\s at the proper position.
 The background colour of each tile (or "slab") shows the ownership.
 \RRed\s tiles belong to \Rplayer 0\s (the human player in games against the
 computer), \Bblue\s to \Bplayer 1\s, \Ggreen\s to \Gplayer 2\s, \Yyellow\s to \Yplayer 3\s,
-and \Ccyan\s to \Cplayer 4\s (the Avatar). A black background shows the
+and \Ccyan\s to \Cplayer 4\s (the Heroes). A black background shows the
 tile is currently unowned. Note that earth and impenetrable rock
 will back to unclaimed state if you press '\wu\s' or save the level
 (it just can't be claimed). The \mpurple\s color shows tiles, which
@@ -214,16 +214,19 @@ creature).
 
 Press \wb\s to create a \yspell book\s (change the type using \ws\s and \wx\s).
 
-Press '\wg\s' or '\wG\s' to create a \ypot of gold\s in the highlighted spot. The
-value is 500 for '\wg\s' and 250 for '\wG\s'.
+Press '\wg\s' or '\wG\s' to create a \ypot of gold\s in the highlighted spot.
+The value is 500 for '\wg\s' and 250 for '\wG\s'.
 
 Press \wd\s to create a \ydungeon special\s in the highlighted
 spot (change the type using \ws\s and \wx\s).
 
+Press \wp\s to create a \yflag post\s in the highlighted spot.
+Change it into prison bar or modify flag color using \ws\s and \wx\s).
+
 Press \wh\s to create a \ydungeon heart\s in the highlighted spot. It will
 be owned by the owner of the tile.
 
-Press \wH\s to create a \yhero gate\s. It will be owned by \Cplayer 4\s (Avatar).
+Press \wH\s to create a \yhero gate\s. It will be owned by \Cplayer 4\s (Heroes).
 
 Press '\wu\s' to \yupdate\s the dungeon. This will make sure all room objects
 (training posts, spikes, torturers, etc) are placed appropriately.

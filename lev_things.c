@@ -1393,7 +1393,8 @@ void update_things_slb_guardpost_floor(struct LEVEL *lvl, int tx, int ty,
         flag_stype=ITEM_SUBTYPE_FLAGPOST;
         break;
     }
-    update_thing_slb_room_one_central_item(lvl,tx,ty,flag_stype,true);
+    unsigned char *thing=update_thing_slb_room_one_central_item(lvl,tx,ty,flag_stype,true);
+    set_thing_subtile_h(thing,2);
 }
 
 void update_things_slb_prison(struct LEVEL *lvl, int tx, int ty,

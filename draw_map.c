@@ -33,6 +33,8 @@ struct PALETTE_ENTRY intense_slab_palette_std[] =
 struct PALETTE_ENTRY intense_slab_palette_weak[] =
  { {15,5,8,0}, {14,14,1,0}, };//divided by 4
 
+short bitmap_rescale=4;
+
 short load_palette(struct PALETTE_ENTRY *pal,char *fname)
 {
     //Reading file
@@ -666,14 +668,13 @@ short generate_map_bitmap(const char *bmpfname,const struct LEVEL *lvl,const sho
  */
 short generate_map_bitmap_mapfname(struct LEVEL *lvl)
 {
-    const short rescale=4;
     short result;
     char *bmpfname;
     bmpfname = (char *)malloc(strlen(lvl->fname)+5);
     if (bmpfname==NULL)
         die ("generate_map_bitmap: Out of memory.");
     sprintf (bmpfname, "%s.bmp", lvl->fname);
-    result = generate_map_bitmap(bmpfname,lvl,rescale);
+    result = generate_map_bitmap(bmpfname,lvl,bitmap_rescale);
     if (result)
       message_info("Bitmap \"%s\" created.",bmpfname);
     free(bmpfname);

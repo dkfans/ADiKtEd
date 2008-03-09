@@ -104,6 +104,9 @@ void actions_mdtng(int key)
         case 'r' : // create torch
           tng_makeitem(sx,sy,ITEM_SUBTYPE_TORCH);
           break;
+        case 'p': // Poles and prison bars
+          tng_makeitem(sx,sy,ITEM_SUBTYPE_FLAGPOST);
+          break;
         case 'T' : // Create trap box
           tng_makeitem(sx,sy,ITEM_SUBTYPE_TBBOULDER);
           break;
@@ -535,6 +538,8 @@ char get_thing_char (int x, int y)
                 return 'h';
               if (is_torch(thing))
                 return 'r';
+              if (is_pole(thing))
+                return 'p';
               return '1';
               }
             default:

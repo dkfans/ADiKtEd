@@ -8,6 +8,7 @@
 #include "scr_help.h"
 #include "var_utils.h"
 #include "input_kb.h"
+#include "draw_map.h"
 
 const char config_filename[]="map.ini";
 
@@ -75,6 +76,10 @@ void read_init(void)
       if (!strcmp(buffer, "DAT_VIEW_MODE"))
       {
           dat_view_mode=atoi(p);
+      } else
+      if (!strcmp(buffer, "BITMAP_SCALE"))
+      {
+          bitmap_rescale=atoi(p);
       } else
       if (!strcmp(buffer, "LEVELS_PATH"))
       {

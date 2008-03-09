@@ -581,9 +581,10 @@ short decompose_script(struct DK_SCRIPT *script)
 short decompose_script_command(struct DK_SCRIPT_COMMAND *cmd,char *text)
 {
   if ((cmd==NULL)||(text==NULL)) return false;
+  char *textdup=strdup(text);
   //Decomposing the string into single parameters - getting first (command name)
   char *wordtxt;
-  wordtxt = strtok (text," \t,(");
+  wordtxt = strtok(textdup," \t,(");
   cmd->index=-1;
   int cmd_idx;
   if (cmd->index<0)
@@ -651,13 +652,18 @@ short decompose_script_command(struct DK_SCRIPT_COMMAND *cmd,char *text)
   }
 
   //TODO: add more command types here!
-  if (cmd->index<0) return false;
+  if (cmd->index<0)
+  {
+      free(textdup);
+      return false;
+  }
   //Decomposing the string into single parameters - getting the rest of parameters
   while (wordtxt != NULL)
   {
     wordtxt = strtok(NULL, " \t,)");
     script_command_param_add(cmd,wordtxt);
   }
+  free(textdup);
   return true;
 }
 

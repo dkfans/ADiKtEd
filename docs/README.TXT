@@ -61,6 +61,10 @@ Press F1 for help.
 
 TODO before final:
  Fixations in room things parameters (height,other)
+Version: 0.70b
+ Map miniature size can be now changed in INI file
+ Fixed damaging the script file
+ Corrected height of Guard flag
 Version: 0.69b
  Added bitmap miniature making (ctrl+b)
 Version: 0.68b
