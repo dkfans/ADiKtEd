@@ -49,10 +49,10 @@ int graffiti_idx_next(struct LEVEL *lvl, int tx, int ty, int prev_idx)
     for (i=prev_idx+1; i < lvl->graffiti_count; i++)
     {
       graf = lvl->graffiti[i];
-      if ((tx>=graf->tx) && (tx<=graf->fin_tx) && (ty>=graf->ty) && (ty<=graf->fin_ty))
+      if ((tx>=graf->tile.x) && (tx<=graf->fin_tile.x) && (ty>=graf->tile.y) && (ty<=graf->fin_tile.y))
           return i;
       // This makes empty/wrong graffitis visible
-      if ((ty==graf->ty) && (tx==graf->tx))
+      if ((ty==graf->tile.y) && (tx==graf->tile.x))
           return i;
     }
     return -1;
@@ -93,7 +93,7 @@ void graffiti_del(struct LEVEL *lvl,unsigned int num)
  * Creates a new graffiti and fills its all properties.
  * The graffiti is not added to LEVEL structure.
  */
-struct DK_GRAFFITI *create_graffiti(int tx, int ty, char *text, int orient)
+struct DK_GRAFFITI *create_graffiti(int tx, int ty, char *text, const struct LEVEL *lvl, int orient)
 {
     tx%=MAP_SIZE_X;
     ty%=MAP_SIZE_Y;
@@ -102,12 +102,12 @@ struct DK_GRAFFITI *create_graffiti(int tx, int ty, char *text, int orient)
     //Filling graffiti structure
     graf = (struct DK_GRAFFITI *)malloc(sizeof(struct DK_GRAFFITI));
     if (graf==NULL) die("Cannot alloc memory for graffiti item");
-    graf->tx=tx;
-    graf->ty=ty;
+    graf->tile.x=tx;
+    graf->tile.y=ty;
     graf->font=GRAFF_FONT_ADICLSSC;
     graf->cube=0x0184;
     graf->text = strdup(text);
-    set_graffiti_orientation(graf,orient);
+    set_graffiti_orientation(graf,lvl,orient);
     return graf;
 }
 
@@ -133,7 +133,7 @@ int graffiti_add_obj(struct LEVEL *lvl,struct DK_GRAFFITI *graf)
  * Graffiti don't have to be in the LEVEL structure, but must have
  * tx,ty,font and text properties set.
  */
-short set_graffiti_orientation(struct DK_GRAFFITI *graf,unsigned short orient)
+short set_graffiti_orientation(struct DK_GRAFFITI *graf,const struct LEVEL *lvl,unsigned short orient)
 {
     if ((graf==NULL)||(graf->text==NULL)) return false;
     //Preparing array bounds
@@ -156,27 +156,27 @@ short set_graffiti_orientation(struct DK_GRAFFITI *graf,unsigned short orient)
       {
       case ORIENT_NS:
       case ORIENT_SN:
-          graf_end_subtl_x=graf->tx*MAP_SUBNUM_X;
-          graf_end_subtl_y=graf->ty*MAP_SUBNUM_Y+subtl_len;
+          graf_end_subtl_x=graf->tile.x*MAP_SUBNUM_X;
+          graf_end_subtl_y=graf->tile.y*MAP_SUBNUM_Y+subtl_len;
           break;
       case ORIENT_WE:
       case ORIENT_EW:
-          graf_end_subtl_x=graf->tx*MAP_SUBNUM_X+subtl_len;
-          graf_end_subtl_y=graf->ty*MAP_SUBNUM_Y;
+          graf_end_subtl_x=graf->tile.x*MAP_SUBNUM_X+subtl_len;
+          graf_end_subtl_y=graf->tile.y*MAP_SUBNUM_Y;
           break;
       case ORIENT_TNS:
       case ORIENT_TSN:
-          graf_end_subtl_x=graf->tx*MAP_SUBNUM_X;
-          graf_end_subtl_y=graf->ty*MAP_SUBNUM_Y+subtl_len;
+          graf_end_subtl_x=graf->tile.x*MAP_SUBNUM_X;
+          graf_end_subtl_y=graf->tile.y*MAP_SUBNUM_Y+subtl_len;
           break;
       case ORIENT_TWE:
       case ORIENT_TEW:
-          graf_end_subtl_x=graf->tx*MAP_SUBNUM_X+subtl_len;
-          graf_end_subtl_y=graf->ty*MAP_SUBNUM_Y;
+          graf_end_subtl_x=graf->tile.x*MAP_SUBNUM_X+subtl_len;
+          graf_end_subtl_y=graf->tile.y*MAP_SUBNUM_Y;
           break;
       default:
-          graf_end_subtl_x=graf->tx*MAP_SUBNUM_X;
-          graf_end_subtl_y=graf->ty*MAP_SUBNUM_Y;
+          graf_end_subtl_x=graf->tile.x*MAP_SUBNUM_X;
+          graf_end_subtl_y=graf->tile.y*MAP_SUBNUM_Y;
           break;
       }
       //If we've exceeded map space - truncate the graffiti displayed
@@ -204,37 +204,37 @@ short set_graffiti_orientation(struct DK_GRAFFITI *graf,unsigned short orient)
     {
       case ORIENT_NS:
       case ORIENT_SN:
-           graf->fin_tx = graf->tx;
-           graf->fin_ty = graf->ty+tiles_len-1;
+           graf->fin_tile.x = graf->tile.x;
+           graf->fin_tile.y = graf->tile.y+tiles_len-1;
            graf->height=graf_h;
            break;
       case ORIENT_WE:
       case ORIENT_EW:
-           graf->fin_tx = graf->tx+tiles_len-1;
-           graf->fin_ty = graf->ty;
+           graf->fin_tile.x = graf->tile.x+tiles_len-1;
+           graf->fin_tile.y = graf->tile.y;
            graf->height=graf_h;
            break;
       case ORIENT_TNS:
       case ORIENT_TSN:
-           graf->fin_tx = graf->tx+txt_tile_height-1;
-           graf->fin_ty = graf->ty+tiles_len-1;
-           if (slab_is_tall(get_tile_slab(lvl,graf->tx,graf->ty)))
+           graf->fin_tile.x = graf->tile.x+txt_tile_height-1;
+           graf->fin_tile.y = graf->tile.y+tiles_len-1;
+           if (slab_is_tall(get_tile_slab(lvl,graf->tile.x,graf->tile.y)))
              graf->height=4;
            else
              graf->height=0;
            break;
       case ORIENT_TWE:
       case ORIENT_TEW:
-           graf->fin_tx = graf->tx+tiles_len-1;
-           graf->fin_ty = graf->ty+txt_tile_height-1;
-           if (slab_is_tall(get_tile_slab(lvl,graf->tx,graf->ty)))
+           graf->fin_tile.x = graf->tile.x+tiles_len-1;
+           graf->fin_tile.y = graf->tile.y+txt_tile_height-1;
+           if (slab_is_tall(get_tile_slab(lvl,graf->tile.x,graf->tile.y)))
              graf->height=4;
            else
              graf->height=0;
            break;
       default:
-           graf->fin_tx = graf->tx+tiles_len-1;
-           graf->fin_ty = graf->ty+tiles_len-1;
+           graf->fin_tile.x = graf->tile.x+tiles_len-1;
+           graf->fin_tile.y = graf->tile.y+tiles_len-1;
            graf->height=graf_h;
            break;
     }
@@ -278,7 +278,7 @@ int graffiti_add(struct LEVEL *lvl,int tx, int ty,int height, char *text,int fon
       unsigned short orient,unsigned short cube)
 {
     if ((lvl==NULL)||(text==NULL)||(strlen(text)<1)) return -1;
-    struct DK_GRAFFITI *graf=create_graffiti(tx,ty,text,orient);
+    struct DK_GRAFFITI *graf=create_graffiti(tx,ty,text,lvl,orient);
     if (graf==NULL) return false;
     graf->font=font;
     graf->height=height;
@@ -298,7 +298,7 @@ void graffiti_update_columns(struct LEVEL *lvl,int graf_idx)
     struct DK_GRAFFITI *graf;
     graf=get_graffiti(lvl, graf_idx);
     if (graf==NULL) return;
-    update_datclm_for_square(lvl,graf->tx,graf->fin_tx,graf->ty,graf->fin_ty);
+    update_datclm_for_square(lvl,graf->tile.x,graf->fin_tile.x,graf->tile.y,graf->fin_tile.y);
 }
 
 /*
@@ -312,17 +312,17 @@ void graffiti_clear_from_columns(struct LEVEL *lvl,int graf_idx)
     if (graf==NULL) return;
     int tx,fin_tx,ty,fin_ty;
     //Setting graffiti coords to off-screen
-    tx=graf->tx;graf->tx=MAP_SIZE_X;
-    fin_tx=graf->fin_tx;graf->fin_tx=MAP_SIZE_X;
-    ty=graf->ty;graf->ty=MAP_SIZE_Y;
-    fin_ty=graf->fin_ty;graf->fin_ty=MAP_SIZE_Y;
+    tx=graf->tile.x;graf->tile.x=MAP_SIZE_X;
+    fin_tx=graf->fin_tile.x;graf->fin_tile.x=MAP_SIZE_X;
+    ty=graf->tile.y;graf->tile.y=MAP_SIZE_Y;
+    fin_ty=graf->fin_tile.y;graf->fin_tile.y=MAP_SIZE_Y;
     //Updating
     update_datclm_for_square(lvl,tx,fin_tx,ty,fin_ty);
     //Setting the coords back
-    graf->tx=tx;
-    graf->fin_tx=fin_tx;
-    graf->ty=ty;
-    graf->fin_ty=fin_ty;
+    graf->tile.x=tx;
+    graf->fin_tile.x=fin_tx;
+    graf->tile.y=ty;
+    graf->fin_tile.y=fin_ty;
 }
 
 struct DK_GRAFFITI *get_graffiti(struct LEVEL *lvl, int graf_idx)
@@ -410,8 +410,8 @@ int place_graffiti_on_slab(struct COLUMN_REC *clm_recs[9],struct LEVEL *lvl, int
       if (graf==NULL) continue;
       //Setting some local variables
       int i;
-      int base_sx=graf->tx*MAP_SUBNUM_X;
-      int base_sy=graf->ty*MAP_SUBNUM_Y;
+      int base_sx=graf->tile.x*MAP_SUBNUM_X;
+      int base_sy=graf->tile.y*MAP_SUBNUM_Y;
       //Counting graffiti length in subtiles
       int subtl_len=compute_graffiti_subtl_length(graf->font,graf->text);
       //Starting part of the graffiti

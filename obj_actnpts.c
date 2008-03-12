@@ -143,7 +143,7 @@ unsigned char *create_actnpt(struct LEVEL *lvl, unsigned int sx, unsigned int sy
     set_actnpt_subtpos(actnpt,0x80,0x80);
     set_actnpt_subtile(actnpt,(unsigned char)sx,(unsigned char)sy);
     set_actnpt_number(actnpt,get_free_acttnpt_number(lvl));
-    set_actnpt_range_subtile(actnpt,1);
+    set_actnpt_range_subtile(actnpt,5);
     return actnpt;
 }
 
@@ -357,9 +357,9 @@ unsigned char *create_stlight(unsigned int sx, unsigned int sy)
     set_stlight_subtpos(stlight,((sx%MAP_SUBNUM_X)*0x40+0x40),((sy%MAP_SUBNUM_Y)*0x40+0x40));
     set_stlight_subtile(stlight,(unsigned char)sx,(unsigned char)sy);
     set_stlight_subtile_h(stlight,5);
-    set_stlight_range_subtile(stlight,0x010);
+    set_stlight_range_subtile(stlight,16);
     set_stlight_range_subtpos(stlight,0);
-    set_stlight_intensivity(stlight,0x020);
+    set_stlight_intensivity(stlight,32);
     //Other parameters - no idea what they mean, but seem to be constant
     stlight[18]=0x0ff;
     stlight[19]=0x0ff;

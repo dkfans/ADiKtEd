@@ -168,7 +168,7 @@ short slab_is_central(struct LEVEL *lvl,int tx,int ty)
  * Verifies slab types and parameters. Returns VERIF_ERROR,
  * VERIF_WARN or VERIF_OK
  */
-short slabs_verify(struct LEVEL *lvl, char *err_msg)
+short slabs_verify(struct LEVEL *lvl, char *err_msg,struct IPOINT_2D *errpt)
 {
   short result;
   int i,j;
@@ -177,7 +177,11 @@ short slabs_verify(struct LEVEL *lvl, char *err_msg)
     {
       result=slab_verify_entry(get_tile_slab(lvl,i,j),err_msg);
       if (result!=VERIF_OK)
+      {
+        errpt->x=i;
+        errpt->y=j;
         return result;
+      }
     }
   return VERIF_OK;
 }

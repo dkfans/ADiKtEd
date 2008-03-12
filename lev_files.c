@@ -809,7 +809,8 @@ short write_text_file(char **lines,int lines_count,char *fname)
  */
 short save_map(struct LEVEL *lvl)
 {
-    if (level_verify(lvl,"save")==VERIF_ERROR)
+    struct IPOINT_2D errpt={-1,-1};
+    if (level_verify(lvl,"save",&errpt)==VERIF_ERROR)
       return false;
 
     //Once there was an CLM/DAT/TNG update function here,
@@ -969,8 +970,74 @@ short load_map(struct LEVEL *lvl)
            break;
         }
         free(fnames);
-        free_map();
+        free(err_msg);
+        free_map(lvl);
         start_new_map(lvl);
+        return false;
+  }
+  if (strlen(lvl->savfname)<1)
+  {
+      strncpy(lvl->savfname,lvl->fname,DISKPATH_SIZE);
+      lvl->savfname[DISKPATH_SIZE-1]=0;
+  }
+  update_level_stats(lvl);
+  free(fnames);
+  free(err_msg);
+  return true;
+}
+
+/*
+ * Loads the map preview. Tries to open only files needed for Slab mode preview.
+ * Returns true on success, on error returns false without clearing the structure.
+ */
+short load_map_preview(struct LEVEL *lvl)
+{
+  char *fnames;
+  char *err_msg;
+  level_free(lvl);
+  if ((lvl->fname==NULL)||(strlen(lvl->fname)<1))
+  {
+    start_new_map(lvl);
+    return false;
+  }
+  level_clear(lvl);
+  err_msg=(char *)malloc(LINEMSG_SIZE);
+  fnames = (char *)malloc(strlen(lvl->fname)+5);
+  if ((fnames==NULL)||(err_msg==NULL))
+    die ("load_map: Out of memory.");
+  short result=ERR_NONE;
+  if (result==ERR_NONE)
+  {
+    sprintf (fnames, "%s.slb", lvl->fname);
+    result=load_slb(lvl,fnames);
+  }    
+  if (result==ERR_NONE)
+  {
+    sprintf (fnames, "%s.own", lvl->fname);
+    result=load_own(lvl,fnames);
+  }    
+  if (result!=ERR_NONE)
+  {
+        switch (result)
+        {
+        case ERR_FILE_NFOUND:
+           message_info_force("Load error: can't open \"%s\"", fnames);
+           break;
+        case ERR_FILE_TOOSMLL:
+           message_info_force("Load error: file too small: \"%s\"", fnames);
+           break;
+        case ERR_FILE_BADDATA:
+           message_info_force("Load error: bad data in \"%s\"", fnames);
+           break;
+        case ERR_INTERNAL:
+           message_info_force("Internal error when loading \"%s\"", fnames);
+           break;
+        default:
+           message_info_force("Couldn't load \"%s\"", fnames);
+           break;
+        }
+        free(fnames);
+        free(err_msg);
         return false;
   }
   if (strlen(lvl->savfname)<1)

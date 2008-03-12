@@ -16,6 +16,7 @@
 short save_map(struct LEVEL *lvl);
 
 short load_map(struct LEVEL *lvl);
+short load_map_preview(struct LEVEL *lvl);
 
 unsigned short script_load_and_execute(struct LEVEL *lvl,char *fname,char *err_msg);
 short write_text_file(char **lines,int lines_count,char *fname);

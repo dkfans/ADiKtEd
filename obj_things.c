@@ -623,7 +623,7 @@ unsigned char *create_thing(unsigned int sx, unsigned int sy)
  * Creates a new thing, prepared to be placed in given coordinates,
  * with body copied from another thing, given as parameter.
  */
-unsigned char *create_thing_copy(unsigned int sx, unsigned int sy,unsigned char *src)
+unsigned char *create_thing_copy(const struct LEVEL *lvl,unsigned int sx, unsigned int sy,unsigned char *src)
 {
     //Preparing array bounds
     int arr_entries_x=MAP_SIZE_X*MAP_SUBNUM_X;
@@ -649,7 +649,7 @@ unsigned char *create_thing_copy(unsigned int sx, unsigned int sy,unsigned char 
 /*
  * Creates a new thing of type item
  */
-unsigned char *create_item(unsigned int sx, unsigned int sy, unsigned char stype_idx)
+unsigned char *create_item(const struct LEVEL *lvl,unsigned int sx, unsigned int sy, unsigned char stype_idx)
 {
     unsigned char *thing;
     thing = create_thing(sx,sy);

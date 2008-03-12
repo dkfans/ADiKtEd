@@ -5,6 +5,8 @@
 #ifndef ADIKT_LEVDATA_H
 #define ADIKT_LEVDATA_H
 
+#include "globals.h"
+
 // Map size definitions
 
 #define MAP_SIZE_X 85
@@ -67,21 +69,19 @@
 
 extern const int idir_subtl_x[];
 extern const int idir_subtl_y[];
- 
+
 //Font - for graffiti
 #define GRAFF_FONT_NONE        0x00
 #define GRAFF_FONT_ADICLSSC    0x01
 #define GRAFF_FONT_ADISIZE8    0x02
 
 struct DK_GRAFFITI {
-    int tx;
-    int ty;
+    struct IPOINT_2D tile;
     char *text;
     unsigned short font;
     unsigned short orient;
     int height;
-    int fin_tx;
-    int fin_ty;
+    struct IPOINT_2D fin_tile;
     unsigned short cube;
   };
 
@@ -181,7 +181,7 @@ struct LEVEL {
 // creates object for storing map
 short level_init(struct LEVEL **lvl_ptr);
 // frees object for storing map
-short level_deinit();
+short level_deinit(struct LEVEL **lvl_ptr);
 
 short level_clear(struct LEVEL *lvl);
 short level_clear_tng(struct LEVEL *lvl);
@@ -190,18 +190,18 @@ short level_clear_lgt(struct LEVEL *lvl);
 short level_clear_datclm(struct LEVEL *lvl);
 short level_clear_other(struct LEVEL *lvl);
 
-short level_free();
+short level_free(struct LEVEL *lvl);
 short level_free_tng(struct LEVEL *lvl);
 
-short level_verify(struct LEVEL *lvl, char *actn_name);
-short level_verify_struct(struct LEVEL *lvl, char *err_msg);
-short actnpts_verify(struct LEVEL *lvl, char *err_msg);
-short level_verify_logic(struct LEVEL *lvl, char *err_msg);
+short level_verify(struct LEVEL *lvl, char *actn_name,struct IPOINT_2D *errpt);
+short level_verify_struct(struct LEVEL *lvl, char *err_msg,struct IPOINT_2D *errpt);
+short actnpts_verify(struct LEVEL *lvl, char *err_msg,struct IPOINT_2D *errpt);
+short level_verify_logic(struct LEVEL *lvl, char *err_msg,struct IPOINT_2D *errpt);
 void start_new_map(struct LEVEL *lvl);
 void generate_random_map(struct LEVEL *lvl);
 void generate_slab_bkgnd_default(struct LEVEL *lvl,unsigned short def_slab);
 void generate_slab_bkgnd_random(struct LEVEL *lvl);
-void free_map(void);
+void free_map(struct LEVEL *lvl);
 
 char *get_thing(const struct LEVEL *lvl,unsigned int x,unsigned int y,unsigned int num);
 int thing_add(struct LEVEL *lvl,unsigned char *thing);
@@ -209,22 +209,22 @@ void thing_del(struct LEVEL *lvl,unsigned int x,unsigned int y,unsigned int num)
 void thing_drop(struct LEVEL *lvl,unsigned int x, unsigned int y, unsigned int num);
 unsigned int get_thing_subnums(const struct LEVEL *lvl,unsigned int x,unsigned int y);
 
-char *get_actnpt(struct LEVEL *lvl,unsigned int x,unsigned int y,unsigned int num);
+char *get_actnpt(const struct LEVEL *lvl,unsigned int x,unsigned int y,unsigned int num);
 void actnpt_add(struct LEVEL *lvl,unsigned char *actnpt);
 void actnpt_del(struct LEVEL *lvl,unsigned int x,unsigned int y,unsigned int num);
-unsigned int get_actnpt_subnums(struct LEVEL *lvl,unsigned int x,unsigned int y);
+unsigned int get_actnpt_subnums(const struct LEVEL *lvl,unsigned int x,unsigned int y);
 
-char *get_stlight(struct LEVEL *lvl,unsigned int x,unsigned int y,unsigned int num);
+char *get_stlight(const struct LEVEL *lvl,unsigned int x,unsigned int y,unsigned int num);
 void stlight_add(struct LEVEL *lvl,unsigned char *stlight);
 void stlight_del(struct LEVEL *lvl,unsigned int x,unsigned int y,unsigned int num);
-unsigned int get_stlight_subnums(struct LEVEL *lvl,unsigned int x,unsigned int y);
+unsigned int get_stlight_subnums(const struct LEVEL *lvl,unsigned int x,unsigned int y);
 
-short get_object_type(struct LEVEL *lvl, unsigned int x, unsigned int y, unsigned int z);
-unsigned char *get_object(struct LEVEL *lvl,unsigned int x,unsigned int y,unsigned int z);
+short get_object_type(const struct LEVEL *lvl, unsigned int x, unsigned int y, unsigned int z);
+unsigned char *get_object(const struct LEVEL *lvl,unsigned int x,unsigned int y,unsigned int z);
 void object_del(struct LEVEL *lvl,unsigned int sx,unsigned int sy,unsigned int z);
-unsigned int get_object_subnums(struct LEVEL *lvl,unsigned int x,unsigned int y);
-unsigned int get_object_tilnums(struct LEVEL *lvl,unsigned int x,unsigned int y);
-int get_object_subtl_last(struct LEVEL *lvl,unsigned int x,unsigned int y,short obj_type);
+unsigned int get_object_subnums(const struct LEVEL *lvl,unsigned int x,unsigned int y);
+unsigned int get_object_tilnums(const struct LEVEL *lvl,unsigned int x,unsigned int y);
+int get_object_subtl_last(const struct LEVEL *lvl,unsigned int x,unsigned int y,short obj_type);
 void update_object_owners(struct LEVEL *lvl);
 
 short get_subtl_wib(struct LEVEL *lvl, unsigned int sx, unsigned int sy);
@@ -251,6 +251,6 @@ void update_level_stats(struct LEVEL *lvl);
 void update_things_stats(struct LEVEL *lvl);
 void update_thing_stats(struct LEVEL *lvl,const unsigned char *thing,short change);
 
-extern struct LEVEL *lvl;
+//extern struct LEVEL *lvl;
 
 #endif // ADIKT_LEVDATA_H

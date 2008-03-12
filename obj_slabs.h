@@ -90,9 +90,10 @@
 #define SLB_GUARDPOST_LTEXT "Guard post"
 
 struct LEVEL;
+struct IPOINT_2D;
 
 short slab_is_central(struct LEVEL *lvl,int x,int y);
-short slabs_verify(struct LEVEL *lvl, char *err_msg);
+short slabs_verify(struct LEVEL *lvl, char *err_msg,struct IPOINT_2D *errpt);
 
 int slab_siblings_oftype(struct LEVEL *lvl,int x,int y,unsigned short slab_type);
 void slab_draw_smear(struct LEVEL *lvl,int startx,int starty,int startr,

@@ -17,6 +17,7 @@
 #include "obj_things.h"
 #include "obj_slabs.h"
 #include "graffiti.h"
+#include "scr_thing.h"
 
 
 // Variables
@@ -29,42 +30,42 @@ char *slbkey;
 /*
  * Initializes variables for the mdslab screen.
  */
-short init_mdslab(void)
+short init_mdslab(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode)
 {
     //Creating mdslab variable
     mdslab=(struct MDSLAB_DATA *)malloc(sizeof(struct MDSLAB_DATA));
     if (mdslab==NULL)
      die("init_mdslab: Cannot allocate memory.");
     //Initialize keys for displaying and putting slabs
-    init_mdslab_keys();
+    init_mdslab_keys(scrmode,mapmode);
     return true;
 }
 
 /*
  * Deallocates memory for the mdslab screen.
  */
-void free_mdslab(void)
+void free_mdslab(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode)
 {
   free(mdslab);
-  free_mdslab_keys();
+  free_mdslab_keys(scrmode,mapmode);
 }
 
 
 /*
  * Covers actions from the slab screen.
  */
-void actions_mdslab(int key)
+void actions_mdslab(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl,int key)
 {
     int d;
     message_release();
-    if (!cursor_actions(key))
+    if (!cursor_actions(scrmode,mapmode,lvl,key))
     {
-        int tx=mapmode->mapx+mapmode->screenx;
-        int ty=mapmode->mapy+mapmode->screeny;
+        int tx=mapmode->map.x+mapmode->screen.x;
+        int ty=mapmode->map.y+mapmode->screen.y;
         switch (key)
         {
         case KEY_ENTER:
-          start_mdslbl(lvl);
+          start_mdslbl(scrmode,mapmode,lvl);
           break;
         case 'u': // Update all things/dat/clm/w?b
           update_slab_owners(lvl);
@@ -72,21 +73,21 @@ void actions_mdslab(int key)
           message_info("All DAT/CLM/W?B entries updated.");
           break;
         case 'v': // Verify whole map
-          level_verify(lvl,NULL);
+          level_verify_with_highlight(lvl,mapmode);
           break;
         case KEY_TAB:
-          end_mdslab();
-          start_mdtng(lvl);
+          end_mdslab(scrmode,mapmode,lvl);
+          start_mdtng(scrmode,mapmode,lvl);
           message_info("Thing mode activated");
           break;
         case 'c':
-          end_mdslab();
-          start_mdclm(lvl);
+          end_mdslab(scrmode,mapmode,lvl);
+          start_mdclm(scrmode,mapmode,lvl);
           message_info("Column mode activated");
           break;
         case 'r':
-          end_mdslab();
-          start_mdrwrk(lvl);
+          end_mdslab(scrmode,mapmode,lvl);
+          start_mdrwrk(scrmode,mapmode,lvl);
           message_info("Rework mode activated");
           break;
         case KEY_CTRL_SPACE:
@@ -97,8 +98,8 @@ void actions_mdslab(int key)
           {
             mapmode->mark=true;
             mapmode->paintmode=false;
-            mapmode->marky=ty;
-            mapmode->markx=tx;
+            mapmode->markp.y=ty;
+            mapmode->markp.x=tx;
           }
           message_info("Mark mode %s",mapmode->mark?"on":"off");
           break;
@@ -116,7 +117,7 @@ void actions_mdslab(int key)
             slb_next_graffiti_orient(lvl,graffiti_idx(lvl,tx,ty));
           break;
         case 'd': // Add/view graffiti down
-            slb_place_graffiti(lvl,tx,ty,ORIENT_NS);
+            slb_place_graffiti(scrmode,mapmode,lvl,tx,ty,ORIENT_NS);
           break;
         case '0':
         case '1':
@@ -125,7 +126,7 @@ void actions_mdslab(int key)
         case '4':
         case '5':
             mapmode->paintown=key-'0';
-            change_ownership((char)(key-'0'));
+            change_ownership(scrmode,mapmode,lvl,(char)(key-'0'));
             message_info("Slab owner changed");
             break;
         case '[':
@@ -189,13 +190,13 @@ void actions_mdslab(int key)
         }
       }
     }
-    slbposcheck();
+    slbposcheck(scrmode,mapmode,lvl);
 }
 
 /*
  * Action function - start the mdslab mode.
  */
-short start_mdslab(struct LEVEL *lvl)
+short start_mdslab(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl)
 {
     scrmode->mode=MD_SLB;
     return true;
@@ -204,7 +205,7 @@ short start_mdslab(struct LEVEL *lvl)
 /*
  * Action function - end the mdslab mode.
  */
-void end_mdslab()
+void end_mdslab(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl)
 {
     mapmode->mark=false;
     mapmode->paintmode=false;
@@ -214,14 +215,14 @@ void end_mdslab()
 /*
  * Action subfunction - check position in slb mode.
  */
-void slbposcheck(void)
+void slbposcheck(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl)
 {
     if (mapmode->paintmode)
     {
       if (mapmode->paintroom != 255)
           slb_place_room(lvl,mapmode,mapmode->paintroom);
       if (mapmode->paintown >= 0)
-          change_ownership((char)(mapmode->paintown));
+          change_ownership(scrmode,mapmode,lvl,(char)(mapmode->paintown));
     }
 }
 
@@ -236,14 +237,14 @@ void slb_place_room(struct LEVEL *lvl,struct MAPMODE_DATA *mapmode,unsigned char
     int markl,markt;
     if (mapmode->mark)
     {
-      markr=mapmode->markr;
-      markb=mapmode->markb;
-      markl=mapmode->markl;
-      markt=mapmode->markt;
+      markr=mapmode->markr.r;
+      markb=mapmode->markr.b;
+      markl=mapmode->markr.l;
+      markt=mapmode->markr.t;
     } else
     {
-      markr=mapmode->screenx+mapmode->mapx;
-      markb=mapmode->screeny+mapmode->mapy;
+      markr=mapmode->screen.x+mapmode->map.x;
+      markb=mapmode->screen.y+mapmode->map.y;
       markl=markr;
       markt=markb;
     }
@@ -274,10 +275,10 @@ void slb_place_room(struct LEVEL *lvl,struct MAPMODE_DATA *mapmode,unsigned char
 /*
  * Action function - change the owner of item mode.
  */
-void change_ownership(unsigned char purchaser)
+void change_ownership(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl,unsigned char purchaser)
 {
-    int tx=mapmode->screenx+mapmode->mapx;
-    int ty=mapmode->screeny+mapmode->mapy;
+    int tx=mapmode->screen.x+mapmode->map.x;
+    int ty=mapmode->screen.y+mapmode->map.y;
     // Sanity check, almost certainly unneeded
     if ((tx >= MAP_SIZE_X) || (tx >= MAP_SIZE_Y) ||
         (tx < 0) || (ty < 0))
@@ -294,22 +295,22 @@ void change_ownership(unsigned char purchaser)
       return;
     }
     // another sanity check - this time for marking mode
-    if ((mapmode->markr > MAP_MAXINDEX_X) || (mapmode->markb > MAP_MAXINDEX_Y) ||
-      (mapmode->markl < 0) || (mapmode->markt < 0))
+    if ((mapmode->markr.r > MAP_MAXINDEX_X) || (mapmode->markr.b > MAP_MAXINDEX_Y) ||
+      (mapmode->markr.l < 0) || (mapmode->markr.t < 0))
       return;
-    for (tx=mapmode->markl; tx<=mapmode->markr; tx++)
-      for (ty=mapmode->markt; ty<=mapmode->markb; ty++)
+    for (tx=mapmode->markr.l; tx<=mapmode->markr.r; tx++)
+      for (ty=mapmode->markr.t; ty<=mapmode->markr.b; ty++)
           set_tile_owner(lvl,tx,ty,purchaser);
     if (obj_auto_update)
-      update_obj_for_square(lvl, mapmode->markl-1, mapmode->markr+1, mapmode->markt-1, mapmode->markb+1);
+      update_obj_for_square(lvl, mapmode->markr.l-1, mapmode->markr.r+1, mapmode->markr.t-1, mapmode->markr.b+1);
     if (datclm_auto_update)
-      update_datclm_for_square(lvl, mapmode->markl-1, mapmode->markr+1, mapmode->markt-1, mapmode->markb+1);
+      update_datclm_for_square(lvl, mapmode->markr.l-1, mapmode->markr.r+1, mapmode->markr.t-1, mapmode->markr.b+1);
     if (obj_auto_update)
-      update_obj_subpos_and_height_for_square(lvl, mapmode->markl-1, mapmode->markr+1, mapmode->markt-1, mapmode->markb+1);
+      update_obj_subpos_and_height_for_square(lvl, mapmode->markr.l-1, mapmode->markr.r+1, mapmode->markr.t-1, mapmode->markr.b+1);
     mapmode->mark=false;
 }
 
-void slb_place_graffiti(struct LEVEL *lvl,int tx, int ty,unsigned short orient)
+void slb_place_graffiti(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl,int tx, int ty,unsigned short orient)
 {
     static char graf_text[READ_BUFSIZE];
     if ((mapmode->mark) || (mapmode->paintmode))
@@ -347,7 +348,7 @@ void slb_next_graffiti_orient(struct LEVEL *lvl,int graf_idx)
     }
     unsigned short new_orient=get_orientation_next(graf->orient);
     graffiti_clear_from_columns(lvl,graf_idx);
-    short result=set_graffiti_orientation(graf,new_orient);
+    short result=set_graffiti_orientation(graf,lvl,new_orient);
     graffiti_update_columns(lvl,graf_idx);
     if (!result)
     {
@@ -360,7 +361,7 @@ void slb_next_graffiti_orient(struct LEVEL *lvl,int graf_idx)
 /*
  * Init function - creates arrays for keyboard shortcuts in slab mode.
  */
-void init_mdslab_keys()
+void init_mdslab_keys(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode)
 {
     int i;
     // Arrays storing keyboard shortcuts and corresponding rooms
@@ -443,7 +444,7 @@ void init_mdslab_keys()
 /*
  * Frees memory allocated by init_mdslab_keys. Should be called in free_mdslab().
  */
-void free_mdslab_keys()
+void free_mdslab_keys(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode)
 {
     free(mdslab->placekeys);
     free(slbkey);
@@ -452,15 +453,15 @@ void free_mdslab_keys()
 /*
  * Draws screen for the mdslab mode.
  */
-void draw_mdslab()
+void draw_mdslab(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl)
 {
     int tx,ty;
-    tx=mapmode->mapx+mapmode->screenx;
-    ty=mapmode->mapy+mapmode->screeny;
-    draw_map_area(lvl,true,true,false);
+    tx=mapmode->map.x+mapmode->screen.x;
+    ty=mapmode->map.y+mapmode->screen.y;
+    draw_map_area(scrmode,mapmode,lvl,true,true,false);
     if (mapmode->panel_mode!=PV_MODE)
     {
-      draw_forced_panel(lvl,mapmode->panel_mode);
+      draw_forced_panel(scrmode,mapmode,lvl,mapmode->panel_mode);
     } else
     {
       int scr_row=0;
@@ -483,9 +484,9 @@ void draw_mdslab()
         screen_printf("%s",get_slab_fullname(slb_type));
       }
       if (scrmode->rows >= scr_row+TNGDAT_ROWS)
-        display_tngdat();
+        display_tngdat(scrmode,mapmode,lvl);
     }
-    draw_map_cursor(lvl,true,true,false);
+    draw_map_cursor(scrmode,mapmode,lvl,true,true,false);
 }
 
 int display_graffiti(struct LEVEL *lvl,int scr_row, int scr_col,int graff_idx)
@@ -499,9 +500,9 @@ int display_graffiti(struct LEVEL *lvl,int scr_row, int scr_col,int graff_idx)
     struct DK_GRAFFITI *graf=lvl->graffiti[graff_idx];
     if (graf==NULL) return scr_row;
     set_cursor_pos(scr_row, scr_col1);
-    screen_printf("Position: %d,%d",graf->tx,graf->ty);
+    screen_printf("Position: %d,%d",graf->tile.x,graf->tile.y);
     set_cursor_pos(scr_row++, scr_col2);
-    screen_printf("End: %d,%d",graf->fin_tx,graf->fin_ty);
+    screen_printf("End: %d,%d",graf->fin_tile.x,graf->fin_tile.y);
     set_cursor_pos(scr_row, scr_col1);
     screen_printf("Orientation: %s",get_orientation_shortname(graf->orient));
     set_cursor_pos(scr_row++, scr_col2);

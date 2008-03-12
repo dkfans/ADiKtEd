@@ -68,6 +68,15 @@ enum borderStyle {bsSingle,bsDouble,bsSolid};
 #define PRINT_COLOR_WHITE_ON_GREY     82
 #define PRINT_COLOR_LMAGENT_ON_GREY   83
 
+//The structure with data required for drawing function
+struct DRAW_DATA {
+    struct SCRMODE_DATA *scrmode;
+    struct MAPMODE_DATA *mapmode;
+    struct LEVEL *lvl;
+};
+
+extern struct DRAW_DATA drawdata;
+
 void set_cursor_visibility(short val);
 int get_screen_rows();
 int get_screen_cols();

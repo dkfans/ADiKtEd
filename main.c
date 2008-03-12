@@ -9,10 +9,11 @@
 #include "var_utils.h"
 #include "input_kb.h"
 #include "draw_map.h"
+#include "output_scr.h"
 
 const char config_filename[]="map.ini";
 
-void read_init(void)
+void read_init(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode)
 {
 #if defined(unix) && !defined(GO32)
     levels_path="."SEPARATOR"levels";
@@ -71,11 +72,11 @@ void read_init(void)
       }
       if (!strcmp(buffer, "SHOW_OBJ_RANGE"))
       {
-          show_obj_range=atoi(p);
+          mapmode->show_obj_range=atoi(p);
       } else
       if (!strcmp(buffer, "DAT_VIEW_MODE"))
       {
-          dat_view_mode=atoi(p);
+          mapmode->dat_view_mode=atoi(p);
       } else
       if (!strcmp(buffer, "BITMAP_SCALE"))
       {
@@ -100,7 +101,7 @@ void read_init(void)
     }
 }
 
-void get_command_line_options(int argc, char **argv)
+void get_command_line_options(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl,int argc, char **argv)
 {
 // Note: Automated commands are now just keys inserted into keyboard input buffer.
 // in the future, this should be a script generated using input parameters
@@ -118,22 +119,22 @@ void get_command_line_options(int argc, char **argv)
         get_savout_fname=false;
         if (strcmp(comnd+1,"v")==0)
         {
-          automated_commands[cmnds_count]='v';
+          scrmode->automated_commands[cmnds_count]='v';
           cmnds_count++;
         } else
         if ((strcmp(comnd+1,"q")==0)||(strcmp(comnd+1,"Q")==0))
         {
-          automated_commands[cmnds_count]=KEY_CTRL_Q;
+          scrmode->automated_commands[cmnds_count]=KEY_CTRL_Q;
           cmnds_count++;
         } else
         if (strcmp(comnd+1,"r")==0)
         {
-          automated_commands[cmnds_count]=KEY_CTRL_R;
+          scrmode->automated_commands[cmnds_count]=KEY_CTRL_R;
           cmnds_count++;
         } else
         if (strcmp(comnd+1,"n")==0)
         {
-          automated_commands[cmnds_count]=KEY_CTRL_N;
+          scrmode->automated_commands[cmnds_count]=KEY_CTRL_N;
           cmnds_count++;
         } else
         if (strcmp(comnd+1,"ds")==0)
@@ -147,15 +148,15 @@ void get_command_line_options(int argc, char **argv)
         } else
         if (strcmp(comnd+1,"dvid")==0)
         {
-          screen_enabled=false;
+          scrmode->screen_enabled=false;
         } else
         if (strcmp(comnd+1,"dinp")==0)
         {
-          input_enabled=false;
+          scrmode->input_enabled=false;
         } else
         if (strcmp(comnd+1,"s")==0)
         {
-          automated_commands[cmnds_count]=KEY_F5;
+          scrmode->automated_commands[cmnds_count]=KEY_F5;
           cmnds_count++;
           get_savout_fname=true;
         } else
@@ -190,17 +191,22 @@ int main(int argc, char **argv)
 {
     struct LEVEL *lvl;
     //Allocate and set basic configuration variables
-    init_levscr_basics();
+    struct SCRMODE_DATA *scrmode;
+    struct MAPMODE_DATA *mapmode;
+    init_levscr_basics(&scrmode,&mapmode);
     // Initialize the message displaying and storing
     init_messages();
     // create object for storing map
     level_init(&lvl);
+    drawdata.scrmode=scrmode;
+    drawdata.mapmode=mapmode;
+    drawdata.lvl=lvl;
     // read configuration file
-    read_init();
+    read_init(scrmode,mapmode);
     // Interpreting command line parameters
-    get_command_line_options(argc,argv);
+    get_command_line_options(scrmode,mapmode,lvl,argc,argv);
     // initing keyboard input and screen output, also all modes.
-    init_levscr_modes();
+    init_levscr_modes(scrmode,mapmode);
     // Load a map, or start new one
     if (strlen(lvl->fname)>0)
     {
@@ -212,9 +218,9 @@ int main(int argc, char **argv)
     }
     do 
     {
-      draw_levscr(lvl);
-      proc_key();
+      draw_levscr(scrmode,mapmode,lvl);
+      proc_key(scrmode,mapmode,lvl);
     } while (!finished);
-    done();
+    done(&scrmode,&mapmode,&lvl);
     return 0;
 }

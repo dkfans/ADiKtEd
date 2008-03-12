@@ -19,8 +19,9 @@ const is_thing_subtype search_tngtype_func[]={
       is_trapbox,is_trap,is_creature,
       is_door,is_roomeffect,is_statue,
       is_furniture,is_food,is_gold,
-      is_torch,is_heartflame,is_lit_thing,
-      is_herogate,is_dnheart,is_doorkey,
+      is_torch,is_heartflame,is_pole,
+      is_lit_thing,is_herogate,is_dnheart,
+      is_doorkey,
       };
 
 const char *search_tngtype_names[]={
@@ -28,15 +29,16 @@ const char *search_tngtype_names[]={
       "Trap boxes","Deployed traps","Creatures",
       "Deployed doors","Room effects","Statues",
       "Furniture items","Food (chickens)","Gold things",
-      "Torches","Heart flames","Lit things",
-      "Hero gates","Dungeon hearts","Door keys",
+      "Torches","Heart flames","Poles and bars",
+      "Lit things","Hero gates","Dungeon hearts",
+      "Door keys",
 };
 
 /*
  * Verifies thing types and parameters. Returns VERIF_ERROR,
  * VERIF_WARN or VERIF_OK
  */
-short things_verify(struct LEVEL *lvl, char *err_msg)
+short things_verify(struct LEVEL *lvl, char *err_msg,struct IPOINT_2D *errpt)
 {
     char child_err_msg[LINEMSG_SIZE];
     strcpy(child_err_msg,"Unknown error");
@@ -56,7 +58,9 @@ short things_verify(struct LEVEL *lvl, char *err_msg)
           short result=thing_verify(thing,child_err_msg);
           if (result!=VERIF_OK)
           {
-            sprintf(err_msg,"%s at slab %d,%d.",child_err_msg,i/MAP_SUBNUM_X,j/MAP_SUBNUM_Y);
+            errpt->x=i/MAP_SUBNUM_X;
+            errpt->y=j/MAP_SUBNUM_Y;
+            sprintf(err_msg,"%s at slab %d,%d.",child_err_msg,errpt->x,errpt->y);
             return result;
           }
         }
@@ -171,7 +175,7 @@ unsigned char get_door_lock(unsigned char *thing)
 /*
  * Returns the orientation that doors should have.
  */
-unsigned char compute_door_orientation(struct LEVEL *lvl, unsigned char *thing)
+unsigned char compute_door_orientation(const struct LEVEL *lvl, unsigned char *thing)
 {
     unsigned short tx=get_thing_subtile_x(thing)/MAP_SUBNUM_X;
     unsigned short ty=get_thing_subtile_y(thing)/MAP_SUBNUM_Y;
@@ -198,7 +202,7 @@ unsigned char compute_door_orientation(struct LEVEL *lvl, unsigned char *thing)
 /*
  * Sweeps things to find an unused hero gate number
  */
-unsigned short get_free_herogate_number(struct LEVEL *lvl)
+unsigned short get_free_herogate_number(const struct LEVEL *lvl)
 {
     //Preparing array bounds
     const int arr_entries_x=MAP_SIZE_X*MAP_SUBNUM_X;
@@ -389,7 +393,7 @@ unsigned char *find_next_stlight_on_map(struct LEVEL *lvl, int *tx, int *ty)
 /*
  * Returns an acceptable value of sensitive tile for torch
  */
-unsigned short compute_torch_sensitile(struct LEVEL *lvl, unsigned char *thing)
+unsigned short compute_torch_sensitile(const struct LEVEL *lvl, unsigned char *thing)
 {
     unsigned short sx=get_thing_subtile_x(thing);
     unsigned short sy=get_thing_subtile_y(thing);
@@ -436,7 +440,7 @@ unsigned short compute_torch_sensitile(struct LEVEL *lvl, unsigned char *thing)
 /*
  * Returns an acceptable value of sensitive tile for room effect
  */
-unsigned short compute_roomeffect_sensitile(struct LEVEL *lvl, unsigned char *thing)
+unsigned short compute_roomeffect_sensitile(const struct LEVEL *lvl, unsigned char *thing)
 {
     unsigned short sx=get_thing_subtile_x(thing);
     unsigned short sy=get_thing_subtile_y(thing);
@@ -448,7 +452,7 @@ unsigned short compute_roomeffect_sensitile(struct LEVEL *lvl, unsigned char *th
 /*
  * Returns an acceptable value of sensitive tile for item thing
  */
-unsigned short compute_item_sensitile(struct LEVEL *lvl, unsigned char *thing)
+unsigned short compute_item_sensitile(const struct LEVEL *lvl, unsigned char *thing)
 {
     if (is_torch(thing))
         return compute_torch_sensitile(lvl,thing);
@@ -486,7 +490,7 @@ unsigned char *create_door(struct LEVEL *lvl, unsigned int sx, unsigned int sy, 
     return thing;
 }
 
-unsigned char *create_torch(struct LEVEL *lvl, unsigned int sx, unsigned int sy,  unsigned char stype_idx)
+unsigned char *create_torch(const struct LEVEL *lvl, unsigned int sx, unsigned int sy,  unsigned char stype_idx)
 {
     unsigned char *thing;
     thing = create_thing(sx,sy);
@@ -523,7 +527,7 @@ unsigned char *create_torch(struct LEVEL *lvl, unsigned int sx, unsigned int sy,
     return thing;
 }
 
-unsigned char *create_doorkey(struct LEVEL *lvl, unsigned int sx, unsigned int sy,  unsigned char stype_idx)
+unsigned char *create_doorkey(const struct LEVEL *lvl, unsigned int sx, unsigned int sy,  unsigned char stype_idx)
 {
     unsigned char *thing;
     thing = create_thing(sx,sy);
@@ -545,13 +549,14 @@ unsigned char *create_doorkey(struct LEVEL *lvl, unsigned int sx, unsigned int s
 /*
  * Creates a new thing of type room effect
  */
-unsigned char *create_roomeffect(unsigned int sx, unsigned int sy, unsigned char stype_idx)
+unsigned char *create_roomeffect(const struct LEVEL *lvl,unsigned int sx, unsigned int sy, unsigned char stype_idx)
 {
     unsigned char *thing;
     thing = create_thing(sx,sy);
     set_thing_type(thing,THING_TYPE_ROOMEFFECT);
     set_thing_subtype(thing,stype_idx);
     set_thing_owner(thing,get_tile_owner(lvl,sx/MAP_SUBNUM_X,sy/MAP_SUBNUM_Y));
+    set_thing_range_subtile(thing,5);
     unsigned short sensitile=compute_roomeffect_sensitile(lvl,thing);
     set_thing_sensitile(thing,sensitile);
     return thing;
@@ -560,7 +565,7 @@ unsigned char *create_roomeffect(unsigned int sx, unsigned int sy, unsigned char
 /*
  * Creates a new thing of type creature
  */
-unsigned char *create_creature(unsigned int sx, unsigned int sy, unsigned char stype_idx)
+unsigned char *create_creature(const struct LEVEL *lvl,unsigned int sx, unsigned int sy, unsigned char stype_idx)
 {
     unsigned char *thing;
     thing = create_thing(sx,sy);
@@ -573,7 +578,7 @@ unsigned char *create_creature(unsigned int sx, unsigned int sy, unsigned char s
 /*
  * Creates a new thing of type trap
  */
-unsigned char *create_trap(unsigned int sx, unsigned int sy, unsigned char stype_idx)
+unsigned char *create_trap(const struct LEVEL *lvl,unsigned int sx, unsigned int sy, unsigned char stype_idx)
 {
     unsigned char *thing;
     thing = create_thing(sx,sy);
@@ -587,7 +592,7 @@ unsigned char *create_trap(unsigned int sx, unsigned int sy, unsigned char stype
  * Creates a new thing of type item. Advanced version - uses one of specialized
  * functions to create the item.
  */
-unsigned char *create_item_adv(struct LEVEL *lvl, unsigned int sx, unsigned int sy, unsigned char stype_idx)
+unsigned char *create_item_adv(const struct LEVEL *lvl, unsigned int sx, unsigned int sy, unsigned char stype_idx)
 {
     unsigned char *thing;
     int tx=sx/MAP_SUBNUM_X;
@@ -598,27 +603,27 @@ unsigned char *create_item_adv(struct LEVEL *lvl, unsigned int sx, unsigned int 
     } else
     if (stype_idx==ITEM_SUBTYPE_HEROGATE)
     {
-        thing=create_item(sx,sy,stype_idx);
+        thing=create_item(lvl,sx,sy,stype_idx);
         set_thing_owner(thing,PLAYER_GOOD);
         //Hero gate must be numbered
         set_thing_level(thing,(char)(-get_free_herogate_number(lvl)));
     } else
     if (stype_idx==ITEM_SUBTYPE_DNHEART)
     {
-        thing=create_item(sx,sy,stype_idx);
+        thing=create_item(lvl,sx,sy,stype_idx);
         set_thing_subtile_h(thing,3); // Raise it up a bit
         set_thing_sensitile(thing,THING_SENSITILE_NONE);
     } else
     if (is_heartflame_stype(stype_idx))
     {
-        thing=create_item(sx,sy,stype_idx);
+        thing=create_item(lvl,sx,sy,stype_idx);
         set_thing_subtile_h(thing,2); // That is where heart flames should be
         unsigned short sensitile=ty*MAP_SIZE_X+tx;
         set_thing_sensitile(thing,sensitile);
     } else
     if (stype_idx==ITEM_SUBTYPE_PRISONBAR)
     {
-        thing=create_item(sx,sy,stype_idx);
+        thing=create_item(lvl,sx,sy,stype_idx);
         set_thing_subtpos(thing,128,128);
         unsigned short sensitile=ty*MAP_SIZE_X+tx;
         set_thing_sensitile(thing,sensitile);
@@ -628,7 +633,7 @@ unsigned char *create_item_adv(struct LEVEL *lvl, unsigned int sx, unsigned int 
         thing=create_doorkey(lvl,sx,sy,stype_idx);
     } else
     {
-        thing=create_item(sx,sy,stype_idx);
+        thing=create_item(lvl,sx,sy,stype_idx);
         if (is_room_thing(thing))
         {
           unsigned short sensitile=ty*MAP_SIZE_X+tx;
@@ -923,7 +928,7 @@ void create_things_slb_room(cr_tng_func cr_floor,cr_tng_func cr_edge,
 {
   unsigned char *surr_slb=(unsigned char *)malloc(9*sizeof(unsigned char));
   unsigned char *surr_own=(unsigned char *)malloc(9*sizeof(unsigned char));
-  get_slab_surround(surr_slb,surr_own,NULL,tx,ty);
+  get_slab_surround(surr_slb,surr_own,NULL,lvl,tx,ty);
   unsigned short slab=surr_slb[IDIR_CENTR];
   unsigned char ownr=surr_own[IDIR_CENTR];
   //Checking if completely surrounded
@@ -1008,7 +1013,7 @@ void create_things_slb_room_simple(cr_tng_func cr_any,
 {
   unsigned char *surr_slb=(unsigned char *)malloc(9*sizeof(unsigned char));
   unsigned char *surr_own=(unsigned char *)malloc(9*sizeof(unsigned char));
-  get_slab_surround(surr_slb,surr_own,NULL,tx,ty);
+  get_slab_surround(surr_slb,surr_own,NULL,lvl,tx,ty);
   unsigned short slab=surr_slb[IDIR_CENTR];
   unsigned char ownr=surr_own[IDIR_CENTR];
   //Very simple...
@@ -1077,7 +1082,7 @@ void update_things_slb_portal_inside(struct LEVEL *lvl, int tx, int ty,
     sy=ty*MAP_SUBNUM_Y+1;
     if (thing_eff==NULL)
     {
-      thing_eff=create_roomeffect(sx,sy, ROOMEFC_SUBTP_ENTRICE);
+      thing_eff=create_roomeffect(lvl,sx,sy, ROOMEFC_SUBTP_ENTRICE);
       thing_add(lvl,thing_eff);
     } else
     {
@@ -1360,7 +1365,7 @@ void update_things_slb_graveyard_corner(struct LEVEL *lvl, int tx, int ty,
 //TODO: put the dry ice effect on right position!
     if (thing_eff==NULL)
     {
-      thing_eff=create_roomeffect(sx,sy,eff_stype_idx);
+      thing_eff=create_roomeffect(lvl,sx,sy,eff_stype_idx);
       thing_add(lvl,thing_eff);
     } else
     {
@@ -1608,7 +1613,7 @@ short update_thing_subpos_and_height(unsigned short *clm_height,unsigned char *t
  * Removes all things that usually exist only in specific rooms,
  * and aren't crucial for the game (like gates and dungeon hearts)
  */
-void remove_noncrucial_room_things(int tx, int ty)
+void remove_noncrucial_room_things(struct LEVEL *lvl,int tx, int ty)
 {
     int sx, sy, i;
     for (sx=tx*3; sx < tx*3+3; sx++)

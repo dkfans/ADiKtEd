@@ -265,6 +265,7 @@ struct DK_SCRIPT_COMMAND {
   };
 
 struct DK_SCRIPT;
+struct IPOINT_2D;
 
 //Functions for script analysis
 short decompose_script(struct DK_SCRIPT *script);
@@ -272,7 +273,7 @@ short decompose_script_command(struct DK_SCRIPT_COMMAND *cmd,char *text);
 //Functions for Adikted script execution
 short execute_script_line(struct LEVEL *lvl,char *line,char *err_msg);
 // Verification
-short txt_verify(struct LEVEL *lvl, char *err_msg);
+short txt_verify(struct LEVEL *lvl, char *err_msg,struct IPOINT_2D *errpt);
 
 //Working with text files
 void text_file_free(char **lines,int lines_count);

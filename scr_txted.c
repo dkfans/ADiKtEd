@@ -21,7 +21,7 @@ TXTED_DATA *editor;
 /*
  * Initializes variables for the scrpt screen.
  */
-short init_scrpt(void)
+short init_scrpt(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode)
 {
     //Creating and clearing scrpt variable
     editor=(TXTED_DATA *)malloc(sizeof(TXTED_DATA));
@@ -33,7 +33,7 @@ short init_scrpt(void)
 /*
  * Deallocates memory for the scrpt screen.
  */
-void free_scrpt(void)
+void free_scrpt(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode)
 {
   free(editor);
 }
@@ -42,7 +42,7 @@ void free_scrpt(void)
 /*
  * Covers actions from the scrpt screen.
  */
-void actions_scrpt(int key)
+void actions_scrpt(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl,int key)
 {
     switch (key)
     {
@@ -60,7 +60,7 @@ void actions_scrpt(int key)
       break;
     case KEY_TAB:
     case KEY_ESCAPE:
-      end_scrpt();
+      end_scrpt(scrmode,mapmode,lvl);
       message_info("Returned to last work mode");
       break;
     }
@@ -73,7 +73,7 @@ void actions_scrpt(int key)
 /*
  * Action function - start the scrpt mode.
  */
-short start_scrpt(struct LEVEL *lvl)
+short start_scrpt(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl)
 {
     editor->prevmode=scrmode->mode;
     editor->y=0;
@@ -87,7 +87,7 @@ short start_scrpt(struct LEVEL *lvl)
 /*
  * Action function - end the scrpt mode.
  */
-void end_scrpt()
+void end_scrpt(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl)
 {
     lvl->script.txt=editor->text;
     lvl->script.lines_count=editor->rows;
@@ -104,7 +104,7 @@ void end_scrpt()
 /*
  * Draws screen for the scrpt mode.
  */
-void draw_scrpt(void)
+void draw_scrpt(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl)
 {
     int i;
     for (i=0; i < scrmode->rows; i++)

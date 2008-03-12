@@ -61,6 +61,12 @@ Press F1 for help.
 
 TODO before final:
  Fixations in room things parameters (height,other)
+Version: 0.71b
+ Created some basic structs to close variables
+ When verifying level ('v') errors are now highlighted
+ Default effects range set to 5 subtiles
+ Some global variables replaced by locals
+ Fixed setting solid property for custom columns
 Version: 0.70b
  Map miniature size can be now changed in INI file
  Fixed damaging the script file

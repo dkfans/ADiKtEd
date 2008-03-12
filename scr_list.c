@@ -29,7 +29,7 @@ LIST_DATA *list;
 /*
  * Initializes variables for the list screen.
  */
-short init_list(void)
+short init_list(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode)
 {
     //Creating and clearing list variable
     list=(LIST_DATA *)malloc(sizeof(LIST_DATA));
@@ -41,7 +41,7 @@ short init_list(void)
 /*
  * Deallocates memory for the list screen.
  */
-void free_list(void)
+void free_list(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode)
 {
   free(list);
 }
@@ -49,31 +49,31 @@ void free_list(void)
 /*
  * Covers actions from the creature screen.
  */
-void actions_crtre(int key)
+void actions_crtre(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl,int key)
 {
     int sx, sy;
-    sx = (mapmode->mapx+mapmode->screenx)*3+mapmode->subtl_x;
-    sy = (mapmode->mapy+mapmode->screeny)*3+mapmode->subtl_y;
+    sx = (mapmode->map.x+mapmode->screen.x)*3+mapmode->subtl.x;
+    sy = (mapmode->map.y+mapmode->screen.y)*3+mapmode->subtl.y;
     unsigned char *thing;
     message_release();
-    if (!actions_list(key))
+    if (!actions_list(scrmode,mapmode,lvl,key))
     {
       switch (key)
       {
         case KEY_TAB:
         case KEY_DEL:
         case KEY_ESCAPE:
-          end_list();
+          end_list(scrmode,mapmode,lvl);
           message_info("Adding creature cancelled");
           break;
         case KEY_ENTER:
-          thing = create_creature(sx,sy,list->pos+1);
+          thing = create_creature(lvl,sx,sy,list->pos+1);
           set_thing_subtile_h(thing,1);
-          set_thing_owner(thing,get_tile_owner(lvl,mapmode->mapx+mapmode->screenx,mapmode->mapy+mapmode->screeny));
+          set_thing_owner(thing,get_tile_owner(lvl,mapmode->map.x+mapmode->screen.x,mapmode->map.y+mapmode->screen.y));
           thing_add(lvl,thing);
           // Show the new thing
-          mdtng->vistng[mapmode->subtl_x][mapmode->subtl_y]=get_object_subtl_last(lvl,sx,sy,OBJECT_TYPE_THING);
-          end_list();
+          mdtng->vistng[mapmode->subtl.x][mapmode->subtl.y]=get_object_subtl_last(lvl,sx,sy,OBJECT_TYPE_THING);
+          end_list(scrmode,mapmode,lvl);
           message_info("Creature added");
           break;
         default:
@@ -86,25 +86,25 @@ void actions_crtre(int key)
 /*
  * Covers actions from the item type screen.
  */
-void actions_itemt(int key)
+void actions_itemt(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl,int key)
 {
     unsigned char *thing;
-    int sx=(mapmode->mapx+mapmode->screenx)*3+mapmode->subtl_x;
-    int sy=(mapmode->mapy+mapmode->screeny)*3+mapmode->subtl_y;
+    int sx=(mapmode->map.x+mapmode->screen.x)*3+mapmode->subtl.x;
+    int sy=(mapmode->map.y+mapmode->screen.y)*3+mapmode->subtl.y;
     message_release();
-    if (!actions_list(key))
+    if (!actions_list(scrmode,mapmode,lvl,key))
     {
       switch (key)
       {
         case KEY_TAB:
         case KEY_DEL:
         case KEY_ESCAPE:
-          end_list();
+          end_list(scrmode,mapmode,lvl);
           message_info("Adding thing cancelled");
           break;
         case KEY_ENTER:
-          tng_makeitem(sx,sy,list->pos+1);
-          end_list();
+          tng_makeitem(scrmode,mapmode,lvl,sx,sy,list->pos+1);
+          end_list(scrmode,mapmode,lvl);
           message_info("Item added");
           break;
         default:
@@ -117,22 +117,22 @@ void actions_itemt(int key)
 /*
  * Covers actions from texture selection screen.
  */
-void actions_mdtextr(int key)
+void actions_mdtextr(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl,int key)
 {
     message_release();
-    if (!actions_list(key))
+    if (!actions_list(scrmode,mapmode,lvl,key))
     {
       switch (key)
       {
         case KEY_TAB:
         case KEY_DEL:
         case KEY_ESCAPE:
-          end_list();
+          end_list(scrmode,mapmode,lvl);
           message_info("Texture change cancelled");
           break;
         case KEY_ENTER:
           lvl->inf=list->pos;
-          end_list();
+          end_list(scrmode,mapmode,lvl);
           message_info("Texture changed");
           break;
         default:
@@ -145,21 +145,21 @@ void actions_mdtextr(int key)
 /*
  * Covers actions from custom columns screen.
  */
-void actions_mdcclm(int key)
+void actions_mdcclm(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl,int key)
 {
     struct DK_CUSTOM_CLM *cclm_recs[9];
     struct COLUMN_REC *clm_recs[9];
-    int tx=(mapmode->mapx+mapmode->screenx);
-    int ty=(mapmode->mapy+mapmode->screeny);
+    int tx=(mapmode->map.x+mapmode->screen.x);
+    int ty=(mapmode->map.y+mapmode->screen.y);
     message_release();
-    if (!actions_list(key))
+    if (!actions_list(scrmode,mapmode,lvl,key))
     {
       switch (key)
       {
         case KEY_TAB:
         case KEY_DEL:
         case KEY_ESCAPE:
-          end_list();
+          end_list(scrmode,mapmode,lvl);
           message_info("Customization cancelled");
           break;
         case KEY_ENTER:
@@ -175,14 +175,14 @@ void actions_mdcclm(int key)
             unsigned char *surr_slb=(unsigned char *)malloc(9*sizeof(unsigned char));
             unsigned char *surr_own=(unsigned char *)malloc(9*sizeof(unsigned char));
             unsigned char **surr_tng=(unsigned char **)malloc(9*sizeof(unsigned char *));
-            get_slab_surround(surr_slb,surr_own,surr_tng,tx,ty);
+            get_slab_surround(surr_slb,surr_own,surr_tng,lvl,tx,ty);
             fill_custom_column_data(list->pos,clm_recs,surr_slb,surr_own,surr_tng);
             for (k=0;k<3;k++)
               for (i=0;i<3;i++)
               {
                 cust_col_add_or_update(lvl,tx*3+i,ty*3+k,cclm_recs[k*3+i]);
               }
-            end_list();
+            end_list(scrmode,mapmode,lvl);
             message_info("Custom columns set");
           };break;
         default:
@@ -195,22 +195,22 @@ void actions_mdcclm(int key)
 /*
  * Covers actions from slab list screen.
  */
-void actions_mdslbl(int key)
+void actions_mdslbl(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl,int key)
 {
     message_release();
-    if (!actions_list(key))
+    if (!actions_list(scrmode,mapmode,lvl,key))
     {
       switch (key)
       {
         case KEY_TAB:
         case KEY_DEL:
         case KEY_ESCAPE:
-          end_list();
+          end_list(scrmode,mapmode,lvl);
           message_info("Slab change cancelled");
           break;
         case KEY_ENTER:
           slb_place_room(lvl,mapmode,list->pos);
-          end_list();
+          end_list(scrmode,mapmode,lvl);
           message_info("New slab placed");
           break;
         default:
@@ -223,21 +223,21 @@ void actions_mdslbl(int key)
 /*
  * Covers actions from object search screen.
  */
-void actions_mdsrch(int key)
+void actions_mdsrch(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl,int key)
 {
     message_release();
-    if (!actions_list(key))
+    if (!actions_list(scrmode,mapmode,lvl,key))
     {
       switch (key)
       {
         case KEY_TAB:
         case KEY_DEL:
         case KEY_ESCAPE:
-          end_list();
+          end_list(scrmode,mapmode,lvl);
           message_info("Object search cancelled");
           break;
         case KEY_ENTER:
-          end_list();
+          end_list(scrmode,mapmode,lvl);
           if (list->pos==0)
           {
             clear_highlight(mapmode);
@@ -268,7 +268,7 @@ void actions_mdsrch(int key)
 /*
  * Covers actions from all screens with numbered list.
  */
-short actions_list(int key)
+short actions_list(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl,int key)
 {
     int num_rows=(list->items)/(list->cols)
                         + (((list->items)%(list->cols))>0);
@@ -314,7 +314,7 @@ short actions_list(int key)
 /*
  * Action function - start any of the the list modes.
  */
-short start_list(struct LEVEL *lvl,int lstmode)
+short start_list(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl,int lstmode)
 {
     list->prevmode=scrmode->mode;
     list->pos=0; // selected item position (rel. to screen top)
@@ -331,10 +331,10 @@ short start_list(struct LEVEL *lvl,int lstmode)
 /*
  * Action function - start texture selection mode.
  */
-short start_mdtextr(struct LEVEL *lvl)
+short start_mdtextr(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl)
 {
     short result;
-    result=start_list(lvl,MD_TXTR);
+    result=start_list(scrmode,mapmode,lvl,MD_TXTR);
     list->pos=lvl->inf;
     return result;
 }
@@ -342,12 +342,12 @@ short start_mdtextr(struct LEVEL *lvl)
 /*
  * Action function - start slab list mode.
  */
-short start_mdslbl(struct LEVEL *lvl)
+short start_mdslbl(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl)
 {
-    int tx=mapmode->mapx+mapmode->screenx;
-    int ty=mapmode->mapy+mapmode->screeny;
+    int tx=mapmode->map.x+mapmode->screen.x;
+    int ty=mapmode->map.y+mapmode->screen.y;
     short result;
-    result=start_list(lvl,MD_SLBL);
+    result=start_list(scrmode,mapmode,lvl,MD_SLBL);
     list->pos=get_tile_slab(lvl,tx,ty);
     return result;
 }
@@ -355,7 +355,7 @@ short start_mdslbl(struct LEVEL *lvl)
 /*
  * Action function - end any of the the list modes.
  */
-void end_list()
+void end_list(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl)
 {
     if (scrmode->mode!=list->prevmode)
       scrmode->mode=list->prevmode;
@@ -369,6 +369,7 @@ void end_list()
  * and key help for given screen.
  */
 void draw_numbered_list(char *(*itemstr)(unsigned short),
+        struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,
         unsigned int start_idx,unsigned int end_idx,unsigned int itm_width)
 {
     unsigned int line_length=min(scrmode->cols,LINEMSG_SIZE);
@@ -409,12 +410,12 @@ void draw_numbered_list(char *(*itemstr)(unsigned short),
     int scr_row=display_mode_keyhelp(0,scrmode->cols+3,scrmode->mode);
 }
 
-void draw_crtre()
+void draw_crtre(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl)
 {
     int all_rows=get_screen_rows();
     int all_cols=get_screen_cols();
 
-    draw_numbered_list(get_creature_subtype_fullname,1,CREATR_SUBTP_FLOAT,16);
+    draw_numbered_list(get_creature_subtype_fullname,scrmode,mapmode,1,CREATR_SUBTP_FLOAT,16);
     int scr_col1=scrmode->cols+3;
     // Display more info about the creature
     if (all_rows > 7)
@@ -430,33 +431,33 @@ void draw_crtre()
     set_cursor_pos(get_screen_rows()-1, 17);
 }
 
-void draw_itemt()
+void draw_itemt(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl)
 {
-    draw_numbered_list(get_item_subtype_fullname,1,ITEM_SUBTYPE_SPELLARMG,18);
+    draw_numbered_list(get_item_subtype_fullname,scrmode,mapmode,1,ITEM_SUBTYPE_SPELLARMG,18);
     set_cursor_pos(get_screen_rows()-1, 17);
 }
 
-void draw_mdtextr()
+void draw_mdtextr(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl)
 {
-    draw_numbered_list(get_texture_fullname,0,INF_MAX_INDEX,55);
+    draw_numbered_list(get_texture_fullname,scrmode,mapmode,0,INF_MAX_INDEX,55);
     set_cursor_pos(get_screen_rows()-1, 17);
 }
 
-void draw_mdcclm()
+void draw_mdcclm(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl)
 {
-    draw_numbered_list(get_custom_column_fullname,0,CUST_CLM_GEN_MAX_INDEX,18);
+    draw_numbered_list(get_custom_column_fullname,scrmode,mapmode,0,CUST_CLM_GEN_MAX_INDEX,18);
     set_cursor_pos(get_screen_rows()-1, 17);
 }
 
-void draw_mdslbl()
+void draw_mdslbl(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl)
 {
-    draw_numbered_list(get_slab_fullname,0,SLAB_TYPE_GUARDPOST,17);
+    draw_numbered_list(get_slab_fullname,scrmode,mapmode,0,SLAB_TYPE_GUARDPOST,17);
     set_cursor_pos(get_screen_rows()-1, 17);
 }
 
-void draw_mdsrch()
+void draw_mdsrch(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl)
 {
-    draw_mdempty();
-    draw_numbered_list(get_search_objtype_name,0,get_search_objtype_count()-1,18);
+    draw_mdempty(scrmode,mapmode,lvl);
+    draw_numbered_list(get_search_objtype_name,scrmode,mapmode,0,get_search_objtype_count()-1,18);
     set_cursor_pos(get_screen_rows()-1, 17);
 }

@@ -6,6 +6,8 @@
 #define ADIKT_SCRTHING_H
 
 struct LEVEL;
+struct SCRMODE_DATA;
+struct MAPMODE_DATA;
 
 // Variables
 
@@ -17,31 +19,31 @@ typedef struct {
 extern MDTNG_DATA *mdtng;
 
 //Functions - init and free
-short init_mdtng(void);
-void free_mdtng(void);
+short init_mdtng(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode);
+void free_mdtng(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode);
 
 //Functions - start and stop
-short start_mdtng(struct LEVEL *lvl);
-void end_mdtng(void);
+short start_mdtng(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl);
+void end_mdtng(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl);
 
 //Functions - actions and screen
-void actions_mdtng(int key);
-void draw_mdtng();
-void draw_mdtng_panel();
+void actions_mdtng(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl,int key);
+void draw_mdtng(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl);
+void draw_mdtng_panel(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl);
 
 //Functions - lower level
 void change_visited_tile(void);
 int display_thing(unsigned char *thing, int x, int y);
 int display_action_point(unsigned char *actnpt, int x, int y);
 int display_static_light(unsigned char *stlight, int x, int y);
-int display_obj_stats(int scr_row, int scr_col);
-int display_tng_subtiles(int scr_row, int scr_col,int ty,int tx);
+int display_obj_stats(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,const struct LEVEL *lvl, int scr_row, int scr_col);
+int display_tng_subtiles(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,const struct LEVEL *lvl, int scr_row, int scr_col,int ty,int tx);
 
 //Functions - internal
-char get_thing_char(int x, int y);
+char get_thing_char(const struct LEVEL *lvl, int x, int y);
 int get_tng_display_color(short obj_type,unsigned char obj_owner,short marked);
-void tng_makeitem(int sx,int sy,unsigned char stype_idx);
-void tng_change_height(struct LEVEL *lvl, unsigned int sx, unsigned int sy,unsigned int z,int delta_height);
-void tng_change_range(struct LEVEL *lvl, unsigned int sx, unsigned int sy,unsigned int z,int delta_range);
+void tng_makeitem(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl,int sx,int sy,unsigned char stype_idx);
+void tng_change_height(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl, unsigned int sx, unsigned int sy,unsigned int z,int delta_height);
+void tng_change_range(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl, unsigned int sx, unsigned int sy,unsigned int z,int delta_range);
 
 #endif // ADIKT_SCRTHING_H

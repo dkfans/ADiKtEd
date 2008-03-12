@@ -5,6 +5,10 @@
 #ifndef ADIKT_VARUTILS_H
 #define ADIKT_VARUTILS_H
 
+struct SCRMODE_DATA;
+struct MAPMODE_DATA;
+struct LEVEL;
+
 void init_messages();
 void free_messages();
 
@@ -28,6 +32,6 @@ short format_data_fname(char **fullname, const char *format, ...);
 int rnd(int range);
 
 void die(const char *format, ...);
-void done(void);
+void done(struct SCRMODE_DATA **scrmode,struct MAPMODE_DATA **mapmode,struct LEVEL **lvl);
 
 #endif // ADIKT_VARUTILS_H

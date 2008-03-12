@@ -6,6 +6,8 @@
 #define ADIKT_SCRLIST_H
 
 struct LEVEL;
+struct SCRMODE_DATA;
+struct MAPMODE_DATA;
 
 //Variables for navigating in list screen
 
@@ -20,34 +22,35 @@ typedef struct {
 extern LIST_DATA *list;
 
 //Functions - init and free
-short init_list(void);
-void free_list(void);
+short init_list(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode);
+void free_list(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode);
 
 //Functions - start and stop
-short start_list(struct LEVEL *lvl,int lstmode);
-void end_list(void);
-short start_mdtextr(struct LEVEL *lvl);
-short start_mdslbl(struct LEVEL *lvl);
+short start_list(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl,int lstmode);
+void end_list(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl);
+short start_mdtextr(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl);
+short start_mdslbl(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl);
 
 //Functions - actions and screen
-void draw_crtre();
-void actions_crtre(int key);
-void draw_itemt();
-void actions_itemt(int key);
-void draw_mdtextr();
-void actions_mdtextr(int key);
-void draw_mdcclm();
-void actions_mdcclm(int key);
-void draw_mdcube();
-void actions_mdcube(int key);
-void draw_mdslbl();
-void actions_mdslbl(int key);
-void draw_mdsrch();
-void actions_mdsrch(int key);
+void draw_crtre(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl);
+void actions_crtre(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl,int key);
+void draw_itemt(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl);
+void actions_itemt(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl,int key);
+void draw_mdtextr(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl);
+void actions_mdtextr(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl,int key);
+void draw_mdcclm(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl);
+void actions_mdcclm(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl,int key);
+void draw_mdcube(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl);
+void actions_mdcube(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl,int key);
+void draw_mdslbl(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl);
+void actions_mdslbl(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl,int key);
+void draw_mdsrch(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl);
+void actions_mdsrch(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl,int key);
 
 //Functions - lower level
-short actions_list(int key);
+short actions_list(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl,int key);
 void draw_numbered_list(char *(*itemstr)(unsigned short),
+        struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,
         unsigned int start_idx,unsigned int end_idx,unsigned int itm_width);
 
 //Functions - internal

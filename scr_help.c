@@ -19,7 +19,7 @@ const char *help_filename="map.hlp";
 
 HELP_DATA *help;
 
-short init_help(void)
+short init_help(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode)
 {
     //Creating and clearing help variable
     help=(HELP_DATA *)malloc(sizeof(HELP_DATA));
@@ -143,7 +143,7 @@ short init_help(void)
 /*
  * Deallocates memory for the help screen.
  */
-void free_help(void)
+void free_help(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode)
 {
   free(help);
 }
@@ -151,7 +151,7 @@ void free_help(void)
 /*
  * Covers actions from the help screen.
  */
-void actions_help(int key)
+void actions_help(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl,int key)
 {
     switch (key)
     {
@@ -168,7 +168,7 @@ void actions_help(int key)
       help->y+=scrmode->rows-1;
       break;
     default:
-      end_help();
+      end_help(scrmode,mapmode,lvl);
     }
     if (help->y+scrmode->rows > help->rows)
       help->y=help->rows-scrmode->rows;
@@ -298,7 +298,7 @@ char ***match_title(char *title, int n)
 /*
  * Action function - start the help mode.
  */
-short start_help(struct LEVEL *lvl)
+short start_help(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl)
 {
     help->formode=scrmode->mode;
     help->y=0;
@@ -371,7 +371,7 @@ short start_help(struct LEVEL *lvl)
 /*
  * Action function - end the help mode.
  */
-void end_help()
+void end_help(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl)
 {
     if (scrmode->mode!=help->formode)
       scrmode->mode=help->formode;
@@ -381,7 +381,7 @@ void end_help()
     message_info("Returned to last work mode.");
 }
 
-void draw_help()
+void draw_help(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl)
 {
     int i;
     for (i=0; i < scrmode->rows; i++)

@@ -23,22 +23,24 @@ typedef struct {
 extern RWRK_DATA *mdrwrk;
 
 struct LEVEL;
+struct SCRMODE_DATA;
+struct MAPMODE_DATA;
 
 //Functions - init and free
-short init_mdrwrk(void);
-void free_mdrwrk(void);
+short init_mdrwrk(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode);
+void free_mdrwrk(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode);
 
 //Functions - start and stop
-short start_mdrwrk(struct LEVEL *lvl);
-void end_mdrwrk(void);
+short start_mdrwrk(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl);
+void end_mdrwrk(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl);
 
 //Functions - actions and screen
-void actions_mdrwrk(int key);
-void draw_mdrwrk();
-void draw_mdrwrk_panel();
+void actions_mdrwrk(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl,int key);
+void draw_mdrwrk(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl);
+void draw_mdrwrk_panel(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl);
 
 //Functions - lower level
-void draw_rework_map_area(struct LEVEL *lvl,RWRK_DATA *mdrwrk);
+void draw_rework_map_area(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl,RWRK_DATA *mdrwrk);
 int get_rework_map_tile_char(struct LEVEL *lvl,int sx,int sy,unsigned short view);
 
 //Functions - internal

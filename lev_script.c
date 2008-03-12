@@ -440,11 +440,10 @@ short execute_adikted_command(struct LEVEL *lvl,struct DK_SCRIPT_COMMAND *cmd,ch
        ccol=create_cust_col();
        struct COLUMN_REC *clm_rec=ccol->rec;
        ccol->wib_val=wib_val;
+       fill_column_rec_sim(clm_rec, 0, base,
+           c[0],c[1],c[2],c[3],c[4],c[5],c[6],c[7]);
        clm_rec->lintel=lintel;
        clm_rec->orientation=orient;
-       clm_rec->base=base;
-       for (i=0;i<8;i++)
-           clm_rec->c[i]=c[i];
        //Adding custom column to level
        cust_col_add_or_update(lvl,sx,sy,ccol);
        return true;
@@ -508,7 +507,7 @@ short execute_adikted_command(struct LEVEL *lvl,struct DK_SCRIPT_COMMAND *cmd,ch
  * Verifies TXT entries. Returns VERIF_ERROR,
  * VERIF_WARN or VERIF_OK
  */
-short txt_verify(struct LEVEL *lvl, char *err_msg)
+short txt_verify(struct LEVEL *lvl, char *err_msg,struct IPOINT_2D *errpt)
 {
     //Sweeping through TXT entries
     int i;
@@ -1083,7 +1082,7 @@ short add_graffiti_to_script(char ***lines,int *lines_count,struct LEVEL *lvl)
           graftxt[k]=c;
       }
       graftxt[graf_len]='\0';
-      sprintf(line,"%s(%d,%d,%d,%s,%s,0x%03x,%s)",graffiti_cmdtext,graf->tx,graf->ty,graf->height,
+      sprintf(line,"%s(%d,%d,%d,%s,%s,0x%03x,%s)",graffiti_cmdtext,graf->tile.x,graf->tile.y,graf->height,
                 orient_cmd_text(graf->orient),font_cmd_text(graf->font),graf->cube,graftxt);
       text_file_linecp_add(lines,lines_count,line);
     }

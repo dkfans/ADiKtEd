@@ -12,7 +12,7 @@
 #include <slang.h>
 
 short screen_initied=false;
-extern struct LEVEL *lvl;
+struct DRAW_DATA drawdata;
 
 #if defined(unix) && !defined(GO32)
 int sigwinch (int sigtype);
@@ -306,7 +306,7 @@ void screen_reinit_and_update(void)
     SLsmg_reset_smg();
     get_screen_size();
     SLsmg_init_smg();
-    draw_levscr(lvl);
+    draw_levscr(drawdata.scrmode,drawdata.mapmode,drawdata.lvl);
 }
 
 /*

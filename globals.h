@@ -72,13 +72,43 @@ struct memory_file
 
 struct memory_file read_file(char *iname);
 
+struct IPOINT_2D {
+    int x;
+    int y;
+};
+
+struct IPOINT_3D {
+    int x;
+    int y;
+    int z;
+};
+
+struct UPOINT_2D {
+    unsigned int x;
+    unsigned int y;
+};
+
+struct UPOINT_3D {
+    unsigned int x;
+    unsigned int y;
+    unsigned int z;
+};
+
+struct USPOINT_2D {
+    unsigned short x;
+    unsigned short y;
+};
+
+struct IRECT_2D {
+    int l;
+    int r;
+    int t;
+    int b;
+};
+
 // File handling variables
 extern char *levels_path;
 extern char *data_path;
-
-// The way DAT entries are shown
-extern short dat_view_mode;
-extern short show_obj_range;
 
 // True means DAT/CLM/WIB are updated automatically
 extern short datclm_auto_update;

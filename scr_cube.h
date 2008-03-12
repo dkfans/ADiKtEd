@@ -8,6 +8,8 @@
 // Variables
 
 struct LEVEL;
+struct SCRMODE_DATA;
+struct MAPMODE_DATA;
 
 typedef struct {
     struct DK_CUSTOM_CLM *cclm_rec;
@@ -17,16 +19,16 @@ typedef struct {
 extern MDCUBE_DATA *mdcube;
 
 //Functions - init and free
-short init_mdcube(void);
-void free_mdcube(void);
+short init_mdcube(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode);
+void free_mdcube(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode);
 
 //Functions - start and stop
-short start_mdcube(struct LEVEL *lvl);
-void end_mdcube(void);
+short start_mdcube(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl);
+void end_mdcube(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl);
 
 //Functions - actions and screen
-void actions_mdcube(int key);
-void draw_mdcube(void);
+void actions_mdcube(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl,int key);
+void draw_mdcube(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl);
 
 //Functions - lower level
 

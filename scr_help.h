@@ -6,9 +6,10 @@
 #define ADIKT_SCRHELP_H
 
 struct LEVEL;
+struct SCRMODE_DATA;
+struct MAPMODE_DATA;
 
 // Help variables
-
 typedef struct {
     int formode;
     int y;
@@ -66,17 +67,17 @@ typedef struct {
 extern HELP_DATA *help;
 
 //Functions - init and free
-short init_help(void);
-void free_help(void);
+short init_help(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode);
+void free_help(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode);
 short init_key_help(int mode);
 
 //Functions - start and stop
-short start_help(struct LEVEL *lvl);
-void end_help(void);
+short start_help(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl);
+void end_help(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl);
 
 //Functions - actions and screen
-void actions_help(int key);
-void draw_help();
+void actions_help(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl,int key);
+void draw_help(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl);
 
 //Functions - lower level
 void draw_help_line(int posy,int posx,char *text);

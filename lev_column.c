@@ -68,7 +68,7 @@ int column_find_or_create(struct LEVEL *lvl,struct COLUMN_REC *clm_rec)
   clm_rec2=create_column_rec();
   for (num=0;num<COLUMN_ENTRIES;num++)
   {
-      if (clm_entry_is_used(num))
+      if (clm_entry_is_used(lvl,num))
       {
         clmentry = (unsigned char *)(lvl->clm[num]);
         get_clm_entry(clm_rec2, clmentry);
@@ -110,7 +110,7 @@ int column_get_free_index(struct LEVEL *lvl)
   // Skip the first one - it is always zero-filled entry
   for (num=1;num<COLUMN_ENTRIES;num++)
   {
-      if (!clm_entry_is_used(num))
+      if (!clm_entry_is_used(lvl,num))
           return num;
   }
   return -1;
@@ -222,7 +222,7 @@ void update_datclm_for_slab(struct LEVEL *lvl, int tx, int ty)
   unsigned char *surr_slb=(unsigned char *)malloc(9*sizeof(unsigned char));
   unsigned char *surr_own=(unsigned char *)malloc(9*sizeof(unsigned char));
   unsigned char **surr_tng=(unsigned char **)malloc(9*sizeof(unsigned char *));
-  get_slab_surround(surr_slb,surr_own,surr_tng,tx,ty);
+  get_slab_surround(surr_slb,surr_own,surr_tng,lvl,tx,ty);
   int i;
   // Creating CoLuMn for each subtile
   struct COLUMN_REC *clm_recs[9];
@@ -246,7 +246,7 @@ void update_datclm_for_slab(struct LEVEL *lvl, int tx, int ty)
  * Returns slab surrounding information, needed for CLM generation.
  */
 void get_slab_surround(unsigned char *surr_slb,unsigned char *surr_own,
-        unsigned char **surr_tng,int x, int y)
+        unsigned char **surr_tng,const struct LEVEL *lvl,int x, int y)
 {
     //Note: the surround[] array indexing must be set in a way
     // that gives right directions if IDIR_* constants are used.
@@ -412,7 +412,7 @@ void clm_utilize_inc(struct LEVEL *lvl, int clmidx)
  * Verifies column values. Returns VERIF_ERROR,
  * VERIF_WARN or VERIF_OK
  */
-short columns_verify(struct LEVEL *lvl, char *err_msg)
+short columns_verify(struct LEVEL *lvl, char *err_msg,struct IPOINT_2D *errpt)
 {
     //Preparing array bounds
     int arr_entries_x=MAP_SIZE_X*MAP_SUBNUM_X;
@@ -704,7 +704,7 @@ void set_dat_unif (struct LEVEL *lvl, int x, int y, int d)
  * Verifies DAT values. Returns VERIF_ERROR,
  * VERIF_WARN or VERIF_OK
  */
-short dat_verify(struct LEVEL *lvl, char *err_msg)
+short dat_verify(struct LEVEL *lvl, char *err_msg,struct IPOINT_2D *errpt)
 {
     //Preparing array bounds
     int dat_entries_x=MAP_SIZE_X*MAP_SUBNUM_X+1;
@@ -717,7 +717,9 @@ short dat_verify(struct LEVEL *lvl, char *err_msg)
           int dat_idx=get_dat_subtile(lvl, i, k);
           if ((dat_idx<0)||(dat_idx>=COLUMN_ENTRIES))
           {
-              sprintf(err_msg,"DAT index out of bounds at slab %d,%d.",i/MAP_SUBNUM_X, k/MAP_SUBNUM_Y);
+              errpt->x=i/MAP_SUBNUM_X;
+              errpt->y=k/MAP_SUBNUM_Y;
+              sprintf(err_msg,"DAT index out of bounds at slab %d,%d.",errpt->x,errpt->y);
               return VERIF_ERROR;
           }
       }
@@ -727,7 +729,7 @@ short dat_verify(struct LEVEL *lvl, char *err_msg)
 /*
  * Returns if the column entry is used, or unused and can be overwritten.
  */
-short clm_entry_is_used(unsigned int clmidx)
+short clm_entry_is_used(const struct LEVEL *lvl,unsigned int clmidx)
 {
     unsigned char *clmentry;
     clmentry = (unsigned char *)(lvl->clm[clmidx]);
@@ -745,7 +747,7 @@ short update_dat_last_column(struct LEVEL *lvl, unsigned short slab)
   unsigned char *surr_slb=(unsigned char *)malloc(9*sizeof(unsigned char));
   unsigned char *surr_own=(unsigned char *)malloc(9*sizeof(unsigned char));
   unsigned char **surr_tng=(unsigned char **)malloc(9*sizeof(unsigned char *));
-  get_slab_surround(surr_slb,surr_own,surr_tng,MAP_SIZE_X,MAP_SIZE_Y);
+  get_slab_surround(surr_slb,surr_own,surr_tng,lvl,MAP_SIZE_X,MAP_SIZE_Y);
   surr_slb[IDIR_CENTR]=slab;
   int i;
   // Creating CoLuMn for each subtile

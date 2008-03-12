@@ -129,8 +129,8 @@ short load_texture(struct MAPDRAW_DATA *draw_data,char *fname)
     return ERR_NONE;
 }
 
-short place_sprite_on_buf_rgb(unsigned char *dest,const struct MAPDRAW_POINT dest_pos,
-    const struct MAPDRAW_POINT dest_size,struct PALETTE_ENTRY *pal,const struct IMAGEITEM *spr)
+short place_sprite_on_buf_rgb(unsigned char *dest,const struct IPOINT_2D dest_pos,
+    const struct IPOINT_2D dest_size,struct PALETTE_ENTRY *pal,const struct IMAGEITEM *spr)
 {
     long dest_idx=((dest_pos.y-(spr->height>>1))*dest_size.x*3);
     unsigned long src_idx=0;
@@ -162,9 +162,9 @@ short place_sprite_on_buf_rgb(unsigned char *dest,const struct MAPDRAW_POINT des
     return true;
 }
 
-short draw_rect_mul_on_buffer(unsigned char *dest,const struct MAPDRAW_POINT dest_pos,
-    const struct MAPDRAW_POINT dest_size,const struct MAPDRAW_POINT rect_size,
-    const struct PALETTE_ENTRY *pxdata,const struct MAPDRAW_POINT scale)
+short draw_rect_mul_on_buffer(unsigned char *dest,const struct IPOINT_2D dest_pos,
+    const struct IPOINT_2D dest_size,const struct IPOINT_2D rect_size,
+    const struct PALETTE_ENTRY *pxdata,const struct IPOINT_2D scale)
 {
     unsigned long dest_idx=(dest_pos.y*dest_size.x*3);
     unsigned long dest_fullsize=dest_size.x*dest_size.y*3;
@@ -194,9 +194,9 @@ short draw_rect_mul_on_buffer(unsigned char *dest,const struct MAPDRAW_POINT des
     return true;
 }
 
-short draw_rect_sum_on_buffer(unsigned char *dest,const struct MAPDRAW_POINT dest_pos,
-    const struct MAPDRAW_POINT dest_size,const struct MAPDRAW_POINT rect_size,
-    const struct PALETTE_ENTRY *pxdata,const struct MAPDRAW_POINT scale)
+short draw_rect_sum_on_buffer(unsigned char *dest,const struct IPOINT_2D dest_pos,
+    const struct IPOINT_2D dest_size,const struct IPOINT_2D rect_size,
+    const struct PALETTE_ENTRY *pxdata,const struct IPOINT_2D scale)
 {
     unsigned long dest_idx=(dest_pos.y*dest_size.x*3);
     unsigned long dest_fullsize=dest_size.x*dest_size.y*3;
@@ -225,10 +225,10 @@ short draw_rect_sum_on_buffer(unsigned char *dest,const struct MAPDRAW_POINT des
     return true;
 }
 
-short draw_texture_on_buffer(unsigned char *dest,const struct MAPDRAW_POINT dest_pos,
-    const struct MAPDRAW_POINT dest_size,const unsigned char *src,const struct MAPDRAW_POINT src_pos,
-    const struct MAPDRAW_POINT src_size,const struct MAPDRAW_POINT rect_size,
-    struct PALETTE_ENTRY *pal,const struct MAPDRAW_POINT scale)
+short draw_texture_on_buffer(unsigned char *dest,const struct IPOINT_2D dest_pos,
+    const struct IPOINT_2D dest_size,const unsigned char *src,const struct IPOINT_2D src_pos,
+    const struct IPOINT_2D src_size,const struct IPOINT_2D rect_size,
+    struct PALETTE_ENTRY *pal,const struct IPOINT_2D scale)
 {
     unsigned long dest_idx=(dest_pos.y*dest_size.x*3);
     unsigned long src_idx=(src_pos.y*src_size.x);
@@ -320,18 +320,18 @@ short draw_texture_on_buffer(unsigned char *dest,const struct MAPDRAW_POINT dest
 
 short draw_map_on_buffer(char *dst,const struct LEVEL *lvl,const struct MAPDRAW_DATA *draw_data)
 {
-    struct MAPDRAW_POINT texture_size={TEXTURE_SIZE_X*TEXTURE_COUNT_X,TEXTURE_SIZE_Y*TEXTURE_COUNT_Y};
-    struct MAPDRAW_POINT single_txtr_size={TEXTURE_SIZE_X,TEXTURE_SIZE_Y};
-    struct MAPDRAW_POINT dest_size={draw_data->end.x-draw_data->start.x+1,draw_data->end.y-draw_data->start.y+1};
-    struct MAPDRAW_POINT texture_pos;
-    struct MAPDRAW_POINT dest_pos;
-    struct MAPDRAW_POINT scale={1<<(draw_data->rescale),1<<(draw_data->rescale)};
-    struct MAPDRAW_POINT scaled_txtr_size={TEXTURE_SIZE_X>>(draw_data->rescale),TEXTURE_SIZE_Y>>(draw_data->rescale)};
+    struct IPOINT_2D texture_size={TEXTURE_SIZE_X*TEXTURE_COUNT_X,TEXTURE_SIZE_Y*TEXTURE_COUNT_Y};
+    struct IPOINT_2D single_txtr_size={TEXTURE_SIZE_X,TEXTURE_SIZE_Y};
+    struct IPOINT_2D dest_size={draw_data->end.x-draw_data->start.x+1,draw_data->end.y-draw_data->start.y+1};
+    struct IPOINT_2D texture_pos;
+    struct IPOINT_2D dest_pos;
+    struct IPOINT_2D scale={1<<(draw_data->rescale),1<<(draw_data->rescale)};
+    struct IPOINT_2D scaled_txtr_size={TEXTURE_SIZE_X>>(draw_data->rescale),TEXTURE_SIZE_Y>>(draw_data->rescale)};
     //Finding start/end of the drawing area
-    struct MAPDRAW_POINT start;
+    struct IPOINT_2D start;
     start.x = draw_data->start.x/scaled_txtr_size.x;
     start.y = draw_data->start.y/scaled_txtr_size.y;
-    struct MAPDRAW_POINT end;
+    struct IPOINT_2D end;
     end.x = draw_data->end.x/scaled_txtr_size.x + ((draw_data->end.x%scaled_txtr_size.x)>0);
     end.y = draw_data->end.y/scaled_txtr_size.y + ((draw_data->end.y%scaled_txtr_size.y)>0);
     int i,j;
@@ -411,16 +411,16 @@ short draw_map_on_buffer(char *dst,const struct LEVEL *lvl,const struct MAPDRAW_
 
 short draw_things_on_buffer(char *dst,const struct LEVEL *lvl,const struct MAPDRAW_DATA *draw_data)
 {
-    struct MAPDRAW_POINT scaled_txtr_size={(TEXTURE_SIZE_X>>(draw_data->rescale)),(TEXTURE_SIZE_Y>>(draw_data->rescale))};
+    struct IPOINT_2D scaled_txtr_size={(TEXTURE_SIZE_X>>(draw_data->rescale)),(TEXTURE_SIZE_Y>>(draw_data->rescale))};
     //Finding start/end subtile of the drawing area
-    struct MAPDRAW_POINT start;
+    struct IPOINT_2D start;
     start.x = draw_data->start.x/scaled_txtr_size.x;
     start.y = draw_data->start.y/scaled_txtr_size.y;
-    struct MAPDRAW_POINT end;
+    struct IPOINT_2D end;
     end.x = draw_data->end.x/scaled_txtr_size.x + ((draw_data->end.x%scaled_txtr_size.x)>0);
     end.y = draw_data->end.y/scaled_txtr_size.y + ((draw_data->end.y%scaled_txtr_size.y)>0);
-    struct MAPDRAW_POINT dest_scaled_size={(end.x-start.x)*scaled_txtr_size.x,(end.y-start.y)*scaled_txtr_size.y};
-    struct MAPDRAW_POINT dest_pos;
+    struct IPOINT_2D dest_scaled_size={(end.x-start.x)*scaled_txtr_size.x,(end.y-start.y)*scaled_txtr_size.y};
+    struct IPOINT_2D dest_pos;
     // Looping through coords and placing things - first pass, the background things
     int i,j,k;
     for (j=start.y; j<end.y; j++)
@@ -498,7 +498,7 @@ short draw_things_on_buffer(char *dst,const struct LEVEL *lvl,const struct MAPDR
     return true;
 }
 
-short write_bitmap_rgb(const char *fname,const unsigned char *data,const struct MAPDRAW_POINT size)
+short write_bitmap_rgb(const char *fname,const unsigned char *data,const struct IPOINT_2D size)
 {
     if ((fname==NULL)||(data==NULL))
     {
@@ -572,8 +572,8 @@ short generate_map_bitmap(const char *bmpfname,const struct LEVEL *lvl,const sho
     }
     if (draw_data->palette==NULL)
       die ("generate_map_bitmap: Out of memory.");
-    struct MAPDRAW_POINT textr_size={TEXTURE_SIZE_X>>rescale,TEXTURE_SIZE_Y>>rescale};
-    struct MAPDRAW_POINT bmp_size;
+    struct IPOINT_2D textr_size={TEXTURE_SIZE_X>>rescale,TEXTURE_SIZE_Y>>rescale};
+    struct IPOINT_2D bmp_size;
     // Settings to draw whole map
     bmp_size.x=textr_size.x*MAP_SIZE_X*MAP_SUBNUM_X;
     bmp_size.y=textr_size.y*MAP_SIZE_Y*MAP_SUBNUM_Y;

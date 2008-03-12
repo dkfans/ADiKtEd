@@ -19,7 +19,7 @@
 /*
  * Initializes variables for the column screen.
  */
-short init_mdclm(void)
+short init_mdclm(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode)
 {
     return true;
 }
@@ -27,7 +27,7 @@ short init_mdclm(void)
 /*
  * Deallocates memory for the column screen.
  */
-void free_mdclm(void)
+void free_mdclm(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode)
 {
 }
 
@@ -35,21 +35,21 @@ void free_mdclm(void)
 /*
  * Covers actions from the column screen.
  */
-void actions_mdclm(int key)
+void actions_mdclm(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl,int key)
 {
     int sx, sy;
-    sx = (mapmode->mapx+mapmode->screenx)*3+mapmode->subtl_x;
-    sy = (mapmode->mapy+mapmode->screeny)*3+mapmode->subtl_y;
+    sx = (mapmode->map.x+mapmode->screen.x)*3+mapmode->subtl.x;
+    sy = (mapmode->map.y+mapmode->screen.y)*3+mapmode->subtl.y;
     message_release();
     
-    if (!cursor_actions(key))
-    if (!subtl_select_actions(key))
+    if (!cursor_actions(scrmode,mapmode,lvl,key))
+    if (!subtl_select_actions(mapmode,key))
     {
       switch (key)
       {
         case KEY_TAB:
         case KEY_ESCAPE:
-          end_mdclm();
+          end_mdclm(scrmode,mapmode,lvl);
           break;
         case 'u': // Update all things/dat/clm/w?b
           update_slab_owners(lvl);
@@ -68,10 +68,10 @@ void actions_mdclm(int key)
             message_info("Updated DAT/CLM/W?B entries of slab %d,%d.",sx/3,sy/3);
           };break;
         case 'm': // manual-set mode
-          start_list(lvl,MD_CCLM);
+          start_list(scrmode,mapmode,lvl,MD_CCLM);
           break;
         case 'b': // cube mode
-          start_mdcube(lvl);
+          start_mdcube(scrmode,mapmode,lvl);
           break;
         default:
           message_info("Unrecognized clm key code: %d",key);
@@ -83,7 +83,7 @@ void actions_mdclm(int key)
 /*
  * Action function - start the column mode.
  */
-short start_mdclm(struct LEVEL *lvl)
+short start_mdclm(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl)
 {
     scrmode->mode=MD_CLM;
     return true;
@@ -92,14 +92,14 @@ short start_mdclm(struct LEVEL *lvl)
 /*
  * Action function - end the column mode.
  */
-void end_mdclm()
+void end_mdclm(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl)
 {
     mapmode->panel_mode=PV_MODE;
     scrmode->mode=MD_SLB;
     message_info("Returned to Slab mode.");
 }
 
-int display_dat_subtiles(int scr_row, int scr_col,int ty,int tx)
+int display_dat_subtiles(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl,int scr_row, int scr_col,int ty,int tx)
 {
     int i, k;
     int color;
@@ -116,13 +116,13 @@ int display_dat_subtiles(int scr_row, int scr_col,int ty,int tx)
             int sx=tx*3+i;
             set_cursor_pos(scr_row, scr_col+i*5);
             
-            if ((i==mapmode->subtl_x) && (k==mapmode->subtl_y) &&
+            if ((i==mapmode->subtl.x) && (k==mapmode->subtl.y) &&
              ((scrmode->mode==MD_CLM)||(scrmode->mode==MD_RWRK)) )
                 color=PRINT_COLOR_BLACK_ON_LGREY;
             else
                 color=PRINT_COLOR_LGREY_ON_BLACK;
             screen_setcolor(color);
-            if (dat_view_mode==2)
+            if (mapmode->dat_view_mode==2)
                 screen_printf("%4u",
                         (unsigned int)get_dat_subtile(lvl,sx,sy));
             else
@@ -136,24 +136,24 @@ int display_dat_subtiles(int scr_row, int scr_col,int ty,int tx)
 /*
  * Draws screen for the column mode.
  */
-void draw_mdclm()
+void draw_mdclm(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl)
 {
-    draw_map_area(lvl,true,true,false);
+    draw_map_area(scrmode,mapmode,lvl,true,true,false);
     if (mapmode->panel_mode!=PV_MODE)
-      draw_forced_panel(lvl,mapmode->panel_mode);
+      draw_forced_panel(scrmode,mapmode,lvl,mapmode->panel_mode);
     else
-      draw_mdclm_panel();
-    draw_map_cursor(lvl,true,true,false);
+      draw_mdclm_panel(scrmode,mapmode,lvl);
+    draw_map_cursor(scrmode,mapmode,lvl,true,true,false);
 }
 
-void draw_mdclm_panel()
+void draw_mdclm_panel(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl)
 {
     int tx, ty;
-    tx = mapmode->screenx+mapmode->mapx;
-    ty = mapmode->screeny+mapmode->mapy;
+    tx = mapmode->screen.x+mapmode->map.x;
+    ty = mapmode->screen.y+mapmode->map.y;
     int sx, sy;
-    sx = tx*3+mapmode->subtl_x;
-    sy = ty*3+mapmode->subtl_y;
+    sx = tx*3+mapmode->subtl.x;
+    sy = ty*3+mapmode->subtl.y;
     int clm_idx=get_dat_subtile(lvl,sx,sy);
     char *clmentry;
     clmentry = lvl->clm[clm_idx%COLUMN_ENTRIES];
@@ -165,7 +165,7 @@ void draw_mdclm_panel()
     screen_printf("Tile WLB:  %03X", get_tile_wlb(lvl, tx, ty));
     set_cursor_pos(pos_y-1, scrmode->cols+23);
     screen_printf("Subtl.FLG: %03X", get_subtl_flg(lvl,sx,sy));
-    display_tngdat();
+    display_tngdat(scrmode,mapmode,lvl);
 }
 
 int display_column(unsigned char *clmentry,int clm_idx, int scr_row, int scr_col)

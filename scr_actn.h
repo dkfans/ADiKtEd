@@ -5,6 +5,8 @@
 #ifndef ADIKT_SCRACTN_H
 #define ADIKT_SCRACTN_H
 
+#include "globals.h"
+
 struct LEVEL;
 
 enum adikt_workmode
@@ -34,8 +36,6 @@ enum adikt_panel_viewmode
   PV_COMPS  = 0x001, //Compass rose
 };
 
-
-
 struct CLIPBOARD {
     int dtype;
     unsigned char *data;
@@ -50,102 +50,110 @@ struct SCRMODE_DATA {
     // (the one without status lines at bottom and info text at right)
     int rows;
     int cols;
+    // Clipboard
     struct CLIPBOARD *clipbrd;
     int clip_count;
+    //Automated commands - allow sending multiple commands to the program.
+    //Used by command line parameters
+    unsigned int *automated_commands;
+    // I/O enable variables
+    short screen_enabled;
+    short input_enabled;
   };
 
 struct MAPMODE_DATA {
     //Marking variables
     short mark;
-    int markx, marky;
+    struct IPOINT_2D markp;
     //Painting properties
     short paintmode;
     short paintown;
     unsigned char paintroom;
     // Location of cursor on screen (where appropriate)
-    int screenx;
-    int screeny;
+    struct IPOINT_2D screen;
     // Location of top left corner of screen in map (where appropriate)
-    int mapx;
-    int mapy;
+    struct IPOINT_2D map;
     // Variables for drawing the mark rectangle
-    int markl, markr, markt, markb;
+    struct IRECT_2D markr;
     // Highlighted squares
     int **hilight;
     // Brightened squares
     int **brighten;
     // Which subtile is being considered in thing and data modes
-    int subtl_x;
-    int subtl_y;
+    struct IPOINT_2D subtl;
     //What is drawn on the right panel
     short panel_mode;
+    // The way DAT entries are shown
+    // 0 for no view, 1 for byte data, 2 for column idx
+    short dat_view_mode;
+    // Will the range of objects be visible?
+    short show_obj_range;
   };
 
 extern const char *modenames[];
 extern const char *longmodenames[];
 
-extern struct SCRMODE_DATA *scrmode;
-extern struct MAPMODE_DATA *mapmode;
-
-extern unsigned int *automated_commands;
 // indicates if the main program loop should end
 extern short finished;
-// I/O enable variables
-extern short screen_enabled;
-extern short input_enabled;
 
 // Screen maintain functions
-void init_levscr_basics(void);
-void init_levscr_modes(void);
-void free_levscr(void);
-void draw_levscr(struct LEVEL *lvl);
+void init_levscr_basics(struct SCRMODE_DATA **scrmode,struct MAPMODE_DATA **mapmode);
+void init_levscr_modes(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode);
+void free_levscr(struct SCRMODE_DATA **scrmode,struct MAPMODE_DATA **mapmode);
+void draw_levscr(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl);
 
 // Keyboard action functions
-void proc_key(void);
-short cursor_actions(int key);
-short subtl_select_actions(int key);
-void curposcheck(void);
+void proc_key(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl);
+short cursor_actions(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl,int key);
+short subtl_select_actions(struct MAPMODE_DATA *mapmode,int key);
+void curposcheck(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode);
 
-int change_mode(int new_mode);
-void draw_forced_panel(struct LEVEL *lvl, short panel_mode);
-
-//Clipboard support - lower level
-struct CLIPBOARD *get_clipboard_object(int idx);
-unsigned char *get_clipboard_slab(int idx);
-unsigned char *get_clipboard_datlst(int idx);
-unsigned char *get_clipboard_column(int idx);
-int copy_to_clipboard_thing(unsigned char *obj);
-int copy_to_clipboard_actnpt(unsigned char *obj);
-int copy_to_clipboard_stlight(unsigned char *obj);
+int change_mode(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl,int new_mode);
+void draw_forced_panel(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl, short panel_mode);
+void draw_map_cursor(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl,short show_ground,short show_rooms,short show_things);
 
 //Clipboard support - lower level
-int add_clipboard_any(char *obj,int obj_type);
-int put_clipboard_any(char *obj,int obj_type);
-void clear_clipboard();
+struct CLIPBOARD *get_clipboard_object(struct SCRMODE_DATA *scrmode,int idx);
+unsigned char *get_clipboard_slab(struct SCRMODE_DATA *scrmode,int idx);
+unsigned char *get_clipboard_datlst(struct SCRMODE_DATA *scrmode,int idx);
+unsigned char *get_clipboard_column(struct SCRMODE_DATA *scrmode,int idx);
+int copy_to_clipboard_thing(struct SCRMODE_DATA *scrmode,unsigned char *obj);
+int copy_to_clipboard_actnpt(struct SCRMODE_DATA *scrmode,unsigned char *obj);
+int copy_to_clipboard_stlight(struct SCRMODE_DATA *scrmode,unsigned char *obj);
+
+//Clipboard support - lower level
+int add_clipboard_any(struct SCRMODE_DATA *scrmode,char *obj,int obj_type);
+int put_clipboard_any(struct SCRMODE_DATA *scrmode,char *obj,int obj_type);
+void clear_clipboard(struct SCRMODE_DATA *scrmode);
 
 //Lower level functions
 void clear_scrmode(struct SCRMODE_DATA *scrmode);
 void clear_mapmode(struct MAPMODE_DATA *mapmode);
 
-void display_tngdat(void);
+void display_tngdat(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl);
 int display_mode_keyhelp(int scr_row, int scr_col,int mode);
-void draw_mdempty();
+void draw_mdempty(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl);
 
-void show_cursor(char cur);
-char *mode_status(int mode);
+void show_cursor(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,char cur);
+char *mode_status(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,int mode);
 short is_simple_mode(int mode);
 
-void mark_check(void);
-int get_draw_map_tile_color(struct LEVEL *lvl,int tx,int ty,short special,short darken_fg,short brighten_bg);
+void mark_check(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode);
+int get_draw_map_tile_color(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl,int tx,int ty,short special,short darken_fg,short brighten_bg);
 int get_screen_color_owned(unsigned char owner,short marked,short darken_fg,short brighten_bg);
-void draw_map_area(struct LEVEL *lvl,short show_ground,short show_rooms,short show_things);
+void draw_map_area(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl,short show_ground,short show_rooms,short show_things);
 int get_draw_map_tile_char(struct LEVEL *lvl,int tx,int ty,
     short show_ground,short show_rooms,short show_things,short force_at);
 
+// Some specific actions
+short level_verify_with_highlight(struct LEVEL *lvl,struct MAPMODE_DATA *mapmode);
+
+// highlight is used for search and showing error position
 int get_tile_highlight(struct MAPMODE_DATA *mapmode, unsigned int tx, unsigned int ty);
 void set_tile_highlight(struct MAPMODE_DATA *mapmode, unsigned int tx, unsigned int ty, int nval);
 void clear_highlight(struct MAPMODE_DATA *mapmode);
 
+// brighten is used to display range of some objects
 short get_tile_brighten(struct MAPMODE_DATA *mapmode, unsigned int tx, unsigned int ty);
 void set_tile_brighten(struct MAPMODE_DATA *mapmode, unsigned int tx, unsigned int ty, short nval);
 void clear_brighten(struct MAPMODE_DATA *mapmode);

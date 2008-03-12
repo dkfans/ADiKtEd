@@ -27,7 +27,7 @@
 #include "obj_column.h"
 #include "lev_data.h"
 
-static void (*actions [])(int)={
+static void (*actions [])(struct SCRMODE_DATA *,struct MAPMODE_DATA *,struct LEVEL *,int)={
      actions_mdslab, actions_mdtng, actions_crtre, actions_itemt,
      actions_help, actions_mdclm, actions_scrpt, actions_mdtextr,
      actions_mdcclm, actions_mdcube, actions_mdslbl, actions_mdrwrk,
@@ -35,13 +35,13 @@ static void (*actions [])(int)={
 
 // Drawing functions for modes. You can fill new entries
 // with "draw_mdempty" till you create proper draw function.
-static void (*mddraw [])()={
+static void (*mddraw [])(struct SCRMODE_DATA *,struct MAPMODE_DATA *,struct LEVEL *)={
      draw_mdslab, draw_mdtng, draw_crtre, draw_itemt,
      draw_help, draw_mdclm, draw_scrpt, draw_mdtextr,
      draw_mdcclm, draw_mdcube, draw_mdslbl, draw_mdrwrk,
      draw_mdsrch,};
 
-static void (*mdend [])()={
+static void (*mdend [])(struct SCRMODE_DATA *,struct MAPMODE_DATA *,struct LEVEL *)={
      end_mdslab, end_mdtng, end_list, end_list,
      end_help, end_mdclm, end_scrpt, end_list,
      end_list, end_list, end_list, end_mdrwrk,
@@ -60,99 +60,86 @@ const char *longmodenames[]={
      "cust.column","cust.cubes","slab list","rework",
      "search",};
 
-struct SCRMODE_DATA *scrmode;
-struct MAPMODE_DATA *mapmode;
-
-//Automated commands - allow sending multiple commands to the program.
-//Used by command line parameters
-unsigned int *automated_commands;
-
 // indicates if the main program loop should end
 short finished;
-// I/O enable variables
-short screen_enabled;
-short input_enabled;
-
-// 0 for no view,, 1 for byte data, 2 for column idx
-short dat_view_mode=0;
 
 /*
  * Initializes basic structures and dynamic variables, which may be needed
  * on parameters reading process. Only the basic structures are inited here.
  */
-void init_levscr_basics(void)
+void init_levscr_basics(struct SCRMODE_DATA **scrmode,struct MAPMODE_DATA **mapmode)
 {
     // variable that informs if main program loop should finish
     finished=false;
     // random num gen seed selection
     srand(time(0));
     //Basic configuration variables
-    screen_enabled=true;
-    input_enabled=true;
+    (*scrmode)->screen_enabled=true;
+    (*scrmode)->input_enabled=true;
     //Creating and clearing screen mode info variable
-    scrmode=(struct SCRMODE_DATA *)malloc(sizeof(struct SCRMODE_DATA));
-    if (scrmode==NULL)
+    *scrmode=(struct SCRMODE_DATA *)malloc(sizeof(struct SCRMODE_DATA));
+    if ((*scrmode)==NULL)
      die("init_levscr: Cannot allocate memory.");
-    clear_scrmode(scrmode);
-    mapmode=(struct MAPMODE_DATA *)malloc(sizeof(struct MAPMODE_DATA));
-    if (mapmode==NULL)
+    clear_scrmode(*scrmode);
+    *mapmode=(struct MAPMODE_DATA *)malloc(sizeof(struct MAPMODE_DATA));
+    if ((*mapmode)==NULL)
      die("init_levscr: Cannot allocate memory.");
     { //allocating mapmode sub-structures
       int i;
-      mapmode->hilight = (int **)malloc(MAP_SIZE_Y*sizeof(int *));
-      if (mapmode->hilight==NULL)
+      (*mapmode)->hilight = (int **)malloc(MAP_SIZE_Y*sizeof(int *));
+      if ((*mapmode)->hilight==NULL)
           die("init_levscr: Out of memory");
       for (i=0; i < MAP_SIZE_Y; i++)
       {
-        mapmode->hilight[i] = (int *)malloc(MAP_SIZE_X*sizeof(int));
-        if (mapmode->hilight[i]==NULL)
+        (*mapmode)->hilight[i] = (int *)malloc(MAP_SIZE_X*sizeof(int));
+        if ((*mapmode)->hilight[i]==NULL)
           die("init_levscr: Out of memory");
       }
-      mapmode->brighten = (int **)malloc(MAP_SIZE_Y*sizeof(int *));
-      if (mapmode->brighten==NULL)
+      (*mapmode)->brighten = (int **)malloc(MAP_SIZE_Y*sizeof(int *));
+      if ((*mapmode)->brighten==NULL)
           die("init_levscr: Out of memory");
       for (i=0; i < MAP_SIZE_Y; i++)
       {
-        mapmode->brighten[i] = (int *)malloc(MAP_SIZE_X*sizeof(int));
-        if (mapmode->brighten[i]==NULL)
+        (*mapmode)->brighten[i] = (int *)malloc(MAP_SIZE_X*sizeof(int));
+        if ((*mapmode)->brighten[i]==NULL)
           die("init_levscr: Out of memory");
       }
     }
-    clear_mapmode(mapmode);
+    clear_mapmode(*mapmode);
     int i;
-    automated_commands=malloc(READ_BUFSIZE*sizeof(unsigned int));
+    (*scrmode)->automated_commands=malloc(READ_BUFSIZE*sizeof(unsigned int));
     for (i=0; i < READ_BUFSIZE; i++)
-      automated_commands[i]=0;
+      (*scrmode)->automated_commands[i]=0;
 }
 
 /*
  * Initializes the screen to work with Adikted.
  */
-void init_levscr_modes(void)
+void init_levscr_modes(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode)
 {
     // initilaize screen support library
-    if (screen_enabled)
+    if (scrmode->screen_enabled)
       screen_init();
     // and keyboard input
-    if (input_enabled)
+    if (scrmode->input_enabled)
       input_init();
     // init modes - read help file
-    init_help();
+    init_help(scrmode,mapmode);
     // init modes - create list structures
-    init_list();
+    init_list(scrmode,mapmode);
     // init modes - create text editor structures
-    init_scrpt();
+    init_scrpt(scrmode,mapmode);
     // init modes - create column structures
-    init_mdclm();
+    init_mdclm(scrmode,mapmode);
     // init modes - create thing structures
-    init_mdtng();
+    init_mdtng(scrmode,mapmode);
     // init modes - create cubes structures
-    init_mdcube();
+    init_mdcube(scrmode,mapmode);
     // initialize slab mode
     //(this includes slbkey required for all screens containing map)
-    init_mdslab();
+    init_mdslab(scrmode,mapmode);
     //Init rework mode
-    init_mdrwrk();
+    init_mdrwrk(scrmode,mapmode);
 }
 
 void clear_scrmode(struct SCRMODE_DATA *scrmode)
@@ -172,40 +159,44 @@ void clear_mapmode(struct MAPMODE_DATA *mapmode)
     mapmode->paintmode=false;
     mapmode->paintown=false;
     mapmode->paintroom=0;
-    mapmode->screenx=0;
-    mapmode->screeny=0;
-    mapmode->mapx=0;
-    mapmode->mapy=0;
-    mapmode->subtl_x=1;
-    mapmode->subtl_y=1;
+    mapmode->screen.x=0;
+    mapmode->screen.y=0;
+    mapmode->map.x=0;
+    mapmode->map.y=0;
+    mapmode->subtl.x=1;
+    mapmode->subtl.y=1;
     mapmode->panel_mode=PV_MODE;
+    mapmode->dat_view_mode=0;
+    mapmode->show_obj_range=1;
     clear_highlight(mapmode);
     clear_brighten(mapmode);
 }
 
-void free_levscr(void)
+void free_levscr(struct SCRMODE_DATA **scrmode,struct MAPMODE_DATA **mapmode)
 {
     // free modes
-    free_help();
-    free_list();
-    free_mdcube();
-    free_scrpt();
-    free_mdclm();
-    free_mdtng();
-    free_mdslab();
-    free_mdrwrk();
+    free_help(*scrmode,*mapmode);
+    free_list(*scrmode,*mapmode);
+    free_mdcube(*scrmode,*mapmode);
+    free_scrpt(*scrmode,*mapmode);
+    free_mdclm(*scrmode,*mapmode);
+    free_mdtng(*scrmode,*mapmode);
+    free_mdslab(*scrmode,*mapmode);
+    free_mdrwrk(*scrmode,*mapmode);
     // Main screen variables
-    free(automated_commands);
     //Freeing mapmode structure
-    if (mapmode->hilight!=NULL)
+    if ((*mapmode)->hilight!=NULL)
     {
       int i;
       for (i=0; i<MAP_SIZE_Y; i++)
-          free(mapmode->hilight[i]);
-      free(mapmode->hilight);
+          free((*mapmode)->hilight[i]);
+      free((*mapmode)->hilight);
     }
-    free(mapmode);
-    free(scrmode);
+    free(*mapmode);
+    *mapmode=NULL;
+    free((*scrmode)->automated_commands);
+    free(*scrmode);
+    *scrmode=NULL;
     // Shutting down screen support
     screen_done();
 }
@@ -279,7 +270,7 @@ void update_brighten(struct LEVEL *lvl,struct MAPMODE_DATA *mapmode)
     const int arr_entries_x=MAP_SIZE_X*MAP_SUBNUM_X;
     const int arr_entries_y=MAP_SIZE_Y*MAP_SUBNUM_Y;
     clear_brighten(mapmode);
-    if (!show_obj_range) return;
+    if (!mapmode->show_obj_range) return;
     int curr_sx, curr_sy, i;
     for (curr_sx=0; curr_sx < arr_entries_x; curr_sx++)
       for (curr_sy=0; curr_sy < arr_entries_y; curr_sy++)
@@ -311,7 +302,7 @@ void update_brighten(struct LEVEL *lvl,struct MAPMODE_DATA *mapmode)
 void set_brighten_for_thing(struct MAPMODE_DATA *mapmode,unsigned char *thing)
 {
   if (thing==NULL) return;
-  if (!show_obj_range) return;
+  if (!mapmode->show_obj_range) return;
   set_brighten_for_range(mapmode,get_thing_subtile_x(thing),
       get_thing_subtile_y(thing),get_thing_range_adv(thing));
 }
@@ -319,7 +310,7 @@ void set_brighten_for_thing(struct MAPMODE_DATA *mapmode,unsigned char *thing)
 void set_brighten_for_actnpt(struct MAPMODE_DATA *mapmode,unsigned char *actnpt)
 {
   if (actnpt==NULL) return;
-  if (!show_obj_range) return;
+  if (!mapmode->show_obj_range) return;
   set_brighten_for_range(mapmode,get_actnpt_subtile_x(actnpt),
       get_actnpt_subtile_y(actnpt),get_actnpt_range_adv(actnpt));
 }
@@ -327,7 +318,7 @@ void set_brighten_for_actnpt(struct MAPMODE_DATA *mapmode,unsigned char *actnpt)
 void set_brighten_for_stlight(struct MAPMODE_DATA *mapmode,unsigned char *stlight)
 {
   if (stlight==NULL) return;
-  if (!show_obj_range) return;
+  if (!mapmode->show_obj_range) return;
   set_brighten_for_range(mapmode,get_stlight_subtile_x(stlight),
       get_stlight_subtile_y(stlight),get_stlight_range_adv(stlight));
 }
@@ -362,17 +353,17 @@ void set_brighten_for_range(struct MAPMODE_DATA *mapmode,
  * Draw the whole screen; Draws bottom lines and calls proper function
  * to draw rest of the screen.
  */
-void draw_levscr(struct LEVEL *lvl)
+void draw_levscr(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl)
 {
     if (mapmode->mark)
-      mark_check();
+      mark_check(scrmode,mapmode);
     set_cursor_visibility(0);
     int all_rows=get_screen_rows();
     int all_cols=get_screen_cols();
     scrmode->rows = all_rows-2;
     scrmode->cols = all_cols-scrmode->keycols;
     //If we shouldn't draw on screen - just exit.
-    if (!screen_enabled) return;
+    if (!scrmode->screen_enabled) return;
     // If we don't have much room at all, just forget it!
     if (scrmode->cols < 0) return;
 
@@ -381,14 +372,14 @@ void draw_levscr(struct LEVEL *lvl)
     // Hope there's enough room for it :)
     if (all_cols>70)
       screen_printf_toeol("Dungeon Keeper Map Editor    %5.5s mode  %s", 
-                 modenames[scrmode->mode], mode_status (scrmode->mode));
+                 modenames[scrmode->mode], mode_status(scrmode,mapmode,scrmode->mode));
 
-    int tx=mapmode->screenx+mapmode->mapx;
-    int ty=mapmode->screeny+mapmode->mapy;
+    int tx=mapmode->screen.x+mapmode->map.x;
+    int ty=mapmode->screen.y+mapmode->map.y;
     set_cursor_pos(all_rows-1, 0);
     screen_setcolor(PRINT_COLOR_LGREY_ON_BLACK);
     screen_printf_toeol(message_get());
-    mddraw[scrmode->mode%MODES_COUNT]();
+    mddraw[scrmode->mode%MODES_COUNT](scrmode,mapmode,lvl);
     set_cursor_pos(all_rows-1, all_cols-1);
     screen_refresh();
 }
@@ -396,12 +387,12 @@ void draw_levscr(struct LEVEL *lvl)
 /*
  * Draws screen for new modes which do not have real drawing function yet.
  */
-void draw_mdempty()
+void draw_mdempty(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl)
 {
     int tx,ty;
-    tx=mapmode->mapx+mapmode->screenx;
-    ty=mapmode->mapy+mapmode->screeny;
-    draw_map_area(lvl,true,false,false);
+    tx=mapmode->map.x+mapmode->screen.x;
+    ty=mapmode->map.y+mapmode->screen.y;
+    draw_map_area(scrmode,mapmode,lvl,true,false,false);
     int scr_row=0;
     int scr_col=scrmode->cols+3;
     set_cursor_pos(scr_row++, scr_col);
@@ -415,7 +406,7 @@ void draw_mdempty()
 /*
  * Draws the right panel with contents set by panel_mode.
  */
-void draw_forced_panel(struct LEVEL *lvl, short panel_mode)
+void draw_forced_panel(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl, short panel_mode)
 {
   int i;
   int scr_row=0;
@@ -425,7 +416,7 @@ void draw_forced_panel(struct LEVEL *lvl, short panel_mode)
   case PV_COMPS:
     for (i=0; i<help->compassrows; i++)
           draw_help_line(scr_row++,scr_col,help->compass[i]);
-    display_tngdat();
+    display_tngdat(scrmode,mapmode,lvl);
     break;
   default:
     break;
@@ -435,38 +426,38 @@ void draw_forced_panel(struct LEVEL *lvl, short panel_mode)
 /*
  * Sets variables for drawing marked area in marking mode.
  */
-void mark_check(void)
+void mark_check(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode)
 {
-    int tx=mapmode->screenx+mapmode->mapx;
-    int ty=mapmode->screeny+mapmode->mapy;
+    int tx=mapmode->screen.x+mapmode->map.x;
+    int ty=mapmode->screen.y+mapmode->map.y;
     if (!mapmode->mark)
       return;
-    if (mapmode->markx <= tx)
+    if (mapmode->markp.x <= tx)
     {
-      mapmode->markl = mapmode->markx;
-      mapmode->markr = tx;
+      mapmode->markr.l = mapmode->markp.x;
+      mapmode->markr.r = tx;
     }
     else
     {
-      mapmode->markr = mapmode->markx;
-      mapmode->markl = tx;
+      mapmode->markr.r = mapmode->markp.x;
+      mapmode->markr.l = tx;
     }
-    if (mapmode->marky <= ty)
+    if (mapmode->markp.y <= ty)
     {
-      mapmode->markt = mapmode->marky;
-      mapmode->markb = ty;
+      mapmode->markr.t = mapmode->markp.y;
+      mapmode->markr.b = ty;
     }
     else
     {
-      mapmode->markb = mapmode->marky;
-      mapmode->markt = ty;
+      mapmode->markr.b = mapmode->markp.y;
+      mapmode->markr.t = ty;
     }
 }
 
-char *mode_status(int mode)
+char *mode_status(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,int mode)
 {
-    int tx=mapmode->screenx+mapmode->mapx;
-    int ty=mapmode->screeny+mapmode->mapy;
+    int tx=mapmode->screen.x+mapmode->map.x;
+    int ty=mapmode->screen.y+mapmode->map.y;
     static char buffer[LINEMSG_SIZE];
     switch (mode)
     {
@@ -507,7 +498,7 @@ char *mode_status(int mode)
  * Returns color in which the specified tile should be drawn.
  * The color depends on tile owner, but also marking mode.
  */
-int get_draw_map_tile_color(struct LEVEL *lvl,int tx,int ty,short special,short darken_fg,short brighten_bg)
+int get_draw_map_tile_color(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl,int tx,int ty,short special,short darken_fg,short brighten_bg)
 {
     int g;
     if ((tx<0)||(tx>=MAP_SIZE_X)) return PRINT_COLOR_GREY_ON_BLACK;
@@ -516,8 +507,8 @@ int get_draw_map_tile_color(struct LEVEL *lvl,int tx,int ty,short special,short 
     int hilight=get_tile_highlight(mapmode,tx,ty);
     if (hilight>0) return hilight;
     int own=get_tile_owner(lvl,tx,ty);
-    short marked=((mapmode->mark) && (tx>=mapmode->markl) && (tx<=mapmode->markr)
-                        && (ty>=mapmode->markt) && (ty<=mapmode->markb));
+    short marked=((mapmode->mark) && (tx>=mapmode->markr.l) && (tx<=mapmode->markr.r)
+                        && (ty>=mapmode->markr.t) && (ty<=mapmode->markr.b));
     int col;
     if (special)
     {
@@ -693,7 +684,7 @@ int get_draw_map_tile_char(struct LEVEL *lvl,int tx,int ty,short show_ground,sho
     char out_ch;
     unsigned short slab;
     if (show_things)
-      out_ch=get_thing_char(tx,ty);
+      out_ch=get_thing_char(lvl,tx,ty);
     else
       out_ch=' ';
     if ((out_ch==' ')&&((show_ground)||(show_rooms)))
@@ -712,14 +703,14 @@ int get_draw_map_tile_char(struct LEVEL *lvl,int tx,int ty,short show_ground,sho
  * Draws the map area for all modes that has map display.
  * Also clears the right panel.
  */
-void draw_map_area(struct LEVEL *lvl,short show_ground,short show_rooms,short show_things)
+void draw_map_area(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl,short show_ground,short show_rooms,short show_things)
 {
     int i, k;
     for (k=0; k<scrmode->rows; k++)
     {
       screen_setcolor(PRINT_COLOR_LGREY_ON_BLACK);
       set_cursor_pos(k,0);
-      int ty=mapmode->mapy+k;
+      int ty=mapmode->map.y+k;
       if (ty >= MAP_SIZE_Y)
       {
           for (i=0; i<scrmode->cols; i++)
@@ -729,7 +720,7 @@ void draw_map_area(struct LEVEL *lvl,short show_ground,short show_rooms,short sh
       {
           for (i=0; i<scrmode->cols; i++)
           {
-            int tx=mapmode->mapx+i;
+            int tx=mapmode->map.x+i;
             if (tx < MAP_SIZE_X)
             {
               char out_ch;
@@ -756,7 +747,7 @@ void draw_map_area(struct LEVEL *lvl,short show_ground,short show_rooms,short sh
               {
                   brighten_bg=false;
               }
-              screen_setcolor(get_draw_map_tile_color(lvl,tx,ty,has_ccol,darken_fg,brighten_bg));
+              screen_setcolor(get_draw_map_tile_color(scrmode,mapmode,lvl,tx,ty,has_ccol,darken_fg,brighten_bg));
               out_ch=get_draw_map_tile_char(lvl,tx,ty,show_ground,show_rooms,show_things,(g>=0));
               screen_printchr(out_ch);
             } else
@@ -776,10 +767,10 @@ void draw_map_area(struct LEVEL *lvl,short show_ground,short show_rooms,short sh
 /*
  * Shows cursor on the map screen.
  */
-void draw_map_cursor(struct LEVEL *lvl,short show_ground,short show_rooms,short show_things)
+void draw_map_cursor(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl,short show_ground,short show_rooms,short show_things)
 {
-    int tx=mapmode->screenx+mapmode->mapx;
-    int ty=mapmode->screeny+mapmode->mapy;
+    int tx=mapmode->screen.x+mapmode->map.x;
+    int ty=mapmode->screen.y+mapmode->map.y;
     char out_ch;
     int g;
     if (show_rooms)
@@ -787,35 +778,35 @@ void draw_map_cursor(struct LEVEL *lvl,short show_ground,short show_rooms,short 
     else
       g = -1;
     out_ch=get_draw_map_tile_char(lvl,tx,ty,show_ground,show_rooms,show_things,(g>=0));
-    show_cursor(out_ch);
+    show_cursor(scrmode,mapmode,out_ch);
 }
 
 /*
  * Shows map cursor at position from mapmode; the cursor is a character
  * same as in the current map background written in different colors.
  */
-void show_cursor(char cur)
+void show_cursor(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,char cur)
 {
-    set_cursor_pos(mapmode->screeny, mapmode->screenx);
+    set_cursor_pos(mapmode->screen.y, mapmode->screen.x);
     screen_setcolor(PRINT_COLOR_RED_ON_WHITE);
     screen_printchr(cur);
     set_cursor_pos(get_screen_rows()-1, get_screen_cols()-1);
 }
 
-void display_tngdat(void)
+void display_tngdat(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl)
 {
     int tx, ty;
-    tx = mapmode->screenx+mapmode->mapx;
-    ty = mapmode->screeny+mapmode->mapy;
+    tx = mapmode->screen.x+mapmode->map.x;
+    ty = mapmode->screen.y+mapmode->map.y;
     if (scrmode->rows > TNGDAT_ROWS)
     {
       int scr_col=scrmode->cols+3;
-      if (dat_view_mode!=0)
+      if (mapmode->dat_view_mode!=0)
       {
-        display_dat_subtiles(scrmode->rows-TNGDAT_ROWS,scr_col,ty,tx);
+        display_dat_subtiles(scrmode,mapmode,lvl,scrmode->rows-TNGDAT_ROWS,scr_col,ty,tx);
         scr_col+=17;
       }
-      display_tng_subtiles(scrmode->rows-TNGDAT_ROWS,scr_col,ty,tx);
+      display_tng_subtiles(scrmode,mapmode,lvl,scrmode->rows-TNGDAT_ROWS,scr_col,ty,tx);
 
     }
 }
@@ -836,39 +827,39 @@ int display_mode_keyhelp(int scr_row, int scr_col,int mode)
 /*
  * Changes the work mode. Reinits mode even if the new one is same as old.
  */
-int change_mode(int new_mode)
+int change_mode(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl,int new_mode)
 {
-  mdend[scrmode->mode%MODES_COUNT]();
+  mdend[scrmode->mode%MODES_COUNT](scrmode,mapmode,lvl);
   switch (new_mode)
   {
   case MD_SLB:
-       start_mdslab(lvl);
+       start_mdslab(scrmode,mapmode,lvl);
        break;
   case MD_TNG:
-       start_mdtng(lvl);
+       start_mdtng(scrmode,mapmode,lvl);
        break;
   case MD_CRTR:
   case MD_ITMT:
   case MD_SRCH:
-       start_list(lvl,new_mode);
+       start_list(scrmode,mapmode,lvl,new_mode);
        break;
   case MD_TXTR:
-       start_mdtextr(lvl);
+       start_mdtextr(scrmode,mapmode,lvl);
        break;
   case MD_CUBE:
-       start_mdcube(lvl);
+       start_mdcube(scrmode,mapmode,lvl);
        break;
   case MD_SLBL:
-       start_mdslbl(lvl);
+       start_mdslbl(scrmode,mapmode,lvl);
        break;
   case MD_HELP:
-       start_help(lvl);
+       start_help(scrmode,mapmode,lvl);
        break;
   case MD_CLM:
-       start_mdclm(lvl);
+       start_mdclm(scrmode,mapmode,lvl);
        break;
   case MD_SCRP:
-       start_scrpt(lvl);
+       start_scrpt(scrmode,mapmode,lvl);
        break;
   }
 }
@@ -879,10 +870,10 @@ int change_mode(int new_mode)
  */
 short is_simple_mode(int mode)
 {
-    if ((scrmode->mode==MD_HELP) || (scrmode->mode==MD_CRTR) ||
-        (scrmode->mode==MD_ITMT) || (scrmode->mode==MD_TXTR) ||
-        (scrmode->mode==MD_CCLM) || (scrmode->mode==MD_CUBE) ||
-        (scrmode->mode==MD_SLBL) || (scrmode->mode==MD_SRCH) )
+    if ((mode==MD_HELP) || (mode==MD_CRTR) ||
+        (mode==MD_ITMT) || (mode==MD_TXTR) ||
+        (mode==MD_CCLM) || (mode==MD_CUBE) ||
+        (mode==MD_SLBL) || (mode==MD_SRCH) )
       return true;
     return false;
 }
@@ -890,17 +881,17 @@ short is_simple_mode(int mode)
 /*
  * Main action function - gets and processes a key stroke.
  */
-void proc_key(void)
+void proc_key(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl)
 {
     static char usrinput[READ_BUFSIZE];
     unsigned int g;
-    if (automated_commands[0]!=0)
+    if (scrmode->automated_commands[0]!=0)
     {
-      g=automated_commands[0];
-      memmove(automated_commands,automated_commands+1,(READ_BUFSIZE-1)*sizeof(unsigned int));
+      g=scrmode->automated_commands[0];
+      memmove(scrmode->automated_commands,scrmode->automated_commands+1,(READ_BUFSIZE-1)*sizeof(unsigned int));
     } else
     {
-      if (!input_enabled)
+      if (!scrmode->input_enabled)
       {
         finished=true;
         return;
@@ -914,7 +905,7 @@ void proc_key(void)
     {
     case KEY_F1:
       if (scrmode->mode != MD_HELP)
-        start_help(lvl);
+        start_help(scrmode,mapmode,lvl);
       break;
     case KEY_CTRL_Q:
       if (!is_simple_mode(scrmode->mode))
@@ -936,10 +927,10 @@ void proc_key(void)
         popup_show("Loading map","Reading map files. Please wait...");
         if (format_map_fname(lvl->fname,usrinput))
         {
-          free_map();
+          free_map(lvl);
           load_map(lvl);
           clear_highlight(mapmode);
-          change_mode(scrmode->mode);
+          change_mode(scrmode,mapmode,lvl,scrmode->mode);
           message_info("Map \"%s\" loaded", lvl->fname);
         } else
           message_error("Map loading cancelled");
@@ -954,10 +945,10 @@ void proc_key(void)
       if (strlen(lvl->fname)>0)
       {
           popup_show("Reloading map","Reading map files. Please wait...");
-          free_map();
+          free_map(lvl);
           load_map(lvl);
           clear_highlight(mapmode);
-          change_mode(scrmode->mode);
+          change_mode(scrmode,mapmode,lvl,scrmode->mode);
           message_info("Map \"%s\" reloaded", lvl->fname);
       } else
           message_error("Map name is empty, cannot load last loaded.");
@@ -1002,10 +993,10 @@ void proc_key(void)
         break;
       }
       popup_show("Clearing map","Generating empty map. Please wait...");
-      free_map();
+      free_map(lvl);
       start_new_map(lvl);
       clear_highlight(mapmode);
-      change_mode(scrmode->mode);
+      change_mode(scrmode,mapmode,lvl,scrmode->mode);
       message_info_force("New map started");
       break;
     case KEY_CTRL_R:
@@ -1015,10 +1006,10 @@ void proc_key(void)
         break;
       }
       popup_show("Randomizing map","Generating random map. Please wait...");
-      free_map();
+      free_map(lvl);
       generate_random_map(lvl);
       clear_highlight(mapmode);
-      change_mode(scrmode->mode);
+      change_mode(scrmode,mapmode,lvl,scrmode->mode);
       message_info_force("Map generation completed");
       break;
     case KEY_CTRL_P:
@@ -1046,7 +1037,7 @@ void proc_key(void)
         message_info("You can't view script from here.");
       } else
       {
-        change_mode(MD_SCRP);
+        change_mode(scrmode,mapmode,lvl,MD_SCRP);
       }
       break;
     case KEY_CTRL_F:
@@ -1055,7 +1046,7 @@ void proc_key(void)
         message_info("You can't search from this mode.");
       } else
       {
-        change_mode(MD_SRCH);
+        change_mode(scrmode,mapmode,lvl,MD_SRCH);
       }
       break;
     case KEY_CTRL_B:
@@ -1074,14 +1065,14 @@ void proc_key(void)
         message_info("You can't change texture from here.");
       } else
       {
-        start_mdtextr(lvl);
+        start_mdtextr(scrmode,mapmode,lvl);
       }
       break;
 
     default:
       {
         //Sending the action to a function corresponding to actual screen
-        actions[scrmode->mode%MODES_COUNT](g);
+        actions[scrmode->mode%MODES_COUNT](scrmode,mapmode,lvl,g);
       };break;
     }
 }
@@ -1089,88 +1080,88 @@ void proc_key(void)
 /*
  * Action function - covers cursor actions from non-help screens.
  */
-short cursor_actions(int key)
+short cursor_actions(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl,int key)
 {
     int osx, osy, omx, omy;
     int i, j;
     
-    osx=mapmode->screenx;
-    osy=mapmode->screeny;
-    omx=mapmode->mapx;
-    omy=mapmode->mapy;
+    osx=mapmode->screen.x;
+    osy=mapmode->screen.y;
+    omx=mapmode->map.x;
+    omy=mapmode->map.y;
     
     switch (key)
     {
     case KEY_CTRL_UP: // ctrl+arrow up
-      mapmode->screeny-=5;
+      mapmode->screen.y-=5;
       break;
     case KEY_CTRL_DOWN: // ctrl+arrow down
-      mapmode->screeny+=5;
+      mapmode->screen.y+=5;
       break;
     case KEY_CTRL_LEFT: // ctrl+arrow left
-      mapmode->screenx-=5;
+      mapmode->screen.x-=5;
       break;
     case KEY_CTRL_RIGHT: // ctrl+arrow right
-      mapmode->screenx+=5;
+      mapmode->screen.x+=5;
       break;
     case KEY_ALT_UP: // alt+arrow up
-      mapmode->screeny-=15;
+      mapmode->screen.y-=15;
       break;
     case KEY_ALT_DOWN: // alt+arrow down
-      mapmode->screeny+=15;
+      mapmode->screen.y+=15;
       break;
     case KEY_ALT_LEFT: // alt+arrow left
-      mapmode->screenx-=15;
+      mapmode->screen.x-=15;
       break;
     case KEY_ALT_RIGHT: // alt+arrow right
-      mapmode->screenx+=15;
+      mapmode->screen.x+=15;
       break;
     case KEY_CTRL_HOME: // ctrl+home
-      mapmode->mapx=0;
-      mapmode->screenx=0;
+      mapmode->map.x=0;
+      mapmode->screen.x=0;
       break;
     case KEY_CTRL_END: // ctrl+end
-      mapmode->mapx=MAP_SIZE_X;
-      mapmode->screenx=MAP_SIZE_X;
+      mapmode->map.x=MAP_SIZE_X;
+      mapmode->screen.x=MAP_SIZE_X;
       break;
     case KEY_CTRL_PGUP: // ctrl+page up
-      mapmode->mapy=0;
-      mapmode->screeny=0;
+      mapmode->map.y=0;
+      mapmode->screen.y=0;
       break;
     case KEY_CTRL_PGDOWN: // ctrl+page down
-      mapmode->mapy=MAP_SIZE_Y;
-      mapmode->screeny=MAP_SIZE_Y;
+      mapmode->map.y=MAP_SIZE_Y;
+      mapmode->screen.y=MAP_SIZE_Y;
       break;
     case KEY_UP:
-      mapmode->screeny--;
+      mapmode->screen.y--;
       break;
     case KEY_DOWN:
-      mapmode->screeny++;
+      mapmode->screen.y++;
       break;
     case KEY_RIGHT:
-      mapmode->screenx++;
+      mapmode->screen.x++;
       break;
     case KEY_LEFT:
-      mapmode->screenx--;
+      mapmode->screen.x--;
       break;
     case KEY_END:
-      mapmode->screenx+=10;
+      mapmode->screen.x+=10;
       break;
     case KEY_HOME:
-      mapmode->screenx-=10;
+      mapmode->screen.x-=10;
       break;
     case KEY_PGUP:
-      mapmode->screeny-=10;
+      mapmode->screen.y-=10;
       break;
     case KEY_PGDOWN:
-      mapmode->screeny+=10;
+      mapmode->screen.y+=10;
       break;
       default:
       return false;
     }
-    curposcheck();
-    int tx=mapmode->screenx+mapmode->mapx;
-    int ty=mapmode->screeny+mapmode->mapy;
+    curposcheck(scrmode,mapmode);
+    int tx=mapmode->screen.x+mapmode->map.x;
+    int ty=mapmode->screen.y+mapmode->map.y;
     if ((omx+osx != tx) || (omy+osy != ty))
       // As we've moved, reset which object we're looking at
     change_visited_tile();
@@ -1180,45 +1171,45 @@ short cursor_actions(int key)
 /*
  * Action function - allows selecting subtiles with digits from numpad.
  */
-short subtl_select_actions(int key)
+short subtl_select_actions(struct MAPMODE_DATA *mapmode,int key)
 {
       switch (key)
       {
         case '1':
-          mapmode->subtl_x=0;
-          mapmode->subtl_y=2;
+          mapmode->subtl.x=0;
+          mapmode->subtl.y=2;
           break;
         case '2':
-          mapmode->subtl_x=1;
-          mapmode->subtl_y=2;
+          mapmode->subtl.x=1;
+          mapmode->subtl.y=2;
           break;
         case '3':
-          mapmode->subtl_x=2;
-          mapmode->subtl_y=2;
+          mapmode->subtl.x=2;
+          mapmode->subtl.y=2;
           break;
         case '4':
-          mapmode->subtl_x=0;
-          mapmode->subtl_y=1;
+          mapmode->subtl.x=0;
+          mapmode->subtl.y=1;
           break;
         case '5':
-          mapmode->subtl_x=1;
-          mapmode->subtl_y=1;
+          mapmode->subtl.x=1;
+          mapmode->subtl.y=1;
           break;
         case '6':
-          mapmode->subtl_x=2;
-          mapmode->subtl_y=1;
+          mapmode->subtl.x=2;
+          mapmode->subtl.y=1;
           break;
         case '7':
-          mapmode->subtl_x=0;
-          mapmode->subtl_y=0;
+          mapmode->subtl.x=0;
+          mapmode->subtl.y=0;
           break;
         case '8':
-          mapmode->subtl_x=1;
-          mapmode->subtl_y=0;
+          mapmode->subtl.x=1;
+          mapmode->subtl.y=0;
           break;
         case '9':
-          mapmode->subtl_x=2;
-          mapmode->subtl_y=0;
+          mapmode->subtl.x=2;
+          mapmode->subtl.y=0;
           break;
       default:
       return false;
@@ -1229,36 +1220,36 @@ short subtl_select_actions(int key)
 /*
  * Action subfunction - check cursor position.
  */
-void curposcheck(void)
+void curposcheck(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode)
 {
-    if (mapmode->screenx < 0)
+    if (mapmode->screen.x < 0)
     {
-      mapmode->mapx+=mapmode->screenx;
-      mapmode->screenx=0;
+      mapmode->map.x+=mapmode->screen.x;
+      mapmode->screen.x=0;
     }
-    if (mapmode->screeny < 0)
+    if (mapmode->screen.y < 0)
     {
-      mapmode->mapy+=mapmode->screeny;
-      mapmode->screeny=0;
+      mapmode->map.y+=mapmode->screen.y;
+      mapmode->screen.y=0;
     }
-    if (mapmode->screeny >= scrmode->rows)
+    if (mapmode->screen.y >= scrmode->rows)
     {
-      mapmode->mapy+=mapmode->screeny-(scrmode->rows-1);
-      mapmode->screeny=scrmode->rows-1;
+      mapmode->map.y+=mapmode->screen.y-(scrmode->rows-1);
+      mapmode->screen.y=scrmode->rows-1;
     }
-    if (mapmode->screenx >= scrmode->cols)
+    if (mapmode->screen.x >= scrmode->cols)
     {
-      mapmode->mapx+=mapmode->screenx-(scrmode->cols-1);
-      mapmode->screenx = scrmode->cols-1;
+      mapmode->map.x+=mapmode->screen.x-(scrmode->cols-1);
+      mapmode->screen.x = scrmode->cols-1;
     }
-    if (mapmode->mapx+scrmode->cols > MAP_SIZE_X)
-      mapmode->mapx = MAP_SIZE_X-scrmode->cols;
-    if (mapmode->mapy+scrmode->rows > MAP_SIZE_Y)
-      mapmode->mapy = MAP_SIZE_Y-scrmode->rows;
-    if (mapmode->mapx < 0)
-      mapmode->mapx=0;
-    if (mapmode->mapy < 0)
-      mapmode->mapy=0;
+    if (mapmode->map.x+scrmode->cols > MAP_SIZE_X)
+      mapmode->map.x = MAP_SIZE_X-scrmode->cols;
+    if (mapmode->map.y+scrmode->rows > MAP_SIZE_Y)
+      mapmode->map.y = MAP_SIZE_Y-scrmode->rows;
+    if (mapmode->map.x < 0)
+      mapmode->map.x=0;
+    if (mapmode->map.y < 0)
+      mapmode->map.y=0;
 }
 
 /*
@@ -1266,7 +1257,7 @@ void curposcheck(void)
  * Objects are action points, lights and things.
  * If cannot find, returns NULL.
  */
-struct CLIPBOARD *get_clipboard_object(int idx)
+struct CLIPBOARD *get_clipboard_object(struct SCRMODE_DATA *scrmode,int idx)
 {
     if (idx<0) return NULL;
     int cidx=-1;
@@ -1286,7 +1277,7 @@ struct CLIPBOARD *get_clipboard_object(int idx)
 /*
  * Gets the slab item from clipboard.
  */
-unsigned char *get_clipboard_slab(int idx)
+unsigned char *get_clipboard_slab(struct SCRMODE_DATA *scrmode,int idx)
 {
     if (idx<0) return NULL;
     int cidx=-1;
@@ -1304,7 +1295,7 @@ unsigned char *get_clipboard_slab(int idx)
 /*
  * Gets the DAT list item from clipboard.
  */
-unsigned char *get_clipboard_datlst(int idx)
+unsigned char *get_clipboard_datlst(struct SCRMODE_DATA *scrmode,int idx)
 {
     if (idx<0) return NULL;
     int cidx=-1;
@@ -1322,7 +1313,7 @@ unsigned char *get_clipboard_datlst(int idx)
 /*
  * Gets the column item from clipboard.
  */
-unsigned char *get_clipboard_column(int idx)
+unsigned char *get_clipboard_column(struct SCRMODE_DATA *scrmode,int idx)
 {
     if (idx<0) return NULL;
     int cidx=-1;
@@ -1342,7 +1333,7 @@ unsigned char *get_clipboard_column(int idx)
  * pasting the given pointer as clipboard item.
  * Returns index of new item.
  */
-int add_clipboard_any(char *obj,int obj_type)
+int add_clipboard_any(struct SCRMODE_DATA *scrmode,char *obj,int obj_type)
 {
     if (obj==NULL) return 0;
     int obj_idx=scrmode->clip_count;
@@ -1360,16 +1351,16 @@ int add_clipboard_any(char *obj,int obj_type)
  * pasting the given pointer as clipboard item.
  * Returns index of new item, which is zero.
  */
-int put_clipboard_any(char *obj,int obj_type)
+int put_clipboard_any(struct SCRMODE_DATA *scrmode,char *obj,int obj_type)
 {
-    clear_clipboard();
-    return add_clipboard_any(obj,obj_type);
+    clear_clipboard(scrmode);
+    return add_clipboard_any(scrmode,obj,obj_type);
 }
 
 /*
  * Clears all object from clipboard (frees the memory).
  */
-void clear_clipboard()
+void clear_clipboard(struct SCRMODE_DATA *scrmode)
 {
      int i;
      for (i=scrmode->clip_count-1;i>=0;i--)
@@ -1382,33 +1373,44 @@ void clear_clipboard()
 /*
  * Copies thing to clipboard, clearing any previous thing there.
  */
-int copy_to_clipboard_thing(unsigned char *obj)
+int copy_to_clipboard_thing(struct SCRMODE_DATA *scrmode,unsigned char *obj)
 {
     if (obj==NULL) return 0;
     unsigned char *obj_cp=(unsigned char *)malloc(SIZEOF_DK_TNG_REC);
     memcpy(obj_cp,obj,SIZEOF_DK_TNG_REC);
-    return put_clipboard_any(obj_cp,OBJECT_TYPE_THING);
+    return put_clipboard_any(scrmode,obj_cp,OBJECT_TYPE_THING);
 }
 
 /*
  * Copies action point to clipboard, clearing any previous thing there.
  */
-int copy_to_clipboard_actnpt(unsigned char *obj)
+int copy_to_clipboard_actnpt(struct SCRMODE_DATA *scrmode,unsigned char *obj)
 {
     if (obj==NULL) return 0;
     unsigned char *obj_cp=(unsigned char *)malloc(SIZEOF_DK_APT_REC);
     memcpy(obj_cp,obj,SIZEOF_DK_APT_REC);
-    return put_clipboard_any(obj_cp,OBJECT_TYPE_ACTNPT);
+    return put_clipboard_any(scrmode,obj_cp,OBJECT_TYPE_ACTNPT);
 }
 
 /*
  * Copies static light to clipboard, clearing any previous thing there.
  */
-int copy_to_clipboard_stlight(unsigned char *obj)
+int copy_to_clipboard_stlight(struct SCRMODE_DATA *scrmode,unsigned char *obj)
 {
     if (obj==NULL) return 0;
     unsigned char *obj_cp=(unsigned char *)malloc(SIZEOF_DK_LGT_REC);
     memcpy(obj_cp,obj,SIZEOF_DK_LGT_REC);
-    return put_clipboard_any(obj_cp,OBJECT_TYPE_STLIGHT);
+    return put_clipboard_any(scrmode,obj_cp,OBJECT_TYPE_STLIGHT);
 }
 
+
+short level_verify_with_highlight(struct LEVEL *lvl,struct MAPMODE_DATA *mapmode)
+{
+    struct IPOINT_2D errpt={-1,-1};
+    short result;
+    clear_highlight(mapmode);
+    result=level_verify(lvl,NULL,&errpt);
+    if ((errpt.x>=0) && (errpt.y>=0))
+      set_tile_highlight(mapmode, errpt.x, errpt.y, PRINT_COLOR_LRED_ON_YELLOW);
+    return result;
+}

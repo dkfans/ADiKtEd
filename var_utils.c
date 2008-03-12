@@ -219,7 +219,7 @@ void free_messages()
 
 void die(const char *format, ...)
 {
-      done();
+      done(NULL,NULL,NULL);
       va_list val;
       va_start(val, format);
       vfprintf(stderr, format, val);
@@ -231,10 +231,11 @@ void die(const char *format, ...)
 /*
  * Clean up all the stuff that init() did.
  */
-void done(void)
+void done(struct SCRMODE_DATA **scrmode,struct MAPMODE_DATA **mapmode,struct LEVEL **lvl)
 {
-    level_deinit();
-    free_levscr();
+    level_deinit(lvl);
+    if ((scrmode!=NULL)&&(mapmode!=NULL))
+      free_levscr(scrmode,mapmode);
     free_messages();
     input_done();
 }

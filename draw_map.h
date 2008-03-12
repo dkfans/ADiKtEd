@@ -5,22 +5,14 @@
 #ifndef ADIKT_DRAWMAP_H
 #define ADIKT_DRAWMAP_H
 
+#include "globals.h"
+
 struct LEVEL;
 
 #define TEXTURE_SIZE_X 32
 #define TEXTURE_SIZE_Y 32
 #define TEXTURE_COUNT_X 8
 #define TEXTURE_COUNT_Y 68
-
-struct MAPDRAW_POINT {
-    int x;
-    int y;
-};
-
-struct MAPDRAW_TXTRPOINT {
-    unsigned short x;
-    unsigned short y;
-};
 
 struct PALETTE_ENTRY {
     unsigned char r;
@@ -37,17 +29,17 @@ struct CUBES_DATA {
 //Texture indices for every side of a cube
 struct CUBE_TEXTURES {
        //north
-    struct MAPDRAW_TXTRPOINT n;
+    struct USPOINT_2D n;
        //south
-    struct MAPDRAW_TXTRPOINT s;
+    struct USPOINT_2D s;
        //west
-    struct MAPDRAW_TXTRPOINT w;
+    struct USPOINT_2D w;
        //east
-    struct MAPDRAW_TXTRPOINT e;
+    struct USPOINT_2D e;
        //top
-    struct MAPDRAW_TXTRPOINT t;
+    struct USPOINT_2D t;
        //bottom
-    struct MAPDRAW_TXTRPOINT b;
+    struct USPOINT_2D b;
 };
 
 struct MAPDRAW_DATA {
@@ -59,8 +51,8 @@ struct MAPDRAW_DATA {
     // Things and other objects
     struct IMAGELIST *images;
     // Where to start/end drawing
-    struct MAPDRAW_POINT start;
-    struct MAPDRAW_POINT end;
+    struct IPOINT_2D start;
+    struct IPOINT_2D end;
     short rescale;
 };
 

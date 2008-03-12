@@ -25,7 +25,7 @@ const int idir_subtl_y[]={
     1, 1, 1,
     2, 2, 2,};
 
-struct LEVEL *lvl=NULL;
+//struct LEVEL *lvl=NULL;
 
 /*
  * creates object for storing one level; allocates memory and inits
@@ -33,14 +33,15 @@ struct LEVEL *lvl=NULL;
  */
 short level_init(struct LEVEL **lvl_ptr)
 {
-    lvl=(struct LEVEL *)malloc(sizeof(struct LEVEL));
-    *lvl_ptr=lvl;
+    (*lvl_ptr)=(struct LEVEL *)malloc(sizeof(struct LEVEL));
+    struct LEVEL *lvl;
+    lvl=(*lvl_ptr);
     if (lvl==NULL)
         die("level_init: Out of memory");
     // map file name
-    lvl->fname=(char *)malloc(DISKPATH_SIZE);
+    lvl->fname=(char *)malloc(DISKPATH_SIZE*sizeof(char));
     memset(lvl->fname,0,DISKPATH_SIZE*sizeof(char));
-    lvl->savfname=(char *)malloc(DISKPATH_SIZE);
+    lvl->savfname=(char *)malloc(DISKPATH_SIZE*sizeof(char));
     memset(lvl->savfname,0,DISKPATH_SIZE*sizeof(char));
     //Preparing array bounds
     const int arr_entries_x=MAP_SIZE_X*MAP_SUBNUM_X;
@@ -446,8 +447,12 @@ short level_clear(struct LEVEL *lvl)
  * allocated by level_init(); to free the content of loaded level,
  * you must call level_free() first;
  */
-short level_deinit()
+short level_deinit(struct LEVEL **lvl_ptr)
 {
+    if ((lvl_ptr==NULL)||((*lvl_ptr)==NULL))
+      return false;
+    struct LEVEL *lvl;
+    lvl=(*lvl_ptr);
     //Preparing array bounds
     const int arr_entries_x=MAP_SIZE_X*MAP_SUBNUM_X;
     const int arr_entries_y=MAP_SIZE_Y*MAP_SUBNUM_Y;
@@ -590,7 +595,7 @@ short level_deinit()
 
     //Final freeing - main lvl object
     free(lvl);
-    lvl=NULL;
+    *lvl_ptr=NULL;
     return true;
 }
 
@@ -700,7 +705,7 @@ short level_free_lgt(struct LEVEL *lvl)
  * the array structure remains intact (as after level_init(), but values
  * are not cleared - use level_clear() to set nulls to pointers)
  */
-short level_free()
+short level_free(struct LEVEL *lvl)
 {
   short result=true;
   result&=level_free_lgt(lvl);
@@ -711,7 +716,7 @@ short level_free()
   return result;
 }
 
-short level_verify(struct LEVEL *lvl, char *actn_name)
+short level_verify(struct LEVEL *lvl, char *actn_name,struct IPOINT_2D *errpt)
 {
   char err_msg[LINEMSG_SIZE];
   strcpy(err_msg,"Unknown error");
@@ -719,42 +724,42 @@ short level_verify(struct LEVEL *lvl, char *actn_name)
   short nres;
   if (result!=VERIF_ERROR)
   {
-    nres=level_verify_struct(lvl,err_msg);
+    nres=level_verify_struct(lvl,err_msg,errpt);
     if (nres!=VERIF_OK) result=nres;
   }
   if (result!=VERIF_ERROR)
   {
-    nres=things_verify(lvl,err_msg);
+    nres=things_verify(lvl,err_msg,errpt);
     if (nres!=VERIF_OK) result=nres;
   }
   if (result!=VERIF_ERROR)
   {
-    nres=slabs_verify(lvl,err_msg);
+    nres=slabs_verify(lvl,err_msg,errpt);
     if (nres!=VERIF_OK) result=nres;
   }
   if (result!=VERIF_ERROR)
   {
-    nres=actnpts_verify(lvl,err_msg);
+    nres=actnpts_verify(lvl,err_msg,errpt);
     if (nres!=VERIF_OK) result=nres;
   }
   if (result!=VERIF_ERROR)
   {
-    nres=columns_verify(lvl,err_msg);
+    nres=columns_verify(lvl,err_msg,errpt);
     if (nres!=VERIF_OK) result=nres;
   }
   if (result!=VERIF_ERROR)
   {
-    nres=dat_verify(lvl,err_msg);
+    nres=dat_verify(lvl,err_msg,errpt);
     if (nres!=VERIF_OK) result=nres;
   }
   if (result!=VERIF_ERROR)
   {
-    nres=txt_verify(lvl,err_msg);
+    nres=txt_verify(lvl,err_msg,errpt);
     if (nres!=VERIF_OK) result=nres;
   }
   if (result!=VERIF_ERROR)
   {
-    nres=level_verify_logic(lvl,err_msg);
+    nres=level_verify_logic(lvl,err_msg,errpt);
     if (nres!=VERIF_OK) result=nres;
   }
   switch (result)
@@ -781,7 +786,7 @@ short level_verify(struct LEVEL *lvl, char *actn_name)
  * Verifies internal LEVEL structure integrity. Returns VERIF_ERROR,
  * VERIF_WARN or VERIF_OK
  */
-short level_verify_struct(struct LEVEL *lvl, char *err_msg)
+short level_verify_struct(struct LEVEL *lvl, char *err_msg,struct IPOINT_2D *errpt)
 {
     //Preparing array bounds
     int arr_entries_x=MAP_SIZE_X*MAP_SUBNUM_X;
@@ -814,7 +819,9 @@ short level_verify_struct(struct LEVEL *lvl, char *err_msg)
           unsigned char *thing = get_thing(lvl,i,j,k);
           if (thing==NULL)
           {
-              sprintf(err_msg,"Null thing pointer at slab %d,%d.",i/MAP_SUBNUM_X, j/MAP_SUBNUM_Y);
+              errpt->x=i/MAP_SUBNUM_X;
+              errpt->y=j/MAP_SUBNUM_Y;
+              sprintf(err_msg,"Null thing pointer at slab %d,%d.",errpt->x,errpt->y);
               return VERIF_ERROR;
           }
         }
@@ -825,7 +832,9 @@ short level_verify_struct(struct LEVEL *lvl, char *err_msg)
           unsigned char *actnpt = lvl->apt_lookup[i][j][k];
           if (actnpt==NULL)
           {
-              sprintf(err_msg,"Null action point pointer at slab %d,%d.",i/MAP_SUBNUM_X, j/MAP_SUBNUM_Y);
+              errpt->x=i/MAP_SUBNUM_X;
+              errpt->y=j/MAP_SUBNUM_Y;
+              sprintf(err_msg,"Null action point pointer at slab %d,%d.",errpt->x,errpt->y);
               return VERIF_ERROR;
           }
         }
@@ -836,7 +845,9 @@ short level_verify_struct(struct LEVEL *lvl, char *err_msg)
           unsigned char *stlight = lvl->lgt_lookup[i][j][k];
           if (stlight==NULL)
           {
-              sprintf(err_msg,"Null static light pointer at slab %d,%d.",i/MAP_SUBNUM_X, j/MAP_SUBNUM_Y);
+              errpt->x=i/MAP_SUBNUM_X;
+              errpt->y=j/MAP_SUBNUM_Y;
+              sprintf(err_msg,"Null static light pointer at slab %d,%d.",errpt->x,errpt->y);
               return VERIF_ERROR;
           }
         }
@@ -867,7 +878,7 @@ short level_verify_struct(struct LEVEL *lvl, char *err_msg)
  * Verifies action points parameters. Returns VERIF_ERROR,
  * VERIF_WARN or VERIF_OK
  */
-short actnpts_verify(struct LEVEL *lvl, char *err_msg)
+short actnpts_verify(struct LEVEL *lvl, char *err_msg,struct IPOINT_2D *errpt)
 {
   return VERIF_OK;
 }
@@ -876,7 +887,7 @@ short actnpts_verify(struct LEVEL *lvl, char *err_msg)
  * Verifies various logic aspects of a map. Returns VERIF_ERROR,
  * VERIF_WARN or VERIF_OK
  */
-short level_verify_logic(struct LEVEL *lvl, char *err_msg)
+short level_verify_logic(struct LEVEL *lvl, char *err_msg,struct IPOINT_2D *errpt)
 {
     //Preparing array bounds
     int arr_entries_x=MAP_SIZE_X*MAP_SUBNUM_X;
@@ -915,7 +926,9 @@ short level_verify_logic(struct LEVEL *lvl, char *err_msg)
             }*/
             if ((pos_h<col_h)&&(!slab_is_door(slab))||(pos_h<min(col_h,1)))
             {
-              sprintf(err_msg,"Thing trapped in solid column on slab %d,%d (h=%d<%d).",i/MAP_SUBNUM_X, j/MAP_SUBNUM_Y,pos_h,col_h);
+              errpt->x=i/MAP_SUBNUM_X;
+              errpt->y=j/MAP_SUBNUM_Y;
+              sprintf(err_msg,"Thing trapped in solid column on slab %d,%d (h=%d<%d).",errpt->x,errpt->y,pos_h,col_h);
               return VERIF_WARN;
             }
           }
@@ -1173,9 +1186,9 @@ void generate_random_map(struct LEVEL *lvl)
     update_level_stats(lvl);
 }
 
-void free_map(void)
+void free_map(struct LEVEL *lvl)
 {
-    level_free();
+    level_free(lvl);
     level_clear(lvl);
 }
 
@@ -1276,7 +1289,7 @@ unsigned int get_thing_subnums(const struct LEVEL *lvl,unsigned int x,unsigned i
     return lvl->tng_subnums[x][y];
 }
 
-char *get_actnpt(struct LEVEL *lvl,unsigned int x,unsigned int y,unsigned int num)
+char *get_actnpt(const struct LEVEL *lvl,unsigned int x,unsigned int y,unsigned int num)
 {
     //Preparing array bounds
     unsigned int arr_entries_x=MAP_SIZE_X*MAP_SUBNUM_X;
@@ -1346,7 +1359,7 @@ void actnpt_del(struct LEVEL *lvl,unsigned int x, unsigned int y, unsigned int n
                         apt_snum*sizeof(char *));
 }
 
-unsigned int get_actnpt_subnums(struct LEVEL *lvl,unsigned int x,unsigned int y)
+unsigned int get_actnpt_subnums(const struct LEVEL *lvl,unsigned int x,unsigned int y)
 {
     //Preparing array bounds
     unsigned int arr_entries_x=MAP_SIZE_X*MAP_SUBNUM_X;
@@ -1357,7 +1370,7 @@ unsigned int get_actnpt_subnums(struct LEVEL *lvl,unsigned int x,unsigned int y)
     return lvl->apt_subnums[x][y];
 }
 
-char *get_stlight(struct LEVEL *lvl,unsigned int x,unsigned int y,unsigned int num)
+char *get_stlight(const struct LEVEL *lvl,unsigned int x,unsigned int y,unsigned int num)
 {
     //Preparing array bounds
     unsigned int arr_entries_x=MAP_SIZE_X*MAP_SUBNUM_X;
@@ -1427,7 +1440,7 @@ void stlight_del(struct LEVEL *lvl,unsigned int x, unsigned int y, unsigned int 
                         lgt_snum*sizeof(char *));
 }
 
-unsigned int get_stlight_subnums(struct LEVEL *lvl,unsigned int x,unsigned int y)
+unsigned int get_stlight_subnums(const struct LEVEL *lvl,unsigned int x,unsigned int y)
 {
     //Preparing array bounds
     unsigned int arr_entries_x=MAP_SIZE_X*MAP_SUBNUM_X;
@@ -1442,7 +1455,7 @@ unsigned int get_stlight_subnums(struct LEVEL *lvl,unsigned int x,unsigned int y
  * Checks what type the object is. Objects are action points, things or lights.
  * Returns one of OBJECT_TYPE_* value
  */
-short get_object_type(struct LEVEL *lvl, unsigned int x, unsigned int y, unsigned int z)
+short get_object_type(const struct LEVEL *lvl, unsigned int x, unsigned int y, unsigned int z)
 {
     //Preparing array bounds
     int arr_entries_x=MAP_SIZE_X*MAP_SUBNUM_X;
@@ -1459,7 +1472,7 @@ short get_object_type(struct LEVEL *lvl, unsigned int x, unsigned int y, unsigne
     return OBJECT_TYPE_NONE;
 }
 
-unsigned char *get_object(struct LEVEL *lvl,unsigned int x,unsigned int y,unsigned int z)
+unsigned char *get_object(const struct LEVEL *lvl,unsigned int x,unsigned int y,unsigned int z)
 {
     //Preparing array bounds
     int arr_entries_x=MAP_SIZE_X*MAP_SUBNUM_X;
@@ -1510,7 +1523,7 @@ void object_del(struct LEVEL *lvl,unsigned int sx,unsigned int sy,unsigned int z
     }
 }
 
-unsigned int get_object_subnums(struct LEVEL *lvl,unsigned int x,unsigned int y)
+unsigned int get_object_subnums(const struct LEVEL *lvl,unsigned int x,unsigned int y)
 {
     //Preparing array bounds
     unsigned int arr_entries_x=MAP_SIZE_X*MAP_SUBNUM_X;
@@ -1521,7 +1534,7 @@ unsigned int get_object_subnums(struct LEVEL *lvl,unsigned int x,unsigned int y)
     return lvl->tng_subnums[x][y]+lvl->apt_subnums[x][y]+lvl->lgt_subnums[x][y];
 }
 
-unsigned int get_object_tilnums(struct LEVEL *lvl,unsigned int x,unsigned int y)
+unsigned int get_object_tilnums(const struct LEVEL *lvl,unsigned int x,unsigned int y)
 {
     if (lvl->tng_apt_lgt_nums==NULL) return 0;
     return lvl->tng_apt_lgt_nums[x%MAP_SIZE_X][y%MAP_SIZE_Y];
@@ -1530,7 +1543,7 @@ unsigned int get_object_tilnums(struct LEVEL *lvl,unsigned int x,unsigned int y)
 /*
  * Returns index of the last object with given type. May return -1 if no object found.
  */
-int get_object_subtl_last(struct LEVEL *lvl,unsigned int x,unsigned int y,short obj_type)
+int get_object_subtl_last(const struct LEVEL *lvl,unsigned int x,unsigned int y,short obj_type)
 {
     //Preparing array bounds
     unsigned int arr_entries_x=MAP_SIZE_X*MAP_SUBNUM_X;

@@ -6,6 +6,7 @@
 #define ADIKT_LEVTHINGS_H
 
 struct LEVEL;
+struct IPOINT_2D;
 
 typedef short (*is_thing_subtype)(const unsigned char *thing);
 typedef unsigned char (*thing_subtype_switch)(const unsigned char stype_idx);
@@ -13,7 +14,7 @@ typedef unsigned char (*thing_subtype_switch)(const unsigned char stype_idx);
 typedef void (*cr_tng_func)(struct LEVEL *lvl, int tx, int ty,
         unsigned char *surr_slb,unsigned char *surr_own);
 
-short things_verify(struct LEVEL *lvl, char *err_msg);
+short things_verify(struct LEVEL *lvl, char *err_msg,struct IPOINT_2D *errpt);
 
 char *get_search_tngtype_name(unsigned short idx);
 is_thing_subtype get_search_tngtype_func(unsigned short idx);
@@ -23,20 +24,20 @@ unsigned char *find_next_object_on_map(struct LEVEL *lvl, int *tx, int *ty, unsi
 short subtl_in_roomeffect_range(struct LEVEL *lvl,unsigned int sx,unsigned int sy);
 
 unsigned char *create_door(struct LEVEL *lvl, unsigned int sx, unsigned int sy, unsigned char stype_idx);
-unsigned char *create_roomeffect(unsigned int sx, unsigned int sy, unsigned char stype_idx);
-unsigned char *create_creature(unsigned int sx, unsigned int sy, unsigned char stype_idx);
-unsigned char *create_trap(unsigned int sx, unsigned int sy, unsigned char stype_idx);
-unsigned char *create_item_adv(struct LEVEL *lvl, unsigned int sx, unsigned int sy, unsigned char stype_idx);
+unsigned char *create_roomeffect(const struct LEVEL *lvl,unsigned int sx, unsigned int sy, unsigned char stype_idx);
+unsigned char *create_creature(const struct LEVEL *lvl,unsigned int sx, unsigned int sy, unsigned char stype_idx);
+unsigned char *create_trap(const struct LEVEL *lvl,unsigned int sx, unsigned int sy, unsigned char stype_idx);
+unsigned char *create_item_adv(const struct LEVEL *lvl, unsigned int sx, unsigned int sy, unsigned char stype_idx);
 
 //Lower level functions, used by create_item_adv
-unsigned char *create_torch(struct LEVEL *lvl, unsigned int sx, unsigned int sy,  unsigned char stype_idx);
-unsigned char *create_doorkey(struct LEVEL *lvl, unsigned int sx, unsigned int sy,  unsigned char stype_idx);
+unsigned char *create_torch(const struct LEVEL *lvl, unsigned int sx, unsigned int sy,  unsigned char stype_idx);
+unsigned char *create_doorkey(const struct LEVEL *lvl, unsigned int sx, unsigned int sy,  unsigned char stype_idx);
 
 short set_door_lock(struct LEVEL *lvl, unsigned char *thing, unsigned char nlock);
 unsigned char get_door_lock(unsigned char *thing);
-unsigned char compute_door_orientation(struct LEVEL *lvl, unsigned char *thing);
-unsigned short compute_torch_sensitile(struct LEVEL *lvl, unsigned char *thing);
-unsigned short compute_roomeffect_sensitile(struct LEVEL *lvl, unsigned char *thing);
+unsigned char compute_door_orientation(const struct LEVEL *lvl, unsigned char *thing);
+unsigned short compute_torch_sensitile(const struct LEVEL *lvl, unsigned char *thing);
+unsigned short compute_roomeffect_sensitile(const struct LEVEL *lvl, unsigned char *thing);
 short owned_things_count(int *count,struct LEVEL *lvl,
     unsigned char type_idx,unsigned char stype_idx);
 unsigned char *find_lit_thing_on_square_radius1(struct LEVEL *lvl, int tx, int ty);
@@ -114,7 +115,7 @@ void update_things_slb_guardpost_floor(struct LEVEL *lvl, int tx, int ty,
 void update_things_slb_prison(struct LEVEL *lvl, int tx, int ty,
         unsigned char *surr_slb,unsigned char *surr_own);
 
-void remove_noncrucial_room_things(int tx, int ty);
+void remove_noncrucial_room_things(struct LEVEL *lvl, int tx, int ty);
 
 
 #endif // ADIKT_LEVTHINGS_H

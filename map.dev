@@ -27,13 +27,13 @@ CustomMakefile=
 IncludeVersionInfo=1
 SupportXPThemes=0
 CompilerSet=0
-CompilerSettings=00000000000000000000e0
+CompilerSettings=00000000000000000000e1
 
 [VersionInfo]
 Major=0
-Minor=5
+Minor=7
 Release=0
-Build=3297
+Build=33
 LanguageID=1033
 CharsetID=1252
 CompanyName=

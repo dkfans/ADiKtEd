@@ -17,7 +17,7 @@ struct DK_GRAFFITI *get_graffiti(struct LEVEL *lvl, int graf_idx);
 char *get_graffiti_text(struct LEVEL *lvl,unsigned int num);
 int graffiti_idx(struct LEVEL *lvl, int tx, int ty);
 int graffiti_idx_next(struct LEVEL *lvl, int tx, int ty,int prev_idx);
-struct DK_GRAFFITI *create_graffiti(int tx, int ty, char *text, int orient);
+struct DK_GRAFFITI *create_graffiti(int tx, int ty, char *text, const struct LEVEL *lvl, int orient);
 int graffiti_add_obj(struct LEVEL *lvl,struct DK_GRAFFITI *graf);
 int graffiti_add(struct LEVEL *lvl,int tx, int ty,int height, char *text,int font,
       unsigned short orient,unsigned short cube);
@@ -30,7 +30,7 @@ short place_graffiti_on_clm_top(struct COLUMN_REC *clm_rec,unsigned short font,
 int compute_graffiti_subtl_length(unsigned short font,char *text);
 void graffiti_update_columns(struct LEVEL *lvl,int graf_idx);
 void graffiti_clear_from_columns(struct LEVEL *lvl,int graf_idx);
-short set_graffiti_orientation(struct DK_GRAFFITI *graf,unsigned short orient);
+short set_graffiti_orientation(struct DK_GRAFFITI *graf,const struct LEVEL *lvl,unsigned short orient);
 int set_graffiti_height(struct DK_GRAFFITI *graf,int height);
 
 int get_graffiti_cube_height(unsigned short font,char *text);
