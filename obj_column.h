@@ -298,7 +298,7 @@
 
 #define CUBE_MAX_INDEX         511
 
-#define CUST_CLM_GEN_MAX_INDEX  37
+#define CUST_CLM_GEN_MAX_INDEX  41
 
 //WIB entry values
 #define COLUMN_WIB_STATIC      0x00
@@ -334,7 +334,7 @@ struct DK_CUSTOM_CLM {
 typedef void (*cr_clm_func)(struct COLUMN_REC *clm_recs[9],
         unsigned char *surr_slb,unsigned char *surr_own, unsigned char **surr_tng);
 
-struct COLUMN_REC *create_column_rec();
+struct COLUMN_REC *create_column_rec(void);
 void free_column_rec(struct COLUMN_REC *clm_rec);
 short clm_rec_copy(struct COLUMN_REC *dest_rec,const struct COLUMN_REC *src_rec);
 void fill_column_rec_sim(struct COLUMN_REC *clm_rec, unsigned int use, int base,
@@ -467,6 +467,15 @@ void fill_columns_slb_roomrelief(struct COLUMN_REC *clm_recs[9], short *allow_re
         unsigned char *surr_slb,unsigned char *surr_own, unsigned char **surr_tng);
 short fill_side_columns_room_relief(struct COLUMN_REC *clm_reca,struct COLUMN_REC *clm_recb,
     struct COLUMN_REC *clm_recc,unsigned short room_slab,unsigned char owner, short corner, short edge);
+
+void create_columns_slb_skulls_on_lava(struct COLUMN_REC *clm_recs[9],
+        unsigned char *surr_slb,unsigned char *surr_own, unsigned char **surr_tng);
+void create_columns_slb_skulls_on_path(struct COLUMN_REC *clm_recs[9],
+        unsigned char *surr_slb,unsigned char *surr_own, unsigned char **surr_tng);
+void create_columns_slb_skulls_on_claimed(struct COLUMN_REC *clm_recs[9],
+        unsigned char *surr_slb,unsigned char *surr_own, unsigned char **surr_tng);
+void create_columns_slb_wall_force_relief_splatbody(struct COLUMN_REC *clm_recs[9],
+        unsigned char *surr_slb,unsigned char *surr_own, unsigned char **surr_tng);
 
 void create_columns_slb_room(cr_clm_func cr_floor,cr_clm_func cr_edge,
         cr_clm_func cr_corner,cr_clm_func cr_inside,cr_clm_func cr_nearinsd,

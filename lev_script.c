@@ -973,7 +973,7 @@ const char *font_cmd_text(int cmdidx)
 /*
  * Creates new DK_SCRIPT_COMMAND and initializes its values
  */
-struct DK_SCRIPT_COMMAND *script_command_create()
+struct DK_SCRIPT_COMMAND *script_command_create(void)
 {
   struct DK_SCRIPT_COMMAND *cmd=(struct DK_SCRIPT_COMMAND *)malloc(sizeof(struct DK_SCRIPT_COMMAND));
   script_command_clear(cmd);

@@ -18,7 +18,7 @@ short disable_sounds=false;
 /*
  * Function for retrieving single key from keyboard.
  */
-unsigned int get_key (void)
+unsigned int get_key(void)
 {
     unsigned int ret;
 #if defined(unix) && !defined(GO32)
@@ -29,6 +29,16 @@ unsigned int get_key (void)
     ret = SLkp_getkey();
 #if defined(unix) && !defined(GO32)
     safe_update = false;
+#endif
+#if defined(WIN32)
+    if (ret==ABORT_KEY)
+    {
+      SLang_reset_tty();
+      if (SLang_init_tty(ABORT_KEY,1,0) == -1) 
+      {
+          die("get_key: SLang_init_tty: returned error code");
+      }
+    }
 #endif
     return ret;
 }
@@ -51,7 +61,7 @@ int get_str(char *prompt, char *buf)
       SLsmg_write_string (prompt);
       SLsmg_write_nchars (buf, len);
 
-      SLsmg_set_color (0);
+      SLsmg_set_color(0);
       SLsmg_erase_eol();
       SLsmg_refresh();
 #if defined(unix) && !defined(GO32)
@@ -68,7 +78,7 @@ int get_str(char *prompt, char *buf)
           buf[len] = '\0';
           return true;
       } 
-      else if ((c == KEY_ESCAPE) || (c == 7))
+      else if ((c == KEY_ESCAPE) || (c == KEY_CTRL_G))
       {
         message_error("User break of input");
         SLKeyBoard_Quit=0;
@@ -76,7 +86,7 @@ int get_str(char *prompt, char *buf)
         return false;
       }
       
-      if (c >= 32 && c <= 126)
+      if ((c>=32) && (c<=126))
       {
           if (len < maxlen)
             buf[len++] = c;
@@ -84,7 +94,7 @@ int get_str(char *prompt, char *buf)
             speaker_beep();
       }
 
-      if (((c == 127) || (c == KEY_BACKSP)) && len > 0)
+      if ( ((c==KEY_BACKSP)||(c==KEY_DEL)) && (len>0) )
           len--;
 
       if (c == 'U'-'@')             // ^U kill line
@@ -96,45 +106,50 @@ int get_str(char *prompt, char *buf)
  * Initialise stuff at the beginning of the program: mostly the
  * SLang library terminal management.
  */
-void input_init(void)
+short input_init(void)
 {
     SLtt_get_terminfo();
 
    // SLkp_init assumes that SLtt_get_terminfo has been called.
    if (SLkp_init() == -1)
      {
-        fprintf(stderr, "axe: SLkp_init: returned error code\n");
-        exit(1);
+        die("axe: SLkp_init: returned error code");
      }
 
     //SLang_init_tty initializes terminal for reading single characters
     //definition: int SLang_init_tty (int abort_char, int flow_ctrl, int opost)
     if (SLang_init_tty(ABORT_KEY,1,0) == -1) 
     {
-        fprintf(stderr, "axe: SLang_init_tty: returned error code\n");
-        exit(1);
+        die("axe: SLang_init_tty: returned error code");
     }
     SLang_set_abort_signal(NULL);
     //This could allow reading CTRL+key sequences
 //    SLgetkey_map_to_ansi(1);
     SLang_flush_input(); 
     input_initied=true;
+    return ERR_KB_NONE;
 }
 
 /*
  * Clean up all the stuff that input_init() did.
  */
-void input_done(void) 
+short input_done(void) 
 {
-    if (!input_initied) return;
+    if (!input_initied) return ERR_KB_ALREADY;
     SLang_reset_tty();
     input_initied=false;
+    return ERR_KB_NONE;
+}
+
+unsigned char key_to_ascii(int key)
+{
+  return (unsigned char)key;
 }
 
 /*
  * Just makes "beep" on error. Disable the body if you require some silence.
  */
-void speaker_beep()
+void speaker_beep(void)
 {
     if (disable_sounds) return;
     SLtt_beep();

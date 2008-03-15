@@ -32,7 +32,7 @@ void draw_mdtng(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct
 void draw_mdtng_panel(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl);
 
 //Functions - lower level
-void change_visited_tile(void);
+void change_visited_tile(struct MAPMODE_DATA *mapmode);
 int display_thing(unsigned char *thing, int x, int y);
 int display_action_point(unsigned char *actnpt, int x, int y);
 int display_static_light(unsigned char *stlight, int x, int y);

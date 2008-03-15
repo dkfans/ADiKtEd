@@ -75,7 +75,7 @@ struct DK_CUSTOM_CLM *get_cust_col(struct LEVEL *lvl, int sx, int sy);
 struct COLUMN_REC *get_cust_col_rec(struct LEVEL *lvl, int sx, int sy);
 unsigned short get_cust_col_wib_entry(struct LEVEL *lvl, int sx, int sy);
 short set_cust_col(struct LEVEL *lvl,int sx,int sy,struct DK_CUSTOM_CLM *ccol);
-struct DK_CUSTOM_CLM *create_cust_col();
+struct DK_CUSTOM_CLM *create_cust_col(void);
 short cust_col_del(struct LEVEL *lvl, int sx, int sy);
 int cust_cols_del_for_tile(struct LEVEL *lvl, int tx, int ty);
 

@@ -72,6 +72,10 @@ short init_help(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode)
     help->srch=NULL;
     help->rwrkrows=0;
     help->rwrk=NULL;
+    help->lmaprows=0;
+    help->lmap=NULL;
+    help->smaprows=0;
+    help->smap=NULL;
     help->tiprows=0;
     help->tips=NULL;
     help->compassrows=0;
@@ -190,8 +194,10 @@ char ***match_title(char *title, int n)
             "cubekeyhelp",                //16
             "slblhelp", "slblkeyhelp",    //17,18
             "srchhelp", "srchkeyhelp",    //19,20
-            "rwrkhelp",                   //21
-            "compass", NULL};             //22
+            "rwrkhelp", "lmaphelp",       //21,22
+            "smaphelp",                   //23
+            "grfthelp", "grftkeyhelp",    //24,25
+            "compass", NULL};             //26
     int i=0;
 
     while (titles[i] && strcmp (titles[i], title))
@@ -199,99 +205,115 @@ char ***match_title(char *title, int n)
     switch (i)
     {
       case 0 :
-      if (n!=-1)
+        if (n!=-1)
           help->slbkeyrows=n;
-      return &(help->slbkey);
+        return &(help->slbkey);
       case 1 :
-      if (n!=-1)
+        if (n!=-1)
           help->tngkeyrows=n;
-      return &(help->tngkey);
+        return &(help->tngkey);
       case 2 :
-      if (n!=-1)
+        if (n!=-1)
           help->crtkeyrows=n;
-      return &(help->crtkey);
+        return &(help->crtkey);
       case 3 :
-      if (n!=-1)
+        if (n!=-1)
           help->itmtkeyrows=n;
-      return &(help->itmtkey);
+        return &(help->itmtkey);
       case 4 :
-      if (n!=-1)
+        if (n!=-1)
           help->slbrows=n;
-      return &(help->slb);
+        return &(help->slb);
       case 5 :
-      if (n!=-1)
+        if (n!=-1)
           help->tngrows=n;
-      return &(help->tng);
+        return &(help->tng);
       case 6 :
-      if (n!=-1)
+        if (n!=-1)
           help->crtrows=n;
-      return &(help->crt);
+        return &(help->crt);
       case 7 :
-      if (n!=-1)
+        if (n!=-1)
           help->itmtrows=n;
-      return &(help->itmt);
+        return &(help->itmt);
       case 8 :
-      if (n!=-1)
+        if (n!=-1)
           help->clmrows=n;
-      return &(help->clm);
+        return &(help->clm);
       case 9 :
-      if (n!=-1)
+        if (n!=-1)
           help->tiprows=n;
-      return &(help->tips);
+        return &(help->tips);
       case 10:
-      if (n!=-1)
+        if (n!=-1)
           help->scrprows=n;
-      return &(help->scrp);
+        return &(help->scrp);
       case 11:
-      if (n!=-1)
+        if (n!=-1)
           help->txtrrows=n;
-      return &(help->txtr);
+        return &(help->txtr);
       case 12:
-      if (n!=-1)
+        if (n!=-1)
           help->cclmrows=n;
-      return &(help->cclm);
+        return &(help->cclm);
       case 13:
-      if (n!=-1)
+        if (n!=-1)
           help->cuberows=n;
-      return &(help->cube);
+        return &(help->cube);
       case 14:
-      if (n!=-1)
+        if (n!=-1)
           help->txtrkeyrows=n;
-      return &(help->txtrkey);
+        return &(help->txtrkey);
       case 15:
-      if (n!=-1)
+        if (n!=-1)
           help->cclmkeyrows=n;
-      return &(help->cclmkey);
+        return &(help->cclmkey);
       case 16:
-      if (n!=-1)
+        if (n!=-1)
           help->cubekeyrows=n;
-      return &(help->cubekey);
+        return &(help->cubekey);
       case 17:
-      if (n!=-1)
+        if (n!=-1)
           help->slblrows=n;
-      return &(help->slbl);
+        return &(help->slbl);
       case 18:
-      if (n!=-1)
+        if (n!=-1)
           help->slblkeyrows=n;
-      return &(help->slblkey);
+        return &(help->slblkey);
       case 19:
-      if (n!=-1)
+        if (n!=-1)
           help->srchrows=n;
-      return &(help->srch);
+        return &(help->srch);
       case 20:
-      if (n!=-1)
+        if (n!=-1)
           help->srchkeyrows=n;
-      return &(help->srchkey);
+        return &(help->srchkey);
       case 21:
-      if (n!=-1)
+        if (n!=-1)
           help->rwrkrows=n;
-      return &(help->rwrk);
+        return &(help->rwrk);
       case 22:
-      if (n!=-1)
+        if (n!=-1)
+          help->lmaprows=n;
+        return &(help->lmap);
+      case 23:
+        if (n!=-1)
+          help->smaprows=n;
+        return &(help->smap);
+      case 24:
+        if (n!=-1)
+          help->grftrows=n;
+        return &(help->grft);
+      case 25:
+        if (n!=-1)
+          help->grftkeyrows=n;
+        return &(help->grftkey);
+      case 26:
+        if (n!=-1)
           help->compassrows=n;
-      return &(help->compass);
+        return &(help->compass);
       default :
-      return NULL;
+        return NULL;
     }
 }
 
@@ -351,6 +373,18 @@ short start_help(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struc
       case MD_RWRK:
         help->rows=help->rwrkrows;
         help->text=help->rwrk;
+        break;
+      case MD_LMAP:
+        help->rows=help->lmaprows;
+        help->text=help->lmap;
+        break;
+      case MD_SMAP:
+        help->rows=help->smaprows;
+        help->text=help->smap;
+        break;
+      case MD_GRFT:
+        help->rows=help->grftrows;
+        help->text=help->grft;
         break;
       default:
         help->rows=0;
@@ -499,7 +533,7 @@ void draw_help_line(int posy,int posx,char *text)
       free(line);
 }
 
-char *get_random_tip()
+char *get_random_tip(void)
 {
     if ((help->tiprows<1)||(help->tips==NULL))
       return "No tip, sorry.";
@@ -546,6 +580,10 @@ short init_key_help(int mode)
       case MD_SRCH:
         help->rows=help->srchkeyrows;
         help->text=help->srchkey;
+        break;
+      case MD_GRFT:
+        help->rows=help->grftkeyrows;
+        help->text=help->grftkey;
         break;
       case MD_CLM:
       case MD_SCRP:

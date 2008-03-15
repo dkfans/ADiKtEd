@@ -11,22 +11,25 @@ struct LEVEL;
 
 enum adikt_workmode
 {
-  MD_SLB    = 0x000,
-  MD_TNG    = 0x001,
-  MD_CRTR   = 0x002,
-  MD_ITMT   = 0x003,
-  MD_HELP   = 0x004,
-  MD_CLM    = 0x005,
-  MD_SCRP   = 0x006,
-  MD_TXTR   = 0x007,
-  MD_CCLM   = 0x008,
-  MD_CUBE   = 0x009,
-  MD_SLBL   = 0x00a,
-  MD_RWRK   = 0x00b,
-  MD_SRCH   = 0x00c,
+  MD_SLB    = 0x000, // Slab mode
+  MD_TNG    = 0x001, // Thing mode
+  MD_CRTR   = 0x002, // Creature type mode
+  MD_ITMT   = 0x003, // Item type mode
+  MD_HELP   = 0x004, // Help mode
+  MD_CLM    = 0x005, // Column mode
+  MD_SCRP   = 0x006, // Script mode
+  MD_TXTR   = 0x007, // Texture selection mode
+  MD_CCLM   = 0x008, // Custom Column list mode
+  MD_CUBE   = 0x009, // Custom Cubes mode
+  MD_SLBL   = 0x00a, // Slab list mode
+  MD_RWRK   = 0x00b, // File formats rework mode
+  MD_SRCH   = 0x00c, // Search mode
+  MD_LMAP   = 0x00d, // Open map with preview mode
+  MD_SMAP   = 0x00e, // Save map with preview mode
+  MD_GRFT   = 0x00f, // Graffiti input mode
 };
 
-#define MODES_COUNT 13
+#define MODES_COUNT 17
 
 #define TNGDAT_ROWS 8
 
@@ -34,6 +37,16 @@ enum adikt_panel_viewmode
 {
   PV_MODE   = 0x000, //Work mode specific data
   PV_COMPS  = 0x001, //Compass rose
+  PV_SLB    = 0x002, //Slab mode panel
+  PV_TNG    = 0x003, //Thing mode panel
+};
+
+enum adikt_string_input
+{
+  SI_NONE   = 0x000, //String input disabled
+  SI_LDMAP  = 0x001, //Input map name to load
+  SI_SVMAP  = 0x002, //Input map name to save
+  SI_GRAFT  = 0x003, //Input graffiti text
 };
 
 struct CLIPBOARD {
@@ -53,6 +66,10 @@ struct SCRMODE_DATA {
     // Clipboard
     struct CLIPBOARD *clipbrd;
     int clip_count;
+    // A variable for storing user-input string
+    char usrinput[READ_BUFSIZE];
+    int usrinput_pos;
+    short usrinput_type;
     //Automated commands - allow sending multiple commands to the program.
     //Used by command line parameters
     unsigned int *automated_commands;
@@ -88,10 +105,18 @@ struct MAPMODE_DATA {
     short dat_view_mode;
     // Will the range of objects be visible?
     short show_obj_range;
+    // Preview of a level, used when opening a level
+    struct LEVEL *preview;
   };
+
+extern void (*actions [])(struct SCRMODE_DATA *,struct MAPMODE_DATA *,struct LEVEL *,int);
+extern void (*mddraw [])(struct SCRMODE_DATA *,struct MAPMODE_DATA *,struct LEVEL *);
+extern short (*mdstart [])(struct SCRMODE_DATA *,struct MAPMODE_DATA *,struct LEVEL *);
+extern void (*mdend [])(struct SCRMODE_DATA *,struct MAPMODE_DATA *,struct LEVEL *);
 
 extern const char *modenames[];
 extern const char *longmodenames[];
+extern const char *string_input_msg[];
 
 // indicates if the main program loop should end
 extern short finished;
@@ -106,6 +131,7 @@ void draw_levscr(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struc
 void proc_key(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl);
 short cursor_actions(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl,int key);
 short subtl_select_actions(struct MAPMODE_DATA *mapmode,int key);
+short string_get_actions(struct SCRMODE_DATA *scrmode,int key);
 void curposcheck(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode);
 
 int change_mode(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl,int new_mode);
@@ -130,7 +156,7 @@ void clear_clipboard(struct SCRMODE_DATA *scrmode);
 void clear_scrmode(struct SCRMODE_DATA *scrmode);
 void clear_mapmode(struct MAPMODE_DATA *mapmode);
 
-void display_tngdat(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl);
+void display_rpanel_bottom(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl);
 int display_mode_keyhelp(int scr_row, int scr_col,int mode);
 void draw_mdempty(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl);
 

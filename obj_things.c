@@ -585,7 +585,7 @@ unsigned char get_usual_item_slab(unsigned char stype_idx)
  * Creates a new thing, completely empty one,
  * without placing it into LEVEL structure
  */
-unsigned char *create_thing_empty()
+unsigned char *create_thing_empty(void)
 {
     unsigned char *thing;
     thing = (unsigned char *)malloc(SIZEOF_DK_TNG_REC);

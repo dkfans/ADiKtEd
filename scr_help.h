@@ -36,6 +36,8 @@ typedef struct {
     char **slblkey;
     int srchkeyrows;
     char **srchkey;
+    int grftkeyrows;
+    char **grftkey;
     int slbrows;
     char **slb;
     int tngrows;
@@ -58,6 +60,12 @@ typedef struct {
     char **srch;
     int rwrkrows;
     char **rwrk;
+    int lmaprows;
+    char **lmap;
+    int grftrows;
+    char **grft;
+    int smaprows;
+    char **smap;
     int tiprows;
     char **tips;
     int compassrows;
@@ -81,7 +89,7 @@ void draw_help(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct 
 
 //Functions - lower level
 void draw_help_line(int posy,int posx,char *text);
-char *get_random_tip();
+char *get_random_tip(void);
 
 //Functions - internal
 char ***match_title(char *title, int n);

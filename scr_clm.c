@@ -51,12 +51,12 @@ void actions_mdclm(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,str
         case KEY_ESCAPE:
           end_mdclm(scrmode,mapmode,lvl);
           break;
-        case 'u': // Update all things/dat/clm/w?b
+        case KEY_U: // Update all things/dat/clm/w?b
           update_slab_owners(lvl);
           update_datclm_for_whole_map(lvl);
           message_info("DAT/CLM/W?B entries updated.");
           break;
-        case 'a': // update dat/clm/w?b of selected tile
+        case KEY_A: // update dat/clm/w?b of selected tile
           {
             //Deleting custom columns - to enable auto-update
             cust_cols_del_for_tile(lvl,sx/3,sy/3);
@@ -67,11 +67,11 @@ void actions_mdclm(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,str
             update_tile_flg_entries(lvl,sx/3,sy/3);
             message_info("Updated DAT/CLM/W?B entries of slab %d,%d.",sx/3,sy/3);
           };break;
-        case 'm': // manual-set mode
-          start_list(scrmode,mapmode,lvl,MD_CCLM);
+        case KEY_M: // manual-set mode
+          mdstart[MD_CCLM](scrmode,mapmode,lvl);
           break;
-        case 'b': // cube mode
-          start_mdcube(scrmode,mapmode,lvl);
+        case KEY_B: // cube mode
+          mdstart[MD_CUBE](scrmode,mapmode,lvl);
           break;
         default:
           message_info("Unrecognized clm key code: %d",key);
@@ -86,6 +86,7 @@ void actions_mdclm(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,str
 short start_mdclm(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl)
 {
     scrmode->mode=MD_CLM;
+    scrmode->usrinput_type=SI_NONE;
     return true;
 }
 
@@ -95,6 +96,9 @@ short start_mdclm(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,stru
 void end_mdclm(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl)
 {
     mapmode->panel_mode=PV_MODE;
+    scrmode->usrinput_type=SI_NONE;
+    scrmode->usrinput_pos=0;
+    scrmode->usrinput[0]='\0';
     scrmode->mode=MD_SLB;
     message_info("Returned to Slab mode.");
 }
@@ -165,7 +169,7 @@ void draw_mdclm_panel(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,
     screen_printf("Tile WLB:  %03X", get_tile_wlb(lvl, tx, ty));
     set_cursor_pos(pos_y-1, scrmode->cols+23);
     screen_printf("Subtl.FLG: %03X", get_subtl_flg(lvl,sx,sy));
-    display_tngdat(scrmode,mapmode,lvl);
+    display_rpanel_bottom(scrmode,mapmode,lvl);
 }
 
 int display_column(unsigned char *clmentry,int clm_idx, int scr_row, int scr_col)

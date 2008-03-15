@@ -44,7 +44,7 @@ void free_mdtng(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode)
   free(mdtng);
 }
 
-void change_visited_tile()
+void change_visited_tile(struct MAPMODE_DATA *mapmode)
 {
     int i,j;
     for (i=0; i<MAP_SUBNUM_X; i++)
@@ -70,67 +70,67 @@ void actions_mdtng(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,str
       {
         case KEY_TAB:
           end_mdtng(scrmode,mapmode,lvl);
-          start_mdslab(scrmode,mapmode,lvl);
+          mdstart[MD_SLB](scrmode,mapmode,lvl);
           message_info("Slab mode activated");
           break;
-        case 'c': //add creature
-          start_list(scrmode,mapmode,lvl,MD_CRTR);
+        case KEY_C: //add creature
+          mdstart[MD_CRTR](scrmode,mapmode,lvl);
           break;
-        case 'i': //add item
-          start_list(scrmode,mapmode,lvl,MD_ITMT);
+        case KEY_I: //add item
+          mdstart[MD_ITMT](scrmode,mapmode,lvl);
           break;
-        case 'b' : // create spell
+        case KEY_B: // create spell
           tng_makeitem(scrmode,mapmode,lvl,sx,sy,ITEM_SUBTYPE_SPELLHOE);
           break;
-        case 'h' : // Add Dungeon heart
+        case KEY_H: // Add Dungeon heart
           tng_makeitem(scrmode,mapmode,lvl,sx,sy,ITEM_SUBTYPE_DNHEART);
           break;
-        case 'H' : // Add hero gate
+        case KEY_SHIFT_H: // Add hero gate
           tng_makeitem(scrmode,mapmode,lvl,sx,sy,ITEM_SUBTYPE_HEROGATE);
           break;
-        case 'd': // Dungeon special
+        case KEY_D: // Dungeon special
           tng_makeitem(scrmode,mapmode,lvl,sx,sy,ITEM_SUBTYPE_SPREVMAP);
           break;
-        case 'g': // Gold
+        case KEY_G: // Gold
           tng_makeitem(scrmode,mapmode,lvl,sx,sy,ITEM_SUBTYPE_GOLDCHEST);
           break;
-        case 'G': // Gold
+        case KEY_SHIFT_G: // Gold
           tng_makeitem(scrmode,mapmode,lvl,sx,sy,ITEM_SUBTYPE_GOLD);
           break;
-        case 'f': // Food
+        case KEY_F: // Food
           tng_makeitem(scrmode,mapmode,lvl,sx,sy,ITEM_SUBTYPE_CHICKNSTB);
           break;
-        case 'r' : // create torch
+        case KEY_R: // create torch
           tng_makeitem(scrmode,mapmode,lvl,sx,sy,ITEM_SUBTYPE_TORCH);
           break;
-        case 'p': // Poles and prison bars
+        case KEY_P: // Poles and prison bars
           tng_makeitem(scrmode,mapmode,lvl,sx,sy,ITEM_SUBTYPE_FLAGPOST);
           break;
-        case 'T' : // Create trap box
+        case KEY_SHIFT_T: // Create trap box
           tng_makeitem(scrmode,mapmode,lvl,sx,sy,ITEM_SUBTYPE_TBBOULDER);
           break;
-        case 'e': // Add room effect
+        case KEY_E: // Add room effect
           thing = create_roomeffect(lvl,sx,sy,ROOMEFC_SUBTP_DRIPWTR);
           thing_add(lvl,thing);
           message_info("Added room effect");
           mdtng->vistng[mapmode->subtl.x][mapmode->subtl.y]=get_object_subtl_last(lvl,sx,sy,OBJECT_TYPE_THING);
           set_brighten_for_thing(mapmode,thing);
           break;
-        case 'a' : // Add action point
+        case KEY_A: // Add action point
           thing = create_actnpt(lvl, sx, sy);
           actnpt_add(lvl,thing);
           message_info("Added action point %d",(unsigned int)get_actnpt_number(thing));
           mdtng->vistng[mapmode->subtl.x][mapmode->subtl.y]=get_object_subtl_last(lvl,sx,sy,OBJECT_TYPE_ACTNPT);
           set_brighten_for_actnpt(mapmode,thing);
           break;
-        case 'L' : // Add static light
+        case KEY_SHIFT_L: // Add static light
           thing = create_stlight(sx, sy);
           stlight_add(lvl,thing);
           message_info("Added static light");
           mdtng->vistng[mapmode->subtl.x][mapmode->subtl.y]=get_object_subtl_last(lvl,sx,sy,OBJECT_TYPE_STLIGHT);
           set_brighten_for_stlight(mapmode,thing);
           break;
-        case 'k' : // Copy thing to clipboard
+        case KEY_K: // Copy thing to clipboard
           {
             int visiting_z=mdtng->vistng[mapmode->subtl.x][mapmode->subtl.y];
             short obj_type=get_object_type(lvl,sx,sy,visiting_z);
@@ -154,7 +154,7 @@ void actions_mdtng(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,str
               break;
             }
           };break;
-        case 'y' : // Create thing from clipboard
+        case KEY_Y: // Create thing from clipboard
           if (scrmode->clip_count>0)
           {
             struct CLIPBOARD *clip_itm;
@@ -196,7 +196,7 @@ void actions_mdtng(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,str
           {
             message_error("Can't create object: clipboard is empty");
           };break;
-        case 'u': // Update all things
+        case KEY_U: // Update all things
           { //Storing stats on objects adding/removal
           int prev_tng_rmv=lvl->stats.things_removed;
           int prev_tng_add=lvl->stats.things_added;
@@ -206,18 +206,18 @@ void actions_mdtng(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,str
           message_info("Auto-maintained TNG entries updated, %u added, %u removed.",
               lvl->stats.things_added-prev_tng_add,lvl->stats.things_removed-prev_tng_rmv);
           mdtng->obj_ranges_changed=true;
-          change_visited_tile();
+          change_visited_tile(mapmode);
           };break;
-        case 'v': // Verify whole map
+        case KEY_V: // Verify whole map
           level_verify_with_highlight(lvl,mapmode);
           break;
-        case 't' : // Create trap
+        case KEY_T: // Create trap
           thing = create_trap (lvl, sx, sy, TRAP_SUBTYPE_BOULDER);
           thing_add(lvl,thing);
           message_info("Added trap");
           mdtng->vistng[mapmode->subtl.x][mapmode->subtl.y]=get_object_subtl_last(lvl,sx,sy,OBJECT_TYPE_THING);
           break;
-        case 'l' : // Lock / unlock a door
+        case KEY_L: // Lock / unlock a door
           {
             int visiting_z=mdtng->vistng[mapmode->subtl.x][mapmode->subtl.y];
             short obj_type=get_object_type(lvl,sx,sy,visiting_z);
@@ -246,7 +246,7 @@ void actions_mdtng(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,str
               break;
             }
           };break;
-        case 'o' : // Change ownership of creature/trap/special/spell
+        case KEY_O: // Change ownership of creature/trap/special/spell
           {
             int visiting_z=mdtng->vistng[mapmode->subtl.x][mapmode->subtl.y];
             short obj_type=get_object_type(lvl,sx,sy,visiting_z);
@@ -262,8 +262,8 @@ void actions_mdtng(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,str
               break;
             }
           };break;
-        case 'S' :
-        case 'X' : // Change type of creature
+        case KEY_SHIFT_S:
+        case KEY_SHIFT_X: // Change type of creature
           {
             int visiting_z=mdtng->vistng[mapmode->subtl.x][mapmode->subtl.y];
             short obj_type=get_object_type(lvl,sx,sy,visiting_z);
@@ -276,7 +276,7 @@ void actions_mdtng(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,str
                  message_error("No creature selected");
                  break;
               }
-              if (key=='S')
+              if (key==KEY_SHIFT_S)
                 set_thing_subtype(thing,get_creature_next(get_thing_subtype(thing)));
               else
                 set_thing_subtype(thing,get_creature_prev(get_thing_subtype(thing)));
@@ -287,7 +287,7 @@ void actions_mdtng(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,str
               break;
             }
           };break;
-        case 's' : // Change level of creature/trap/special/spell/lair/room efct
+        case KEY_S: // Change level of creature/trap/special/spell/lair/room efct
           {
             int visiting_z=mdtng->vistng[mapmode->subtl.x][mapmode->subtl.y];
             short obj_type=get_object_type(lvl,sx,sy,visiting_z);
@@ -315,7 +315,7 @@ void actions_mdtng(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,str
               break;
             }
           };break;
-        case 'x' : // Change level of creature/trap/special/spell/lair/room efct
+        case KEY_X: // Change level of creature/trap/special/spell/lair/room efct
           {
             int visiting_z=mdtng->vistng[mapmode->subtl.x][mapmode->subtl.y];
             short obj_type=get_object_type(lvl,sx,sy,visiting_z);
@@ -343,31 +343,31 @@ void actions_mdtng(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,str
               break;
             }
           };break;
-        case '/' : // Cycle through highlighted things
+        case KEY_SLASH: // Cycle through highlighted things
           {
           unsigned int obj_num=get_object_subnums(lvl,sx,sy);
           if (obj_num > 0)
             mdtng->vistng[mapmode->subtl.x][mapmode->subtl.y]=(mdtng->vistng[mapmode->subtl.x][mapmode->subtl.y]+1)%(obj_num);
           };break;
-        case '[' :
+        case KEY_SQRBRCKTL:
           {
             int visiting_z=mdtng->vistng[mapmode->subtl.x][mapmode->subtl.y];
             tng_change_height(scrmode,mapmode,lvl,sx,sy,visiting_z,-64);
           };break;
-        case ']' :
+        case KEY_SQRBRCKTR:
           {
             int visiting_z=mdtng->vistng[mapmode->subtl.x][mapmode->subtl.y];
             tng_change_height(scrmode,mapmode,lvl,sx,sy, visiting_z,+64);
           };break;
 
-        case '-' :
-        case '_' :
+        case KEY_NMINUS:
+        case KEY_UNDERLN:
           {
             int visiting_z=mdtng->vistng[mapmode->subtl.x][mapmode->subtl.y];
             tng_change_range(scrmode,mapmode,lvl,sx,sy,visiting_z,-64);
           };break;
-        case '=' :
-        case '+' :
+        case KEY_NPLUS:
+        case KEY_EQUAL:
           {
             int visiting_z=mdtng->vistng[mapmode->subtl.x][mapmode->subtl.y];
             tng_change_range(scrmode,mapmode,lvl,sx,sy, visiting_z,+64);
@@ -419,8 +419,9 @@ void actions_mdtng(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,str
 short start_mdtng(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl)
 {
     mapmode->mark=false;
-    change_visited_tile();
+    change_visited_tile(mapmode);
     mdtng->obj_ranges_changed=true;
+    scrmode->usrinput_type=SI_NONE;
     scrmode->mode=MD_TNG;
     return true;
 }
@@ -431,6 +432,9 @@ short start_mdtng(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,stru
 void end_mdtng(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl)
 {
     mapmode->panel_mode=PV_MODE;
+    scrmode->usrinput_type=SI_NONE;
+    scrmode->usrinput_pos=0;
+    scrmode->usrinput[0]='\0';
 }
 
 /*
@@ -477,7 +481,7 @@ void draw_mdtng_panel(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,
       display_obj_stats(scrmode,mapmode,lvl,k,scr_col1);
       break;
     }
-    display_tngdat(scrmode,mapmode,lvl);
+    display_rpanel_bottom(scrmode,mapmode,lvl);
 }
 
 char get_thing_char (const struct LEVEL *lvl, int x, int y)

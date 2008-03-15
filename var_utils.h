@@ -9,19 +9,20 @@ struct SCRMODE_DATA;
 struct MAPMODE_DATA;
 struct LEVEL;
 
-void init_messages();
-void free_messages();
+void init_messages(void);
+void free_messages(void);
 
 void strip_crlf(char *string_in);
 
 void message_error(const char *format, ...);
 void message_info(const char *format, ...);
 void message_info_force(const char *format, ...);
-short message_is_empty();
-void message_release();
-char *message_get();
+short message_is_empty(void);
+void message_release(void);
+char *message_get(void);
 
 void popup_show(const char *title,const char *format, ...);
+void message_log(const char *format, ...);
 
 int arr_ushort_pos(const unsigned short *arr,unsigned short slab_type,int array_count);
 

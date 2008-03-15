@@ -33,6 +33,7 @@ const int idir_subtl_y[]={
  */
 short level_init(struct LEVEL **lvl_ptr)
 {
+     message_log(" level_init: started");
     (*lvl_ptr)=(struct LEVEL *)malloc(sizeof(struct LEVEL));
     struct LEVEL *lvl;
     lvl=(*lvl_ptr);
@@ -201,6 +202,7 @@ short level_init(struct LEVEL **lvl_ptr)
         die("level_init: Out of memory");
     }
   }
+  message_log(" level_init: finished, now clearing");
   return level_clear(lvl);
 }
 
@@ -373,10 +375,10 @@ short level_clear_other(struct LEVEL *lvl)
       if (lvl->slb[i]!=NULL)
         memset(lvl->slb[i],0,MAP_SIZE_X*sizeof(unsigned short));
     }
-    for (i=0; i < MAP_SIZE_Y; i++)
+    for (i=0; i < dat_entries_y; i++)
     {
       if (lvl->own[i]!=NULL)
-        memset(lvl->own[i],0,dat_entries_x*sizeof(char));
+        memset(lvl->own[i],PLAYER_UNSET,dat_entries_x*sizeof(char));
     }
 
     for (i=0; i < dat_entries_y; i++)
@@ -432,6 +434,7 @@ short level_clear_other(struct LEVEL *lvl)
  */
 short level_clear(struct LEVEL *lvl)
 {
+  message_log(" level_clear: started");
   short result=true;
   result&=level_clear_lgt(lvl);
   result&=level_clear_apt(lvl);
@@ -439,6 +442,7 @@ short level_clear(struct LEVEL *lvl)
   result&=level_clear_datclm(lvl);
   result&=level_clear_stats(lvl);
   result&=level_clear_other(lvl);
+    message_log(" level_clear: finished");
   return result;
 }
 
@@ -449,6 +453,7 @@ short level_clear(struct LEVEL *lvl)
  */
 short level_deinit(struct LEVEL **lvl_ptr)
 {
+    message_log(" level_deinit: started");
     if ((lvl_ptr==NULL)||((*lvl_ptr)==NULL))
       return false;
     struct LEVEL *lvl;
@@ -596,6 +601,7 @@ short level_deinit(struct LEVEL **lvl_ptr)
     //Final freeing - main lvl object
     free(lvl);
     *lvl_ptr=NULL;
+    message_log(" level_deinit: finished");
     return true;
 }
 
@@ -707,12 +713,14 @@ short level_free_lgt(struct LEVEL *lvl)
  */
 short level_free(struct LEVEL *lvl)
 {
+  message_log(" level_free: started");
   short result=true;
   result&=level_free_lgt(lvl);
   result&=level_free_apt(lvl);
   result&=level_free_tng(lvl);
   result&=level_free_txt(lvl);
   result&=level_free_graffiti(lvl);
+  message_log(" level_free: finished");
   return result;
 }
 
@@ -1150,13 +1158,16 @@ void generate_slab_bkgnd_random(struct LEVEL *lvl)
  */
 void start_new_map(struct LEVEL *lvl)
 {
+    message_log(" start_new_map: starting");
     level_clear(lvl);
     //Preparing array bounds
     int arr_entries_x=MAP_SIZE_X*MAP_SUBNUM_X;
     int arr_entries_y=MAP_SIZE_Y*MAP_SUBNUM_Y;
 
+    message_log(" start_new_map: generating background");
     generate_slab_bkgnd_default(lvl,SLAB_TYPE_EARTH);
 
+    message_log(" start_new_map: updating columns");
     // CLM should be empty, add permanent entries
     add_permanent_columns(lvl);
     //And update all DAT/CLM values; it also updates the WIB values.
@@ -1165,7 +1176,9 @@ void start_new_map(struct LEVEL *lvl)
 
     lvl->inf=0x00;
 
+    message_log(" start_new_map: updating level stats");
     update_level_stats(lvl);
+    message_log(" start_new_map: finished");
 }
 
 void generate_random_map(struct LEVEL *lvl)
@@ -1190,6 +1203,12 @@ void free_map(struct LEVEL *lvl)
 {
     level_free(lvl);
     level_clear(lvl);
+}
+
+short level_generate_random_extension(struct LEVEL *lvl,char *ret_msg)
+{
+  sprintf(ret_msg,"Can't find anything to add.");
+  return false;
 }
 
 char *get_thing(const struct LEVEL *lvl,unsigned int x,unsigned int y,unsigned int num)

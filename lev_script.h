@@ -314,7 +314,7 @@ const char *font_cmd_text(int cmdidx);
 //Other lower level functions
 short script_command_param_add(struct DK_SCRIPT_COMMAND *cmd,char *param);
 void script_command_clear(struct DK_SCRIPT_COMMAND *cmd);
-struct DK_SCRIPT_COMMAND *script_command_create();
+struct DK_SCRIPT_COMMAND *script_command_create(void);
 void script_command_renew(struct DK_SCRIPT_COMMAND **cmd);
 void script_command_free(struct DK_SCRIPT_COMMAND *cmd);
 char *get_orientation_shortname(unsigned short orient);

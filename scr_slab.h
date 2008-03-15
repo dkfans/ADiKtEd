@@ -28,10 +28,15 @@ void free_mdslab(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode);
 //Functions - start and stop
 short start_mdslab(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl);
 void end_mdslab(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl);
+short start_mdgrafit(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl);
+void end_mdgrafit(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl);
 
 //Functions - actions and screen
 void actions_mdslab(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl,int key);
 void draw_mdslab(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl);
+void draw_mdslab_panel(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl);
+void actions_mdgrafit(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl,int key);
+void draw_mdgrafit(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl);
 
 //Functions - lower level
 void init_mdslab_keys(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode);
@@ -39,9 +44,10 @@ void free_mdslab_keys(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode)
 
 //Functions - internal
 void slbposcheck(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl);
-void change_ownership(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl,unsigned char purchaser);
+void change_ownership(struct MAPMODE_DATA *mapmode,struct LEVEL *lvl,unsigned char purchaser);
+void slb_change_ownership(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl,unsigned char purchaser);
 void slb_place_room(struct LEVEL *lvl,struct MAPMODE_DATA *mapmode,unsigned char room);
-void slb_place_graffiti(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl,int tx, int ty,unsigned short orient);
 void slb_next_graffiti_orient(struct LEVEL *lvl,int graf_idx);
+void slb_change_graffiti_height(struct LEVEL *lvl,int graf_idx,int delta);
 
 #endif // ADIKT_SCRSLAB_H

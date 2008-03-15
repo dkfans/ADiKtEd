@@ -122,7 +122,7 @@ unsigned char *find_next_object_on_map(struct LEVEL *lvl, int *tx, int *ty, unsi
     }
 }
 
-unsigned short get_search_objtype_count()
+unsigned short get_search_objtype_count(void)
 {
      unsigned short count=3;
      count+=sizeof(search_tngtype_func)/sizeof(is_thing_subtype);

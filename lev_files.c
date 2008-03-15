@@ -809,6 +809,7 @@ short write_text_file(char **lines,int lines_count,char *fname)
  */
 short save_map(struct LEVEL *lvl)
 {
+    message_log(" save_map: started");
     struct IPOINT_2D errpt={-1,-1};
     if (level_verify(lvl,"save",&errpt)==VERIF_ERROR)
       return false;
@@ -854,6 +855,7 @@ short save_map(struct LEVEL *lvl)
       lvl->fname[DISKPATH_SIZE-1]=0;
     }
     free(fnames);
+    message_log(" save_map: finished");
     return result;
 }
 
@@ -863,6 +865,7 @@ short save_map(struct LEVEL *lvl)
  */
 short load_map(struct LEVEL *lvl)
 {
+  message_log(" load_map: started");
   char *fnames;
   char *err_msg;
   level_free(lvl);
@@ -983,12 +986,14 @@ short load_map(struct LEVEL *lvl)
   update_level_stats(lvl);
   free(fnames);
   free(err_msg);
+  message_log(" load_map: finished");
   return true;
 }
 
 /*
  * Loads the map preview. Tries to open only files needed for Slab mode preview.
  * Returns true on success, on error returns false without clearing the structure.
+ * (but the data from before the loading is cleared)
  */
 short load_map_preview(struct LEVEL *lvl)
 {
@@ -997,7 +1002,7 @@ short load_map_preview(struct LEVEL *lvl)
   level_free(lvl);
   if ((lvl->fname==NULL)||(strlen(lvl->fname)<1))
   {
-    start_new_map(lvl);
+    level_clear(lvl);
     return false;
   }
   level_clear(lvl);

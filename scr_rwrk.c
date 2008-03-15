@@ -62,33 +62,33 @@ void actions_mdrwrk(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,st
         case KEY_ESCAPE:
           end_mdrwrk(scrmode,mapmode,lvl);
           break;
-        case 's':
+        case KEY_S:
           mdrwrk->view=RVM_SLB;
           break;
-        case 'o':
+        case KEY_O:
           mdrwrk->view=RVM_OWN;
           break;
-        case 'd':
+        case KEY_D:
           mdrwrk->view=RVM_DAT;
           break;
-        case 'i':
+        case KEY_I:
           mdrwrk->view=RVM_WIB;
           break;
-        case 'l':
+        case KEY_L:
           mdrwrk->view=RVM_WLB;
           break;
-        case 'f':
+        case KEY_F:
           mdrwrk->view=RVM_FLG;
           break;
-        case 'c':
+        case KEY_C:
           write_def_clm_source(lvl,"adi_clm.log");
           message_info("Column log file written.");
           break;
-        case 't':
+        case KEY_T:
           write_def_tng_source(lvl,"adi_tng.log");
           message_info("Things log file written.");
           break;
-        case 'b':
+        case KEY_B:
           if (get_str("Enter starting cube index: ", usrinput))
           {
             int st_cube=0;
@@ -213,7 +213,7 @@ void draw_mdrwrk(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struc
 
 void draw_mdrwrk_panel(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl)
 {
-    draw_mdclm_panel();
+    draw_mdclm_panel(scrmode,mapmode,lvl);
 }
 
 /*

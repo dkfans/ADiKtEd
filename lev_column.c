@@ -936,7 +936,7 @@ short set_cust_col(struct LEVEL *lvl,int sx,int sy,struct DK_CUSTOM_CLM *ccol)
  * Creates a new custom column and fills its properties.
  * The new object is not added to LEVEL structure.
  */
-struct DK_CUSTOM_CLM *create_cust_col()
+struct DK_CUSTOM_CLM *create_cust_col(void)
 {
     struct DK_CUSTOM_CLM *ccol;
     //Filling graffiti structure

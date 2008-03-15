@@ -3,7 +3,7 @@
 \wT\s:Training  \wl\s:Library   \w%\s:Bridge
 \wW\s:Workshop  \wG\s:Guard     \wP\s:Prison
 \wO\s:Torture   \wB\s:Barracks  \we\s:Temple
-\wg\s:Grave     \wS\s:Scavenge  \wh\s:Heart
+\wg\s:Graveyard \wS\s:Scavenger \wh\s:Heart
 \wE\s:Entrance
 \w#\s:Rock      \w.\s:Earth     \w-\s:Path
 \w \s:Claimed   \w/\s:Torchdirt \w$\s:Gold
@@ -21,12 +21,15 @@ Doors - \ww\sood, \wi\sron, \wb\sraced, \wm\sagic
 [crtkeyhelp]
 Creature type mode:
 
-Select the creature
-you wish to add.
+Select the creature you wish to add.
 
-The creature's ownership will
-be set to that of the tile you
-are placing it in.
+The creature's ownership is first
+set to that of the tile you are
+placing it in, but you can change
+owner with '\wo\s'.
+
+Use '\ws\s' and '\wx\s' to change level
+of the creature.
 [itmtkeyhelp]
 Item type mode:
 
@@ -67,6 +70,15 @@ Note that it is qicker to place
 slabs by pressing its character
 directly in slab mode.
 See slab mode help for details.
+[grftkeyhelp]
+Graffiti type mode:
+
+Enter the graffiti text.
+
+Press \wenter\s to draw it.
+
+Other parameters can be changed
+later, after drawing.
 [slbhelp]
 Slab mode help:
 
@@ -118,7 +130,7 @@ placed). To avoid the disappearing, place graffiti on rock. If you
 don't want its background to look like rock, use manual columns
 (see column mode help for details).
 
-Note that single graffiti is visible only from one side of the tile,
+\rNote\s that single graffiti is visible only from one side of the tile,
 for example if it has WE (west-east) orientation, it will only
 be visible from south. To see the text from both sides, you have to
 create two graffiti items with oposite orientation (like WE and EW).
@@ -147,27 +159,30 @@ To \yquit\s, press \wctrl+q\s.
 Add creature mode help:
 
 A list will appear on the screen of all the available creatures.
-Simply select the creature you want with \warrow keys\s, then press \wenter\s.
+Simply \yselect the creature\s you want with \warrow keys\s, then press \wenter\s.
 
-You can cancel operation with \wtab\s or \wdelete\s.
+You can \ycancel operation\s with \wtab\s or \wdelete\s.
 
 The creature will be added to the slot that was highlighted in
-"thing" mode. The creature will be owned by whoever owns the tile it
-is created on. However, you may change the ownership of the tile
-later without changing the ownership of the creature.
+"thing" mode.
 
-The creature will be level one; you can change this in "thing" mode.
+The creature will be owned by whoever owns the tile it
+is created on, unless you \ychange the owner\s with '\wo\s'.
+You may change the ownership of the tile later without
+changing the ownership of the creature.
+
+Press '\ws\s' and '\wx\s' to \ychange level\s of the creature.
 
 [itmhelp]
 Item selection and options help:
 
 A list will appear on the screen of all the available items.
-Simply select the item you want to create with arrow keys,
-then press enter.
+Simply \yselect the item\s you want to create with \warrow keys\s,
+then press \wenter\s.
 
-Note that this function may set the item parameters in a wrong
-way. You should use other functions to add traps, doors, specials
-and similar objects (see "thing" mode help for details).
+Note that if you want to add specific item, it may be faster to use
+its shortcut key instead of the items list provided here (see
+"thing" mode help for details).
 
 The item will be added to the slot that was highlighted in
 "thing" mode.
@@ -177,7 +192,7 @@ To cancel, press \wtab\s or \wdelete\s.
 [tnghelp]
 "Thing" mode help:
 
-Move around as in slab mode.
+\yMove around\s as in slab mode.
 The ownership backgrounds are similar to slab mode, but some
 background colors are brighter - these are tiles within range
 of action points, room effects and static lights. The map slabs
@@ -193,7 +208,7 @@ will appear. If a tile has more than 9 objects on it, it will be shown
 as a '+'. Moving over a tile shows the details of the objects on that
 tile.
 
-The key on the right of the screen should allow you to read the object
+The \rkey on the right\s of the screen should allow you to read the object
 types where they're displayed as letters.
 
 Press '\wk\s' to \ycopy\s the highlighted thing (creature or object) onto the
@@ -212,43 +227,46 @@ creature will be owned by whoever owns the tile (although the
 ownership of the tile can later be changed without affecting the
 creature).
 
-Press '\wb\s' to create a \yspell book\s (change the type using '\ws\s' and '\wx\s').
-Spell books should be unowned and must be transported to your library
-by Imp to allow player to use the spell.
-
-Press '\wg\s' or '\wG\s' to create a \ypot of gold\s in the highlighted spot.
-The value is 500 for '\wg\s' and 250 for '\wG\s'.
-
-Press '\wd\s' to create a \ydungeon special\s in the highlighted
-spot (change the type using '\ws\s' and '\wx\s').
-
-Press '\wp\s' to create a \yflag post\s in the highlighted spot.
-Change it into prison bar or modify flag color using '\ws\s' and '\wx\s').
-
-Press '\wh\s' to create a \ydungeon heart\s in the highlighted spot. It will
-be owned by the owner of the tile.
-
-Press '\wH\s' to create a \yhero gate\s. It will be owned by \Cplayer 4\s (Heroes).
-
-Press '\wu\s' to \yupdate\s the dungeon. This will make sure all room objects
-(training posts, spikes, torturers, etc) are placed appropriately.
-Only things will be updated, the .clm and .dat values will stay intact.
-You must press '\wu\s' in slab mode to update them.
-
 Press '\wt\s' to create a \ytrap\s (change the type using '\ws\s' and '\wx\s').
-
-Press '\wT\s' to create a \ytrap box\s (a non-placed trap). Change the type
-using '\ws\s' and '\wx\s'.
 
 Press '\we\s' to create \yroom effect\s (change the type using '\ws\s' and '\wx\s').
 
-Press '\wL\s' to create \ystatic light\s.
+Press '\wL\s' to create \ystatic light\s. Change its range with '\w-\s' and '\w+\s',
+and height with '\w[\s' and '\w]\s'.
 
 Press '\wa\s' to create \yaction point\s. Change its range with '\w-\s' and '\w+\s'.
 
 Press '\wi\s' to create \yany item\s. Allows you to choose item to place from
 full list. You can use it for items which has no associated key,
 or if you just feel better with making your choice from a list.
+
+Items which have assiciated key are listed on right panel. These include:
+
+ Press '\wb\s' to create a \yspell book\s (change the type using '\ws\s' and '\wx\s').
+ Spell books should be unowned and must be transported to your library
+ by Imp to allow player to use the spell.
+
+ Press '\wg\s' or '\wG\s' to create a \ypot of gold\s in the highlighted spot.
+ The value is 500 for '\wg\s' and 250 for '\wG\s'.
+
+ Press '\wd\s' to create a \ydungeon special\s in the highlighted
+ spot (change the type using '\ws\s' and '\wx\s').
+
+ Press '\wp\s' to create a \yflag post\s in the highlighted spot.
+ Change it into prison bar or modify flag color using '\ws\s' and '\wx\s').
+
+ Press '\wh\s' to create a \ydungeon heart\s in the highlighted spot. It will
+ be owned by the owner of the tile.
+
+ Press '\wH\s' to create a \yhero gate\s. It will be owned by \Cplayer 4\s (Heroes).
+
+ Press '\wT\s' to create a \ytrap box\s (a non-placed trap). Change the type
+ using '\ws\s' and '\wx\s'.
+
+Press '\wu\s' to \yupdate\s the dungeon. This will make sure all room objects
+(training posts, spikes, torturers, etc) are placed appropriately.
+Only things will be updated, the .clm and .dat values will stay intact.
+You must press '\wu\s' in slab mode to update them.
 
 Press '\ws\s' and '\wx\s' to \yincrease/decrease level\s of a highlighted
 creature, the type of a highlighted trap, the type of a 
@@ -261,7 +279,7 @@ Press '\wo\s' to \ychange owner\s of a highlighted thing or creature. The
 ownership cycles through the players (and "unclaimed").
 
 Press '\w[\s' and '\w]\s' to \ychange height/altitude\s of highlighted object.
-Please note that ADiKtEd will allow you to place things inside of
+Please note that aDiKtEd will allow you to place things inside of
 solid columns, so be careful.
 
 Press '\w-\s' and '\w+\s' to \ychange range\s of highlighted object. This
@@ -280,11 +298,11 @@ To \ysave\s, press \wctrl+s\s. To save on last saved file name, press \wF5\s.
 [clmhelp]
 "Column" mode help:
 
-Move around as in slab mode. The main map shows exactly the same
+\yMove around\s as in slab mode. The main map shows exactly the same
 details as in slab made. The only difference is that instead of
 seeing the slab key, you now see the column data for the highlighted
-subtile. This mode is mainly used for testing purposes, and for
-advanced mapmakers.
+subtile. This mode is mainly used for \rtesting purposes\s, and for
+\radvanced mapmakers\s.
 
 Press '\w1\s'-'\w9\s' to \ychange highlighted column slot\s - using the \wnumber
 \wpad\s with \wnum lock\s on makes this easier.
@@ -304,7 +322,7 @@ be autogenerated on update.
 
 Don't press '\wb\s' yet, because \ymanual cubes\s are unfinished and won't work.
 
-Manually setting a column allows you to create illusions and hide objects.
+\yManually setting\s a column allows you to \rcreate illusions\s and \rhide objects\s.
 You can, for example, hide a door by placing rock columns on their place.
 The door will become visible when a slab near them will change, for example
 if your imps will claim the area near them, or you will place a room,
@@ -400,6 +418,32 @@ Slabs containing matching
 objects will be highlighted,
 and will stay this way until
 you clear the results.
+[lmaphelp]
+Map load mode help:
+
+You can \yselect a file name\s to \rload\s by two ways.
+
+1. By \ytyping\s the map name or map number with keyboard
+  You can use \wleft/right arrow\s, \wdel\s, \wbackspace\s to
+  modify the name.
+
+2. By \yselecting\s the map to load from a list. You can use
+  \wup/down arrow\s, \wpage up/down\s, \whome/end\s to select the map.
+
+Once selected, press \wenter\s to \yload the map\s.
+[smaphelp]
+Map save mode help:
+
+You can \yselect a file name\s to \rsave\s by two ways.
+
+1. By \ytyping\s the map name or map number with keyboard
+  You can use \wleft/right arrow\s, \wdel\s, \wbackspace\s to
+  modify the name.
+
+2. By \yselecting\s the map to save from a list. You can use
+  \wup/down arrow\s, \wpage up/down\s, \whome/end\s to select the map.
+
+Once selected, press \wenter\s to \ysave the map\s.
 [rwrkhelp]
 Rework mode help:
 
@@ -411,9 +455,32 @@ You can only view raw contentof various game files:
 
 To generate utility map for testing cube values,
 press \wb\s and enter the first cube. There are
-511 cubes in the game.
+512 cubes in the game.
 
 To back to slab mode, press \wesc\s or \wtab\s.
+
+[grfthelp]
+Graffiti mode help:
+
+Type the graffiti which you wish to draw, beginning at the slab
+selected in slab mode.
+
+Press \wenter\s to draw the typed text as graffiti (\yplace graffiti\s).
+
+Graffiti shows up as a line of purple \m@\s signs. If you'll make
+graffiti on something other than unpenetrable rock, it may disappear
+when the tile near it will change (will be claimed, digged or room
+placed). To avoid the disappearing, place graffiti on rock. If you
+don't want its background to look like rock, use manual columns
+(see column mode help for details).
+
+\rNote\s that single graffiti is visible only from one side of the tile,
+for example if it has WE (west-east) orientation, it will only
+be visible from south. To see the text from both sides, you have to
+create two graffiti items with oposite orientation (like WE and EW).
+
+To \ycancel\s and back to slab mode, press \wesc\s or \wtab\s.
+
 [compass]
                   *
 \b /\\~~~~~~~~~~~~~~~\s|\b~~~~~~~~~~~~~~~/\\

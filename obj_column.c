@@ -35,7 +35,9 @@ static void (*custom_columns_gen [])(struct COLUMN_REC *clm_recs[9],
      create_columns_slb_bridge,create_columns_slb_gems,            //20
      create_columns_slb_guardpost,
      create_columns_slb_thingems_path,create_columns_slb_rock_gndlev,
-     create_columns_slb_rockcaped_pathcave,
+     create_columns_slb_rockcaped_pathcave,create_columns_slb_skulls_on_lava,
+     create_columns_slb_skulls_on_path,create_columns_slb_skulls_on_claimed,
+     create_columns_slb_wall_force_relief_splatbody,
      };
 
 const char *custom_columns_fullnames[]={
@@ -59,7 +61,9 @@ const char *custom_columns_fullnames[]={
      SLB_BRIDGE_LTEXT,"Standard Gems",            //20
      SLB_GUARDPOST_LTEXT,
      "Thin gems on path","Ground level rock",
-     "Rock with cave",
+     "Rock with cave","Skulls on Lava",
+     "Skulls on Path","Skulls on Claimed",
+     "Wall w/body splat",
      };
 
 const char *cube_fullnames[]={
@@ -218,7 +222,7 @@ const unsigned short dir_rot_270[]={
 /*
  * Creates empty COLUMN_REC structure, sets default values inside
 */
-struct COLUMN_REC *create_column_rec()
+struct COLUMN_REC *create_column_rec(void)
 {
     struct COLUMN_REC *clm_rec=(struct COLUMN_REC *)malloc(sizeof(struct COLUMN_REC));
     if (clm_rec==NULL) die("Cannot allocate memory for clm_rec");
@@ -957,6 +961,27 @@ void create_columns_slb_torchdirt(struct COLUMN_REC *clm_recs[9],
     modify_frail_columns(clm_recs,surr_slb,surr_own,surr_tng);
 }
 
+void create_columns_slb_skulls_on_lava(struct COLUMN_REC *clm_recs[9],
+        unsigned char *surr_slb,unsigned char *surr_own, unsigned char **surr_tng)
+{
+  create_columns_slb_lava(clm_recs,surr_slb,surr_own,surr_tng);
+  place_column_wall_lair_b(clm_recs[IDIR_CENTR], surr_own[IDIR_CENTR]);
+}
+
+void create_columns_slb_skulls_on_path(struct COLUMN_REC *clm_recs[9],
+        unsigned char *surr_slb,unsigned char *surr_own, unsigned char **surr_tng)
+{
+  create_columns_slb_path(clm_recs,surr_slb,surr_own,surr_tng);
+  place_column_wall_lair_b(clm_recs[IDIR_CENTR], surr_own[IDIR_CENTR]);
+}
+
+void create_columns_slb_skulls_on_claimed(struct COLUMN_REC *clm_recs[9],
+        unsigned char *surr_slb,unsigned char *surr_own, unsigned char **surr_tng)
+{
+  create_columns_slb_claimed(clm_recs,surr_slb,surr_own,surr_tng);
+  place_column_wall_lair_b(clm_recs[IDIR_CENTR], surr_own[IDIR_CENTR]);
+}
+
 /*
  * Creates wall with red brick inside. Returns where are whole brick walls
  */
@@ -1196,6 +1221,84 @@ short fill_side_columns_room_relief(struct COLUMN_REC *clm_reca,struct COLUMN_RE
   default:
     return false;
   }
+}
+
+/*
+ * Creates wall with splatted dead body (torture chamber specific)
+ */
+void create_columns_slb_wall_force_relief_splatbody(struct COLUMN_REC *clm_recs[9],
+        unsigned char *surr_slb,unsigned char *surr_own, unsigned char **surr_tng)
+{
+    const unsigned short dir_a[]={IDIR_NW,   IDIR_NE,   IDIR_SE,   IDIR_SW};
+    const unsigned short dir_b[]={IDIR_WEST, IDIR_NORTH,IDIR_EAST, IDIR_SOUTH};
+    // Filling the wall with brick & cobblestones on edges
+    int i;
+    for (i=0;i<4;i++)
+    {
+      fill_column_wall_cobblestones(clm_recs[dir_a[i]], surr_own[IDIR_CENTR]);
+      fill_column_wall_redsmbrick_b(clm_recs[dir_b[i]], surr_own[IDIR_CENTR]);
+    }
+    fill_column_wall_centr(clm_recs[IDIR_CENTR], surr_own[IDIR_CENTR]);
+    // Finding best orientation for the relief
+    const unsigned short *dir;
+    short draw_oposite;
+    if (slab_is_short(surr_slb[IDIR_WEST]) && slab_is_short(surr_slb[IDIR_NORTH]))
+    {
+      dir=dir_rot_000;
+      draw_oposite=false;
+    } else
+    if (slab_is_short(surr_slb[IDIR_EAST]) && slab_is_short(surr_slb[IDIR_SOUTH]))
+    {
+      dir=dir_rot_180;
+      draw_oposite=false;
+    } else
+    if (slab_is_short(surr_slb[IDIR_EAST]) && slab_is_short(surr_slb[IDIR_WEST]))
+    {
+      dir=dir_rot_090;
+      draw_oposite=true;
+    } else
+    if (slab_is_short(surr_slb[IDIR_NORTH]) && slab_is_short(surr_slb[IDIR_SOUTH]))
+    {
+      dir=dir_rot_000;
+      draw_oposite=true;
+    } else
+    if (slab_is_short(surr_slb[IDIR_EAST]) || slab_is_short(surr_slb[IDIR_SOUTH]))
+    {
+      dir=dir_rot_180;
+      draw_oposite=false;
+    } else
+    //if (slab_is_short(surr_slb[IDIR_WEST]) || slab_is_short(surr_slb[IDIR_NORTH]))
+    {
+      dir=dir_rot_000;
+      draw_oposite=false;
+    }
+    // Drawing the reliefs
+    if (draw_oposite)
+    {
+        place_column_wall_torture_a(clm_recs[dir[0]],surr_own[IDIR_CENTR]);
+        place_column_wall_torture_b(clm_recs[dir[1]],surr_own[IDIR_CENTR]);
+        place_column_wall_torture_c(clm_recs[dir[2]],surr_own[IDIR_CENTR]);
+        place_column_wall_torture_a(clm_recs[dir[6]],surr_own[IDIR_CENTR]);
+        place_column_wall_torture_b(clm_recs[dir[7]],surr_own[IDIR_CENTR]);
+        place_column_wall_torture_c(clm_recs[dir[8]],surr_own[IDIR_CENTR]);
+    } else
+    {
+      if (dir==dir_rot_180)
+      {
+        place_column_wall_torture_b(clm_recs[dir[1]],surr_own[IDIR_CENTR]);
+        place_column_wall_torture_b(clm_recs[dir[3]],surr_own[IDIR_CENTR]);
+        place_column_wall_torture_a(clm_recs[dir[2]],surr_own[IDIR_CENTR]);
+        place_column_wall_torture_c(clm_recs[dir[0]],surr_own[IDIR_CENTR]);
+        place_column_wall_torture_a(clm_recs[dir[6]],surr_own[IDIR_CENTR]);
+      } else
+      {
+        place_column_wall_torture_b(clm_recs[dir[1]],surr_own[IDIR_CENTR]);
+        place_column_wall_torture_b(clm_recs[dir[3]],surr_own[IDIR_CENTR]);
+        place_column_wall_torture_c(clm_recs[dir[2]],surr_own[IDIR_CENTR]);
+        place_column_wall_torture_a(clm_recs[dir[0]],surr_own[IDIR_CENTR]);
+        place_column_wall_torture_c(clm_recs[dir[6]],surr_own[IDIR_CENTR]);
+      }
+    }
 }
 
 /*

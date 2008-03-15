@@ -78,8 +78,8 @@ struct DRAW_DATA {
 extern struct DRAW_DATA drawdata;
 
 void set_cursor_visibility(short val);
-int get_screen_rows();
-int get_screen_cols();
+int get_screen_rows(void);
+int get_screen_cols(void);
 void set_cursor_pos(int row,int col);
 void screen_setcolor(int idx);
 void screen_printchr(char dst);
@@ -88,7 +88,7 @@ void screen_printf_toeol(char *format, ...);
 void screen_draw_hline(int posy,int posx,int length,short border_style);
 void screen_draw_vline(int posy,int posx,int length,short border_style);
 void screen_draw_window(int posy,int posx,int sizey,int sizex,int border_size,short border_style);
-void screen_refresh();
+void screen_refresh(void);
 void screen_init(void);
 void screen_reinit_and_update(void);
 void screen_done(void);

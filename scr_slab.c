@@ -50,13 +50,13 @@ void free_mdslab(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode)
   free_mdslab_keys(scrmode,mapmode);
 }
 
-
 /*
  * Covers actions from the slab screen.
  */
 void actions_mdslab(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl,int key)
 {
     int d;
+    char *msg;
     message_release();
     if (!cursor_actions(scrmode,mapmode,lvl,key))
     {
@@ -65,30 +65,36 @@ void actions_mdslab(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,st
         switch (key)
         {
         case KEY_ENTER:
-          start_mdslbl(scrmode,mapmode,lvl);
+          mdstart[MD_SLBL](scrmode,mapmode,lvl);
           break;
-        case 'u': // Update all things/dat/clm/w?b
+        case KEY_U: // Update all things/dat/clm/w?b
           update_slab_owners(lvl);
           update_datclm_for_whole_map(lvl);
           message_info("All DAT/CLM/W?B entries updated.");
           break;
-        case 'v': // Verify whole map
+        case KEY_V: // Verify whole map
           level_verify_with_highlight(lvl,mapmode);
           break;
         case KEY_TAB:
           end_mdslab(scrmode,mapmode,lvl);
-          start_mdtng(scrmode,mapmode,lvl);
+          mdstart[MD_TNG](scrmode,mapmode,lvl);
           message_info("Thing mode activated");
           break;
-        case 'c':
+        case KEY_C:
           end_mdslab(scrmode,mapmode,lvl);
-          start_mdclm(scrmode,mapmode,lvl);
+          mdstart[MD_CLM](scrmode,mapmode,lvl);
           message_info("Column mode activated");
           break;
-        case 'r':
+        case KEY_R:
           end_mdslab(scrmode,mapmode,lvl);
-          start_mdrwrk(scrmode,mapmode,lvl);
+          mdstart[MD_RWRK](scrmode,mapmode,lvl);
           message_info("Rework mode activated");
+          break;
+        case KEY_CTRL_X:
+          msg=malloc(LINEMSG_SIZE*sizeof(char));
+          level_generate_random_extension(lvl,msg);
+          message_info("Random extension: %s",msg);
+          free(msg);
           break;
         case KEY_CTRL_SPACE:
           if (mapmode->mark)
@@ -113,55 +119,52 @@ void actions_mdslab(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,st
           } else
             message_error("Nothing to delete");
           break;
-        case 'a': // Change graffiti orientation
+        case KEY_A: // Change graffiti orientation
             slb_next_graffiti_orient(lvl,graffiti_idx(lvl,tx,ty));
           break;
-        case 'd': // Add/view graffiti down
-            slb_place_graffiti(scrmode,mapmode,lvl,tx,ty,ORIENT_NS);
+        case KEY_D: // Add/view graffiti down
+            if ((mapmode->mark) || (mapmode->paintmode))
+            {
+              message_error("Can't draw graffiti whilst painting or marking");
+              return;
+            }
+            mdstart[MD_GRFT](scrmode,mapmode,lvl);
           break;
-        case '0':
-        case '1':
-        case '2':
-        case '3':
-        case '4':
-        case '5':
-            mapmode->paintown=key-'0';
-            change_ownership(scrmode,mapmode,lvl,(char)(key-'0'));
-            message_info("Slab owner changed");
+        case KEY_NUM0:
+            slb_change_ownership(scrmode,mapmode,lvl,PLAYER0);
             break;
-        case '[':
+        case KEY_NUM1:
+            slb_change_ownership(scrmode,mapmode,lvl,PLAYER1);
+            break;
+        case KEY_NUM2:
+            slb_change_ownership(scrmode,mapmode,lvl,PLAYER2);
+            break;
+        case KEY_NUM3:
+            slb_change_ownership(scrmode,mapmode,lvl,PLAYER3);
+            break;
+        case KEY_NUM4:
+            slb_change_ownership(scrmode,mapmode,lvl,PLAYER_GOOD);
+            break;
+        case KEY_NUM5:
+            slb_change_ownership(scrmode,mapmode,lvl,PLAYER_UNSET);
+            break;
+        case KEY_SQRBRCKTL:
           d = graffiti_idx(lvl,tx,ty);
           if (d>=0)
           {
-            struct DK_GRAFFITI *graf;
-            graf=get_graffiti(lvl,d);
-            int nheight=graf->height-1;
-            if (set_graffiti_height(graf,nheight)==nheight)
-            {
-              message_info("Height decreased");
-              graffiti_update_columns(lvl,d);
-            } else
-              message_error("Value limit reached");
+            slb_change_graffiti_height(lvl,d,-1);
           } else
             message_error("Nothing to decrease");
           break;
-        case ']':
+        case KEY_SQRBRCKTR:
           d = graffiti_idx(lvl,tx,ty);
           if (d>=0)
           {
-            struct DK_GRAFFITI *graf;
-            graf=get_graffiti(lvl,d);
-            int nheight=graf->height+1;
-            if (set_graffiti_height(graf,nheight)==nheight)
-            {
-              message_info("Height increased");
-              graffiti_update_columns(lvl,d);
-            } else
-              message_error("Value limit reached");
+            slb_change_graffiti_height(lvl,d,1);
           } else
             message_error("Nothing to increase");
           break;
-        case 'z':
+        case KEY_Z:
             if (mapmode->paintmode==false)
             {
               mapmode->paintmode=true;
@@ -199,6 +202,7 @@ void actions_mdslab(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,st
 short start_mdslab(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl)
 {
     scrmode->mode=MD_SLB;
+    scrmode->usrinput_type=SI_NONE;
     return true;
 }
 
@@ -210,6 +214,9 @@ void end_mdslab(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct
     mapmode->mark=false;
     mapmode->paintmode=false;
     mapmode->panel_mode=PV_MODE;
+    scrmode->usrinput_type=SI_NONE;
+    scrmode->usrinput_pos=0;
+    scrmode->usrinput[0]='\0';
 }
 
 /*
@@ -222,7 +229,7 @@ void slbposcheck(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struc
       if (mapmode->paintroom != 255)
           slb_place_room(lvl,mapmode,mapmode->paintroom);
       if (mapmode->paintown >= 0)
-          change_ownership(scrmode,mapmode,lvl,(char)(mapmode->paintown));
+          change_ownership(mapmode,lvl,(char)(mapmode->paintown));
     }
 }
 
@@ -273,9 +280,9 @@ void slb_place_room(struct LEVEL *lvl,struct MAPMODE_DATA *mapmode,unsigned char
 }
 
 /*
- * Action function - change the owner of item mode.
+ * Action sub-function - change the owner of slab.
  */
-void change_ownership(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl,unsigned char purchaser)
+void change_ownership(struct MAPMODE_DATA *mapmode,struct LEVEL *lvl,unsigned char purchaser)
 {
     int tx=mapmode->screen.x+mapmode->map.x;
     int ty=mapmode->screen.y+mapmode->map.y;
@@ -310,26 +317,37 @@ void change_ownership(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,
     mapmode->mark=false;
 }
 
-void slb_place_graffiti(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl,int tx, int ty,unsigned short orient)
+/*
+ * Action function - change the owner of a slab and display message.
+ */
+void slb_change_ownership(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl,unsigned char purchaser)
 {
-    static char graf_text[READ_BUFSIZE];
-    if ((mapmode->mark) || (mapmode->paintmode))
+    mapmode->paintown=purchaser;
+    change_ownership(mapmode,lvl,purchaser);
+    message_info("Slab owner changed to %s",get_owner_type_fullname(purchaser));
+}
+
+void slb_change_graffiti_height(struct LEVEL *lvl,int graf_idx,int delta)
+{
+    struct DK_GRAFFITI *graf;
+    graf=get_graffiti(lvl,graf_idx);
+    if (graf==NULL)
     {
-        message_error("Can't draw graffiti whilst painting or marking");
-        return;
+      message_error("Graffiti doesn't exist");
+      return;
     }
-    if (get_str("Enter graffiti: ", graf_text))
+    int nheight=graf->height+delta;
+    char *oper;
+    if (delta>0)
+        oper="in";
+    else
+        oper="de";
+    if (set_graffiti_height(graf,nheight)==nheight)
     {
-      int graf_idx;
-      graf_idx=graffiti_add(lvl,tx,ty,0,graf_text,GRAFF_FONT_ADICLSSC,orient,0x0184);
-      if (graf_idx<0)
-      {
-        message_error("Cannot add graffiti(not enought room?)");
-        return;
-      }
+      message_info("Graffiti height %screased",oper);
       graffiti_update_columns(lvl,graf_idx);
-      message_info("Graffiti placed");
-    }
+    } else
+      message_error("Graffiti height limit reached");
 }
 
 void slb_next_graffiti_orient(struct LEVEL *lvl,int graf_idx)
@@ -367,18 +385,18 @@ void init_mdslab_keys(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode)
     // Arrays storing keyboard shortcuts and corresponding rooms
     // These must end with zero
     static const unsigned int room_keys[]={
-      't', 'L', 'H',
-      'T', 'l', '%',
-      'W', 'G', 'P',
-      'O', 'B', 'e',
-      'g', 's', 'S',
-      'h', '#', '.',
-      '-', ' ', '/',
-      '^', '\\', '&',
-      '*', '(', '$',
-      '!', '`', '~',
-      '=', 'w', 'b',
-      'i', 'm', 'E',
+      KEY_T,       KEY_SHIFT_L,   KEY_SHIFT_H,
+      KEY_SHIFT_T, KEY_L,         KEY_PERCENT,
+      KEY_SHIFT_W, KEY_SHIFT_G,   KEY_SHIFT_P,
+      KEY_SHIFT_O, KEY_SHIFT_B,   KEY_E,
+      KEY_G,       KEY_S,         KEY_SHIFT_S,
+      KEY_H,       KEY_HASH,      KEY_DOT,
+      KEY_NMINUS,  KEY_SPACE,     KEY_SLASH,
+      KEY_DASH,    KEY_BSLASH,    KEY_AMPRSNT,
+      KEY_ASTERIX, KEY_RNDBRCKTL, KEY_DOLLAR,
+      KEY_EXCLAM,  KEY_APOSTRT,   KEY_TILDE,
+      KEY_EQUAL,   KEY_W,         KEY_B,
+      KEY_I,       KEY_M,         KEY_SHIFT_E,
        0};
     static const unsigned char room_types[]={
       SLAB_TYPE_TREASURE, SLAB_TYPE_LAIR, SLAB_TYPE_HATCHERY,
@@ -430,7 +448,7 @@ void init_mdslab_keys(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode)
     i=0;
     while (room_keys[i])
     {
-      slbkey[room_types[i]]=room_keys[i];
+      slbkey[room_types[i]]=key_to_ascii(room_keys[i]);
       i++;
     }
     // Hack for some slabs that are not in room_types[], 
@@ -455,38 +473,39 @@ void free_mdslab_keys(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode)
  */
 void draw_mdslab(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl)
 {
+    draw_map_area(scrmode,mapmode,lvl,true,true,false);
+    if (mapmode->panel_mode!=PV_MODE)
+      draw_forced_panel(scrmode,mapmode,lvl,mapmode->panel_mode);
+    else
+      draw_mdslab_panel(scrmode,mapmode,lvl);
+    draw_map_cursor(scrmode,mapmode,lvl,true,true,false);
+}
+
+void draw_mdslab_panel(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl)
+{
     int tx,ty;
     tx=mapmode->map.x+mapmode->screen.x;
     ty=mapmode->map.y+mapmode->screen.y;
-    draw_map_area(scrmode,mapmode,lvl,true,true,false);
-    if (mapmode->panel_mode!=PV_MODE)
+    int scr_row=0;
+    int scr_col=scrmode->cols+3;
+    int graff_idx=graffiti_idx(lvl,tx,ty);
+    if (graff_idx<0)
     {
-      draw_forced_panel(scrmode,mapmode,lvl,mapmode->panel_mode);
+        scr_row=display_mode_keyhelp(scr_row,scr_col,scrmode->mode);
     } else
     {
-      int scr_row=0;
-      int scr_col=scrmode->cols+3;
-      int graff_idx=graffiti_idx(lvl,tx,ty);
-      if (graff_idx<0)
-      {
-        scr_row=display_mode_keyhelp(scr_row,scr_col,scrmode->mode);
-      } else
-      {
         scr_row=display_graffiti(lvl,scr_row,scr_col,graff_idx);
-      }
-      if (scrmode->rows >= scr_row+TNGDAT_ROWS+3)
-      {
+    }
+    if (scrmode->rows >= scr_row+TNGDAT_ROWS+3)
+    {
         set_cursor_pos(scrmode->rows-TNGDAT_ROWS-2, scr_col);
         unsigned short slb_type=get_tile_slab(lvl,tx,ty);
         screen_setcolor(PRINT_COLOR_LGREY_ON_BLACK);
         screen_printf(".slb entry:%3d ",slb_type);
         screen_setcolor(PRINT_COLOR_WHITE_ON_BLACK);
         screen_printf("%s",get_slab_fullname(slb_type));
-      }
-      if (scrmode->rows >= scr_row+TNGDAT_ROWS)
-        display_tngdat(scrmode,mapmode,lvl);
     }
-    draw_map_cursor(scrmode,mapmode,lvl,true,true,false);
+    display_rpanel_bottom(scrmode,mapmode,lvl);
 }
 
 int display_graffiti(struct LEVEL *lvl,int scr_row, int scr_col,int graff_idx)
@@ -517,3 +536,78 @@ int display_graffiti(struct LEVEL *lvl,int scr_row, int scr_col,int graff_idx)
     screen_printf("%s",graf->text);
     return scr_row;
 }
+
+/*
+ * Action function - start the mdgrafit mode.
+ */
+short start_mdgrafit(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl)
+{
+    scrmode->mode=MD_GRFT;
+    scrmode->usrinput_type=SI_GRAFT;
+    message_info("Graffiti mode started");
+    return true;
+}
+
+/*
+ * Action function - end the mdgrafit mode.
+ */
+void end_mdgrafit(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl)
+{
+    mapmode->panel_mode=PV_MODE;
+    scrmode->usrinput_type=SI_NONE;
+    scrmode->usrinput_pos=0;
+    scrmode->usrinput[0]='\0';
+    scrmode->mode=MD_SLB;
+}
+
+/*
+ * Draws screen for the mdgrafit mode.
+ */
+void draw_mdgrafit(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl)
+{
+    draw_map_area(scrmode,mapmode,lvl,true,true,false);
+    if (mapmode->panel_mode!=PV_MODE)
+      draw_forced_panel(scrmode,mapmode,lvl,mapmode->panel_mode);
+    else
+      draw_mdslab_panel(scrmode,mapmode,lvl);
+}
+
+
+/*
+ * Covers actions from the graffiti input screen.
+ */
+void actions_mdgrafit(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl,int key)
+{
+    message_release();
+    if (!string_get_actions(scrmode,key))
+    {
+      switch (key)
+      {
+        case KEY_TAB:
+        case KEY_ESCAPE:
+          mdend[MD_GRFT](scrmode,mapmode,lvl);
+          message_info("Graffiti creation cancelled");
+          break;
+        case KEY_ENTER:
+          {
+          int tx,ty;
+          tx=mapmode->map.x+mapmode->screen.x;
+          ty=mapmode->map.y+mapmode->screen.y;
+          int graf_idx;
+          graf_idx=graffiti_add(lvl,tx,ty,0,scrmode->usrinput,GRAFF_FONT_ADICLSSC,ORIENT_NS,0x0184);
+          mdend[MD_GRFT](scrmode,mapmode,lvl);
+          if (graf_idx<0)
+          {
+            message_error("Cannot add graffiti(not enought room?)");
+            break;
+          }
+          graffiti_update_columns(lvl,graf_idx);
+          message_info("Graffiti placed");
+          };break;
+        default:
+          message_info("Unrecognized \"%s\" key code: %d",longmodenames[MD_GRFT],key);
+          speaker_beep();
+      }
+    }
+}
+

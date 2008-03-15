@@ -280,7 +280,7 @@ unsigned char get_thing_range_subtile(const unsigned char *thing);
 short set_thing_range_subtile(unsigned char *thing,unsigned char rng);
 unsigned int get_thing_range_adv(const unsigned char *thing);
 
-unsigned char *create_thing_empty();
+unsigned char *create_thing_empty(void);
 unsigned char *create_thing(unsigned int sx, unsigned int sy);
 unsigned char *create_thing_copy(const struct LEVEL *lvl,unsigned int sx, unsigned int sy,unsigned char *src);
 unsigned char *create_item(const struct LEVEL *lvl,unsigned int sx, unsigned int sy, unsigned char stype_idx);

@@ -7,10 +7,10 @@ A version of this is also within this distribution,
 called adikted_tutorial.html. You may wish to print this out.
 
 Here's the Win32 version executable. Just put all the
-files in the same directory, edit map.ini as appropriate (don't
-worry about changing DAT_VIEW_MODE, that just changes the way round
-the bytes on the .dat display are shown), and run it.
-Usage: map [mapfile] [-m <logfile>] [-v] [-r] [-n] -s [mapfile] [-q]
+files in the same directory, edit map.ini as appropriate (you should
+change paths to your DK files; you can also change other parameters
+if you want), and run it.
+Usage: map [mapfile] [-m <logfile>] [-v] [-r] [-n] [-s [mapfile]] [-q]
 where:
   mapfile  Specifies filename (eg newmap), or just map number
           (like 18 etc.) which is loaded. Skipping this will start
@@ -61,6 +61,14 @@ Press F1 for help.
 
 TODO before final:
  Fixations in room things parameters (height,other)
+Version: 0.72b
+ Unified initialization of work modes (probably some errors fixed)
+ New Load Map (ctrl+l) and Save screens (with preview)
+ Fixed hanging on ctrl+g key
+ Extended logging ("-m" command line option)
+ Some corrections to "add creature" screen
+ Some new "custom columns"
+ New graffiti entering screen ('d' in slab mode)
 Version: 0.71b
  Created some basic structs to close variables
  When verifying level ('v') errors are now highlighted

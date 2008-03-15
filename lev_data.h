@@ -201,6 +201,8 @@ void start_new_map(struct LEVEL *lvl);
 void generate_random_map(struct LEVEL *lvl);
 void generate_slab_bkgnd_default(struct LEVEL *lvl,unsigned short def_slab);
 void generate_slab_bkgnd_random(struct LEVEL *lvl);
+short level_generate_random_extension(struct LEVEL *lvl,char *ret_msg);
+
 void free_map(struct LEVEL *lvl);
 
 char *get_thing(const struct LEVEL *lvl,unsigned int x,unsigned int y,unsigned int num);

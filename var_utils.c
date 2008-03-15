@@ -59,12 +59,13 @@ void message_error(const char *format, ...)
     vsprintf(message, format, val);
     va_end(val);
     message_is_warn=true;
+    // Write to log file if it is opened
     if (msgout_fp!=NULL)
       fprintf(msgout_fp,"%s\n",message);
     speaker_beep();
 }
 
-short message_is_empty()
+short message_is_empty(void)
 {
      if ((message!=NULL)&&(message[0]>'\0')) return false;
      return true;
@@ -82,6 +83,7 @@ void message_info(const char *format, ...)
     vsprintf(message, format, val);
     va_end(val);
     message_is_warn=false;
+    // Write to log file if it is opened
     if (msgout_fp!=NULL)
       fprintf(msgout_fp,"%s\n",message);
 }
@@ -97,18 +99,33 @@ void message_info_force(const char *format, ...)
     vsprintf(message, format, val);
     va_end(val);
     message_is_warn=false;
+    // Write to log file if it is opened
     if (msgout_fp!=NULL)
       fprintf(msgout_fp,"%s\n",message);
 }
 
-void message_release()
+void message_release(void)
 {
       message_is_warn=false;
 }
 
-char *message_get()
+char *message_get(void)
 {
      return message;
+}
+
+/*
+ * Only logs the message, without showing on screen.
+ */
+void message_log(const char *format, ...)
+{
+    if (msgout_fp==NULL) return;
+    va_list val;
+    va_start(val, format);
+    // Write to log file if it is opened
+    vfprintf(msgout_fp, format, val);
+    va_end(val);
+    fprintf(msgout_fp,"\n");
 }
 
 /*
@@ -142,8 +159,9 @@ void popup_show(const char *title,const char *format, ...)
       set_cursor_pos(posy+2,posx+1);
       screen_printf("%s",msg);
       screen_refresh();
+    // Write to log file if it is opened
       if (msgout_fp!=NULL)
-        fprintf(msgout_fp,"%s\n",message);
+        fprintf(msgout_fp,"%s\n",msg);
       free(msg);
 }
 
@@ -202,14 +220,14 @@ short set_msglog_fname(char *fname)
     return false;
 }
 
-void init_messages()
+void init_messages(void)
 {
   message=NULL;
   message_prv=NULL;
   msgout_fp=NULL;
 }
 
-void free_messages()
+void free_messages(void)
 {
     free(message_prv);
     free(message);
@@ -223,8 +241,15 @@ void die(const char *format, ...)
       va_list val;
       va_start(val, format);
       vfprintf(stderr, format, val);
+      // Write to log file if it is opened
+      if (msgout_fp!=NULL)
+        vfprintf(msgout_fp, format, val);
       va_end(val);
       fprintf(stderr, "\n");
+      // Write to log file if it is opened
+      if (msgout_fp!=NULL)
+        fprintf(msgout_fp,"\n");
+      free_messages();
       exit(1);
 }
 
@@ -240,7 +265,7 @@ void done(struct SCRMODE_DATA **scrmode,struct MAPMODE_DATA **mapmode,struct LEV
     input_done();
 }
 
-int rnd (int range)
+int rnd(int range)
 {
     return (int) (((float)range)*rand()/(RAND_MAX+1.0));
 }

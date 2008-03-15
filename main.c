@@ -9,12 +9,12 @@
 #include "var_utils.h"
 #include "input_kb.h"
 #include "draw_map.h"
-#include "output_scr.h"
 
 const char config_filename[]="map.ini";
 
 void read_init(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode)
 {
+    message_log(" read_init: started");
 #if defined(unix) && !defined(GO32)
     levels_path="."SEPARATOR"levels";
 #else
@@ -73,14 +73,17 @@ void read_init(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode)
       if (!strcmp(buffer, "SHOW_OBJ_RANGE"))
       {
           mapmode->show_obj_range=atoi(p);
+          message_log(" read_init: show_obj_range set to %d",(int)mapmode->show_obj_range);
       } else
       if (!strcmp(buffer, "DAT_VIEW_MODE"))
       {
           mapmode->dat_view_mode=atoi(p);
+          message_log(" read_init: dat_view_mode set to %d",(int)mapmode->dat_view_mode);
       } else
       if (!strcmp(buffer, "BITMAP_SCALE"))
       {
           bitmap_rescale=atoi(p);
+          message_log(" read_init: bitmap_rescale set to %d",(int)bitmap_rescale);
       } else
       if (!strcmp(buffer, "LEVELS_PATH"))
       {
@@ -89,6 +92,7 @@ void read_init(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode)
           if (l)
             if (levels_path[l-1]==SEPARATOR[0])
                 levels_path[l-1]=0;
+          message_log(" read_init: levels_path set to \"%s\"",levels_path);
       } else
       if (!strcmp(buffer, "DATA_PATH"))
       {
@@ -97,8 +101,10 @@ void read_init(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode)
           if (l)
             if (data_path[l-1]==SEPARATOR[0])
                 data_path[l-1]=0;
+          message_log(" read_init: data_path set to \"%s\"",data_path);
       }
     }
+    message_log(" read_init: finished");
 }
 
 void get_command_line_options(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl,int argc, char **argv)
@@ -198,9 +204,6 @@ int main(int argc, char **argv)
     init_messages();
     // create object for storing map
     level_init(&lvl);
-    drawdata.scrmode=scrmode;
-    drawdata.mapmode=mapmode;
-    drawdata.lvl=lvl;
     // read configuration file
     read_init(scrmode,mapmode);
     // Interpreting command line parameters
@@ -216,11 +219,13 @@ int main(int argc, char **argv)
     {
       start_new_map(lvl);
     }
+    message_log(" main: entering application loop");
     do 
     {
       draw_levscr(scrmode,mapmode,lvl);
       proc_key(scrmode,mapmode,lvl);
     } while (!finished);
+    message_log(" main: application loop finished");
     done(&scrmode,&mapmode,&lvl);
     return 0;
 }

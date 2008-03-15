@@ -24,12 +24,12 @@ void set_cursor_visibility(short val)
   SLtt_set_cursor_visibility(val);
 }
 
-int get_screen_rows()
+int get_screen_rows(void)
 {
   return SLtt_Screen_Rows;
 }
 
-int get_screen_cols()
+int get_screen_cols(void)
 {
   return SLtt_Screen_Cols;
 }
@@ -98,7 +98,7 @@ void screen_printchr(char dst)
     SLsmg_write_char(dst);
 }
 
-void screen_refresh()
+void screen_refresh(void)
 {
     if (!screen_initied) return;
     SLsmg_refresh();

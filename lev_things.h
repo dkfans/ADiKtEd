@@ -19,7 +19,7 @@ short things_verify(struct LEVEL *lvl, char *err_msg,struct IPOINT_2D *errpt);
 char *get_search_tngtype_name(unsigned short idx);
 is_thing_subtype get_search_tngtype_func(unsigned short idx);
 char *get_search_objtype_name(unsigned short idx);
-unsigned short get_search_objtype_count();
+unsigned short get_search_objtype_count(void);
 unsigned char *find_next_object_on_map(struct LEVEL *lvl, int *tx, int *ty, unsigned short srch_idx);
 short subtl_in_roomeffect_range(struct LEVEL *lvl,unsigned int sx,unsigned int sy);
 
