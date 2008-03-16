@@ -10,6 +10,7 @@
 #include <math.h>
 #include "globals.h"
 #include "var_utils.h"
+#include "obj_cube.h"
 #include "obj_slabs.h"
 #include "lev_data.h"
 #include "lev_files.h"
@@ -370,6 +371,9 @@ short draw_map_on_buffer(char *dst,const struct LEVEL *lvl,const struct MAPDRAW_
             texture_pos.y=(cube_idx-0x021b)*TEXTURE_SIZE_Y;
           } else
           {
+            //Unowned Entrance hack, to skip loading of cube groups file
+            if (cube_idx==CUBE_EYEDROCKBLINK)
+              cube_idx=CUBE_EYEDROCKWHITE;
             struct CUBE_TEXTURES *cube=&(draw_data->cubes.data[cube_idx&511]);
             texture_pos.x=(cube->t.x)*TEXTURE_SIZE_X;
             texture_pos.y=(cube->t.y)*TEXTURE_SIZE_Y;

@@ -70,6 +70,8 @@ typedef struct {
     char **tips;
     int compassrows;
     char **compass;
+    int mcompassrows;
+    char **mcompass;
   } HELP_DATA;
 
 extern HELP_DATA *help;

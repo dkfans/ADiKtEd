@@ -61,6 +61,16 @@ Press F1 for help.
 
 TODO before final:
  Fixations in room things parameters (height,other)
+Version: 0.73b
+ Added space saving if screen size is small
+ INI file commented, and added some options
+ End of text line is now written as "\r\n", not only "\n"
+ Level graphic generation improved and more adjustable
+ Fixed typing path in load/save screens
+ Changed the way of clearing unused CLM entries
+ CLM generation code divided to more files
+ A little more cubes defined
+ Small correction to BMP creation function
 Version: 0.72b
  Unified initialization of work modes (probably some errors fixed)
  New Load Map (ctrl+l) and Save screens (with preview)

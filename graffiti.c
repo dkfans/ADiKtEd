@@ -9,6 +9,7 @@
 
 #include "globals.h"
 #include "lev_data.h"
+#include "obj_column_def.h"
 #include "obj_things.h"
 #include "obj_slabs.h"
 #include "obj_column.h"

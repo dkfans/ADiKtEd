@@ -188,10 +188,12 @@ void clear_mapmode(struct MAPMODE_DATA *mapmode)
     mapmode->subtl.x=1;
     mapmode->subtl.y=1;
     mapmode->panel_mode=PV_MODE;
-    mapmode->dat_view_mode=0;
+    mapmode->dat_view_mode=1;
+    mapmode->level_preview=LPREV_LOAD;
     mapmode->show_obj_range=1;
     clear_highlight(mapmode);
     clear_brighten(mapmode);
+    level_clear_options(&(mapmode->optns));
     level_free(mapmode->preview);
     level_clear(mapmode->preview);
 }
@@ -450,8 +452,15 @@ void draw_forced_panel(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode
   switch (panel_mode)
   {
   case PV_COMPS:
-    for (i=0; i<help->compassrows; i++)
+    if (scrmode->rows >= help->compassrows+TNGDAT_ROWS)
+    {
+      for (i=0; i<help->compassrows; i++)
           draw_help_line(scr_row++,scr_col,help->compass[i]);
+    } else
+    {
+      for (i=0; i<help->mcompassrows; i++)
+          draw_help_line(scr_row++,scr_col,help->mcompass[i]);
+    }
     display_rpanel_bottom(scrmode,mapmode,lvl);
     break;
   case PV_SLB:
@@ -876,15 +885,27 @@ void display_rpanel_bottom(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *map
     ty = mapmode->screen.y+mapmode->map.y;
     if (scrmode->usrinput_type==SI_NONE)
     {
+      short compressed;
+      int scr_row;
+      int tngdat_rows_min=(TNGDAT_ROWS>>1)+(TNGDAT_ROWS%1);
       if (scrmode->rows > TNGDAT_ROWS)
+      {
+        compressed=false;
+        scr_row=scrmode->rows-TNGDAT_ROWS;
+      } else
+      {
+        compressed=true;
+        scr_row=scrmode->rows-tngdat_rows_min;
+      }
+      if (scrmode->rows >= tngdat_rows_min)
       {
         int scr_col=scrmode->cols+3;
         if (mapmode->dat_view_mode!=0)
         {
-          display_dat_subtiles(scrmode,mapmode,lvl,scrmode->rows-TNGDAT_ROWS,scr_col,ty,tx);
+          display_dat_subtiles(scrmode,mapmode,lvl,scr_row,scr_col,compressed,ty,tx);
           scr_col+=17;
         }
-        display_tng_subtiles(scrmode,mapmode,lvl,scrmode->rows-TNGDAT_ROWS,scr_col,ty,tx);
+        display_tng_subtiles(scrmode,mapmode,lvl,scr_row,scr_col,compressed,ty,tx);
       }
     } else
     {

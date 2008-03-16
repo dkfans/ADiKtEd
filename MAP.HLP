@@ -120,17 +120,17 @@ slab, just press another slab or number key. To stop painting, press
 '\wz\s' again.
 
 To draw some \ygraffiti\s to a dungeon, press '\wd\s'. You can alter its
-orientation using '\wa\s' - it will swich through 8 possible orientations.
-Press \wdelete\s or \wbackspace\s to remove graffiti.
+\yorientation\s using '\wa\s' - it will swich through 8 possible orientations.
+Press \wdelete\s or \wbackspace\s to \yremove graffiti\s.
 
 Graffiti shows up as a line of purple \m@\s signs. If you'll make
-graffiti on something other than unpenetrable rock, it will disappear
+graffiti on something other than unpenetrable rock, \rit will disappear\s
 when the tile near it will change (will be claimed, digged or room
 placed). To avoid the disappearing, place graffiti on rock. If you
 don't want its background to look like rock, use manual columns
 (see column mode help for details).
 
-\rNote\s that single graffiti is visible only from one side of the tile,
+Note that single graffiti is visible only from \rone side of the tile\s,
 for example if it has WE (west-east) orientation, it will only
 be visible from south. To see the text from both sides, you have to
 create two graffiti items with oposite orientation (like WE and EW).
@@ -449,15 +449,19 @@ Rework mode help:
 
 This mode is for map format reworking only.
 You can't edit anything here.
-You can only view raw contentof various game files:
+You can only view raw content of various game files:
 
-\wo\swn, \ws\slb, w\wi\sb, w\wl\sb, \wf\slg,...
+\ws\slb, \wo\swn, w\wi\sb, w\wl\sb, \wd\sat, \wf\slg.
 
 To generate utility map for testing cube values,
 press \wb\s and enter the first cube. There are
 512 cubes in the game.
 
-To back to slab mode, press \wesc\s or \wtab\s.
+To generate \ycolumn log\s file, press '\wc\s',
+
+To generate \ythings log\s file, press '\wt\s',
+
+To \yback\s to slab mode, press \wesc\s or \wtab\s.
 
 [grfthelp]
 Graffiti mode help:
@@ -507,4 +511,18 @@ To \ycancel\s and back to slab mode, press \wesc\s or \wtab\s.
 \b(\co\b )\s             `.`             \b( \co\b)
 \b \\/~~~~~~~~~~~~~~~\s|\b~~~~~~~~~~~~~~~\\/
                  -|-
+[mcompass]
+             \wN\s
+       \wNW\s    \y|\s    \wNE\s
+        <\y\\\s> )\y|\s( <\y/\s>
+          \y\\  |  /\s
+        )  \y\\ | /\s  (
+      )     \y\\|/\s     (
+ \wW\y--\s)\y--------\wO\y--------\s(\y--\wE\s
+      )     \y/|\\\s     (
+        )  \y/ | \\\s  (
+          \y/  |  \\\s
+        <\y/\s> )\y|\s( <\y\\\s>
+       \wSW\s    \y|\s    \wSE\s
+             \wS\s
 [end]

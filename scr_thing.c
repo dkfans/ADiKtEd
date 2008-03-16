@@ -830,7 +830,8 @@ int display_obj_stats(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,
     return scr_row;
 }
 
-int display_tng_subtiles(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,const struct LEVEL *lvl, int scr_row, int scr_col,int ty,int tx)
+int display_tng_subtiles(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,
+    const struct LEVEL *lvl, int scr_row, int scr_col,short compressed,int ty,int tx)
 {
     set_cursor_pos(scr_row, scr_col);
     screen_setcolor(PRINT_COLOR_LGREY_ON_BLACK);
@@ -900,7 +901,9 @@ int display_tng_subtiles(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmo
             screen_setcolor(color);
             screen_printf("%s",type_text);
         }
-        scr_row+=2;
+        scr_row++;
+        if (!compressed)
+          scr_row++;
     }
     return scr_row;
 }

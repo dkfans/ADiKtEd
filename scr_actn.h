@@ -49,6 +49,13 @@ enum adikt_string_input
   SI_GRAFT  = 0x003, //Input graffiti text
 };
 
+enum adikt_level_preview
+{
+  LPREV_NONE   = 0x000,
+  LPREV_LOAD   = 0x001,
+  LPREV_SAVE   = 0x002,
+};
+
 struct CLIPBOARD {
     int dtype;
     unsigned char *data;
@@ -105,8 +112,12 @@ struct MAPMODE_DATA {
     short dat_view_mode;
     // Will the range of objects be visible?
     short show_obj_range;
+    // Will the preview of level be visible?
+    short level_preview;
     // Preview of a level, used when opening a level
     struct LEVEL *preview;
+    // Level options - are copied into current level
+    struct LEVOPTIONS optns;
   };
 
 extern void (*actions [])(struct SCRMODE_DATA *,struct MAPMODE_DATA *,struct LEVEL *,int);

@@ -10,6 +10,7 @@
 
 #include <math.h>
 #include "globals.h"
+#include "obj_column_def.h"
 #include "obj_slabs.h"
 #include "obj_things.h"
 #include "obj_column.h"
@@ -203,7 +204,26 @@ short level_init(struct LEVEL **lvl_ptr)
     }
   }
   message_log(" level_init: finished, now clearing");
+  level_clear_options(&(lvl->optns));
   return level_clear(lvl);
+}
+
+/*
+ * Clears options for given level. This one is not executed
+ * when clearing the level, only when making new one.
+ */
+short level_clear_options(struct LEVOPTIONS *optns)
+{
+    optns->unaffected_gems=false;
+    optns->unaffected_rock=false;
+    optns->fill_reinforced_corner=true;
+    optns->frail_columns=true;
+    return true;
+}
+
+short level_set_options(struct LEVEL *lvl,struct LEVOPTIONS *optns)
+{
+      memcpy(&(lvl->optns),optns,sizeof(struct LEVOPTIONS));
 }
 
 /*
@@ -295,8 +315,7 @@ short level_clear_datclm(struct LEVEL *lvl)
     for (i=0; i<COLUMN_ENTRIES; i++)
     {
       lvl->clm_utilize[i]=0;
-      if (lvl->clm[i]!=NULL)
-        memset(lvl->clm[i],0,SIZEOF_DK_CLM_REC);
+      clear_clm_entry(lvl->clm[i]);
     }
     //Clearing CLM header
     memset(lvl->clm_hdr,0,SIZEOF_DK_CLM_HEADER);
@@ -314,16 +333,20 @@ short level_clear_datclm(struct LEVEL *lvl)
     unsigned char *clmentry;
     struct COLUMN_REC *clm_rec;
     clm_rec=create_column_rec();
-    //Firs one is special - should have nonzero use at start
+    //First one is special - should have nonzero use at start
     clmentry = (unsigned char *)(lvl->clm[0]);
     fill_column_rec_sim(clm_rec,lvl->clm_utilize[0], 0,  0, 0, 0, 0, 0, 0, 0, 0);
     set_clm_entry(clmentry, clm_rec);
+/*
+    // filling with zeros again is now not needed,
+    // but may become needed on future modifications (if USE will be required to set here)
     fill_column_rec_sim(clm_rec,0, 0,  0, 0, 0, 0, 0, 0, 0, 0);
     for (i=1; i < COLUMN_ENTRIES; i++)
     {
       clmentry = (unsigned char *)(lvl->clm[i]);
       set_clm_entry(clmentry, clm_rec);
     }
+*/
     free_column_rec(clm_rec);
     return true;
 }
@@ -431,6 +454,7 @@ short level_clear_other(struct LEVEL *lvl)
 /*
  * clears the whole object for storing level; drops any old pointers
  * without deallocating them; requies level_init() to be run first;
+ * leaves only optns struct unaffected;
  */
 short level_clear(struct LEVEL *lvl)
 {

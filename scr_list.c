@@ -743,7 +743,12 @@ void end_mdlmap(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct
 
 void draw_mdlmap(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl)
 {
-    draw_map_area(scrmode,mapmode,mapmode->preview,true,true,false);
+    struct LEVEL *draw_lvl;
+    if ((mapmode->level_preview&LPREV_LOAD) == LPREV_LOAD)
+        draw_lvl=mapmode->preview;
+    else
+        draw_lvl=lvl;
+    draw_map_area(scrmode,mapmode,draw_lvl,true,true,false);
     draw_rpanel_list(get_listview_map_fname,scrmode,mapmode,0,9999,12);
     display_rpanel_bottom(scrmode,mapmode,lvl);
 }
@@ -803,8 +808,11 @@ void actions_mdlmap(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,st
     if (load_preview)
     {
       format_map_fname(mapmode->preview->fname,scrmode->usrinput);
-      if (load_map_preview(mapmode->preview))
-        message_info("Map \"%s\" preview loaded",scrmode->usrinput);
+      if ((mapmode->level_preview&LPREV_LOAD) == LPREV_LOAD)
+      {
+        if (load_map_preview(mapmode->preview))
+          message_info("Map \"%s\" preview loaded",scrmode->usrinput);
+      }
     }
 }
 
@@ -831,10 +839,12 @@ void end_mdsmap(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct
 
 void draw_mdsmap(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl)
 {
-/*
-    draw_map_area(scrmode,mapmode,mapmode->preview,true,true,false);
-*/
-    draw_map_area(scrmode,mapmode,lvl,true,true,false);
+    struct LEVEL *draw_lvl;
+    if ((mapmode->level_preview&LPREV_SAVE) == LPREV_SAVE)
+        draw_lvl=mapmode->preview;
+    else
+        draw_lvl=lvl;
+    draw_map_area(scrmode,mapmode,draw_lvl,true,true,false);
     draw_rpanel_list(get_listview_map_fname,scrmode,mapmode,0,9999,12);
     display_rpanel_bottom(scrmode,mapmode,lvl);
 }
@@ -892,9 +902,10 @@ void actions_mdsmap(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,st
     if (load_preview)
     {
       format_map_fname(mapmode->preview->fname,scrmode->usrinput);
-/*
-      if (load_map_preview(mapmode->preview))
-        message_info("Map \"%s\" preview loaded",scrmode->usrinput);
-*/
+      if ((mapmode->level_preview&LPREV_SAVE) == LPREV_SAVE)
+      {
+        if (load_map_preview(mapmode->preview))
+          message_info("Map \"%s\" preview loaded",scrmode->usrinput);
+      }
     }
 }

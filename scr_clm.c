@@ -9,6 +9,7 @@
 #include "scr_clm.h"
 
 #include "globals.h"
+#include "obj_column_def.h"
 #include "output_scr.h"
 #include "input_kb.h"
 #include "scr_actn.h"
@@ -103,7 +104,8 @@ void end_mdclm(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct 
     message_info("Returned to Slab mode.");
 }
 
-int display_dat_subtiles(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl,int scr_row, int scr_col,int ty,int tx)
+int display_dat_subtiles(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,
+    struct LEVEL *lvl,int scr_row, int scr_col,short compressed,int ty,int tx)
 {
     int i, k;
     int color;
@@ -132,7 +134,9 @@ int display_dat_subtiles(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmo
             else
                 screen_printf("%04X",(unsigned int)get_dat_val(lvl,sx,sy));
         }
-        scr_row+=2;
+        scr_row++;
+        if (!compressed)
+          scr_row++;
     }
     return scr_row;
 }

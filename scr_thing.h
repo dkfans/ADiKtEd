@@ -37,7 +37,8 @@ int display_thing(unsigned char *thing, int x, int y);
 int display_action_point(unsigned char *actnpt, int x, int y);
 int display_static_light(unsigned char *stlight, int x, int y);
 int display_obj_stats(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,const struct LEVEL *lvl, int scr_row, int scr_col);
-int display_tng_subtiles(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,const struct LEVEL *lvl, int scr_row, int scr_col,int ty,int tx);
+int display_tng_subtiles(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,
+    const struct LEVEL *lvl, int scr_row, int scr_col,short compressed,int ty,int tx);
 
 //Functions - internal
 char get_thing_char(const struct LEVEL *lvl, int x, int y);

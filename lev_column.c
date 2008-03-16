@@ -7,6 +7,7 @@
 
 #include "lev_column.h"
 
+#include "obj_column_def.h"
 #include "obj_column.h"
 #include "lev_data.h"
 #include "globals.h"
@@ -228,7 +229,7 @@ void update_datclm_for_slab(struct LEVEL *lvl, int tx, int ty)
   struct COLUMN_REC *clm_recs[9];
   for (i=0;i<9;i++)
     clm_recs[i]=create_column_rec();
-  create_columns_for_slab(clm_recs,surr_slb,surr_own,surr_tng);
+  create_columns_for_slab(clm_recs,&(lvl->optns),surr_slb,surr_own,surr_tng);
   //Custom columns, and graffiti
   if (slab_has_custom_columns(lvl, tx, ty))
     update_custom_columns_for_slab(clm_recs,lvl,tx,ty);
@@ -392,6 +393,12 @@ void clm_utilize_dec(struct LEVEL *lvl, int clmidx)
   clmentry=lvl->clm[clmidx];
   if (clmentry!=NULL)
     clm_entry_use_dec(clmentry);
+  // If the entry is unused, let's clear it completely, just for sure.
+  if ((lvl->clm_utilize[clmidx]<1)&&(get_clm_entry_permanent(clmentry)==0))
+  {
+    lvl->clm_utilize[clmidx]=0;
+    clear_clm_entry(clmentry);
+  }
 }
 
 /*
@@ -754,7 +761,7 @@ short update_dat_last_column(struct LEVEL *lvl, unsigned short slab)
   struct COLUMN_REC *clm_recs[9];
   for (i=0;i<9;i++)
     clm_recs[i]=create_column_rec();
-  create_columns_for_slab(clm_recs,surr_slb,surr_own,surr_tng);
+  create_columns_for_slab(clm_recs,&(lvl->optns),surr_slb,surr_own,surr_tng);
   //Use the columns to set DAT/CLM entries in LEVEL
   int sx, sy;
   sx=dat_entries_x-1;

@@ -169,6 +169,8 @@ struct LEVEL {
     // Elements that are not part of DK levels, but are importand for Adikted
     // Level statistics
     struct LEVSTATS stats;
+    // Options, which affects level graphic generation, and other stuff
+    struct LEVOPTIONS optns;
     // Custom columns definition
     // There can be only one custom column on each subtile.
     // The lookup array size is arr_entries_y+1 x arr_entries_x+1
@@ -182,6 +184,7 @@ struct LEVEL {
 short level_init(struct LEVEL **lvl_ptr);
 // frees object for storing map
 short level_deinit(struct LEVEL **lvl_ptr);
+short level_set_options(struct LEVEL *lvl,struct LEVOPTIONS *optns);
 
 short level_clear(struct LEVEL *lvl);
 short level_clear_tng(struct LEVEL *lvl);
@@ -189,6 +192,7 @@ short level_clear_apt(struct LEVEL *lvl);
 short level_clear_lgt(struct LEVEL *lvl);
 short level_clear_datclm(struct LEVEL *lvl);
 short level_clear_other(struct LEVEL *lvl);
+short level_clear_options(struct LEVOPTIONS *optns);
 
 short level_free(struct LEVEL *lvl);
 short level_free_tng(struct LEVEL *lvl);

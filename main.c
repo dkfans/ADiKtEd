@@ -30,7 +30,7 @@ void read_init(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode)
     // If we can't get anything, warn but don't die
     if (!fp)
     {
-      message_info_force("Couldn't open %s, defaults loaded.",config_filename);
+      message_info_force("Couldn't open \"%s\", defaults loaded.",config_filename);
       return;
     } else
     {
@@ -40,7 +40,7 @@ void read_init(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode)
     {
       //Searchinf for a line containing equal sign
       p = strchr (buffer, '=');
-      if (p==NULL)
+      if ((p==NULL)||(buffer[0]==';'))
           continue;
       strip_crlf(buffer);
       (*p)=0;
@@ -85,6 +85,31 @@ void read_init(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode)
           bitmap_rescale=atoi(p);
           message_log(" read_init: bitmap_rescale set to %d",(int)bitmap_rescale);
       } else
+      if (!strcmp(buffer, "LEVEL_PREVIEW"))
+      {
+          mapmode->level_preview=atoi(p);
+          message_log(" read_init: level_preview set to %d",(int)mapmode->level_preview);
+      } else
+      if (!strcmp(buffer, "FILL_REINFORCED_CORNER"))
+      {
+          mapmode->optns.fill_reinforced_corner=atoi(p);
+          message_log(" read_init: fill_reinforced_corner set to %d",(int)mapmode->optns.fill_reinforced_corner);
+      } else
+      if (!strcmp(buffer, "UNAFFECTED_GEMS"))
+      {
+          mapmode->optns.unaffected_gems=atoi(p);
+          message_log(" read_init: unaffected_gems set to %d",(int)mapmode->optns.unaffected_gems);
+      } else
+      if (!strcmp(buffer, "UNAFFECTED_ROCK"))
+      {
+          mapmode->optns.unaffected_rock=atoi(p);
+          message_log(" read_init: unaffected_rock set to %d",(int)mapmode->optns.unaffected_rock);
+      } else
+      if (!strcmp(buffer, "FRAIL_COLUMNS"))
+      {
+          mapmode->optns.frail_columns=atoi(p);
+          message_log(" read_init: frail_columns set to %d",(int)mapmode->optns.frail_columns);
+      } else
       if (!strcmp(buffer, "LEVELS_PATH"))
       {
           levels_path=strdup(p);
@@ -102,6 +127,9 @@ void read_init(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode)
             if (data_path[l-1]==SEPARATOR[0])
                 data_path[l-1]=0;
           message_log(" read_init: data_path set to \"%s\"",data_path);
+      } else
+      {
+          message_info_force("Bad command \"%s\" in file \"%s\".",buffer,config_filename);
       }
     }
     message_log(" read_init: finished");
@@ -208,6 +236,7 @@ int main(int argc, char **argv)
     read_init(scrmode,mapmode);
     // Interpreting command line parameters
     get_command_line_options(scrmode,mapmode,lvl,argc,argv);
+    level_set_options(lvl,&(mapmode->optns));
     // initing keyboard input and screen output, also all modes.
     init_levscr_modes(scrmode,mapmode);
     // Load a map, or start new one

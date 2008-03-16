@@ -20,6 +20,9 @@ FILE *msgout_fp;
 char *levels_path;
 char *data_path;
 
+/*
+ * Strips control characters from end of the string
+ */
 void strip_crlf(char *string_in)
 {
     int i;
@@ -61,7 +64,7 @@ void message_error(const char *format, ...)
     message_is_warn=true;
     // Write to log file if it is opened
     if (msgout_fp!=NULL)
-      fprintf(msgout_fp,"%s\n",message);
+      fprintf(msgout_fp,"%s\r\n",message);
     speaker_beep();
 }
 
@@ -85,7 +88,7 @@ void message_info(const char *format, ...)
     message_is_warn=false;
     // Write to log file if it is opened
     if (msgout_fp!=NULL)
-      fprintf(msgout_fp,"%s\n",message);
+      fprintf(msgout_fp,"%s\r\n",message);
 }
 
 void message_info_force(const char *format, ...)
@@ -101,7 +104,7 @@ void message_info_force(const char *format, ...)
     message_is_warn=false;
     // Write to log file if it is opened
     if (msgout_fp!=NULL)
-      fprintf(msgout_fp,"%s\n",message);
+      fprintf(msgout_fp,"%s\r\n",message);
 }
 
 void message_release(void)
@@ -125,7 +128,7 @@ void message_log(const char *format, ...)
     // Write to log file if it is opened
     vfprintf(msgout_fp, format, val);
     va_end(val);
-    fprintf(msgout_fp,"\n");
+    fprintf(msgout_fp,"\r\n");
 }
 
 /*
@@ -161,11 +164,14 @@ void popup_show(const char *title,const char *format, ...)
       screen_refresh();
     // Write to log file if it is opened
       if (msgout_fp!=NULL)
-        fprintf(msgout_fp,"%s\n",msg);
+        fprintf(msgout_fp,"%s\r\n",msg);
       free(msg);
 }
 
-short format_map_fname(char *fname, char *usrinput)
+/*
+ * Creates map filename from given string.
+ */
+short format_map_fname(char *fname, const char *usrinput)
 {
     // if the file does not have a path
     if (strstr(usrinput,SEPARATOR)==NULL)
@@ -174,8 +180,9 @@ short format_map_fname(char *fname, char *usrinput)
           char *dotpos=strrchr(usrinput,'.');
           if (dotpos!=NULL)
           {
-              *dotpos='\0';
-              sprintf(fname, "%s", usrinput);
+              int len=dotpos-usrinput;
+              strncpy(fname,usrinput,len);
+              fname[len]='\0';
           } else
           // If there are no dots or separators, maybe it's a number of map, not filename
           {
@@ -214,7 +221,7 @@ short set_msglog_fname(char *fname)
     msgout_fp=fopen(fname,"wb");
     if (msgout_fp!=NULL)
     {
-      fprintf(msgout_fp,"aDiKtEd message log file\n");
+      fprintf(msgout_fp,"aDiKtEd message log file\r\n");
       return true;
     }
     return false;
@@ -248,7 +255,7 @@ void die(const char *format, ...)
       fprintf(stderr, "\n");
       // Write to log file if it is opened
       if (msgout_fp!=NULL)
-        fprintf(msgout_fp,"\n");
+        fprintf(msgout_fp,"\r\n");
       free_messages();
       exit(1);
 }

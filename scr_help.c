@@ -80,6 +80,8 @@ short init_help(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode)
     help->tips=NULL;
     help->compassrows=0;
     help->compass=NULL;
+    help->mcompassrows=0;
+    help->mcompass=NULL;
 
     char buffer[READ_BUFSIZE];
     char title[READ_BUFSIZE];
@@ -197,7 +199,8 @@ char ***match_title(char *title, int n)
             "rwrkhelp", "lmaphelp",       //21,22
             "smaphelp",                   //23
             "grfthelp", "grftkeyhelp",    //24,25
-            "compass", NULL};             //26
+            "compass", "mcompass",        //26,27
+            NULL,};
     int i=0;
 
     while (titles[i] && strcmp (titles[i], title))
@@ -312,6 +315,10 @@ char ***match_title(char *title, int n)
         if (n!=-1)
           help->compassrows=n;
         return &(help->compass);
+      case 27:
+        if (n!=-1)
+          help->mcompassrows=n;
+        return &(help->mcompass);
       default :
         return NULL;
     }

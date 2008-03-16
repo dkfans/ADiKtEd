@@ -106,6 +106,14 @@ struct IRECT_2D {
     int b;
 };
 
+struct LEVOPTIONS {
+    // Level graphic generation options
+    short unaffected_gems;
+    short unaffected_rock;
+    short fill_reinforced_corner;
+    short frail_columns;
+  };
+
 // File handling variables
 extern char *levels_path;
 extern char *data_path;

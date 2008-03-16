@@ -23,7 +23,8 @@ void draw_mdclm(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct
 void draw_mdclm_panel(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl);
 
 //Functions - lower level
-int display_dat_subtiles(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl,int scr_row, int scr_col,int ty,int tx);
+int display_dat_subtiles(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,
+    struct LEVEL *lvl,int scr_row, int scr_col,short compressed,int ty,int tx);
 int display_column(unsigned char *clmentry,int clm_idx, int scr_row, int scr_col);
 
 //Functions - internal

@@ -8,6 +8,7 @@
 #include "lev_files.h"
 
 #include "globals.h"
+#include "obj_column_def.h"
 #include "obj_slabs.h"
 #include "obj_things.h"
 #include "bulcommn.h"
@@ -302,7 +303,8 @@ short load_txt(struct LEVEL *lvl,char *fname)
     lvl->script.txt=(char **)malloc(lines_count*sizeof(unsigned char *));
     lvl->script.list=(struct DK_SCRIPT_COMMAND **)malloc(lines_count*sizeof(struct DK_SCRIPT_COMMAND *));
     ptr=mem.content;
-    int currline=0;
+    int currline;
+    currline=0;
     while (currline<lines_count)
     {
       if (ptr>=ptr_end) ptr=ptr_end-1;
@@ -321,6 +323,19 @@ short load_txt(struct LEVEL *lvl,char *fname)
       ptr=nptr+1;
       currline++;
     }
+    int nonempty_lines=lines_count-1;
+    // Delete empty lines at end
+    while ((nonempty_lines>=0)&&((lvl->script.txt[nonempty_lines][0])=='\0'))
+      nonempty_lines--;
+    currline=lines_count-1;
+    while (currline>nonempty_lines)
+    {
+      free(lvl->script.txt[currline]);
+      currline--;
+    }
+    lines_count=nonempty_lines+1;
+    lvl->script.txt=(char **)realloc(lvl->script.txt,lines_count*sizeof(unsigned char *));
+    lvl->script.list=(struct DK_SCRIPT_COMMAND **)realloc(lvl->script.list,lines_count*sizeof(struct DK_SCRIPT_COMMAND *));
     lvl->script.lines_count=lines_count;
     free (mem.content);
     decompose_script(&(lvl->script));
@@ -796,10 +811,14 @@ short write_text_file(char **lines,int lines_count,char *fname)
     for (i=0;i<last_line;i++)
     {
       fputs(lines[i],fp);
-      fputs("\n",fp);
+      fputs("\r\n",fp);
     }
     if (last_line>=0)
+    {
       fputs(lines[last_line],fp);
+      if (lines[last_line][0] != '\0')
+        fputs("\r\n",fp);
+    }
     fclose(fp);
     return true;
 }
