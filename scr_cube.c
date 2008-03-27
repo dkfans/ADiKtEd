@@ -16,6 +16,7 @@
 #include "obj_column.h"
 #include "scr_actn.h"
 #include "scr_list.h"
+#include "scr_help.h"
 
 // Variables
 
@@ -99,6 +100,8 @@ void end_mdcube(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct
  */
 void draw_mdcube(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl)
 {
+    // Note: get_cubedesc_head shouldn't be used here, because it may contain names
+    // which are too long for the list (without shortcuts)
     draw_numbered_list(get_cube_fullname,scrmode,mapmode,0,CUBE_MAX_INDEX,20);
     set_cursor_pos(get_screen_rows()-1, 17);
 }

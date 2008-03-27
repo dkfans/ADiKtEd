@@ -26,8 +26,6 @@
 
 LIST_DATA *list;
 
-char map_fname[LINEMSG_SIZE];
-
 /*
  * Initializes variables for the list screen.
  */
@@ -167,6 +165,7 @@ short start_list(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struc
     list->val1=0;
     list->val2=0;
     list->val3=0;
+    list->ptr=NULL;
     scrmode->mode=lstmode;
     message_info("Use arrow keys and page up/down to move, "
       "enter to choose.");
@@ -261,7 +260,55 @@ void draw_numbered_list(char *(*itemstr)(unsigned short),
       screen_printchr(' ');
       screen_printchr(' ');
     }
-    int scr_row=display_mode_keyhelp(0,scrmode->cols+3,scrmode->mode);
+    int scr_row=display_mode_keyhelp(0,scrmode->cols+3,scrmode->rows,scrmode->mode,list->pos);
+}
+
+/*
+ * Draws screen with a list of things, including index of every thing,
+ * and key help for given screen.
+ */
+void draw_thing_list(char *(*itemstr)(unsigned short),thing_subtype_arrayitem index_func,
+        struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,
+        unsigned int count,unsigned int itm_width)
+{
+    unsigned int line_length=min(scrmode->cols,LINEMSG_SIZE);
+    unsigned int entry_width=itm_width+5;
+    int scr_rows=scrmode->rows;
+    list->cols=max((unsigned int)(line_length/entry_width),1);
+    list->items=count;
+    unsigned int num_rows=list->items/list->cols
+                        + (((list->items)%(list->cols))>0);
+    unsigned int i,k;
+    int col;
+    for (i=0; i < scr_rows; i++)
+    {
+      set_cursor_pos(i, 0);
+      char it_msg[LINEMSG_SIZE];
+      if (i+list->y<num_rows)
+        for (k=0;k<list->cols;k++)
+        {
+          int itm_idx=list->y+i+k*num_rows;
+          int real_index=index_func(itm_idx);
+          if (itm_idx==list->pos)
+              col=PRINT_COLOR_BLACK_ON_LGREY;
+          else
+              col=PRINT_COLOR_LGREY_ON_BLACK;
+          if (itm_idx<count)
+            sprintf(it_msg,"%3d: %-*.*s",
+                    real_index,itm_width,itm_width, itemstr(real_index));
+          else
+            sprintf(it_msg,"");
+          screen_setcolor(col);
+          screen_printf("%s",it_msg);
+        }
+      screen_setcolor(PRINT_COLOR_LGREY_ON_BLACK);
+      screen_printf_toeol("");
+      set_cursor_pos(i, scrmode->cols);
+      screen_setcolor(PRINT_COLOR_YELLOW_ON_BLUE);
+      screen_printchr(' ');
+      screen_printchr(' ');
+    }
+    int scr_row=display_mode_keyhelp(0,scrmode->cols+3,scrmode->rows,scrmode->mode,index_func(list->pos)-1);
 }
 
 /*
@@ -312,12 +359,8 @@ void draw_rpanel_list(char *(*itemstr)(unsigned short),
 /*
  * Covers actions from the creature screen.
  */
-void actions_crtre(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl,int key)
+void actions_crcrtr(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl,int key)
 {
-    int sx, sy;
-    sx = (mapmode->map.x+mapmode->screen.x)*3+mapmode->subtl.x;
-    sy = (mapmode->map.y+mapmode->screen.y)*3+mapmode->subtl.y;
-    unsigned char *thing;
     message_release();
     if (!actions_list(scrmode,mapmode,lvl,key))
     {
@@ -328,14 +371,14 @@ void actions_crtre(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,str
           break;
         case KEY_S:
         case KEY_SHIFT_S:
-          if (list->val1<10)
+          if (list->val1<9)
             list->val1++;
           else
             message_error("Max level reached");
           break;
         case KEY_X:
         case KEY_SHIFT_X:
-          if (list->val1>1)
+          if (list->val1>0)
             list->val1--;
           else
             message_error("Min level reached");
@@ -347,16 +390,17 @@ void actions_crtre(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,str
           message_info("Adding creature cancelled");
           break;
         case KEY_ENTER:
-          thing = create_creature(lvl,sx,sy,list->pos+1);
+        {
+          int sx, sy;
+          sx = (mapmode->map.x+mapmode->screen.x)*3+mapmode->subtl.x;
+          sy = (mapmode->map.y+mapmode->screen.y)*3+mapmode->subtl.y;
+          unsigned char *thing;
+          thing=tng_makecreature(scrmode,mapmode,lvl,sx,sy,list->pos+1);
           set_thing_subtile_h(thing,1);
           set_thing_level(thing,list->val1);
           set_thing_owner(thing,list->val2);
-          thing_add(lvl,thing);
-          // Show the new thing
-          mdtng->vistng[mapmode->subtl.x][mapmode->subtl.y]=get_object_subtl_last(lvl,sx,sy,OBJECT_TYPE_THING);
           mdend[MD_CRTR](scrmode,mapmode,lvl);
-          message_info("Creature added");
-          break;
+        }; break;
         default:
           message_info("Unrecognized creature key code: %d",key);
           speaker_beep();
@@ -367,11 +411,8 @@ void actions_crtre(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,str
 /*
  * Covers actions from the item type screen.
  */
-void actions_itemt(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl,int key)
+void actions_critem(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl,int key)
 {
-    unsigned char *thing;
-    int sx=(mapmode->map.x+mapmode->screen.x)*3+mapmode->subtl.x;
-    int sy=(mapmode->map.y+mapmode->screen.y)*3+mapmode->subtl.y;
     message_release();
     if (!actions_list(scrmode,mapmode,lvl,key))
     {
@@ -380,16 +421,19 @@ void actions_itemt(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,str
         case KEY_TAB:
         case KEY_DEL:
         case KEY_ESCAPE:
-          mdend[MD_ITMT](scrmode,mapmode,lvl);
-          message_info("Adding thing cancelled");
+          mdend[MD_CITM](scrmode,mapmode,lvl);
+          message_info("Adding Item cancelled");
           break;
         case KEY_ENTER:
-          tng_makeitem(scrmode,mapmode,lvl,sx,sy,list->pos+1);
-          mdend[MD_ITMT](scrmode,mapmode,lvl);
-          message_info("Item added");
-          break;
+        {
+          int sx=(mapmode->map.x+mapmode->screen.x)*3+mapmode->subtl.x;
+          int sy=(mapmode->map.y+mapmode->screen.y)*3+mapmode->subtl.y;
+          unsigned char *thing;
+          thing=tng_makeitem(scrmode,mapmode,lvl,sx,sy,list->pos+1);
+          mdend[MD_CITM](scrmode,mapmode,lvl);
+        };break;
         default:
-          message_info("Unrecognized item key code: %d",key);
+          message_info("Unrecognized add item key code: %d",key);
           speaker_beep();
       }
     }
@@ -576,28 +620,33 @@ short start_mdslbl(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,str
     return result;
 }
 
-void draw_crtre(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl)
+void draw_crcrtr(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl)
 {
-    int all_rows=get_screen_rows();
-    int all_cols=get_screen_cols();
-
     draw_numbered_list(get_creature_subtype_fullname,scrmode,mapmode,1,CREATR_SUBTP_FLOAT,16);
+    int scr_row=scrmode->rows-4;
     int scr_col1=scrmode->cols+3;
     // Display more info about the creature
-    if (all_rows > 7)
+    if (scr_row > 0)
     {
       screen_setcolor(PRINT_COLOR_LGREY_ON_BLACK);
-      set_cursor_pos(all_rows-10, scr_col1);
-      screen_printf("%s","Creature parameters");
-      set_cursor_pos(all_rows-8, scr_col1);
-      screen_printf("Level: %d",list->val1);
-      set_cursor_pos(all_rows-6, scr_col1);
-      screen_printf("Owner: %s",get_owner_type_fullname(list->val2));
+      set_cursor_pos(scr_row++, scr_col1);
+      screen_printf_toeol("Creature parameters");
+      set_cursor_pos(scr_row++, scr_col1);
+      screen_setcolor(PRINT_COLOR_LGREY_ON_BLACK);
+      screen_printf("Level (s/x): ");
+      screen_setcolor(PRINT_COLOR_LGREEN_ON_BLACK);
+      screen_printf("%d", list->val1+1);
+      set_cursor_pos(scr_row++, scr_col1);
+      screen_setcolor(PRINT_COLOR_LGREY_ON_BLACK);
+      screen_printf("Owner   (o): ");
+      screen_setcolor(get_screen_color_owned(list->val2,false,false,false));
+      screen_printf(get_owner_type_fullname(list->val2));
+      screen_setcolor(PRINT_COLOR_LGREY_ON_BLACK);
     }
     set_cursor_pos(get_screen_rows()-1, 17);
 }
 
-void draw_itemt(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl)
+void draw_critem(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl)
 {
     draw_numbered_list(get_item_subtype_fullname,scrmode,mapmode,1,ITEM_SUBTYPE_SPELLARMG,18);
     set_cursor_pos(get_screen_rows()-1, 17);
@@ -605,7 +654,7 @@ void draw_itemt(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct
 
 void draw_mdtextr(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl)
 {
-    draw_numbered_list(get_texture_fullname,scrmode,mapmode,0,INF_MAX_INDEX,55);
+    draw_numbered_list(get_texture_fullname,scrmode,mapmode,0,INF_MAX_INDEX,14);
     set_cursor_pos(get_screen_rows()-1, 17);
 }
 
@@ -621,15 +670,277 @@ void draw_mdslbl(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struc
     set_cursor_pos(get_screen_rows()-1, 17);
 }
 
+void draw_crefct(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl)
+{
+    draw_numbered_list(get_roomeffect_subtype_fullname,scrmode,mapmode,1,ROOMEFC_SUBTP_DRYICE,15);
+    int scr_row=scrmode->rows-4;
+    int scr_col1=scrmode->cols+3;
+    // Display more info about the creature
+    if (scr_row > 0)
+    {
+      screen_setcolor(PRINT_COLOR_LGREY_ON_BLACK);
+      set_cursor_pos(scr_row++, scr_col1);
+      screen_printf_toeol("Room Effect parameters");
+      set_cursor_pos(scr_row++, scr_col1);
+      screen_setcolor(PRINT_COLOR_LGREY_ON_BLACK);
+      screen_printf("Owner   (o): ");
+      screen_setcolor(get_screen_color_owned(list->val2,false,false,false));
+      screen_printf(get_owner_type_fullname(list->val2));
+      screen_setcolor(PRINT_COLOR_LGREY_ON_BLACK);
+    }
+    set_cursor_pos(get_screen_rows()-1, 17);
+}
+
+void actions_crefct(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl,int key)
+{
+    message_release();
+    if (!actions_list(scrmode,mapmode,lvl,key))
+    {
+      switch (key)
+      {
+        case KEY_TAB:
+        case KEY_DEL:
+        case KEY_ESCAPE:
+          mdend[MD_CEFC](scrmode,mapmode,lvl);
+          message_info("Effect creation cancelled");
+          break;
+        case KEY_ENTER:
+        {
+          int sx, sy;
+          sx = (mapmode->map.x+mapmode->screen.x)*3+mapmode->subtl.x;
+          sy = (mapmode->map.y+mapmode->screen.y)*3+mapmode->subtl.y;
+          unsigned char *thing;
+          thing=tng_makeroomeffect(scrmode,mapmode,lvl,sx,sy,list->pos+1);
+          mdend[MD_CEFC](scrmode,mapmode,lvl);
+        };break;
+        default:
+          message_info("Unrecognized add effect key code: %d",key);
+          speaker_beep();
+      }
+    }
+}
+
+void draw_crtrap(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl)
+{
+    draw_numbered_list(get_trap_subtype_fullname,scrmode,mapmode,1,TRAP_SUBTYPE_DUMMY7,14);
+    int scr_row=scrmode->rows-4;
+    int scr_col1=scrmode->cols+3;
+    // Display more info about the creature
+    if (scr_row > 0)
+    {
+      screen_setcolor(PRINT_COLOR_LGREY_ON_BLACK);
+      set_cursor_pos(scr_row++, scr_col1);
+      screen_printf_toeol("Trap parameters");
+      set_cursor_pos(scr_row++, scr_col1);
+      screen_setcolor(PRINT_COLOR_LGREY_ON_BLACK);
+      screen_printf("Owner   (o): ");
+      screen_setcolor(get_screen_color_owned(list->val2,false,false,false));
+      screen_printf(get_owner_type_fullname(list->val2));
+      screen_setcolor(PRINT_COLOR_LGREY_ON_BLACK);
+    }
+    set_cursor_pos(get_screen_rows()-1, 17);
+}
+
+void actions_crtrap(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl,int key)
+{
+    message_release();
+    if (!actions_list(scrmode,mapmode,lvl,key))
+    {
+      switch (key)
+      {
+        case KEY_TAB:
+        case KEY_DEL:
+        case KEY_ESCAPE:
+          mdend[MD_CTRP](scrmode,mapmode,lvl);
+          message_info("Trap creation cancelled");
+          break;
+        case KEY_ENTER:
+        {
+          int sx, sy;
+          sx = (mapmode->map.x+mapmode->screen.x)*3+mapmode->subtl.x;
+          sy = (mapmode->map.y+mapmode->screen.y)*3+mapmode->subtl.y;
+          unsigned char *thing;
+          thing=tng_maketrap(scrmode,mapmode,lvl,sx,sy,list->pos+1);
+          mdend[MD_CTRP](scrmode,mapmode,lvl);
+        };break;
+        default:
+          message_info("Unrecognized add trap key code: %d",key);
+          speaker_beep();
+      }
+    }
+}
+
+void draw_editem(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl)
+{
+    draw_thing_list(get_item_subtype_fullname,get_thing_subtypes_arritem_func(list->val1),
+        scrmode,mapmode,get_thing_subtypes_count(list->val1),18);
+//    draw_numbered_list(get_item_subtype_fullname,scrmode,mapmode,1,ITEM_SUBTYPE_SPELLARMG,18);
+    set_cursor_pos(get_screen_rows()-1, 17);
+}
+
+void actions_editem(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl,int key)
+{
+    message_release();
+    if (!actions_list(scrmode,mapmode,lvl,key))
+    {
+      switch (key)
+      {
+        case KEY_TAB:
+        case KEY_DEL:
+        case KEY_ESCAPE:
+          mdend[MD_EITM](scrmode,mapmode,lvl);
+          message_info("Item edit cancelled");
+          break;
+        case KEY_ENTER:
+        {
+          thing_subtype_arrayitem index_func;
+          index_func=get_thing_subtypes_arritem_func(list->val1);
+          int real_index=-1;
+          if (index_func!=NULL)
+              real_index=index_func(list->pos);
+          if (real_index>=0)
+            set_thing_subtype(list->ptr,real_index);
+          mdend[MD_EITM](scrmode,mapmode,lvl);
+          if (real_index<0)
+          {
+              message_error("Internal error: Can't get subtype for selected item");
+              break;
+          }
+          message_info("Item subtype and properties changed");
+        }; break;
+        default:
+          message_info("Unrecognized edit item key code: %d",key);
+          speaker_beep();
+      }
+    }
+}
+
+void draw_edcrtr(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl)
+{
+    draw_crcrtr(scrmode,mapmode,lvl);
+}
+
+void actions_edcrtr(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl,int key)
+{
+    message_release();
+    if (!actions_list(scrmode,mapmode,lvl,key))
+    {
+      switch (key)
+      {
+        case KEY_O:
+          list->val2=get_owner_next(list->val2);
+          break;
+        case KEY_S:
+        case KEY_SHIFT_S:
+          if (list->val1<9)
+            list->val1++;
+          else
+            message_error("Max level reached");
+          break;
+        case KEY_X:
+        case KEY_SHIFT_X:
+          if (list->val1>0)
+            list->val1--;
+          else
+            message_error("Min level reached");
+          break;
+        case KEY_TAB:
+        case KEY_DEL:
+        case KEY_ESCAPE:
+          mdend[MD_ECRT](scrmode,mapmode,lvl);
+          message_info("Creature edit cancelled");
+          break;
+        case KEY_ENTER:
+          set_thing_subtype(list->ptr,list->pos+1);
+          set_thing_level(list->ptr,list->val1);
+          set_thing_owner(list->ptr,list->val2);
+          mdend[MD_ECRT](scrmode,mapmode,lvl);
+          message_info("Creature properties changed");
+          break;
+        default:
+          message_info("Unrecognized edit creature key code: %d",key);
+          speaker_beep();
+      }
+    }
+}
+
+void draw_edefct(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl)
+{
+    draw_crefct(scrmode,mapmode,lvl);
+}
+
+void actions_edefct(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl,int key)
+{
+    message_release();
+    if (!actions_list(scrmode,mapmode,lvl,key))
+    {
+      switch (key)
+      {
+        case KEY_O:
+          list->val2=get_owner_next(list->val2);
+          break;
+        case KEY_TAB:
+        case KEY_DEL:
+        case KEY_ESCAPE:
+          mdend[MD_EFCT](scrmode,mapmode,lvl);
+          message_info("Room Effect edit cancelled");
+          break;
+        case KEY_ENTER:
+          set_thing_subtype(list->ptr,list->pos+1);
+          set_thing_owner(list->ptr,list->val2);
+          mdend[MD_EFCT](scrmode,mapmode,lvl);
+          message_info("Room Effect properties changed");
+          break;
+        default:
+          message_info("Unrecognized edit effect key code: %d",key);
+          speaker_beep();
+      }
+    }
+}
+
+void draw_edtrap(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl)
+{
+    draw_crtrap(scrmode,mapmode,lvl);
+}
+
+void actions_edtrap(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl,int key)
+{
+    message_release();
+    if (!actions_list(scrmode,mapmode,lvl,key))
+    {
+      switch (key)
+      {
+        case KEY_O:
+          list->val2=get_owner_next(list->val2);
+          break;
+        case KEY_TAB:
+        case KEY_DEL:
+        case KEY_ESCAPE:
+          mdend[MD_ETRP](scrmode,mapmode,lvl);
+          message_info("Trap edit cancelled");
+          break;
+        case KEY_ENTER:
+          set_thing_subtype(list->ptr,list->pos+1);
+          set_thing_owner(list->ptr,list->val2);
+          mdend[MD_ETRP](scrmode,mapmode,lvl);
+          message_info("Trap properties changed");
+          break;
+        default:
+          message_info("Unrecognized edit trap key code: %d",key);
+          speaker_beep();
+      }
+    }
+}
+
 void draw_mdsrch(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl)
 {
     draw_numbered_list(get_search_objtype_name,scrmode,mapmode,0,get_search_objtype_count()-1,18);
     set_cursor_pos(get_screen_rows()-1, 17);
 }
 
-short start_crtre(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl)
+short start_crcrtr(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl)
 {
-    message_log(" start_crtre: starting");
+    message_log(" start_crcrtr: starting");
     int sx, sy;
     sx = (mapmode->map.x+mapmode->screen.x)*3+mapmode->subtl.x;
     sy = (mapmode->map.y+mapmode->screen.y)*3+mapmode->subtl.y;
@@ -637,31 +948,161 @@ short start_crtre(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,stru
     result=start_list(scrmode,mapmode,lvl,MD_CRTR);
     scrmode->usrinput_type=SI_NONE;
     // creature level
-    list->val1=1;
+    list->val1=0;
     // owning player
     list->val2=get_tile_owner(lvl,mapmode->map.x+mapmode->screen.x,mapmode->map.y+mapmode->screen.y);
 //    list->pos=
-    message_log(" start_crtre: completed");
+    message_log(" start_crcrtr: completed");
     return result;
 }
 
-void end_crtre(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl)
+void end_crcrtr(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl)
 {
     end_list(scrmode,mapmode,lvl);
 }
 
-short start_itemt(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl)
+short start_critem(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl)
 {
-    message_log(" start_itemt: starting");
+    message_log(" start_critem: starting");
     short result;
-    result=start_list(scrmode,mapmode,lvl,MD_ITMT);
+    result=start_list(scrmode,mapmode,lvl,MD_CITM);
     scrmode->usrinput_type=SI_NONE;
 //    list->pos=
-    message_log(" start_itemt: completed");
+    message_log(" start_critem: completed");
     return result;
 }
 
-void end_itemt(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl)
+void end_critem(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl)
+{
+    end_list(scrmode,mapmode,lvl);
+}
+
+short start_crefct(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl)
+{
+    message_log(" start_crefct: starting");
+    short result;
+    result=start_list(scrmode,mapmode,lvl,MD_CEFC);
+    scrmode->usrinput_type=SI_NONE;
+//    list->pos=
+    message_log(" start_crefct: completed");
+    return result;
+}
+
+void end_crefct(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl)
+{
+    end_list(scrmode,mapmode,lvl);
+}
+
+short start_crtrap(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl)
+{
+    message_log(" start_crtrap: starting");
+    short result;
+    result=start_list(scrmode,mapmode,lvl,MD_CTRP);
+    scrmode->usrinput_type=SI_NONE;
+//    list->pos=
+    message_log(" start_crtrap: completed");
+    return result;
+}
+
+void end_crtrap(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl)
+{
+    end_list(scrmode,mapmode,lvl);
+}
+
+short start_editem(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl)
+{
+    message_log(" start_editem: starting");
+    int sx, sy;
+    sx = (mapmode->map.x+mapmode->screen.x)*3+mapmode->subtl.x;
+    sy = (mapmode->map.y+mapmode->screen.y)*3+mapmode->subtl.y;
+    unsigned char *thing;
+    thing=get_object(lvl,sx,sy,mdtng->vistng[mapmode->subtl.x][mapmode->subtl.y]);
+    // Note: we're not checking if the object is a thing - it have to be thing
+    // but let's make sure it is a creature
+    int arr_idx=get_thing_subtypes_arridx(thing);
+    if (arr_idx<0)
+    {
+      message_error("Can't find types list containing selected item.");
+      return false;
+    }
+    unsigned short stype_idx=get_thing_subtype(thing);
+    short result;
+    result=start_list(scrmode,mapmode,lvl,MD_EITM);
+    scrmode->usrinput_type=SI_NONE;
+    list->val1=arr_idx;
+    int npos=get_thing_subtypes_arritmidx(arr_idx,stype_idx);
+    if (npos>=0)
+      list->pos=npos;
+    list->ptr=thing;
+    message_log(" start_editem: completed");
+    return result;
+}
+
+void end_editem(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl)
+{
+    end_list(scrmode,mapmode,lvl);
+}
+
+short start_edefct(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl)
+{
+    message_log(" start_edefct: starting");
+    int sx, sy;
+    sx = (mapmode->map.x+mapmode->screen.x)*3+mapmode->subtl.x;
+    sy = (mapmode->map.y+mapmode->screen.y)*3+mapmode->subtl.y;
+    unsigned char *thing;
+    thing=get_object(lvl,sx,sy,mdtng->vistng[mapmode->subtl.x][mapmode->subtl.y]);
+    // Note: we're not checking if the object is a thing - it have to be thing
+    // but let's make sure it is a creature
+    if (!is_roomeffect(thing))
+    {
+      message_error("Can't edit effect - wrong object type");
+      return false;
+    }
+    short result;
+    result=start_list(scrmode,mapmode,lvl,MD_EFCT);
+    scrmode->usrinput_type=SI_NONE;
+    list->pos=get_thing_subtype(thing)-1;
+    // owning player
+    list->val2=get_thing_owner(thing);
+    // The pointer which is changed at end
+    list->ptr=thing;
+    message_log(" start_edefct: completed");
+    return result;
+}
+
+void end_edefct(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl)
+{
+    end_list(scrmode,mapmode,lvl);
+}
+
+short start_edtrap(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl)
+{
+    message_log(" start_edtrap: starting");
+    int sx, sy;
+    sx = (mapmode->map.x+mapmode->screen.x)*3+mapmode->subtl.x;
+    sy = (mapmode->map.y+mapmode->screen.y)*3+mapmode->subtl.y;
+    unsigned char *thing;
+    thing=get_object(lvl,sx,sy,mdtng->vistng[mapmode->subtl.x][mapmode->subtl.y]);
+    // Note: we're not checking if the object is a thing - it have to be thing
+    // but let's make sure it is a creature
+    if (!is_trap(thing))
+    {
+      message_error("Can't edit trap - wrong object type");
+      return false;
+    }
+    short result;
+    result=start_list(scrmode,mapmode,lvl,MD_ETRP);
+    scrmode->usrinput_type=SI_NONE;
+    list->pos=get_thing_subtype(thing)-1;
+    // owning player
+    list->val2=get_thing_owner(thing);
+    // The pointer which is changed at end
+    list->ptr=thing;
+    message_log(" start_edtrap: completed");
+    return result;
+}
+
+void end_edtrap(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl)
 {
     end_list(scrmode,mapmode,lvl);
 }
@@ -692,6 +1133,40 @@ void end_mdslbl(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct
     end_list(scrmode,mapmode,lvl);
 }
 
+short start_edcrtr(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl)
+{
+    message_log(" start_ecrtr: starting");
+    int sx, sy;
+    sx = (mapmode->map.x+mapmode->screen.x)*3+mapmode->subtl.x;
+    sy = (mapmode->map.y+mapmode->screen.y)*3+mapmode->subtl.y;
+    unsigned char *thing;
+    thing=get_object(lvl,sx,sy,mdtng->vistng[mapmode->subtl.x][mapmode->subtl.y]);
+    // Note: we're not checking if the object is a thing - it have to be thing
+    // but let's make sure it is a creature
+    if (!is_creature(thing))
+    {
+      message_error("Can't edit creature - wrong object type");
+      return false;
+    }
+    short result;
+    result=start_list(scrmode,mapmode,lvl,MD_ECRT);
+    scrmode->usrinput_type=SI_NONE;
+    list->pos=get_thing_subtype(thing)-1;
+    // creature level
+    list->val1=get_thing_level(thing);
+    // owning player
+    list->val2=get_thing_owner(thing);
+    // The pointer which is changed at end
+    list->ptr=thing;
+    message_log(" start_ecrtr: completed");
+    return result;
+}
+
+void end_edcrtr(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl)
+{
+    end_list(scrmode,mapmode,lvl);
+}
+
 short start_mdsrch(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl)
 {
     message_log(" start_mdsrch: starting");
@@ -710,6 +1185,7 @@ void end_mdsrch(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct
 
 char *get_listview_map_fname(unsigned short pos_idx)
 {
+  static char map_fname[LINEMSG_SIZE];
     if (pos_idx<1)
     {
       sprintf (map_fname, "(%s)","user typed");
@@ -795,6 +1271,7 @@ void actions_mdlmap(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,st
               break;
             }
             free_map(lvl);
+            strcpy(lvl->savfname,"");
             load_map(lvl);
             clear_highlight(mapmode);
             change_mode(scrmode,mapmode,lvl,scrmode->mode);

@@ -74,10 +74,13 @@ void actions_mdtng(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,str
           message_info("Slab mode activated");
           break;
         case KEY_C: //add creature
-          mdstart[MD_CRTR](scrmode,mapmode,lvl);
+          if (mapmode->creature_list_on_create)
+            mdstart[MD_CRTR](scrmode,mapmode,lvl);
+          else
+            tng_makecreature(scrmode,mapmode,lvl,sx,sy,CREATR_SUBTP_WIZRD);
           break;
         case KEY_I: //add item
-          mdstart[MD_ITMT](scrmode,mapmode,lvl);
+          mdstart[MD_CITM](scrmode,mapmode,lvl);
           break;
         case KEY_B: // create spell
           tng_makeitem(scrmode,mapmode,lvl,sx,sy,ITEM_SUBTYPE_SPELLHOE);
@@ -110,11 +113,10 @@ void actions_mdtng(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,str
           tng_makeitem(scrmode,mapmode,lvl,sx,sy,ITEM_SUBTYPE_TBBOULDER);
           break;
         case KEY_E: // Add room effect
-          thing = create_roomeffect(lvl,sx,sy,ROOMEFC_SUBTP_DRIPWTR);
-          thing_add(lvl,thing);
-          message_info("Added room effect");
-          mdtng->vistng[mapmode->subtl.x][mapmode->subtl.y]=get_object_subtl_last(lvl,sx,sy,OBJECT_TYPE_THING);
-          set_brighten_for_thing(mapmode,thing);
+          if (mapmode->roomeffect_list_on_create)
+            mdstart[MD_CEFC](scrmode,mapmode,lvl);
+          else
+            tng_makeroomeffect(scrmode,mapmode,lvl,sx,sy,ROOMEFC_SUBTP_DRIPWTR);
           break;
         case KEY_A: // Add action point
           thing = create_actnpt(lvl, sx, sy);
@@ -212,10 +214,10 @@ void actions_mdtng(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,str
           level_verify_with_highlight(lvl,mapmode);
           break;
         case KEY_T: // Create trap
-          thing = create_trap (lvl, sx, sy, TRAP_SUBTYPE_BOULDER);
-          thing_add(lvl,thing);
-          message_info("Added trap");
-          mdtng->vistng[mapmode->subtl.x][mapmode->subtl.y]=get_object_subtl_last(lvl,sx,sy,OBJECT_TYPE_THING);
+          if (mapmode->traps_list_on_create)
+            mdstart[MD_CTRP](scrmode,mapmode,lvl);
+          else
+            tng_maketrap(scrmode,mapmode,lvl,sx,sy,TRAP_SUBTYPE_BOULDER);
           break;
         case KEY_L: // Lock / unlock a door
           {
@@ -288,61 +290,11 @@ void actions_mdtng(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,str
             }
           };break;
         case KEY_S: // Change level of creature/trap/special/spell/lair/room efct
-          {
-            int visiting_z=mdtng->vistng[mapmode->subtl.x][mapmode->subtl.y];
-            short obj_type=get_object_type(lvl,sx,sy,visiting_z);
-            switch (obj_type)
-            {
-            case OBJECT_TYPE_THING:
-              thing = get_object(lvl,sx,sy,visiting_z);
-              if (is_creature(thing))
-              {
-                if (get_thing_level(thing)<9)
-                {
-                  set_thing_level(thing,get_thing_level(thing)+1);
-                  message_info("Creature level increased.");
-                } else
-                message_error("Creature level limit reached.");
-              } else
-              if (switch_thing_subtype(thing,true))
-              {
-                  message_info("Item type switched to next.");
-              } else
-                  message_error("This item has no level nor type.");
-              break;
-            default:
-              message_error("Can't change level: no thing selected.");
-              break;
-            }
-          };break;
+          action_inc_object_level(scrmode,mapmode,lvl);
+          break;
         case KEY_X: // Change level of creature/trap/special/spell/lair/room efct
-          {
-            int visiting_z=mdtng->vistng[mapmode->subtl.x][mapmode->subtl.y];
-            short obj_type=get_object_type(lvl,sx,sy,visiting_z);
-            switch (obj_type)
-            {
-            case OBJECT_TYPE_THING:
-              thing = get_object(lvl,sx,sy,visiting_z);
-              if (is_creature(thing))
-              {
-                if (get_thing_level(thing)>0)
-                {
-                  set_thing_level(thing,get_thing_level(thing)-1);
-                  message_info("Creature level decreased.");
-                } else
-                message_error("Creature level limit reached.");
-              } else
-              if (switch_thing_subtype(thing,false))
-              {
-                  message_info("Item type switched to previous.");
-              } else
-                  message_error("This item has no level nor type.");
-              break;
-            default:
-              message_error("Can't change level: no thing selected.");
-              break;
-            }
-          };break;
+          action_dec_object_level(scrmode,mapmode,lvl);
+          break;
         case KEY_SLASH: // Cycle through highlighted things
           {
           unsigned int obj_num=get_object_subnums(lvl,sx,sy);
@@ -374,35 +326,11 @@ void actions_mdtng(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,str
           };break;
 
         case KEY_DEL: // delete
-          {
-            int visiting_z=mdtng->vistng[mapmode->subtl.x][mapmode->subtl.y];
-            short obj_type=get_object_type(lvl,sx,sy,visiting_z);
-            switch (obj_type)
-            {
-            case OBJECT_TYPE_STLIGHT:
-              object_del(lvl,sx,sy, visiting_z);
-              message_info_force("Static light deleted.");
-              mdtng->obj_ranges_changed=true;
-              break;
-            case OBJECT_TYPE_ACTNPT:
-              object_del(lvl,sx,sy, visiting_z);
-              message_info_force("Action point deleted.");
-              mdtng->obj_ranges_changed=true;
-              break;
-            case OBJECT_TYPE_THING:
-              object_del(lvl,sx,sy, visiting_z);
-              message_info_force("Thing deleted.");
-              mdtng->obj_ranges_changed=true;
-              break;
-            default:
-              message_error("Nothing to delete.");
-              break;
-            }
-            if (visiting_z>0)
-              mdtng->vistng[mapmode->subtl.x][mapmode->subtl.y]--;
-            else
-              mdtng->vistng[mapmode->subtl.x][mapmode->subtl.y]=get_object_subnums(lvl,sx,sy)-1;;
-          };break;
+          action_delete_object(scrmode,mapmode,lvl);
+          break;
+        case KEY_ENTER:
+          action_edit_object(scrmode,mapmode,lvl);
+          break;
         case KEY_ESCAPE:
           message_info(get_random_tip());
           break;
@@ -474,17 +402,17 @@ void draw_mdtng_panel(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,
       display_static_light(obj, scr_col1, 1);
       break;
     case OBJECT_TYPE_THING:
-      display_thing(obj, scr_col1, 1);
+      display_thing(obj, scr_col1, 1, scrmode->rows);
       break;
     default:
-      k=display_mode_keyhelp(k,scr_col1,scrmode->mode);
+      k=display_mode_keyhelp(k,scr_col1,scrmode->rows-TNGDAT_ROWS,scrmode->mode,0);
       display_obj_stats(scrmode,mapmode,lvl,k,scr_col1);
       break;
     }
     display_rpanel_bottom(scrmode,mapmode,lvl);
 }
 
-char get_thing_char (const struct LEVEL *lvl, int x, int y)
+char get_thing_char(const struct LEVEL *lvl, int x, int y)
 {
     switch (get_object_tilnums(lvl,x,y))
     {
@@ -542,7 +470,7 @@ char get_thing_char (const struct LEVEL *lvl, int x, int y)
                 return 'h';
               if (is_torch(thing))
                 return 'r';
-              if (is_pole(thing))
+              if (is_polebar(thing))
                 return 'p';
               return '1';
               }
@@ -569,18 +497,18 @@ char get_thing_char (const struct LEVEL *lvl, int x, int y)
     }
 }
 
-int display_thing(unsigned char *thing, int x, int y)
+int display_thing(unsigned char *thing, int scr_col, int scr_row,int max_row)
 {
     int m, i;
 
     screen_setcolor(PRINT_COLOR_LGREY_ON_BLACK);
-    set_cursor_pos(y++, x);
+    set_cursor_pos(scr_row++, scr_col);
     screen_printf("%s","Thing data block:");
     const int data_per_line=7;
     int data_lines=(SIZEOF_DK_TNG_REC/data_per_line)+((SIZEOF_DK_TNG_REC%data_per_line)>0);
     for (m=0; m < data_lines; m++)
     {
-      set_cursor_pos(y++, x);
+      set_cursor_pos(scr_row++, scr_col);
       for (i=0; i < data_per_line; i++)
       {
           int data_byte=m*data_per_line+i;
@@ -589,24 +517,27 @@ int display_thing(unsigned char *thing, int x, int y)
       }
       screen_printf_toeol("");
     }
-    y++;
-    set_cursor_pos(y++, x);
+    scr_row++;
+    set_cursor_pos(scr_row++, scr_col);
     int tpos_x=get_thing_subtile_x(thing);
     int tpos_y=get_thing_subtile_y(thing);
     screen_printf("Subtile: %3d,%3d (Tile: %2d, %2d)", tpos_x, tpos_y,
               tpos_x/MAP_SUBNUM_X, tpos_y/MAP_SUBNUM_Y);
-    set_cursor_pos(y++, x);
+    set_cursor_pos(scr_row++, scr_col);
     screen_printf("Position within subtile: %3d, %3d",
               get_thing_subtpos_x(thing), get_thing_subtpos_y(thing));
-    set_cursor_pos(y++, x);
+    set_cursor_pos(scr_row++, scr_col);
     unsigned char type_idx=get_thing_type(thing);
-    screen_printf("Thing type: %s",get_thing_type_fullname(type_idx));
-    set_cursor_pos(y++, x);
+    screen_printf("Thing type: ");
+    screen_setcolor(PRINT_COLOR_WHITE_ON_BLACK);
+    screen_printf(get_thing_type_fullname(type_idx));
+    set_cursor_pos(scr_row++, scr_col);
+    screen_setcolor(PRINT_COLOR_LGREY_ON_BLACK);
     screen_printf("Altitude: %3d within subtile %d",
         get_thing_subtpos_h(thing),get_thing_subtile_h(thing));
     if ((type_idx==THING_TYPE_ROOMEFFECT)||(type_idx==THING_TYPE_ITEM))
     {
-        set_cursor_pos(y++, x);
+        set_cursor_pos(scr_row++, scr_col);
         int sen_tl=get_thing_sensitile(thing);
         screen_printf("Sensitive tile:");
         if (sen_tl==THING_SENSITILE_NONE)
@@ -626,79 +557,146 @@ int display_thing(unsigned char *thing, int x, int y)
     // Creature
     case THING_TYPE_CREATURE:
     {
-      set_cursor_pos(y++, x);
-      screen_printf("Kind: %s", get_creature_subtype_fullname(get_thing_subtype(thing)));
-      set_cursor_pos(y++, x);
-      screen_printf("Level: %d", get_thing_level(thing)+1);
-      set_cursor_pos(y++, x);
-      screen_printf("Owner: %s", get_owner_type_fullname(get_thing_owner(thing)));
+      unsigned short stype_idx=get_thing_subtype(thing);
+      unsigned short owner=get_thing_owner(thing);
+      set_cursor_pos(scr_row++, scr_col);
+      screen_printf("Kind : ");
+      screen_setcolor(PRINT_COLOR_LRED_ON_BLACK);
+      screen_printf(get_creature_subtype_fullname(stype_idx));
+      set_cursor_pos(scr_row++, scr_col);
+      screen_setcolor(PRINT_COLOR_LGREY_ON_BLACK);
+      screen_printf("Level: ");
+      screen_setcolor(PRINT_COLOR_LGREEN_ON_BLACK);
+      screen_printf("%d", get_thing_level(thing)+1);
+      set_cursor_pos(scr_row++, scr_col);
+      screen_setcolor(PRINT_COLOR_LGREY_ON_BLACK);
+      screen_printf("Owner: ");
+      screen_setcolor(get_screen_color_owned(owner,false,false,false));
+      screen_printf(get_owner_type_fullname(owner));
+      screen_setcolor(PRINT_COLOR_LGREY_ON_BLACK);
+      scr_row++;
+      if (init_item_desc(MD_CRTR,stype_idx-1) && (help->drows<=(max_row-scr_row)))
+      {
+        for (i=0; i<help->drows; i++)
+            draw_help_line(scr_row++,scr_col,help->desc[i],DHFLAG_USE_COLORS);
+      }
     };break;
     // Trap
     case THING_TYPE_TRAP:
     {
-      set_cursor_pos(y++, x);
-      screen_printf("Kind : %s", get_trap_subtype_fullname(get_thing_subtype(thing)));
-      set_cursor_pos(y++, x);
-      screen_printf("Owner: %s", get_owner_type_fullname(get_thing_owner(thing)));
+      unsigned short stype_idx=get_thing_subtype(thing);
+      set_cursor_pos(scr_row++, scr_col);
+      screen_printf("Kind : ");
+      screen_setcolor(PRINT_COLOR_LRED_ON_BLACK);
+      screen_printf(get_trap_subtype_fullname(stype_idx));
+      set_cursor_pos(scr_row++, scr_col);
+      screen_setcolor(PRINT_COLOR_LGREY_ON_BLACK);
+      screen_printf("Owner: ");
+      unsigned short owner=get_thing_owner(thing);
+      screen_setcolor(get_screen_color_owned(owner,false,false,false));
+      screen_printf(get_owner_type_fullname(owner));
+      screen_setcolor(PRINT_COLOR_LGREY_ON_BLACK);
+      scr_row++;
+      if (init_item_desc(MD_CTRP,stype_idx-1) && (help->drows<=(max_row-scr_row)))
+      {
+        for (i=0; i<help->drows; i++)
+            draw_help_line(scr_row++,scr_col,help->desc[i],DHFLAG_USE_COLORS);
+      }
     };break;
     // Door
     case THING_TYPE_DOOR:
     {
-      set_cursor_pos(y++, x);
-      screen_printf("Kind: %s", get_door_subtype_fullname(get_thing_subtype(thing)));
-      set_cursor_pos(y++, x);
-      screen_printf("Owner: %s", get_owner_type_fullname(get_thing_owner(thing)));
-      set_cursor_pos(y++, x);
-      char *lock_state;
+      unsigned short stype_idx=get_thing_subtype(thing);
+      set_cursor_pos(scr_row++, scr_col);
+      screen_printf("Kind : ");
+      screen_setcolor(PRINT_COLOR_LRED_ON_BLACK);
+      screen_printf(get_door_subtype_fullname(stype_idx));
+      set_cursor_pos(scr_row++, scr_col);
+      screen_setcolor(PRINT_COLOR_LGREY_ON_BLACK);
+      screen_printf("Owner: ");
+      unsigned short owner=get_thing_owner(thing);
+      screen_setcolor(get_screen_color_owned(owner,false,false,false));
+      screen_printf(get_owner_type_fullname(owner));
+      set_cursor_pos(scr_row++, scr_col);
+      screen_setcolor(PRINT_COLOR_LGREY_ON_BLACK);
+      screen_printf("State: ");
+      screen_setcolor(PRINT_COLOR_LGREEN_ON_BLACK);
       if (get_door_lock(thing)==DOOR_PASS_UNLOCKED)
-          lock_state="Unlocked";
+          screen_printf("Unlocked");
       else
-          lock_state="Locked";
-      screen_printf("State: %s",lock_state);
+          screen_printf("Locked");
+      screen_setcolor(PRINT_COLOR_LGREY_ON_BLACK);
     };break;
     // Room effect
     case THING_TYPE_ROOMEFFECT:
     {
-      set_cursor_pos(y++, x);
-      screen_printf("Kind: %s",get_roomeffect_subtype_fullname(get_thing_subtype(thing)));
-      set_cursor_pos(y++, x);
+      unsigned short stype_idx=get_thing_subtype(thing);
+      set_cursor_pos(scr_row++, scr_col);
+      screen_printf("Kind : ");
+      screen_setcolor(PRINT_COLOR_LRED_ON_BLACK);
+      screen_printf(get_roomeffect_subtype_fullname(stype_idx));
+      set_cursor_pos(scr_row++, scr_col);
+      screen_setcolor(PRINT_COLOR_LGREY_ON_BLACK);
       screen_printf("Range: %3d subtiles and %3d",
           get_thing_range_subtile(thing),get_thing_range_subtpos(thing));
+      scr_row++;
+      if (init_item_desc(MD_EFCT,stype_idx-1) && (help->drows<=(max_row-scr_row)))
+      {
+        for (i=0; i<help->drows; i++)
+            draw_help_line(scr_row++,scr_col,help->desc[i],DHFLAG_USE_COLORS);
+      }
     };break;
     // Object
     case THING_TYPE_ITEM:
     {
-      set_cursor_pos(y++, x);
+      set_cursor_pos(scr_row++, scr_col);
       unsigned char stype_idx=get_thing_subtype(thing);
-      screen_printf("Kind: %s",get_item_subtype_fullname(stype_idx));
+      screen_printf("Kind : ");
+      screen_setcolor(PRINT_COLOR_LRED_ON_BLACK);
+      screen_printf(get_item_subtype_fullname(stype_idx));
+      screen_setcolor(PRINT_COLOR_LGREY_ON_BLACK);
       if (stype_idx==ITEM_SUBTYPE_HEROGATE)
       {
           unsigned int cnum=-(char)get_thing_level(thing);
-          set_cursor_pos(y-1, x+20);
+          set_cursor_pos(scr_row-1, scr_col+20);
           screen_printf("Number: %d", cnum);
       }
-      set_cursor_pos(y++, x);
-      screen_printf("Owner: %s", get_owner_type_fullname(get_thing_owner(thing)));
-      set_cursor_pos(y++, x);
-      screen_printf("Category: %s",get_item_category_fullname(get_thing_subtype(thing)));
-
+      set_cursor_pos(scr_row++, scr_col);
+      screen_printf("Owner: ");
+      unsigned short owner=get_thing_owner(thing);
+      screen_setcolor(get_screen_color_owned(owner,false,false,false));
+      screen_printf(get_owner_type_fullname(owner));
+      set_cursor_pos(scr_row++, scr_col);
+      screen_setcolor(PRINT_COLOR_LGREY_ON_BLACK);
+      screen_printf("Category: ");
+      screen_setcolor(PRINT_COLOR_LGREEN_ON_BLACK);
+      screen_printf(get_thing_category_fullname(get_item_category(stype_idx)));
+      scr_row++;
+      screen_setcolor(PRINT_COLOR_LGREY_ON_BLACK);
+      if (init_item_desc(MD_CITM,stype_idx-1) && (help->drows<=(max_row-scr_row)))
+      {
+        for (i=0; i<help->drows; i++)
+            draw_help_line(scr_row++,scr_col,help->desc[i],DHFLAG_USE_COLORS);
+      }
     };break;
     default:
     {
-      set_cursor_pos(y++, x);
+      set_cursor_pos(scr_row++, scr_col);
+      screen_setcolor(PRINT_COLOR_LRED_ON_BLACK);
       screen_printf("Unrecognized thing!");
-      set_cursor_pos(y++, x);
+      set_cursor_pos(scr_row++, scr_col);
+      screen_setcolor(PRINT_COLOR_LGREY_ON_BLACK);
       screen_printf("Type index: %d", (unsigned int)type_idx);
     };break;
     }
-    return y;
+    return scr_row;
 }
 
 int display_action_point (unsigned char *actnpt, int x, int y)
 {
     screen_setcolor(PRINT_COLOR_LGREY_ON_BLACK);
     set_cursor_pos(y++, x);
-    screen_printf("%s","Action point data block:");
+    screen_printf("Action point data block:");
     const int data_per_line=8;
     int data_lines=(SIZEOF_DK_APT_REC/data_per_line)+((SIZEOF_DK_APT_REC%data_per_line)>0);
     int m, i;
@@ -715,7 +713,14 @@ int display_action_point (unsigned char *actnpt, int x, int y)
     }
     y++;
     set_cursor_pos(y++, x);
-    screen_printf("Action point number %d:", get_actnpt_number(actnpt));
+    screen_setcolor(PRINT_COLOR_WHITE_ON_BLACK);
+    screen_printf("Action point");
+    screen_setcolor(PRINT_COLOR_LGREY_ON_BLACK);
+    screen_printf(" number ");
+    screen_setcolor(PRINT_COLOR_LGREEN_ON_BLACK);
+    screen_printf("%d", get_actnpt_number(actnpt));
+    screen_setcolor(PRINT_COLOR_LGREY_ON_BLACK);
+    screen_printf(":");
     set_cursor_pos(y++, x);
     int subtlpos_x=get_actnpt_subtile_x(actnpt);
     int subtlpos_y=get_actnpt_subtile_y(actnpt);
@@ -751,8 +756,10 @@ int display_static_light(unsigned char *stlight, int x, int y)
     }
     y++;
     set_cursor_pos(y++, x);
+    screen_setcolor(PRINT_COLOR_WHITE_ON_BLACK);
     screen_printf("Static light");
     set_cursor_pos(y++, x);
+    screen_setcolor(PRINT_COLOR_LGREY_ON_BLACK);
     int subtlpos_x=get_stlight_subtile_x(stlight);
     int subtlpos_y=get_stlight_subtile_y(stlight);
     screen_printf("Subtile: %3d,%3d (Tile: %2d, %2d)", subtlpos_x, subtlpos_y,
@@ -767,7 +774,10 @@ int display_static_light(unsigned char *stlight, int x, int y)
     screen_printf("Range: %3d subtiles and %d",
         (unsigned int)get_stlight_range_subtile(stlight),(unsigned int)get_stlight_range_subtpos(stlight));
     set_cursor_pos(y++, x);
-    screen_printf("Intensivity: %3d",(unsigned int)get_stlight_intensivity(stlight));
+    screen_printf("Intensivity: ");
+    screen_setcolor(PRINT_COLOR_LGREEN_ON_BLACK);
+    screen_printf("%3d",(unsigned int)get_stlight_intensivity(stlight));
+    screen_setcolor(PRINT_COLOR_LGREY_ON_BLACK);
     return y;
 }
 
@@ -799,33 +809,66 @@ int display_obj_stats(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,
       screen_printf("Room Effcts:%4d",lvl->stats.roomeffects_count);
       set_cursor_pos(scr_row++, scr_col2);
       screen_printf("Doors:%4d",lvl->stats.doors_count);
-      set_cursor_pos(scr_row++, scr_col1);
+      set_cursor_pos(scr_row, scr_col1);
+      screen_printf("Room things:%4d",lvl->stats.room_things_count);
+      set_cursor_pos(scr_row++, scr_col2);
       screen_printf("Items:%4d",lvl->stats.items_count);
     }
-    if (scrmode->rows >= scr_row+TNGDAT_ROWS+6)
+    if (scrmode->rows >= scr_row+TNGDAT_ROWS+9)
     {
       set_cursor_pos(scr_row++, scr_col);
       screen_printf("%s","Detailed items");
       set_cursor_pos(scr_row, scr_col2);
-      screen_printf("Hero gats:%4d",lvl->stats.hero_gates_count);
+      screen_printf("Hero gates:%4d",lvl->stats.hero_gates_count);
       set_cursor_pos(scr_row++, scr_col1);
       screen_printf("Dung hearts:%4d",lvl->stats.dn_hearts_count);
-      set_cursor_pos(scr_row, scr_col2);
-      screen_printf("Torches:%6d",lvl->stats.torches_count);
-      set_cursor_pos(scr_row++, scr_col1);
-      screen_printf("Dn specials:%4d",lvl->stats.dng_specboxes_count);
-      set_cursor_pos(scr_row, scr_col2);
-      screen_printf("Statues:%6d",lvl->stats.statues_count);
-      set_cursor_pos(scr_row++, scr_col1);
-      screen_printf("Spell books:%4d",lvl->stats.spellbooks_count);
-      set_cursor_pos(scr_row, scr_col2);
-      screen_printf("Gold tngs:%4d",lvl->stats.gold_things_count);
-      set_cursor_pos(scr_row++, scr_col1);
-      screen_printf("Creatr lairs:%3d",lvl->stats.crtr_lairs_count);
-      set_cursor_pos(scr_row, scr_col2);
-      screen_printf("Furniture:%4d",lvl->stats.furniture_count);
-      set_cursor_pos(scr_row++, scr_col1);
-      screen_printf("Room things:%4d",lvl->stats.room_things_count);
+
+      set_cursor_pos(scr_row, scr_col1);
+      screen_printf("%9s:%6d",get_thing_category_shortname(THING_CATEGR_ITEMEFFCT),
+          lvl->stats.things_count[THING_CATEGR_ITEMEFFCT]);
+      set_cursor_pos(scr_row++, scr_col2);
+      screen_printf("%9s:%5d",get_thing_category_shortname(THING_CATEGR_CREATLAIR),
+          lvl->stats.things_count[THING_CATEGR_CREATLAIR]);
+      set_cursor_pos(scr_row, scr_col1);
+      screen_printf("%9s:%6d",get_thing_category_shortname(THING_CATEGR_SPECIALBOX),
+          lvl->stats.things_count[THING_CATEGR_SPECIALBOX]);
+      set_cursor_pos(scr_row++, scr_col2);
+      screen_printf("%9s:%5d",get_thing_category_shortname(THING_CATEGR_SPELLBOOK),
+          lvl->stats.things_count[THING_CATEGR_SPELLBOOK]);
+      set_cursor_pos(scr_row, scr_col1);
+      screen_printf("%9s:%6d",get_thing_category_shortname(THING_CATEGR_WRKSHOPBOX),
+          lvl->stats.things_count[THING_CATEGR_WRKSHOPBOX]);
+      set_cursor_pos(scr_row++, scr_col2);
+      screen_printf("%9s:%5d",get_thing_category_shortname(THING_CATEGR_SPINNTNG),
+          lvl->stats.things_count[THING_CATEGR_SPINNTNG]);
+      set_cursor_pos(scr_row, scr_col1);
+      screen_printf("%9s:%6d",get_thing_category_shortname(THING_CATEGR_FOOD),
+          lvl->stats.things_count[THING_CATEGR_FOOD]);
+      set_cursor_pos(scr_row++, scr_col2);
+      screen_printf("%9s:%5d",get_thing_category_shortname(THING_CATEGR_GOLD),
+          lvl->stats.things_count[THING_CATEGR_GOLD]);
+      set_cursor_pos(scr_row, scr_col1);
+      screen_printf("%9s:%6d",get_thing_category_shortname(THING_CATEGR_TORCHCNDL),
+          lvl->stats.things_count[THING_CATEGR_TORCHCNDL]);
+      set_cursor_pos(scr_row++, scr_col2);
+      screen_printf("%9s:%5d",get_thing_category_shortname(THING_CATEGR_HEARTFLAME),
+          lvl->stats.things_count[THING_CATEGR_HEARTFLAME]);
+      set_cursor_pos(scr_row, scr_col1);
+      screen_printf("%9s:%6d",get_thing_category_shortname(THING_CATEGR_POLEBAR),
+          lvl->stats.things_count[THING_CATEGR_POLEBAR]);
+      set_cursor_pos(scr_row++, scr_col2);
+      screen_printf("%9s:%5d",get_thing_category_shortname(THING_CATEGR_STATUE),
+          lvl->stats.things_count[THING_CATEGR_STATUE]);
+      set_cursor_pos(scr_row, scr_col1);
+      screen_printf("%9s:%6d",get_thing_category_shortname(THING_CATEGR_FURNITURE),
+          lvl->stats.things_count[THING_CATEGR_FURNITURE]);
+      set_cursor_pos(scr_row++, scr_col2);
+      screen_printf("%9s:%5d",get_thing_category_shortname(THING_CATEGR_ROOMEQUIP),
+          lvl->stats.things_count[THING_CATEGR_ROOMEQUIP]);
+      set_cursor_pos(scr_row, scr_col1);
+      screen_printf("%9s:%6d",get_thing_category_shortname(THING_CATEGR_PWHAND),
+          lvl->stats.things_count[THING_CATEGR_PWHAND]);
+      scr_row++;
     }
     return scr_row;
 }
@@ -927,18 +970,61 @@ int get_tng_display_color(short obj_type,unsigned char obj_owner,short marked)
     }
 }
 
-void tng_makeitem(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl,int sx,int sy,unsigned char stype_idx)
+unsigned char *tng_makeitem(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl,int sx,int sy,unsigned char stype_idx)
 {
     unsigned char *thing;
     thing=create_item_adv(lvl,sx,sy,stype_idx);
     if (thing==NULL)
     {
         message_error("Cannot create thing");
-        return;
+        return NULL;
     }
     thing_add(lvl,thing);
     mdtng->vistng[mapmode->subtl.x][mapmode->subtl.y]=get_object_subtl_last(lvl,sx,sy,OBJECT_TYPE_THING);
     message_info("Item added: %s",get_item_subtype_fullname(stype_idx));
+    return thing;
+}
+
+unsigned char *tng_makeroomeffect(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl,int sx,int sy,unsigned char stype_idx)
+{
+    unsigned char *thing;
+    thing = create_roomeffect(lvl,sx,sy,stype_idx);
+    if (thing==NULL)
+    {
+        message_error("Cannot create Room Effect");
+        return NULL;
+    }
+    thing_add(lvl,thing);
+    message_info("Room Effect added to map at (%d,%d)",sx,sy);
+    mdtng->vistng[mapmode->subtl.x][mapmode->subtl.y]=get_object_subtl_last(lvl,sx,sy,OBJECT_TYPE_THING);
+    set_brighten_for_thing(mapmode,thing);
+    return thing;
+}
+
+unsigned char *tng_maketrap(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl,int sx,int sy,unsigned char stype_idx)
+{
+    unsigned char *thing;
+    thing = create_trap (lvl, sx, sy, stype_idx);
+    if (thing==NULL)
+    {
+        message_error("Cannot create Trap");
+        return NULL;
+    }
+    thing_add(lvl,thing);
+    message_info("Trap added to map at (%d,%d)",sx,sy);
+    mdtng->vistng[mapmode->subtl.x][mapmode->subtl.y]=get_object_subtl_last(lvl,sx,sy,OBJECT_TYPE_THING);
+    return thing;
+}
+
+unsigned char *tng_makecreature(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl,int sx,int sy,unsigned char stype_idx)
+{
+    unsigned char *thing;
+    thing = create_creature(lvl,sx,sy,stype_idx);
+    thing_add(lvl,thing);
+    // Show the new thing
+    mdtng->vistng[mapmode->subtl.x][mapmode->subtl.y]=get_object_subtl_last(lvl,sx,sy,OBJECT_TYPE_THING);
+    message_info("Creature added to map at (%d,%d)",sx,sy);
+    return thing;
 }
 
 void tng_change_height(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl, unsigned int sx, unsigned int sy,unsigned int z,int delta_height)
@@ -1099,5 +1185,144 @@ void tng_change_range(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,
       else
           mdtng->obj_ranges_changed=true;
       break;
+    }
+}
+
+void action_edit_object(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl)
+{
+    int sx, sy;
+    sx = (mapmode->map.x+mapmode->screen.x)*MAP_SUBNUM_X+mapmode->subtl.x;
+    sy = (mapmode->map.y+mapmode->screen.y)*MAP_SUBNUM_Y+mapmode->subtl.y;
+    int visiting_z=mdtng->vistng[mapmode->subtl.x][mapmode->subtl.y];
+    short obj_type=get_object_type(lvl,sx,sy,visiting_z);
+    unsigned char *thing;
+    thing = get_object(lvl,sx,sy,visiting_z);
+    switch (obj_type)
+    {
+    case OBJECT_TYPE_THING:
+      {
+        unsigned char type_idx=get_thing_type(thing);
+        switch (type_idx)
+        {
+        case THING_TYPE_CREATURE:
+            mdstart[MD_ECRT](scrmode,mapmode,lvl);
+            break;
+        case THING_TYPE_TRAP:
+            mdstart[MD_ETRP](scrmode,mapmode,lvl);
+            break;
+        case THING_TYPE_ITEM:
+            mdstart[MD_EITM](scrmode,mapmode,lvl);
+            break;
+        case THING_TYPE_ROOMEFFECT:
+            mdstart[MD_EFCT](scrmode,mapmode,lvl);
+            break;
+        case THING_TYPE_DOOR:
+            message_error("Can't edit door: no such function.");
+            break;
+        }
+      };break;
+    default:
+        message_error("Can't edit: no thing selected.");
+        break;
+    }
+}
+
+void action_delete_object(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl)
+{
+    int sx, sy;
+    sx = (mapmode->map.x+mapmode->screen.x)*MAP_SUBNUM_X+mapmode->subtl.x;
+    sy = (mapmode->map.y+mapmode->screen.y)*MAP_SUBNUM_Y+mapmode->subtl.y;
+    int visiting_z=mdtng->vistng[mapmode->subtl.x][mapmode->subtl.y];
+    short obj_type=get_object_type(lvl,sx,sy,visiting_z);
+    switch (obj_type)
+    {
+    case OBJECT_TYPE_STLIGHT:
+        object_del(lvl,sx,sy, visiting_z);
+        message_info_force("Static light deleted.");
+        mdtng->obj_ranges_changed=true;
+        break;
+    case OBJECT_TYPE_ACTNPT:
+        object_del(lvl,sx,sy, visiting_z);
+        message_info_force("Action point deleted.");
+        mdtng->obj_ranges_changed=true;
+        break;
+    case OBJECT_TYPE_THING:
+        object_del(lvl,sx,sy, visiting_z);
+        message_info_force("Thing deleted.");
+        mdtng->obj_ranges_changed=true;
+        break;
+    default:
+        message_error("Nothing to delete.");
+        break;
+    }
+    if (visiting_z>0)
+        mdtng->vistng[mapmode->subtl.x][mapmode->subtl.y]--;
+    else
+        mdtng->vistng[mapmode->subtl.x][mapmode->subtl.y]=get_object_subnums(lvl,sx,sy)-1;
+}
+
+void action_inc_object_level(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl)
+{
+    int sx, sy;
+    sx = (mapmode->map.x+mapmode->screen.x)*MAP_SUBNUM_X+mapmode->subtl.x;
+    sy = (mapmode->map.y+mapmode->screen.y)*MAP_SUBNUM_Y+mapmode->subtl.y;
+    unsigned char *thing;
+    int visiting_z=mdtng->vistng[mapmode->subtl.x][mapmode->subtl.y];
+    short obj_type=get_object_type(lvl,sx,sy,visiting_z);
+    switch (obj_type)
+    {
+    case OBJECT_TYPE_THING:
+        thing = get_object(lvl,sx,sy,visiting_z);
+        if (is_creature(thing))
+        {
+            if (get_thing_level(thing)<9)
+            {
+                set_thing_level(thing,get_thing_level(thing)+1);
+                message_info("Creature level increased.");
+            } else
+                message_error("Creature level limit reached.");
+        } else
+        if (switch_thing_subtype(thing,true))
+        {
+            message_info("Item type switched to next.");
+        } else
+            message_error("This item has no level/type, or its limit is reached.");
+        break;
+    default:
+        message_error("Can't change level: no thing selected.");
+        break;
+    }
+}
+
+void action_dec_object_level(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl)
+{
+    int sx, sy;
+    sx = (mapmode->map.x+mapmode->screen.x)*MAP_SUBNUM_X+mapmode->subtl.x;
+    sy = (mapmode->map.y+mapmode->screen.y)*MAP_SUBNUM_Y+mapmode->subtl.y;
+    unsigned char *thing;
+    int visiting_z=mdtng->vistng[mapmode->subtl.x][mapmode->subtl.y];
+    short obj_type=get_object_type(lvl,sx,sy,visiting_z);
+    switch (obj_type)
+    {
+    case OBJECT_TYPE_THING:
+        thing = get_object(lvl,sx,sy,visiting_z);
+        if (is_creature(thing))
+        {
+            if (get_thing_level(thing)>0)
+            {
+                set_thing_level(thing,get_thing_level(thing)-1);
+                message_info("Creature level decreased.");
+            } else
+            message_error("Creature level limit reached.");
+        } else
+        if (switch_thing_subtype(thing,false))
+        {
+            message_info("Item type switched to previous.");
+        } else
+            message_error("This item has no level/type, or its limit is reached.");
+        break;
+    default:
+        message_error("Can't change level: no thing selected.");
+        break;
     }
 }

@@ -479,10 +479,13 @@ void create_columns_slb_wallbrick(struct COLUMN_REC *clm_recs[9], short *allow_r
       &&(slab_is_tall(surr_slb[dir_b[i]])&& surrnd_not_enemy(surr_own,dir_b[i])))))
     {
       if ((fill_reinforced_corner)&&(slab_is_short(surr_slb[dir_c[i]]))
-          &&(!slab_is_short_unclmabl(surr_slb[dir_c[i]])))
+          &&(!(surr_slb[dir_c[i]]==SLAB_TYPE_PATH)))
       {
         fill_column_earthground(clm_recs[dir_c[i]], surr_own[IDIR_CENTR]);
-        place_column_wall_cobblestones(clm_recs[dir_c[i]], surr_own[IDIR_CENTR]);
+        if (fill_reinforced_corner==1)
+          place_column_wall_cobblestones(clm_recs[dir_c[i]], surr_own[IDIR_CENTR]);
+        else
+          place_column_wall_cobblestones_mk(clm_recs[dir_c[i]], surr_own[IDIR_CENTR]);
       } else
       {
         fill_column_earth(clm_recs[dir_c[i]],surr_own[IDIR_CENTR]);

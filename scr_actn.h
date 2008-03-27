@@ -13,8 +13,8 @@ enum adikt_workmode
 {
   MD_SLB    = 0x000, // Slab mode
   MD_TNG    = 0x001, // Thing mode
-  MD_CRTR   = 0x002, // Creature type mode
-  MD_ITMT   = 0x003, // Item type mode
+  MD_CRTR   = 0x002, // Create Creature mode
+  MD_CITM   = 0x003, // Create Item mode
   MD_HELP   = 0x004, // Help mode
   MD_CLM    = 0x005, // Column mode
   MD_SCRP   = 0x006, // Script mode
@@ -27,9 +27,15 @@ enum adikt_workmode
   MD_LMAP   = 0x00d, // Open map with preview mode
   MD_SMAP   = 0x00e, // Save map with preview mode
   MD_GRFT   = 0x00f, // Graffiti input mode
+  MD_CEFC   = 0x010, // Create Room Effect mode
+  MD_CTRP   = 0x011, // Create Trap mode
+  MD_EITM   = 0x012, // Edit Item mode
+  MD_ECRT   = 0x013, // Edit Creature mode
+  MD_EFCT   = 0x014, // Edit Room Effect mode
+  MD_ETRP   = 0x015, // Edit Trap mode
 };
 
-#define MODES_COUNT 17
+#define MODES_COUNT 22
 
 #define TNGDAT_ROWS 8
 
@@ -114,6 +120,14 @@ struct MAPMODE_DATA {
     short show_obj_range;
     // Will the preview of level be visible?
     short level_preview;
+    // Open list when creating trap
+    short traps_list_on_create;
+    // Open list when creating effect
+    short roomeffect_list_on_create;
+    // Open list when creating creature
+    short creature_list_on_create;
+    // Open list when creating traps, doors, spellbooks, specials, ...
+    short items_list_on_create;
     // Preview of a level, used when opening a level
     struct LEVEL *preview;
     // Level options - are copied into current level
@@ -145,6 +159,23 @@ short subtl_select_actions(struct MAPMODE_DATA *mapmode,int key);
 short string_get_actions(struct SCRMODE_DATA *scrmode,int key);
 void curposcheck(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode);
 
+// The single actions
+void action_enter_texture_mode(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl);
+void action_generate_bitmap(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl);
+void action_enter_search_mode(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl);
+void action_enter_script_mode(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl);
+void action_toggle_datclm_aupdate(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl);
+void action_toggle_compass_rose(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl);
+void action_create_new_map(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl);
+void action_create_random_backgnd(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl);
+void action_save_map_quick(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl);
+void action_enter_mapsave_mode(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl);
+void action_load_map_quick(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl);
+void action_enter_mapload_mode(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl);
+void action_quit_program(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl);
+void action_enter_help_mode(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl);
+
+// Action/drawing subfunctions
 int change_mode(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl,int new_mode);
 void draw_forced_panel(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl, short panel_mode);
 void draw_map_cursor(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl,short show_ground,short show_rooms,short show_things);
@@ -168,7 +199,7 @@ void clear_scrmode(struct SCRMODE_DATA *scrmode);
 void clear_mapmode(struct MAPMODE_DATA *mapmode);
 
 void display_rpanel_bottom(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl);
-int display_mode_keyhelp(int scr_row, int scr_col,int mode);
+int display_mode_keyhelp(int scr_row, int scr_col,int max_row,int mode,int itm_idx);
 void draw_mdempty(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl);
 
 void show_cursor(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,char cur);

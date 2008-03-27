@@ -38,9 +38,6 @@ void free_mdclm(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode)
  */
 void actions_mdclm(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl,int key)
 {
-    int sx, sy;
-    sx = (mapmode->map.x+mapmode->screen.x)*3+mapmode->subtl.x;
-    sy = (mapmode->map.y+mapmode->screen.y)*3+mapmode->subtl.y;
     message_release();
     
     if (!cursor_actions(scrmode,mapmode,lvl,key))
@@ -50,24 +47,14 @@ void actions_mdclm(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,str
       {
         case KEY_TAB:
         case KEY_ESCAPE:
-          end_mdclm(scrmode,mapmode,lvl);
+          mdend[MD_CLM](scrmode,mapmode,lvl);
           break;
         case KEY_U: // Update all things/dat/clm/w?b
-          update_slab_owners(lvl);
-          update_datclm_for_whole_map(lvl);
-          message_info("DAT/CLM/W?B entries updated.");
+          action_update_all_datclm(scrmode,mapmode,lvl);
           break;
         case KEY_A: // update dat/clm/w?b of selected tile
-          {
-            //Deleting custom columns - to enable auto-update
-            cust_cols_del_for_tile(lvl,sx/3,sy/3);
-            //Updating
-            update_datclm_for_slab(lvl, sx/3,sy/3);
-            update_tile_wib_entries(lvl,sx/3,sy/3);
-            update_tile_wlb_entry(lvl,sx/3,sy/3);
-            update_tile_flg_entries(lvl,sx/3,sy/3);
-            message_info("Updated DAT/CLM/W?B entries of slab %d,%d.",sx/3,sy/3);
-          };break;
+          action_delele_custclm_and_update(scrmode,mapmode,lvl);
+          break;
         case KEY_M: // manual-set mode
           mdstart[MD_CCLM](scrmode,mapmode,lvl);
           break;
@@ -207,4 +194,26 @@ int display_column(unsigned char *clmentry,int clm_idx, int scr_row, int scr_col
     screen_printf("Base bl: %03X", clm_rec->base);
     free_column_rec(clm_rec);
     return scr_row;
+}
+
+void action_update_all_datclm(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl)
+{
+          update_slab_owners(lvl);
+          update_datclm_for_whole_map(lvl);
+          message_info("DAT/CLM/W?B entries updated for whole map.");
+}
+
+void action_delele_custclm_and_update(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl)
+{
+    int sx, sy;
+    sx = (mapmode->map.x+mapmode->screen.x)*3+mapmode->subtl.x;
+    sy = (mapmode->map.y+mapmode->screen.y)*3+mapmode->subtl.y;
+    //Deleting custom columns - to enable auto-update
+    cust_cols_del_for_tile(lvl,sx/3,sy/3);
+    //Updating
+    update_datclm_for_slab(lvl, sx/3,sy/3);
+    update_tile_wib_entries(lvl,sx/3,sy/3);
+    update_tile_wlb_entry(lvl,sx/3,sy/3);
+    update_tile_flg_entries(lvl,sx/3,sy/3);
+    message_info("Updated DAT/CLM/W?B entries of slab %d,%d.",sx/3,sy/3);
 }

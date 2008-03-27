@@ -19,9 +19,10 @@ Doors - \ww\sood, \wi\sron, \wb\sraced, \wm\sagic
 \wf\s:Chicken
 
 [crtkeyhelp]
-Creature type mode:
+Creature add/edit mode:
 
-Select the creature you wish to add.
+Select the creature you wish to
+have in the level.
 
 The creature's ownership is first
 set to that of the tile you are
@@ -30,20 +31,41 @@ owner with '\wo\s'.
 
 Use '\ws\s' and '\wx\s' to change level
 of the creature.
-[itmtkeyhelp]
-Item type mode:
 
-Select the item
-you wish to add.
+[itmtkeyhelp]
+Item add/edit mode:
+
+Select the item type which
+you wish to have in level.
 
 The item's ownership will
 be set to that of the tile you
 are placing it in.
+
+[efctkeyhelp]
+Room Effect add/edit mode:
+
+Select the effect type which
+you wish to have in level.
+
+Press \wenter\s to accept.
+
+[trapkeyhelp]
+Trap add/edit mode:
+
+Select the trap type which
+you wish to have in level.
+
+The trap's ownership will
+be set to that of the tile you
+are placing it in.
+
 [txtrkeyhelp]
 Texture select mode:
 
 Select the texture which you want
 to be used when drawing map.
+
 [cclmkeyhelp]
 Custom columns mode:
 
@@ -53,12 +75,14 @@ for current map tile.
 Note that the appearence may
 depend on the tile siblings,
 even if it is custom column.
+
 [cubekeyhelp]
 Custom cubes mode:
 
 Select cubes for the current
 map subtile. The exact cube
 values will be used in map.
+
 [slblkeyhelp]
 Slab list mode:
 
@@ -70,6 +94,7 @@ Note that it is qicker to place
 slabs by pressing its character
 directly in slab mode.
 See slab mode help for details.
+
 [grftkeyhelp]
 Graffiti type mode:
 
@@ -113,7 +138,7 @@ out of marking mode.
 
 To mark out a boundary (a wall, for example), press '\wz\s'. This will put
 you into \ypaint mode\s. Nothing will change until you press a slab key
-or a number from '\w0\s' to '\w5\s', when you will start painting. Now when you
+or a number from '\w0\s' to '\w5\s', then you will start painting. Now when you
 move, you paint the tile your cursor is over with either the slab or
 ownership you selected (or both). To change the paint ownership or
 slab, just press another slab or number key. To stop painting, press
@@ -140,7 +165,7 @@ You can put the graffiti lower or higher (\ychange height\s) using
 To \ycreate BMP\s miniature of the whole map, use \wctrl+b\s.
 The status line will tell you where the output file is written.
 This function requires some of DK data files to work. Be warned - 
-it is wise to save your work before creating miniature.
+it is wise to \rsave your work\s before creating miniature.
 
 To \yupdate\s the dungeon dat/clm/w?b (but not things), press '\wu\s'.
 To toggle \yautomatic update\s of things/dat/clm, press \wctrl+u\s.
@@ -177,17 +202,41 @@ Press '\ws\s' and '\wx\s' to \ychange level\s of the creature.
 Item selection and options help:
 
 A list will appear on the screen of all the available items.
-Simply \yselect the item\s you want to create with \warrow keys\s,
-then press \wenter\s.
+Simply \yselect the item\s you want to create/change into with
+\warrow keys\s, then press \wenter\s.
 
-Note that if you want to add specific item, it may be faster to use
-its shortcut key instead of the items list provided here (see
-"thing" mode help for details).
+If creating items, note that if you want to \yadd specific item\s,
+it may be faster to use its \rshortcut key\s instead of the items
+list (see "thing" mode help for details).
 
 The item will be added to the slot that was highlighted in
 "thing" mode.
 
-To cancel, press \wtab\s or \wdelete\s.
+To \ycancel\s, press \wtab\s or \wdelete\s.
+
+[efcthelp]
+Room Effect selection and options help:
+
+A list will appear on the screen of all the available effects.
+Simply \yselect the type\s you want to create/change into with
+\warrow keys\s, then press \wenter\s.
+
+\rIf creating new\s room effect, it will be added to the slot that
+was highlighted in "thing" mode.
+
+To \ycancel\s, press \wtab\s or \wdelete\s.
+
+[traphelp]
+Trap selection and options help:
+
+A list will appear on the screen of all the available trap types.
+Simply \yselect the trap\s you want to create/change into with
+\warrow keys\s, then press \wenter\s.
+
+\rIf creating new\s trap, it will be added to the slot that was
+highlighted in "thing" mode.
+
+To \ycancel\s, press \wtab\s or \wdelete\s.
 
 [tnghelp]
 "Thing" mode help:
@@ -265,7 +314,7 @@ Items which have assiciated key are listed on right panel. These include:
 
 Press '\wu\s' to \yupdate\s the dungeon. This will make sure all room objects
 (training posts, spikes, torturers, etc) are placed appropriately.
-Only things will be updated, the .clm and .dat values will stay intact.
+\rOnly things\s will be updated, the .clm and .dat values will stay intact.
 You must press '\wu\s' in slab mode to update them.
 
 Press '\ws\s' and '\wx\s' to \yincrease/decrease level\s of a highlighted
@@ -274,6 +323,9 @@ highlighted dungeon special, or the type of a spell book.
 This also works on other items (even torches), so try it.
 
 Press '\wS\s' and '\wX\s' to \ychange type\s of a highlighted creature.
+
+Alternatively, you can press \wenter\s on most objects to \ychange their\s
+\ytype\s by selecting it from a \rlist screen\s.
 
 Press '\wo\s' to \ychange owner\s of a highlighted thing or creature. The
 ownership cycles through the players (and "unclaimed").
@@ -381,6 +433,7 @@ Select cubes to place on the subtile you wish to be customized.
 Original column graphic will be replaced by your columns.
 
 To cancel selection and exit, press \wesc\s or \wtab\s.
+
 [slblhelp]
 Slab list mode help:
 
@@ -478,12 +531,6434 @@ placed). To avoid the disappearing, place graffiti on rock. If you
 don't want its background to look like rock, use manual columns
 (see column mode help for details).
 
-\rNote\s that single graffiti is visible only from one side of the tile,
+Note that single graffiti is visible only from \rone side of the tile\s,
 for example if it has WE (west-east) orientation, it will only
 be visible from south. To see the text from both sides, you have to
 create two graffiti items with oposite orientation (like WE and EW).
 
 To \ycancel\s and back to slab mode, press \wesc\s or \wtab\s.
+
+[slabdesc]
+\rImpenetrable Rock\s
+
+Solid rock. Your Imps cannot
+dig through this.
+Graphic for this slab is never
+updated by the game, so it's
+perfect for custom columns.
+
+\rGold Seam\s
+
+Your source of wealth.
+Dig this out and your Imps will
+take it to your Treasure Room.
+
+
+
+\rEarth\s
+
+Digable earth. Imps can
+change it into path.
+Graphic for the slab is updated
+when a sibbling slab changes.
+
+
+\rTorch plate earth\s
+
+Standard earth, but with a torch
+plate put on.
+The torch plate will be put only
+on columns near to the torches.
+Torches are \yplaced automatically\s
+near this slab if they are needed.
+\rWall with drape\s
+
+A reinforced brick & stone wall
+that enemies cannot break through.
+This one can contain drape on top,
+but only if it is not near any room,
+and it is not edge of the wall.
+
+\rWall with torch\s
+
+A reinforced brick & stone wall
+that enemies cannot break through.
+This one can contain torch plate
+if there is any torch nearby.
+Torches are \yplaced automatically\s
+near this slab if they are needed.
+\rWall with twins\s
+
+A reinforced brick & stone wall
+that enemies cannot break through.
+This one can contain twins relief,
+but only if it is not near any room,
+and it is not edge of the wall.
+
+\rWall with woman\s
+
+A reinforced brick & stone wall
+that enemies cannot break through.
+This one can contain woman relief,
+but only if it is not near any room,
+and it is not edge of the wall.
+
+\rWall with pair shaging\s
+
+A reinforced brick & stone wall
+that enemies cannot break through.
+This one can contain shaging pair
+relief.
+
+
+Unknown slab
+
+This slab is not used by the game.
+Place it only if you know what
+you're doing.
+
+
+
+\rPath\s
+
+Unclaimed earth floor. Imps can
+claim it if any of the sibling
+slabs is a claimed ground or room.
+
+
+
+\rClaimed ground\s
+
+Player's dungeon territory.
+Enemy imps can reclaim this ground,
+but it takes a little bit longer
+than claiming a path.
+Player can build rooms on this slab.
+
+\rLava\s
+
+Hot lava. Only hard-skinned
+creatures can step into it without
+losing health.
+This slab is animated and waves.
+Often a lava effect is placed on it.
+
+\rWater\s
+
+Creatures can move in water, but
+imps can't claim area after it,
+unless a bridge will be built.
+Often a dripping effect is
+placed on it.
+
+\rEntrance\s
+
+This room usually has size of 3x3
+slabs, and is unowned when starting
+a game. After a player claims it,
+creatures can come to the dungeon
+through it. It can't be built by
+a player, must exist at start.
+Unknown slab
+
+This slab is not used by the game.
+Place it only if you know what
+you're doing.
+
+
+
+\rTreasure room\s
+
+This is where gold is stored. Every
+non-corner slab of this room can
+store up to 1000 gold. Without this
+room it's impossible to get gold
+other than the starting gold.
+
+Unknown slab
+
+This slab is not used by the game.
+Place it only if you know what
+you're doing.
+
+
+
+\rLibrary\s
+
+Spell books and specials found by
+your imps are stored here.
+Warlocks are often researching
+spells here, and they're not very
+happy when someone is tresspassing.
+
+Unknown slab
+
+This slab is not used by the game.
+Place it only if you know what
+you're doing.
+
+
+
+\rPrison\s
+
+Captured enemies are transported
+here. They can then slowly die
+of hunger, or wait for the torture
+chamber to become unused.
+
+
+Unknown slab
+
+This slab is not used by the game.
+Place it only if you know what
+you're doing.
+
+
+
+\rTorture chamber\s
+
+Allows player to torture enemies
+to make them join his side.
+Also attracts Dark Mistresses.
+
+
+
+Unknown slab
+
+This slab is not used by the game.
+Place it only if you know what
+you're doing.
+
+
+
+\rTraining room\s
+
+Creatures can train here,
+increasing level up to 10.
+Eventually, some of them may then
+change into stronger creatures.
+
+
+Unknown slab
+
+This slab is not used by the game.
+Place it only if you know what
+you're doing.
+
+
+
+\rDungeon heart\s
+
+The life force of a dungeon.
+One heart is required for every
+player. It usually has size of
+3x3 slabs.
+
+
+Unknown slab
+
+This slab is not used by the game.
+Place it only if you know what
+you're doing.
+
+
+
+\rWorkshop\s
+
+The room Allows creatures to work
+inside and produce doors and traps.
+Products can be placed on the
+dungeon as a defence, and sold for
+gold.
+
+Unknown slab
+
+This slab is not used by the game.
+Place it only if you know what
+you're doing.
+
+
+
+\rScavenger room\s
+
+Creatures inside can scavenge enemy
+creatures, convincing them to join
+your side. Scavenging costs lot
+of gold.
+
+
+Unknown slab
+
+This slab is not used by the game.
+Place it only if you know what
+you're doing.
+
+
+
+\rTemple\s
+
+Creature put into this room
+increases its happinsess over time.
+
+
+
+
+Unknown slab
+
+This slab is not used by the game.
+Place it only if you know what
+you're doing.
+
+
+
+\rGraveyard\s
+
+Imps can place dead bodies into
+this room. If dead body lays
+in grayeyard for long enough,
+a vampire is born.
+
+
+Unknown slab
+
+This slab is not used by the game.
+Place it only if you know what
+you're doing.
+
+
+
+\rHatchery\s
+
+Chickens are grown is this room.
+Your creatures eat them. Without
+it, creatures get hungry, and
+slowly die. Lack of food also
+makes creatures angry.
+
+Unknown slab
+
+This slab is not used by the game.
+Place it only if you know what
+you're doing.
+
+
+
+\rLair\s
+
+Your creatures can rest in this
+room. Without it, creatures get
+angry.
+
+
+
+Unknown slab
+
+This slab is not used by the game.
+Place it only if you know what
+you're doing.
+
+
+
+\rBarracks\s
+
+This room is used to make groups
+of creatures. It also is required
+for Orcs to be attracted into your
+dungeon.
+
+
+Unknown slab
+
+This slab is not used by the game.
+Place it only if you know what
+you're doing.
+
+
+
+\rWooden door\s
+The simplest means of restricting
+access. It takes short to destroy
+these doors even for unexperienced
+creature.
+A door identifier thing is auto
+created when door slab is put. It
+is reqired for the door to work.
+\rWooden door 2\s
+
+It takes short to destroy these
+doors even for unexperienced
+creature.
+It is not known why there are two
+copies of this slab.
+
+\rBraced door\s
+
+A wooden door reinforced with iron.
+Stronger than ones made only
+of wood.
+A door identifier thing is auto
+created when door slab is put. It
+is reqired for the door to work.
+\rBraced door 2\s
+
+A wooden door reinforced with iron.
+Stronger than ones made only
+of wood.
+It is not known why there are two
+copies of this slab.
+
+\rIron door\s
+
+Strong, heavy door capable of
+sustaining massive damage.
+
+A door identifier thing is auto
+created when door slab is put. It
+is reqired for the door to work.
+\rIron door 2\s
+
+Strong, heavy door capable of
+sustaining massive damage.
+
+It is not known why there are two
+copies of this slab.
+
+\rMagic door\s
+A special door, highly resistant
+to physical damage but susceptible
+to magical damage. Destroying these
+can take some time even for
+experienced group of creatures.
+A door identifier thing is auto
+created when door slab is put.
+\rMagic door 2\s
+
+Destroying these can take some time
+even for experienced group
+of creatures.
+It is not known why there are two
+copies of this slab.
+
+Unknown slab
+
+This slab is not used by the game.
+Place it only if you know what
+you're doing.
+
+
+
+\rBridge\s
+
+This room can be built on water or
+lava, to claim the area after it
+
+
+
+
+\rGems\s
+
+Source of wealth that requires more
+digging than gold, but never
+depletes. Up to 3 Imps can work
+on every side of the gem slab.
+
+
+\rGuard post\s
+
+This room is a wooden guard area
+with player's flag on center.
+
+
+
+
+
+[crtrdesc]
+\rWizard\s
+
+An excellent magical fighter with a
+huge range of spells. Wizards are
+very vain and hate other Wizards.
+
+
+
+\rBarbarian\s
+
+The Barbarian is a very tough and
+strong character who battles to the
+death.
+
+
+
+\rArcher\s
+
+Although this hero is bad at hand to
+hand combat, he is excellent at a
+long range and very hard to get
+close to.
+
+
+\rMonk\s
+
+The monk is a good fighter who can
+heal himself and heroes around him
+when they take hits in battle.
+
+
+
+\rDwarf (DwarfA)\s
+
+A good hand-to-hand fighter who
+makes a point of stealing any gold
+he finds lying about.
+
+
+
+\rKnight\s
+
+Usually comes in as Lord of the
+Land. Excellent at hand-to-hand
+combat. He is the sworn enemy of
+the Horned Reaper and they both
+immediately fight to the death
+if they encounter one another.
+\rAvatar\s
+
+The Greatest and Overlord of the
+Land. Extremely tough and
+excellent hand-to-hand fighter.
+
+
+
+\rTunneller (DwarfB)\s
+
+A very poor fighter, but is speedy
+at digging through earth towards
+your Dungeon. Heroes use Tunnellers
+to get them into your realm.
+
+
+\rWitch\s
+
+A Good Witch who is a competent
+magical fighter but, sadly for her,
+has an aversion to Vampires.
+
+
+
+\rGiant\s
+
+The Giant is slow and lumbering but
+a large, tough fighter.
+
+
+
+
+\rFairy\s
+
+A weak hero who is bad at combat
+but excellent at spells.
+
+
+
+
+\rThief\s
+
+An average if sneaky fighter who
+likes to hunt out and steal gold.
+
+
+
+
+\rSamurai\s
+A master swordsman, the Samurai is
+fearless and swift in battle. The
+Samurai's code of fighting, the
+Bushido, is strict and the sense of
+honour he has can hamper his
+performance when faced by hordes of
+evil, nihilistic creatures.
+\rHorned Reaper\s
+
+The biggest and the most destructive
+of all the creatures. He does not
+group with any creature. Sadistic,
+psychotic fighter. Usually referred
+to by Dungeon-dwellers as Horny,
+although never to its face.
+\rSkeleton\s
+
+A basic fighter of average ability
+that is created in the Prison if a
+humanoid creature dies.
+
+
+
+\rTroll\s
+
+This is a very hardy creature whose
+primary job is in the Workshop.
+They are average fighters.
+
+
+
+\rDragon\s
+
+They are excellent in combat
+because of lots of health, and the
+Heal spell. Also are impervious to
+lava and gain experience if their
+Lair is placed next to lava.
+
+\rDemon Spawn\s
+
+These are scaly, squat creatures
+who are good fighters despite their
+size. They enjoy training and will
+become level 2 Dragons once they
+have trained past level 10.
+
+\rFly\s
+Fast but flimsy, flies are a
+push-over for the stronger invaders
+into your Dungeon. They hate Spiders
+and fight them if forced to share
+the same Lair. They are excellent
+explorers and reveal the map to
+you by flying over water and lava.
+\rDark Mistress\s
+
+The kinkiest of the creatures who
+enjoys pain and inflicting it on
+others. She goes to watch a torture
+if one is in progress. Slapping her
+makes her happier and she rushes off
+to a battle as soon as one starts.
+\rWarlock (Sorceror)\s
+Powerful magical creatures who are
+excellent at research. Training
+expands their range of spells.
+If there are Warlocks in a group
+and their total experience is more
+than fifteen, they lead a rebellion
+against the rest of the group.
+\rBile Demon\s
+A very big, red, greedy creatures;
+they are excellent fighters and as
+hard as nails. Their primary job is
+manufacturing. If they don't get
+enough food, they get angry and fall
+asleep until food arrives. They are
+invulnerable to Poison Gas.
+\rImp\s
+These are the most valuable of the
+creatures, as they perform all the
+tunnelling work in a Dungeon and
+also maintain it by dragging away
+dead bodies, dragging uncontious
+enemies to the Prison and fitting
+traps.
+\rBeetle (Bug)\s
+
+Beetles are very weak and are
+regarded as fireball fodder by the
+stronger heroes. They are needed
+for some sacrifices in the Temple.
+
+
+\rVampire\s
+These can be created in Graveyard
+from decomposing bodies. If it is
+scavenging in the Scavenger Room and
+there are no other Vampires on the
+map, it raises the Portal attraction
+by half, thus increasing the number
+of creatures who enter your Dungeon.
+\rSpider\s
+
+A weak creature who sometimes goes
+to the Prison and freeze prisoners
+for fun. Spiders detest the Flies
+and fight them if provoked or
+stationed in the same Lair.
+
+\rHell Hound\s
+
+A double headed dog who is great at
+guarding and pointing out heroes or
+enemy creatures.
+They cock their legs on dead bodies
+to aid decomposition.
+
+\rGhost\s
+
+These requires no food and can see
+creatures that are using the Conceal
+Creature spell. Ghosts are created
+when a creature dies in a Torture
+Chamber.
+
+\rTentacle\s
+
+An aquatic beast, the Tentacle only
+enters a Dungeon if there is water
+around. He hangs around the water
+and attacks enemies from there.
+
+
+\rOrc\s
+
+A basic fighting creature of average
+ability. Orcs are good for guarding
+key strategic points in the Dungeon,
+and for bulking out player's army.
+
+
+\rFloating spirit\s
+
+Helper creature, used as Lost Soul
+(spectators) in multiplayer.
+Adding it to level as regular
+creature may make the game unstable.
+
+
+
+[itmtdesc]
+\rBarrel\s
+
+Wooden barrel; has no function, used
+just for diversity.
+
+
+
+
+\rTorch\s
+
+Lit torch. Placed near wall, acts
+as a source of light which can be
+destroyed when the wall is digged.
+
+
+
+\rGold Chest (500)\s
+
+Gold chest storing 500 gold.
+
+
+
+
+
+\rTemple statue\s
+
+Humanoid statue sitting cross-legged
+with flame in legs.
+Room equipment used in corners of
+the Temple.
+
+
+\rDungeon Heart\s
+
+The life force of a dungeon.
+Should be placed on Heart slab.
+
+
+
+
+\rGold (250)\s
+
+Pot of gold, worth 250 gold.
+
+
+
+
+
+\rUnlit torch\s
+
+Torch which is not a light source
+(without flame).
+
+
+
+
+\rStatue without flame (unlit)\s
+
+Humanoid statue sitting cross-legged
+without light source.
+
+
+
+
+\rGrowing Chicken\s
+
+The growing egg coming out of the
+ground.
+Automatically converts into
+\rChicken stable\s after a few game
+turns.
+
+\rChicken\s
+
+A full-grown yellow chicken, walking
+around and waiting to be eaten.
+
+
+
+
+\rHand of evil spell\s
+
+A spell book. If taken to Library
+by Imp, the player will receive
+possibility of holding creatures
+in hand.
+
+
+\rCreate Imp spell\s
+
+A spell book. If taken to Library
+by Imp, the player will receive
+possibility of creating Imps.
+
+
+
+\rMust Obey spell\s
+
+A spell book. If taken to Library
+by Imp, the player will receive
+the Must Obey spell.
+
+
+
+\rSlap spell\s
+
+A spell book. If taken to Library
+by Imp, the player will receive
+possibility of slapping creatures.
+
+
+
+\rSight of Evil spell\s
+
+A spell book. If taken to Library
+by Imp, the player will receive
+the ability of casting Sight of Evil
+spell.
+
+
+\rCall to Arms spell\s
+
+A spell book. If taken to Library
+by Imp, the player will receive
+the ability of casting Call to Arms
+spell.
+
+
+\rCave In spell\s
+
+A spell book. If taken to Library
+by Imp, the player will receive
+the ability of casting Cave In
+spell.
+
+
+\rHeal Creature spell\s
+
+A spell book. If taken to Library
+by Imp, the player will receive
+the ability of casting Heal spell
+on a creature.
+
+
+\rHold Audience spell\s
+
+A spell book. If taken to Library
+by Imp, the player will receive
+the ability of casting Hold Audience
+spell.
+
+
+\rLightning spell\s
+
+A spell book. If taken to Library
+by Imp, the player will receive
+the ability of casting Lightning
+spell.
+
+
+\rSpeed Creature spell\s
+
+A spell book. If taken to Library
+by Imp, the player will receive
+the ability of casting Speed spell
+on a creature.
+
+
+\rProtect Creature spell\s
+
+A spell book. If taken to Library
+by Imp, the player will receive
+the ability of casting Protect
+spell on a creature.
+
+
+\rConceal Creature spell\s
+
+A spell book. If taken to Library
+by Imp, the player will receive
+the ability of casting Conceal
+spell on a creature.
+
+
+\rNull1\s
+
+Non-existing item.
+Shouldn't be used.
+
+
+
+
+\rNull2\s
+
+Non-existing item.
+Shouldn't be used.
+
+
+
+
+\rAnvil\s
+
+Room equipment for Workshop.
+Used in corners of the room.
+
+
+
+
+\rPrison bar\s
+
+Room equipment for Prison.
+
+
+
+
+
+\rCandlestick\s
+
+A lit candle with candlestick.
+Used in corner of some rooms, can be
+also placed as graphic addition.
+
+
+
+\rGravestone\s
+
+Room equipment for Graveyard.
+Small gravestone with RIP
+drawn on it.
+
+
+
+\rAztec (Horny) Statue\s
+
+Aztec-style statue. No idea why
+it's called Horny - represents a
+person which is definetely without
+horns.
+
+
+\rTraining post\s
+
+Room equipment for Training Room.
+
+
+
+
+
+\rTorture spike\s
+
+Room equipment for Torture Chamber.
+Used at the room edge.
+
+
+
+
+\rTemple Spangle\s
+
+Effect of steam and water drops
+for the temple.
+
+
+
+
+\rPotion1\s
+
+A bottle of potion. It can't be
+used to drink and is just a graphic
+addition.
+
+This one comes in \mpurple\s color.
+
+\rPotion2\s
+
+A bottle of potion. It can't be
+used to drink and is just a graphic
+addition.
+
+This one comes in \bblue\s color.
+
+\rPotion3\s
+
+A bottle of potion. It can't be
+used to drink and is just a graphic
+addition.
+
+This one comes in \ggreen\s color.
+
+\rPower hand\s
+
+Standard green Hand of Evil.
+
+A helper item that represents the
+mouse cursor during the game.
+
+
+\rPower hand grab\s
+
+Hand of Evil when picking up
+something.
+
+A helper item that represents the
+mouse cursor during the game.
+
+\rPower hand whip\s
+
+Hand of Evil ready to slap a
+creature.
+
+A helper item that represents the
+mouse cursor during the game.
+
+\rChicken stable\s
+
+Egg, grown out the ground and
+waiting without movement.
+
+Automatically converts into
+\rChicken wobble\s after a few game
+turns.
+\rChicken wobble\s
+
+Egg, moving like the chicken is
+trying to get out.
+Automatically converts into
+\rChicken crack\s after a few game
+turns.
+
+\rChicken crack\s
+
+Chicken comming out of the egg.
+Automatically converts into
+\rChicken\s after a few game turns.
+
+
+
+\rGold (200)\s
+
+Gold laying on the ground, without
+any container.
+
+Worth 200 gold.
+
+
+\rSpinning key\s
+
+A spinning door key, used over
+closed doors.
+
+
+
+
+\rDisease spell\s
+
+A spell book. If taken to Library
+by Imp, the player will receive
+the ability of casting Disease
+spell on enemy creature.
+
+
+\rChicken spell\s
+
+A spell book. If taken to Library
+by Imp, the player will receive
+the ability of casting Disease
+spell on a creature.
+
+
+\rDestroy Walls spell\s
+
+A spell book. If taken to Library
+by Imp, the player will receive
+the ability of casting Destroy
+Walls spell.
+
+
+\rTime Bomb spell\s
+
+A spell book. If taken to Library
+by Imp, the player will receive
+the ability of casting Time Bomb
+spell.
+
+
+\rHero gate\s
+
+A gateway which allows heroes to
+enter your dungeon. Can't be
+destroyed. The command to release
+heroes must exist in script file for
+this to work.
+
+\rSpinning key 2\s
+
+Another spinning key.
+
+No idea if there's any difference
+between the two keys.
+
+
+\rArmour\s
+
+Looks like a light flash
+which fades after a few game turns.
+
+
+
+
+\rGold Hoarde 1\s
+
+Pile of gold, may be put only in
+Treasure Room.
+
+
+
+
+\rGold Hoarde 2\s
+
+Pile of gold, may be put only in
+Treasure Room.
+
+
+
+
+\rGold Hoarde 3\s
+
+Pile of gold, may be put only in
+Treasure Room.
+
+
+
+
+\rGold Hoarde 4\s
+
+Pile of gold, may be put only in
+Treasure Room.
+
+
+
+
+\rGold Hoarde 5\s
+
+Pile of gold, may be put only in
+Treasure Room.
+
+
+
+
+\rWizard Lair\s
+
+Red circle with five candles on
+edge.
+If placed without binding to a
+creature, this lair will act just
+as a graphic addition. Can be
+placed on any slab.
+\rBarbarian Lair\s
+
+Red circle with five candles on
+edge.
+If placed without binding to a
+creature, this lair will act just
+as a graphic addition. Can be
+placed on any slab.
+\rArcher Lair\s
+
+Red circle with five candles on
+edge.
+If placed without binding to a
+creature, this lair will act just
+as a graphic addition. Can be
+placed on any slab.
+\rMonk Lair\s
+
+Red circle with five candles on
+edge.
+If placed without binding to a
+creature, this lair will act just
+as a graphic addition. Can be
+placed on any slab.
+\rDwarfa Lair\s
+
+Red circle with five candles on
+edge.
+If placed without binding to a
+creature, this lair will act just
+as a graphic addition. Can be
+placed on any slab.
+\rKnight Lair\s
+
+Red circle with five candles on
+edge.
+If placed without binding to a
+creature, this lair will act just
+as a graphic addition. Can be
+placed on any slab.
+\rAvatar Lair\s
+
+Red circle with five candles on
+edge.
+If placed without binding to a
+creature, this lair will act just
+as a graphic addition. Can be
+placed on any slab.
+\rTunneller Lair\s
+
+Red circle with five candles on
+edge.
+If placed without binding to a
+creature, this lair will act just
+as a graphic addition. Can be
+placed on any slab.
+\rWitch Lair\s
+
+Red circle with five candles on
+edge.
+If placed without binding to a
+creature, this lair will act just
+as a graphic addition. Can be
+placed on any slab.
+\rGiant Lair\s
+
+Red circle with five candles on
+edge.
+If placed without binding to a
+creature, this lair will act just
+as a graphic addition. Can be
+placed on any slab.
+\rFairy Lair\s
+
+Red circle with five candles on
+edge.
+If placed without binding to a
+creature, this lair will act just
+as a graphic addition. Can be
+placed on any slab.
+\rThief Lair\s
+
+Red circle with five candles on
+edge.
+If placed without binding to a
+creature, this lair will act just
+as a graphic addition. Can be
+placed on any slab.
+\rSamurai Lair\s
+
+Red circle with five candles on
+edge.
+If placed without binding to a
+creature, this lair will act just
+as a graphic addition. Can be
+placed on any slab.
+\rHorny Lair\s
+
+Looks like throne chair.
+
+If placed without binding to a
+creature, this lair will act just
+as a graphic addition. Can be
+placed on any slab.
+\rSkeleton Lair\s
+
+A stack of skulls and bones.
+
+If placed without binding to a
+creature, this lair will act just
+as a graphic addition. Can be
+placed on any slab.
+\rGoblin Lair\s
+
+Circle made of sprigs and leaves.
+
+If placed without binding to a
+creature, this lair will act just
+as a graphic addition. Can be
+placed on any slab.
+\rDragon Lair\s
+
+Looks like dragon's skeleton.
+
+If placed without binding to a
+creature, this lair will act just
+as a graphic addition. Can be
+placed on any slab.
+\rDemon Spawn Lair\s
+
+Short circular wall of white skulls.
+
+If placed without binding to a
+creature, this lair will act just
+as a graphic addition. Can be
+placed on any slab.
+\rFly Lair\s
+
+Looks like wasp nest.
+
+If placed without binding to a
+creature, this lair will act just
+as a graphic addition. Can be
+placed on any slab.
+\rDark Mistress Lair\s
+
+Green circle with something burning
+on it.
+If placed without binding to a
+creature, this lair will act just
+as a graphic addition. Can be
+placed on any slab.
+\rSorceror (Warlock)  Lair\s
+
+A couple of mushrooms with three
+candles.
+If placed without binding to a
+creature, this lair will act just
+as a graphic addition. Can be
+placed on any slab.
+\rBile Demon Lair\s
+
+Pool filled with something green.
+
+If placed without binding to a
+creature, this lair will act just
+as a graphic addition. Can be
+placed on any slab.
+\rImp Lair\s
+
+Looks exactly like Dragon Lair.
+This lair will act just as a
+graphic addition. Imps don't
+require sleep so the never use
+lair.
+
+\rBug Lair\s
+
+Small, tent-like piece of.. junk.
+
+If placed without binding to a
+creature, this lair will act just
+as a graphic addition. Can be
+placed on any slab.
+\rVampire Lair\s
+
+A standing wooden coffin.
+
+If placed without binding to a
+creature, this lair will act just
+as a graphic addition. Can be
+placed on any slab.
+\rSpider Lair\s
+
+Strange thing with two spider nets.
+
+If placed without binding to a
+creature, this lair will act just
+as a graphic addition. Can be
+placed on any slab.
+\rHell Hound Lair\s
+
+Wooden peg with a chain.
+
+If placed without binding to a
+creature, this lair will act just
+as a graphic addition. Can be
+placed on any slab.
+\rGhost Lair\s
+
+Looks like a grave in shape of cross,
+with a skull on top of it.
+If placed without binding to a
+creature, this lair will act just
+as a graphic addition. Can be
+placed on any slab.
+\rTentacle Lair\s
+
+Looks like small, green holder.
+
+If placed without binding to a
+creature, this lair will act just
+as a graphic addition. Can be
+placed on any slab.
+\rReveal map special\s
+
+Dungeon Special box that allows a
+player to reveal the whole map.
+
+
+
+
+\rResurrect creature special\s
+
+Dungeon Special box that allows a
+player to resurrect a creature
+which died or changed into another.
+
+
+
+\rTransfer creature special\s
+
+Dungeon Special box that allows a
+player to transfer a creature
+to the next map in campaign
+missions.
+
+
+\rSteal hero special\s
+
+Dungeon Special box that allows a
+player to get random hero.
+
+
+
+
+\rMultiply creatures special\s
+
+Dungeon Special box that allows a
+player to create a copy of all
+creatures.
+
+
+
+\rIncrease level special\s
+
+Dungeon Special box that allows a
+player to increase experience
+level of all creatures by 1.
+
+
+
+\rMake safe special\s
+
+Dungeon Special box that allows a
+player to fortify all his walls.
+
+
+
+
+\rReveal hidden world special\s
+
+Dungeon Special box that allows a
+player to reveal hidden realm.
+It works only on some missions
+in campaign play.
+
+
+\rBoulder trap box\s
+
+Imps can get this box into player's
+Workshop, allowing him to place the
+trap.
+
+
+
+\rAlarm trap box\s
+
+Imps can get this box into player's
+Workshop, allowing him to place the
+trap.
+
+
+
+\rPoison gas trap box\s
+
+Imps can get this box into player's
+Workshop, allowing him to place the
+trap.
+
+
+
+\rLightning trap box\s
+
+Imps can get this box into player's
+Workshop, allowing him to place the
+trap.
+
+
+
+\rWord of Power trap box\s
+
+Imps can get this box into player's
+Workshop, allowing him to place the
+trap.
+
+
+
+\rLava trap box\s
+
+Imps can get this box into player's
+Workshop, allowing him to place the
+trap.
+
+
+
+\rTrap Dummy 2\s
+
+Looks like a trap box.
+
+
+
+
+
+\rTrap Dummy 3\s
+
+Looks like a trap box.
+
+
+
+
+
+\rTrap Dummy 4\s
+
+Looks like a trap box.
+
+
+
+
+
+\rTrap Dummy 5\s
+
+Looks like a trap box.
+
+
+
+
+
+\rTrap Dummy 6\s
+
+Looks like a trap box.
+
+
+
+
+
+\rTrap Dummy 7\s
+
+Looks like a trap box.
+
+
+
+
+
+\rDoor Wood box\s
+
+Imps can get this box into player's
+Workshop, allowing him to place the
+door.
+
+
+
+\rDoor Brace box\s
+
+Imps can get this box into player's
+Workshop, allowing him to place the
+door.
+
+
+
+\rDoor Steel box\s
+
+Imps can get this box into player's
+Workshop, allowing him to place the
+door.
+
+
+
+\rDoor Magic box\s
+
+Imps can get this box into player's
+Workshop, allowing him to place the
+door.
+
+
+
+\rWorkshop Item\s
+
+
+
+
+
+
+
+\rHeart flame \R(red)\s
+
+Usually four of these flames are
+placed around Dungeon Heart of
+\Rplayer 0\s (Human player).
+
+
+
+\rDisease\s
+
+Casted Disease spell.
+Looks like a very little black fly.
+
+
+
+
+\rScavenger eye\s
+
+Room equipment for Scavenger Room.
+
+
+
+
+
+\rWorkshop machine\s
+
+Room equipment for workshop.
+
+
+
+
+
+\rGuard Flag \R(red)\s
+
+Room equipment for Guard Post,
+if it is owned by \RHuman player\s.
+
+
+
+
+\rGuard Flag \B(blue)\s
+
+Room equipment for Guard Post,
+if it is owned by \Bplayer 1\s.
+
+
+
+
+\rGuard Flag \G(green)\s
+
+Room equipment for Guard Post,
+if it is owned by \Gplayer 2\s.
+
+
+
+
+\rGuard Flag \Y(yellow)\s
+
+Room equipment for Guard Post,
+if it is owned by \Yplayer 3\s.
+
+
+
+
+\rFlagpost\s
+
+Room equipment for Guard Post,
+used if it is unowned.
+
+
+
+
+\rHeart flame \B(blue)\s
+
+Usually four of these flames are
+placed around Dungeon Heart of
+\Bplayer 1\s.
+
+
+
+\rHeart flame \G(green)\s
+
+Usually four of these flames are
+placed around Dungeon Heart of
+\Gplayer 2\s.
+
+
+
+\rHeart flame \Y(yellow)\s
+
+Usually four of these flames are
+placed around Dungeon Heart of
+\Yplayer 3\s.
+
+
+
+\rPower Sight\s
+
+Casted Sight of Evil spell.
+
+
+
+
+
+\rPower Lightning\s
+
+Casted Lightning spell.
+
+
+
+
+
+\rTorturer\s
+
+Room equipment for Torture Chamber.
+
+
+
+
+
+\rOrc Lair\s
+
+Circle of brown skulls.
+
+If placed without binding to a
+creature, this lair will act just
+as a graphic addition. Can be
+placed on any slab.
+\rPower Hand Gold\s
+
+A helper item that represents the
+mouse cursor during the game.
+
+
+
+
+\rCoin\s
+
+Spinning coin, similar to key.
+
+
+
+
+
+\rStatue 2\s
+
+
+
+
+
+
+
+\rStatue 3\s
+
+
+
+
+
+
+
+\rStatue 4\s
+
+
+
+
+
+
+
+\rStatue 5\s
+
+
+
+
+
+
+
+\rStatue 6\s
+
+
+
+
+
+
+
+\rArmageddon Spell\s
+
+A spell book. If taken to Library
+by Imp, the player will receive
+possibility of casting the spell.
+
+
+
+
+[txtrdesc]
+\rStandard texture\s
+
+The one with walls as in Adikted
+description. Used in most of
+original campaign maps.
+
+
+
+\rAncient texture\s
+
+This one has brighter walls than
+the first. Walls have Aztec
+drawings on these testures.
+
+
+
+\rWinter texture\s
+
+Walls with snow and ice drawings
+representing snow drops.
+
+
+
+
+\rSnake Key texture\s
+
+Walls with key of life and snake.
+The wall brick is brown in this
+texture, not red like on standard
+one.
+
+
+\rStone Face texture\s
+
+Rough walls with red eyed face on.
+The walls are bright on this
+texture, nearly yellow.
+
+
+
+\rBig Breasts texture\s
+
+The woman reliefs on these textures
+have bigger breasts than standard.
+
+
+
+
+\rRough Ancient texture\s
+
+Texture with ancient relief theme
+and rougher earth.
+
+
+
+
+\rSkull Relief texture\s
+
+On this texture walls are brighter
+than standard, and reliefs are
+representing skulls of various size.
+
+
+
+
+[cclmdesc]
+\rStandard Rock\s
+
+This will use look of a standard
+rick to draw the slab.
+
+
+
+
+\rStandard Gold\s
+
+This will use look of gold to draw
+the slab. The gold view will be
+affected by sibling slabs, such as
+lava, water or path, but the
+columns will not be recomputed
+when the slabs will change later.
+\rUnaffected Earth\s
+
+This will use look of earth to draw
+the slab. The resulting earth will
+consist of 9 fully filled column,
+and sibling slabs won't affect the
+view.
+
+\rStandard Earth\s
+
+This will use look of earth to draw
+the slab. The earth view will be
+affected by sibling slabs, such as
+lava, water or path, but the
+columns will not be recomputed
+when the slabs will change later.
+\rTorch plate earth\s
+
+This will use look of earth with
+torch plates. The plates will only
+be visible on sides where there are
+torches near. If you will modify
+slabs or change torches later,
+the columns won't be auto updated.
+\rWall with drape\s
+This will use look of wall with
+a drape on top. The drape will
+be created in color of player which
+owns the slab when this function is
+selected. If you will modify
+slabs or change owner later,
+the columns won't be auto updated.
+\rWall with torch\s
+
+This will use look of wall with
+torch plates. The plates will only
+be visible on sides where there are
+torches near. If you will modify
+slabs or change torches later,
+the columns won't be auto updated.
+\rWall with twins\s
+
+This will use look of wall with
+twins relief. The relief will
+be visible only on sides where
+there is path or claimed area
+near when this function is
+selected.
+\rWall with woman\s
+
+This will use look of wall with
+woman relief. The relief will
+be visible only on sides where
+there is path or claimed area
+near when this function is
+selected.
+\rWall with pair shaging\s
+
+This will use look of wall with
+shaging pair relief. The relief
+will be visible only on sides
+where there is path or claimed
+area near when this function is
+selected.
+\rStandard Path\s
+
+Makes the slab look like standard
+Path (Unclaimed ground).
+
+
+
+
+\rClaimed ground\s
+
+Makes the slab look like ordinary
+claimed ground. The ground color
+depends on who owns the slab.
+If the owner is changed later,
+the color won't change.
+
+\rStandard Lava\s
+
+Makes the slab look like standard
+lava. Note that it only looks like
+lava, and is not real one, so
+the lava view won't affect nearby
+earth or gold slabs.
+
+\rStandard Water\s
+
+Makes the slab look like standard
+water. Note that it only looks like
+water, and is not real one, so it
+won't affect nearby earth or gold
+slabs the same way that water do.
+
+\rEntrance (Portal)\s
+
+Makes the slab look like Entrance.
+Note that some of the surrounding
+slabs have to be of same type to
+make the Portal look like whole
+room. Otherwise it will look like
+a single slab of the room.
+\rTreasure Room\s
+Makes the slab look like Treasure
+Room. Note that some of the
+surrounding slabs have to be of
+same type to make the Treasure
+Room look like whole room.
+Otherwise it will look like
+a single slab of the room.
+\rLibrary\s
+
+Makes the slab look like Library.
+Note that some of the surrounding
+slabs have to be of same type to
+make the Library look like whole
+room. Otherwise it will look like
+a single slab of the room.
+\rPrison\s
+
+Makes the slab look like Prison.
+Note that some of the surrounding
+slabs have to be of same type to
+make the Prison look like whole
+room. Otherwise it will look like
+a single slab of the room.
+\rTorture Chamber\s
+Makes the slab look like Torture
+Chamber. Note that some of the
+surrounding slabs have to be of
+same type to make the Chamber
+look like whole room.
+Otherwise it will look like
+a single slab of the room.
+\rTraining Room\s
+Makes the slab look like Training
+Room. Note that some of the
+surrounding slabs have to be of
+same type to make the Training
+Room look like whole room.
+Otherwise it will look like
+a single slab of the room.
+\rDungeon Heart\s
+Makes the slab look like Dungeon
+Heart. Note that some of the
+surrounding slabs have to be of
+same type to make the Dungeon
+Heart look like whole room.
+Otherwise it will look like
+a single slab of the room.
+\rWorkshop\s
+
+Makes the slab look like Workshop.
+Note that some of the surrounding
+slabs have to be of same type to
+make the Workshop look like whole
+room. Otherwise it will look like
+a single slab of the room.
+\rScavenger Room\s
+Makes the slab look like Scavenger
+Room. Note that some of the
+surrounding slabs have to be of
+same type to make the Scavenger
+Room look like whole room.
+Otherwise it will look like
+a single slab of the room.
+\rTemple\s
+
+Makes the slab look like Temple.
+Note that some of the surrounding
+slabs have to be of same type to
+make the Temple look like whole
+room. Otherwise it will look like
+a single slab of the room.
+\rGraveyard\s
+
+Makes the slab look like Graveyard.
+Note that some of the surrounding
+slabs have to be of same type to
+make the Graveyard look like whole
+room. Otherwise it will look like
+a single slab of the room.
+\rHatchery\s
+
+Makes the slab look like Hatchery.
+Note that some of the surrounding
+slabs have to be of same type to
+make the Hatchery look like whole
+room. Otherwise it will look like
+a single slab of the room.
+\rLair\s
+
+Makes the slab look like Lair.
+Note that some of the surrounding
+slabs have to be of same type to
+make the Lair look like whole
+room. Otherwise it will look like
+a single slab of the room.
+\rBarracks\s
+
+Makes the slab look like Barracks.
+Note that some of the surrounding
+slabs have to be of same type to
+make the Barracks look like whole
+room. Otherwise it will look like
+a single slab of the room.
+\rWooden Door\s
+
+Makes the slab look like Wooden
+Door. The door orientation will be
+detected when creating the custom
+columns. If surrounding slabs will
+change after creating the columns,
+
+\rBraced Door\s
+
+Makes the slab look like Braced
+Door. The door orientation will be
+detected when creating the custom
+columns. If surrounding slabs will
+change after creating the columns,
+
+\rIron Door\s
+
+Makes the slab look like Iron
+Door. The door orientation will be
+detected when creating the custom
+columns. If surrounding slabs will
+change after creating the columns,
+
+\rMagic Door\s
+
+Makes the slab look like Magic
+Door. The door orientation will be
+detected when creating the custom
+columns. If surrounding slabs will
+change after creating the columns,
+
+\rBridge\s
+
+Makes the slab look like Bridge.
+
+
+
+
+
+\rStandard Gems\s
+
+This will use look of gems to draw
+the slab. Still the slab will have
+properties of original slab, so if
+original slab was not gold or gems,
+then the player won't get richer
+by digging it.
+\rGuard Post\s
+
+Makes the slab look like Guard post.
+
+
+
+
+
+\rThin gems on path\s
+
+This will create a path slab with
+single column of gems at center.
+If placed on gems, the slab will
+still be digged by up to 12 Imps
+at one time.
+
+\rGround level rock\s
+
+This will create a slab with rock
+textures, but no higher than ground
+level. Creatures will be able to
+walk through the slab.
+
+
+\rRock with cave\s
+
+This will create a slab with rock
+view, but containing a hole which
+will allow creatures to go through.
+
+
+
+\rSkulls on Lava\s
+
+A single column of skulls surrounded
+by lava.
+
+
+
+
+\rSkulls on Path\s
+
+A single column of skulls surrounded
+by path.
+
+
+
+
+\rSkulls on Claimed Ground\s
+
+A single column of skulls surrounded
+by claimed area.
+
+
+
+
+\rWall with body splat\s
+Makes a slab to look like reinforced
+wall with splatted body on it (the
+wall used for Torture Chamber).
+The wall can't have splatted body
+from all four sides, so there should
+be at least one tall slab around.
+
+[efctdesc]
+\rLava effect\s
+
+Creates the balls of fire that jump
+from the lava light and up the area
+around them, with the proper sound
+effect included. It will only work
+when placed on lava.
+
+\rDripping Water effect\s
+
+The effect where water drips from
+the ceiling and splashes onto the
+floor. This can be placed anywhere
+in your dungeon and adds to the
+general atmosphere.
+
+\rRock Fall effect\s
+
+A continous visual effect of the
+Rock Fall spell.
+
+
+
+
+\rEntrance Ice effect\s
+
+Creates clouds of fog that floats
+over the ground before dissipating.
+
+Starts a little way off the ground
+and drifts down.
+
+\rDry Ice effect\s
+
+Creates clouds of fog that floats
+over the ground before dissipating.
+
+Constantly remains at ankle height.
+
+
+unknown effect 6
+
+Probably won't work.
+
+
+
+
+
+unknown effect 7
+
+Probably won't work.
+
+
+
+
+
+unknown effect 8
+
+Probably won't work.
+
+
+
+
+
+
+[trapdesc]
+\rBoulder trap\s
+Allows to lay down a huge round
+rock which rolls over heroes and
+enemy creatures when they come
+within range. Although your own
+creatures do not set off the trap,
+they can still be squashed if caught
+in it's path.
+\rAlarm trap\s
+
+Starts Call To Arms if triggered.
+All player creatures in the area
+are summoned to a specific point.
+The trap can be triggered twelve
+times before it must be replaced.
+
+\rPoison Gas trap\s
+Emits a cloud of toxic gas which
+drains the health of anything near
+it. The trap can be used five times
+before it needs replacing. Your Imps
+will then automatically replace it.
+The poisoned gas can hurt your own
+creatures if they inhale it.
+\rLightning trap\s
+
+Lets loose a bolt of lightning when
+tripped. The trap has a limit of
+twelve shots before it needs to be
+replaced by your Imps. They do this
+automatically. Shots from the trap
+do not harm your creatures.
+\rWord of Power trap\s
+Explodes with a Word of Power spell
+when a hero or enemy creature passes
+over it. The spell expands from the
+trap in all directions. The trap
+does not harm your creatures but
+only has three shots and isn't
+replaced by your Imps.
+\rLava trap\s
+
+Turns the tile on which it is set to
+lava when a hero or enemy creature
+steps on it. The trap can only be
+laid once and is capable of damaging
+your creatures if they are on it
+when it is triggered.
+Dummy trap 2
+
+Probably won't work.
+
+
+
+
+
+Dummy trap 3
+
+Probably won't work.
+
+
+
+
+
+Dummy trap 4
+
+Probably won't work.
+
+
+
+
+
+Dummy trap 5
+
+Probably won't work.
+
+
+
+
+
+Dummy trap 6
+
+Probably won't work.
+
+
+
+
+
+Dummy trap 7
+
+Probably won't work.
+
+
+
+
+
+[cubedesc]
+\rempty cube\s
+
+The first cube is \yinvisible\s,
+because it means free space for
+the game. Creatures can move
+through this cube.
+
+
+\rstandard earth 1\s
+
+First of the \yearth cubes\s.
+Randomly selected earth cubes
+are used to represent every
+earth slab on map.
+
+
+\rstandard earth 2\s
+
+Senond of the \yearth cubes\s.
+Randomly selected earth cubes
+are used to represent every
+earth slab on map.
+
+
+\rstandard earth 3\s
+
+Third of the \yearth cubes\s.
+Randomly selected earth cubes
+are used to represent every
+earth slab on map.
+
+
+earth bright top L
+
+
+
+
+
+
+
+earth bright top C
+
+
+
+
+
+
+
+earth bright top R
+
+
+
+
+
+
+
+earth n/water L
+
+
+
+
+
+
+
+earth n/water R
+
+
+
+
+
+
+
+earth n/wtr s.top L
+
+
+
+
+
+
+
+earth n/wtr s.top C
+
+
+
+
+
+
+
+earth n/wtr s.top R
+
+
+
+
+
+
+
+stone w/earth top 1
+
+
+
+
+
+
+
+stone w/earth top 2
+
+
+
+
+
+
+
+white stone
+
+
+
+
+
+
+
+stone w/earth top 3
+
+
+
+
+
+
+
+unknown cube 0x0010
+
+
+
+
+
+
+
+unknown cube 0x0011
+
+
+
+
+
+
+
+unknown cube 0x0012
+
+
+
+
+
+
+
+unknown cube 0x0013
+
+
+
+
+
+
+
+unknown cube 0x0014
+
+
+
+
+
+
+
+unknown cube 0x0015
+
+
+
+
+
+
+
+unknown cube 0x0016
+
+
+
+
+
+
+
+unknown cube 0x0017
+
+
+
+
+
+
+
+unknown cube 0x0018
+
+
+
+
+
+
+
+unknown cube 0x0019
+
+
+
+
+
+
+
+unknown cube 0x001a
+
+
+
+
+
+
+
+unknown cube 0x001b
+
+
+
+
+
+
+
+unknown cube 0x001c
+
+
+
+
+
+
+
+unknown cube 0x001d
+
+
+
+
+
+
+
+unknown cube 0x001e
+
+
+
+
+
+
+
+unknown cube 0x001f
+
+
+
+
+
+
+
+unknown cube 0x0020
+
+
+
+
+
+
+
+unknown cube 0x0021
+
+
+
+
+
+
+
+unknown cube 0x0022
+
+
+
+
+
+
+
+unknown cube 0x0023
+
+
+
+
+
+
+
+unknown cube 0x0024
+
+
+
+
+
+
+
+unknown cube 0x0025
+
+
+
+
+
+
+
+unknown cube 0x0026
+
+
+
+
+
+
+
+static water
+
+
+
+
+
+
+
+static dark lava
+
+
+
+
+
+
+
+static bright lava
+
+
+
+
+
+
+
+unknown cube 0x002a
+
+
+
+
+
+
+
+unknown cube 0x002b
+
+
+
+
+
+
+
+unknown cube 0x002c
+
+
+
+
+
+
+
+unknown cube 0x002d
+
+
+
+
+
+
+
+unknown cube 0x002e
+
+
+
+
+
+
+
+unknown cube 0x002f
+
+
+
+
+
+
+
+unknown cube 0x0030
+
+
+
+
+
+
+
+unknown cube 0x0031
+
+
+
+
+
+
+
+unknown cube 0x0032
+
+
+
+
+
+
+
+unknown cube 0x0033
+
+
+
+
+
+
+
+unknown cube 0x0034
+
+
+
+
+
+
+
+unknown cube 0x0035
+
+
+
+
+
+
+
+unknown cube 0x0036
+
+
+
+
+
+
+
+unknown cube 0x0037
+
+
+
+
+
+
+
+unknown cube 0x0038
+
+
+
+
+
+
+
+unknown cube 0x0039
+
+
+
+
+
+
+
+unknown cube 0x003a
+
+
+
+
+
+
+
+unknown cube 0x003b
+
+
+
+
+
+
+
+unknown cube 0x003c
+
+
+
+
+
+
+
+unknown cube 0x003d
+
+
+
+
+
+
+
+unknown cube 0x003e
+
+
+
+
+
+
+
+unknown cube 0x003f
+
+
+
+
+
+
+
+unknown cube 0x0040
+
+
+
+
+
+
+
+unknown cube 0x0041
+
+
+
+
+
+
+
+unknown cube 0x0042
+
+
+
+
+
+
+
+unknown cube 0x0043
+
+
+
+
+
+
+
+unknown cube 0x0044
+
+
+
+
+
+
+
+unknown cube 0x0045
+
+
+
+
+
+
+
+unknown cube 0x0046
+
+
+
+
+
+
+
+unknown cube 0x0047
+
+
+
+
+
+
+
+unknown cube 0x0048
+
+
+
+
+
+
+
+unknown cube 0x0049
+
+
+
+
+
+
+
+unknown cube 0x004a
+
+
+
+
+
+
+
+unknown cube 0x004b
+
+
+
+
+
+
+
+unknown cube 0x004c
+
+
+
+
+
+
+
+unknown cube 0x004d
+
+
+
+
+
+
+
+unknown cube 0x004e
+
+
+
+
+
+
+
+unknown cube 0x004f
+
+
+
+
+
+
+
+unknown cube 0x0050
+
+
+
+
+
+
+
+unknown cube 0x0051
+
+
+
+
+
+
+
+unknown cube 0x0052
+
+
+
+
+
+
+
+unknown cube 0x0053
+
+
+
+
+
+
+
+woman wall rlf TL
+
+
+
+
+
+
+
+woman wall rlf TC
+
+
+
+
+
+
+
+woman wall rlf TR
+
+
+
+
+
+
+
+woman wall rlf UL
+
+
+
+
+
+
+
+woman wall rlf UC
+
+
+
+
+
+
+
+woman wall rlf UR
+
+
+
+
+
+
+
+woman wall rlf ML
+
+
+
+
+
+
+
+woman wall rlf MC
+
+
+
+
+
+
+
+woman wall rlf MR
+
+
+
+
+
+
+
+woman wall rlf BL
+
+
+
+
+
+
+
+woman wall rlf BC
+
+
+
+
+
+
+
+woman wall rlf BR
+
+
+
+
+
+
+
+twins wall rlf TL
+
+
+
+
+
+
+
+twins wall rlf TC
+
+
+
+
+
+
+
+twins wall rlf TR
+
+
+
+
+
+
+
+twins wall rlf ML
+
+
+
+
+
+
+
+twins wall rlf MC
+
+
+
+
+
+
+
+twins wall rlf MR
+
+
+
+
+
+
+
+twins wall rlf BL
+
+
+
+
+
+
+
+twins wall rlf BC
+
+
+
+
+
+
+
+twins wall rlf BR
+
+
+
+
+
+
+
+pair shagn rlf TL
+
+
+
+
+
+
+
+pair shagn rlf TC
+
+
+
+
+
+
+
+pair shagn rlf TR
+
+
+
+
+
+
+
+pair shagn rlf UL
+
+
+
+
+
+
+
+pair shagn rlf UC
+
+
+
+
+
+
+
+pair shagn rlf UR
+
+
+
+
+
+
+
+pair shagn rlf ML
+
+
+
+
+
+
+
+pair shagn rlf MC
+
+
+
+
+
+
+
+pair shagn rlf MR
+
+
+
+
+
+
+
+pair shagn rlf BL
+
+
+
+
+
+
+
+pair shagn rlf BC
+
+
+
+
+
+
+
+pair shagn rlf BR
+
+
+
+
+
+
+
+unknown cube 0x0075
+
+
+
+
+
+
+
+unknown cube 0x0076
+
+
+
+
+
+
+
+unknown cube 0x0077
+
+
+
+
+
+
+
+unknown cube 0x0078
+
+
+
+
+
+
+
+unknown cube 0x0079
+
+
+
+
+
+
+
+unknown cube 0x007a
+
+
+
+
+
+
+
+unknown cube 0x007b
+
+
+
+
+
+
+
+unknown cube 0x007c
+
+
+
+
+
+
+
+unknown cube 0x007d
+
+
+
+
+
+
+
+unknown cube 0x007e
+
+
+
+
+
+
+
+unknown cube 0x007f
+
+
+
+
+
+
+
+unknown cube 0x0080
+
+
+
+
+
+
+
+unknown cube 0x0081
+
+
+
+
+
+
+
+unknown cube 0x0082
+
+
+
+
+
+
+
+unknown cube 0x0083
+
+
+
+
+
+
+
+unknown cube 0x0084
+
+
+
+
+
+
+
+unknown cube 0x0085
+
+
+
+
+
+
+
+unknown cube 0x0086
+
+
+
+
+
+
+
+unknown cube 0x0087
+
+
+
+
+
+
+
+unknown cube 0x0088
+
+
+
+
+
+
+
+unknown cube 0x0089
+
+
+
+
+
+
+
+unknown cube 0x008a
+
+
+
+
+
+
+
+unknown cube 0x008b
+
+
+
+
+
+
+
+unknown cube 0x008c
+
+
+
+
+
+
+
+unknown cube 0x008d
+
+
+
+
+
+
+
+unknown cube 0x008e
+
+
+
+
+
+
+
+unknown cube 0x008f
+
+
+
+
+
+
+
+unknown cube 0x0090
+
+
+
+
+
+
+
+unknown cube 0x0091
+
+
+
+
+
+
+
+unknown cube 0x0092
+
+
+
+
+
+
+
+unknown cube 0x0093
+
+
+
+
+
+
+
+unknown cube 0x0094
+
+
+
+
+
+
+
+unknown cube 0x0095
+
+
+
+
+
+
+
+unknown cube 0x0096
+
+
+
+
+
+
+
+unknown cube 0x0097
+
+
+
+
+
+
+
+unknown cube 0x0098
+
+
+
+
+
+
+
+unknown cube 0x0099
+
+
+
+
+
+
+
+unknown cube 0x009a
+
+
+
+
+
+
+
+unknown cube 0x009b
+
+
+
+
+
+
+
+unknown cube 0x009c
+
+
+
+
+
+
+
+unknown cube 0x009d
+
+
+
+
+
+
+
+unknown cube 0x009e
+
+
+
+
+
+
+
+unknown cube 0x009f
+
+
+
+
+
+
+
+unknown cube 0x00a0
+
+
+
+
+
+
+
+unknown cube 0x00a1
+
+
+
+
+
+
+
+unknown cube 0x00a2
+
+
+
+
+
+
+
+unknown cube 0x00a3
+
+
+
+
+
+
+
+unknown cube 0x00a4
+
+
+
+
+
+
+
+unknown cube 0x00a5
+
+
+
+
+
+
+
+unknown cube 0x00a6
+
+
+
+
+
+
+
+unknown cube 0x00a7
+
+
+
+
+
+
+
+unknown cube 0x00a8
+
+
+
+
+
+
+
+unknown cube 0x00a9
+
+
+
+
+
+
+
+unknown cube 0x00aa
+
+
+
+
+
+
+
+unknown cube 0x00ab
+
+
+
+
+
+
+
+unknown cube 0x00ac
+
+
+
+
+
+
+
+unknown cube 0x00ad
+
+
+
+
+
+
+
+unknown cube 0x00ae
+
+
+
+
+
+
+
+unknown cube 0x00af
+
+
+
+
+
+
+
+unknown cube 0x00b0
+
+
+
+
+
+
+
+unknown cube 0x00b1
+
+
+
+
+
+
+
+unknown cube 0x00b2
+
+
+
+
+
+
+
+unknown cube 0x00b3
+
+
+
+
+
+
+
+unknown cube 0x00b4
+
+
+
+
+
+
+
+unknown cube 0x00b5
+
+
+
+
+
+
+
+unknown cube 0x00b6
+
+
+
+
+
+
+
+unknown cube 0x00b7
+
+
+
+
+
+
+
+unknown cube 0x00b8
+
+
+
+
+
+
+
+unknown cube 0x00b9
+
+
+
+
+
+
+
+unknown cube 0x00ba
+
+
+
+
+
+
+
+unknown cube 0x00bb
+
+
+
+
+
+
+
+unknown cube 0x00bc
+
+
+
+
+
+
+
+unknown cube 0x00bd
+
+
+
+
+
+
+
+unknown cube 0x00be
+
+
+
+
+
+
+
+unknown cube 0x00bf
+
+
+
+
+
+
+
+unknown cube 0x00c0
+
+
+
+
+
+
+
+unknown cube 0x00c1
+
+
+
+
+
+
+
+unknown cube 0x00c2
+
+
+
+
+
+
+
+unknown cube 0x00c3
+
+
+
+
+
+
+
+unknown cube 0x00c4
+
+
+
+
+
+
+
+unknown cube 0x00c5
+
+
+
+
+
+
+
+unknown cube 0x00c6
+
+
+
+
+
+
+
+unknown cube 0x00c7
+
+
+
+
+
+
+
+unknown cube 0x00c8
+
+
+
+
+
+
+
+unknown cube 0x00c9
+
+
+
+
+
+
+
+unknown cube 0x00ca
+
+
+
+
+
+
+
+unknown cube 0x00cb
+
+
+
+
+
+
+
+unknown cube 0x00cc
+
+
+
+
+
+
+
+unknown cube 0x00cd
+
+
+
+
+
+
+
+unknown cube 0x00ce
+
+
+
+
+
+
+
+unknown cube 0x00cf
+
+
+
+
+
+
+
+unknown cube 0x00d0
+
+
+
+
+
+
+
+unknown cube 0x00d1
+
+
+
+
+
+
+
+unknown cube 0x00d2
+
+
+
+
+
+
+
+unknown cube 0x00d3
+
+
+
+
+
+
+
+unknown cube 0x00d4
+
+
+
+
+
+
+
+unknown cube 0x00d5
+
+
+
+
+
+
+
+unknown cube 0x00d6
+
+
+
+
+
+
+
+unknown cube 0x00d7
+
+
+
+
+
+
+
+unknown cube 0x00d8
+
+
+
+
+
+
+
+unknown cube 0x00d9
+
+
+
+
+
+
+
+unknown cube 0x00da
+
+
+
+
+
+
+
+unknown cube 0x00db
+
+
+
+
+
+
+
+unknown cube 0x00dc
+
+
+
+
+
+
+
+unknown cube 0x00dd
+
+
+
+
+
+
+
+unknown cube 0x00de
+
+
+
+
+
+
+
+unknown cube 0x00df
+
+
+
+
+
+
+
+unknown cube 0x00e0
+
+
+
+
+
+
+
+head shape wall TL
+
+
+
+
+
+
+
+head shape wall TC
+
+
+
+
+
+
+
+head shape wall TR
+
+
+
+
+
+
+
+head shape wall BL
+
+
+
+
+
+
+
+head shape wall BC
+
+
+
+
+
+
+
+head shape wall BR
+
+
+
+
+
+
+
+tortr floor w/circl
+
+
+
+
+
+
+
+skel.splat wall TL
+
+
+
+
+
+
+
+skel.splat wall TC
+
+
+
+
+
+
+
+skel.splat wall TR
+
+
+
+
+
+
+
+skel.splat wall ML
+
+
+
+
+
+
+
+skel.splat wall MC
+
+
+
+
+
+
+
+skel.splat wall MR
+
+
+
+
+
+
+
+skel.splat wall BL
+
+
+
+
+
+
+
+skel.splat wall BC
+
+
+
+
+
+
+
+skel.splat wall BR
+
+
+
+
+
+
+
+unknown cube 0x00f1
+
+
+
+
+
+
+
+unknown cube 0x00f2
+
+
+
+
+
+
+
+unknown cube 0x00f3
+
+
+
+
+
+
+
+unknown cube 0x00f4
+
+
+
+
+
+
+
+unknown cube 0x00f5
+
+
+
+
+
+
+
+unknown cube 0x00f6
+
+
+
+
+
+
+
+unknown cube 0x00f7
+
+
+
+
+
+
+
+unknown cube 0x00f8
+
+
+
+
+
+
+
+unknown cube 0x00f9
+
+
+
+
+
+
+
+unknown cube 0x00fa
+
+
+
+
+
+
+
+unknown cube 0x00fb
+
+
+
+
+
+
+
+unknown cube 0x00fc
+
+
+
+
+
+
+
+unknown cube 0x00fd
+
+
+
+
+
+
+
+unknown cube 0x00fe
+
+
+
+
+
+
+
+unknown cube 0x00ff
+
+
+
+
+
+
+
+unknown cube 0x0100
+
+
+
+
+
+
+
+unknown cube 0x0101
+
+
+
+
+
+
+
+unknown cube 0x0102
+
+
+
+
+
+
+
+unknown cube 0x0103
+
+
+
+
+
+
+
+unknown cube 0x0104
+
+
+
+
+
+
+
+unknown cube 0x0105
+
+
+
+
+
+
+
+unknown cube 0x0106
+
+
+
+
+
+
+
+unknown cube 0x0107
+
+
+
+
+
+
+
+unknown cube 0x0108
+
+
+
+
+
+
+
+unknown cube 0x0109
+
+
+
+
+
+
+
+unknown cube 0x010a
+
+
+
+
+
+
+
+unknown cube 0x010b
+
+
+
+
+
+
+
+unknown cube 0x010c
+
+
+
+
+
+
+
+unknown cube 0x010d
+
+
+
+
+
+
+
+unknown cube 0x010e
+
+
+
+
+
+
+
+unknown cube 0x010f
+
+
+
+
+
+
+
+unknown cube 0x0110
+
+
+
+
+
+
+
+unknown cube 0x0111
+
+
+
+
+
+
+
+unknown cube 0x0112
+
+
+
+
+
+
+
+unknown cube 0x0113
+
+
+
+
+
+
+
+unknown cube 0x0114
+
+
+
+
+
+
+
+unknown cube 0x0115
+
+
+
+
+
+
+
+unknown cube 0x0116
+
+
+
+
+
+
+
+unknown cube 0x0117
+
+
+
+
+
+
+
+unknown cube 0x0118
+
+
+
+
+
+
+
+unknown cube 0x0119
+
+
+
+
+
+
+
+unknown cube 0x011a
+
+
+
+
+
+
+
+unknown cube 0x011b
+
+
+
+
+
+
+
+unknown cube 0x011c
+
+
+
+
+
+
+
+unknown cube 0x011d
+
+
+
+
+
+
+
+unknown cube 0x011e
+
+
+
+
+
+
+
+unknown cube 0x011f
+
+
+
+
+
+
+
+unknown cube 0x0120
+
+
+
+
+
+
+
+unknown cube 0x0121
+
+
+
+
+
+
+
+unknown cube 0x0122
+
+
+
+
+
+
+
+unknown cube 0x0123
+
+
+
+
+
+
+
+unknown cube 0x0124
+
+
+
+
+
+
+
+unknown cube 0x0125
+
+
+
+
+
+
+
+unknown cube 0x0126
+
+
+
+
+
+
+
+unknown cube 0x0127
+
+
+
+
+
+
+
+unknown cube 0x0128
+
+
+
+
+
+
+
+unknown cube 0x0129
+
+
+
+
+
+
+
+unknown cube 0x012a
+
+
+
+
+
+
+
+unknown cube 0x012b
+
+
+
+
+
+
+
+unknown cube 0x012c
+
+
+
+
+
+
+
+unknown cube 0x012d
+
+
+
+
+
+
+
+unknown cube 0x012e
+
+
+
+
+
+
+
+unknown cube 0x012f
+
+
+
+
+
+
+
+unknown cube 0x0130
+
+
+
+
+
+
+
+unknown cube 0x0131
+
+
+
+
+
+
+
+unknown cube 0x0132
+
+
+
+
+
+
+
+unknown cube 0x0133
+
+
+
+
+
+
+
+unknown cube 0x0134
+
+
+
+
+
+
+
+unknown cube 0x0135
+
+
+
+
+
+
+
+unknown cube 0x0136
+
+
+
+
+
+
+
+unknown cube 0x0137
+
+
+
+
+
+
+
+unknown cube 0x0138
+
+
+
+
+
+
+
+unknown cube 0x0139
+
+
+
+
+
+
+
+unknown cube 0x013a
+
+
+
+
+
+
+
+unknown cube 0x013b
+
+
+
+
+
+
+
+unknown cube 0x013c
+
+
+
+
+
+
+
+unknown cube 0x013d
+
+
+
+
+
+
+
+unknown cube 0x013e
+
+
+
+
+
+
+
+unknown cube 0x013f
+
+
+
+
+
+
+
+unknown cube 0x0140
+
+
+
+
+
+
+
+unknown cube 0x0141
+
+
+
+
+
+
+
+unknown cube 0x0142
+
+
+
+
+
+
+
+unknown cube 0x0143
+
+
+
+
+
+
+
+unknown cube 0x0144
+
+
+
+
+
+
+
+unknown cube 0x0145
+
+
+
+
+
+
+
+unknown cube 0x0146
+
+
+
+
+
+
+
+unknown cube 0x0147
+
+
+
+
+
+
+
+unknown cube 0x0148
+
+
+
+
+
+
+
+unknown cube 0x0149
+
+
+
+
+
+
+
+unknown cube 0x014a
+
+
+
+
+
+
+
+unknown cube 0x014b
+
+
+
+
+
+
+
+unknown cube 0x014c
+
+
+
+
+
+
+
+unknown cube 0x014d
+
+
+
+
+
+
+
+unknown cube 0x014e
+
+
+
+
+
+
+
+unknown cube 0x014f
+
+
+
+
+
+
+
+unknown cube 0x0150
+
+
+
+
+
+
+
+unknown cube 0x0151
+
+
+
+
+
+
+
+unknown cube 0x0152
+
+
+
+
+
+
+
+unknown cube 0x0153
+
+
+
+
+
+
+
+unknown cube 0x0154
+
+
+
+
+
+
+
+unknown cube 0x0155
+
+
+
+
+
+
+
+unknown cube 0x0156
+
+
+
+
+
+
+
+unknown cube 0x0157
+
+
+
+
+
+
+
+unknown cube 0x0158
+
+
+
+
+
+
+
+unknown cube 0x0159
+
+
+
+
+
+
+
+unknown cube 0x015a
+
+
+
+
+
+
+
+unknown cube 0x015b
+
+
+
+
+
+
+
+unknown cube 0x015c
+
+
+
+
+
+
+
+unknown cube 0x015d
+
+
+
+
+
+
+
+unknown cube 0x015e
+
+
+
+
+
+
+
+unknown cube 0x015f
+
+
+
+
+
+
+
+unknown cube 0x0160
+
+
+
+
+
+
+
+unknown cube 0x0161
+
+
+
+
+
+
+
+unknown cube 0x0162
+
+
+
+
+
+
+
+wooden door 0x0163
+
+
+
+
+
+
+
+wooden door 0x0164
+
+
+
+
+
+
+
+wooden door 0x0165
+
+
+
+
+
+
+
+wooden door 0x0166
+
+
+
+
+
+
+
+wooden door 0x0167
+
+
+
+
+
+
+
+wooden door 0x0168
+
+
+
+
+
+
+
+wooden door 0x0169
+
+
+
+
+
+
+
+wooden door 0x016a
+
+
+
+
+
+
+
+wooden door 0x016b
+
+
+
+
+
+
+
+braced door 0x016c
+
+
+
+
+
+
+
+braced door 0x016d
+
+
+
+
+
+
+
+braced door 0x016e
+
+
+
+
+
+
+
+braced door 0x016f
+
+
+
+
+
+
+
+braced door 0x0170
+
+
+
+
+
+
+
+braced door 0x0171
+
+
+
+
+
+
+
+braced door 0x0172
+
+
+
+
+
+
+
+braced door 0x0173
+
+
+
+
+
+
+
+braced door 0x0174
+
+
+
+
+
+
+
+steel door 0x0175
+
+
+
+
+
+
+
+steel door 0x0176
+
+
+
+
+
+
+
+steel door 0x0177
+
+
+
+
+
+
+
+steel door 0x0178
+
+
+
+
+
+
+
+steel door 0x0179
+
+
+
+
+
+
+
+steel door 0x017a
+
+
+
+
+
+
+
+steel door 0x017b
+
+
+
+
+
+
+
+steel door 0x017c
+
+
+
+
+
+
+
+steel door 0x017d
+
+
+
+
+
+
+
+unknown cube 0x017e
+
+
+
+
+
+
+
+unknown cube 0x017f
+
+
+
+
+
+
+
+unknown cube 0x0180
+
+
+
+
+
+
+
+unknown cube 0x0181
+
+
+
+
+
+
+
+unknown cube 0x0182
+
+
+
+
+
+
+
+unknown cube 0x0183
+
+
+
+
+
+
+
+unknown cube 0x0184
+
+
+
+
+
+
+
+unknown cube 0x0185
+
+
+
+
+
+
+
+unknown cube 0x0186
+
+
+
+
+
+
+
+unknown cube 0x0187
+
+
+
+
+
+
+
+unknown cube 0x0188
+
+
+
+
+
+
+
+unknown cube 0x0189
+
+
+
+
+
+
+
+unknown cube 0x018a
+
+
+
+
+
+
+
+unknown cube 0x018b
+
+
+
+
+
+
+
+unknown cube 0x018c
+
+
+
+
+
+
+
+unknown cube 0x018d
+
+
+
+
+
+
+
+unknown cube 0x018e
+
+
+
+
+
+
+
+unknown cube 0x018f
+
+
+
+
+
+
+
+unknown cube 0x0190
+
+
+
+
+
+
+
+unknown cube 0x0191
+
+
+
+
+
+
+
+unknown cube 0x0192
+
+
+
+
+
+
+
+unknown cube 0x0193
+
+
+
+
+
+
+
+unknown cube 0x0194
+
+
+
+
+
+
+
+unknown cube 0x0195
+
+
+
+
+
+
+
+unknown cube 0x0196
+
+
+
+
+
+
+
+unknown cube 0x0197
+
+
+
+
+
+
+
+unknown cube 0x0198
+
+
+
+
+
+
+
+unknown cube 0x0199
+
+
+
+
+
+
+
+unknown cube 0x019a
+
+
+
+
+
+
+
+unknown cube 0x019b
+
+
+
+
+
+
+
+unknown cube 0x019c
+
+
+
+
+
+
+
+unknown cube 0x019d
+
+
+
+
+
+
+
+unknown cube 0x019e
+
+
+
+
+
+
+
+unknown cube 0x019f
+
+
+
+
+
+
+
+unknown cube 0x01a0
+
+
+
+
+
+
+
+unknown cube 0x01a1
+
+
+
+
+
+
+
+unknown cube 0x01a2
+
+
+
+
+
+
+
+unknown cube 0x01a3
+
+
+
+
+
+
+
+unknown cube 0x01a4
+
+
+
+
+
+
+
+unknown cube 0x01a5
+
+
+
+
+
+
+
+unknown cube 0x01a6
+
+
+
+
+
+
+
+unknown cube 0x01a7
+
+
+
+
+
+
+
+unknown cube 0x01a8
+
+
+
+
+
+
+
+unknown cube 0x01a9
+
+
+
+
+
+
+
+unknown cube 0x01aa
+
+
+
+
+
+
+
+blue face flag
+
+
+
+
+
+
+
+green face flag
+
+
+
+
+
+
+
+yellow face flag
+
+
+
+
+
+
+
+unowned flag place
+
+
+
+
+
+
+
+white face flag
+
+
+
+
+
+
+
+red face flag stone
+
+
+
+
+
+
+
+lair floor Cntr
+
+
+
+
+
+
+
+fence brick wall T
+
+
+
+
+
+
+
+fence brick wall B
+
+
+
+
+
+
+
+wood floor hole R
+
+
+
+
+
+
+
+wood floor hole L
+
+
+
+
+
+
+
+wood floor hole C
+
+
+
+
+
+
+
+wood floor n/lava
+
+
+
+
+
+
+
+wood floor n/water
+
+
+
+
+
+
+
+valuable gems 1
+
+
+
+
+
+
+
+valuable gems 2
+
+
+
+
+
+
+
+valuable gems 3
+
+
+
+
+
+
+
+valuable gems 4
+
+
+
+
+
+
+
+empty cube 0x01bd
+
+
+
+
+
+
+
+empty cube 0x01be
+
+
+
+
+
+
+
+empty cube 0x01bf
+
+
+
+
+
+
+
+empty cube 0x01c0
+
+
+
+
+
+
+
+empty cube 0x01c1
+
+
+
+
+
+
+
+empty cube 0x01c2
+
+
+
+
+
+
+
+empty cube 0x01c3
+
+
+
+
+
+
+
+empty cube 0x01c4
+
+
+
+
+
+
+
+empty cube 0x01c5
+
+
+
+
+
+
+
+empty cube 0x01c6
+
+
+
+
+
+
+
+empty cube 0x01c7
+
+
+
+
+
+
+
+empty cube 0x01c8
+
+
+
+
+
+
+
+empty cube 0x01c9
+
+
+
+
+
+
+
+empty cube 0x01ca
+
+
+
+
+
+
+
+empty cube 0x01cb
+
+
+
+
+
+
+
+empty cube 0x01cc
+
+
+
+
+
+
+
+empty cube 0x01cd
+
+
+
+
+
+
+
+empty cube 0x01ce
+
+
+
+
+
+
+
+empty cube 0x01cf
+
+
+
+
+
+
+
+empty cube 0x01d0
+
+
+
+
+
+
+
+empty cube 0x01d1
+
+
+
+
+
+
+
+empty cube 0x01d2
+
+
+
+
+
+
+
+empty cube 0x01d3
+
+
+
+
+
+
+
+empty cube 0x01d4
+
+
+
+
+
+
+
+empty cube 0x01d5
+
+
+
+
+
+
+
+empty cube 0x01d6
+
+
+
+
+
+
+
+empty cube 0x01d7
+
+
+
+
+
+
+
+empty cube 0x01d8
+
+
+
+
+
+
+
+empty cube 0x01d9
+
+
+
+
+
+
+
+empty cube 0x01da
+
+
+
+
+
+
+
+empty cube 0x01db
+
+
+
+
+
+
+
+empty cube 0x01dc
+
+
+
+
+
+
+
+empty cube 0x01dd
+
+
+
+
+
+
+
+empty cube 0x01de
+
+
+
+
+
+
+
+empty cube 0x01df
+
+
+
+
+
+
+
+empty cube 0x01e0
+
+
+
+
+
+
+
+empty cube 0x01e1
+
+
+
+
+
+
+
+empty cube 0x01e2
+
+
+
+
+
+
+
+empty cube 0x01e3
+
+
+
+
+
+
+
+empty cube 0x01e4
+
+
+
+
+
+
+
+empty cube 0x01e5
+
+
+
+
+
+
+
+empty cube 0x01e6
+
+
+
+
+
+
+
+empty cube 0x01e7
+
+
+
+
+
+
+
+empty cube 0x01e8
+
+
+
+
+
+
+
+empty cube 0x01e9
+
+
+
+
+
+
+
+empty cube 0x01ea
+
+
+
+
+
+
+
+empty cube 0x01eb
+
+
+
+
+
+
+
+empty cube 0x01ec
+
+
+
+
+
+
+
+empty cube 0x01ed
+
+
+
+
+
+
+
+empty cube 0x01ee
+
+
+
+
+
+
+
+empty cube 0x01ef
+
+
+
+
+
+
+
+empty cube 0x01f0
+
+
+
+
+
+
+
+empty cube 0x01f1
+
+
+
+
+
+
+
+empty cube 0x01f2
+
+
+
+
+
+
+
+empty cube 0x01f3
+
+
+
+
+
+
+
+empty cube 0x01f4
+
+
+
+
+
+
+
+empty cube 0x01f5
+
+
+
+
+
+
+
+empty cube 0x01f6
+
+
+
+
+
+
+
+empty cube 0x01f7
+
+
+
+
+
+
+
+empty cube 0x01f8
+
+
+
+
+
+
+
+empty cube 0x01f9
+
+
+
+
+
+
+
+empty cube 0x01fa
+
+
+
+
+
+
+
+empty cube 0x01fb
+
+
+
+
+
+
+
+empty cube 0x01fc
+
+
+
+
+
+
+
+empty cube 0x01fd
+
+
+
+
+
+
+
+empty cube 0x01fe
+
+
+
+
+
+
+
+empty cube 0x01ff
+
+
+
+
+
+
+
 
 [compass]
                   *

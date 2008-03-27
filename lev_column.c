@@ -433,6 +433,13 @@ short columns_verify(struct LEVEL *lvl, char *err_msg,struct IPOINT_2D *errpt)
       if (result!=VERIF_OK)
       {
         sprintf(err_msg,"%s in column %d.",err_msg,i);
+        int sx,sy;
+        sx=-1;sy=-1;
+        if (find_dat_entry(lvl,&sx,&sy,i))
+        {
+          errpt->x=sx/MAP_SUBNUM_X;
+          errpt->y=sy/MAP_SUBNUM_Y;
+        }
         return result;
       }
     }
@@ -705,6 +712,28 @@ void set_dat(struct LEVEL *lvl, int x, int y, int tl, int tm, int tr,
 void set_dat_unif (struct LEVEL *lvl, int x, int y, int d)
 {
     set_dat (lvl, x, y, d, d, d, d, d, d, d, d, d);
+}
+
+/*
+ * Starts searching at a subtile after (sx,sy). Finds the next subtile containing
+ * given clm_index and returns it in (sx,sy). On error/cannot find, returns (-1,-1)/
+ * if (-1,-1) is given at start, searches from (0,0).
+ */
+short find_dat_entry(const struct LEVEL *lvl, int *sx, int *sy, const unsigned int clm_idx)
+{
+  if (((*sx)<0)||((*sy)<0))
+  { (*sx)=-1; (*sy)=0; }
+  do {
+    (*sx)++;
+    if ((*sx)>=MAP_SUBTOTAL_X)
+    { (*sx)=0; (*sy)++; }
+    if ((*sy)>=MAP_SUBTOTAL_Y)
+    {
+      (*sx)=-1; (*sy)=-1;
+      return false;
+    }
+  } while (get_dat_subtile(lvl,*sx,*sy) != clm_idx);
+  return true;
 }
 
 /*

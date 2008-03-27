@@ -364,13 +364,9 @@ short level_clear_stats(struct LEVEL *lvl)
     //Items stats
     lvl->stats.hero_gates_count=0;
     lvl->stats.dn_hearts_count=0;
-    lvl->stats.spellbooks_count=0;
-    lvl->stats.dng_specboxes_count=0;
-    lvl->stats.crtr_lairs_count=0;
-    lvl->stats.statues_count=0;
-    lvl->stats.torches_count=0;
-    lvl->stats.gold_things_count=0;
-    lvl->stats.furniture_count=0;
+    int i;
+    for (i=0;i<THING_CATEGR_COUNT;i++)
+      lvl->stats.things_count[i]=0;
     //Various stats
     lvl->stats.room_things_count=0;
     //Stats on objects adding/removal
@@ -1810,22 +1806,13 @@ void update_thing_stats(struct LEVEL *lvl,const unsigned char *thing,short chang
               lvl->stats.hero_gates_count+=change;
           if (is_dnheart(thing))
               lvl->stats.dn_hearts_count+=change;
-          if (is_spellbook(thing))
-              lvl->stats.spellbooks_count+=change;
-          if (is_dngspecbox(thing))
-              lvl->stats.dng_specboxes_count+=change;
-          if (is_crtrlair(thing))
-              lvl->stats.crtr_lairs_count+=change;
-          if (is_statue(thing))
-              lvl->stats.statues_count+=change;
-          if (is_torch(thing))
-              lvl->stats.torches_count+=change;
-          if (is_gold(thing))
-              lvl->stats.gold_things_count+=change;
-          if (is_room_thing(thing))
+
+          int categr=get_thing_subtypes_arridx(thing);
+          if (categr<THING_CATEGR_COUNT)
+            lvl->stats.things_count[categr]+=change;
+
+          if (is_room_inventory(thing))
               lvl->stats.room_things_count+=change;
-          if (is_furniture(thing))
-              lvl->stats.furniture_count+=change;
           if (change>0)
               lvl->stats.things_added+=change;
           else

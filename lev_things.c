@@ -14,12 +14,15 @@
 #include "obj_things.h"
 #include "lev_column.h"
 
+/*
+ * Functions and names used in search mode
+ */
 const is_thing_subtype search_tngtype_func[]={
       is_spellbook,is_dngspecbox,is_crtrlair,
       is_trapbox,is_trap,is_creature,
       is_door,is_roomeffect,is_statue,
       is_furniture,is_food,is_gold,
-      is_torch,is_heartflame,is_pole,
+      is_torch,is_heartflame,is_polebar,
       is_lit_thing,is_herogate,is_dnheart,
       is_doorkey,
       };
@@ -51,6 +54,12 @@ short things_verify(struct LEVEL *lvl, char *err_msg,struct IPOINT_2D *errpt)
     {
       for (j=0; j < arr_entries_x; j++)
       {
+        unsigned int creatures_on_subtl=0;
+        unsigned int roomeffects_on_subtl=0;
+        unsigned int traps_on_subtl=0;
+        unsigned int lit_things_on_subtl=0;
+        unsigned int doors_on_subtl=0;
+        unsigned int booksboxes_on_subtl=0;
         int things_count=get_thing_subnums(lvl,i,j);
         for (k=0; k <things_count ; k++)
         {
@@ -63,6 +72,33 @@ short things_verify(struct LEVEL *lvl, char *err_msg,struct IPOINT_2D *errpt)
             sprintf(err_msg,"%s at slab %d,%d.",child_err_msg,errpt->x,errpt->y);
             return result;
           }
+          if (is_creature(thing))  creatures_on_subtl++;
+          if (is_trap(thing))  traps_on_subtl++;
+          if (is_roomeffect(thing))  roomeffects_on_subtl++;
+          if (is_lit_thing(thing))  lit_things_on_subtl++;
+          if (is_door(thing)) doors_on_subtl++;
+          if (is_spellbook(thing)||is_dngspecbox(thing)||is_trapbox(thing)
+              ||is_doorbox(thing)) booksboxes_on_subtl++;
+        }
+        char *err_objcount=NULL;
+        if (creatures_on_subtl>5)
+            err_objcount="five creature";
+        if (traps_on_subtl>3)
+            err_objcount="three traps";
+        if (roomeffects_on_subtl>3)
+            err_objcount="three room effects";
+        if (lit_things_on_subtl>2)
+            err_objcount="two lit things";
+        if (doors_on_subtl>1)
+            err_objcount="one door thing";
+        if (booksboxes_on_subtl>1)
+            err_objcount="one book/workshop box/special";
+        if (err_objcount!=NULL)
+        {
+            errpt->x=i/MAP_SUBNUM_X;
+            errpt->y=j/MAP_SUBNUM_Y;
+            sprintf(err_msg,"More than %s at one subtile on slab %d,%d.",err_objcount,errpt->x,errpt->y);
+            return VERIF_WARN;
         }
       }
     }
@@ -634,7 +670,7 @@ unsigned char *create_item_adv(const struct LEVEL *lvl, unsigned int sx, unsigne
     } else
     {
         thing=create_item(lvl,sx,sy,stype_idx);
-        if (is_room_thing(thing))
+        if (is_room_inventory(thing))
         {
           unsigned short sensitile=ty*MAP_SIZE_X+tx;
           set_thing_sensitile(thing,sensitile);
@@ -1038,7 +1074,7 @@ void delete_room_things_subtl(struct LEVEL *lvl, int sx, int sy)
     for (i=last_thing; i>=0; i--)
     {
       unsigned char *thing=get_thing(lvl,sx,sy,i);
-      if (is_room_thing(thing))
+      if (is_room_inventory(thing))
       {
           //checking surrounding slabs to be sure
           // if we should delete torches
@@ -1064,7 +1100,7 @@ void update_things_slb_portal_inside(struct LEVEL *lvl, int tx, int ty,
           for (i=last_thing; i>=0; i--)
           {
             unsigned char *thing=get_thing(lvl,sx,sy,i);
-            if (is_room_thing(thing))
+            if (is_room_inventory(thing))
             {
                 unsigned char stype_idx=get_thing_subtype(thing);
                 if (is_roomeffect(thing)&&(stype_idx==ROOMEFC_SUBTP_ENTRICE)&&(thing_eff==NULL))
@@ -1110,7 +1146,7 @@ unsigned char *update_thing_slb_room_one_central_item(struct LEVEL *lvl, int tx,
           for (i=last_thing; i>=0; i--)
           {
             unsigned char *thing=get_thing(lvl,sx,sy,i);
-            if (is_room_thing(thing))
+            if (is_room_inventory(thing))
             {
                 unsigned char type_idx=get_thing_type(thing);
                 unsigned char stype_idx=get_thing_subtype(thing);
@@ -1161,7 +1197,7 @@ unsigned char *update_thing_slb_room_one_item_subtl(struct LEVEL *lvl, int sx, i
     for (i=last_thing; i>=0; i--)
     {
         unsigned char *thing=get_thing(lvl,sx,sy,i);
-        if (is_room_thing(thing))
+        if (is_room_inventory(thing))
         {
             unsigned char type_idx=get_thing_type(thing);
             unsigned char stype_idx=get_thing_subtype(thing);
@@ -1334,7 +1370,7 @@ void update_things_slb_graveyard_corner(struct LEVEL *lvl, int tx, int ty,
           for (i=last_thing; i>=0; i--)
           {
             unsigned char *thing=get_thing(lvl,sx,sy,i);
-            if (is_room_thing(thing))
+            if (is_room_inventory(thing))
             {
                 unsigned char type_idx=get_thing_type(thing);
                 unsigned char stype_idx=get_thing_subtype(thing);
@@ -1623,7 +1659,7 @@ void remove_noncrucial_room_things(struct LEVEL *lvl,int tx, int ty)
           for (i=last_thing; i>=0; i--)
           {
             char *thing=get_thing(lvl,sx,sy,i);
-            if (is_room_thing(thing) && (!is_crucial_thing(thing)))
+            if (is_room_inventory(thing) && (!is_dncrucial(thing)))
                 thing_del(lvl,sx, sy, i);
           }
      }

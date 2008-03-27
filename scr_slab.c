@@ -414,7 +414,7 @@ void init_mdslab_keys(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode)
       0};
 
     if (sizeof(room_keys)/sizeof(*room_keys) != sizeof(room_types)/sizeof(*room_types))
-      die ("init_keys: Number of rooms doesn't match number of keys");
+      die("init_keys: Number of rooms doesn't match number of keys");
     mdslab->placenkeys=1;
     i=0;
     while (room_keys[i])
@@ -491,7 +491,7 @@ void draw_mdslab_panel(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode
     int graff_idx=graffiti_idx(lvl,tx,ty);
     if (graff_idx<0)
     {
-        scr_row=display_mode_keyhelp(scr_row,scr_col,scrmode->mode);
+        scr_row=display_mode_keyhelp(scr_row,scr_col,scrmode->rows-TNGDAT_ROWS-2,scrmode->mode,0);
     } else
     {
         scr_row=display_graffiti(lvl,scr_row,scr_col,graff_idx);

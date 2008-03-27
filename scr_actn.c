@@ -28,45 +28,55 @@
 #include "lev_data.h"
 
 void (*actions [])(struct SCRMODE_DATA *,struct MAPMODE_DATA *,struct LEVEL *,int)={
-     actions_mdslab, actions_mdtng,  actions_crtre,  actions_itemt,
+     actions_mdslab, actions_mdtng,  actions_crcrtr,  actions_critem,
      actions_help,   actions_mdclm,  actions_scrpt,  actions_mdtextr,
      actions_mdcclm, actions_mdcube, actions_mdslbl, actions_mdrwrk,
-     actions_mdsrch, actions_mdlmap, actions_mdsmap, actions_mdgrafit,};
+     actions_mdsrch, actions_mdlmap, actions_mdsmap, actions_mdgrafit,
+     actions_crefct, actions_crtrap, actions_editem, actions_edcrtr,
+     actions_edefct, actions_edtrap, };
 
 // Drawing functions for modes. You can fill new entries
 // with "draw_mdempty" till you create proper draw function.
 void (*mddraw [])(struct SCRMODE_DATA *,struct MAPMODE_DATA *,struct LEVEL *)={
-     draw_mdslab, draw_mdtng,  draw_crtre,  draw_itemt,
+     draw_mdslab, draw_mdtng,  draw_crcrtr,  draw_critem,
      draw_help,   draw_mdclm,  draw_scrpt,  draw_mdtextr,
      draw_mdcclm, draw_mdcube, draw_mdslbl, draw_mdrwrk,
-     draw_mdsrch, draw_mdlmap, draw_mdsmap, draw_mdgrafit,};
+     draw_mdsrch, draw_mdlmap, draw_mdsmap, draw_mdgrafit,
+     draw_crefct, draw_crtrap, draw_editem, draw_edcrtr,
+     draw_edefct, draw_edtrap, };
 
 short (*mdstart [])(struct SCRMODE_DATA *,struct MAPMODE_DATA *,struct LEVEL *)={
-     start_mdslab, start_mdtng,  start_crtre,  start_itemt,
+     start_mdslab, start_mdtng,  start_crcrtr,  start_critem,
      start_help,   start_mdclm,  start_scrpt,  start_mdtextr,
      start_mdcclm, start_mdcube, start_mdslbl, start_mdrwrk,
-     start_mdsrch, start_mdlmap, start_mdsmap, start_mdgrafit,};
+     start_mdsrch, start_mdlmap, start_mdsmap, start_mdgrafit,
+     start_crefct, start_crtrap, start_editem, start_edcrtr,
+     start_edefct, start_edtrap, };
 
 void (*mdend [])(struct SCRMODE_DATA *,struct MAPMODE_DATA *,struct LEVEL *)={
-     end_mdslab, end_mdtng,  end_crtre,  end_itemt,
+     end_mdslab, end_mdtng,  end_crcrtr,  end_critem,
      end_help,   end_mdclm,  end_scrpt,  end_mdtextr,
      end_mdcclm, end_mdcube, end_mdslbl, end_mdrwrk,
-     end_mdsrch, end_mdlmap, end_mdsmap, end_mdgrafit,};
+     end_mdsrch, end_mdlmap, end_mdsmap, end_mdgrafit,
+     end_crefct, end_crtrap, end_editem, end_edcrtr,
+     end_edefct, end_edtrap, };
 
 // Max. 5 chars mode names
 const char *modenames[]={
-     "Slab", "Thing", "Crtr", "Item",
-     "Help", "Clmn", "Scrpt", "Textr",
-     "CClm", "CCube", "SlbLs","Rewrk",
-     "Srch", "OMap", "SMap",  "Grft",
-     "(bad)",};
+     "Slab",  "Thing", "ACrtr", "AItem",
+     "Help",  "Clmn",  "Scrpt", "Textr",
+     "CClm",  "CCube", "SlbLs", "Rewrk",
+     "Srch",  "OMap",  "SMap",  "Grft",
+     "AEfct", "ATrap", "EItem", "ECrtr",
+     "EEfct", "ETrap", "(bad)",};
 // longer mode names
 const char *longmodenames[]={
      "slab", "thing", "add creature","add item",
      "help", "column", "script", "texture",
      "cust.column","cust.cubes","slab list","rework",
      "search", "open map", "save map", "graffiti",
-     "(bad)",};
+     "add effect", "add trap", "edit item", "edit creatre",
+     "edit effect", "edit trap", "(bad)",};
 
 const char *string_input_msg[]={ "",
      "Map number/name to load:",
@@ -191,6 +201,10 @@ void clear_mapmode(struct MAPMODE_DATA *mapmode)
     mapmode->dat_view_mode=1;
     mapmode->level_preview=LPREV_LOAD;
     mapmode->show_obj_range=1;
+    mapmode->traps_list_on_create=1;
+    mapmode->roomeffect_list_on_create=1;
+    mapmode->items_list_on_create=1;
+    mapmode->creature_list_on_create=1;
     clear_highlight(mapmode);
     clear_brighten(mapmode);
     level_clear_options(&(mapmode->optns));
@@ -437,7 +451,7 @@ void draw_mdempty(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,stru
     set_cursor_pos(scr_row++, scr_col);
     screen_printf("No drawing function yet.");
     scr_row++;
-    scr_row=display_mode_keyhelp(scr_row,scr_col,scrmode->mode);
+    scr_row=display_mode_keyhelp(scr_row,scr_col,scrmode->rows,scrmode->mode,0);
     message_log(" draw_mdempty: finished");
 }
 
@@ -455,11 +469,11 @@ void draw_forced_panel(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode
     if (scrmode->rows >= help->compassrows+TNGDAT_ROWS)
     {
       for (i=0; i<help->compassrows; i++)
-          draw_help_line(scr_row++,scr_col,help->compass[i]);
+          draw_help_line(scr_row++,scr_col,help->compass[i],DHFLAG_USE_COLORS);
     } else
     {
       for (i=0; i<help->mcompassrows; i++)
-          draw_help_line(scr_row++,scr_col,help->mcompass[i]);
+          draw_help_line(scr_row++,scr_col,help->mcompass[i],DHFLAG_USE_COLORS);
     }
     display_rpanel_bottom(scrmode,mapmode,lvl);
     break;
@@ -529,7 +543,7 @@ char *mode_status(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,int 
     case MD_CRTR:
       sprintf (buffer, "   (Selecting kind)");
       break;
-    case MD_ITMT:
+    case MD_CITM:
     case MD_TXTR:
     case MD_SLBL:
     case MD_SRCH:
@@ -917,12 +931,19 @@ void display_rpanel_bottom(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *map
  * Displays key help for given mode. Key help is visible on right
  * panel in some work modes.
  */
-int display_mode_keyhelp(int scr_row, int scr_col,int mode)
+int display_mode_keyhelp(int scr_row, int scr_col,int max_row,int mode,int itm_idx)
 {
-    if (!init_key_help(mode)) return 0;
     int i;
-    for (i=0; i<help->rows; i++)
-          draw_help_line(scr_row++,scr_col,help->text[i]);
+    if (init_key_help(mode) && (help->rows<=(max_row-scr_row)))
+    {
+      for (i=0; i<help->rows; i++)
+          draw_help_line(scr_row++,scr_col,help->text[i],DHFLAG_USE_COLORS);
+    }
+    if (init_item_desc(mode,itm_idx) && (help->drows<=(max_row-scr_row)))
+    {
+      for (i=0; i<help->drows; i++)
+          draw_help_line(scr_row++,scr_col,help->desc[i],DHFLAG_USE_COLORS);
+    }
     return scr_row;
 }
 
@@ -975,150 +996,46 @@ void proc_key(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct L
     switch (g)
     {
     case KEY_F1:
-      if (scrmode->mode != MD_HELP)
-        mdstart[MD_HELP](scrmode,mapmode,lvl);
+      action_enter_help_mode(scrmode,mapmode,lvl);
       break;
     case KEY_CTRL_Q:
-      if (is_simple_mode(scrmode->mode))
-      {
-          message_info("You can't quit from here.");
-          break;
-      }
-      message_log(" proc_key: setting finished to true");
-      //TODO: maybe we should ask to save unsaved data?
-      finished=true;
-//      actions[scrmode->mode%MODES_COUNT](KEY_CTRL_Q); // Grotty but it'll work
+      action_quit_program(scrmode,mapmode,lvl);
       break;
     case KEY_CTRL_L:
-      if (is_simple_mode(scrmode->mode))
-      {
-        message_info("You can't load from here.");
-        break;
-      }
-      mdstart[MD_LMAP](scrmode,mapmode,lvl);
+      action_enter_mapload_mode(scrmode,mapmode,lvl);
       break;
     case KEY_F7:
-      if (is_simple_mode(scrmode->mode))
-      {
-        message_info("You can't load from here.");
-        break;
-      }
-      if (strlen(lvl->fname)>0)
-      {
-          popup_show("Reloading map","Reading map files. Please wait...");
-          free_map(lvl);
-          load_map(lvl);
-          clear_highlight(mapmode);
-          change_mode(scrmode,mapmode,lvl,scrmode->mode);
-          message_info("Map \"%s\" reloaded", lvl->fname);
-      } else
-          message_error("Map name is empty, cannot load last loaded.");
+      action_load_map_quick(scrmode,mapmode,lvl);
       break;
     case KEY_CTRL_S:
-      if (is_simple_mode(scrmode->mode))
-      {
-        message_info("You can't save from here.");
-        break;
-      }
-      mdstart[MD_SMAP](scrmode,mapmode,lvl);
+      action_enter_mapsave_mode(scrmode,mapmode,lvl);
       break;
     case KEY_F5:
-      if (is_simple_mode(scrmode->mode))
-      {
-        message_info("You can't save from here.");
-        break;
-      }
-      if (strlen(lvl->savfname)>0)
-      {
-        popup_show("Saving map","Writing map files. Please wait...");
-        save_map(lvl);
-        message_info("Map \"%s\" saved", lvl->savfname);
-      } else
-      {
-          message_error("Map name is empty, please save as.");
-      }
+      action_save_map_quick(scrmode,mapmode,lvl);
       break;
     case KEY_CTRL_N:
-      if (is_simple_mode(scrmode->mode))
-      {
-        message_info("You can't clear map from here.");
-        break;
-      }
-      popup_show("Clearing map","Generating empty map. Please wait...");
-      free_map(lvl);
-      start_new_map(lvl);
-      clear_highlight(mapmode);
-      change_mode(scrmode,mapmode,lvl,scrmode->mode);
-      message_info_force("New map started");
+      action_create_new_map(scrmode,mapmode,lvl);
       break;
     case KEY_CTRL_R:
-      if (is_simple_mode(scrmode->mode))
-      {
-        message_info("You can't randomize map from here.");
-        break;
-      }
-      popup_show("Randomizing map","Generating random map. Please wait...");
-      free_map(lvl);
-      generate_random_map(lvl);
-      clear_highlight(mapmode);
-      change_mode(scrmode,mapmode,lvl,scrmode->mode);
-      message_info_force("Map generation completed");
+      action_create_random_backgnd(scrmode,mapmode,lvl);
       break;
     case KEY_CTRL_P:
-      if (is_simple_mode(scrmode->mode))
-      {
-        message_info("Go back to map view first.");
-        break;
-      }
-      if (mapmode->panel_mode!=PV_COMPS)
-        mapmode->panel_mode=PV_COMPS;
-      else
-        mapmode->panel_mode=PV_MODE;
-      message_info_force("Compass rose mode %s",(mapmode->panel_mode==PV_COMPS)?"enabled":"disabled");
+      action_toggle_compass_rose(scrmode,mapmode,lvl);
       break;
     case KEY_CTRL_U:
-      datclm_auto_update=!datclm_auto_update;
-      if (datclm_auto_update)
-        message_info_force("Automatic update of DAT/CLM/WIB enabled");
-      else
-        message_info_force("Auto DAT/CLM/WIB update disabled - manual with \"u\"");
+      action_toggle_datclm_aupdate(scrmode,mapmode,lvl);
       break;
     case KEY_CTRL_T:
-      if ((scrmode->mode==MD_HELP) || (scrmode->mode==MD_CRTR) || (scrmode->mode==MD_ITMT))
-      {
-        message_info("You can't view script from here.");
-      } else
-      {
-        change_mode(scrmode,mapmode,lvl,MD_SCRP);
-      }
+      action_enter_script_mode(scrmode,mapmode,lvl);
       break;
     case KEY_CTRL_F:
-      if (is_simple_mode(scrmode->mode))
-      {
-        message_info("You can't search from this mode.");
-      } else
-      {
-        change_mode(scrmode,mapmode,lvl,MD_SRCH);
-      }
+      action_enter_search_mode(scrmode,mapmode,lvl);
       break;
     case KEY_CTRL_B:
-      if (is_simple_mode(scrmode->mode))
-      {
-        message_info("You can't generate BMP from this mode.");
-      } else
-      {
-        popup_show("Generating bitmap","Creating and writing BMP file. Please wait...");
-        generate_map_bitmap_mapfname(lvl);
-      }
+      action_generate_bitmap(scrmode,mapmode,lvl);
       break;
     case KEY_CTRL_E:
-      if (is_simple_mode(scrmode->mode))
-      {
-        message_info("You can't change texture from here.");
-      } else
-      {
-        mdstart[MD_TXTR](scrmode,mapmode,lvl);
-      }
+      action_enter_texture_mode(scrmode,mapmode,lvl);
       break;
 
     default:
@@ -1407,6 +1324,182 @@ void curposcheck(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode)
       mapmode->map.x=0;
     if (mapmode->map.y < 0)
       mapmode->map.y=0;
+}
+
+void action_enter_help_mode(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl)
+{
+      if (scrmode->mode != MD_HELP)
+        mdstart[MD_HELP](scrmode,mapmode,lvl);
+}
+
+void action_quit_program(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl)
+{
+    if (is_simple_mode(scrmode->mode))
+    {
+          message_info("You can't quit from here.");
+          return;
+    }
+    message_log(" proc_key: setting finished to true");
+    //TODO: maybe we should ask to save unsaved data?
+    finished=true;
+//    actions[scrmode->mode%MODES_COUNT](KEY_CTRL_Q); // Grotty but it'll work
+}
+
+void action_enter_mapload_mode(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl)
+{
+    if (is_simple_mode(scrmode->mode))
+    {
+        message_info("You can't load from here.");
+        return;
+    }
+    mdstart[MD_LMAP](scrmode,mapmode,lvl);
+}
+
+void action_load_map_quick(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl)
+{
+    if (is_simple_mode(scrmode->mode))
+    {
+        message_info("You can't load from here.");
+        return;
+    }
+    if (strlen(lvl->fname)>0)
+    {
+          popup_show("Reloading map","Reading map files. Please wait...");
+          free_map(lvl);
+          strcpy(lvl->savfname,"");
+          load_map(lvl);
+          clear_highlight(mapmode);
+          change_mode(scrmode,mapmode,lvl,scrmode->mode);
+          message_info("Map \"%s\" reloaded", lvl->fname);
+    } else
+          message_error("Map name is empty, cannot load last loaded.");
+}
+
+void action_enter_mapsave_mode(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl)
+{
+    if (is_simple_mode(scrmode->mode))
+    {
+        message_info("You can't save from here.");
+        return;
+    }
+    mdstart[MD_SMAP](scrmode,mapmode,lvl);
+}
+
+void action_save_map_quick(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl)
+{
+    if (is_simple_mode(scrmode->mode))
+    {
+        message_info("You can't save from here.");
+        return;
+    }
+    if (strlen(lvl->savfname)>0)
+    {
+        popup_show("Saving map","Writing map files. Please wait...");
+        save_map(lvl);
+        message_info("Map \"%s\" saved", lvl->savfname);
+    } else
+    {
+          message_error("Map name is empty, please save as.");
+    }
+}
+
+void action_create_new_map(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl)
+{
+    if (is_simple_mode(scrmode->mode))
+    {
+        message_info("You can't clear map from here.");
+        return;
+    }
+    popup_show("Clearing map","Generating empty map. Please wait...");
+    free_map(lvl);
+    start_new_map(lvl);
+    clear_highlight(mapmode);
+    change_mode(scrmode,mapmode,lvl,scrmode->mode);
+    message_info_force("New map started");
+}
+
+void action_create_random_backgnd(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl)
+{
+    if (is_simple_mode(scrmode->mode))
+    {
+        message_info("You can't randomize map from here.");
+        return;
+    }
+    popup_show("Randomizing map","Generating random map. Please wait...");
+    free_map(lvl);
+    generate_random_map(lvl);
+    clear_highlight(mapmode);
+    change_mode(scrmode,mapmode,lvl,scrmode->mode);
+    message_info_force("Map generation completed");
+}
+
+
+void action_toggle_compass_rose(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl)
+{
+    if (is_simple_mode(scrmode->mode))
+    {
+        message_info("Go back to map view first.");
+        return;
+    }
+    if (mapmode->panel_mode!=PV_COMPS)
+        mapmode->panel_mode=PV_COMPS;
+    else
+        mapmode->panel_mode=PV_MODE;
+    message_info_force("Compass rose mode %s",(mapmode->panel_mode==PV_COMPS)?"enabled":"disabled");
+}
+
+void action_toggle_datclm_aupdate(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl)
+{
+    datclm_auto_update=!datclm_auto_update;
+    if (datclm_auto_update)
+        message_info_force("Automatic update of DAT/CLM/WIB enabled");
+    else
+        message_info_force("Auto DAT/CLM/WIB update disabled - manual with \"u\"");
+}
+
+void action_enter_script_mode(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl)
+{
+    if (is_simple_mode(scrmode->mode))
+    {
+        message_info("You can't view script from here.");
+    } else
+    {
+        change_mode(scrmode,mapmode,lvl,MD_SCRP);
+    }
+}
+
+void action_enter_search_mode(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl)
+{
+    if (is_simple_mode(scrmode->mode))
+    {
+        message_info("You can't search from this mode.");
+    } else
+    {
+        change_mode(scrmode,mapmode,lvl,MD_SRCH);
+    }
+}
+
+void action_generate_bitmap(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl)
+{
+    if (is_simple_mode(scrmode->mode))
+    {
+        message_info("You can't generate BMP from this mode.");
+    } else
+    {
+        popup_show("Generating bitmap","Creating and writing BMP file. Please wait...");
+        generate_map_bitmap_mapfname(lvl);
+    }
+}
+
+void action_enter_texture_mode(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl)
+{
+    if (is_simple_mode(scrmode->mode))
+    {
+        message_info("You can't change texture from here.");
+    } else
+    {
+        mdstart[MD_TXTR](scrmode,mapmode,lvl);
+    }
 }
 
 /*

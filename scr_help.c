@@ -16,6 +16,7 @@
 // Help variables
 
 const char *help_filename="map.hlp";
+const int itm_desc_rows=8;
 
 HELP_DATA *help;
 
@@ -29,6 +30,8 @@ short init_help(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode)
     help->y=0;
     help->rows=0;
     help->text=NULL;
+    help->drows=0;
+    help->desc=NULL;
 
     help->clmrows=0;
     help->clm=NULL;
@@ -82,6 +85,30 @@ short init_help(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode)
     help->compass=NULL;
     help->mcompassrows=0;
     help->mcompass=NULL;
+    help->cubedescrows=0;
+    help->cubedesc=NULL;
+    help->slabdescrows=0;
+    help->slabdesc=NULL;
+    help->crtrdescrows=0;
+    help->crtrdesc=NULL;
+    help->itmtdescrows=0;
+    help->itmtdesc=NULL;
+    help->txtrdescrows=0;
+    help->txtrdesc=NULL;
+    help->efctrows=0;
+    help->efct=NULL;
+    help->efctkeyrows=0;
+    help->efctkey=NULL;
+    help->efctdescrows=0;
+    help->efctdesc=NULL;
+    help->traprows=0;
+    help->trap=NULL;
+    help->trapkeyrows=0;
+    help->trapkey=NULL;
+    help->trapdescrows=0;
+    help->trapdesc=NULL;
+    help->cclmdescrows=0;
+    help->cclmdesc=NULL;
 
     char buffer[READ_BUFSIZE];
     char title[READ_BUFSIZE];
@@ -99,14 +126,14 @@ short init_help(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode)
     while (fgets(buffer, READ_BUFSIZE-1, fp))
     {
       strip_crlf(buffer);
-      if (buffer[0]=='[' && buffer[strlen(buffer)-1]==']')
+      if ((buffer[0]=='[') && (buffer[strlen(buffer)-1]==']'))
       {
           what = match_title (title, n);
           if (n && what)
           {
-            *what = (char **)malloc(n*sizeof (char *));
-            if (!*what)
-                die ("init_help: Out of memory");
+            *what = (char **)malloc(n*sizeof(char *));
+            if ((*what)==NULL)
+                die("init_help: Out of memory");
           }
           n=0;
           strcpy (title, buffer+1);
@@ -122,7 +149,7 @@ short init_help(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode)
     while (fgets (buffer, READ_BUFSIZE-1, fp))
     {
       strip_crlf(buffer);
-      if (buffer[0]=='[' && buffer[strlen(buffer)-1]==']')
+      if ((buffer[0]=='[') && (buffer[strlen(buffer)-1]==']'))
       {
           strcpy (title, buffer+1);
           title[strlen(title)-1]=0;
@@ -135,14 +162,14 @@ short init_help(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode)
           {
             (*what)[n]=(char *)malloc((strlen (buffer)+1)*sizeof(char));
             if (!(*what)[n])
-                die ("init_help: Out of memory");
+                die("init_help: Out of memory");
             strcpy ((*what)[n], buffer);
           }
           n++;
       }
     }
-    fseek (fp, (long)0, SEEK_SET);
-    fclose (fp);
+    fseek(fp, (long)0, SEEK_SET);
+    fclose(fp);
     return true;
 }
 
@@ -151,6 +178,7 @@ short init_help(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode)
  */
 void free_help(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode)
 {
+  //We could do more than that...
   free(help);
 }
 
@@ -200,10 +228,16 @@ char ***match_title(char *title, int n)
             "smaphelp",                   //23
             "grfthelp", "grftkeyhelp",    //24,25
             "compass", "mcompass",        //26,27
+            "cubedesc", "slabdesc",       //28,29
+            "crtrdesc", "itmtdesc",       //30,31
+            "txtrdesc", "cclmdesc",       //32,33
+            "efcthelp", "traphelp",       //34,35
+            "efctkeyhelp", "trapkeyhelp", //36,37
+            "efctdesc", "trapdesc",       //38,39
             NULL,};
     int i=0;
 
-    while (titles[i] && strcmp (titles[i], title))
+    while (titles[i] && strcmp(titles[i], title))
       i++;
     switch (i)
     {
@@ -319,7 +353,55 @@ char ***match_title(char *title, int n)
         if (n!=-1)
           help->mcompassrows=n;
         return &(help->mcompass);
-      default :
+      case 28:
+        if (n!=-1)
+          help->cubedescrows=n;
+        return &(help->cubedesc);
+      case 29:
+        if (n!=-1)
+          help->slabdescrows=n;
+        return &(help->slabdesc);
+      case 30:
+        if (n!=-1)
+          help->crtrdescrows=n;
+        return &(help->crtrdesc);
+      case 31:
+        if (n!=-1)
+          help->itmtdescrows=n;
+        return &(help->itmtdesc);
+      case 32:
+        if (n!=-1)
+          help->txtrdescrows=n;
+        return &(help->txtrdesc);
+      case 33:
+        if (n!=-1)
+          help->cclmdescrows=n;
+        return &(help->cclmdesc);
+      case 34:
+        if (n!=-1)
+          help->efctrows=n;
+        return &(help->efct);
+      case 35:
+        if (n!=-1)
+          help->traprows=n;
+        return &(help->trap);
+      case 36:
+        if (n!=-1)
+          help->efctkeyrows=n;
+        return &(help->efctkey);
+      case 37:
+        if (n!=-1)
+          help->trapkeyrows=n;
+        return &(help->trapkey);
+      case 38:
+        if (n!=-1)
+          help->efctdescrows=n;
+        return &(help->efctdesc);
+      case 39:
+        if (n!=-1)
+          help->trapdescrows=n;
+        return &(help->trapdesc);
+      default:
         return NULL;
     }
 }
@@ -331,6 +413,8 @@ short start_help(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struc
 {
     help->formode=scrmode->mode;
     help->y=0;
+    help->drows=0;
+    help->desc=NULL;
     switch (help->formode)
     {
       case MD_SLB:
@@ -338,10 +422,12 @@ short start_help(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struc
         help->text=help->slb;
         break;
       case MD_CRTR:
+      case MD_ECRT:
         help->rows=help->crtrows;
         help->text=help->crt;
         break;
-      case MD_ITMT:
+      case MD_CITM:
+      case MD_EITM:
         help->rows=help->itmtrows;
         help->text=help->itmt;
         break;
@@ -393,6 +479,16 @@ short start_help(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struc
         help->rows=help->grftrows;
         help->text=help->grft;
         break;
+      case MD_CEFC:
+      case MD_EFCT:
+        help->rows=help->efctrows;
+        help->text=help->efct;
+        break;
+      case MD_CTRP:
+      case MD_ETRP:
+        help->rows=help->traprows;
+        help->text=help->trap;
+        break;
       default:
         help->rows=0;
         help->text=NULL;
@@ -430,16 +526,17 @@ void draw_help(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct 
       char *help_line="";
       if (help->y+i < help->rows)
           help_line=help->text[help->y+i];
-      draw_help_line(i,0,help_line);
+      draw_help_line(i,0,help_line,DHFLAG_USE_COLORS);
     }
     set_cursor_pos(get_screen_rows()-1, get_screen_cols()-1);
 }
 
-void draw_help_line(int posy,int posx,char *text)
+void draw_help_line(int posy,int posx,char *text,short flags)
 {
       char *line=(char *)malloc(LINEMSG_SIZE*sizeof(char));
       set_cursor_pos(posy,posx);
-      screen_setcolor(PRINT_COLOR_LGREY_ON_BLACK);
+      if ((flags&DHFLAG_USE_COLORS)==DHFLAG_USE_COLORS)
+        screen_setcolor(PRINT_COLOR_LGREY_ON_BLACK);
       char *lpos=text;
       char *lend;
       do {
@@ -464,73 +561,76 @@ void draw_help_line(int posy,int posx,char *text)
         if (lend!=NULL)
           if (strlen(lend)>0)
           {
-              if (lend[1]=='\\')
+              switch (lend[1])
               {
+              case '\\':
                 screen_printf("\\");
-              } else
-              if (lend[1]=='w')
-              {
-                screen_setcolor(PRINT_COLOR_WHITE_ON_BLACK);
-              } else
-              if (lend[1]=='s')
-              {
-                screen_setcolor(PRINT_COLOR_LGREY_ON_BLACK);
-              } else
-              if (lend[1]=='i')
-              {
-                screen_setcolor(PRINT_COLOR_BLACK_ON_LGREY);
-              } else
-              if (lend[1]=='r')
-              {
-                screen_setcolor(PRINT_COLOR_LRED_ON_BLACK);
-              } else
-              if (lend[1]=='y')
-              {
-                screen_setcolor(PRINT_COLOR_YELLOW_ON_BLACK);
-              } else
-              if (lend[1]=='m')
-              {
-                screen_setcolor(PRINT_COLOR_LMAGENT_ON_BLACK);
-              } else
-              if (lend[1]=='c')
-              {
-                screen_setcolor(PRINT_COLOR_LCYAN_ON_BLACK);
-              } else
-              if (lend[1]=='b')
-              {
-                screen_setcolor(PRINT_COLOR_LBLUE_ON_BLACK);
-              } else
-
-              if (lend[1]=='D')
-              {
-                screen_setcolor(PRINT_COLOR_YELLOW_ON_BLUE);
-              } else
-
-              if (lend[1]=='P')
-              {
-                screen_setcolor(PRINT_COLOR_RED_ON_WHITE);
-              } else
-              if (lend[1]=='R')
-              {
-                screen_setcolor(PRINT_COLOR_WHITE_ON_RED);
+                break;
+              case 'w':
+                if ((flags&DHFLAG_USE_COLORS)==DHFLAG_USE_COLORS)
+                  screen_setcolor(PRINT_COLOR_WHITE_ON_BLACK);
+                break;
+              case 's':
+                if ((flags&DHFLAG_USE_COLORS)==DHFLAG_USE_COLORS)
+                  screen_setcolor(PRINT_COLOR_LGREY_ON_BLACK);
+                break;
+              case 'i':
+                if ((flags&DHFLAG_USE_COLORS)==DHFLAG_USE_COLORS)
+                  screen_setcolor(PRINT_COLOR_BLACK_ON_LGREY);
+                break;
+              case 'r':
+                if ((flags&DHFLAG_USE_COLORS)==DHFLAG_USE_COLORS)
+                  screen_setcolor(PRINT_COLOR_LRED_ON_BLACK);
+                break;
+              case 'y':
+                if ((flags&DHFLAG_USE_COLORS)==DHFLAG_USE_COLORS)
+                  screen_setcolor(PRINT_COLOR_YELLOW_ON_BLACK);
+                break;
+              case 'm':
+                if ((flags&DHFLAG_USE_COLORS)==DHFLAG_USE_COLORS)
+                  screen_setcolor(PRINT_COLOR_LMAGENT_ON_BLACK);
+                break;
+              case 'c':
+                if ((flags&DHFLAG_USE_COLORS)==DHFLAG_USE_COLORS)
+                  screen_setcolor(PRINT_COLOR_LCYAN_ON_BLACK);
+                break;
+              case 'b':
+                if ((flags&DHFLAG_USE_COLORS)==DHFLAG_USE_COLORS)
+                  screen_setcolor(PRINT_COLOR_LBLUE_ON_BLACK);
+                break;
+              case 'g':
+                if ((flags&DHFLAG_USE_COLORS)==DHFLAG_USE_COLORS)
+                  screen_setcolor(PRINT_COLOR_LGREEN_ON_BLACK);
+                break;
+              case 'D':
+                if ((flags&DHFLAG_USE_COLORS)==DHFLAG_USE_COLORS)
+                  screen_setcolor(PRINT_COLOR_YELLOW_ON_BLUE);
+                break;
+              case 'P':
+                if ((flags&DHFLAG_USE_COLORS)==DHFLAG_USE_COLORS)
+                  screen_setcolor(PRINT_COLOR_RED_ON_WHITE);
+                break;
+              case 'R':
+                if ((flags&DHFLAG_USE_COLORS)==DHFLAG_USE_COLORS)
+                  screen_setcolor(PRINT_COLOR_WHITE_ON_RED);
+                break;
+              case 'C':
+                if ((flags&DHFLAG_USE_COLORS)==DHFLAG_USE_COLORS)
+                  screen_setcolor(PRINT_COLOR_WHITE_ON_CYAN);
+                break;
+              case 'G':
+                if ((flags&DHFLAG_USE_COLORS)==DHFLAG_USE_COLORS)
+                  screen_setcolor(PRINT_COLOR_WHITE_ON_GREEN);
+                break;
+              case 'Y':
+                if ((flags&DHFLAG_USE_COLORS)==DHFLAG_USE_COLORS)
+                  screen_setcolor(PRINT_COLOR_WHITE_ON_BROWN);
+                break;
+              case 'B':
+                if ((flags&DHFLAG_USE_COLORS)==DHFLAG_USE_COLORS)
+                  screen_setcolor(PRINT_COLOR_WHITE_ON_BLUE);
+                break;
               }
-              if (lend[1]=='C')
-              {
-                screen_setcolor(PRINT_COLOR_WHITE_ON_CYAN);
-              }
-              if (lend[1]=='G')
-              {
-                screen_setcolor(PRINT_COLOR_WHITE_ON_GREEN);
-              }
-              if (lend[1]=='Y')
-              {
-                screen_setcolor(PRINT_COLOR_WHITE_ON_BROWN);
-              }
-              if (lend[1]=='B')
-              {
-                screen_setcolor(PRINT_COLOR_WHITE_ON_BLUE);
-              }
-
               lend++;
           }
 
@@ -550,6 +650,8 @@ char *get_random_tip(void)
 
 short init_key_help(int mode)
 {
+    help->drows=0;
+    help->desc=NULL;
     switch (mode)
     {
       case MD_SLB:
@@ -557,10 +659,12 @@ short init_key_help(int mode)
         help->text=help->slbkey;
         break;
       case MD_CRTR:
+      case MD_ECRT:
         help->rows=help->crtkeyrows;
         help->text=help->crtkey;
         break;
-      case MD_ITMT:
+      case MD_CITM:
+      case MD_EITM:
         help->rows=help->itmtkeyrows;
         help->text=help->itmtkey;
         break;
@@ -592,6 +696,16 @@ short init_key_help(int mode)
         help->rows=help->grftkeyrows;
         help->text=help->grftkey;
         break;
+      case MD_CEFC:
+      case MD_EFCT:
+        help->rows=help->efctkeyrows;
+        help->text=help->efctkey;
+        break;
+      case MD_CTRP:
+      case MD_ETRP:
+        help->rows=help->trapkeyrows;
+        help->text=help->trapkey;
+        break;
       case MD_CLM:
       case MD_SCRP:
       case MD_RWRK:
@@ -605,4 +719,104 @@ short init_key_help(int mode)
       return false;
     }
     return true;
+}
+
+short init_item_desc(int mode,int itm_idx)
+{
+    if (itm_idx<0) return false;
+    unsigned long pos=itm_desc_rows*itm_idx;
+    help->drows=0;
+    help->desc=NULL;
+    switch (mode)
+    {
+      case MD_CUBE:
+        if (help->cubedescrows >= pos+itm_desc_rows)
+        {
+          help->drows=itm_desc_rows;
+          help->desc=&(help->cubedesc[pos]);
+        }
+        break;
+      case MD_SLBL:
+        if (help->slabdescrows >= pos+itm_desc_rows)
+        {
+          help->drows=itm_desc_rows;
+          help->desc=&(help->slabdesc[pos]);
+        }
+        break;
+      case MD_CRTR:
+      case MD_ECRT:
+        if (help->crtrdescrows >= pos+itm_desc_rows)
+        {
+          help->drows=itm_desc_rows;
+          help->desc=&(help->crtrdesc[pos]);
+        }
+        break;
+      case MD_CITM:
+      case MD_EITM:
+        if (help->itmtdescrows >= pos+itm_desc_rows)
+        {
+          help->drows=itm_desc_rows;
+          help->desc=&(help->itmtdesc[pos]);
+        }
+        break;
+
+      case MD_CEFC:
+      case MD_EFCT:
+        if (help->efctdescrows >= pos+itm_desc_rows)
+        {
+          help->drows=itm_desc_rows;
+          help->desc=&(help->efctdesc[pos]);
+        }
+        break;
+      case MD_CTRP:
+      case MD_ETRP:
+        if (help->trapdescrows >= pos+itm_desc_rows)
+        {
+          help->drows=itm_desc_rows;
+          help->desc=&(help->trapdesc[pos]);
+        }
+        break;
+      case MD_TXTR:
+        if (help->txtrdescrows >= pos+itm_desc_rows)
+        {
+          help->drows=itm_desc_rows;
+          help->desc=&(help->txtrdesc[pos]);
+        }
+        break;
+      case MD_CCLM:
+        if (help->cclmdescrows >= pos+itm_desc_rows)
+        {
+          help->drows=itm_desc_rows;
+          help->desc=&(help->cclmdesc[pos]);
+        }
+        break;
+      default:
+        break;
+    }
+    // Remove empty lines at end
+    if (help->desc!=NULL)
+    {
+      while (help->desc[help->drows-1][0]=='\0')
+      {
+        help->drows--;
+        if (help->drows<1) break;
+      }
+    }
+    if ((help->drows<1)||(help->desc==NULL))
+    {
+      return false;
+    }
+    return true;
+}
+
+/*
+ * Returns cube type name as text
+ */
+char *get_cubedesc_head(unsigned short idx)
+{
+    unsigned long pos=itm_desc_rows*idx;
+    if (help->cubedescrows >= pos+itm_desc_rows)
+      return (char *)help->cubedesc[pos];
+    else
+      return "unknown cube";
 }

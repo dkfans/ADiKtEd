@@ -62,16 +62,6 @@
 extern volatile int safe_update, update_required;
 #endif
 
-// header for file.c
-
-struct memory_file
-{
-    long len;
-    unsigned char *content;
-};
-
-struct memory_file read_file(char *iname);
-
 struct IPOINT_2D {
     int x;
     int y;
@@ -117,6 +107,14 @@ struct LEVOPTIONS {
 // File handling variables
 extern char *levels_path;
 extern char *data_path;
+
+// Thing categorization helpers
+#define THING_CATEGR_COUNT 0x16
+typedef short (*is_thing_subtype)(const unsigned char *thing);
+typedef short (*is_item_subtype)(const unsigned char stype_idx);
+typedef int (*thing_subtype_arrayindex)(const unsigned char stype_idx);
+typedef unsigned char (*thing_subtype_switch)(const unsigned char stype_idx);
+typedef unsigned char (*thing_subtype_arrayitem)(const int arr_itm);
 
 // True means DAT/CLM/WIB are updated automatically
 extern short datclm_auto_update;

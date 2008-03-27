@@ -13,17 +13,17 @@
 #include "obj_slabs.h"
 
 const char *cube_fullnames[]={
- "empty cube",          "standard earth 1",   "standard earth 2",     "standard earth 3",//000
- "tamped earth 1",      "tamped earth 2",     "tamped earth 3",       "unknown cube 0x0007",
- "unknown cube 0x0008", "unknown cube 0x0009", "unknown cube 0x000a", "unknown cube 0x000b",//008
- "unknown cube 0x000c", "unknown cube 0x000d", "unknown cube 0x000e", "unknown cube 0x000f",
+ "empty cube",          "standard earth 1",    "standard earth 2",    "standard earth 3",   //000
+ "earth bright top L",  "earth bright top C",  "earth bright top R",  "earth n/water L",
+ "earth n/water R",     "earth n/wtr s.top L", "earth n/wtr s.top C", "earth n/wtr s.top R",//008
+ "stone w/earth top 1", "stone w/earth top 2", "white stone",         "stone w/earth top 3",
  "unknown cube 0x0010", "unknown cube 0x0011", "unknown cube 0x0012", "unknown cube 0x0013",//010
  "unknown cube 0x0014", "unknown cube 0x0015", "unknown cube 0x0016", "unknown cube 0x0017",
  "unknown cube 0x0018", "unknown cube 0x0019", "unknown cube 0x001a", "unknown cube 0x001b",//018
  "unknown cube 0x001c", "unknown cube 0x001d", "unknown cube 0x001e", "unknown cube 0x001f",
  "unknown cube 0x0020", "unknown cube 0x0021", "unknown cube 0x0022", "unknown cube 0x0023",//020
- "unknown cube 0x0024", "unknown cube 0x0025", "unknown cube 0x0026", "unknown cube 0x0027",
- "unknown cube 0x0028", "unknown cube 0x0029", "unknown cube 0x002a", "unknown cube 0x002b",//028
+ "unknown cube 0x0024", "unknown cube 0x0025", "unknown cube 0x0026", "static water",
+ "static dark lava",    "static bright lava",  "unknown cube 0x002a", "unknown cube 0x002b",//028
  "unknown cube 0x002c", "unknown cube 0x002d", "unknown cube 0x002e", "unknown cube 0x002f",
  "unknown cube 0x0030", "unknown cube 0x0031", "unknown cube 0x0032", "unknown cube 0x0033",//030
  "unknown cube 0x0034", "unknown cube 0x0035", "unknown cube 0x0036", "unknown cube 0x0037",
@@ -101,14 +101,14 @@ const char *cube_fullnames[]={
  "unknown cube 0x0154", "unknown cube 0x0155", "unknown cube 0x0156", "unknown cube 0x0157",
  "unknown cube 0x0158", "unknown cube 0x0159", "unknown cube 0x015a", "unknown cube 0x015b",//158
  "unknown cube 0x015c", "unknown cube 0x015d", "unknown cube 0x015e", "unknown cube 0x015f",
- "unknown cube 0x0160", "unknown cube 0x0161", "unknown cube 0x0162", "unknown cube 0x0163",//160
- "unknown cube 0x0164", "unknown cube 0x0165", "unknown cube 0x0166", "unknown cube 0x0167",
- "unknown cube 0x0168", "unknown cube 0x0169", "unknown cube 0x016a", "unknown cube 0x016b",//168
- "unknown cube 0x016c", "unknown cube 0x016d", "unknown cube 0x016e", "unknown cube 0x016f",
- "unknown cube 0x0170", "unknown cube 0x0171", "unknown cube 0x0172", "unknown cube 0x0173",//170
- "unknown cube 0x0174", "unknown cube 0x0175", "unknown cube 0x0176", "unknown cube 0x0177",
- "unknown cube 0x0178", "unknown cube 0x0179", "unknown cube 0x017a", "unknown cube 0x017b",//178
- "unknown cube 0x017c", "unknown cube 0x017d", "unknown cube 0x017e", "unknown cube 0x017f",
+ "unknown cube 0x0160", "unknown cube 0x0161", "unknown cube 0x0162", "wooden door 0x0163",//160
+ "wooden door 0x0164",  "wooden door 0x0165",  "wooden door 0x0166",  "wooden door 0x0167",
+ "wooden door 0x0168",  "wooden door 0x0169",  "wooden door 0x016a",  "wooden door 0x016b",//168
+ "braced door 0x016c",  "braced door 0x016d",  "braced door 0x016e",  "braced door 0x016f",
+ "braced door 0x0170",  "braced door 0x0171",  "braced door 0x0172",  "braced door 0x0173",//170
+ "braced door 0x0174",  "steel door 0x0175",   "steel door 0x0176",   "steel door 0x0177",
+ "steel door 0x0178",   "steel door 0x0179",   "steel door 0x017a",   "steel door 0x017b",//178
+ "steel door 0x017c",   "steel door 0x017d",   "unknown cube 0x017e", "unknown cube 0x017f",
  "unknown cube 0x0180", "unknown cube 0x0181", "unknown cube 0x0182", "unknown cube 0x0183",//180
  "unknown cube 0x0184", "unknown cube 0x0185", "unknown cube 0x0186", "unknown cube 0x0187",
  "unknown cube 0x0188", "unknown cube 0x0189", "unknown cube 0x018a", "unknown cube 0x018b",//188
@@ -151,6 +151,7 @@ const unsigned short wib_columns_animate[]={
 const unsigned short animated_cubes[]={
       CUBE_ANI_WATER, //water
       CUBE_ANI_LAVADK, CUBE_ANI_LAVABR, //lava
+      0x0201, 0x0202, 0x0203, //unknown - are used in template (?!)
 };
 
 /*
@@ -880,10 +881,38 @@ void place_column_doormagic_c(struct COLUMN_REC *clm_rec, unsigned char owner)
   clm_rec->height=compute_clm_rec_height(clm_rec);
 }
 
-void fill_column_rock(struct COLUMN_REC *clm_rec, unsigned char owner)
+void fill_column_rock_gndlev(struct COLUMN_REC *clm_rec, unsigned char owner)
 {
      fill_column_rec_simp(clm_rec, 0, CUBE_PATH_SMLSTONES,
-         CUBE_ROCK3, CUBE_ROCK3, CUBE_ROCK2, CUBE_ROCK2, CUBE_ROCK1, 0x0, 0x0, 0x0);
+         CUBE_ROCK_ANY, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0);
+}
+
+void fill_column_rockground(struct COLUMN_REC *clm_rec, unsigned char owner)
+{
+     fill_column_rec_simp(clm_rec, 0, CUBE_PATH_SMLSTONES,
+         CUBE_ROCK3, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0);
+}
+
+void fill_column_rock(struct COLUMN_REC *clm_rec, unsigned char owner)
+{
+     fill_column_rockground(clm_rec,owner);
+     place_column_rock(clm_rec,owner);
+}
+
+/*
+ * Rock column - should be placed on rock ground.
+ */
+void place_column_rock(struct COLUMN_REC *clm_rec, unsigned char owner)
+{
+  int pos=clm_rec->height-4;
+  if (pos<0) pos=clm_rec->height;
+  if (pos>4) pos=4;
+  clm_rec->c[pos+0]=CUBE_ROCK3;
+  clm_rec->c[pos+1]=CUBE_ROCK2;
+  clm_rec->c[pos+2]=CUBE_ROCK2;
+  clm_rec->c[pos+3]=CUBE_ROCK1;
+  clm_rec->solid=compute_clm_rec_solid(clm_rec);
+  clm_rec->height=compute_clm_rec_height(clm_rec);
 }
 
 /*
@@ -1471,12 +1500,6 @@ void fill_column_bridge_inside(struct COLUMN_REC *clm_rec, unsigned char owner)
 {
      fill_column_rec_sim(clm_rec, 0, 0x1f3,
          0x1b8, 0x0, 0x0, 0x0, 0x0, 0, 0, 0);
-}
-
-void fill_column_rock_gndlev(struct COLUMN_REC *clm_rec, unsigned char owner)
-{
-     fill_column_rec_simp(clm_rec, 0, CUBE_PATH_SMLSTONES,
-         CUBE_ROCK1 +rnd(3), 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0);
 }
 
 void place_column_wall_drape_a(struct COLUMN_REC *clm_rec, unsigned char owner)

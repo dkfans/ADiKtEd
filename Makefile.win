@@ -5,8 +5,8 @@ CPP  = g++.exe
 CC   = gcc.exe
 WINDRES = windres.exe
 RES  = map_private.res
-OBJ  = dernc.o file.o graffiti.o main.o input_kb.o scr_help.o var_utils.o output_scr.o scr_thing.o graffiti_font.o bulcommn.o lev_data.o lev_files.o obj_slabs.o obj_things.o obj_column.o obj_actnpts.o lev_things.o lev_column.o obj_column_per.o scr_list.o scr_slab.o scr_clm.o scr_actn.o scr_txted.o lev_script.o scr_rwrk.o scr_cube.o draw_map.o xtabdat8.o obj_column_def.o $(RES)
-LINKOBJ  = dernc.o file.o graffiti.o main.o input_kb.o scr_help.o var_utils.o output_scr.o scr_thing.o graffiti_font.o bulcommn.o lev_data.o lev_files.o obj_slabs.o obj_things.o obj_column.o obj_actnpts.o lev_things.o lev_column.o obj_column_per.o scr_list.o scr_slab.o scr_clm.o scr_actn.o scr_txted.o lev_script.o scr_rwrk.o scr_cube.o draw_map.o xtabdat8.o obj_column_def.o $(RES)
+OBJ  = dernc.o graffiti.o main.o input_kb.o scr_help.o var_utils.o output_scr.o scr_thing.o graffiti_font.o bulcommn.o lev_data.o lev_files.o obj_slabs.o obj_things.o obj_column.o obj_actnpts.o lev_things.o lev_column.o obj_column_per.o scr_list.o scr_slab.o scr_clm.o scr_actn.o scr_txted.o lev_script.o scr_rwrk.o scr_cube.o draw_map.o xtabdat8.o obj_column_def.o memfile.o $(RES)
+LINKOBJ  = dernc.o graffiti.o main.o input_kb.o scr_help.o var_utils.o output_scr.o scr_thing.o graffiti_font.o bulcommn.o lev_data.o lev_files.o obj_slabs.o obj_things.o obj_column.o obj_actnpts.o lev_things.o lev_column.o obj_column_per.o scr_list.o scr_slab.o scr_clm.o scr_actn.o scr_txted.o lev_script.o scr_rwrk.o scr_cube.o draw_map.o xtabdat8.o obj_column_def.o memfile.o $(RES)
 LIBS =  -L"D:/ProgsNT/Dev-Cpp/lib" ../../../ProgsNT/Dev-Cpp/lib/libslang.a  -march=pentium-mmx -mmmx 
 INCS =  -I"D:/ProgsNT/Dev-Cpp/include" 
 CXXINCS =  -I"D:/ProgsNT/Dev-Cpp/lib/gcc/mingw32/3.4.2/include"  -I"D:/ProgsNT/Dev-Cpp/include/c++/3.4.2/backward"  -I"D:/ProgsNT/Dev-Cpp/include/c++/3.4.2/mingw32"  -I"D:/ProgsNT/Dev-Cpp/include/c++/3.4.2"  -I"D:/ProgsNT/Dev-Cpp/include" 
@@ -28,9 +28,6 @@ $(BIN): $(OBJ)
 
 dernc.o: dernc.c
 	$(CC) -c dernc.c -o dernc.o $(CFLAGS)
-
-file.o: file.c
-	$(CC) -c file.c -o file.o $(CFLAGS)
 
 graffiti.o: graffiti.c
 	$(CC) -c graffiti.c -o graffiti.o $(CFLAGS)
@@ -118,6 +115,9 @@ xtabdat8.o: xtabdat8.c
 
 obj_column_def.o: obj_column_def.c
 	$(CC) -c obj_column_def.c -o obj_column_def.o $(CFLAGS)
+
+memfile.o: memfile.c
+	$(CC) -c memfile.c -o memfile.o $(CFLAGS)
 
 map_private.res: map_private.rc 
 	$(WINDRES) -i map_private.rc --input-format=rc -o map_private.res -O coff 

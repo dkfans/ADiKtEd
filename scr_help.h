@@ -9,12 +9,16 @@ struct LEVEL;
 struct SCRMODE_DATA;
 struct MAPMODE_DATA;
 
+#define DHFLAG_USE_COLORS 1
+
 // Help variables
 typedef struct {
     int formode;
     int y;
     int rows;
     char **text;
+    int drows;
+    char **desc;
 
     int clmrows;
     char **clm;
@@ -72,6 +76,30 @@ typedef struct {
     char **compass;
     int mcompassrows;
     char **mcompass;
+    int cubedescrows;
+    char **cubedesc;
+    int slabdescrows;
+    char **slabdesc;
+    int crtrdescrows;
+    char **crtrdesc;
+    int itmtdescrows;
+    char **itmtdesc;
+    int txtrdescrows;
+    char **txtrdesc;
+    int efctrows;
+    char **efct;
+    int efctkeyrows;
+    char **efctkey;
+    int efctdescrows;
+    char **efctdesc;
+    int traprows;
+    char **trap;
+    int trapkeyrows;
+    char **trapkey;
+    int trapdescrows;
+    char **trapdesc;
+    int cclmdescrows;
+    char **cclmdesc;
   } HELP_DATA;
 
 extern HELP_DATA *help;
@@ -80,6 +108,10 @@ extern HELP_DATA *help;
 short init_help(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode);
 void free_help(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode);
 short init_key_help(int mode);
+short init_item_desc(int mode,int itm_idx);
+
+//Functions - for displaying list items
+char *get_cubedesc_head(unsigned short idx);
 
 //Functions - start and stop
 short start_help(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl);
@@ -90,7 +122,7 @@ void actions_help(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,stru
 void draw_help(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl);
 
 //Functions - lower level
-void draw_help_line(int posy,int posx,char *text);
+void draw_help_line(int posy,int posx,char *text,short flags);
 char *get_random_tip(void);
 
 //Functions - internal

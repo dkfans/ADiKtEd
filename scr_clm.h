@@ -22,6 +22,10 @@ void actions_mdclm(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,str
 void draw_mdclm(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl);
 void draw_mdclm_panel(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl);
 
+// Single actions
+void action_update_all_datclm(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl);
+void action_delele_custclm_and_update(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl);
+
 //Functions - lower level
 int display_dat_subtiles(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,
     struct LEVEL *lvl,int scr_row, int scr_col,short compressed,int ty,int tx);

@@ -78,6 +78,7 @@
 #define CUBE_ROCK1          0x002b
 #define CUBE_ROCK2          0x002c
 #define CUBE_ROCK3          0x002d
+#define CUBE_ROCK_ANY       (0x002b +rnd(3))
 
 //TODO: add defines here
 

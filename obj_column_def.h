@@ -93,6 +93,8 @@ void fill_column_claimedgnd_nearlava(struct COLUMN_REC *clm_rec, unsigned char o
 void fill_column_lava(struct COLUMN_REC *clm_rec, unsigned char owner);
 void fill_column_water(struct COLUMN_REC *clm_rec, unsigned char owner);
 void fill_column_earthground(struct COLUMN_REC *clm_rec, unsigned char owner);
+void fill_column_rockground(struct COLUMN_REC *clm_rec, unsigned char owner);
+void fill_column_rock_gndlev(struct COLUMN_REC *clm_rec, unsigned char owner);
 
 // Placing doors
 
@@ -112,6 +114,7 @@ void place_column_doormagic_c(struct COLUMN_REC *clm_rec, unsigned char owner);
 // Unclaimed tall columns
 
 void fill_column_rock(struct COLUMN_REC *clm_rec, unsigned char owner);
+void place_column_rock(struct COLUMN_REC *clm_rec, unsigned char owner);
 void fill_column_gold(struct COLUMN_REC *clm_rec, unsigned char owner);
 void fill_column_gold_nearwater(struct COLUMN_REC *clm_rec, unsigned char owner);
 void fill_column_gold_nearlava(struct COLUMN_REC *clm_rec, unsigned char owner);
@@ -188,7 +191,6 @@ void fill_column_guardpost_floor_a(struct COLUMN_REC *clm_rec, unsigned char own
 void fill_column_guardpost_floor_b(struct COLUMN_REC *clm_rec, unsigned char owner);
 void fill_column_guardpost_floor_c(struct COLUMN_REC *clm_rec, unsigned char owner);
 void fill_column_bridge_inside(struct COLUMN_REC *clm_rec, unsigned char owner);
-void fill_column_rock_gndlev(struct COLUMN_REC *clm_rec, unsigned char owner);
 
 // Room-specific walls
 

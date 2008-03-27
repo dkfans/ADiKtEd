@@ -36,6 +36,7 @@ where:
           With this, generating maps and starting new one will be very
           fast, but the update must be triggered manually before
           saving a map.
+  -bmp  Write bitmap miniature of the map.
   -dvid  Disable showing anything on screen. Screen is not initied
          nor refreshed. Useful if you want only run some commands
          and quit.
@@ -61,6 +62,15 @@ Press F1 for help.
 
 TODO before final:
  Fixations in room things parameters (height,other)
+ Fixations in room corner graphics
+Version: 0.74b
+ Extended CLM entries verification
+ Texture animations are readed when creating BMPs
+ Correction in BMP resizing algorithm
+ File reading routine rewritten, better error handling
+ Added help about elements of various lists
+ Fixed some mistakes in TNG logic, rewritten TNG categorization
+ Added "edit object" function (enter key in Thing mode)
 Version: 0.73b
  Added space saving if screen size is small
  INI file commented, and added some options

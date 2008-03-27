@@ -110,6 +110,27 @@ void read_init(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode)
           mapmode->optns.frail_columns=atoi(p);
           message_log(" read_init: frail_columns set to %d",(int)mapmode->optns.frail_columns);
       } else
+
+      if (!strcmp(buffer, "TRAPS_LIST_ON_CREATE"))
+      {
+          mapmode->traps_list_on_create=atoi(p);
+          message_log(" read_init: traps_list_on_create set to %d",(int)mapmode->traps_list_on_create);
+      } else
+      if (!strcmp(buffer, "ROOMEFFECT_LIST_ON_CREATE"))
+      {
+          mapmode->roomeffect_list_on_create=atoi(p);
+          message_log(" read_init: roomeffect_list_on_create set to %d",(int)mapmode->roomeffect_list_on_create);
+      } else
+      if (!strcmp(buffer, "ITEMS_LIST_ON_CREATE"))
+      {
+          mapmode->items_list_on_create=atoi(p);
+          message_log(" read_init: items_list_on_create set to %d",(int)mapmode->items_list_on_create);
+      } else
+      if (!strcmp(buffer, "CREATURE_LIST_ON_CREATE"))
+      {
+          mapmode->creature_list_on_create=atoi(p);
+          message_log(" read_init: creature_list_on_create set to %d",(int)mapmode->creature_list_on_create);
+      } else
       if (!strcmp(buffer, "LEVELS_PATH"))
       {
           levels_path=strdup(p);
@@ -169,6 +190,11 @@ void get_command_line_options(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *
         if (strcmp(comnd+1,"n")==0)
         {
           scrmode->automated_commands[cmnds_count]=KEY_CTRL_N;
+          cmnds_count++;
+        } else
+        if (strcmp(comnd+1,"bmp")==0)
+        {
+          scrmode->automated_commands[cmnds_count]=KEY_CTRL_B;
           cmnds_count++;
         } else
         if (strcmp(comnd+1,"ds")==0)

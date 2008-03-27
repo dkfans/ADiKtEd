@@ -13,8 +13,8 @@
 #include "globals.h"
 #include "obj_things.h"
 
-const char *owner_names[]={"Keeper 0 (Human)", "Keeper 1", "Keeper 2",
-    "Keeper 3", "Heroes", "Unclaimed"};
+const char *owner_names[]={"Keeper 0 (Human)", "Keeper 1 (blue)", "Keeper 2 (green)",
+    "Keeper 3 (yellow)", "Heroes (Player4)", "Unclaimed/Unowned"};
 
 const unsigned char owners_list[]={
     PLAYER0, PLAYER1, PLAYER2, PLAYER3,

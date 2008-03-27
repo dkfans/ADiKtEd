@@ -15,7 +15,7 @@
 char *message_prv;
 char *message;
 short message_is_warn;
-FILE *msgout_fp;
+char *msgout_fname;
 
 char *levels_path;
 char *data_path;
@@ -51,6 +51,54 @@ void trim_right(char *string_in)
     }
 }
 
+/*
+ * Only logs the message, without showing on screen.
+ * the va_list and inline version.
+ */
+inline void message_log_vl(const char *format, va_list val)
+{
+    if (msgout_fname==NULL) return;
+    FILE *msgout_fp;
+    msgout_fp=fopen(msgout_fname,"ab");
+    if (msgout_fp!=NULL)
+    {
+      // Write to log file if it is opened
+      vfprintf(msgout_fp, format, val);
+      fprintf(msgout_fp,"\r\n");
+      fclose(msgout_fp);
+    }
+}
+
+/*
+ * Simplified function for message logging; is inline and
+ * allows writing only single string.
+ */
+inline void message_log_simp(const char *str)
+{
+    if (msgout_fname==NULL) return;
+    FILE *msgout_fp;
+    msgout_fp=fopen(msgout_fname,"ab");
+    // Write to log file if it is opened
+    if (msgout_fp!=NULL)
+    {
+      fprintf(msgout_fp, "%s\r\n",str);
+      fclose(msgout_fp);
+    }
+}
+
+/*
+ * Only logs the message, without showing on screen.
+ * Standard version - allows formatted message.
+ */
+void message_log(const char *format, ...)
+{
+    if (msgout_fname==NULL) return;
+    va_list val;
+    va_start(val, format);
+    message_log_vl(format, val);
+    va_end(val);
+}
+
 void message_error(const char *format, ...)
 {
     va_list val;
@@ -62,9 +110,8 @@ void message_error(const char *format, ...)
     vsprintf(message, format, val);
     va_end(val);
     message_is_warn=true;
-    // Write to log file if it is opened
-    if (msgout_fp!=NULL)
-      fprintf(msgout_fp,"%s\r\n",message);
+    // Write to log file if it is prepared
+    message_log_simp(message);
     speaker_beep();
 }
 
@@ -86,9 +133,8 @@ void message_info(const char *format, ...)
     vsprintf(message, format, val);
     va_end(val);
     message_is_warn=false;
-    // Write to log file if it is opened
-    if (msgout_fp!=NULL)
-      fprintf(msgout_fp,"%s\r\n",message);
+    // Write to log file if it is prepared
+    message_log_simp(message);
 }
 
 void message_info_force(const char *format, ...)
@@ -102,9 +148,8 @@ void message_info_force(const char *format, ...)
     vsprintf(message, format, val);
     va_end(val);
     message_is_warn=false;
-    // Write to log file if it is opened
-    if (msgout_fp!=NULL)
-      fprintf(msgout_fp,"%s\r\n",message);
+    // Write to log file if it is prepared
+    message_log_simp(message);
 }
 
 void message_release(void)
@@ -118,54 +163,39 @@ char *message_get(void)
 }
 
 /*
- * Only logs the message, without showing on screen.
- */
-void message_log(const char *format, ...)
-{
-    if (msgout_fp==NULL) return;
-    va_list val;
-    va_start(val, format);
-    // Write to log file if it is opened
-    vfprintf(msgout_fp, format, val);
-    va_end(val);
-    fprintf(msgout_fp,"\r\n");
-}
-
-/*
  * Popups are temporary messages, visible only until next screen redraw.
  */
 void popup_show(const char *title,const char *format, ...)
 {
-      char *msg;
-      msg=(char *)malloc(LINEMSG_SIZE*sizeof(char));
-      va_list val;
-      va_start(val, format);
-      vsprintf(msg, format, val);
-      va_end(val);
-      int rows=get_screen_rows();
-      int cols=get_screen_cols();
-      int textlen=max(strlen(title),strlen(msg));
-      int window_rows=4;
-      int window_cols=3*cols/4;
-      if (textlen+2>window_cols)
+    char *msg;
+    msg=(char *)malloc(LINEMSG_SIZE*sizeof(char));
+    va_list val;
+    va_start(val, format);
+    vsprintf(msg, format, val);
+    va_end(val);
+    int rows=get_screen_rows();
+    int cols=get_screen_cols();
+    int textlen=max(strlen(title),strlen(msg));
+    int window_rows=4;
+    int window_cols=3*cols/4;
+    if (textlen+2>window_cols)
         window_cols=textlen+2;
-      if (window_cols>cols-2)
+    if (window_cols>cols-2)
         window_cols=max(cols-2,0);
-      int posx=(cols-window_cols)>>1;
-      int posy=(rows-window_rows)>>1;
-      screen_setcolor(PRINT_COLOR_RED_ON_WHITE);
-      screen_draw_window(posy,posx,window_rows,window_cols,1,bsDouble);
-      int title_x=(cols-strlen(title)-2)>>1;
-      if (title_x<posx) title_x=posx;
-      set_cursor_pos(posy,title_x);
-      screen_printf(" %s ",title);
-      set_cursor_pos(posy+2,posx+1);
-      screen_printf("%s",msg);
-      screen_refresh();
-    // Write to log file if it is opened
-      if (msgout_fp!=NULL)
-        fprintf(msgout_fp,"%s\r\n",msg);
-      free(msg);
+    int posx=(cols-window_cols)>>1;
+    int posy=(rows-window_rows)>>1;
+    screen_setcolor(PRINT_COLOR_RED_ON_WHITE);
+    screen_draw_window(posy,posx,window_rows,window_cols,1,bsDouble);
+    int title_x=(cols-strlen(title)-2)>>1;
+    if (title_x<posx) title_x=posx;
+    set_cursor_pos(posy,title_x);
+    screen_printf(" %s ",title);
+    set_cursor_pos(posy+2,posx+1);
+    screen_printf("%s",msg);
+    screen_refresh();
+    // Write to log file if it is prepared
+    message_log_simp(msg);
+    free(msg);
 }
 
 /*
@@ -200,6 +230,29 @@ short format_map_fname(char *fname, const char *usrinput)
     return false;
 }
 
+/*
+ * Prepares short version of the given filename; result can't be longer
+ * than maxlen. Allocates memory for the returned string - you should
+ * free() it after use.
+ */
+char *prepare_short_fname(char *fname, unsigned int maxlen)
+{
+    char *start;
+    start=strrchr(fname,SEPARATOR[0]);
+    if (start==NULL)
+        start=fname;
+    unsigned int len=strlen(start);
+    if (len > maxlen)
+          len=maxlen;
+    char *retname;
+    retname=(char *)malloc(len+1);
+    if (retname==NULL)
+      die("prepare_short_fname: Cannot allocate memory.");
+    strncpy(retname,fname,len);
+    retname[len]='\0';
+    return retname;
+}
+
 short format_data_fname(char **fullname, const char *format, ...)
 {
     va_list val;
@@ -209,37 +262,58 @@ short format_data_fname(char **fullname, const char *format, ...)
     va_end(val);
     *fullname = (char *)malloc(strlen(file)+strlen(data_path)+4);
     if (*fullname==NULL)
-      die ("format_data_fname: Out of memory.");
+      die("format_data_fname: Out of memory.");
     sprintf(*fullname, "%s"SEPARATOR"%s", data_path, file);
     free(file);
     if (strlen(*fullname)>strlen(data_path)) return true;
     return false;
 }
 
+/*
+ * Sets message log file name. Rewrites it, then writes header and two
+ * last messages.
+ */
 short set_msglog_fname(char *fname)
 {
-    msgout_fp=fopen(fname,"wb");
+    if ((fname==NULL)||(fname[0]=='\0'))
+    {
+        msgout_fname=NULL;
+        return false;
+    }
+    FILE *msgout_fp;
+    msgout_fname=strdup(fname);
+    msgout_fp=fopen(msgout_fname,"wb");
     if (msgout_fp!=NULL)
     {
       fprintf(msgout_fp,"aDiKtEd message log file\r\n");
+      if (message_prv!=NULL)
+        fprintf(msgout_fp,"%s\r\n",message_prv);
+      if (message!=NULL)
+        fprintf(msgout_fp,"%s\r\n",message);
+      fclose(msgout_fp);
       return true;
     }
+    free(msgout_fname);
+    msgout_fname=NULL;
     return false;
 }
 
+/*
+ * Clears message log variables without freeing memory (drops any pointers).
+ */
 void init_messages(void)
 {
   message=NULL;
   message_prv=NULL;
-  msgout_fp=NULL;
+  message_is_warn=false;
+  msgout_fname=NULL;
 }
 
 void free_messages(void)
 {
     free(message_prv);
     free(message);
-    if (msgout_fp!=NULL)
-      fclose(msgout_fp);
+    free(msgout_fname);
 }
 
 void die(const char *format, ...)
@@ -248,14 +322,10 @@ void die(const char *format, ...)
       va_list val;
       va_start(val, format);
       vfprintf(stderr, format, val);
-      // Write to log file if it is opened
-      if (msgout_fp!=NULL)
-        vfprintf(msgout_fp, format, val);
+      // Write to log file if it is prepared
+      message_log_vl(format, val);
       va_end(val);
       fprintf(stderr, "\n");
-      // Write to log file if it is opened
-      if (msgout_fp!=NULL)
-        fprintf(msgout_fp,"\r\n");
       free_messages();
       exit(1);
 }

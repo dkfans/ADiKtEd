@@ -8,6 +8,7 @@
 #include "lev_files.h"
 
 #include "globals.h"
+#include "memfile.h"
 #include "obj_column_def.h"
 #include "obj_slabs.h"
 #include "obj_things.h"
@@ -17,6 +18,27 @@
 #include "lev_data.h"
 #include "lev_script.h"
 
+char *load_error(int errcode)
+{
+//    static char str[128];
+    static char *const errors[] = {
+	"File too small",
+	"Bad data",
+	"Internal error",
+	"Unknown error",
+    };
+//sprintf(str,"%d",errcode);
+//return str;
+    if (errcode>ERR_FILE_TOOSMLL)
+    {
+      return read_file_error(errcode);
+    }
+    errcode = (-errcode)-ERR_FILE_TOOSMLL;
+    if ((errcode < 0) || (errcode > (sizeof(errors)/sizeof(*errors) - 1)) )
+      errcode = sizeof(errors)/sizeof(*errors) - 1;
+	return errors[errcode];
+}
+
 /*
  * Old way of reading various files; not used anymore
  */
@@ -25,15 +47,18 @@ short load_subtile(unsigned char **dest,
                         int linesize, int nlines, int lineoffset,
                         int mbytes, int byteoffset)
 {
-    struct memory_file mem;
+    struct MEMORY_FILE mem;
     int i, j;
     long addr=0;
 
     mem = read_file(fname);
-    if (mem.len==-1) // Couldn't open file
+    if (mem.errcode!=MFILE_OK)
       return false;
     if ((mem.len<mbytes*nlines*x*y) || (mem.len!=length))
+    {
+      free(mem.content);
       return false;
+    }
     for (i=0; i < y; i++)
     {
       addr += linesize*lineoffset;
@@ -57,13 +82,13 @@ unsigned char **load_subtile_malloc(char *fname, int length,
     unsigned char **dest;
     dest = (unsigned char **)malloc(x*sizeof(char *));
     if (dest==NULL)
-      die ("load_subtile: Out of memory.\n");
+      die("load_subtile: Out of memory.\n");
     int i;
     for (i=0; i < x; i++)
     {
       dest[i]=(unsigned char *)malloc(y*sizeof(char));
       if (dest[i]==NULL)
-          die ("load_subtile: Out of memory");
+          die("load_subtile: Out of memory");
     }
     // Loading
     short result=load_subtile(dest,fname,length,x,y,
@@ -80,19 +105,20 @@ unsigned char **load_subtile_malloc(char *fname, int length,
 
 short load_tng(struct LEVEL *lvl,char *fname)
 {
-    struct memory_file mem;
+    struct MEMORY_FILE mem;
     int tng_num;
     int i, j;
     unsigned char *thing;
     if (lvl==NULL) return ERR_INTERNAL;
     mem = read_file (fname);
-    if (mem.len==-1) return ERR_FILE_NFOUND;
-    if (mem.len<SIZEOF_DK_TNG_HEADER) return ERR_FILE_TOOSMLL;
+    if (mem.errcode!=MFILE_OK) return mem.errcode;
+    if (mem.len<SIZEOF_DK_TNG_HEADER)
+    { free(mem.content); return ERR_FILE_TOOSMLL; }
     //Read the header    
     tng_num = read_short_le_buf(mem.content);
     // Check everything's cushty
     if (mem.len != tng_num*SIZEOF_DK_TNG_REC+SIZEOF_DK_TNG_HEADER)
-      return ERR_FILE_BADDATA;
+    { free(mem.content); return ERR_FILE_BADDATA; }
     //Read tng entries
     for (i=0; i < tng_num; i++)
     {
@@ -109,18 +135,19 @@ short load_tng(struct LEVEL *lvl,char *fname)
 
 short load_clm(struct LEVEL *lvl,char *fname)
 {
-    struct memory_file mem;
+    struct MEMORY_FILE mem;
     int i, j;
     if ((lvl==NULL)||(lvl->clm==NULL)) return ERR_INTERNAL;
     mem = read_file(fname);
-    if (mem.len==-1) return ERR_FILE_NFOUND;
-    if (mem.len < SIZEOF_DK_CLM_HEADER) return ERR_FILE_TOOSMLL;
+    if (mem.errcode!=MFILE_OK) return mem.errcode;
+    if (mem.len < SIZEOF_DK_CLM_HEADER)
+    { free(mem.content); return ERR_FILE_TOOSMLL; }
     memcpy(lvl->clm_hdr, mem.content+0, SIZEOF_DK_CLM_HEADER);
     int num_clms=read_long_le_buf(mem.content+0);
     if (mem.len != SIZEOF_DK_CLM_REC*num_clms+SIZEOF_DK_CLM_HEADER)
-      return ERR_FILE_BADDATA;
+    { free(mem.content); return ERR_FILE_BADDATA; }
     if (num_clms>COLUMN_ENTRIES)
-      return ERR_FILE_BADDATA;
+    { free(mem.content); return ERR_FILE_BADDATA; }
     for (i=0; i<num_clms; i++)
     {
       int offs=SIZEOF_DK_CLM_REC*i+SIZEOF_DK_CLM_HEADER;
@@ -136,19 +163,20 @@ short load_clm(struct LEVEL *lvl,char *fname)
  */
 short load_apt(struct LEVEL *lvl,char *fname)
 {
-    struct memory_file mem;
+    struct MEMORY_FILE mem;
     int i;
     unsigned char *actnpt;
     
     if ((lvl==NULL)||(lvl->apt_lookup==NULL)) return ERR_INTERNAL;
     mem = read_file (fname);
-    if (mem.len==-1) return ERR_FILE_NFOUND;
-    if (mem.len < SIZEOF_DK_APT_HEADER) return ERR_FILE_TOOSMLL;
+    if (mem.errcode!=MFILE_OK) return mem.errcode;
+    if (mem.len < SIZEOF_DK_APT_HEADER)
+    { free(mem.content); return ERR_FILE_TOOSMLL; }
     long apt_num;
     apt_num = read_long_le_buf(mem.content+0);
     // Check everything's cushty
     if (mem.len != apt_num*SIZEOF_DK_APT_REC+SIZEOF_DK_APT_HEADER)
-      return ERR_FILE_BADDATA;
+    { free(mem.content); return ERR_FILE_BADDATA; }
     for (i=0; i < apt_num; i++)
     {
       actnpt=(unsigned char *)malloc(SIZEOF_DK_APT_REC);
@@ -165,12 +193,12 @@ short load_apt(struct LEVEL *lvl,char *fname)
 
 short load_inf(struct LEVEL *lvl,char *fname)
 {
-    struct memory_file mem;
+    struct MEMORY_FILE mem;
     mem = read_file(fname);
     //If wrong filesize - pannic
-    if (mem.len==-1) return ERR_FILE_NFOUND;
+    if (mem.errcode!=MFILE_OK) return mem.errcode;
     if (mem.len != 1)
-      return ERR_FILE_BADDATA;
+    { free(mem.content); return ERR_FILE_BADDATA; }
     lvl->inf=mem.content[0];
     free (mem.content);
     return ERR_NONE;
@@ -182,11 +210,11 @@ short load_wib(struct LEVEL *lvl,char *fname)
     const int dat_entries_x=MAP_SIZE_X*MAP_SUBNUM_X+1;
     const int dat_entries_y=MAP_SIZE_Y*MAP_SUBNUM_Y+1;
     //Loading the file
-    struct memory_file mem;
+    struct MEMORY_FILE mem;
     mem = read_file(fname);
-    if (mem.len==-1) return ERR_FILE_NFOUND;
+    if (mem.errcode!=MFILE_OK) return mem.errcode;
     if ((mem.len!=dat_entries_x*dat_entries_y))
-      return ERR_FILE_BADDATA;
+    { free(mem.content); return ERR_FILE_BADDATA; }
     //Reading WIB entries
     int sx, sy;
     unsigned long addr;
@@ -207,11 +235,11 @@ short load_wib(struct LEVEL *lvl,char *fname)
 short load_slb(struct LEVEL *lvl,char *fname)
 {
     //Reading file
-    struct memory_file mem;
+    struct MEMORY_FILE mem;
     mem = read_file(fname);
-    if (mem.len==-1) return ERR_FILE_NFOUND;
+    if (mem.errcode!=MFILE_OK) return mem.errcode;
     if ((mem.len!=2*MAP_SIZE_X*MAP_SIZE_Y))
-      return ERR_FILE_BADDATA;
+    { free(mem.content); return ERR_FILE_BADDATA; }
     //Loading the entries
     int i, k;
     unsigned long addr=0;
@@ -233,11 +261,11 @@ short load_own(struct LEVEL *lvl,char *fname)
     int dat_entries_x=MAP_SIZE_X*MAP_SUBNUM_X+1;
     int dat_entries_y=MAP_SIZE_Y*MAP_SUBNUM_Y+1;
     //Loading the file
-    struct memory_file mem;
+    struct MEMORY_FILE mem;
     mem = read_file(fname);
-    if (mem.len==-1) return ERR_FILE_NFOUND;
+    if (mem.errcode!=MFILE_OK) return mem.errcode;
     if ((mem.len!=dat_entries_x*dat_entries_y))
-      return ERR_FILE_BADDATA;
+    { free(mem.content); return ERR_FILE_BADDATA; }
     //Reading entries
     int sx, sy;
     unsigned long addr;
@@ -262,11 +290,11 @@ short load_dat(struct LEVEL *lvl,char *fname)
     const int dat_entries_y=MAP_SIZE_Y*MAP_SUBNUM_Y+1;
     const unsigned int line_len=2*dat_entries_x;
     //Loading the file
-    struct memory_file mem;
+    struct MEMORY_FILE mem;
     mem = read_file(fname);
-    if (mem.len==-1) return ERR_FILE_NFOUND;
+    if (mem.errcode!=MFILE_OK) return mem.errcode;
     if ((mem.len!=line_len*dat_entries_y))
-      return ERR_FILE_BADDATA;
+    { free(mem.content); return ERR_FILE_BADDATA; }
     //Reading DAT entries
     int sx, sy;
     unsigned long addr;
@@ -284,12 +312,13 @@ short load_dat(struct LEVEL *lvl,char *fname)
 
 short load_txt(struct LEVEL *lvl,char *fname)
 {
-    struct memory_file mem;
+    struct MEMORY_FILE mem;
     mem = read_file(fname);
     //If filesize too small - pannic
     lvl->script.lines_count=0;
-    if (mem.len==-1) return ERR_FILE_NFOUND;
-    if (mem.len < 2) return ERR_FILE_TOOSMLL;
+    if (mem.errcode!=MFILE_OK) return mem.errcode;
+    if (mem.len < 2)
+    { free(mem.content); return ERR_FILE_TOOSMLL; }
     unsigned char *content=mem.content;
     unsigned char *ptr=mem.content;
     unsigned char *ptr_end=mem.content+mem.len;
@@ -348,22 +377,22 @@ short load_txt(struct LEVEL *lvl,char *fname)
  */
 short load_lgt(struct LEVEL *lvl,char *fname)
 {
-    struct memory_file mem;
+    struct MEMORY_FILE mem;
     unsigned char *stlight;
     
     if ((lvl==NULL)||(lvl->lgt_lookup==NULL))
       return ERR_INTERNAL;
     mem = read_file (fname);
-    if (mem.len==-1) return ERR_FILE_NFOUND;
+    if (mem.errcode!=MFILE_OK) return mem.errcode;
     if (mem.len < SIZEOF_DK_LGT_HEADER)
-      return ERR_FILE_TOOSMLL;
+    { free(mem.content); return ERR_FILE_TOOSMLL; }
 
     lvl->lgt_total_count=0;
     long lgt_num;
     lgt_num = read_long_le_buf(mem.content+0);
     // Check everything's cushty
     if (mem.len != lgt_num*SIZEOF_DK_LGT_REC+SIZEOF_DK_LGT_HEADER)
-      return ERR_FILE_BADDATA;
+    { free(mem.content); return ERR_FILE_BADDATA; }
     int i;
     for (i=0; i<lgt_num; i++)
     {
@@ -386,12 +415,12 @@ short load_lgt(struct LEVEL *lvl,char *fname)
  */
 short load_wlb(struct LEVEL *lvl,char *fname)
 {
-    struct memory_file mem;
+    struct MEMORY_FILE mem;
     mem = read_file(fname);
     //If wrong filesize - don't load
-    if (mem.len==-1) return ERR_FILE_NFOUND;
+    if (mem.errcode!=MFILE_OK) return mem.errcode;
     if (mem.len != MAP_SIZE_X*MAP_SIZE_Y)
-      return ERR_FILE_BADDATA;
+    { free(mem.content); return ERR_FILE_BADDATA; }
     int i,j;
     for (i=0;i<MAP_SIZE_Y;i++)
       for (j=0;j<MAP_SIZE_X;j++)
@@ -414,11 +443,11 @@ short load_flg(struct LEVEL *lvl,char *fname)
     const int dat_entries_y=MAP_SIZE_Y*MAP_SUBNUM_Y+1;
     const unsigned int line_len=2*dat_entries_x;
     //Loading the file
-    struct memory_file mem;
+    struct MEMORY_FILE mem;
     mem = read_file(fname);
-    if (mem.len==-1) return ERR_FILE_NFOUND;
+    if (mem.errcode!=MFILE_OK) return mem.errcode;
     if ((mem.len!=line_len*dat_entries_y))
-      return ERR_FILE_BADDATA;
+    { free(mem.content); return ERR_FILE_BADDATA; }
     //Reading entries
     int sx, sy;
     unsigned long addr;
@@ -440,11 +469,11 @@ short load_flg(struct LEVEL *lvl,char *fname)
 unsigned short script_load_and_execute(struct LEVEL *lvl,char *fname,char *err_msg)
 {
     sprintf(err_msg,"No error");
-    struct memory_file mem;
+    struct MEMORY_FILE mem;
     mem = read_file(fname);
-    if (mem.len==-1) return ERR_FILE_NFOUND;
+    if (mem.errcode!=MFILE_OK) return mem.errcode;
     if (mem.len < 2)
-      return ERR_FILE_TOOSMLL;
+    { free(mem.content); return ERR_FILE_TOOSMLL; }
     unsigned char *content=mem.content;
     unsigned char *ptr=mem.content;
     unsigned char *ptr_end=mem.content+mem.len;
@@ -840,7 +869,7 @@ short save_map(struct LEVEL *lvl)
     char *fnames;
     fnames = (char *)malloc(strlen(lvl->savfname)+5);
     if (fnames==NULL)
-      die ("save_map: Out of memory");
+      die("save_map: Out of memory");
     short result=true;
     sprintf (fnames, "%s.own", lvl->savfname);
     result&=write_own(lvl,fnames);
@@ -868,7 +897,7 @@ short save_map(struct LEVEL *lvl)
     result&=write_flg(lvl,fnames);
     sprintf (fnames, "%s.adi", lvl->savfname);
     result&=write_adi_script(lvl,fnames);
-    if ((result)&&(strlen(lvl->fname)<1))
+    if ((result)||(strlen(lvl->fname)<1))
     {
       strncpy(lvl->fname,lvl->savfname,DISKPATH_SIZE);
       lvl->fname[DISKPATH_SIZE-1]=0;
@@ -897,7 +926,7 @@ short load_map(struct LEVEL *lvl)
   err_msg=(char *)malloc(LINEMSG_SIZE);
   fnames = (char *)malloc(strlen(lvl->fname)+5);
   if ((fnames==NULL)||(err_msg==NULL))
-    die ("load_map: Out of memory.");
+    die("load_map: Out of memory.");
   short result=ERR_NONE;
   if (result==ERR_NONE)
   {
@@ -973,31 +1002,14 @@ short load_map(struct LEVEL *lvl)
   }    
   if (result!=ERR_NONE)
   {
-        switch (result)
-        {
-        case ERR_FILE_NFOUND:
-           message_error("Load error: can't open \"%s\"", fnames);
-           break;
-        case ERR_FILE_TOOSMLL:
-           message_error("Load error: file too small: \"%s\"", fnames);
-           break;
-        case ERR_FILE_BADDATA:
-           message_error("Load error: bad data in \"%s\"", fnames);
-           break;
-        case ERR_INTERNAL:
-           message_error("Internal error when loading \"%s\"", fnames);
-           break;
-        default:
-           message_error("Couldn't load \"%s\"", fnames);
-           break;
-        }
-        free(fnames);
-        free(err_msg);
-        free_map(lvl);
-        start_new_map(lvl);
-        return false;
+      message_error("Error: %s when loading \"%s\"",load_error(result), fnames);
+      free(fnames);
+      free(err_msg);
+      free_map(lvl);
+      start_new_map(lvl);
+      return false;
   }
-  if (strlen(lvl->savfname)<1)
+  if ((result==ERR_NONE)&&(strlen(lvl->savfname)<1))
   {
       strncpy(lvl->savfname,lvl->fname,DISKPATH_SIZE);
       lvl->savfname[DISKPATH_SIZE-1]=0;
@@ -1028,7 +1040,7 @@ short load_map_preview(struct LEVEL *lvl)
   err_msg=(char *)malloc(LINEMSG_SIZE);
   fnames = (char *)malloc(strlen(lvl->fname)+5);
   if ((fnames==NULL)||(err_msg==NULL))
-    die ("load_map: Out of memory.");
+    die("load_map: Out of memory.");
   short result=ERR_NONE;
   if (result==ERR_NONE)
   {
@@ -1042,27 +1054,10 @@ short load_map_preview(struct LEVEL *lvl)
   }    
   if (result!=ERR_NONE)
   {
-        switch (result)
-        {
-        case ERR_FILE_NFOUND:
-           message_info_force("Load error: can't open \"%s\"", fnames);
-           break;
-        case ERR_FILE_TOOSMLL:
-           message_info_force("Load error: file too small: \"%s\"", fnames);
-           break;
-        case ERR_FILE_BADDATA:
-           message_info_force("Load error: bad data in \"%s\"", fnames);
-           break;
-        case ERR_INTERNAL:
-           message_info_force("Internal error when loading \"%s\"", fnames);
-           break;
-        default:
-           message_info_force("Couldn't load \"%s\"", fnames);
-           break;
-        }
-        free(fnames);
-        free(err_msg);
-        return false;
+      message_info_force("Preview: %s when loading \"%s\"",load_error(result), fnames);
+      free(fnames);
+      free(err_msg);
+      return false;
   }
   if (strlen(lvl->savfname)<1)
   {

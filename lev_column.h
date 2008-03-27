@@ -8,14 +8,14 @@
 #ifndef ADIKT_LEVCOLMN_H
 #define ADIKT_LEVCOLMN_H
 
-#define INF_STANDARD_LTEXT "Standard - the one with walls as in Adikted description"
-#define INF_ANCIENT_LTEXT  "Ancient - brighter walls with Aztec drawings"
-#define INF_WINTER_LTEXT   "Winter - walls with snow and ice drawings"
-#define INF_SNAKE_LTEXT    "Snake key - walls with key of life and snake"
-#define INF_FACE_LTEXT     "Stone face - rough walls with red eyed face on"
-#define INF_BRESTS_LTEXT   "Big breasts - walls with bigger breasts than standard"
-#define INF_RGANCNT_LTEXT  "Rough Ancient - ancient theme with rougher earth"
-#define INF_SKULL_LTEXT    "Skull - brighter walls with skulls on"
+#define INF_STANDARD_LTEXT "Standard"
+#define INF_ANCIENT_LTEXT  "Ancient"
+#define INF_WINTER_LTEXT   "Winter"
+#define INF_SNAKE_LTEXT    "Snake key"
+#define INF_FACE_LTEXT     "Stone face"
+#define INF_BRESTS_LTEXT   "Big breasts"
+#define INF_RGANCNT_LTEXT  "Rough Ancient"
+#define INF_SKULL_LTEXT    "Skull relief"
 #define INF_MAX_INDEX 7
 
 struct LEVEL;
@@ -38,6 +38,7 @@ void set_dat_subtile(struct LEVEL *lvl, int sx, int sy, int d);
 void set_dat(struct LEVEL *lvl,int x, int y, int tl, int tm, int tr,
         int ml, int mm, int mr, int bl, int bm, int br);
 void set_dat_unif (struct LEVEL *lvl, int x, int y, int d);
+short find_dat_entry(const struct LEVEL *lvl, int *sx, int *sy, const unsigned int clm_idx);
 short dat_verify(struct LEVEL *lvl, char *err_msg,struct IPOINT_2D *errpt);
 
 void update_datclm_for_whole_map(struct LEVEL *lvl);

@@ -31,9 +31,15 @@ void actions_mdtng(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,str
 void draw_mdtng(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl);
 void draw_mdtng_panel(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl);
 
+// Single actions
+void action_edit_object(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl);
+void action_delete_object(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl);
+void action_inc_object_level(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl);
+void action_dec_object_level(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl);
+
 //Functions - lower level
 void change_visited_tile(struct MAPMODE_DATA *mapmode);
-int display_thing(unsigned char *thing, int x, int y);
+int display_thing(unsigned char *thing, int scr_col, int scr_row,int max_row);
 int display_action_point(unsigned char *actnpt, int x, int y);
 int display_static_light(unsigned char *stlight, int x, int y);
 int display_obj_stats(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,const struct LEVEL *lvl, int scr_row, int scr_col);
@@ -43,7 +49,10 @@ int display_tng_subtiles(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmo
 //Functions - internal
 char get_thing_char(const struct LEVEL *lvl, int x, int y);
 int get_tng_display_color(short obj_type,unsigned char obj_owner,short marked);
-void tng_makeitem(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl,int sx,int sy,unsigned char stype_idx);
+unsigned char *tng_makeitem(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl,int sx,int sy,unsigned char stype_idx);
+unsigned char *tng_makeroomeffect(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl,int sx,int sy,unsigned char stype_idx);
+unsigned char *tng_maketrap(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl,int sx,int sy,unsigned char stype_idx);
+unsigned char *tng_makecreature(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl,int sx,int sy,unsigned char stype_idx);
 void tng_change_height(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl, unsigned int sx, unsigned int sy,unsigned int z,int delta_height);
 void tng_change_range(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl, unsigned int sx, unsigned int sy,unsigned int z,int delta_range);
 

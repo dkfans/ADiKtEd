@@ -22,24 +22,31 @@ struct PALETTE_ENTRY {
 };
 
 struct CUBES_DATA {
-    int count;
     struct CUBE_TEXTURES *data;
+    int count;
+    struct CUBE_TXTRANIM *anitx;
+    int anitxcount;
 };
 
 //Texture indices for every side of a cube
 struct CUBE_TEXTURES {
        //north
-    struct USPOINT_2D n;
+    unsigned int n;
        //south
-    struct USPOINT_2D s;
+    unsigned int s;
        //west
-    struct USPOINT_2D w;
+    unsigned int w;
        //east
-    struct USPOINT_2D e;
+    unsigned int e;
        //top
-    struct USPOINT_2D t;
+    unsigned int t;
        //bottom
-    struct USPOINT_2D b;
+    unsigned int b;
+};
+
+//Animated texture - indices of textures which are swiching
+struct CUBE_TXTRANIM {
+    unsigned int data[8];
 };
 
 struct MAPDRAW_DATA {

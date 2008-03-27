@@ -4,7 +4,7 @@ LINK = gcc
 LFLAGS =
 LIBS = -L. -lslang
 RES  = 
-OBJ  = dernc.o file.o graffiti.o main.o input_kb.o scr_help.o var_utils.o output_scr.o scr_thing.o graffiti_font.o bulcommn.o lev_data.o lev_files.o obj_slabs.o obj_things.o obj_column.o obj_actnpts.o lev_things.o lev_column.o obj_column_def.o obj_column_per.o scr_list.o scr_slab.o scr_clm.o scr_actn.o scr_txted.o lev_script.o scr_rwrk.o scr_cube.o draw_map.o xtabdat8.o $(RES)
+OBJ  = dernc.o memfile.o graffiti.o main.o input_kb.o scr_help.o var_utils.o output_scr.o scr_thing.o graffiti_font.o bulcommn.o lev_data.o lev_files.o obj_slabs.o obj_things.o obj_column.o obj_actnpts.o lev_things.o lev_column.o obj_column_def.o obj_column_per.o scr_list.o scr_slab.o scr_clm.o scr_actn.o scr_txted.o lev_script.o scr_rwrk.o scr_cube.o draw_map.o xtabdat8.o $(RES)
 BIN  = map
 RM = rm -f
 
@@ -17,7 +17,7 @@ map: $(OBJ)
 	$(LINK) -o $(BIN) $(OBJ) $(LIBS)
 
 dernc.o: dernc.c
-file.o: file.c
+memfile.o: memfile.c
 graffiti.o: graffiti.c
 internal.o: internal.c
 main.o: main.c

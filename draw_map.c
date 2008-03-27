@@ -10,6 +10,7 @@
 #include <math.h>
 #include "globals.h"
 #include "var_utils.h"
+#include "memfile.h"
 #include "obj_cube.h"
 #include "obj_slabs.h"
 #include "lev_data.h"
@@ -39,9 +40,9 @@ short bitmap_rescale=4;
 short load_palette(struct PALETTE_ENTRY *pal,char *fname)
 {
     //Reading file
-    struct memory_file mem;
+    struct MEMORY_FILE mem;
     mem = read_file(fname);
-    if (mem.len==-1) return ERR_FILE_NFOUND;
+    if (mem.errcode!=MFILE_OK) return mem.errcode;
     if ((mem.len!=256*3))
     {
       free(mem.content);
@@ -64,16 +65,21 @@ short load_palette(struct PALETTE_ENTRY *pal,char *fname)
 short load_cubedata(struct CUBES_DATA *cubes,char *fname)
 {
     //Reading file
-    struct memory_file mem;
+    struct MEMORY_FILE mem;
     mem = read_file(fname);
-    if (mem.len==-1) return ERR_FILE_NFOUND;
-    if ((mem.len!=512*18+4))
+    if (mem.errcode!=MFILE_OK) return mem.errcode;
+    if (mem.len<22)
+    {
+      free(mem.content);
+      return ERR_FILE_BADDATA;
+    }
+    cubes->count=read_short_le_buf(mem.content+0);
+    if ((mem.len!=cubes->count*18+4))
     {
       free(mem.content);
       return ERR_FILE_BADDATA;
     }
     //Loading the entries
-    cubes->count=512;
     cubes->data=malloc(cubes->count*sizeof(struct CUBE_TEXTURES));
     int i;
     for (i=0; i<cubes->count; i++)
@@ -81,24 +87,45 @@ short load_cubedata(struct CUBES_DATA *cubes,char *fname)
         unsigned int item_pos=i*18+4;
         unsigned int val;
         val=read_short_le_buf(mem.content+item_pos+0);
-        cubes->data[i].n.x=val&7;
-        cubes->data[i].n.y=(val>>3)&127;
+        cubes->data[i].n=val;
         val=read_short_le_buf(mem.content+item_pos+2);
-        cubes->data[i].s.x=val&7;
-        cubes->data[i].s.y=(val>>3)&127;
+        cubes->data[i].s=val;
         val=read_short_le_buf(mem.content+item_pos+4);
-        cubes->data[i].w.x=val&7;
-        cubes->data[i].w.y=(val>>3)&127;
+        cubes->data[i].w=val;
         val=read_short_le_buf(mem.content+item_pos+6);
-        cubes->data[i].e.x=val&7;
-        cubes->data[i].e.y=(val>>3)&127;
+        cubes->data[i].e=val;
         val=read_short_le_buf(mem.content+item_pos+ 8);
-        cubes->data[i].t.x=val&7;
-        cubes->data[i].t.y=(val>>3)&127;
+        cubes->data[i].t=val;
         val=read_short_le_buf(mem.content+item_pos+10);
-        cubes->data[i].b.x=val&7;
-        cubes->data[i].b.y=(val>>3)&127;
+        cubes->data[i].b=val;
     }
+    free(mem.content);
+    return ERR_NONE;
+}
+
+short load_textureanim(struct CUBES_DATA *cubes,char *fname)
+{
+    //Reading file
+    struct MEMORY_FILE mem;
+    mem = read_file(fname);
+    if (mem.errcode!=MFILE_OK) return mem.errcode;
+    cubes->anitxcount=(mem.len>>4);
+    if ((mem.len!=(cubes->anitxcount<<4)))
+    {
+      free(mem.content);
+      return ERR_FILE_BADDATA;
+    }
+    //Loading the entries
+    cubes->anitx=malloc(cubes->anitxcount*sizeof(struct CUBE_TXTRANIM));
+    int i,k;
+    for (i=0; i<cubes->anitxcount; i++)
+      for (k=0; k<8; k++)
+      {
+        unsigned int item_pos=i*16 + k*2;
+        unsigned int val;
+        val=read_short_le_buf(mem.content+item_pos);
+        cubes->anitx[i].data[k]=val;
+      }
     free(mem.content);
     return ERR_NONE;
 }
@@ -107,9 +134,9 @@ short load_texture(struct MAPDRAW_DATA *draw_data,char *fname)
 {
     unsigned long texture_file_len = (TEXTURE_SIZE_X*TEXTURE_COUNT_X) * (TEXTURE_SIZE_Y*TEXTURE_COUNT_Y);
     //Reading file
-    struct memory_file mem;
+    struct MEMORY_FILE mem;
     mem = read_file(fname);
-    if (mem.len==-1) return ERR_FILE_NFOUND;
+    if (mem.errcode!=MFILE_OK) return mem.errcode;
     if ((mem.len!=texture_file_len))
     {
       free(mem.content);
@@ -118,7 +145,7 @@ short load_texture(struct MAPDRAW_DATA *draw_data,char *fname)
     // Allocating buffer
     draw_data->texture=malloc(texture_file_len);
     if (draw_data->texture==NULL)
-      die ("load_texture: Out of memory.");
+      die("load_texture: Out of memory.");
     //Loading the entries
     int i;
     for (i=0; i<(TEXTURE_SIZE_Y*TEXTURE_COUNT_Y); i++)
@@ -245,6 +272,8 @@ short draw_texture_on_buffer(unsigned char *dest,const struct IPOINT_2D dest_pos
           src_idx+=src_size.x;
           continue;
       }
+      int src_add=rnd(scale.y)*src_size.x;
+      if (src_idx+src_add>=src_fullsize) break;
       unsigned short ridy=rnd(256);
       if (scale.x>7)
         for (i=0;i<rect_size.x;i++)
@@ -256,24 +285,24 @@ short draw_texture_on_buffer(unsigned char *dest,const struct IPOINT_2D dest_pos
           unsigned short ridx=rnd(1);
           struct PALETTE_ENTRY *pxdata1;
           if ((src_pos.x+i+ridx)>=src_size.x)
-            pxdata1=&pal[src[src_idx+src_pos.x+i]];
+            pxdata1=&pal[src[src_idx+src_add+src_pos.x+i]];
           else
-            pxdata1=&pal[src[src_idx+src_pos.x+i+ridx]];
+            pxdata1=&pal[src[src_idx+src_add+src_pos.x+i+ridx]];
           struct PALETTE_ENTRY *pxdata2;
           if ((src_pos.x+i+ridx+2)>=src_size.x)
             pxdata2=pxdata1;
           else
-            pxdata2=&pal[src[src_idx+src_pos.x+i+ridx+2]];
+            pxdata2=&pal[src[src_idx+src_add+src_pos.x+i+ridx+2]];
           struct PALETTE_ENTRY *pxdata3;
           if ((src_pos.x+i+ridx+4)>=src_size.x)
             pxdata3=pxdata1;
           else
-            pxdata3=&pal[src[src_idx+src_pos.x+i+ridx+4]];
+            pxdata3=&pal[src[src_idx+src_add+src_pos.x+i+ridx+4]];
           struct PALETTE_ENTRY *pxdata4;
           if ((src_pos.x+i+ridx+6)>=src_size.x)
             pxdata4=pxdata1;
           else
-            pxdata4=&pal[src[src_idx+src_pos.x+i+ridx+6]];
+            pxdata4=&pal[src[src_idx+src_add+src_pos.x+i+ridx+6]];
           dest[dest_idx+(dest_sidx*3)+0]=(pxdata1->b)+(pxdata2->b)+(pxdata3->b)+(pxdata4->b);
           dest[dest_idx+(dest_sidx*3)+1]=(pxdata1->g)+(pxdata2->g)+(pxdata3->g)+(pxdata4->g);
           dest[dest_idx+(dest_sidx*3)+2]=(pxdata1->r)+(pxdata2->r)+(pxdata3->r)+(pxdata4->r);
@@ -289,14 +318,14 @@ short draw_texture_on_buffer(unsigned char *dest,const struct IPOINT_2D dest_pos
           unsigned short ridx=rnd(1);
           struct PALETTE_ENTRY *pxdata1;
           if ((src_pos.x+i+ridx)>=src_size.x)
-            pxdata1=&pal[src[src_idx+src_pos.x+i]];
+            pxdata1=&pal[src[src_idx+src_add+src_pos.x+i]];
           else
-            pxdata1=&pal[src[src_idx+src_pos.x+i+ridx]];
+            pxdata1=&pal[src[src_idx+src_add+src_pos.x+i+ridx]];
           struct PALETTE_ENTRY *pxdata2;
           if ((src_pos.x+i+ridx+2)>=src_size.x)
             pxdata2=pxdata1;
           else
-            pxdata2=&pal[src[src_idx+src_pos.x+i+ridx+2]];
+            pxdata2=&pal[src[src_idx+src_add+src_pos.x+i+ridx+2]];
           dest[dest_idx+(dest_sidx*3)+0]=(pxdata1->b<<1)+(pxdata2->b<<1);
           dest[dest_idx+(dest_sidx*3)+1]=(pxdata1->g<<1)+(pxdata2->g<<1);
           dest[dest_idx+(dest_sidx*3)+2]=(pxdata1->r<<1)+(pxdata2->r<<1);
@@ -308,13 +337,52 @@ short draw_texture_on_buffer(unsigned char *dest,const struct IPOINT_2D dest_pos
           unsigned long dest_sidx=dest_pos.x+(i/scale.x);
           if (dest_sidx>=dest_size.x) continue;
           if ((src_pos.x+i)>=src_size.x) continue;
-          struct PALETTE_ENTRY *pxdata=&pal[src[src_idx+src_pos.x+i]];
+          struct PALETTE_ENTRY *pxdata=&pal[src[src_idx+src_add+src_pos.x+i]];
           dest[dest_idx+(dest_sidx*3)+0]=(pxdata->b<<2);
           dest[dest_idx+(dest_sidx*3)+1]=(pxdata->g<<2);
           dest[dest_idx+(dest_sidx*3)+2]=(pxdata->r<<2);
         }
       dest_idx+=(3*dest_size.x);
       src_idx+=src_size.x;
+    }
+    return true;
+}
+
+/*
+ * returns texture coords for top of the cube with given index
+ */
+short get_top_texture_pos(struct IPOINT_2D *texture_pos,const struct CUBES_DATA *cubes,unsigned short cube_idx)
+{
+    if ((cube_idx>=0x021b)&&(cube_idx<0x025f))
+    //Water and lava hack, to skip loading of cube groups file
+    {
+        texture_pos->x=(rnd(8))*TEXTURE_SIZE_X;
+        texture_pos->y=(cube_idx-0x021b)*TEXTURE_SIZE_Y;
+    } else
+    {
+        // Retrieving texture top index
+        unsigned int cube_top;
+        if (cube_idx<cubes->count)
+        {
+            cube_top=cubes->data[cube_idx].t;
+        } else
+        {
+            cube_top=0;
+        }
+        // Checking if the index is animated
+        if (cube_top>=TEXTURE_COUNT_X*TEXTURE_COUNT_Y)
+        {
+            cube_top-=TEXTURE_COUNT_X*TEXTURE_COUNT_Y;
+            if (cube_top<cubes->anitxcount)
+            {
+              cube_top=cubes->anitx[cube_top].data[rnd(8)];
+            } else
+            {
+              cube_top=0;
+            }
+        }
+        texture_pos->x=(cube_top&7)*TEXTURE_SIZE_X;
+        texture_pos->y=((cube_top>>3)&127)*TEXTURE_SIZE_Y;
     }
     return true;
 }
@@ -345,39 +413,7 @@ short draw_map_on_buffer(char *dst,const struct LEVEL *lvl,const struct MAPDRAW_
           unsigned char *clmentry;
           clmentry=get_subtile_column(lvl,i,j);
           cube_idx=get_clm_entry_topcube(clmentry);
-
-          if ((cube_idx>=CUBE_GOLD1)&&(cube_idx<=CUBE_GOLD3))
-          //Gold hack, to skip loading of cube groups file
-          {
-            texture_pos.x=((((cube_idx-CUBE_GOLD1)&1)<<2)+rnd(4))*TEXTURE_SIZE_X;
-            texture_pos.y=(((cube_idx-CUBE_GOLD1)>>1)+10)*TEXTURE_SIZE_Y;
-          } else
-          if ((cube_idx>=CUBE_GOLD_DARKSD1)&&(cube_idx<=CUBE_GOLD_DARKSD3))
-          //Dark Gold hack, to skip loading of cube groups file
-          {
-            texture_pos.x=((4)+rnd(4))*TEXTURE_SIZE_X;
-            texture_pos.y=(11)*TEXTURE_SIZE_Y;
-          } else
-          if ((cube_idx>=CUBE_GEMS1)&&(cube_idx<=CUBE_GEMS4))
-          //Gems hack, to skip loading of cube groups file
-          {
-            texture_pos.x=(((cube_idx-CUBE_GEMS1)&1)+4)*TEXTURE_SIZE_X;
-            texture_pos.y=(34)*TEXTURE_SIZE_Y;
-          } else
-          if ((cube_idx>=0x021b)&&(cube_idx<0x025f))
-          //Water and lava hack, to skip loading of cube groups file
-          {
-            texture_pos.x=(rnd(8))*TEXTURE_SIZE_X;
-            texture_pos.y=(cube_idx-0x021b)*TEXTURE_SIZE_Y;
-          } else
-          {
-            //Unowned Entrance hack, to skip loading of cube groups file
-            if (cube_idx==CUBE_EYEDROCKBLINK)
-              cube_idx=CUBE_EYEDROCKWHITE;
-            struct CUBE_TEXTURES *cube=&(draw_data->cubes.data[cube_idx&511]);
-            texture_pos.x=(cube->t.x)*TEXTURE_SIZE_X;
-            texture_pos.y=(cube->t.y)*TEXTURE_SIZE_Y;
-          }
+          get_top_texture_pos(&texture_pos,&(draw_data->cubes),cube_idx);
           dest_pos.x=i*(scaled_txtr_size.x);
           draw_texture_on_buffer(dst,dest_pos,dest_size,draw_data->texture,
               texture_pos,texture_size,single_txtr_size,draw_data->palette,scale);
@@ -558,7 +594,7 @@ short generate_map_bitmap(const char *bmpfname,const struct LEVEL *lvl,const sho
     short result;
     struct MAPDRAW_DATA *draw_data=malloc(sizeof(struct MAPDRAW_DATA));
     if (draw_data==NULL)
-      die ("generate_map_bitmap: Out of memory.");
+      die("generate_map_bitmap: Out of memory.");
     // Initializing draw_data values
     draw_data->cubes.data=NULL;
     draw_data->cubes.count=0;
@@ -575,7 +611,7 @@ short generate_map_bitmap(const char *bmpfname,const struct LEVEL *lvl,const sho
       draw_data->intnspal=NULL;
     }
     if (draw_data->palette==NULL)
-      die ("generate_map_bitmap: Out of memory.");
+      die("generate_map_bitmap: Out of memory.");
     struct IPOINT_2D textr_size={TEXTURE_SIZE_X>>rescale,TEXTURE_SIZE_Y>>rescale};
     struct IPOINT_2D bmp_size;
     // Settings to draw whole map
@@ -611,6 +647,15 @@ short generate_map_bitmap(const char *bmpfname,const struct LEVEL *lvl,const sho
     if (result)
     {
       fnames=NULL;
+      format_data_fname(&fnames,"tmapanim.dat");
+      result = (load_textureanim(&(draw_data->cubes),fnames)==ERR_NONE);
+      if (!result)
+          message_error("Error when loading file \"%s\"",fnames);
+      free(fnames);
+    }
+    if (result)
+    {
+      fnames=NULL;
       format_data_fname(&fnames,"tmapa%03d.dat",(int)(lvl->inf%8));
       result = (load_texture(draw_data,fnames)==ERR_NONE);
       if (!result)
@@ -636,7 +681,7 @@ short generate_map_bitmap(const char *bmpfname,const struct LEVEL *lvl,const sho
     {
       bitmap=(unsigned char *)malloc((bmp_size.x*bmp_size.y+1)*3);
       if (bitmap==NULL)
-        die ("generate_map_bitmap: Out of memory.");
+        die("generate_map_bitmap: Out of memory.");
     }
     if (result)
     {
@@ -676,7 +721,7 @@ short generate_map_bitmap_mapfname(struct LEVEL *lvl)
     char *bmpfname;
     bmpfname = (char *)malloc(strlen(lvl->fname)+5);
     if (bmpfname==NULL)
-        die ("generate_map_bitmap: Out of memory.");
+        die("generate_map_bitmap: Out of memory.");
     sprintf (bmpfname, "%s.bmp", lvl->fname);
     result = generate_map_bitmap(bmpfname,lvl,bitmap_rescale);
     if (result)

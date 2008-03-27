@@ -13,6 +13,7 @@ void init_messages(void);
 void free_messages(void);
 
 void strip_crlf(char *string_in);
+char *prepare_short_fname(char *fname, unsigned int maxlen);
 
 void message_error(const char *format, ...);
 void message_info(const char *format, ...);

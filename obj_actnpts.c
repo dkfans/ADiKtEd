@@ -136,7 +136,7 @@ unsigned char *create_actnpt(struct LEVEL *lvl, unsigned int sx, unsigned int sy
     unsigned char *actnpt;
     actnpt = (unsigned char *)malloc(SIZEOF_DK_APT_REC);
     if (actnpt==NULL)
-      die ("create_actnpt: Out of memory.");
+      die("create_actnpt: Out of memory.");
     int i;
     for (i=0; i < SIZEOF_DK_APT_REC; i++)
       actnpt[i]=0;
@@ -163,7 +163,7 @@ unsigned char *create_actnpt_copy(unsigned int sx, unsigned int sy,unsigned char
     unsigned char *actnpt;
     actnpt = (unsigned char *)malloc(SIZEOF_DK_APT_REC);
     if (actnpt==NULL)
-      die ("create_actnpt: Out of memory.");
+      die("create_actnpt: Out of memory.");
     memcpy(actnpt,src,SIZEOF_DK_APT_REC);
     set_actnpt_subtpos(actnpt,0x80,0x80);
     set_actnpt_subtile(actnpt,(unsigned char)sx,(unsigned char)sy);
@@ -350,7 +350,7 @@ unsigned char *create_stlight(unsigned int sx, unsigned int sy)
     unsigned char *stlight;
     stlight = (unsigned char *)malloc(SIZEOF_DK_LGT_REC);
     if (stlight==NULL)
-      die ("create_stlight: Out of memory.");
+      die("create_stlight: Out of memory.");
     int i;
     for (i=0; i < SIZEOF_DK_LGT_REC; i++)
       stlight[i]=0;
@@ -382,7 +382,7 @@ unsigned char *create_stlight_copy(unsigned int sx, unsigned int sy,unsigned cha
     unsigned char *stlight;
     stlight = (unsigned char *)malloc(SIZEOF_DK_LGT_REC);
     if (stlight==NULL)
-      die ("create_stlight_copy: Out of memory.");
+      die("create_stlight_copy: Out of memory.");
     int i;
     memcpy(stlight,src,SIZEOF_DK_LGT_REC);
     set_stlight_subtpos(stlight,((sx%MAP_SUBNUM_X)*0x40+0x40),((sy%MAP_SUBNUM_Y)*0x40+0x40));

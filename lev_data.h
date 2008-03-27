@@ -101,13 +101,7 @@ struct LEVSTATS {
     //Items stats
     int hero_gates_count;
     int dn_hearts_count;
-    int spellbooks_count;
-    int dng_specboxes_count;
-    int crtr_lairs_count;
-    int statues_count;
-    int torches_count;
-    int gold_things_count;
-    int furniture_count;
+    int things_count[THING_CATEGR_COUNT];
     //Various stats
     int room_things_count;
     //Stats on objects adding/removal

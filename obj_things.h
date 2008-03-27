@@ -5,6 +5,8 @@
 #ifndef ADIKT_OBJTHINGS_H
 #define ADIKT_OBJTHINGS_H
 
+#include "globals.h"
+
 //Things - most of the game objects is stored as thing
 #define THING_TYPE_NONE        0x00
 #define THING_TYPE_ITEM        0x01
@@ -64,14 +66,14 @@
 #define ITEM_SUBTYPE_CHICKNSTB 0x28
 #define ITEM_SUBTYPE_CHICKNWOB 0x29
 #define ITEM_SUBTYPE_CHICKNCRK 0x2a
-#define ITEM_SUBTYPE_CHICKN2   0x2b //not sure about this one
+#define ITEM_SUBTYPE_GOLDL     0x2b
 #define ITEM_SUBTYPE_SPINNKEY  0x2c
 #define ITEM_SUBTYPE_SPELLDISE 0x2d
 #define ITEM_SUBTYPE_SPELLCHKN 0x2e
 #define ITEM_SUBTYPE_SPELLDWAL 0x2f
 #define ITEM_SUBTYPE_SPELLTBMB 0x30
 #define ITEM_SUBTYPE_HEROGATE  0x31
-#define ITEM_SUBTYPE_UNKN32    0x32
+#define ITEM_SUBTYPE_SPINNKEY2 0x32
         //UNTESTED - indices may differ by one
 #define ITEM_SUBTYPE_ARMOUR    0x33
 #define ITEM_SUBTYPE_GLDHOARD1 0x34
@@ -147,33 +149,19 @@
 #define ITEM_SUBTYPE_FLAGPOST  0x77
 #define ITEM_SUBTYPE_HEARTFLMB 0x78
 #define ITEM_SUBTYPE_HEARTFLMG 0x79
-#define ITEM_SUBTYPE_HEARTFLMY 0x7a //isn't it purple?!
+#define ITEM_SUBTYPE_HEARTFLMY 0x7a
 #define ITEM_SUBTYPE_PWSIGHT   0x7b
 #define ITEM_SUBTYPE_PWLIGHTNG 0x7c
 #define ITEM_SUBTYPE_TORTURER  0x7d
 #define ITEM_SUBTYPE_LAIRORC   0x7e
 #define ITEM_SUBTYPE_PWHANDGLD 0x7f
-#define ITEM_SUBTYPE_COIN      0x80
+#define ITEM_SUBTYPE_SPINNCOIN 0x80
 #define ITEM_SUBTYPE_STATUE2   0x81
 #define ITEM_SUBTYPE_STATUE3   0x82
 #define ITEM_SUBTYPE_STATUE4   0x83
 #define ITEM_SUBTYPE_STATUE5   0x84
 #define ITEM_SUBTYPE_STATUE6   0x85
 #define ITEM_SUBTYPE_SPELLARMG 0x86
-
-#define ITEM_CATEGR_NULL       0x00
-#define ITEM_CATEGR_VARIOUS    0x01
-#define ITEM_CATEGR_ROOMEQUIP  0x02
-#define ITEM_CATEGR_SPELLBOOK  0x03
-#define ITEM_CATEGR_STATUES    0x04
-#define ITEM_CATEGR_GOLD       0x05
-#define ITEM_CATEGR_FOOD       0x06
-#define ITEM_CATEGR_CREATLAIR  0x07
-#define ITEM_CATEGR_SPECIALBOX 0x08
-#define ITEM_CATEGR_WRKSHOPBOX 0x09
-#define ITEM_CATEGR_PWHNDEFFCT 0x0a
-#define ITEM_CATEGR_LIGHTS     0x0b
-#define ITEM_CATEGR_UNKNOWN    0x10
 
 //Effects (all listed)
 #define ROOMEFC_SUBTP_LAVA     0x01
@@ -239,6 +227,32 @@
 #define DOOR_PASS_UNLOCKED     0x00
 #define DOOR_PASS_LOCKED       0x01
 
+//Thing categories - indices must match the arrays in .c file
+// the UNKNOWN category must be the last one, and THING_CATEGR_COUNT
+// must be set to the count of categories
+#define THING_CATEGR_NULL       0x00
+#define THING_CATEGR_ROOMEFFCT  0x01
+#define THING_CATEGR_ITEMEFFCT  0x02
+#define THING_CATEGR_CREATR     0x03
+#define THING_CATEGR_CREATLAIR  0x04
+#define THING_CATEGR_TRAP       0x05
+#define THING_CATEGR_DOOR       0x06
+#define THING_CATEGR_SPECIALBOX 0x07
+#define THING_CATEGR_SPELLBOOK  0x08
+#define THING_CATEGR_WRKSHOPBOX 0x09
+#define THING_CATEGR_SPINNTNG   0x0a
+#define THING_CATEGR_FOOD       0x0b
+#define THING_CATEGR_GOLD       0x0c
+#define THING_CATEGR_TORCHCNDL  0x0d
+#define THING_CATEGR_HEARTFLAME 0x0e
+#define THING_CATEGR_POLEBAR    0x0f
+#define THING_CATEGR_STATUE     0x10
+#define THING_CATEGR_FURNITURE  0x11
+#define THING_CATEGR_ROOMEQUIP  0x12
+#define THING_CATEGR_PWHAND     0x13
+#define THING_CATEGR_DNCRUCIAL  0x14
+#define THING_CATEGR_UNKNOWN    0x15
+
 //Other defines
 #define THING_SENSITILE_NONE   0x0ffff
 
@@ -248,7 +262,7 @@ struct IPOINT_2D;
 unsigned char get_thing_type(const unsigned char *thing);
 short set_thing_type(unsigned char *thing,unsigned char type_idx);
 unsigned char get_thing_subtype(const unsigned char *thing);
-short set_thing_subtype(unsigned char *thing,unsigned char stype_idx);
+short set_thing_subtype(unsigned char *thing,const unsigned char stype_idx);
 unsigned char get_thing_owner(const unsigned char *thing);
 short set_thing_owner(unsigned char *thing,unsigned char plyr_idx);
 
@@ -271,7 +285,6 @@ short set_thing_level(unsigned char *thing,unsigned char lev_num);
 unsigned short get_thing_sensitile(const unsigned char *thing);
 short set_thing_sensitile(unsigned char *thing,unsigned short til_num);
 
-short switch_thing_subtype(unsigned char *thing,short forward);
 unsigned char get_door_orientation(const unsigned char *thing);
 short set_door_orientation(unsigned char *thing,unsigned char orient);
 unsigned char get_thing_range_subtpos(const unsigned char *thing);
@@ -285,71 +298,140 @@ unsigned char *create_thing(unsigned int sx, unsigned int sy);
 unsigned char *create_thing_copy(const struct LEVEL *lvl,unsigned int sx, unsigned int sy,unsigned char *src);
 unsigned char *create_item(const struct LEVEL *lvl,unsigned int sx, unsigned int sy, unsigned char stype_idx);
 
-short is_spellbook(const unsigned char *thing);
-short is_spellbook_stype(const unsigned char stype_idx);
-unsigned char get_spellbook_next(const unsigned char stype_idx);
-unsigned char get_spellbook_prev(const unsigned char stype_idx);
-short is_dngspecbox(const unsigned char *thing);
-short is_dngspecbox_stype(const unsigned char stype_idx);
-unsigned char get_dngspecbox_next(const unsigned char stype_idx);
-unsigned char get_dngspecbox_prev(const unsigned char stype_idx);
+// Categorization
+short is_nulltng(const unsigned char *thing);
+short is_nulltng_stype(const unsigned char stype_idx);
+int get_nulltng_arridx(const unsigned char stype_idx);
+unsigned char get_nulltng_arritm(const int arr_itm);
+unsigned int get_nulltng_count(void);
+short is_roomeffect(const unsigned char *thing);
+int get_roomeffect_arridx(const unsigned char stype_idx);
+unsigned char get_roomeffect_arritm(const int arr_itm);
+unsigned int get_roomeffect_count(void);
+short is_itemeffect(const unsigned char *thing);
+short is_itemeffect_stype(const unsigned char stype_idx);
+int get_itemeffect_arridx(const unsigned char stype_idx);
+unsigned char get_itemeffect_arritm(const int arr_itm);
+unsigned int get_itemeffect_count(void);
+short is_creature(const unsigned char *thing);
+int get_creature_arridx(const unsigned char stype_idx);
+unsigned char get_creature_arritm(const int arr_itm);
+unsigned int get_creature_count(void);
 short is_crtrlair(const unsigned char *thing);
 short is_crtrlair_stype(const unsigned char stype_idx);
-unsigned char get_crtrlair_next(const unsigned char stype_idx);
-unsigned char get_crtrlair_prev(const unsigned char stype_idx);
-short is_trapbox(const unsigned char *thing);
-short is_trapbox_stype(const unsigned char stype_idx);
-unsigned char get_trapbox_next(const unsigned char stype_idx);
-unsigned char get_trapbox_prev(const unsigned char stype_idx);
+int get_crtrlair_arridx(const unsigned char stype_idx);
+unsigned char get_crtrlair_arritm(const int arr_itm);
+unsigned int get_crtrlair_count(void);
 short is_trap(const unsigned char *thing);
-unsigned char get_trap_next(const unsigned char stype_idx);
-unsigned char get_trap_prev(const unsigned char stype_idx);
-short is_creature(const unsigned char *thing);
-unsigned char get_creature_next(const unsigned char stype_idx);
-unsigned char get_creature_prev(const unsigned char stype_idx);
+int get_trap_arridx(const unsigned char stype_idx);
+unsigned char get_trap_arritm(const int arr_itm);
+unsigned int get_trap_count(void);
 short is_door(const unsigned char *thing);
-unsigned char get_door_next(const unsigned char stype_idx);
-unsigned char get_door_prev(const unsigned char stype_idx);
-short is_roomeffect(const unsigned char *thing);
-unsigned char get_roomeffect_next(const unsigned char stype_idx);
-unsigned char get_roomeffect_prev(const unsigned char stype_idx);
-short is_statue(const unsigned char *thing);
-short is_statue_stype(const unsigned char stype_idx);
-unsigned char get_statue_next(const unsigned char stype_idx);
-unsigned char get_statue_prev(const unsigned char stype_idx);
-short is_furniture(const unsigned char *thing);
-short is_furniture_stype(const unsigned char stype_idx);
-unsigned char get_furniture_next(const unsigned char stype_idx);
-unsigned char get_furniture_prev(const unsigned char stype_idx);
+int get_door_arridx(const unsigned char stype_idx);
+unsigned char get_door_arritm(const int arr_itm);
+unsigned int get_door_count(void);
+short is_dngspecbox(const unsigned char *thing);
+short is_dngspecbox_stype(const unsigned char stype_idx);
+int get_dngspecbox_arridx(const unsigned char stype_idx);
+unsigned char get_dngspecbox_arritm(const int arr_itm);
+unsigned int get_dngspecbox_count(void);
+short is_spellbook(const unsigned char *thing);
+short is_spellbook_stype(const unsigned char stype_idx);
+int get_spellbook_arridx(const unsigned char stype_idx);
+unsigned char get_spellbook_arritm(const int arr_itm);
+unsigned int get_spellbook_count(void);
+short is_wrkshopbox(const unsigned char *thing);
+short is_wrkshopbox_stype(const unsigned char stype_idx);
+int get_wrkshopbox_arridx(const unsigned char stype_idx);
+unsigned char get_wrkshopbox_arritm(const int arr_itm);
+unsigned int get_wrkshopbox_count(void);
+short is_spinningtng(const unsigned char *thing);
+short is_spinningtng_stype(const unsigned char stype_idx);
+int get_spinningtng_arridx(const unsigned char stype_idx);
+unsigned char get_spinningtng_arritm(const int arr_itm);
+unsigned int get_spinningtng_count(void);
 short is_food(const unsigned char *thing);
 short is_food_stype(const unsigned char stype_idx);
-unsigned char get_food_next(const unsigned char stype_idx);
-unsigned char get_food_prev(const unsigned char stype_idx);
+int get_food_arridx(const unsigned char stype_idx);
+unsigned char get_food_arritm(const int arr_itm);
+unsigned int get_food_count(void);
 short is_gold(const unsigned char *thing);
 short is_gold_stype(const unsigned char stype_idx);
-unsigned char get_gold_next(const unsigned char stype_idx);
-unsigned char get_gold_prev(const unsigned char stype_idx);
-short is_torch(const unsigned char *thing);
-short is_torch_stype(const unsigned char stype_idx);
-unsigned char get_torch_next(const unsigned char stype_idx);
-unsigned char get_torch_prev(const unsigned char stype_idx);
+int get_gold_arridx(const unsigned char stype_idx);
+unsigned char get_gold_arritm(const int arr_itm);
+unsigned int get_gold_count(void);
+short is_torchcndl(const unsigned char *thing);
+short is_torchcndl_stype(const unsigned char stype_idx);
+int get_torchcndl_arridx(const unsigned char stype_idx);
+unsigned char get_torchcndl_arritm(const int arr_itm);
+unsigned int get_torchcndl_count(void);
 short is_heartflame(const unsigned char *thing);
 short is_heartflame_stype(const unsigned char stype_idx);
+int get_heartflame_arridx(const unsigned char stype_idx);
+unsigned char get_heartflame_arritm(const int arr_itm);
 unsigned char get_heartflame_next(const unsigned char stype_idx);
 unsigned char get_heartflame_prev(const unsigned char stype_idx);
-short is_pole(const unsigned char *thing);
-short is_pole_stype(const unsigned char stype_idx);
-unsigned char get_pole_next(const unsigned char stype_idx);
-unsigned char get_pole_prev(const unsigned char stype_idx);
+unsigned int get_heartflame_count(void);
+short is_polebar(const unsigned char *thing);
+short is_polebar_stype(const unsigned char stype_idx);
+int get_polebar_arridx(const unsigned char stype_idx);
+unsigned char get_polebar_arritm(const int arr_itm);
+unsigned int get_polebar_count(void);
+short is_statue(const unsigned char *thing);
+short is_statue_stype(const unsigned char stype_idx);
+int get_statue_arridx(const unsigned char stype_idx);
+unsigned char get_statue_arritm(const int arr_itm);
+unsigned int get_statue_count(void);
+short is_furniture(const unsigned char *thing);
+short is_furniture_stype(const unsigned char stype_idx);
+int get_furniture_arridx(const unsigned char stype_idx);
+unsigned char get_furniture_arritm(const int arr_itm);
+unsigned int get_furniture_count(void);
+short is_roomequip(const unsigned char *thing);
+short is_roomequip_stype(const unsigned char stype_idx);
+int get_roomequip_arridx(const unsigned char stype_idx);
+unsigned char get_roomequip_arritm(const int arr_itm);
+unsigned int get_roomequip_count(void);
+short is_pwhand(const unsigned char *thing);
+short is_pwhand_stype(const unsigned char stype_idx);
+int get_pwhand_arridx(const unsigned char stype_idx);
+unsigned char get_pwhand_arritm(const int arr_itm);
+unsigned int get_pwhand_count(void);
+short is_dncrucial(const unsigned char *thing);
+short is_dncrucial_stype(const unsigned char stype_idx);
+int get_dncrucial_arridx(const unsigned char stype_idx);
+unsigned char get_dncrucial_arritm(const int arr_itm);
+unsigned int get_dncrucial_count(void);
+// This one always returns false
+short is_false_stype(const unsigned char stype_idx);
+
+// Additional functions - not categorization
+short is_trapbox(const unsigned char *thing);
+short is_trapbox_stype(const unsigned char stype_idx);
+int get_trapbox_arridx(const unsigned char stype_idx);
+unsigned char get_trapbox_arritm(const int arr_itm);
+unsigned int get_trapbox_count(void);
+short is_doorbox(const unsigned char *thing);
+short is_doorbox_stype(const unsigned char stype_idx);
+int get_doorbox_arridx(const unsigned char stype_idx);
+unsigned char get_doorbox_arritm(const int arr_itm);
+unsigned int get_doorbox_count(void);
+short is_torch(const unsigned char *thing);
+short is_torch_stype(const unsigned char stype_idx);
+int get_torch_arridx(const unsigned char stype_idx);
+unsigned char get_torch_arritm(const int arr_itm);
+unsigned int get_torch_count(void);
 short is_lit_thing(const unsigned char *thing);
 short is_lit_thing_stype(const unsigned char stype_idx);
-unsigned char get_lit_thing_next(const unsigned char stype_idx);
-unsigned char get_lit_thing_prev(const unsigned char stype_idx);
+int get_lit_thing_arridx(const unsigned char stype_idx);
+unsigned char get_lit_thing_arritm(const int arr_itm);
+unsigned int get_lit_thing_count(void);
+
 short is_herogate(const unsigned char *thing);
 short is_dnheart(const unsigned char *thing);
 short is_doorkey(const unsigned char *thing);
 short is_trainpost(const unsigned char *thing);
-short is_room_thing(const unsigned char *thing);
+short is_room_inventory(const unsigned char *thing);
 short is_clmaffective_thing(const unsigned char *thing);
 
 int get_item_category(unsigned char stype_idx);
@@ -357,15 +439,26 @@ unsigned char get_usual_item_slab(unsigned char stype_idx);
 unsigned char get_usual_thing_slab(unsigned char *thing);
 short subtl_in_thing_range(const unsigned char *thing,unsigned int sx,unsigned int sy);
 
-char *get_thing_type_fullname(unsigned short type_idx);
-char *get_thing_type_shortname(unsigned short type_idx);
-char *get_item_subtype_fullname(unsigned short stype_idx);
-char *get_item_subtype_shortname(unsigned short stype_idx);
-char *get_creature_subtype_fullname(unsigned short stype_idx);
-char *get_creature_subtype_shortname(unsigned short stype_idx);
-char *get_trap_subtype_fullname(unsigned short stype_idx);
-char *get_door_subtype_fullname(unsigned short stype_idx);
-char *get_item_category_fullname(unsigned short stype_idx);
+char *get_thing_type_fullname(const unsigned short type_idx);
+char *get_thing_type_shortname(const unsigned short type_idx);
+char *get_item_subtype_fullname(const unsigned short stype_idx);
+char *get_item_subtype_shortname(const unsigned short stype_idx);
+char *get_creature_subtype_fullname(const unsigned short stype_idx);
+char *get_creature_subtype_shortname(const unsigned short stype_idx);
+char *get_trap_subtype_fullname(const unsigned short stype_idx);
+char *get_door_subtype_fullname(const unsigned short stype_idx);
+char *get_thing_category_fullname(const unsigned short arr_idx);
+char *get_thing_category_shortname(const unsigned short arr_idx);
+char *get_roomeffect_subtype_fullname(const unsigned short stype_idx);
+
+int get_thing_subtypes_arridx(const unsigned char *thing);
+unsigned int get_thing_subtypes_count(const unsigned short arr_idx);
+unsigned int get_thing_subtypes_arritem(const unsigned short arr_idx,const int arr_itm);
+int get_thing_subtypes_arritmidx(const unsigned short arr_idx,const unsigned short stype_idx);
+thing_subtype_arrayitem get_thing_subtypes_arritem_func(const unsigned short arr_idx);
+unsigned short get_thing_subtypes_next(const unsigned short arr_idx,const unsigned short stype_idx);
+unsigned short get_thing_subtypes_prev(const unsigned short arr_idx,const unsigned short stype_idx);
+short switch_thing_subtype(unsigned char *thing,const short forward);
 
 short thing_verify(unsigned char *thing, char *err_msg);
 
