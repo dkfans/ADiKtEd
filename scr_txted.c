@@ -58,6 +58,10 @@ void actions_scrpt(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,str
     case KEY_PGDOWN:
       editor->y+=scrmode->rows-1;
       break;
+    case KEY_U:
+      recompute_script_levels(&(lvl->script));
+      recompose_script(&(lvl->script));
+      break;
     case KEY_TAB:
     case KEY_ESCAPE:
       end_scrpt(scrmode,mapmode,lvl);

@@ -333,6 +333,7 @@ short set_stlight_intensivity(unsigned char *stlight,unsigned char intens)
 {
     if (stlight==NULL) return 0;
     stlight[2]=intens;
+    return 1;
 }
 
 /*

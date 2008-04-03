@@ -10,29 +10,32 @@ struct LEVEL;
 //Command types
 
 enum cmd_groups {
+    // The main commands - at start of the line
     CMD_UNKNOWN = 0x000,
-    CMD_PAROBJ  = 0x001,  //party objective
-    CMD_FLAG    = 0x002,
-    CMD_TIMER   = 0x003,
+    CMD_CONDIT  = 0x001,
+    CMD_PARTY   = 0x002,
+    CMD_AVAIL   = 0x003,
     CMD_CUSTOBJ = 0x004,  //custom objective/info
     CMD_SETUP   = 0x005,
-/*
-    CMD_CRTRADJ = 0x006,
-*/
-    CMD_PARTY   = 0x007,
-    CMD_CONDIT  = 0x008,
-    CMD_AVAIL   = 0x009,
-    CMD_DOOR    = 0x00a,
-    CMD_TRAP    = 0x00b,
-    CMD_SPELL   = 0x00c,
-    CMD_VARIBL  = 0x00d,
-    CMD_OPERATR = 0x00e,
-/*
-    CMD_PLAYER  = 0x00f,
-*/
-    CMD_CREATR  = 0x010,
-    CMD_ROOM    = 0x011,
-    CMD_COMP    = 0x012,
+    CMD_TRIGER  = 0x006,
+    CMD_CRTRADJ = 0x007,
+    CMD_COMMNT  = 0x008,  // REMs and empty lines
+    CMD_OBSOLT  = 0x009,  // commands that worked only in beta or before
+
+    // Command parameters
+    CMD_PAROBJ  = 0x010,  //party objective
+    CMD_FLAG    = 0x012,
+    CMD_TIMER   = 0x013,
+    CMD_DOOR    = 0x014,
+    CMD_TRAP    = 0x015,
+    CMD_SPELL   = 0x016,
+    CMD_VARIBL  = 0x017,
+    CMD_OPERATR = 0x018,
+    CMD_CREATR  = 0x019,
+    CMD_ROOM    = 0x01a,
+    CMD_COMP    = 0x01b,
+
+    // Adikted - specific
     CMD_ORIENT  = 0x0fe,
     CMD_ADIKTED = 0x0ff,
 };
@@ -42,75 +45,48 @@ enum cmd_groups {
 // A = Argument (text value). E.g: PLAYER0, TREASURE...
 // N = Numerical (number value). E.g: 200, 10...
 
-//Note: Doors, Traps, Spells are defined elswhere
-#define CREATURE             0x07f
-#define ROOM                 0x07e
-
+//Commands - conditions
 //Setup commands
-enum cmnds_setup {
-// 8 - SET_GENERATE_SPEED([a]) N
-    SET_GEN_SPEED       = 0x001,
-// 10 - START_MONEY([player],[a]) AN
-    START_MONEY         = 0x002,
-// 16 - COMPUTER_PLAYER([player],[a]) AN
-    COMP_PLAYER         = 0x003,
-// 71 - ALLY_PLAYERS([player],[player]) AA
-    ALLY_PLAYERS        = 0x004,
-// 59 - SET_MUSIC([a]) N
-    SET_MUSIC           = 0x005,
-// 15 - RESEARCH([player],[research type],[room or spell],[a]) AAAN
-    RESEARCH            = 0x006,
-// 67 - SET_COMPUTER_GLOBALS([player],[a],[a],[a],[a],[a],[a]) ANNNNNN
-    SET_COMPUTER_GLOBALS= 0x007,
-// 68 - SET_COMPUTER_CHECKS([player],["ChecksName"],[CheckEvery],[AttackPercent],[CTADuration],[MinForAttack],[LastCheck]) AANNNNN
-    SET_COMPUTER_CHECKS = 0x008,
-// 69 - SET_COMPUTER_EVENT([player],["EventName"],[Data1],[Data2]) AANN
-    SET_COMPUTER_EVENT  = 0x009,
-// 70 - SET_COMPUTER_PROCESS([player],["ProcessName"],[Priority],[Data1],[Data2],[Data3],[Data4]) AANNNNN
-    SET_COMPUTER_PROCESS= 0x00a,
+enum cmnds_condit {
+// 5 - IF([player],[variable][comparison][a]) AAAN
+    COND_IF             = 0x001,
+// 65 - IF_AVAILABLE([player],[name],[comparison],[a]) AAAN
+    IF_AVAILABLE        = 0x002,
+// 18 - IF_ACTION_POINT([action point],[player]) NA
+    IF_ACTNPT           = 0x003,
+// 6 - ENDIF
+    COND_ENDIF          = 0x004,
 };
 
-//Creatures adjusting
-enum cmnds_crtradj {
-// 72 - DEAD_CREATURES_RETURN_TO_POOL([a]) N
-    DEAD_CREATURES_RET_TO_POOL=0x001,
-// 25 - MAX_CREATURES([player],[a]) AN
-    MAX_CREATURES      = 0x002,
-// 40 - ADD_CREATURE_TO_POOL([creature],[a]) AN
-    ADD_CREATR_TO_POOL = 0x003,
-// 58 - SET_CREATURE_MAX_LEVEL([player],[creature],[max experience]) AAN
-    SET_CREATR_MAX_LEVEL=0x004,
-// 61 - SET_CREATURE_STRENGTH([creature],[a]) AN
-    SET_CREATR_STRENGTH= 0x005,
-// 60 - SET_CREATURE_HEALTH([creature],[a]) AN
-    SET_CREATR_HEALTH  = 0x006,
-// 62 - SET_CREATURE_ARMOUR([creature],[a]) AN
-    SET_CREATR_ARMOUR  = 0x007,
-// 63 - SET_CREATURE_FEAR([creature],[a]) AN
-    SET_CREATR_FEAR    = 0x008,
+//Commands - partys
+enum cmnds_party {
+// 0 - CREATE_PARTY([party name]) A
+    CREATE_PARTY             = 0x001,
+// 19 - ADD_TUNNELLER_TO_LEVEL([player],[action point],[head for],[action point/target player],[experience],[gold]) AAANNN
+    ADD_TUNNELER_TOLEV       = 0x002,
+// 1 - ADD_TO_PARTY([party name],[creature],[experience],[gold],[objective],[Countdown]) AANNAN
+    ADD_TO_PARTY             = 0x003,
+// 2 - ADD_PARTY_TO_LEVEL([player],[name],[action point],[a]) AAAN
+    ADD_PARTY_TOLEV          = 0x004,
+// 3 - ADD_CREATURE_TO_LEVEL([player],[creature],[action point],[a],[experience],[gold]) AAANNN
+    ADD_CREATR_TOLEV         = 0x005,
+//39 - ADD_TUNNELLER_PARTY_TO_LEVEL([player],[party name],[action point],[head for],[action point/target player],[experience],[gold]) AAAANNN
+    ADD_TUNNELLER_PARTY_TOLEV= 0x006,
 };
 
-// Game action control
-// 76 - SWAP_CREATURE([?],[?]) AA
-#define CREATR_SWAP          0x00a
-// 7 - SET_HATE([a],[a],[a]) NNN
-#define SET_HATE             0x009
-// 24 - SET_FLAG([player],[flag],[a]) AAN
-#define SET_FLAG             0x008
-// 21 - LOSE_GAME
-#define GAME_LOSE            0x007
-// 20 - WIN_GAME
-#define GAME_WIN             0x006
-// 17 - SET_TIMER([player],[timer]) AA
-#define SET_TIMER            0x005
-// 41 - RESET_ACTION_POINT([action point]) N
-#define RESET_ACTNPT         0x004
-// 26 - NEXT_COMMAND_REUSABLE
-#define NEXT_CMD_REUSABLE    0x003
-// 9 - REM
-#define REM                  0x002
-// Empty lines will be stored in this category
-#define EMPTYLN              0x001
+//Commands - availability
+enum cmnds_avail {
+// 11 - ROOM_AVAILABLE([player],[room],[can be available],[is available]) AANN
+    ROOM_AVAIL          = 0x001,
+// 12 - CREATURE_AVAILABLE([player],[creature],[can be available],[is available]) AANN
+    CREATR_AVAIL        = 0x002,
+// 13 - MAGIC_AVAILABLE([player],[spell],[can be available],[is available]) AANN
+    MAGIC_AVAIL         = 0x003,
+// 14 - TRAP_AVAILABLE([player],[trap],[can be available],[number available]) AANN
+    TRAP_AVAIL          = 0x004,
+// 29 - DOOR_AVAILABLE([player],[door],[can be available],[number available]) AANN
+    DOOR_AVAIL          = 0x005,
+};
 
 //Custom objectives and info boxes
 enum cmnds_custobj {
@@ -132,41 +108,91 @@ enum cmnds_custobj {
     QUICK_INFO         = 0x008,
 };
 
-//Commands - partys
-//39 - ADD_TUNNELLER_PARTY_TO_LEVEL([player],[party name],[action point],[head for],[action point/target player],[experience],[gold]) AAAANNN
-#define ADD_TUNNELLER_PARTY_TOLEV 0x006
-// 3 - ADD_CREATURE_TO_LEVEL([player],[creature],[action point],[a],[experience],[gold]) AAANNN
-#define ADD_CREATR_TOLEV          0x005
-// 2 - ADD_PARTY_TO_LEVEL([player],[name],[action point],[a]) AAAN
-#define ADD_PARTY_TOLEV           0x004
-// 1 - ADD_TO_PARTY([party name],[creature],[experience],[gold],[objective],[Countdown]) AANNAN
-#define ADD_TO_PARTY              0x003
-// 19 - ADD_TUNNELLER_TO_LEVEL([player],[action point],[head for],[action point/target player],[experience],[gold]) AAANNN
-#define ADD_TUNNELER_TOLEV        0x002
-// 0 - CREATE_PARTY([party name]) A
-#define CREATE_PARTY              0x001
+//Setup commands
+enum cmnds_setup {
+// 8 - SET_GENERATE_SPEED([a]) N
+    SET_GEN_SPEED       = 0x001,
+// 10 - START_MONEY([player],[a]) AN
+    START_MONEY         = 0x002,
+// 16 - COMPUTER_PLAYER([player],[a]) AN
+    COMP_PLAYER         = 0x003,
+// 71 - ALLY_PLAYERS([player],[player]) AA
+    ALLY_PLAYERS        = 0x004,
+// 7 - SET_HATE([a],[a],[a]) NNN
+    SET_HATE            = 0x005,
+// 15 - RESEARCH([player],[research type],[room or spell],[a]) AAAN
+    RESEARCH            = 0x006,
+// 67 - SET_COMPUTER_GLOBALS([player],[a],[a],[a],[a],[a],[a]) ANNNNNN
+    SET_COMPUTER_GLOBALS= 0x007,
+// 68 - SET_COMPUTER_CHECKS([player],["ChecksName"],[CheckEvery],[AttackPercent],[CTADuration],[MinForAttack],[LastCheck]) AANNNNN
+    SET_COMPUTER_CHECKS = 0x008,
+// 69 - SET_COMPUTER_EVENT([player],["EventName"],[Data1],[Data2]) AANN
+    SET_COMPUTER_EVENT  = 0x009,
+// 70 - SET_COMPUTER_PROCESS([player],["ProcessName"],[Priority],[Data1],[Data2],[Data3],[Data4]) AANNNNN
+    SET_COMPUTER_PROCESS= 0x00a,
+// 25 - MAX_CREATURES([player],[a]) AN
+    MAX_CREATURES       = 0x00b,
+};
 
-//Commands - availability
-// 29 - DOOR_AVAILABLE([player],[door],[can be available],[number available]) AANN
-#define DOOR_AVAIL           0x005
-// 14 - TRAP_AVAILABLE([player],[trap],[can be available],[number available]) AANN
-#define TRAP_AVAIL           0x004
-// 13 - MAGIC_AVAILABLE([player],[spell],[can be available],[is available]) AANN
-#define MAGIC_AVAIL          0x003
-// 12 - CREATURE_AVAILABLE([player],[creature],[can be available],[is available]) AANN
-#define CREATR_AVAIL         0x002
-// 11 - ROOM_AVAILABLE([player],[room],[can be available],[is available]) AANN
-#define ROOM_AVAIL           0x001
+// Game action control/trigger commands
+enum cmnds_triger {
+// 41 - RESET_ACTION_POINT([action point]) N
+    RESET_ACTNPT        = 0x001,
+// 26 - NEXT_COMMAND_REUSABLE
+    NEXT_CMD_REUSABLE   = 0x002,
+// 24 - SET_FLAG([player],[flag],[a]) AAN
+    SET_FLAG            = 0x003,
+// 17 - SET_TIMER([player],[timer]) AA
+    SET_TIMER           = 0x004,
+// 21 - LOSE_GAME
+    GAME_LOSE           = 0x005,
+// 20 - WIN_GAME
+    GAME_WIN            = 0x006,
+// 59 - SET_MUSIC([a]) N
+    SET_MUSIC           = 0x007,
+};
 
-//Commands - conditions
-// 5 - IF([player],[variable][comparison][a]) AAAN
-#define COND_IF              0x001
-// 65 - IF_AVAILABLE([player],[name],[comparison],[a]) AAAN
-#define IF_AVAILABLE         0x002
-// 18 - IF_ACTION_POINT([action point],[player]) NA
-#define IF_ACTNPT            0x003
-// 6 - ENDIF
-#define COND_ENDIF           0x004
+//Creatures adjusting
+enum cmnds_crtradj {
+// 72 - DEAD_CREATURES_RETURN_TO_POOL([a]) N
+    DEAD_CREATURES_RET_TO_POOL=0x001,
+// 40 - ADD_CREATURE_TO_POOL([creature],[a]) AN
+    ADD_CREATR_TO_POOL = 0x002,
+// 58 - SET_CREATURE_MAX_LEVEL([player],[creature],[max experience]) AAN
+    SET_CREATR_MAX_LEVEL=0x003,
+// 61 - SET_CREATURE_STRENGTH([creature],[a]) AN
+    SET_CREATR_STRENGTH= 0x004,
+// 60 - SET_CREATURE_HEALTH([creature],[a]) AN
+    SET_CREATR_HEALTH  = 0x005,
+// 62 - SET_CREATURE_ARMOUR([creature],[a]) AN
+    SET_CREATR_ARMOUR  = 0x006,
+// 63 - SET_CREATURE_FEAR([creature],[a]) AN
+    SET_CREATR_FEAR    = 0x007,
+// 76 - SWAP_CREATURE([?],[?]) AA
+    CREATR_SWAP        = 0x008,
+};
+
+// Comments/skiped commands
+enum cmnds_comnt {
+// Empty lines will be stored in this category
+    EMPTYLN             = 0x001,
+// 9 - REM
+    REM                 = 0x002,
+};
+
+// Obsolete commands
+enum obsolt_comnt {
+    OBSOLT_PRINT        = 0x001,
+    CREATE_TEXT         = 0x002,
+};
+
+
+
+
+//Note: Doors, Traps, Spells are defined elswhere
+#define CREATURE             0x07f
+#define ROOM                 0x07e
+
 
 //Variables
 #define ALL_DNGNS_DESTROYED  0x001
@@ -262,6 +288,8 @@ struct DK_SCRIPT_COMMAND {
     int index;  // Specific command index inside the group
     unsigned char **params; // Parameters, as text
     int param_count;  // Count of the parameters
+    int level;  // amount of opened loops; 0 means main block
+                // (regulates how much empty spaces to add before the command)
   };
 
 struct DK_SCRIPT;
@@ -269,7 +297,10 @@ struct IPOINT_2D;
 
 //Functions for script analysis
 short decompose_script(struct DK_SCRIPT *script);
-short decompose_script_command(struct DK_SCRIPT_COMMAND *cmd,char *text);
+short recompose_script(struct DK_SCRIPT *script);
+short recompute_script_levels(struct DK_SCRIPT *script);
+short decompose_script_command(struct DK_SCRIPT_COMMAND *cmd,const char *text);
+char *recompose_script_command(const struct DK_SCRIPT_COMMAND *cmd);
 //Functions for Adikted script execution
 short execute_script_line(struct LEVEL *lvl,char *line,char *err_msg);
 // Verification
@@ -280,15 +311,34 @@ void text_file_free(char **lines,int lines_count);
 int text_file_line_add(char ***lines,int *lines_count,char *text);
 int text_file_linecp_add(char ***lines,int *lines_count,char *text);
 
-//Lower level - for obtaining index of a command
+//Lower level - for obtaining index of a command/parameter - adikted specific
 int adikted_cmd_index(char *cmdtext);
 const char *adikted_cmd_text(int cmdidx);
+int orient_cmd_index(char *cmdtext);
+const char *orient_cmd_text(int cmdidx);
+unsigned short get_orientation_next(unsigned short orient);
+int font_cmd_index(char *cmdtext);
+const char *font_cmd_text(int cmdidx);
+//Lower level - for obtaining index of a command - dk commands
 int condit_cmd_index(char *cmdtext);
 const char *condit_cmd_text(int cmdidx);
 int party_cmd_index(char *cmdtext);
 const char *party_cmd_text(int cmdidx);
 int avail_cmd_index(char *cmdtext);
 const char *avail_cmd_text(int cmdidx);
+int custobj_cmd_index(char *cmdtext);
+const char *custobj_cmd_text(int cmdidx);
+int setup_cmd_index(char *cmdtext);
+const char *setup_cmd_text(int cmdidx);
+int triger_cmd_index(char *cmdtext);
+const char *triger_cmd_text(int cmdidx);
+int crtradj_cmd_index(char *cmdtext);
+const char *crtradj_cmd_text(int cmdidx);
+int obsolt_cmd_index(char *cmdtext);
+const char *obsolt_cmd_text(int cmdidx);
+int commnt_cmd_index(char *cmdtext);
+const char *commnt_cmd_text(int cmdidx);
+//Lower level - for obtaining index of a parameter - dk command parameters
 int comp_plyr_cmd_index(char *cmdtext);
 const char *comp_plyr_cmd_text(int cmdidx);
 int operator_cmd_index(char *cmdtext);
@@ -301,15 +351,6 @@ int flag_cmd_index(char *cmdtext);
 const char *flag_cmd_text(int cmdidx);
 int party_objectv_cmd_index(char *cmdtext);
 const char *party_objectv_cmd_text(int cmdidx);
-int custobj_cmd_index(char *cmdtext);
-const char *custobj_cmd_text(int cmdidx);
-int setup_cmd_index(char *cmdtext);
-const char *setup_cmd_text(int cmdidx);
-int orient_cmd_index(char *cmdtext);
-const char *orient_cmd_text(int cmdidx);
-unsigned short get_orientation_next(unsigned short orient);
-int font_cmd_index(char *cmdtext);
-const char *font_cmd_text(int cmdidx);
 
 //Other lower level functions
 short script_command_param_add(struct DK_SCRIPT_COMMAND *cmd,char *param);
@@ -320,6 +361,9 @@ void script_command_free(struct DK_SCRIPT_COMMAND *cmd);
 char *get_orientation_shortname(unsigned short orient);
 char *get_font_longname(unsigned short font);
 short script_param_to_int(int *val,char *param);
+const char *script_cmd_text(int group,int cmdidx);
+short is_no_bracket_command(int group,int cmdidx);
+char *script_strword( const char *str, const short whole_rest );
 
 //Lower level - executing commands
 short execute_adikted_command(struct LEVEL *lvl,struct DK_SCRIPT_COMMAND *cmd,char *err_msg);

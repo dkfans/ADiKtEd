@@ -33,26 +33,6 @@ const char *cmd_adikted_arr[]={
         "",custom_column_cmdtext,graffiti_cmdtext  //0x000,0x001,0x002
         };
 
-//Objectives of creatures in partys
-const char objctv_defend_party_cmdtext[]="DEFEND_PARTY";
-const char objctv_attack_rooms_cmdtext[]="ATTACK_ROOMS";
-const char objctv_attack_dnheart_cmdtext[]="ATTACK_DUNGEON_HEART";
-const char objctv_enemies_cmdtext[]="ATTACK_ENEMIES";
-const char objctv_steal_spells_cmdtext[]="STEAL_SPELLS";
-const char objctv_steal_gold_cmdtext[]="STEAL_GOLD";
-//Heading objectives for tunneller partys
-const char objctv_approp_dung_cmdtext[]="APPROPIATE_DUNGEON";
-const char objctv_dnheart_cmdtext[]="DUNGEON_HEART";
-const char objctv_dungeon_cmdtext[]="DUNGEON";
-const char objctv_actnpt_cmdtext[]="ACTION_POINT";
-// CMD_OBJCTV - objectives of creatures in partys
-const char *cmd_party_objectv_arr[]={
-        "",objctv_actnpt_cmdtext,objctv_dungeon_cmdtext,  //0x000,0x001,0x002
-        objctv_dnheart_cmdtext,objctv_approp_dung_cmdtext,
-        objctv_steal_gold_cmdtext,objctv_steal_spells_cmdtext,objctv_enemies_cmdtext,
-        objctv_attack_dnheart_cmdtext,objctv_attack_rooms_cmdtext,objctv_defend_party_cmdtext,
-        };
-
 // Partys - commands
 const char create_party_cmdtext[]="CREATE_PARTY";
 const char add_tunneler_tolev_cmdtext[]="ADD_TUNNELLER_TO_LEVEL";
@@ -77,6 +57,90 @@ const char door_avail_cmdtext[]="DOOR_AVAILABLE";
 const char *cmd_avail_arr[]={
         "",room_avail_cmdtext,creatr_avail_cmdtext,  //0x000,0x001,0x002
         magic_avail_cmdtext,trap_avail_cmdtext,door_avail_cmdtext,
+        };
+
+//Custom objectives
+const char display_objectv_cmdtext[]="DISPLAY_OBJECTIVE";
+const char display_objectv_wpos_cmdtext[]="DISPLAY_OBJECTIVE_WITH_POS";
+const char display_info_cmdtext[]="DISPLAY_INFORMATION";
+const char display_info_wpos_cmdtext[]="DISPLAY_INFORMATION_WITH_POS";
+const char bonus_lev_time_cmdtext[]="BONUS_LEVEL_TIME";
+const char tutorial_flash_btn_cmdtext[]="TUTORIAL_FLASH_BUTTON";
+const char quick_objectv_cmdtext[]="QUICK_OBJECTIVE";
+const char quick_info_cmdtext[]="QUICK_INFORMATION";
+// CMD_CUSTOBJ - objectives and info boxes
+const char *cmd_custobj_arr[]={
+        "",display_objectv_cmdtext,display_objectv_wpos_cmdtext,
+        display_info_cmdtext,display_info_wpos_cmdtext,bonus_lev_time_cmdtext,
+        tutorial_flash_btn_cmdtext,quick_objectv_cmdtext,quick_info_cmdtext,
+        };
+
+//Setup commands
+const char set_gen_speed_cmdtext[]="SET_GENERATE_SPEED";
+const char start_money_cmdtext[]="START_MONEY";
+const char comp_player_cmdtext[]="COMPUTER_PLAYER";
+const char ally_players_cmdtext[]="ALLY_PLAYERS";
+const char set_hate_cmdtext[]="SET_HATE";
+const char resrch_cmdtext[]="RESEARCH";
+const char set_computer_globals_cmdtext[]="SET_COMPUTER_GLOBALS";
+const char set_computer_checks_cmdtext[]="SET_COMPUTER_CHECKS";
+const char set_computer_event_cmdtext[]="SET_COMPUTER_EVENT";
+const char set_computer_process_cmdtext[]="SET_COMPUTER_PROCESS";
+const char max_creatures_cmdtext[]="MAX_CREATURES";
+// CMD_SETUP - setup commands
+const char *cmd_setup_arr[]={
+        "",set_gen_speed_cmdtext,start_money_cmdtext,
+        comp_player_cmdtext,ally_players_cmdtext,
+        set_hate_cmdtext,resrch_cmdtext,
+        set_computer_globals_cmdtext,set_computer_checks_cmdtext,
+        set_computer_event_cmdtext,set_computer_process_cmdtext,
+        max_creatures_cmdtext,};
+
+//Action/Trigger commands
+const char reset_actnpt_cmdtext[]="RESET_ACTION_POINT";
+const char next_cmd_reusable_cmdtext[]="NEXT_COMMAND_REUSABLE";
+const char set_flag_cmdtext[]="SET_FLAG";
+const char set_timer_cmdtext[]="SET_TIMER";
+const char game_lose_cmdtext[]="LOSE_GAME";
+const char game_win_cmdtext[]="WIN_GAME";
+const char set_music_cmdtext[]="SET_MUSIC";
+// CMD_TRIGER - Action/Trigger commands
+const char *cmd_triger_arr[]={
+        "",reset_actnpt_cmdtext,next_cmd_reusable_cmdtext,
+        set_flag_cmdtext,set_timer_cmdtext,
+        game_lose_cmdtext,game_win_cmdtext,
+        set_music_cmdtext,};
+
+//Creatures adjusting
+const char dead_creatures_ret_to_pool_cmdtext[]="DEAD_CREATURES_RETURN_TO_POOL";
+const char add_creatr_to_pool_cmdtext[]="ADD_CREATURE_TO_POOL";
+const char set_creatr_fear_cmdtext[]="SET_CREATURE_FEAR";
+const char set_creatr_armour_cmdtext[]="SET_CREATURE_ARMOUR";
+const char set_creatr_health_cmdtext[]="SET_CREATURE_HEALTH";
+const char set_creatr_strength_cmdtext[]="SET_CREATURE_STRENGTH";
+const char set_creatr_max_level_cmdtext[]="SET_CREATURE_MAX_LEVEL";
+const char creatr_swap_cmdtext[]="SWAP_CREATURE";
+// CMD_CRTRADJ - objectives and info boxes
+const char *cmd_crtradj_arr[]={
+        "",dead_creatures_ret_to_pool_cmdtext,
+        add_creatr_to_pool_cmdtext,set_creatr_max_level_cmdtext,
+        set_creatr_strength_cmdtext,set_creatr_health_cmdtext,
+        set_creatr_armour_cmdtext,set_creatr_fear_cmdtext,
+        creatr_swap_cmdtext,
+        };
+
+// Comments/skipped commands
+const char rem_cmdtext[]="REM";
+const char emptyln_cmdtext[]="";
+const char *cmd_commnt_arr[]={
+        "",emptyln_cmdtext,rem_cmdtext,
+        };
+
+// Obsolete commands
+const char print_cmdtext[]="PRINT";
+const char create_text_cmdtext[]="CREATE_TEXT";
+const char *cmd_obsolt_arr[]={
+        "",print_cmdtext,create_text_cmdtext,
         };
 
 //Variables - Flags
@@ -109,36 +173,6 @@ const char *cmd_timer_arr[]={
         "",timer0_cmdtext,timer1_cmdtext,  //0x000,0x001,0x002
         timer2_cmdtext,timer3_cmdtext,timer4_cmdtext,
         timer5_cmdtext,timer6_cmdtext,timer7_cmdtext,
-        };
-
-//Computer player tweaks (undocumented)
-const char comp_sell_trapsdoors_cmdtext[]="COMPUTER_SELL_TRAPS_AND_DOORS";
-const char comp_attack_magic_cmdtext[]="COMPUTER_ATTACK_MAGIC";
-const char comp_wait_for_bridge_cmdtext[]="COMPUTER_WAIT_FOR_BRIDGE";
-const char comp_magic_speed_up_cmdtext[]="COMPUTER_MAGIC_SPEED_UP";
-const char comp_dig_to_neutral_cmdtext[]="COMPUTER_DIG_TO_NEUTRAL";
-const char comp_slap_imps_cmdtext[]="COMPUTER_SLAP_IMPS";
-const char comp_move_creatrs_todefens_cmdtext[]="COMPUTER_MOVE_CREATURES_TO_DEFEND";
-const char comp_move_creatrs_topos_cmdtext[]="COMPUTER_MOVE_CREATURE_TO_POS";
-const char comp_move_creatrs_toroom_cmdtext[]="COMPUTER_MOVE_CREATURE_TO_ROOM";
-const char comp_pickup_for_attack_cmdtext[]="COMPUTER_PICKUP_FOR_ATTACK";
-const char comp_magic_callarms_cmdtext[]="COMPUTER_MAGIC_CALL_TO_ARMS";
-const char comp_dig_toattack_cmdtext[]="COMPUTER_DIG_TO_ATTACK";
-const char comp_dig_togold_cmdtext[]="COMPUTER_DIG_TO_GOLD";
-const char comp_dig_toentrnce_cmdtext[]="COMPUTER_DIG_TO_ENTRANCE";
-const char comp_place_room_cmdtext[]="COMPUTER_PLACE_ROOM";
-const char comp_check_room_dug_cmdtext[]="COMPUTER_CHECK_ROOM_DUG";
-const char comp_dig_room_cmdtext[]="COMPUTER_DIG_ROOM";
-const char comp_dig_room_passage_cmdtext[]="COMPUTER_DIG_ROOM_PASSAGE";
-// CMD_COMP - computer player tweaks
-const char *cmd_comp_plyr_arr[]={
-        "",comp_sell_trapsdoors_cmdtext,comp_attack_magic_cmdtext,  //0x000,0x001,0x002
-        comp_wait_for_bridge_cmdtext,comp_magic_speed_up_cmdtext,comp_dig_to_neutral_cmdtext,
-        comp_slap_imps_cmdtext,comp_move_creatrs_todefens_cmdtext,comp_move_creatrs_topos_cmdtext,
-        comp_move_creatrs_toroom_cmdtext,comp_pickup_for_attack_cmdtext,comp_magic_callarms_cmdtext,
-        comp_dig_toattack_cmdtext,comp_dig_togold_cmdtext,comp_dig_toentrnce_cmdtext,
-        comp_place_room_cmdtext,comp_check_room_dug_cmdtext,comp_dig_room_cmdtext,
-        comp_dig_room_passage_cmdtext,
         };
 
 //Operators
@@ -190,63 +224,56 @@ const char *cmd_variabl_arr[]={
         game_turn_cmdtext,money_cmdtext,
         };
 
-//Custom objectives
-const char display_objectv_cmdtext[]="DISPLAY_OBJECTIVE";
-const char display_objectv_wpos_cmdtext[]="DISPLAY_OBJECTIVE_WITH_POS";
-const char display_info_cmdtext[]="DISPLAY_INFORMATION";
-const char display_info_wpos_cmdtext[]="DISPLAY_INFORMATION_WITH_POS";
-const char bonus_lev_time_cmdtext[]="BONUS_LEVEL_TIME";
-const char tutorial_flash_btn_cmdtext[]="TUTORIAL_FLASH_BUTTON";
-const char quick_objectv_cmdtext[]="QUICK_OBJECTIVE";
-const char quick_info_cmdtext[]="QUICK_INFORMATION";
-// CMD_OBJCTV - objectives and info boxes
-const char *cmd_custobj_arr[]={
-        "",display_objectv_cmdtext,display_objectv_wpos_cmdtext,
-        display_info_cmdtext,display_info_wpos_cmdtext,bonus_lev_time_cmdtext,
-        tutorial_flash_btn_cmdtext,quick_objectv_cmdtext,quick_info_cmdtext,
+//Objectives of creatures in partys
+const char objctv_defend_party_cmdtext[]="DEFEND_PARTY";
+const char objctv_attack_rooms_cmdtext[]="ATTACK_ROOMS";
+const char objctv_attack_dnheart_cmdtext[]="ATTACK_DUNGEON_HEART";
+const char objctv_enemies_cmdtext[]="ATTACK_ENEMIES";
+const char objctv_steal_spells_cmdtext[]="STEAL_SPELLS";
+const char objctv_steal_gold_cmdtext[]="STEAL_GOLD";
+//Heading objectives for tunneller partys
+const char objctv_approp_dung_cmdtext[]="APPROPIATE_DUNGEON";
+const char objctv_dnheart_cmdtext[]="DUNGEON_HEART";
+const char objctv_dungeon_cmdtext[]="DUNGEON";
+const char objctv_actnpt_cmdtext[]="ACTION_POINT";
+// CMD_OBJCTV - objectives of creatures in partys
+const char *cmd_party_objectv_arr[]={
+        "",objctv_actnpt_cmdtext,objctv_dungeon_cmdtext,  //0x000,0x001,0x002
+        objctv_dnheart_cmdtext,objctv_approp_dung_cmdtext,
+        objctv_steal_gold_cmdtext,objctv_steal_spells_cmdtext,objctv_enemies_cmdtext,
+        objctv_attack_dnheart_cmdtext,objctv_attack_rooms_cmdtext,objctv_defend_party_cmdtext,
         };
 
-//Setup commands
-const char set_gen_speed_cmdtext[]="SET_GENERATE_SPEED";
-const char start_money_cmdtext[]="START_MONEY";
-const char comp_player_cmdtext[]="COMPUTER_PLAYER";
-const char ally_players_cmdtext[]="ALLY_PLAYERS";
-const char set_music_cmdtext[]="SET_MUSIC";
-const char resrch_cmdtext[]="RESEARCH";
-const char set_computer_globals_cmdtext[]="SET_COMPUTER_GLOBALS";
-const char set_computer_checks_cmdtext[]="SET_COMPUTER_CHECKS";
-const char set_computer_event_cmdtext[]="SET_COMPUTER_EVENT";
-const char set_computer_process_cmdtext[]="SET_COMPUTER_PROCESS";
-// CMD_SETUP - objectives and info boxes
-const char *cmd_setup_arr[]={
-        "",set_gen_speed_cmdtext,start_money_cmdtext,
-        comp_player_cmdtext,ally_players_cmdtext,
-        set_music_cmdtext,resrch_cmdtext,
-        set_computer_globals_cmdtext,set_computer_checks_cmdtext,
-        set_computer_event_cmdtext,set_computer_process_cmdtext,
+//Computer player tweaks (undocumented)
+const char comp_sell_trapsdoors_cmdtext[]="COMPUTER_SELL_TRAPS_AND_DOORS";
+const char comp_attack_magic_cmdtext[]="COMPUTER_ATTACK_MAGIC";
+const char comp_wait_for_bridge_cmdtext[]="COMPUTER_WAIT_FOR_BRIDGE";
+const char comp_magic_speed_up_cmdtext[]="COMPUTER_MAGIC_SPEED_UP";
+const char comp_dig_to_neutral_cmdtext[]="COMPUTER_DIG_TO_NEUTRAL";
+const char comp_slap_imps_cmdtext[]="COMPUTER_SLAP_IMPS";
+const char comp_move_creatrs_todefens_cmdtext[]="COMPUTER_MOVE_CREATURES_TO_DEFEND";
+const char comp_move_creatrs_topos_cmdtext[]="COMPUTER_MOVE_CREATURE_TO_POS";
+const char comp_move_creatrs_toroom_cmdtext[]="COMPUTER_MOVE_CREATURE_TO_ROOM";
+const char comp_pickup_for_attack_cmdtext[]="COMPUTER_PICKUP_FOR_ATTACK";
+const char comp_magic_callarms_cmdtext[]="COMPUTER_MAGIC_CALL_TO_ARMS";
+const char comp_dig_toattack_cmdtext[]="COMPUTER_DIG_TO_ATTACK";
+const char comp_dig_togold_cmdtext[]="COMPUTER_DIG_TO_GOLD";
+const char comp_dig_toentrnce_cmdtext[]="COMPUTER_DIG_TO_ENTRANCE";
+const char comp_place_room_cmdtext[]="COMPUTER_PLACE_ROOM";
+const char comp_check_room_dug_cmdtext[]="COMPUTER_CHECK_ROOM_DUG";
+const char comp_dig_room_cmdtext[]="COMPUTER_DIG_ROOM";
+const char comp_dig_room_passage_cmdtext[]="COMPUTER_DIG_ROOM_PASSAGE";
+// CMD_COMP - computer player tweaks
+const char *cmd_comp_plyr_arr[]={
+        "",comp_sell_trapsdoors_cmdtext,comp_attack_magic_cmdtext,  //0x000,0x001,0x002
+        comp_wait_for_bridge_cmdtext,comp_magic_speed_up_cmdtext,comp_dig_to_neutral_cmdtext,
+        comp_slap_imps_cmdtext,comp_move_creatrs_todefens_cmdtext,comp_move_creatrs_topos_cmdtext,
+        comp_move_creatrs_toroom_cmdtext,comp_pickup_for_attack_cmdtext,comp_magic_callarms_cmdtext,
+        comp_dig_toattack_cmdtext,comp_dig_togold_cmdtext,comp_dig_toentrnce_cmdtext,
+        comp_place_room_cmdtext,comp_check_room_dug_cmdtext,comp_dig_room_cmdtext,
+        comp_dig_room_passage_cmdtext,
         };
 
-
-//Creatures adjusting
-const char dead_creatures_ret_to_pool_cmdtext[]="DEAD_CREATURES_RETURN_TO_POOL";
-const char set_creatr_fear_cmdtext[]="SET_CREATURE_FEAR";
-const char set_creatr_armour_cmdtext[]="SET_CREATURE_ARMOUR";
-const char set_creatr_health_cmdtext[]="SET_CREATURE_HEALTH";
-const char set_creatr_strength_cmdtext[]="SET_CREATURE_STRENGTH";
-const char set_creatr_max_level_cmdtext[]="SET_CREATURE_MAX_LEVEL";
-
-const char creatr_swap_cmdtext[]="SWAP_CREATURE";
-
-const char reset_actnpt_cmdtext[]="RESET_ACTION_POINT";
-const char add_creatr_to_pool_cmdtext[]="ADD_CREATURE_TO_POOL";
-const char next_cmd_reusable_cmdtext[]="NEXT_COMMAND_REUSABLE";
-const char max_creatures_cmdtext[]="MAX_CREATURES";
-const char set_flag_cmdtext[]="SET_FLAG";
-const char game_lose_cmdtext[]="LOSE_GAME";
-const char game_win_cmdtext[]="WIN_GAME";
-const char set_timer_cmdtext[]="SET_TIMER";
-const char rem_cmdtext[]="REM";
-const char set_hate_cmdtext[]="SET_HATE";
 const char creature_cmdtext[]="CREATURE";
 const char room_cmdtext[]="ROOM";
 //Workshop - Doors
@@ -516,18 +543,24 @@ short txt_verify(struct LEVEL *lvl, char *err_msg,struct IPOINT_2D *errpt)
     {
         struct DK_SCRIPT_COMMAND *cmd;
         cmd=lvl->script.list[i];
-/* TODO: enable when script recogizing is complete
         if (cmd->group == CMD_UNKNOWN)
         {
-            sprintf(err_msg,"Unrecognized script command at line %d.",i);
+            sprintf(err_msg,"Unrecognized script command at line %d.",i+1);
             return VERIF_WARN;
         }
-*/
+        if (cmd->group == CMD_ADIKTED)
+        {
+            sprintf(err_msg,"ADiKtEd specific command used in DK script at line %d.",i+1);
+            return VERIF_WARN;
+        }
+        if ((cmd->group==CMD_OBSOLT) && (cmd->index!=OBSOLT_PRINT) )
+        {
+            sprintf(err_msg,"Obsolete command used in script at line %d.",i+1);
+            return VERIF_WARN;
+        }
     }
   return VERIF_OK;
 }
-
-
 
 short execute_script_line(struct LEVEL *lvl,char *line,char *err_msg)
 {
@@ -576,15 +609,178 @@ short decompose_script(struct DK_SCRIPT *script)
       //This is needed because script_command_renew() could change the pointer
       script->list[i]=cmd;
   }
+  return true;
 }
 
-short decompose_script_command(struct DK_SCRIPT_COMMAND *cmd,char *text)
+short recompose_script(struct DK_SCRIPT *script)
+{
+  if (script==NULL) return false;
+  int i;
+  for (i=0;i<script->lines_count;i++)
+  {
+      char *nline;
+      nline=recompose_script_command(script->list[i]);
+      free(script->txt[i]);
+      if (nline!=NULL)
+        script->txt[i]=nline;
+      else
+        script->txt[i]=strdup("");
+  }
+  return true;
+}
+
+short recompute_script_levels(struct DK_SCRIPT *script)
+{
+  if (script==NULL) return false;
+  int i;
+  int lev=0;
+  short result=true;
+  for (i=0;i<script->lines_count;i++)
+  {
+      struct DK_SCRIPT_COMMAND *cmd=script->list[i];
+      switch (cmd->group)
+      {
+      case CMD_CONDIT:
+        if (cmd->index==COND_ENDIF)
+        {
+          lev--;
+          cmd->level=max(lev,0);
+        } else
+        {
+          cmd->level=max(lev,0);
+          lev++;
+        }
+        break;
+      case CMD_PARTY:
+        if (cmd->index==ADD_TO_PARTY)
+          cmd->level=max(lev+1,1);
+        else
+          cmd->level=max(lev,0);
+        break;
+      default:
+        cmd->level=max(lev,0);
+        break;
+      }
+      if (lev<0)
+        result=false;
+  }
+  if (lev!=0)
+    result=false;
+  return result;
+}
+
+int get_script_command_level(const char *text)
+{
+    int lev=0;
+    int nspac=0;
+    int len=strlen(text);
+    int i;
+    for (i=0;i<len;i++)
+    {
+        if (text[i]==' ')
+        {
+          nspac++;
+          if (nspac>=4)
+          {
+            nspac=0;
+            lev++;
+          }
+        } else
+        if (text[i]=='\t')
+        {
+            lev++;
+        } else
+        break;
+    }
+    if (nspac>0)
+      lev++;
+    return lev;
+}
+
+char *script_strword( const char *str, const short whole_rest )
+{
+  static const char *text;
+  if (str!=NULL)
+  {
+    text=str;
+  }
+  if (text==NULL)
+  {
+//    message_log("  script_strword: end of text");
+    return NULL;
+  }
+  int len;
+  do {
+    len=strcspn(text," \t,()");
+    if (len==0)
+    {
+      if (text[0]=='\0')
+      {
+        text=NULL;
+//          message_log("  script_strword: line empty");
+        return NULL;
+      }
+      text++;
+    }
+  } while (len==0);
+  if (whole_rest)
+  {
+    char *wholetxt=strdup(text);
+//    message_log("  script_strword: returning whole \"%s\"",text);
+    text=NULL;
+    return wholetxt;
+  }
+  // So now we're sure that first character is not a token.
+  // and that the string is not empty
+  // Determining end of the parameter
+  int text_len;
+  text_len=strlen(text);
+  // operators
+  if ((text[0]=='=')||(text[0]=='>')||(text[0]=='<')
+  ||(text[0]=='|')||(text[0]=='/')||(text[0]=='*'))
+  {
+    len=1;
+    while (((text[len]=='=')||(text[len]=='>')||(text[len]=='<')||
+        (text[len]=='|')||(text[len]=='/')||(text[len]=='*'))&&(len<3))
+    {
+      len++;
+    }
+  } else
+  // Text block taken into quote
+  if ((text[0]=='\"')||(text[0]=='\''))
+  {
+    char quot_chr[2];
+    quot_chr[0]=text[0];
+    quot_chr[1]='\0';
+    len=1;
+    do {
+      len=strcspn( text+len, quot_chr );
+      if (len<text_len) len++;
+    } while ((len<text_len)&&(text[len-1]=='\\'));
+  } else
+  // Standard word
+  {
+    // Check for operators after the word
+    int oplen=strcspn(text,"=><|/*\"\'");
+    if (oplen<len)
+      len=oplen;
+  }
+  char *wordtxt;
+  wordtxt=malloc(len+1);
+  if (wordtxt==NULL) die("script_strword: cannot allocate memory");
+  strncpy(wordtxt,text,len);
+  wordtxt[len]='\0';
+  text+=len;
+  return wordtxt;
+}
+
+short decompose_script_command(struct DK_SCRIPT_COMMAND *cmd,const char *text)
 {
   if ((cmd==NULL)||(text==NULL)) return false;
-  char *textdup=strdup(text);
   //Decomposing the string into single parameters - getting first (command name)
   char *wordtxt;
-  wordtxt = strtok(textdup," \t,(");
+  cmd->level=get_script_command_level(text);
+  wordtxt = script_strword(text,false);
   cmd->index=-1;
   int cmd_idx;
   if (cmd->index<0)
@@ -625,15 +821,6 @@ short decompose_script_command(struct DK_SCRIPT_COMMAND *cmd,char *text)
   }
   if (cmd->index<0)
   {
-    cmd_idx=comp_plyr_cmd_index(wordtxt);
-    if (cmd_idx>=0)
-    {
-      cmd->group=CMD_COMP;
-      cmd->index=cmd_idx;
-    }
-  }
-  if (cmd->index<0)
-  {
     cmd_idx=custobj_cmd_index(wordtxt);
     if (cmd_idx>=0)
     {
@@ -650,31 +837,203 @@ short decompose_script_command(struct DK_SCRIPT_COMMAND *cmd,char *text)
       cmd->index=cmd_idx;
     }
   }
-
-  //TODO: add more command types here!
   if (cmd->index<0)
   {
-      free(textdup);
+    cmd_idx=triger_cmd_index(wordtxt);
+    if (cmd_idx>=0)
+    {
+      cmd->group=CMD_TRIGER;
+      cmd->index=cmd_idx;
+    }
+  }
+  if (cmd->index<0)
+  {
+    cmd_idx=crtradj_cmd_index(wordtxt);
+    if (cmd_idx>=0)
+    {
+      cmd->group=CMD_CRTRADJ;
+      cmd->index=cmd_idx;
+    }
+  }
+  if (cmd->index<0)
+  {
+    cmd_idx=obsolt_cmd_index(wordtxt);
+    if (cmd_idx>=0)
+    {
+      cmd->group=CMD_OBSOLT;
+      cmd->index=cmd_idx;
+    }
+  }
+  if (cmd->index<0)
+  {
+    cmd_idx=commnt_cmd_index(wordtxt);
+    if (cmd_idx>=0)
+    {
+      cmd->group=CMD_COMMNT;
+      cmd->index=cmd_idx;
+    }
+  }
+  if (cmd->index<0)
+  {
+      cmd->group=CMD_UNKNOWN;
+      message_log("  decompose_script_command: \"%s\" not recognized",wordtxt);
+      free(wordtxt);
       return false;
   }
-  //Decomposing the string into single parameters - getting the rest of parameters
-  while (wordtxt != NULL)
+  free(wordtxt);
+  //Decomposing the string into parameters - in this case, treat the rest as one parameter
+  if (cmd->group==CMD_COMMNT)
   {
-    wordtxt = strtok(NULL, " \t,)");
-    script_command_param_add(cmd,wordtxt);
+      wordtxt = script_strword(NULL,true);
+//      message_log("  decompose_script_command: got comment \"%s\"",wordtxt);
+      script_command_param_add(cmd,wordtxt);
+  } else
+  //Decomposing the string into single parameters - getting the rest of parameters
+  {
+    while (wordtxt != NULL)
+    {
+      wordtxt = script_strword(NULL,false);
+//      message_log("  decompose_script_command: got parameter \"%s\"",wordtxt);
+      script_command_param_add(cmd,wordtxt);
+    }
   }
-  free(textdup);
   return true;
 }
 
+/*
+ * Adds param as next script command parameter for cmd; adds direct pointer,
+ * without duplicatidg the param pointer.
+ */
 short script_command_param_add(struct DK_SCRIPT_COMMAND *cmd,char *param)
 {
     if ((cmd==NULL)||(param==NULL)) return false;
     int param_idx=cmd->param_count;
     cmd->params=realloc(cmd->params,(param_idx+1)*sizeof(char *));
-    cmd->params[param_idx]=strdup(param);
+    cmd->params[param_idx]=param;
     cmd->param_count=param_idx+1;
     return true;
+}
+
+short is_no_bracket_command(int group,int cmdidx)
+{
+    switch (group)
+    {
+    case CMD_CONDIT:
+      switch (cmdidx)
+      {
+      case COND_ENDIF:
+        return true;
+      }
+      return false;
+    case CMD_PARTY:
+      return false;
+    case CMD_AVAIL:
+      return false;
+    case CMD_CUSTOBJ:
+      return false;
+    case CMD_SETUP:
+      return false;
+    case CMD_TRIGER:
+      switch (cmdidx)
+      {
+      case NEXT_CMD_REUSABLE:
+      case GAME_LOSE:
+      case GAME_WIN:
+        return true;
+      }
+      return false;
+    case CMD_CRTRADJ:
+      return false;
+    case CMD_COMMNT:
+      return true;
+    case CMD_OBSOLT:
+      return false;
+
+    case CMD_ADIKTED:
+      return false;
+    case CMD_UNKNOWN:
+    default:
+      return false;
+    }
+}
+
+char *recompose_script_command(const struct DK_SCRIPT_COMMAND *cmd)
+{
+     if (cmd==NULL) return strdup("");
+     const char *cmd_name=script_cmd_text(cmd->group,cmd->index);
+     int len;
+     len=(cmd->level*4)+strlen(cmd_name)+2;
+     int param_idx;
+     for (param_idx=0;param_idx<cmd->param_count;param_idx++)
+     {
+       len+=strlen(cmd->params[param_idx])+2;
+     }
+     len+=2;
+     char *text=(char *)malloc(len);
+     if (text==NULL) die("recompose_script_command: cannot allocate memory");
+     text[0]='\0';
+     if (len<192)
+     {
+       int i;
+       for (i=0;i<cmd->level;i++)
+         strcat(text,"    ");
+     }
+     strcat(text,cmd_name);
+     short no_bracket=is_no_bracket_command(cmd->group,cmd->index);
+     if (no_bracket)
+     {
+       if (cmd->param_count>0)
+         strcat(text," ");
+     } else
+     {
+       strcat(text,"(");
+     }
+     int last_param=cmd->param_count-1;
+     for (param_idx=0;param_idx<last_param;param_idx++)
+     {
+       strcat(text,cmd->params[param_idx]);
+       if ((param_idx>0)&&(cmd->group==CMD_CONDIT)&&
+          ((cmd->index==COND_IF)||(cmd->index==IF_AVAILABLE)))
+         strcat(text," ");
+       else
+         strcat(text,",");
+     }
+     if (last_param>=0)
+       strcat(text,cmd->params[last_param]);
+     if (!no_bracket)
+       strcat(text,")");
+     return text;
+}
+
+const char *script_cmd_text(int group,int cmdidx)
+{
+    switch (group)
+    {
+    case CMD_CONDIT:
+      return condit_cmd_text(cmdidx);
+    case CMD_PARTY:
+      return party_cmd_text(cmdidx);
+    case CMD_AVAIL:
+      return avail_cmd_text(cmdidx);
+    case CMD_CUSTOBJ:
+      return custobj_cmd_text(cmdidx);
+    case CMD_SETUP:
+      return setup_cmd_text(cmdidx);
+    case CMD_TRIGER:
+      return triger_cmd_text(cmdidx);
+    case CMD_CRTRADJ:
+      return crtradj_cmd_text(cmdidx);
+    case CMD_COMMNT:
+      return commnt_cmd_text(cmdidx);
+    case CMD_OBSOLT:
+      return obsolt_cmd_text(cmdidx);
+
+    case CMD_ADIKTED:
+      return adikted_cmd_text(cmdidx);
+    case CMD_UNKNOWN:
+    default:
+      return "X";
+    }
 }
 
 int adikted_cmd_index(char *cmdtext)
@@ -684,7 +1043,7 @@ int adikted_cmd_index(char *cmdtext)
     int array_count=sizeof(cmd_adikted_arr)/sizeof(char *);
     while (i<array_count)
     {
-      if (strcmp(cmd_adikted_arr[i],cmdtext)==0)
+      if (stricmp(cmd_adikted_arr[i],cmdtext)==0)
         return i;
       i++;
     }
@@ -705,7 +1064,7 @@ int condit_cmd_index(char *cmdtext)
     int array_count=sizeof(cmd_condit_arr)/sizeof(char *);
     while (i<array_count)
     {
-      if (strcmp(cmd_condit_arr[i],cmdtext)==0)
+      if (stricmp(cmd_condit_arr[i],cmdtext)==0)
         return i;
       i++;
     }
@@ -726,7 +1085,7 @@ int flag_cmd_index(char *cmdtext)
     int array_count=sizeof(cmd_flag_arr)/sizeof(char *);
     while (i<array_count)
     {
-      if (strcmp(cmd_flag_arr[i],cmdtext)==0)
+      if (stricmp(cmd_flag_arr[i],cmdtext)==0)
         return i;
       i++;
     }
@@ -747,7 +1106,7 @@ int party_objectv_cmd_index(char *cmdtext)
     int array_count=sizeof(cmd_party_objectv_arr)/sizeof(char *);
     while (i<array_count)
     {
-      if (strcmp(cmd_party_objectv_arr[i],cmdtext)==0)
+      if (stricmp(cmd_party_objectv_arr[i],cmdtext)==0)
         return i;
       i++;
     }
@@ -768,7 +1127,7 @@ int party_cmd_index(char *cmdtext)
     int array_count=sizeof(cmd_party_arr)/sizeof(char *);
     while (i<array_count)
     {
-      if (strcmp(cmd_party_arr[i],cmdtext)==0)
+      if (stricmp(cmd_party_arr[i],cmdtext)==0)
         return i;
       i++;
     }
@@ -789,7 +1148,7 @@ int avail_cmd_index(char *cmdtext)
     int array_count=sizeof(cmd_avail_arr)/sizeof(char *);
     while (i<array_count)
     {
-      if (strcmp(cmd_avail_arr[i],cmdtext)==0)
+      if (stricmp(cmd_avail_arr[i],cmdtext)==0)
         return i;
       i++;
     }
@@ -810,7 +1169,7 @@ int comp_plyr_cmd_index(char *cmdtext)
     int array_count=sizeof(cmd_comp_plyr_arr)/sizeof(char *);
     while (i<array_count)
     {
-      if (strcmp(cmd_comp_plyr_arr[i],cmdtext)==0)
+      if (stricmp(cmd_comp_plyr_arr[i],cmdtext)==0)
         return i;
       i++;
     }
@@ -831,7 +1190,7 @@ int operator_cmd_index(char *cmdtext)
     int array_count=sizeof(cmd_operator_arr)/sizeof(char *);
     while (i<array_count)
     {
-      if (strcmp(cmd_operator_arr[i],cmdtext)==0)
+      if (stricmp(cmd_operator_arr[i],cmdtext)==0)
         return i;
       i++;
     }
@@ -852,7 +1211,7 @@ int variabl_cmd_index(char *cmdtext)
     int array_count=sizeof(cmd_variabl_arr)/sizeof(char *);
     while (i<array_count)
     {
-      if (strcmp(cmd_variabl_arr[i],cmdtext)==0)
+      if (stricmp(cmd_variabl_arr[i],cmdtext)==0)
         return i;
       i++;
     }
@@ -873,7 +1232,7 @@ int timer_cmd_index(char *cmdtext)
     int array_count=sizeof(cmd_timer_arr)/sizeof(char *);
     while (i<array_count)
     {
-      if (strcmp(cmd_timer_arr[i],cmdtext)==0)
+      if (stricmp(cmd_timer_arr[i],cmdtext)==0)
         return i;
       i++;
     }
@@ -894,7 +1253,7 @@ int custobj_cmd_index(char *cmdtext)
     int array_count=sizeof(cmd_custobj_arr)/sizeof(char *);
     while (i<array_count)
     {
-      if (strcmp(cmd_custobj_arr[i],cmdtext)==0)
+      if (stricmp(cmd_custobj_arr[i],cmdtext)==0)
         return i;
       i++;
     }
@@ -915,7 +1274,7 @@ int setup_cmd_index(char *cmdtext)
     int array_count=sizeof(cmd_setup_arr)/sizeof(char *);
     while (i<array_count)
     {
-      if (strcmp(cmd_setup_arr[i],cmdtext)==0)
+      if (stricmp(cmd_setup_arr[i],cmdtext)==0)
         return i;
       i++;
     }
@@ -929,6 +1288,91 @@ const char *setup_cmd_text(int cmdidx)
     return cmd_setup_arr[cmdidx];
 }
 
+int triger_cmd_index(char *cmdtext)
+{
+    if ((cmdtext==NULL)||(strlen(cmdtext)<2)) return -1;
+    int i=0;
+    int array_count=sizeof(cmd_triger_arr)/sizeof(char *);
+    while (i<array_count)
+    {
+      if (stricmp(cmd_triger_arr[i],cmdtext)==0)
+        return i;
+      i++;
+    }
+    return -1;
+}
+
+const char *triger_cmd_text(int cmdidx)
+{
+    int array_count=sizeof(cmd_triger_arr)/sizeof(char *);
+    if ((cmdidx<0)||(cmdidx>=array_count)) return "X";
+    return cmd_triger_arr[cmdidx];
+}
+
+int crtradj_cmd_index(char *cmdtext)
+{
+    if ((cmdtext==NULL)||(strlen(cmdtext)<2)) return -1;
+    int i=0;
+    int array_count=sizeof(cmd_crtradj_arr)/sizeof(char *);
+    while (i<array_count)
+    {
+      if (stricmp(cmd_crtradj_arr[i],cmdtext)==0)
+        return i;
+      i++;
+    }
+    return -1;
+}
+
+const char *crtradj_cmd_text(int cmdidx)
+{
+    int array_count=sizeof(cmd_crtradj_arr)/sizeof(char *);
+    if ((cmdidx<0)||(cmdidx>=array_count)) return "X";
+    return cmd_crtradj_arr[cmdidx];
+}
+
+int obsolt_cmd_index(char *cmdtext)
+{
+    if ((cmdtext==NULL)||(strlen(cmdtext)<2)) return -1;
+    int i=0;
+    int array_count=sizeof(cmd_obsolt_arr)/sizeof(char *);
+    while (i<array_count)
+    {
+      if (stricmp(cmd_obsolt_arr[i],cmdtext)==0)
+        return i;
+      i++;
+    }
+    return -1;
+}
+
+const char *obsolt_cmd_text(int cmdidx)
+{
+    int array_count=sizeof(cmd_obsolt_arr)/sizeof(char *);
+    if ((cmdidx<0)||(cmdidx>=array_count)) return "X";
+    return cmd_obsolt_arr[cmdidx];
+}
+
+int commnt_cmd_index(char *cmdtext)
+{
+    if (cmdtext==NULL) return EMPTYLN;
+    if (strlen(cmdtext)<1) return EMPTYLN;
+    int i=0;
+    int array_count=sizeof(cmd_commnt_arr)/sizeof(char *);
+    while (i<array_count)
+    {
+      if (stricmp(cmd_commnt_arr[i],cmdtext)==0)
+        return i;
+      i++;
+    }
+    return -1;
+}
+
+const char *commnt_cmd_text(int cmdidx)
+{
+    int array_count=sizeof(cmd_commnt_arr)/sizeof(char *);
+    if ((cmdidx<0)||(cmdidx>=array_count)) return "X";
+    return cmd_commnt_arr[cmdidx];
+}
+
 int orient_cmd_index(char *cmdtext)
 {
     if ((cmdtext==NULL)||(strlen(cmdtext)<2)) return -1;
@@ -936,7 +1380,7 @@ int orient_cmd_index(char *cmdtext)
     int array_count=sizeof(cmd_orient_arr)/sizeof(char *);
     while (i<array_count)
     {
-      if (strcmp(cmd_orient_arr[i],cmdtext)==0)
+      if (stricmp(cmd_orient_arr[i],cmdtext)==0)
         return i;
       i++;
     }
@@ -957,7 +1401,7 @@ int font_cmd_index(char *cmdtext)
     int array_count=sizeof(cmd_font_arr)/sizeof(char *);
     while (i<array_count)
     {
-      if (strcmp(cmd_font_arr[i],cmdtext)==0)
+      if (stricmp(cmd_font_arr[i],cmdtext)==0)
         return i;
       i++;
     }

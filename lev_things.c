@@ -54,6 +54,7 @@ short things_verify(struct LEVEL *lvl, char *err_msg,struct IPOINT_2D *errpt)
     {
       for (j=0; j < arr_entries_x; j++)
       {
+        unsigned short slab=get_tile_slab(lvl, i/MAP_SUBNUM_X, j/MAP_SUBNUM_Y);
         unsigned int creatures_on_subtl=0;
         unsigned int roomeffects_on_subtl=0;
         unsigned int traps_on_subtl=0;
@@ -61,6 +62,8 @@ short things_verify(struct LEVEL *lvl, char *err_msg,struct IPOINT_2D *errpt)
         unsigned int doors_on_subtl=0;
         unsigned int booksboxes_on_subtl=0;
         int things_count=get_thing_subnums(lvl,i,j);
+        int categr=-1;
+        unsigned short subtp_x,subtp_y,subtp_h;
         for (k=0; k <things_count ; k++)
         {
           unsigned char *thing = get_thing(lvl,i,j,k);
@@ -71,6 +74,47 @@ short things_verify(struct LEVEL *lvl, char *err_msg,struct IPOINT_2D *errpt)
             errpt->y=j/MAP_SUBNUM_Y;
             sprintf(err_msg,"%s at slab %d,%d.",child_err_msg,errpt->x,errpt->y);
             return result;
+          }
+          // Checking sensitile again (one check is in thing_verify())
+          if (get_thing_type(thing)==THING_TYPE_ITEM)
+          {
+            int sen_tl;
+            sen_tl=get_thing_sensitile(thing);
+            int auto_sen_tl;
+            auto_sen_tl=compute_item_sensitile(lvl,thing);
+            if ((sen_tl!=auto_sen_tl)&&(!is_torchcndl(thing))&&(!is_spinningtng(thing))&&
+                (!is_statue(thing))&&(!is_dncrucial(thing))&&(!is_furniture(thing)))
+            {
+              errpt->x=i/MAP_SUBNUM_X;
+              errpt->y=j/MAP_SUBNUM_Y;
+              sprintf(err_msg,"%s at slab %d,%d.","Sensitive tile incorrectly set",errpt->x,errpt->y);
+              return VERIF_WARN;
+            }
+            unsigned short stype_idx=get_thing_subtype(thing);
+            if (((stype_idx==ITEM_SUBTYPE_GLDHOARD1)||(stype_idx==ITEM_SUBTYPE_GLDHOARD2)||
+                (stype_idx==ITEM_SUBTYPE_GLDHOARD3)||(stype_idx==ITEM_SUBTYPE_GLDHOARD4)||
+                (stype_idx==ITEM_SUBTYPE_GLDHOARD5))&&(slab!=SLAB_TYPE_TREASURE))
+            {
+              errpt->x=i/MAP_SUBNUM_X;
+              errpt->y=j/MAP_SUBNUM_Y;
+              sprintf(err_msg,"Gold hoarde put outside of treasure room on slab %d,%d.",
+                  errpt->x,errpt->y);
+              return VERIF_WARN;
+            }
+            if ((get_thing_subtypes_arridx(thing)==categr)&&(get_thing_subtpos_x(thing)==subtp_x)&&
+                (get_thing_subtpos_y(thing)==subtp_y)&&(get_thing_subtpos_h(thing)==subtp_h)&&
+                (!is_gold(thing))&&(!is_food(thing)))
+            {
+              errpt->x=i/MAP_SUBNUM_X;
+              errpt->y=j/MAP_SUBNUM_Y;
+              sprintf(err_msg,"Multiple %s with exactly same position on slab %d,%d.",
+                  get_thing_category_fullname(categr),errpt->x,errpt->y);
+              return VERIF_WARN;
+            }
+            categr=get_thing_subtypes_arridx(thing);
+            subtp_x=get_thing_subtpos_x(thing);
+            subtp_y=get_thing_subtpos_y(thing);
+            subtp_h=get_thing_subtpos_h(thing);
           }
           if (is_creature(thing))  creatures_on_subtl++;
           if (is_trap(thing))  traps_on_subtl++;
@@ -490,20 +534,68 @@ unsigned short compute_roomeffect_sensitile(const struct LEVEL *lvl, unsigned ch
  */
 unsigned short compute_item_sensitile(const struct LEVEL *lvl, unsigned char *thing)
 {
-    if (is_torch(thing))
-        return compute_torch_sensitile(lvl,thing);
-    else
-    if (is_gold(thing))
-        return THING_SENSITILE_NONE;
-    else
-    switch (get_thing_subtype(thing))
-    default:
+    unsigned short sx=get_thing_subtile_x(thing);
+    unsigned short sy=get_thing_subtile_y(thing);
+    int tx=sx/MAP_SUBNUM_X;
+    int ty=sy/MAP_SUBNUM_Y;
+    unsigned short stype_idx;
+    stype_idx=get_thing_subtype(thing);
+    unsigned short slab_type;
+    slab_type=get_tile_slab(lvl,tx,ty);
+    int categr=get_thing_subtypes_arridx(thing);
+    switch (categr)
     {
-        unsigned short sx=get_thing_subtile_x(thing);
-        unsigned short sy=get_thing_subtile_y(thing);
-        int tx=sx/MAP_SUBNUM_X;
-        int ty=sy/MAP_SUBNUM_Y;
+    case THING_CATEGR_ROOMEFFCT:
+         return compute_roomeffect_sensitile(lvl, thing);
+    case THING_CATEGR_STATUE:
+    case THING_CATEGR_HEARTFLAME:
+    case THING_CATEGR_ROOMEQUIP:
+    case THING_CATEGR_POLEBAR:
+    case THING_CATEGR_FURNITURE:
+      if (slab_is_room(slab_type))
         return ty*MAP_SIZE_X+tx;
+      else
+        return THING_SENSITILE_NONE;
+    case THING_CATEGR_TORCHCNDL:
+      if (is_torch(thing))
+        return compute_torch_sensitile(lvl,thing);
+      else
+      if (slab_is_room(slab_type))
+        return ty*MAP_SIZE_X+tx;
+      else
+        return THING_SENSITILE_NONE;
+    case THING_CATEGR_ITEMEFFCT://not sure about this one
+      if ((stype_idx==ITEM_SUBTYPE_TEMPLESPN)&&(slab_is_room(slab_type)))
+        return ty*MAP_SIZE_X+tx;
+      else
+        return THING_SENSITILE_NONE;
+    case THING_CATEGR_DNCRUCIAL:
+      if (stype_idx==ITEM_SUBTYPE_HEROGATE)
+        return THING_SENSITILE_NONE;
+      else
+        return ty*MAP_SIZE_X+tx;
+    case THING_CATEGR_SPINNTNG:
+    case THING_CATEGR_CREATLAIR://not sure about this one
+    case THING_CATEGR_FOOD://not sure about this one
+        return ty*MAP_SIZE_X+tx;
+    case THING_CATEGR_GOLD:
+// from level 19 - all gold things have sensitile=none
+//      if ((stype_idx==ITEM_SUBTYPE_GOLDCHEST)||(stype_idx==ITEM_SUBTYPE_GOLD)||
+//          (stype_idx==ITEM_SUBTYPE_GOLDL))
+        return THING_SENSITILE_NONE;
+    case THING_CATEGR_NULL:
+    case THING_CATEGR_SPECIALBOX:
+    case THING_CATEGR_SPELLBOOK:
+    case THING_CATEGR_WRKSHOPBOX:
+    case THING_CATEGR_UNKNOWN:
+    case THING_CATEGR_PWHAND:
+    default:
+        return THING_SENSITILE_NONE;
+    // These have sensitile used for other data
+    case THING_CATEGR_TRAP:
+    case THING_CATEGR_DOOR:
+    case THING_CATEGR_CREATR:
+         return 0;
     }
 }
 
@@ -521,6 +613,7 @@ unsigned char *create_door(struct LEVEL *lvl, unsigned int sx, unsigned int sy, 
     set_thing_subtpos(thing,128,128);
     set_thing_subtile_h(thing,5);
     set_door_orientation(thing,compute_door_orientation(lvl,thing));
+    set_thing_sensitile(thing,get_free_indexedthing_number(lvl));
     //Set default lock state
     set_thing_level(thing,DOOR_PASS_UNLOCKED);
     return thing;
@@ -576,8 +669,8 @@ unsigned char *create_doorkey(const struct LEVEL *lvl, unsigned int sx, unsigned
     set_thing_subtile_h(thing,4);
     set_thing_subtpos_h(thing,0x000);
     set_thing_subtpos(thing,0x080,0x080);
-    //Note: in most DK maps, sensitile is set to 0, but I believe it is an error
-    unsigned short sensitile=ty*MAP_SIZE_X+tx;
+    //Note: in most DK maps, sensitile of key is set to 0, but I believe it is an error
+    unsigned short sensitile=compute_item_sensitile(lvl,thing);
     set_thing_sensitile(thing,sensitile);
     return thing;
 }
@@ -608,6 +701,8 @@ unsigned char *create_creature(const struct LEVEL *lvl,unsigned int sx, unsigned
     set_thing_type(thing,THING_TYPE_CREATURE);
     set_thing_subtype(thing,stype_idx);
     set_thing_owner(thing,get_tile_owner(lvl,sx/MAP_SUBNUM_X,sy/MAP_SUBNUM_Y));
+    set_thing_level(thing,0);
+    set_thing_sensitile(thing,get_free_indexedthing_number(lvl));
     return thing;
 }
 
@@ -621,7 +716,45 @@ unsigned char *create_trap(const struct LEVEL *lvl,unsigned int sx, unsigned int
     set_thing_type(thing,THING_TYPE_TRAP);
     set_thing_subtype(thing,stype_idx);
     set_thing_owner(thing,get_tile_owner(lvl,sx/MAP_SUBNUM_X,sy/MAP_SUBNUM_Y));
+    set_thing_sensitile(thing,get_free_indexedthing_number(lvl));
     return thing;
+}
+
+/*
+ * Sweeps things to find an unused trap/door/creature number
+ */
+unsigned short get_free_indexedthing_number(const struct LEVEL *lvl)
+{
+    //Preparing array bounds
+    int arr_entries_x=MAP_SIZE_X*MAP_SUBNUM_X;
+    int arr_entries_y=MAP_SIZE_Y*MAP_SUBNUM_Y;
+    int k;
+    int used_size=lvl->stats.doors_count+lvl->stats.traps_count+lvl->stats.creatures_count+16;
+    unsigned char *used=malloc(used_size*sizeof(unsigned char));
+    for (k=0;k<used_size;k++)
+      used[k]=0;
+    int cy, cx;
+    for (cy=0; cy<arr_entries_y; cy++)
+    {
+      for (cx=0; cx<arr_entries_x; cx++)
+      {
+          int num_subs=lvl->tng_subnums[cx][cy];
+          for (k=0; k<num_subs; k++)
+          {
+              char *thing=get_thing(lvl,cx,cy,k);
+              if (is_trap(thing)||is_door(thing)||is_creature(thing))
+              {
+                unsigned short sensitl=get_thing_sensitile(thing);
+                if (sensitl<used_size) used[sensitl]=1;
+              }
+          }
+      }
+    }
+    // Note: numbering starts at 1, not 0
+    int new_num=1;
+    while (used[new_num]>0) new_num++;
+    free(used);
+    return new_num;
 }
 
 /*
@@ -643,25 +776,28 @@ unsigned char *create_item_adv(const struct LEVEL *lvl, unsigned int sx, unsigne
         set_thing_owner(thing,PLAYER_GOOD);
         //Hero gate must be numbered
         set_thing_level(thing,(char)(-get_free_herogate_number(lvl)));
+        unsigned short sensitile=compute_item_sensitile(lvl,thing);
+        set_thing_sensitile(thing,sensitile);
     } else
     if (stype_idx==ITEM_SUBTYPE_DNHEART)
     {
         thing=create_item(lvl,sx,sy,stype_idx);
         set_thing_subtile_h(thing,3); // Raise it up a bit
-        set_thing_sensitile(thing,THING_SENSITILE_NONE);
+        unsigned short sensitile=compute_item_sensitile(lvl,thing);
+        set_thing_sensitile(thing,sensitile);
     } else
     if (is_heartflame_stype(stype_idx))
     {
         thing=create_item(lvl,sx,sy,stype_idx);
         set_thing_subtile_h(thing,2); // That is where heart flames should be
-        unsigned short sensitile=ty*MAP_SIZE_X+tx;
+        unsigned short sensitile=compute_item_sensitile(lvl,thing);
         set_thing_sensitile(thing,sensitile);
     } else
     if (stype_idx==ITEM_SUBTYPE_PRISONBAR)
     {
         thing=create_item(lvl,sx,sy,stype_idx);
         set_thing_subtpos(thing,128,128);
-        unsigned short sensitile=ty*MAP_SIZE_X+tx;
+        unsigned short sensitile=compute_item_sensitile(lvl,thing);
         set_thing_sensitile(thing,sensitile);
     } else
     if (stype_idx==ITEM_SUBTYPE_SPINNKEY)
@@ -670,11 +806,8 @@ unsigned char *create_item_adv(const struct LEVEL *lvl, unsigned int sx, unsigne
     } else
     {
         thing=create_item(lvl,sx,sy,stype_idx);
-        if (is_room_inventory(thing))
-        {
-          unsigned short sensitile=ty*MAP_SIZE_X+tx;
-          set_thing_sensitile(thing,sensitile);
-        }
+        unsigned short sensitile=compute_item_sensitile(lvl,thing);
+        set_thing_sensitile(thing,sensitile);
     }
     return thing;
 }

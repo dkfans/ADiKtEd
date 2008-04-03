@@ -63,6 +63,15 @@ Press F1 for help.
 TODO before final:
  Fixations in room things parameters (height,other)
  Fixations in room corner graphics
+Version: 0.75b
+ Script file recognition logic extended
+ Modified frail columns generation to prevent stucked imps
+ Static light intensivity can now be changed using s/x
+ Added basic verification of script commands (only command names)
+ Added experimental script update function ('u' in script mode)
+ Fixed sensitive tile computing for various things
+ Extended items verification
+ Traps, doors and creatures are now numbered (as in official editor)
 Version: 0.74b
  Extended CLM entries verification
  Texture animations are readed when creating BMPs

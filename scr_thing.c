@@ -535,6 +535,9 @@ int display_thing(unsigned char *thing, int scr_col, int scr_row,int max_row)
     screen_setcolor(PRINT_COLOR_LGREY_ON_BLACK);
     screen_printf("Altitude: %3d within subtile %d",
         get_thing_subtpos_h(thing),get_thing_subtile_h(thing));
+    // Only room effects and doors have sensitive tile.
+    // but Traps, doors and creatures may have a number written in same way
+    // on this position - to check
     if ((type_idx==THING_TYPE_ROOMEFFECT)||(type_idx==THING_TYPE_ITEM))
     {
         set_cursor_pos(scr_row++, scr_col);
@@ -1267,6 +1270,7 @@ void action_inc_object_level(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *m
     sx = (mapmode->map.x+mapmode->screen.x)*MAP_SUBNUM_X+mapmode->subtl.x;
     sy = (mapmode->map.y+mapmode->screen.y)*MAP_SUBNUM_Y+mapmode->subtl.y;
     unsigned char *thing;
+    unsigned char *stlight;
     int visiting_z=mdtng->vistng[mapmode->subtl.x][mapmode->subtl.y];
     short obj_type=get_object_type(lvl,sx,sy,visiting_z);
     switch (obj_type)
@@ -1288,6 +1292,22 @@ void action_inc_object_level(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *m
         } else
             message_error("This item has no level/type, or its limit is reached.");
         break;
+    case OBJECT_TYPE_STLIGHT:
+        stlight = get_object(lvl,sx,sy,visiting_z);
+        unsigned int intens=get_stlight_intensivity(stlight);
+        if (intens<255)
+        {
+            if (intens<127)
+              intens++;
+            else
+              intens+=4;
+            if (intens>255) intens=255;
+            set_stlight_intensivity(stlight,intens);
+        } else
+        {
+            message_error("Maximum static light intensivity reached.");
+        }
+        break;
     default:
         message_error("Can't change level: no thing selected.");
         break;
@@ -1300,6 +1320,7 @@ void action_dec_object_level(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *m
     sx = (mapmode->map.x+mapmode->screen.x)*MAP_SUBNUM_X+mapmode->subtl.x;
     sy = (mapmode->map.y+mapmode->screen.y)*MAP_SUBNUM_Y+mapmode->subtl.y;
     unsigned char *thing;
+    unsigned char *stlight;
     int visiting_z=mdtng->vistng[mapmode->subtl.x][mapmode->subtl.y];
     short obj_type=get_object_type(lvl,sx,sy,visiting_z);
     switch (obj_type)
@@ -1320,6 +1341,18 @@ void action_dec_object_level(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *m
             message_info("Item type switched to previous.");
         } else
             message_error("This item has no level/type, or its limit is reached.");
+        break;
+    case OBJECT_TYPE_STLIGHT:
+        stlight = get_object(lvl,sx,sy,visiting_z);
+        unsigned int intens=get_stlight_intensivity(stlight);
+        if (intens>1)
+        {
+            intens--;
+            set_stlight_intensivity(stlight,intens);
+        } else
+        {
+            message_error("Minimum static light intensivity reached.");
+        }
         break;
     default:
         message_error("Can't change level: no thing selected.");

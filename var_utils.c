@@ -285,7 +285,7 @@ short set_msglog_fname(char *fname)
     msgout_fp=fopen(msgout_fname,"wb");
     if (msgout_fp!=NULL)
     {
-      fprintf(msgout_fp,"aDiKtEd message log file\r\n");
+      fprintf(msgout_fp,"ADiKtEd message log file\r\n");
       if (message_prv!=NULL)
         fprintf(msgout_fp,"%s\r\n",message_prv);
       if (message!=NULL)

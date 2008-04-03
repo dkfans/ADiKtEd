@@ -1349,17 +1349,23 @@ void modify_frail_columns(struct COLUMN_REC *clm_recs[9],
       if (slab_is_short_unclmabl(surr_slb[dir_a[i]]) &&
           slab_is_short_unclmabl(surr_slb[dir_b[i]]))
       {
+          if ((surr_slb[dir_a[i]]==SLAB_TYPE_PATH)&&(surr_slb[dir_b[i]]==SLAB_TYPE_PATH)&&
+              slab_is_tall(surr_slb[dir_c[i]]))
+          {
+            // Path on both sides, and tall diagonal slabs - in this case we shouldn't
+            // modify the columns, as this may cause imps to stuck
+          } else
           if ((surr_slb[dir_a[i]]==SLAB_TYPE_PATH)||(surr_slb[dir_b[i]]==SLAB_TYPE_PATH))
           {
             if (rnd(100)<base_prob)
               fill_column_path(clm_recs[dir_c[i]], surr_own[IDIR_CENTR]);
           } else
-          if ((surr_slb[dir_a[i]]==SLAB_TYPE_WATER)||(surr_slb[dir_b[i]]==SLAB_TYPE_WATER))
+          if ((surr_slb[dir_a[i]]==SLAB_TYPE_WATER)&&(surr_slb[dir_b[i]]==SLAB_TYPE_WATER))
           {
             if (rnd(100)<base_prob+33)
               fill_column_water(clm_recs[dir_c[i]], surr_own[IDIR_CENTR]);
           } else
-          if ((surr_slb[dir_a[i]]==SLAB_TYPE_LAVA)||(surr_slb[dir_b[i]]==SLAB_TYPE_LAVA))
+          if ((surr_slb[dir_a[i]]==SLAB_TYPE_LAVA)&&(surr_slb[dir_b[i]]==SLAB_TYPE_LAVA))
           {
             if (rnd(100)<base_prob+33)
               fill_column_lava(clm_recs[dir_c[i]], surr_own[IDIR_CENTR]);

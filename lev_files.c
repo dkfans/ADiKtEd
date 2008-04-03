@@ -1181,6 +1181,8 @@ short write_def_tng_source(struct LEVEL *lvl,char *fname)
             int spos_x=get_thing_subtile_x(thing);
             int spos_y=get_thing_subtile_y(thing);
             int sen_tl=get_thing_sensitile(thing);
+            unsigned short tngtype=get_thing_type(thing);
+//            if (tngtype!=THING_TYPE_ITEM) continue;
             if ( (sen_tl!=((spos_x/MAP_SUBNUM_Y-1)+(spos_y/MAP_SUBNUM_Y-1)*MAP_SIZE_X)) &&
                  (sen_tl!=((spos_x/MAP_SUBNUM_Y-1)+(spos_y/MAP_SUBNUM_Y+0)*MAP_SIZE_X)) &&
                  (sen_tl!=((spos_x/MAP_SUBNUM_Y-1)+(spos_y/MAP_SUBNUM_Y+1)*MAP_SIZE_X)) &&
@@ -1200,8 +1202,19 @@ short write_def_tng_source(struct LEVEL *lvl,char *fname)
               get_thing_subtpos_x(thing), get_thing_subtpos_y(thing));
               fprintf(fp," alt %3d altstl %d",
                 get_thing_subtpos_h(thing),get_thing_subtile_h(thing));
-              fprintf(fp," typ %5s",get_thing_type_shortname(get_thing_type(thing)));
-              fprintf(fp," knd %s",get_item_subtype_fullname(get_thing_subtype(thing)));
+              fprintf(fp," typ %5s",get_thing_type_shortname(tngtype));
+              switch (tngtype)
+              {
+              case THING_TYPE_DOOR:
+                fprintf(fp," knd %s",get_door_subtype_fullname(get_thing_subtype(thing)));
+                break;
+              case THING_TYPE_TRAP:
+                fprintf(fp," knd %s",get_trap_subtype_fullname(get_thing_subtype(thing)));
+                break;
+              case THING_TYPE_ITEM:
+                fprintf(fp," knd %s",get_item_subtype_fullname(get_thing_subtype(thing)));
+                break;
+              }
               fprintf(fp,"\n");
               for (i=0; i < SIZEOF_DK_TNG_REC; i++)
               {

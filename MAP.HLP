@@ -181,15 +181,15 @@ To \ysave\s, press \wctrl+s\s. To save on last saved file name, press \wF5\s.
 To \yquit\s, press \wctrl+q\s.
 
 [crthelp]
-Add creature mode help:
+Add/edit creature mode help:
 
 A list will appear on the screen of all the available creatures.
 Simply \yselect the creature\s you want with \warrow keys\s, then press \wenter\s.
 
 You can \ycancel operation\s with \wtab\s or \wdelete\s.
 
-The creature will be added to the slot that was highlighted in
-"thing" mode.
+If adding new creature, it will be created in the slot that was
+highlighted in "thing" mode.
 
 The creature will be owned by whoever owns the tile it
 is created on, unless you \ychange the owner\s with '\wo\s'.
@@ -331,7 +331,7 @@ Press '\wo\s' to \ychange owner\s of a highlighted thing or creature. The
 ownership cycles through the players (and "unclaimed").
 
 Press '\w[\s' and '\w]\s' to \ychange height/altitude\s of highlighted object.
-Please note that aDiKtEd will allow you to place things inside of
+Please note that ADiKtEd will allow you to place things inside of
 solid columns, so be careful.
 
 Press '\w-\s' and '\w+\s' to \ychange range\s of highlighted object. This
@@ -1247,13 +1247,13 @@ Gold chest storing 500 gold.
 
 
 
-\rTemple statue\s
+\rTemple statue (lit)\s
 
 Humanoid statue sitting cross-legged
-with flame in legs.
+with flame in legs. It is quite
+bright.
 Room equipment used in corners of
 the Temple.
-
 
 \rDungeon Heart\s
 
@@ -1282,9 +1282,9 @@ Torch which is not a light source
 \rStatue without flame (unlit)\s
 
 Humanoid statue sitting cross-legged
-without light source.
-
-
+without light source. Despite having
+no light, this one is still quite
+bright.
 
 
 \rGrowing Chicken\s
@@ -1587,7 +1587,7 @@ spell on enemy creature.
 
 A spell book. If taken to Library
 by Imp, the player will receive
-the ability of casting Disease
+the ability of casting Chicken
 spell on a creature.
 
 
@@ -2247,12 +2247,12 @@ Spinning coin, similar to key.
 
 
 
-\rStatue 2\s
+\rStatue 2 (unlit)\s
 
+Humanoid statue sitting cross-legged
+without light source.
 
-
-
-
+This one looks dark.
 
 
 \rStatue 3\s

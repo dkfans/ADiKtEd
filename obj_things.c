@@ -26,9 +26,9 @@ Thing data block:
 0x09 thing_range_subtpos
 0x0a thing_range_subtile
 0x0b \
-0x0c thing_sensitile
+0x0c thing_sensitile/thing_index
 0x0d door_orientation
-0x0e thing_level
+0x0e thing_level/herogate_num/door_lock
 0x0f
 0x10
 0x11

@@ -37,6 +37,8 @@ unsigned char get_door_lock(unsigned char *thing);
 unsigned char compute_door_orientation(const struct LEVEL *lvl, unsigned char *thing);
 unsigned short compute_torch_sensitile(const struct LEVEL *lvl, unsigned char *thing);
 unsigned short compute_roomeffect_sensitile(const struct LEVEL *lvl, unsigned char *thing);
+unsigned short compute_item_sensitile(const struct LEVEL *lvl, unsigned char *thing);
+unsigned short get_free_indexedthing_number(const struct LEVEL *lvl);
 short owned_things_count(int *count,struct LEVEL *lvl,
     unsigned char type_idx,unsigned char stype_idx);
 unsigned char *find_lit_thing_on_square_radius1(struct LEVEL *lvl, int tx, int ty);
