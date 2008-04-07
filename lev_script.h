@@ -34,6 +34,8 @@ enum cmd_groups {
     CMD_CREATR  = 0x019,
     CMD_ROOM    = 0x01a,
     CMD_COMP    = 0x01b,
+    CMD_PLAYER  = 0x01c,
+    CMD_SPECIAL = 0x01d,
 
     // Adikted - specific
     CMD_ORIENT  = 0x0fe,
@@ -50,7 +52,7 @@ enum cmd_groups {
 enum cmnds_condit {
 // 5 - IF([player],[variable][comparison][a]) AAAN
     COND_IF             = 0x001,
-// 65 - IF_AVAILABLE([player],[name],[comparison],[a]) AAAN
+// 65 - IF_AVAILABLE([player],[name][comparison][a]) AAAN
     IF_AVAILABLE        = 0x002,
 // 18 - IF_ACTION_POINT([action point],[player]) NA
     IF_ACTNPT           = 0x003,
@@ -177,17 +179,20 @@ enum cmnds_comnt {
 // Empty lines will be stored in this category
     EMPTYLN             = 0x001,
 // 9 - REM
-    REM                 = 0x002,
+    CMNT_REM            = 0x002,
 };
 
 // Obsolete commands
-enum obsolt_comnt {
+enum cmnds_obsolt {
     OBSOLT_PRINT        = 0x001,
     CREATE_TEXT         = 0x002,
 };
 
-
-
+// Special parameters and numbers
+enum cmnds_special {
+    SPEC_RANDOM        = 0x001,
+    SPEC_NUMBER        = 0x002,
+};
 
 //Note: Doors, Traps, Spells are defined elswhere
 #define CREATURE             0x07f
@@ -277,6 +282,8 @@ enum obsolt_comnt {
 #define COMP_DIG_ROOM              0x011
 #define COMP_DIG_ROOM_PASSAGE      0x012
 
+#define MAX_PARTYS 16
+
 //ADiKtEd specific commands
 enum cmnds_adikted {
     CUSTOM_COLUMN      = 0x001,
@@ -292,8 +299,23 @@ struct DK_SCRIPT_COMMAND {
                 // (regulates how much empty spaces to add before the command)
   };
 
+struct SCRIPT_VERIFY_DATA {
+    unsigned char *dnhearts;
+    int dnhearts_count;
+    unsigned char *herogts;
+    unsigned int herogts_count;
+    unsigned char *actnpts;
+    unsigned int actnpts_count;
+    int level;
+    int total_ifs;
+    int total_in_pool;
+    char **partys;
+  };
+
 struct DK_SCRIPT;
 struct IPOINT_2D;
+
+extern int script_level_spaces;
 
 //Functions for script analysis
 short decompose_script(struct DK_SCRIPT *script);
@@ -303,8 +325,9 @@ short decompose_script_command(struct DK_SCRIPT_COMMAND *cmd,const char *text);
 char *recompose_script_command(const struct DK_SCRIPT_COMMAND *cmd);
 //Functions for Adikted script execution
 short execute_script_line(struct LEVEL *lvl,char *line,char *err_msg);
-// Verification
-short txt_verify(struct LEVEL *lvl, char *err_msg,struct IPOINT_2D *errpt);
+//Functions - verification
+short dkscript_verify(const struct LEVEL *lvl, char *err_msg,int *err_line,int *err_param);
+short txt_verify(const struct LEVEL *lvl, char *err_msg,struct IPOINT_2D *errpt);
 
 //Working with text files
 void text_file_free(char **lines,int lines_count);
@@ -312,44 +335,52 @@ int text_file_line_add(char ***lines,int *lines_count,char *text);
 int text_file_linecp_add(char ***lines,int *lines_count,char *text);
 
 //Lower level - for obtaining index of a command/parameter - adikted specific
-int adikted_cmd_index(char *cmdtext);
+int adikted_cmd_index(const char *cmdtext);
 const char *adikted_cmd_text(int cmdidx);
-int orient_cmd_index(char *cmdtext);
+int orient_cmd_index(const char *cmdtext);
 const char *orient_cmd_text(int cmdidx);
 unsigned short get_orientation_next(unsigned short orient);
-int font_cmd_index(char *cmdtext);
+int font_cmd_index(const char *cmdtext);
 const char *font_cmd_text(int cmdidx);
 //Lower level - for obtaining index of a command - dk commands
-int condit_cmd_index(char *cmdtext);
+int condit_cmd_index(const char *cmdtext);
 const char *condit_cmd_text(int cmdidx);
-int party_cmd_index(char *cmdtext);
+int party_cmd_index(const char *cmdtext);
 const char *party_cmd_text(int cmdidx);
-int avail_cmd_index(char *cmdtext);
+int avail_cmd_index(const char *cmdtext);
 const char *avail_cmd_text(int cmdidx);
-int custobj_cmd_index(char *cmdtext);
+int custobj_cmd_index(const char *cmdtext);
 const char *custobj_cmd_text(int cmdidx);
-int setup_cmd_index(char *cmdtext);
+int setup_cmd_index(const char *cmdtext);
 const char *setup_cmd_text(int cmdidx);
-int triger_cmd_index(char *cmdtext);
+int triger_cmd_index(const char *cmdtext);
 const char *triger_cmd_text(int cmdidx);
-int crtradj_cmd_index(char *cmdtext);
+int crtradj_cmd_index(const char *cmdtext);
 const char *crtradj_cmd_text(int cmdidx);
-int obsolt_cmd_index(char *cmdtext);
+int obsolt_cmd_index(const char *cmdtext);
 const char *obsolt_cmd_text(int cmdidx);
-int commnt_cmd_index(char *cmdtext);
+int commnt_cmd_index(const char *cmdtext);
 const char *commnt_cmd_text(int cmdidx);
 //Lower level - for obtaining index of a parameter - dk command parameters
-int comp_plyr_cmd_index(char *cmdtext);
-const char *comp_plyr_cmd_text(int cmdidx);
-int operator_cmd_index(char *cmdtext);
+int special_cmd_index(const char *cmdtext);
+const char *special_cmd_text(int cmdidx,const char *param);
+int operator_cmd_index(const char *cmdtext);
 const char *operator_cmd_text(int cmdidx);
-int variabl_cmd_index(char *cmdtext);
+int comp_plyr_cmd_index(const char *cmdtext);
+const char *comp_plyr_cmd_text(int cmdidx);
+int players_cmd_index(const char *cmdtext);
+const char *players_cmd_text(int cmdidx);
+int creatures_cmd_index(const char *cmdtext);
+const char *creatures_cmd_text(int cmdidx);
+int operator_cmd_index(const char *cmdtext);
+const char *operator_cmd_text(int cmdidx);
+int variabl_cmd_index(const char *cmdtext);
 const char *variabl_cmd_text(int cmdidx);
-int timer_cmd_index(char *cmdtext);
+int timer_cmd_index(const char *cmdtext);
 const char *timer_cmd_text(int cmdidx);
-int flag_cmd_index(char *cmdtext);
+int flag_cmd_index(const char *cmdtext);
 const char *flag_cmd_text(int cmdidx);
-int party_objectv_cmd_index(char *cmdtext);
+int party_objectv_cmd_index(const char *cmdtext);
 const char *party_objectv_cmd_text(int cmdidx);
 
 //Other lower level functions
@@ -360,7 +391,7 @@ void script_command_renew(struct DK_SCRIPT_COMMAND **cmd);
 void script_command_free(struct DK_SCRIPT_COMMAND *cmd);
 char *get_orientation_shortname(unsigned short orient);
 char *get_font_longname(unsigned short font);
-short script_param_to_int(int *val,char *param);
+short script_param_to_int(int *val,const char *param);
 const char *script_cmd_text(int group,int cmdidx);
 short is_no_bracket_command(int group,int cmdidx);
 char *script_strword( const char *str, const short whole_rest );

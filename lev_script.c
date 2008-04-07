@@ -143,6 +143,10 @@ const char *cmd_obsolt_arr[]={
         "",print_cmdtext,create_text_cmdtext,
         };
 
+// Special commands - replacing numbers
+const char random_cmdtext[]="RANDOM";
+
+
 //Variables - Flags
 const char flag0_cmdtext[]="FLAG0";
 const char flag1_cmdtext[]="FLAG1";
@@ -314,41 +318,63 @@ const char player3_cmdtext[]="PLAYER3";
 const char player2_cmdtext[]="PLAYER2";
 const char player1_cmdtext[]="PLAYER1";
 const char player0_cmdtext[]="PLAYER0";
+// CMD_PLAYER - target player selection
+const char *cmd_players_arr[]={
+        player0_cmdtext,player1_cmdtext,player2_cmdtext,  //0x000,0x001,0x002
+        player3_cmdtext,player_good_cmdtext,"",  //0x003,0x004,0x005
+        player_all_cmdtext,
+        };
 //Evil Creatures
+const char creatr_horny_cmdtext[]="HORNY";
+const char creatr_skeleton_cmdtext[]="SKELETON";
+const char creatr_troll_cmdtext[]="TROLL";
+const char creatr_dragon_cmdtext[]="DRAGON";
+const char creatr_dmspawn_cmdtext[]="DEMONSPAWN";
+const char creatr_fly_cmdtext[]="FLY";
+const char creatr_dkmist_cmdtext[]="DARK_MISTRESS";
+const char creatr_sorcer_cmdtext[]="SORCEROR";
+const char creatr_biledm_cmdtext[]="BILE_DEMON";
+const char creatr_imp_cmdtext[]="IMP";
+const char creatr_bug_cmdtext[]="BUG";
+const char creatr_vampire_cmdtext[]="VAMPIRE";
+const char creatr_spider_cmdtext[]="SPIDER";
+const char creatr_hound_cmdtext[]="HELL_HOUND";
+const char creatr_ghost_cmdtext[]="GHOST";
+const char creatr_tentacl_cmdtext[]="TENTACLE";
+const char creatr_orc_cmdtext[]="ORC";
+//Good Creatures
+const char creatr_wizard_cmdtext[]="WIZARD";
+const char creatr_barbarin_cmdtext[]="BARBARIAN";
+const char creatr_archr_cmdtext[]="ARCHER";
+const char creatr_monk_cmdtext[]="MONK";
+const char creatr_dwarfa_cmdtext[]="DWARFA";
+const char creatr_knight_cmdtext[]="KNIGHT";
+const char creatr_avatar_cmdtext[]="AVATAR";
+const char creatr_tunnelr_cmdtext[]="TUNNELLER";
+const char creatr_witch_cmdtext[]="WITCH";
+const char creatr_giant_cmdtext[]="GIANT";
+const char creatr_fairy_cmdtext[]="FAIRY";
+const char creatr_thief_cmdtext[]="THIEF";
+const char creatr_samurai_cmdtext[]="SAMURAI";
 const char creatr_newa_cmdtext[]="NEW_CREATURE_B";
 const char creatr_newb_cmdtext[]="NEW_CREATURE_A";
 const char creatr_flspirit_cmdtext[]="FLOATING_SPIRIT";
-const char creatr_orc_cmdtext[]="ORC";
-const char creatr_tentacl_cmdtext[]="TENTACLE";
-const char creatr_ghost_cmdtext[]="GHOST";
-const char creatr_hound_cmdtext[]="HELL_HOUND";
-const char creatr_spider_cmdtext[]="SPIDER";
-const char creatr_vampire_cmdtext[]="VAMPIRE";
-const char creatr_bug_cmdtext[]="BUG";
-const char creatr_imp_cmdtext[]="IMP";
-const char creatr_biledm_cmdtext[]="BILE_DEMON";
-const char creatr_sorcer_cmdtext[]="SORCEROR";
-const char creatr_dkmist_cmdtext[]="DARK_MISTRESS";
-const char creatr_fly_cmdtext[]="FLY";
-const char creatr_dmspawn_cmdtext[]="DEMONSPAWN";
-const char creatr_dragon_cmdtext[]="DRAGON";
-const char creatr_troll_cmdtext[]="TROLL";
-const char creatr_skeleton_cmdtext[]="SKELETON";
-const char creatr_horny_cmdtext[]="HORNY";
-//Good Creatures
-const char creatr_samurai_cmdtext[]="SAMURAI";
-const char creatr_thief_cmdtext[]="THIEF";
-const char creatr_fairy_cmdtext[]="FAIRY";
-const char creatr_giant_cmdtext[]="GIANT";
-const char creatr_witch_cmdtext[]="WITCH";
-const char creatr_tunnelr_cmdtext[]="TUNNELLER";
-const char creatr_avatar_cmdtext[]="AVATAR";
-const char creatr_knight_cmdtext[]="KNIGHT";
-const char creatr_dwarfa_cmdtext[]="DWARFA";
-const char creatr_monk_cmdtext[]="MONK";
-const char creatr_archr_cmdtext[]="ARCHER";
-const char creatr_barbarin_cmdtext[]="BARBARIAN";
-const char creatr_wizard_cmdtext[]="WIZARD";
+
+// CMD_CREATR - creature type selection
+const char *cmd_creatures_arr[]={
+        "", creatr_wizard_cmdtext, creatr_barbarin_cmdtext,  //0x000,0x001,0x002
+        creatr_archr_cmdtext, creatr_monk_cmdtext, creatr_dwarfa_cmdtext,
+        creatr_knight_cmdtext, creatr_avatar_cmdtext, creatr_tunnelr_cmdtext,
+        creatr_witch_cmdtext, creatr_giant_cmdtext, creatr_fairy_cmdtext,
+        creatr_thief_cmdtext, creatr_samurai_cmdtext, creatr_horny_cmdtext,
+        creatr_skeleton_cmdtext, creatr_troll_cmdtext, creatr_dragon_cmdtext,
+        creatr_dmspawn_cmdtext, creatr_fly_cmdtext, creatr_dkmist_cmdtext,
+        creatr_sorcer_cmdtext, creatr_biledm_cmdtext, creatr_imp_cmdtext,
+        creatr_bug_cmdtext, creatr_vampire_cmdtext, creatr_spider_cmdtext,
+        creatr_hound_cmdtext, creatr_ghost_cmdtext, creatr_tentacl_cmdtext,
+        creatr_orc_cmdtext,  creatr_flspirit_cmdtext, creatr_newa_cmdtext,
+        creatr_newb_cmdtext,
+        };
 //Rooms
 const char room_grdpost_cmdtext[]="GUARD_POST";
 const char room_brige_cmdtext[]="BRIDGE";
@@ -404,7 +430,10 @@ const char *cmd_orient_shortnames[]={
 const char *cmd_font_longnames[]={
         "none","Classic","Size 8" };
 
-short script_param_to_int(int *val,char *param)
+// Configuration variables
+int script_level_spaces=4;
+
+short script_param_to_int(int *val,const char *param)
 {
   if ((param==NULL)||(val==NULL)) return false;
   int n_read;
@@ -531,35 +560,1345 @@ short execute_adikted_command(struct LEVEL *lvl,struct DK_SCRIPT_COMMAND *cmd,ch
     }
 }
 
+short script_cmd_verify_argcount(char *err_msg,const struct DK_SCRIPT_COMMAND *cmd,const int prop_count)
+{
+    if (cmd->param_count!=prop_count)
+    {
+      if (prop_count>0)
+      {
+        sprintf(err_msg,"Script command \"%s\" requires %d arguments, has %d",
+          script_cmd_text(cmd->group,cmd->index),prop_count,cmd->param_count);
+/* old message - was too long
+        char *amount;
+        if (cmd->param_count>prop_count)
+          amount="Too many";
+        else
+          amount="Not enough";
+        sprintf(err_msg,"%s arguments (%d) for %s script command (%d required)",amount,
+          cmd->param_count,script_cmd_text(cmd->group,cmd->index),prop_count);
+*/
+        return false;
+      } else
+      {
+        sprintf(err_msg,"Script command \"%s\" shouldn't have arguments",
+            script_cmd_text(cmd->group,cmd->index));
+        return false;
+      }
+    }
+    return true;
+}
+
+short string_is_decimal_number(const char *str,const short allow_sign)
+{
+  if (str==NULL) return false;
+  if (str[0]=='\0') return false;
+  int len=strlen(str);
+  if (!isdigit(str[0]))
+  {
+    if ((!allow_sign)||(len<2)||((str[0]!='+')&&(str[0]!='-')))
+      return false;
+  }
+  int i;
+  for (i=1;i<len;i++)
+  {
+    if (!isdigit(str[i]))
+        return false;
+  }
+  return true;
+}
+
+short script_cmd_verify_arg_actnpt(struct SCRIPT_VERIFY_DATA *scverif,char *err_msg,
+        const char *param,const short allow_herogate,const short allow_plyrheart)
+{
+    if (allow_plyrheart)
+    {
+      int cmd_idx;
+      cmd_idx=players_cmd_index(param);
+      if (cmd_idx>=0)
+        return true;
+    }
+    if (!string_is_decimal_number(param,true))
+    {
+        sprintf(err_msg,"Invalid action point number \"%s\" in script",param);
+        return false;
+    }
+    if (strlen(param)>6)
+    {
+        sprintf(err_msg,"Too long action point number \"%s\" in script",param);
+        return false;
+    }
+    if ((!allow_herogate)&&(!string_is_decimal_number(param,false)))
+    {
+        sprintf(err_msg,"Hero gate not allowed as action point in script");
+        return false;
+    }
+    int val;
+    if (!script_param_to_int(&val,param))
+    {
+        sprintf(err_msg,"Internal - no numeric value for \"%s\" in script",param);
+        return false;
+    }
+    if (val>0)
+    {
+        if (val >= (scverif->actnpts_count))
+        {
+            sprintf(err_msg,"Too large %s number %d used in script","action point",val);
+            return false;
+        }
+        if ((scverif->actnpts[val]) == 0)
+        {
+            sprintf(err_msg,"Nonexisting %s %d used in script","action point",val);
+            return false;
+        }
+    } else
+    if (val<0)
+    {
+        if ((-val) >= (scverif->herogts_count))
+        {
+            sprintf(err_msg,"Too large %s number %d used in script","hero gate",(-val));
+            return false;
+        }
+        if ((scverif->herogts[-val]) == 0)
+        {
+            sprintf(err_msg,"Nonexisting %s %d used in script","hero gate",(-val));
+            return false;
+        }
+    } else
+    {
+        sprintf(err_msg,"Zero is not valid action point number in script",param);
+        return false;
+    }
+    return true;
+}
+
+short script_cmd_verify_arg_gameturn(struct SCRIPT_VERIFY_DATA *scverif,char *err_msg,
+        const char *param)
+{
+    if (!string_is_decimal_number(param,false))
+    {
+        sprintf(err_msg,"Invalid game turns amount \"%s\" in script",param);
+        return false;
+    }
+    if (strlen(param)>7)
+    {
+        sprintf(err_msg,"Game turns amount \"%s\" too long in script",param);
+        return false;
+    }
+    int val;
+    if (!script_param_to_int(&val,param))
+    {
+        sprintf(err_msg,"Internal - no numeric value for \"%s\" in script",param);
+        return false;
+    }
+    if (val<0)
+    {
+            sprintf(err_msg,"Game turns amout \"%s\" exceeds integer range in script",param);
+            return false;
+    }
+    if (val > (20*60*60*24))
+    {
+            sprintf(err_msg,"Game turns amout %d exceeds one day delay in script",val);
+            return false;
+    }
+    return true;
+}
+
+short script_cmd_verify_arg_goldamnt(struct SCRIPT_VERIFY_DATA *scverif,char *err_msg,
+        const char *param)
+{
+    if (!string_is_decimal_number(param,false))
+    {
+        sprintf(err_msg,"Invalid gold amount \"%s\" in script",param);
+        return false;
+    }
+    if (strlen(param)>10)
+    {
+        sprintf(err_msg,"Gold amount \"%s\" too long in script",param);
+        return false;
+    }
+    int val;
+    if (!script_param_to_int(&val,param))
+    {
+        sprintf(err_msg,"Internal - no numeric value for \"%s\" in script",param);
+        return false;
+    }
+    if (val<0)
+    {
+            sprintf(err_msg,"Gold amout \"%s\" exceeds integer range in script",param);
+            return false;
+    }
+    if (val > 2000000000)
+    {
+            sprintf(err_msg,"Gold amout %d exceeds safe value in script",val);
+            return false;
+    }
+    return true;
+}
+
+short script_cmd_verify_arg_experience(struct SCRIPT_VERIFY_DATA *scverif,char *err_msg,
+        const char *param)
+{
+    if (!string_is_decimal_number(param,false))
+    {
+        sprintf(err_msg,"Invalid experience level \"%s\" in script",param);
+        return false;
+    }
+    if (strlen(param)>2)
+    {
+        sprintf(err_msg,"Experience level \"%s\" too long in script",param);
+        return false;
+    }
+    int val;
+    if (!script_param_to_int(&val,param))
+    {
+        sprintf(err_msg,"Internal - no numeric value for \"%s\" in script",param);
+        return false;
+    }
+    if (val>10)
+    {
+            sprintf(err_msg,"Experience level %d exceeds maximum of %u in script",val,10);
+            return false;
+    }
+    if (val < 1)
+    {
+            sprintf(err_msg,"Experience level must be at least 1, but is %d in script",val);
+            return false;
+    }
+    return true;
+}
+
+short script_cmd_verify_arg_ncrtrs(struct SCRIPT_VERIFY_DATA *scverif,char *err_msg,
+        const char *param,int *count)
+{
+    if (!string_is_decimal_number(param,false))
+    {
+        sprintf(err_msg,"Invalid creatures count \"%s\" in script",param);
+        return false;
+    }
+    if (strlen(param)>3)
+    {
+        sprintf(err_msg,"Creatures count \"%s\" too long in script",param);
+        return false;
+    }
+    int val;
+    if (!script_param_to_int(&val,param))
+    {
+        sprintf(err_msg,"Internal - no numeric value for \"%s\" in script",param);
+        return false;
+    }
+    if (val > 255)
+    {
+            sprintf(err_msg,"Creatures count %d exceeds maximum of %u in script",val,255);
+            return false;
+    }
+    if (val < 1)
+    {
+            sprintf(err_msg,"Creatures count must be at least 1, but is %d in script",val);
+            return false;
+    }
+    return true;
+}
+
+short script_cmd_verify_arg_operator(struct SCRIPT_VERIFY_DATA *scverif,char *err_msg,
+        const char *param,int *opertr_idx)
+{
+    int cmd_idx;
+    cmd_idx=operator_cmd_index(param);
+    if (cmd_idx<0)
+    {
+        sprintf(err_msg,"Unrecognized operator \"%s\" in script",param);
+        return false;
+    }
+    *opertr_idx=cmd_idx;
+    return true;
+}
+
+short script_cmd_verify_arg_player(struct SCRIPT_VERIFY_DATA *scverif,char *err_msg,
+        const char *param,int *plyr_idx)
+{
+    int cmd_idx;
+    cmd_idx=players_cmd_index(param);
+    if (cmd_idx<0)
+    {
+        sprintf(err_msg,"Unrecognized player \"%s\" in script",param);
+        return false;
+    }
+    *plyr_idx=cmd_idx;
+    return true;
+}
+
+short script_cmd_verify_arg_creatr(struct SCRIPT_VERIFY_DATA *scverif,char *err_msg,
+        const char *param,int *crtr_idx)
+{
+    int cmd_idx;
+    cmd_idx=creatures_cmd_index(param);
+    if (cmd_idx<0)
+    {
+        sprintf(err_msg,"Unrecognized creature \"%s\" in script",param);
+        return false;
+    }
+    *crtr_idx=cmd_idx;
+    return true;
+}
+
+short script_cmd_verify_arg_party_objectv(struct SCRIPT_VERIFY_DATA *scverif,char *err_msg,
+        const char *param,const short heading_objctv)
+{
+    int cmd_idx;
+    cmd_idx=party_objectv_cmd_index(param);
+    char *whos;
+    if (heading_objctv)
+        whos="tunneller";
+    else
+        whos="party member";
+    if (cmd_idx<0)
+    {
+        sprintf(err_msg,"Unrecognized %s objective \"%s\" in script",whos,param);
+        return false;
+    }
+    if (((heading_objctv)&&(cmd_idx>OBJCTV_APPROP_DUNG))||
+       ((!heading_objctv)&&(cmd_idx<=OBJCTV_APPROP_DUNG)))
+    {
+        sprintf(err_msg,"Parameter \"%s\" is not %s objective in script",param,whos);
+        return false;
+    }
+    return true;
+}
+
+short script_cmd_verify_arg_limparam(struct SCRIPT_VERIFY_DATA *scverif,char *err_msg,
+        const char *param,const char *param_name,int min_val,unsigned int max_val)
+{
+    if (!string_is_decimal_number(param,false))
+    {
+        sprintf(err_msg,"Invalid %s value \"%s\" in script",param_name,param);
+        return false;
+    }
+    if (strlen(param)>3)
+    {
+        sprintf(err_msg,"%s value \"%s\" too long in script",param_name,param);
+        return false;
+    }
+    int val;
+    if (!script_param_to_int(&val,param))
+    {
+        sprintf(err_msg,"Internal - no numeric value for \"%s\" in script",param);
+        return false;
+    }
+    if (val>max_val)
+    {
+        sprintf(err_msg,"%s value %d exceeds maximum of %u in script",param_name,val,max_val);
+        return false;
+    }
+    if (val < min_val)
+    {
+        sprintf(err_msg,"%s value must be at least %d, but is %d in script",param_name,min_val,val);
+        return false;
+    }
+    return true;
+}
+
+short script_cmd_verify_arg_unsg_int(struct SCRIPT_VERIFY_DATA *scverif,char *err_msg,
+        const char *param,int min_val,unsigned int max_val)
+{
+    if (!string_is_decimal_number(param,false))
+    {
+        sprintf(err_msg,"Invalid integer value \"%s\" in script",param);
+        return false;
+    }
+    int max_digits=1;
+    unsigned int tmp=max_val;
+    while (true)
+    {
+        tmp=tmp/10;
+        if (tmp>0)
+          max_digits++;
+        else
+          break;
+    }
+    if (strlen(param)>max_digits)
+    {
+        sprintf(err_msg,"Integer value \"%s\" too long in script",param);
+        return false;
+    }
+    int val;
+    if (!script_param_to_int(&val,param))
+    {
+        sprintf(err_msg,"Internal - no numeric value for \"%s\" in script",param);
+        return false;
+    }
+    if (val<0)
+    {
+            sprintf(err_msg,"Value \"%s\" exceeds integer range in script",param);
+            return false;
+    }
+    if (val > max_val)
+    {
+            sprintf(err_msg,"Integer value %d exceeds maximum of %u in script",val,max_val);
+            return false;
+    }
+    if (val < min_val)
+    {
+            sprintf(err_msg,"Value %d is smaller than minimum of %u in script",val,min_val);
+            return false;
+    }
+    return true;
+}
+
+short script_cmd_verify_condit(struct SCRIPT_VERIFY_DATA *scverif,char *err_msg,int *err_param,const struct DK_SCRIPT_COMMAND *cmd)
+{
+    int plyr_idx;
+    int opertr_idx;
+    switch (cmd->index)
+    {
+    case COND_IF:
+        if (!script_cmd_verify_argcount(err_msg,cmd,4))
+        {
+            (*err_param)=-2;
+            return VERIF_WARN;
+        }
+        if (!script_cmd_verify_arg_player(scverif,err_msg,cmd->params[0],&plyr_idx))
+        {
+            (*err_param)=0;
+            return VERIF_WARN;
+        }
+        if (!script_cmd_verify_arg_operator(scverif,err_msg,cmd->params[2],&opertr_idx))
+        {
+            (*err_param)=2;
+            return VERIF_WARN;
+        }
+        scverif->level++;
+        scverif->total_ifs++;
+        break;
+    case IF_AVAILABLE:
+        if (!script_cmd_verify_argcount(err_msg,cmd,4))
+        {
+            (*err_param)=-2;
+            return VERIF_WARN;
+        }
+        if (!script_cmd_verify_arg_player(scverif,err_msg,cmd->params[0],&plyr_idx))
+        {
+            (*err_param)=0;
+            return VERIF_WARN;
+        }
+        if (!script_cmd_verify_arg_operator(scverif,err_msg,cmd->params[2],&opertr_idx))
+        {
+            (*err_param)=2;
+            return VERIF_WARN;
+        }
+        scverif->level++;
+        scverif->total_ifs++;
+        break;
+    case IF_ACTNPT:
+        if (!script_cmd_verify_argcount(err_msg,cmd,2))
+        {
+            (*err_param)=-2;
+            return VERIF_WARN;
+        }
+        if (!script_cmd_verify_arg_actnpt(scverif,err_msg,cmd->params[0],false,false))
+        {
+            (*err_param)=0;
+            return VERIF_WARN;
+        }
+        if (!script_cmd_verify_arg_player(scverif,err_msg,cmd->params[1],&plyr_idx))
+        {
+            (*err_param)=1;
+            return VERIF_WARN;
+        }
+        scverif->level++;
+        scverif->total_ifs++;
+        break;
+    case COND_ENDIF:
+        if (!script_cmd_verify_argcount(err_msg,cmd,0))
+        {
+            (*err_param)=-2;
+            return VERIF_WARN;
+        }
+        scverif->level--;
+        break;
+    default:
+        sprintf(err_msg,"Internal warn - wrong CONDIT script command");
+        return VERIF_WARN;
+    }
+    if (scverif->level<0)
+    {
+        sprintf(err_msg,"Script command ENDIF found without IF");
+        return VERIF_WARN;
+    }
+    return VERIF_OK;
+}
+
+short script_cmd_verify_party(struct SCRIPT_VERIFY_DATA *scverif,char *err_msg,int *err_param,const struct DK_SCRIPT_COMMAND *cmd)
+{
+    int i;
+    int plyr_idx;
+    int crtr_idx;
+    switch (cmd->index)
+    {
+    case CREATE_PARTY:
+        if (!script_cmd_verify_argcount(err_msg,cmd,1))
+        {
+            (*err_param)=-2;
+            return VERIF_WARN;
+        }
+        i=0;
+        while (i<MAX_PARTYS)
+        {
+            if (scverif->partys[i]==NULL) break;
+            i++;
+        }
+        if (i>=MAX_PARTYS)
+        {
+            sprintf(err_msg,"Amount of partys in script exceeds %d",MAX_PARTYS);
+            return VERIF_WARN;
+        }
+        scverif->partys[i]=strdup(cmd->params[0]);
+        break;
+    case ADD_TUNNELER_TOLEV:
+        if (!script_cmd_verify_argcount(err_msg,cmd,6))
+        {
+            (*err_param)=-2;
+            return VERIF_WARN;
+        }
+        if (!script_cmd_verify_arg_player(scverif,err_msg,cmd->params[0],&plyr_idx))
+        {
+            (*err_param)=0;
+            return VERIF_WARN;
+        }
+        if (!script_cmd_verify_arg_actnpt(scverif,err_msg,cmd->params[1],true,true))
+        {
+            (*err_param)=1;
+            return VERIF_WARN;
+        }
+        if (!script_cmd_verify_arg_party_objectv(scverif,err_msg,cmd->params[2],true))
+        {
+            (*err_param)=2;
+            return VERIF_WARN;
+        }
+        if (!script_cmd_verify_arg_experience(scverif,err_msg,cmd->params[4]))
+        {
+            (*err_param)=4;
+            return VERIF_WARN;
+        }
+        if (!script_cmd_verify_arg_goldamnt(scverif,err_msg,cmd->params[5]))
+        {
+            (*err_param)=5;
+            return VERIF_WARN;
+        }
+        break;
+    case ADD_TO_PARTY:
+        if (!script_cmd_verify_argcount(err_msg,cmd,6))
+        {
+            (*err_param)=-2;
+            return VERIF_WARN;
+        }
+        if (!script_cmd_verify_arg_creatr(scverif,err_msg,cmd->params[1],&crtr_idx))
+        {
+            (*err_param)=1;
+            return VERIF_WARN;
+        }
+        if (!script_cmd_verify_arg_experience(scverif,err_msg,cmd->params[2]))
+        {
+            (*err_param)=2;
+            return VERIF_WARN;
+        }
+        if (!script_cmd_verify_arg_goldamnt(scverif,err_msg,cmd->params[3]))
+        {
+            (*err_param)=3;
+            return VERIF_WARN;
+        }
+        if (!script_cmd_verify_arg_party_objectv(scverif,err_msg,cmd->params[4],false))
+        {
+            (*err_param)=4;
+            return VERIF_WARN;
+        }
+        break;
+    case ADD_PARTY_TOLEV:
+        if (!script_cmd_verify_argcount(err_msg,cmd,4))
+        {
+            (*err_param)=-2;
+            return VERIF_WARN;
+        }
+        if (!script_cmd_verify_arg_player(scverif,err_msg,cmd->params[0],&plyr_idx))
+        {
+            (*err_param)=0;
+            return VERIF_WARN;
+        }
+        if (!script_cmd_verify_arg_actnpt(scverif,err_msg,cmd->params[2],true,true))
+        {
+            (*err_param)=2;
+            return VERIF_WARN;
+        }
+        if (!script_cmd_verify_arg_unsg_int(scverif,err_msg,cmd->params[3],1,200))
+        {
+            (*err_param)=3;
+            return VERIF_WARN;
+        }
+        break;
+    case ADD_CREATR_TOLEV:
+        if (!script_cmd_verify_argcount(err_msg,cmd,6))
+        {
+            (*err_param)=-2;
+            return VERIF_WARN;
+        }
+        if (!script_cmd_verify_arg_player(scverif,err_msg,cmd->params[0],&plyr_idx))
+        {
+            (*err_param)=0;
+            return VERIF_WARN;
+        }
+        if (!script_cmd_verify_arg_creatr(scverif,err_msg,cmd->params[1],&crtr_idx))
+        {
+            (*err_param)=1;
+            return VERIF_WARN;
+        }
+        if (!script_cmd_verify_arg_actnpt(scverif,err_msg,cmd->params[2],true,true))
+        {
+            (*err_param)=2;
+            return VERIF_WARN;
+        }
+        if (!script_cmd_verify_arg_ncrtrs(scverif,err_msg,cmd->params[3],&i))
+        {
+            (*err_param)=3;
+            return VERIF_WARN;
+        }
+        if (!script_cmd_verify_arg_experience(scverif,err_msg,cmd->params[4]))
+        {
+            (*err_param)=4;
+            return VERIF_WARN;
+        }
+        if (!script_cmd_verify_arg_goldamnt(scverif,err_msg,cmd->params[5]))
+        {
+            (*err_param)=5;
+            return VERIF_WARN;
+        }
+        break;
+    case ADD_TUNNELLER_PARTY_TOLEV:
+        if (!script_cmd_verify_argcount(err_msg,cmd,7))
+        {
+            (*err_param)=-2;
+            return VERIF_WARN;
+        }
+        if (!script_cmd_verify_arg_player(scverif,err_msg,cmd->params[0],&plyr_idx))
+        {
+            (*err_param)=0;
+            return VERIF_WARN;
+        }
+        if (!script_cmd_verify_arg_actnpt(scverif,err_msg,cmd->params[2],true,true))
+        {
+            (*err_param)=2;
+            return VERIF_WARN;
+        }
+        if (!script_cmd_verify_arg_party_objectv(scverif,err_msg,cmd->params[3],true))
+        {
+            (*err_param)=3;
+            return VERIF_WARN;
+        }
+        if (!script_cmd_verify_arg_experience(scverif,err_msg,cmd->params[5]))
+        {
+            (*err_param)=5;
+            return VERIF_WARN;
+        }
+        if (!script_cmd_verify_arg_goldamnt(scverif,err_msg,cmd->params[6]))
+        {
+            (*err_param)=6;
+            return VERIF_WARN;
+        }
+        break;
+    default:
+        sprintf(err_msg,"Internal warn - wrong PARTY script command");
+        return VERIF_WARN;
+    }
+    return VERIF_OK;
+}
+
+short script_cmd_verify_avail(struct SCRIPT_VERIFY_DATA *scverif,char *err_msg,int *err_param,const struct DK_SCRIPT_COMMAND *cmd)
+{
+    int plyr_idx;
+    int crtr_idx;
+    switch (cmd->index)
+    {
+    case ROOM_AVAIL:
+        if (!script_cmd_verify_argcount(err_msg,cmd,4))
+        {
+            (*err_param)=-2;
+            return VERIF_WARN;
+        }
+        if (!script_cmd_verify_arg_player(scverif,err_msg,cmd->params[0],&plyr_idx))
+        {
+            (*err_param)=0;
+            return VERIF_WARN;
+        }
+        break;
+    case CREATR_AVAIL:
+        if (!script_cmd_verify_argcount(err_msg,cmd,4))
+        {
+            (*err_param)=-2;
+            return VERIF_WARN;
+        }
+        if (!script_cmd_verify_arg_player(scverif,err_msg,cmd->params[0],&plyr_idx))
+        {
+            (*err_param)=0;
+            return VERIF_WARN;
+        }
+        if (!script_cmd_verify_arg_creatr(scverif,err_msg,cmd->params[1],&crtr_idx))
+        {
+            (*err_param)=1;
+            return VERIF_WARN;
+        }
+        break;
+    case MAGIC_AVAIL:
+        if (!script_cmd_verify_argcount(err_msg,cmd,4))
+        {
+            (*err_param)=-2;
+            return VERIF_WARN;
+        }
+        if (!script_cmd_verify_arg_player(scverif,err_msg,cmd->params[0],&plyr_idx))
+        {
+            (*err_param)=0;
+            return VERIF_WARN;
+        }
+        break;
+    case TRAP_AVAIL:
+        if (!script_cmd_verify_argcount(err_msg,cmd,4))
+        {
+            (*err_param)=-2;
+            return VERIF_WARN;
+        }
+        if (!script_cmd_verify_arg_player(scverif,err_msg,cmd->params[0],&plyr_idx))
+        {
+            (*err_param)=0;
+            return VERIF_WARN;
+        }
+        break;
+    case DOOR_AVAIL:
+        if (!script_cmd_verify_argcount(err_msg,cmd,4))
+        {
+            (*err_param)=-2;
+            return VERIF_WARN;
+        }
+        if (!script_cmd_verify_arg_player(scverif,err_msg,cmd->params[0],&plyr_idx))
+        {
+            (*err_param)=0;
+            return VERIF_WARN;
+        }
+        break;
+    default:
+        sprintf(err_msg,"Internal warn - wrong AVAIL script command");
+        return VERIF_WARN;
+    }
+    return VERIF_OK;
+}
+
+short script_cmd_verify_custobj(struct SCRIPT_VERIFY_DATA *scverif,char *err_msg,int *err_param,const struct DK_SCRIPT_COMMAND *cmd)
+{
+    int plyr_idx;
+    switch (cmd->index)
+    {
+    case DISPLAY_OBJECTV:
+        if (!script_cmd_verify_argcount(err_msg,cmd,2))
+        {
+            (*err_param)=-2;
+            return VERIF_WARN;
+        }
+        if (!script_cmd_verify_arg_player(scverif,err_msg,cmd->params[1],&plyr_idx))
+        {
+            (*err_param)=1;
+            return VERIF_WARN;
+        }
+        break;
+    case DISPLAY_OBJECTV_WPOS:
+        if (!script_cmd_verify_argcount(err_msg,cmd,3))
+        {
+            (*err_param)=-2;
+            return VERIF_WARN;
+        }
+        break;
+    case DISPLAY_INFO:
+        if (cmd->param_count!=2)
+          if (!script_cmd_verify_argcount(err_msg,cmd,1))
+          {
+            (*err_param)=-2;
+            return VERIF_WARN;
+          }
+        break;
+    case DISPLAY_INFO_WPOS:
+        if (!script_cmd_verify_argcount(err_msg,cmd,3))
+        {
+            (*err_param)=-2;
+            return VERIF_WARN;
+        }
+        break;
+    case BONUS_LEV_TIME:
+        if (!script_cmd_verify_argcount(err_msg,cmd,1))
+        {
+            (*err_param)=-2;
+            return VERIF_WARN;
+        }
+        if (!script_cmd_verify_arg_gameturn(scverif,err_msg,cmd->params[0]))
+        {
+            (*err_param)=0;
+            return VERIF_WARN;
+        }
+        break;
+    case TUTORIAL_FLASH_BTN:
+        if (!script_cmd_verify_argcount(err_msg,cmd,2))
+        {
+            (*err_param)=-2;
+            return VERIF_WARN;
+        }
+        break;
+    case QUICK_OBJECTV:
+        if (!script_cmd_verify_argcount(err_msg,cmd,3))
+        {
+            (*err_param)=-2;
+            return VERIF_WARN;
+        }
+        if (!script_cmd_verify_arg_player(scverif,err_msg,cmd->params[2],&plyr_idx))
+        {
+            (*err_param)=2;
+            return VERIF_WARN;
+        }
+        break;
+    case QUICK_INFO:
+        if (!script_cmd_verify_argcount(err_msg,cmd,2))
+        {
+            (*err_param)=-2;
+            return VERIF_WARN;
+        }
+        break;
+    default:
+        sprintf(err_msg,"Internal warn - wrong CUSTOBJ script command");
+        return VERIF_WARN;
+    }
+    return VERIF_OK;
+}
+
+short script_cmd_verify_setup(struct SCRIPT_VERIFY_DATA *scverif,char *err_msg,int *err_param,const struct DK_SCRIPT_COMMAND *cmd)
+{
+    int i;
+    int plyr_idx;
+    int plyr2_idx;
+    switch (cmd->index)
+    {
+    case SET_GEN_SPEED:
+        if (!script_cmd_verify_argcount(err_msg,cmd,1))
+        {
+            (*err_param)=-2;
+            return VERIF_WARN;
+        }
+        if (!script_cmd_verify_arg_gameturn(scverif,err_msg,cmd->params[0]))
+        {
+            (*err_param)=0;
+            return VERIF_WARN;
+        }
+        break;
+    case START_MONEY:
+        if (!script_cmd_verify_argcount(err_msg,cmd,2))
+        {
+            (*err_param)=-2;
+            return VERIF_WARN;
+        }
+        if (!script_cmd_verify_arg_player(scverif,err_msg,cmd->params[0],&plyr_idx))
+        {
+            (*err_param)=0;
+            return VERIF_WARN;
+        }
+        if (!script_cmd_verify_arg_goldamnt(scverif,err_msg,cmd->params[1]))
+        {
+            (*err_param)=1;
+            return VERIF_WARN;
+        }
+        break;
+    case COMP_PLAYER:
+        if (!script_cmd_verify_argcount(err_msg,cmd,2))
+        {
+            (*err_param)=-2;
+            return VERIF_WARN;
+        }
+        if (!script_cmd_verify_arg_player(scverif,err_msg,cmd->params[0],&plyr_idx))
+        {
+            (*err_param)=0;
+            return VERIF_WARN;
+        }
+        break;
+    case ALLY_PLAYERS:
+        if (!script_cmd_verify_argcount(err_msg,cmd,2))
+        {
+            (*err_param)=-2;
+            return VERIF_WARN;
+        }
+        if (!script_cmd_verify_arg_player(scverif,err_msg,cmd->params[0],&plyr_idx))
+        {
+            (*err_param)=0;
+            return VERIF_WARN;
+        }
+        if (!script_cmd_verify_arg_player(scverif,err_msg,cmd->params[1],&plyr2_idx))
+        {
+            (*err_param)=1;
+            return VERIF_WARN;
+        }
+        break;
+    case SET_HATE:
+        if (!script_cmd_verify_argcount(err_msg,cmd,3))
+        {
+            (*err_param)=-2;
+            return VERIF_WARN;
+        }
+        break;
+    case RESEARCH:
+        if (!script_cmd_verify_argcount(err_msg,cmd,4))
+        {
+            (*err_param)=-2;
+            return VERIF_WARN;
+        }
+        if (!script_cmd_verify_arg_player(scverif,err_msg,cmd->params[0],&plyr_idx))
+        {
+            (*err_param)=0;
+            return VERIF_WARN;
+        }
+        break;
+    case SET_COMPUTER_GLOBALS:
+        if (!script_cmd_verify_argcount(err_msg,cmd,7))
+        {
+            (*err_param)=-2;
+            return VERIF_WARN;
+        }
+        break;
+    case SET_COMPUTER_CHECKS:
+        if (!script_cmd_verify_argcount(err_msg,cmd,7))
+        {
+            (*err_param)=-2;
+            return VERIF_WARN;
+        }
+        if (!script_cmd_verify_arg_player(scverif,err_msg,cmd->params[0],&plyr_idx))
+        {
+            (*err_param)=0;
+            return VERIF_WARN;
+        }
+        break;
+    case SET_COMPUTER_EVENT:
+        if (!script_cmd_verify_argcount(err_msg,cmd,4))
+        {
+            (*err_param)=-2;
+            return VERIF_WARN;
+        }
+        if (!script_cmd_verify_arg_player(scverif,err_msg,cmd->params[0],&plyr_idx))
+        {
+            (*err_param)=0;
+            return VERIF_WARN;
+        }
+        break;
+    case SET_COMPUTER_PROCESS:
+        if (!script_cmd_verify_argcount(err_msg,cmd,7))
+        {
+            (*err_param)=-2;
+            return VERIF_WARN;
+        }
+        if (!script_cmd_verify_arg_player(scverif,err_msg,cmd->params[0],&plyr_idx))
+        {
+            (*err_param)=0;
+            return VERIF_WARN;
+        }
+        break;
+    case MAX_CREATURES:
+        if (!script_cmd_verify_argcount(err_msg,cmd,2))
+        {
+            (*err_param)=-2;
+            return VERIF_WARN;
+        }
+        if (!script_cmd_verify_arg_player(scverif,err_msg,cmd->params[0],&plyr_idx))
+        {
+            (*err_param)=0;
+            return VERIF_WARN;
+        }
+        if (!script_cmd_verify_arg_ncrtrs(scverif,err_msg,cmd->params[1],&i))
+        {
+            (*err_param)=1;
+            return VERIF_WARN;
+        }
+        break;
+    default:
+        sprintf(err_msg,"Internal warn - wrong SETUP script command");
+        return VERIF_WARN;
+    }
+    return VERIF_OK;
+}
+
+short script_cmd_verify_triger(struct SCRIPT_VERIFY_DATA *scverif,char *err_msg,int *err_param,const struct DK_SCRIPT_COMMAND *cmd)
+{
+    int plyr_idx;
+    switch (cmd->index)
+    {
+    case RESET_ACTNPT:
+        if (!script_cmd_verify_argcount(err_msg,cmd,1))
+        {
+            (*err_param)=-2;
+            return VERIF_WARN;
+        }
+        if (!script_cmd_verify_arg_actnpt(scverif,err_msg,cmd->params[0],false,false))
+        {
+            (*err_param)=0;
+            return VERIF_WARN;
+        }
+        break;
+    case NEXT_CMD_REUSABLE:
+        if (!script_cmd_verify_argcount(err_msg,cmd,0))
+        {
+            (*err_param)=-2;
+            return VERIF_WARN;
+        }
+        break;
+    case SET_FLAG:
+        if (!script_cmd_verify_argcount(err_msg,cmd,3))
+        {
+            (*err_param)=-2;
+            return VERIF_WARN;
+        }
+        if (!script_cmd_verify_arg_player(scverif,err_msg,cmd->params[0],&plyr_idx))
+        {
+            (*err_param)=0;
+            return VERIF_WARN;
+        }
+        if (!script_cmd_verify_arg_limparam(scverif,err_msg,cmd->params[2],"flag",0,255))
+        {
+            (*err_param)=2;
+            return VERIF_WARN;
+        }
+        break;
+    case SET_TIMER:
+        if (!script_cmd_verify_argcount(err_msg,cmd,2))
+        {
+            (*err_param)=-2;
+            return VERIF_WARN;
+        }
+        if (!script_cmd_verify_arg_player(scverif,err_msg,cmd->params[0],&plyr_idx))
+        {
+            (*err_param)=0;
+            return VERIF_WARN;
+        }
+        break;
+    case GAME_LOSE:
+        if (!script_cmd_verify_argcount(err_msg,cmd,0))
+        {
+            (*err_param)=-2;
+            return VERIF_WARN;
+        }
+        break;
+    case GAME_WIN:
+        if (!script_cmd_verify_argcount(err_msg,cmd,0))
+        {
+            (*err_param)=-2;
+            return VERIF_WARN;
+        }
+        break;
+    case SET_MUSIC:
+        if (!script_cmd_verify_argcount(err_msg,cmd,1))
+        {
+            (*err_param)=-2;
+            return VERIF_WARN;
+        }
+        break;
+    default:
+        sprintf(err_msg,"Internal warn - wrong TRIGER script command");
+        return VERIF_WARN;
+    }
+    return VERIF_OK;
+}
+
+short script_cmd_verify_crtradj(struct SCRIPT_VERIFY_DATA *scverif,char *err_msg,int *err_param,const struct DK_SCRIPT_COMMAND *cmd)
+{
+    int i;
+    int plyr_idx;
+    int crtr_idx;
+    int crtr2_idx;
+    switch (cmd->index)
+    {
+    case DEAD_CREATURES_RET_TO_POOL:
+        if (!script_cmd_verify_argcount(err_msg,cmd,1))
+        {
+            (*err_param)=-2;
+            return VERIF_WARN;
+        }
+        break;
+    case ADD_CREATR_TO_POOL:
+        if (!script_cmd_verify_argcount(err_msg,cmd,2))
+        {
+            (*err_param)=-2;
+            return VERIF_WARN;
+        }
+        if (!script_cmd_verify_arg_creatr(scverif,err_msg,cmd->params[0],&crtr_idx))
+        {
+            (*err_param)=0;
+            return VERIF_WARN;
+        }
+        if (!script_cmd_verify_arg_ncrtrs(scverif,err_msg,cmd->params[1],&i))
+        {
+            (*err_param)=1;
+            return VERIF_WARN;
+        }
+        scverif->total_in_pool+=i;
+        break;
+    case SET_CREATR_MAX_LEVEL:
+        if (!script_cmd_verify_argcount(err_msg,cmd,3))
+        {
+            (*err_param)=-2;
+            return VERIF_WARN;
+        }
+        if (!script_cmd_verify_arg_player(scverif,err_msg,cmd->params[0],&plyr_idx))
+        {
+            (*err_param)=0;
+            return VERIF_WARN;
+        }
+        if (!script_cmd_verify_arg_creatr(scverif,err_msg,cmd->params[1],&crtr_idx))
+        {
+            (*err_param)=1;
+            return VERIF_WARN;
+        }
+        if (!script_cmd_verify_arg_experience(scverif,err_msg,cmd->params[2]))
+        {
+            (*err_param)=2;
+            return VERIF_WARN;
+        }
+        break;
+    case SET_CREATR_STRENGTH:
+        if (!script_cmd_verify_argcount(err_msg,cmd,2))
+        {
+            (*err_param)=-2;
+            return VERIF_WARN;
+        }
+        if (!script_cmd_verify_arg_creatr(scverif,err_msg,cmd->params[0],&crtr_idx))
+        {
+            (*err_param)=0;
+            return VERIF_WARN;
+        }
+        if (!script_cmd_verify_arg_limparam(scverif,err_msg,cmd->params[1],"strength",0,255))
+        {
+            (*err_param)=1;
+            return VERIF_WARN;
+        }
+        break;
+    case SET_CREATR_HEALTH:
+        if (!script_cmd_verify_argcount(err_msg,cmd,2))
+        {
+            (*err_param)=-2;
+            return VERIF_WARN;
+        }
+        if (!script_cmd_verify_arg_creatr(scverif,err_msg,cmd->params[0],&crtr_idx))
+        {
+            (*err_param)=0;
+            return VERIF_WARN;
+        }
+        if (!script_cmd_verify_arg_limparam(scverif,err_msg,cmd->params[1],"health",0,1024))
+        {
+            (*err_param)=1;
+            return VERIF_WARN;
+        }
+        break;
+    case SET_CREATR_ARMOUR:
+        if (!script_cmd_verify_argcount(err_msg,cmd,2))
+        {
+            (*err_param)=-2;
+            return VERIF_WARN;
+        }
+        if (!script_cmd_verify_arg_creatr(scverif,err_msg,cmd->params[0],&crtr_idx))
+        {
+            (*err_param)=0;
+            return VERIF_WARN;
+        }
+        if (!script_cmd_verify_arg_limparam(scverif,err_msg,cmd->params[1],"armour",0,255))
+        {
+            (*err_param)=1;
+            return VERIF_WARN;
+        }
+        break;
+    case SET_CREATR_FEAR:
+        if (!script_cmd_verify_argcount(err_msg,cmd,2))
+        {
+            (*err_param)=-2;
+            return VERIF_WARN;
+        }
+        if (!script_cmd_verify_arg_creatr(scverif,err_msg,cmd->params[0],&crtr_idx))
+        {
+            (*err_param)=0;
+            return VERIF_WARN;
+        }
+        if (!script_cmd_verify_arg_limparam(scverif,err_msg,cmd->params[1],"fear",0,255))
+        {
+            (*err_param)=1;
+            return VERIF_WARN;
+        }
+        break;
+    case CREATR_SWAP:
+        if (!script_cmd_verify_argcount(err_msg,cmd,2))
+        {
+            (*err_param)=-2;
+            return VERIF_WARN;
+        }
+        if (!script_cmd_verify_arg_creatr(scverif,err_msg,cmd->params[0],&crtr_idx))
+        {
+            (*err_param)=0;
+            return VERIF_WARN;
+        }
+        if (!script_cmd_verify_arg_creatr(scverif,err_msg,cmd->params[1],&crtr2_idx))
+        {
+            (*err_param)=0;
+            return VERIF_WARN;
+        }
+        break;
+    default:
+        sprintf(err_msg,"Internal warn - wrong CRTRADJ script command");
+        return VERIF_WARN;
+    }
+    return VERIF_OK;
+}
+
+short script_cmd_verify_commnt(struct SCRIPT_VERIFY_DATA *scverif,char *err_msg,int *err_param,const struct DK_SCRIPT_COMMAND *cmd)
+{
+    switch (cmd->index)
+    {
+    case EMPTYLN:
+    case CMNT_REM:
+        break;
+    default:
+        sprintf(err_msg,"Internal warn - wrong COMMNT script command");
+        return VERIF_WARN;
+    }
+    return VERIF_OK;
+}
+
+short script_cmd_verify_obsol(struct SCRIPT_VERIFY_DATA *scverif,char *err_msg,int *err_param,const struct DK_SCRIPT_COMMAND *cmd)
+{
+    switch (cmd->index)
+    {
+    case OBSOLT_PRINT:
+        if (!script_cmd_verify_argcount(err_msg,cmd,1))
+        {
+            (*err_param)=-2;
+            return VERIF_WARN;
+        }
+        break;
+    default:
+        sprintf(err_msg,"Obsolete command used in script");
+        return VERIF_WARN;
+    }
+    return VERIF_OK;
+}
+
+/*
+ * Verifies TXT entries. Returns VERIF_ERROR, VERIF_WARN or VERIF_OK
+ * This is just a wrapper to unify parameters in the main checking function.
+ */
+short txt_verify(const struct LEVEL *lvl, char *err_msg,struct IPOINT_2D *errpt)
+{
+    int err_line=-1;
+    int err_param=-9;
+    short result=dkscript_verify(lvl,err_msg,&err_line,&err_param);
+    if (result!=VERIF_OK)
+    {
+      errpt->x=-1;
+      errpt->y=-1;
+    }
+    return result;
+}
+
 /*
  * Verifies TXT entries. Returns VERIF_ERROR,
  * VERIF_WARN or VERIF_OK
  */
-short txt_verify(struct LEVEL *lvl, char *err_msg,struct IPOINT_2D *errpt)
+short dkscript_verify(const struct LEVEL *lvl, char *err_msg,int *err_line,int *err_param)
 {
-    //Sweeping through TXT entries
+    char child_err_msg[LINEMSG_SIZE];
+    child_err_msg[0]='\0';
+    struct SCRIPT_VERIFY_DATA scverif;
+    scverif.dnhearts_count=0;
+    scverif.herogts_count=256;
+    if (!create_herogate_number_used_arr(lvl,&(scverif.herogts),&(scverif.herogts_count)))
+        sprintf(child_err_msg,"hero gates");
+    scverif.actnpts_count=256;
+    if (!create_actnpt_number_used_arr(lvl,&(scverif.actnpts),&(scverif.actnpts_count)))
+        sprintf(child_err_msg,"action points");
+    if (child_err_msg[0]!='\0')
+    {
+        sprintf(err_msg,"Internal - cannot list %s to verify script",child_err_msg);
+        return VERIF_WARN;
+    }
+    scverif.level=0;
+    scverif.total_ifs=0;
+    scverif.total_in_pool=0;
+    scverif.partys=(char **)malloc((MAX_PARTYS+1)*sizeof(char *));
+    if (scverif.partys==NULL)
+        die("txt_verify: Cannot allocate memory");
     int i;
+    for (i=0; i<(MAX_PARTYS+1); i++)
+      scverif.partys[i]=NULL;
+
+    short result=VERIF_OK;
+    //Sweeping through TXT entries
     for (i=0; i<lvl->script.lines_count; i++)
     {
         struct DK_SCRIPT_COMMAND *cmd;
         cmd=lvl->script.list[i];
-        if (cmd->group == CMD_UNKNOWN)
+        switch (cmd->group)
         {
-            sprintf(err_msg,"Unrecognized script command at line %d.",i+1);
-            return VERIF_WARN;
+        case CMD_CONDIT:
+            result=script_cmd_verify_condit(&scverif,child_err_msg,err_param,cmd);
+            break;
+        case CMD_PARTY:
+            result=script_cmd_verify_party(&scverif,child_err_msg,err_param,cmd);
+            break;
+        case CMD_AVAIL:
+            result=script_cmd_verify_avail(&scverif,child_err_msg,err_param,cmd);
+            break;
+        case CMD_CUSTOBJ:
+            result=script_cmd_verify_custobj(&scverif,child_err_msg,err_param,cmd);
+            break;
+        case CMD_SETUP:
+            result=script_cmd_verify_setup(&scverif,child_err_msg,err_param,cmd);
+            break;
+        case CMD_TRIGER:
+            result=script_cmd_verify_triger(&scverif,child_err_msg,err_param,cmd);
+            break;
+        case CMD_CRTRADJ:
+            result=script_cmd_verify_crtradj(&scverif,child_err_msg,err_param,cmd);
+            break;
+        case CMD_COMMNT:
+            result=script_cmd_verify_commnt(&scverif,child_err_msg,err_param,cmd);
+            break;
+        case CMD_OBSOLT:
+            result=script_cmd_verify_obsol(&scverif,child_err_msg,err_param,cmd);
+            break;
+        case CMD_UNKNOWN:
+            sprintf(child_err_msg,"Unrecognized script command");
+            result=VERIF_WARN;
+            break;
+        case CMD_ADIKTED:
+            sprintf(child_err_msg,"ADiKtEd specific command used in DK script");
+            result=VERIF_WARN;
+            break;
+        default:
+            sprintf(child_err_msg,"Internal - bad script command group");
+            result=VERIF_WARN;
+            break;
         }
-        if (cmd->group == CMD_ADIKTED)
+        // If error found - break the for loop
+        if (result!=VERIF_OK)
         {
-            sprintf(err_msg,"ADiKtEd specific command used in DK script at line %d.",i+1);
-            return VERIF_WARN;
-        }
-        if ((cmd->group==CMD_OBSOLT) && (cmd->index!=OBSOLT_PRINT) )
-        {
-            sprintf(err_msg,"Obsolete command used in script at line %d.",i+1);
-            return VERIF_WARN;
+            sprintf(err_msg,"%s at line %d.",child_err_msg,i+1);
+            *err_line=i;
+            break;
         }
     }
-  return VERIF_OK;
+    if (scverif.total_ifs>48)
+    {
+        sprintf(err_msg,"Script file contains more than %d IF statements.",48);
+        result=VERIF_WARN;
+    }
+    //Freeing structure and returning
+    for (i=0; i<16; i++)
+      free(scverif.partys[i]);
+    free(scverif.partys);
+    free(scverif.actnpts);
+    free(scverif.herogts);
+    return result;
 }
 
 short execute_script_line(struct LEVEL *lvl,char *line,char *err_msg)
@@ -680,7 +2019,7 @@ int get_script_command_level(const char *text)
         if (text[i]==' ')
         {
           nspac++;
-          if (nspac>=4)
+          if (nspac>=script_level_spaces)
           {
             nspac=0;
             lev++;
@@ -697,7 +2036,7 @@ int get_script_command_level(const char *text)
     return lev;
 }
 
-char *script_strword( const char *str, const short whole_rest )
+short script_strword_pos( const char **ptr, unsigned int *ptr_len, const char *str, const short whole_rest )
 {
   static const char *text;
   if (str!=NULL)
@@ -706,38 +2045,41 @@ char *script_strword( const char *str, const short whole_rest )
   }
   if (text==NULL)
   {
-//    message_log("  script_strword: end of text");
-    return NULL;
+    (*ptr_len)=0;
+//    message_log("  script_strword_pos: end of text");
+    return false;
   }
   int len;
   do {
-    len=strcspn(text," \t,()");
+    len=strcspn(text," \t,();");
     if (len==0)
     {
       if (text[0]=='\0')
       {
+        (*ptr_len)=0;
         text=NULL;
-//          message_log("  script_strword: line empty");
-        return NULL;
+//          message_log("  script_strword_pos: line empty");
+        return false;
       }
       text++;
     }
   } while (len==0);
+  int text_len;
+  text_len=strlen(text);
   if (whole_rest)
   {
-    char *wholetxt=strdup(text);
-//    message_log("  script_strword: returning whole \"%s\"",text);
+    (*ptr)=text;
+    (*ptr_len)=text_len;
+//    message_log("  script_strword_pos: returning whole \"%s\"",text);
     text=NULL;
-    return wholetxt;
+    return true;
   }
   // So now we're sure that first character is not a token.
   // and that the string is not empty
   // Determining end of the parameter
-  int text_len;
-  text_len=strlen(text);
   // operators
   if ((text[0]=='=')||(text[0]=='>')||(text[0]=='<')
-  ||(text[0]=='|')||(text[0]=='/')||(text[0]=='*'))
+  ||(text[0]=='|')||(text[0]=='/')||(text[0]=='*')||(text[0]=='!'))
   {
     len=1;
     while (((text[len]=='=')||(text[len]=='>')||(text[len]=='<')||
@@ -757,21 +2099,185 @@ char *script_strword( const char *str, const short whole_rest )
       len=strcspn( text+len, quot_chr );
       if (len<text_len) len++;
     } while ((len<text_len)&&(text[len-1]=='\\'));
+    if (len<text_len) len++;
   } else
   // Standard word
   {
     // Check for operators after the word
-    int oplen=strcspn(text,"=><|/*\"\'");
+    int oplen=0;
+    if (text[0]!='\0')
+      oplen=strcspn(text+1,"=><|/*\"\'-+!")+1;
     if (oplen<len)
       len=oplen;
   }
+  (*ptr)=text;
+  (*ptr_len)=len;
+  text+=len;
+  return true;
+}
+
+char *script_strword( const char *str, const short whole_rest )
+{
+  const char *ptr;
+  unsigned int len;
+  if (!script_strword_pos(&ptr,&len,str,whole_rest))
+    return NULL;
   char *wordtxt;
   wordtxt=malloc(len+1);
   if (wordtxt==NULL) die("script_strword: cannot allocate memory");
-  strncpy(wordtxt,text,len);
+  strncpy(wordtxt,ptr,len);
   wordtxt[len]='\0';
-  text+=len;
   return wordtxt;
+}
+
+/*
+ * Returns group and index of a script word
+ */
+int recognize_script_word_group_and_idx(int *index,const char *wordtxt,const short is_parameter)
+{
+  int cmd_idx;
+  if (is_parameter)
+  {
+    cmd_idx=comp_plyr_cmd_index(wordtxt);
+    if (cmd_idx>=0)
+    {
+      *index=cmd_idx;
+      return CMD_COMP;
+    }
+    cmd_idx=players_cmd_index(wordtxt);
+    if (cmd_idx>=0)
+    {
+      *index=cmd_idx;
+      return CMD_PLAYER;
+    }
+    cmd_idx=operator_cmd_index(wordtxt);
+    if (cmd_idx>=0)
+    {
+      *index=cmd_idx;
+      return CMD_OPERATR;
+    }
+    cmd_idx=variabl_cmd_index(wordtxt);
+    if (cmd_idx>=0)
+    {
+      *index=cmd_idx;
+      return CMD_VARIBL;
+    }
+    cmd_idx=timer_cmd_index(wordtxt);
+    if (cmd_idx>=0)
+    {
+      *index=cmd_idx;
+      return CMD_TIMER;
+    }
+    cmd_idx=flag_cmd_index(wordtxt);
+    if (cmd_idx>=0)
+    {
+      *index=cmd_idx;
+      return CMD_FLAG;
+    }
+    cmd_idx=party_objectv_cmd_index(wordtxt);
+    if (cmd_idx>=0)
+    {
+      *index=cmd_idx;
+      return CMD_PAROBJ;
+    }
+/*
+    if (cmd_idx>=0)
+    {
+      *index=cmd_idx;
+      return CMD_DOOR;
+    }
+    if (cmd_idx>=0)
+    {
+      *index=cmd_idx;
+      return CMD_TRAP;
+    }
+    if (cmd_idx>=0)
+    {
+      *index=cmd_idx;
+      return CMD_SPELL;
+    }
+    if (cmd_idx>=0)
+    {
+      *index=cmd_idx;
+      return CMD_CREATR;
+    }
+    if (cmd_idx>=0)
+    {
+      *index=cmd_idx;
+      return CMD_ROOM;
+    }
+*/
+    cmd_idx=special_cmd_index(wordtxt);
+    if (cmd_idx>=0)
+    {
+      *index=cmd_idx;
+      return CMD_SPECIAL;
+    }
+  } else
+  {
+    cmd_idx=adikted_cmd_index(wordtxt);
+    if (cmd_idx>=0)
+    {
+      *index=cmd_idx;
+      return CMD_ADIKTED;
+    }
+    cmd_idx=condit_cmd_index(wordtxt);
+    if (cmd_idx>=0)
+    {
+      *index=cmd_idx;
+      return CMD_CONDIT;
+    }
+    cmd_idx=party_cmd_index(wordtxt);
+    if (cmd_idx>=0)
+    {
+      *index=cmd_idx;
+      return CMD_PARTY;
+    }
+    cmd_idx=avail_cmd_index(wordtxt);
+    if (cmd_idx>=0)
+    {
+      *index=cmd_idx;
+      return CMD_AVAIL;
+    }
+    cmd_idx=custobj_cmd_index(wordtxt);
+    if (cmd_idx>=0)
+    {
+      *index=cmd_idx;
+      return CMD_CUSTOBJ;
+    }
+    cmd_idx=setup_cmd_index(wordtxt);
+    if (cmd_idx>=0)
+    {
+      *index=cmd_idx;
+      return CMD_SETUP;
+    }
+    cmd_idx=triger_cmd_index(wordtxt);
+    if (cmd_idx>=0)
+    {
+      *index=cmd_idx;
+      return CMD_TRIGER;
+    }
+    cmd_idx=crtradj_cmd_index(wordtxt);
+    if (cmd_idx>=0)
+    {
+      *index=cmd_idx;
+      return CMD_CRTRADJ;
+    }
+    cmd_idx=obsolt_cmd_index(wordtxt);
+    if (cmd_idx>=0)
+    {
+      *index=cmd_idx;
+      return CMD_OBSOLT;
+    }
+    cmd_idx=commnt_cmd_index(wordtxt);
+    if (cmd_idx>=0)
+    {
+      *index=cmd_idx;
+      return CMD_COMMNT;
+    }
+  }
+  *index=-1;
+  return CMD_UNKNOWN;
 }
 
 short decompose_script_command(struct DK_SCRIPT_COMMAND *cmd,const char *text)
@@ -781,103 +2287,15 @@ short decompose_script_command(struct DK_SCRIPT_COMMAND *cmd,const char *text)
   char *wordtxt;
   cmd->level=get_script_command_level(text);
   wordtxt = script_strword(text,false);
-  cmd->index=-1;
   int cmd_idx;
-  if (cmd->index<0)
-  {
-    cmd_idx=adikted_cmd_index(wordtxt);
-    if (cmd_idx>=0)
-    {
-      cmd->group=CMD_ADIKTED;
-      cmd->index=cmd_idx;
-    }
-  }
-  if (cmd->index<0)
-  {
-    cmd_idx=condit_cmd_index(wordtxt);
-    if (cmd_idx>=0)
-    {
-      cmd->group=CMD_CONDIT;
-      cmd->index=cmd_idx;
-    }
-  }
-  if (cmd->index<0)
-  {
-    cmd_idx=party_cmd_index(wordtxt);
-    if (cmd_idx>=0)
-    {
-      cmd->group=CMD_PARTY;
-      cmd->index=cmd_idx;
-    }
-  }
-  if (cmd->index<0)
-  {
-    cmd_idx=avail_cmd_index(wordtxt);
-    if (cmd_idx>=0)
-    {
-      cmd->group=CMD_AVAIL;
-      cmd->index=cmd_idx;
-    }
-  }
-  if (cmd->index<0)
-  {
-    cmd_idx=custobj_cmd_index(wordtxt);
-    if (cmd_idx>=0)
-    {
-      cmd->group=CMD_CUSTOBJ;
-      cmd->index=cmd_idx;
-    }
-  }
-  if (cmd->index<0)
-  {
-    cmd_idx=setup_cmd_index(wordtxt);
-    if (cmd_idx>=0)
-    {
-      cmd->group=CMD_SETUP;
-      cmd->index=cmd_idx;
-    }
-  }
-  if (cmd->index<0)
-  {
-    cmd_idx=triger_cmd_index(wordtxt);
-    if (cmd_idx>=0)
-    {
-      cmd->group=CMD_TRIGER;
-      cmd->index=cmd_idx;
-    }
-  }
-  if (cmd->index<0)
-  {
-    cmd_idx=crtradj_cmd_index(wordtxt);
-    if (cmd_idx>=0)
-    {
-      cmd->group=CMD_CRTRADJ;
-      cmd->index=cmd_idx;
-    }
-  }
-  if (cmd->index<0)
-  {
-    cmd_idx=obsolt_cmd_index(wordtxt);
-    if (cmd_idx>=0)
-    {
-      cmd->group=CMD_OBSOLT;
-      cmd->index=cmd_idx;
-    }
-  }
-  if (cmd->index<0)
-  {
-    cmd_idx=commnt_cmd_index(wordtxt);
-    if (cmd_idx>=0)
-    {
-      cmd->group=CMD_COMMNT;
-      cmd->index=cmd_idx;
-    }
-  }
+  cmd->group=recognize_script_word_group_and_idx(&cmd_idx,wordtxt,false);
+  cmd->index=cmd_idx;
   if (cmd->index<0)
   {
       cmd->group=CMD_UNKNOWN;
       message_log("  decompose_script_command: \"%s\" not recognized",wordtxt);
       free(wordtxt);
+      script_command_param_add(cmd,strdup(text));
       return false;
   }
   free(wordtxt);
@@ -952,6 +2370,7 @@ short is_no_bracket_command(int group,int cmdidx)
     case CMD_ADIKTED:
       return false;
     case CMD_UNKNOWN:
+      return true;
     default:
       return false;
     }
@@ -962,7 +2381,7 @@ char *recompose_script_command(const struct DK_SCRIPT_COMMAND *cmd)
      if (cmd==NULL) return strdup("");
      const char *cmd_name=script_cmd_text(cmd->group,cmd->index);
      int len;
-     len=(cmd->level*4)+strlen(cmd_name)+2;
+     len=(cmd->level*script_level_spaces)+strlen(cmd_name)+2;
      int param_idx;
      for (param_idx=0;param_idx<cmd->param_count;param_idx++)
      {
@@ -974,9 +2393,12 @@ char *recompose_script_command(const struct DK_SCRIPT_COMMAND *cmd)
      text[0]='\0';
      if (len<192)
      {
-       int i;
+       int i,k;
        for (i=0;i<cmd->level;i++)
-         strcat(text,"    ");
+       {
+         for (k=0;k<script_level_spaces;k++)
+           strcat(text," ");
+       }
      }
      strcat(text,cmd_name);
      short no_bracket=is_no_bracket_command(cmd->group,cmd->index);
@@ -1032,11 +2454,11 @@ const char *script_cmd_text(int group,int cmdidx)
       return adikted_cmd_text(cmdidx);
     case CMD_UNKNOWN:
     default:
-      return "X";
+      return rem_cmdtext;
     }
 }
 
-int adikted_cmd_index(char *cmdtext)
+int adikted_cmd_index(const char *cmdtext)
 {
     if ((cmdtext==NULL)||(strlen(cmdtext)<2)) return -1;
     int i=0;
@@ -1053,11 +2475,11 @@ int adikted_cmd_index(char *cmdtext)
 const char *adikted_cmd_text(int cmdidx)
 {
     int array_count=sizeof(cmd_adikted_arr)/sizeof(char *);
-    if ((cmdidx<0)||(cmdidx>=array_count)) return "X";
+    if ((cmdidx<0)||(cmdidx>=array_count)) return rem_cmdtext;
     return cmd_adikted_arr[cmdidx];
 }
 
-int condit_cmd_index(char *cmdtext)
+int condit_cmd_index(const char *cmdtext)
 {
     if ((cmdtext==NULL)||(strlen(cmdtext)<2)) return -1;
     int i=0;
@@ -1074,11 +2496,11 @@ int condit_cmd_index(char *cmdtext)
 const char *condit_cmd_text(int cmdidx)
 {
     int array_count=sizeof(cmd_condit_arr)/sizeof(char *);
-    if ((cmdidx<0)||(cmdidx>=array_count)) return "X";
+    if ((cmdidx<0)||(cmdidx>=array_count)) return rem_cmdtext;
     return cmd_condit_arr[cmdidx];
 }
 
-int flag_cmd_index(char *cmdtext)
+int flag_cmd_index(const char *cmdtext)
 {
     if ((cmdtext==NULL)||(strlen(cmdtext)<2)) return -1;
     int i=0;
@@ -1095,11 +2517,11 @@ int flag_cmd_index(char *cmdtext)
 const char *flag_cmd_text(int cmdidx)
 {
     int array_count=sizeof(cmd_flag_arr)/sizeof(char *);
-    if ((cmdidx<0)||(cmdidx>=array_count)) return "X";
+    if ((cmdidx<0)||(cmdidx>=array_count)) return rem_cmdtext;
     return cmd_flag_arr[cmdidx];
 }
 
-int party_objectv_cmd_index(char *cmdtext)
+int party_objectv_cmd_index(const char *cmdtext)
 {
     if ((cmdtext==NULL)||(strlen(cmdtext)<2)) return -1;
     int i=0;
@@ -1116,11 +2538,11 @@ int party_objectv_cmd_index(char *cmdtext)
 const char *party_objectv_cmd_text(int cmdidx)
 {
     int array_count=sizeof(cmd_party_objectv_arr)/sizeof(char *);
-    if ((cmdidx<0)||(cmdidx>=array_count)) return "X";
+    if ((cmdidx<0)||(cmdidx>=array_count)) return rem_cmdtext;
     return cmd_party_objectv_arr[cmdidx];
 }
 
-int party_cmd_index(char *cmdtext)
+int party_cmd_index(const char *cmdtext)
 {
     if ((cmdtext==NULL)||(strlen(cmdtext)<2)) return -1;
     int i=0;
@@ -1137,11 +2559,11 @@ int party_cmd_index(char *cmdtext)
 const char *party_cmd_text(int cmdidx)
 {
     int array_count=sizeof(cmd_party_arr)/sizeof(char *);
-    if ((cmdidx<0)||(cmdidx>=array_count)) return "X";
+    if ((cmdidx<0)||(cmdidx>=array_count)) return rem_cmdtext;
     return cmd_party_arr[cmdidx];
 }
 
-int avail_cmd_index(char *cmdtext)
+int avail_cmd_index(const char *cmdtext)
 {
     if ((cmdtext==NULL)||(strlen(cmdtext)<2)) return -1;
     int i=0;
@@ -1158,11 +2580,11 @@ int avail_cmd_index(char *cmdtext)
 const char *avail_cmd_text(int cmdidx)
 {
     int array_count=sizeof(cmd_avail_arr)/sizeof(char *);
-    if ((cmdidx<0)||(cmdidx>=array_count)) return "X";
+    if ((cmdidx<0)||(cmdidx>=array_count)) return rem_cmdtext;
     return cmd_avail_arr[cmdidx];
 }
 
-int comp_plyr_cmd_index(char *cmdtext)
+int comp_plyr_cmd_index(const char *cmdtext)
 {
     if ((cmdtext==NULL)||(strlen(cmdtext)<2)) return -1;
     int i=0;
@@ -1179,13 +2601,78 @@ int comp_plyr_cmd_index(char *cmdtext)
 const char *comp_plyr_cmd_text(int cmdidx)
 {
     int array_count=sizeof(cmd_comp_plyr_arr)/sizeof(char *);
-    if ((cmdidx<0)||(cmdidx>=array_count)) return "X";
+    if ((cmdidx<0)||(cmdidx>=array_count)) return rem_cmdtext;
     return cmd_comp_plyr_arr[cmdidx];
 }
 
-int operator_cmd_index(char *cmdtext)
+int players_cmd_index(const char *cmdtext)
 {
     if ((cmdtext==NULL)||(strlen(cmdtext)<2)) return -1;
+    int i=0;
+    int array_count=sizeof(cmd_players_arr)/sizeof(char *);
+    while (i<array_count)
+    {
+      if (stricmp(cmd_players_arr[i],cmdtext)==0)
+        return i;
+      i++;
+    }
+    return -1;
+}
+
+const char *players_cmd_text(int cmdidx)
+{
+    int array_count=sizeof(cmd_players_arr)/sizeof(char *);
+    if ((cmdidx<0)||(cmdidx>=array_count)) return "X";
+    return cmd_players_arr[cmdidx];
+}
+
+int creatures_cmd_index(const char *cmdtext)
+{
+    if ((cmdtext==NULL)||(strlen(cmdtext)<2)) return -1;
+    int i=0;
+    int array_count=sizeof(cmd_creatures_arr)/sizeof(char *);
+    while (i<array_count)
+    {
+      if (stricmp(cmd_creatures_arr[i],cmdtext)==0)
+        return i;
+      i++;
+    }
+    return -1;
+}
+
+const char *creatures_cmd_text(int cmdidx)
+{
+    int array_count=sizeof(cmd_creatures_arr)/sizeof(char *);
+    if ((cmdidx<0)||(cmdidx>=array_count)) return "X";
+    return cmd_creatures_arr[cmdidx];
+}
+
+int special_cmd_index(const char *cmdtext)
+{
+    if ((cmdtext==NULL)||(strlen(cmdtext)<1)) return -1;
+    if (stricmp(random_cmdtext,cmdtext)==0)
+        return SPEC_RANDOM;
+    int val;
+    if (script_param_to_int(&val,cmdtext))
+        return SPEC_NUMBER;
+    return -1;
+}
+
+const char *special_cmd_text(int cmdidx,const char *cmdtext)
+{
+    switch (cmdidx)
+    {
+    case SPEC_RANDOM:
+        return random_cmdtext;
+    case SPEC_NUMBER:
+    default:
+        return cmdtext;
+    }
+}
+
+int operator_cmd_index(const char *cmdtext)
+{
+    if ((cmdtext==NULL)||(strlen(cmdtext)<1)) return -1;
     int i=0;
     int array_count=sizeof(cmd_operator_arr)/sizeof(char *);
     while (i<array_count)
@@ -1200,11 +2687,11 @@ int operator_cmd_index(char *cmdtext)
 const char *operator_cmd_text(int cmdidx)
 {
     int array_count=sizeof(cmd_operator_arr)/sizeof(char *);
-    if ((cmdidx<0)||(cmdidx>=array_count)) return "X";
+    if ((cmdidx<0)||(cmdidx>=array_count)) return rem_cmdtext;
     return cmd_operator_arr[cmdidx];
 }
 
-int variabl_cmd_index(char *cmdtext)
+int variabl_cmd_index(const char *cmdtext)
 {
     if ((cmdtext==NULL)||(strlen(cmdtext)<2)) return -1;
     int i=0;
@@ -1221,11 +2708,11 @@ int variabl_cmd_index(char *cmdtext)
 const char *variabl_cmd_text(int cmdidx)
 {
     int array_count=sizeof(cmd_variabl_arr)/sizeof(char *);
-    if ((cmdidx<0)||(cmdidx>=array_count)) return "X";
+    if ((cmdidx<0)||(cmdidx>=array_count)) return rem_cmdtext;
     return cmd_variabl_arr[cmdidx];
 }
 
-int timer_cmd_index(char *cmdtext)
+int timer_cmd_index(const char *cmdtext)
 {
     if ((cmdtext==NULL)||(strlen(cmdtext)<2)) return -1;
     int i=0;
@@ -1242,11 +2729,11 @@ int timer_cmd_index(char *cmdtext)
 const char *timer_cmd_text(int cmdidx)
 {
     int array_count=sizeof(cmd_timer_arr)/sizeof(char *);
-    if ((cmdidx<0)||(cmdidx>=array_count)) return "X";
+    if ((cmdidx<0)||(cmdidx>=array_count)) return rem_cmdtext;
     return cmd_timer_arr[cmdidx];
 }
 
-int custobj_cmd_index(char *cmdtext)
+int custobj_cmd_index(const char *cmdtext)
 {
     if ((cmdtext==NULL)||(strlen(cmdtext)<2)) return -1;
     int i=0;
@@ -1263,11 +2750,11 @@ int custobj_cmd_index(char *cmdtext)
 const char *custobj_cmd_text(int cmdidx)
 {
     int array_count=sizeof(cmd_custobj_arr)/sizeof(char *);
-    if ((cmdidx<0)||(cmdidx>=array_count)) return "X";
+    if ((cmdidx<0)||(cmdidx>=array_count)) return rem_cmdtext;
     return cmd_custobj_arr[cmdidx];
 }
 
-int setup_cmd_index(char *cmdtext)
+int setup_cmd_index(const char *cmdtext)
 {
     if ((cmdtext==NULL)||(strlen(cmdtext)<2)) return -1;
     int i=0;
@@ -1284,11 +2771,11 @@ int setup_cmd_index(char *cmdtext)
 const char *setup_cmd_text(int cmdidx)
 {
     int array_count=sizeof(cmd_setup_arr)/sizeof(char *);
-    if ((cmdidx<0)||(cmdidx>=array_count)) return "X";
+    if ((cmdidx<0)||(cmdidx>=array_count)) return rem_cmdtext;
     return cmd_setup_arr[cmdidx];
 }
 
-int triger_cmd_index(char *cmdtext)
+int triger_cmd_index(const char *cmdtext)
 {
     if ((cmdtext==NULL)||(strlen(cmdtext)<2)) return -1;
     int i=0;
@@ -1305,11 +2792,11 @@ int triger_cmd_index(char *cmdtext)
 const char *triger_cmd_text(int cmdidx)
 {
     int array_count=sizeof(cmd_triger_arr)/sizeof(char *);
-    if ((cmdidx<0)||(cmdidx>=array_count)) return "X";
+    if ((cmdidx<0)||(cmdidx>=array_count)) return rem_cmdtext;
     return cmd_triger_arr[cmdidx];
 }
 
-int crtradj_cmd_index(char *cmdtext)
+int crtradj_cmd_index(const char *cmdtext)
 {
     if ((cmdtext==NULL)||(strlen(cmdtext)<2)) return -1;
     int i=0;
@@ -1326,11 +2813,11 @@ int crtradj_cmd_index(char *cmdtext)
 const char *crtradj_cmd_text(int cmdidx)
 {
     int array_count=sizeof(cmd_crtradj_arr)/sizeof(char *);
-    if ((cmdidx<0)||(cmdidx>=array_count)) return "X";
+    if ((cmdidx<0)||(cmdidx>=array_count)) return rem_cmdtext;
     return cmd_crtradj_arr[cmdidx];
 }
 
-int obsolt_cmd_index(char *cmdtext)
+int obsolt_cmd_index(const char *cmdtext)
 {
     if ((cmdtext==NULL)||(strlen(cmdtext)<2)) return -1;
     int i=0;
@@ -1347,11 +2834,11 @@ int obsolt_cmd_index(char *cmdtext)
 const char *obsolt_cmd_text(int cmdidx)
 {
     int array_count=sizeof(cmd_obsolt_arr)/sizeof(char *);
-    if ((cmdidx<0)||(cmdidx>=array_count)) return "X";
+    if ((cmdidx<0)||(cmdidx>=array_count)) return rem_cmdtext;
     return cmd_obsolt_arr[cmdidx];
 }
 
-int commnt_cmd_index(char *cmdtext)
+int commnt_cmd_index(const char *cmdtext)
 {
     if (cmdtext==NULL) return EMPTYLN;
     if (strlen(cmdtext)<1) return EMPTYLN;
@@ -1369,11 +2856,11 @@ int commnt_cmd_index(char *cmdtext)
 const char *commnt_cmd_text(int cmdidx)
 {
     int array_count=sizeof(cmd_commnt_arr)/sizeof(char *);
-    if ((cmdidx<0)||(cmdidx>=array_count)) return "X";
+    if ((cmdidx<0)||(cmdidx>=array_count)) return rem_cmdtext;
     return cmd_commnt_arr[cmdidx];
 }
 
-int orient_cmd_index(char *cmdtext)
+int orient_cmd_index(const char *cmdtext)
 {
     if ((cmdtext==NULL)||(strlen(cmdtext)<2)) return -1;
     int i=0;
@@ -1390,11 +2877,11 @@ int orient_cmd_index(char *cmdtext)
 const char *orient_cmd_text(int cmdidx)
 {
     int array_count=sizeof(cmd_orient_arr)/sizeof(char *);
-    if ((cmdidx<0)||(cmdidx>=array_count)) return "X";
+    if ((cmdidx<0)||(cmdidx>=array_count)) return rem_cmdtext;
     return cmd_orient_arr[cmdidx];
 }
 
-int font_cmd_index(char *cmdtext)
+int font_cmd_index(const char *cmdtext)
 {
     if ((cmdtext==NULL)||(strlen(cmdtext)<2)) return -1;
     int i=0;
@@ -1411,7 +2898,7 @@ int font_cmd_index(char *cmdtext)
 const char *font_cmd_text(int cmdidx)
 {
     int array_count=sizeof(cmd_font_arr)/sizeof(char *);
-    if ((cmdidx<0)||(cmdidx>=array_count)) return "X";
+    if ((cmdidx<0)||(cmdidx>=array_count)) return rem_cmdtext;
     return cmd_font_arr[cmdidx];
 }
 

@@ -18,12 +18,11 @@
 const char *help_filename="map.hlp";
 const int itm_desc_rows=8;
 
-HELP_DATA *help;
-
-short init_help(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode)
+short init_help(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata)
 {
     //Creating and clearing help variable
-    help=(HELP_DATA *)malloc(sizeof(HELP_DATA));
+    workdata->help=(struct HELP_DATA *)malloc(sizeof(struct HELP_DATA));
+    struct HELP_DATA *help=workdata->help;
     if (help==NULL)
      die("init_help: Cannot allocate memory.");
     help->formode=0;
@@ -128,7 +127,7 @@ short init_help(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode)
       strip_crlf(buffer);
       if ((buffer[0]=='[') && (buffer[strlen(buffer)-1]==']'))
       {
-          what = match_title (title, n);
+          what = match_title(help,title, n);
           if (n && what)
           {
             *what = (char **)malloc(n*sizeof(char *));
@@ -153,7 +152,7 @@ short init_help(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode)
       {
           strcpy (title, buffer+1);
           title[strlen(title)-1]=0;
-          what=match_title (title, -1);
+          what=match_title (help,title, -1);
           n=0;
       }
       else
@@ -176,41 +175,43 @@ short init_help(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode)
 /*
  * Deallocates memory for the help screen.
  */
-void free_help(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode)
+void free_help(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata)
 {
   //We could do more than that...
-  free(help);
+  free(workdata->help);
 }
 
 /*
  * Covers actions from the help screen.
  */
-void actions_help(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl,int key)
+void actions_help(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata,int key)
 {
+    int *y=&(workdata->help->y);
+    int rows=workdata->help->rows;
     switch (key)
     {
     case KEY_UP:
-      help->y--;
+      (*y)--;
       break;
     case KEY_DOWN:
-      help->y++;
+      (*y)++;
       break;
     case KEY_PGUP:
-      help->y-=scrmode->rows-1;
+      (*y)-=scrmode->rows-1;
       break;
     case KEY_PGDOWN:
-      help->y+=scrmode->rows-1;
+      (*y)+=scrmode->rows-1;
       break;
     default:
-      end_help(scrmode,mapmode,lvl);
+      end_help(scrmode,workdata);
     }
-    if (help->y+scrmode->rows > help->rows)
-      help->y=help->rows-scrmode->rows;
-    if (help->y < 0)
-      help->y=0;
+    if ((*y)+scrmode->rows > rows)
+      (*y)=rows-scrmode->rows;
+    if ((*y) < 0)
+      (*y)=0;
 }
 
-char ***match_title(char *title, int n)
+char ***match_title(struct HELP_DATA *help,const char *title, const int n)
 {
     static const char *titles[]={
             "slbkeyhelp", "tngkeyhelp",   //0,1
@@ -409,8 +410,9 @@ char ***match_title(char *title, int n)
 /*
  * Action function - start the help mode.
  */
-short start_help(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl)
+short start_help(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata)
 {
+    struct HELP_DATA *help=workdata->help;
     help->formode=scrmode->mode;
     help->y=0;
     help->drows=0;
@@ -508,24 +510,25 @@ short start_help(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struc
 /*
  * Action function - end the help mode.
  */
-void end_help(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl)
+void end_help(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata)
 {
-    if (scrmode->mode!=help->formode)
-      scrmode->mode=help->formode;
+    if (scrmode->mode!=workdata->help->formode)
+      scrmode->mode=workdata->help->formode;
     else
       scrmode->mode=MD_SLB;
     message_release();
     message_info("Returned to last work mode.");
 }
 
-void draw_help(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl)
+void draw_help(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata)
 {
+    int y=workdata->help->y;
     int i;
     for (i=0; i < scrmode->rows; i++)
     {
       char *help_line="";
-      if (help->y+i < help->rows)
-          help_line=help->text[help->y+i];
+      if (y+i < workdata->help->rows)
+          help_line=workdata->help->text[y+i];
       draw_help_line(i,0,help_line,DHFLAG_USE_COLORS);
     }
     set_cursor_pos(get_screen_rows()-1, get_screen_cols()-1);
@@ -640,7 +643,7 @@ void draw_help_line(int posy,int posx,char *text,short flags)
       free(line);
 }
 
-char *get_random_tip(void)
+char *get_random_tip(const struct HELP_DATA *help)
 {
     if ((help->tiprows<1)||(help->tips==NULL))
       return "No tip, sorry.";
@@ -648,7 +651,7 @@ char *get_random_tip(void)
     return help->tips[num];
 }
 
-short init_key_help(int mode)
+short init_key_help(struct HELP_DATA *help,int mode)
 {
     help->drows=0;
     help->desc=NULL;
@@ -721,7 +724,7 @@ short init_key_help(int mode)
     return true;
 }
 
-short init_item_desc(int mode,int itm_idx)
+short init_item_desc(struct HELP_DATA *help,int mode,int itm_idx)
 {
     if (itm_idx<0) return false;
     unsigned long pos=itm_desc_rows*itm_idx;
@@ -812,11 +815,11 @@ short init_item_desc(int mode,int itm_idx)
 /*
  * Returns cube type name as text
  */
-char *get_cubedesc_head(unsigned short idx)
+char *get_cubedesc_head(struct WORKMODE_DATA *workdata,unsigned short idx)
 {
     unsigned long pos=itm_desc_rows*idx;
-    if (help->cubedescrows >= pos+itm_desc_rows)
-      return (char *)help->cubedesc[pos];
+    if (workdata->help->cubedescrows >= pos+itm_desc_rows)
+      return (char *)workdata->help->cubedesc[pos];
     else
       return "unknown cube";
 }

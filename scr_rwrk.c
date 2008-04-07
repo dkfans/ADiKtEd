@@ -19,73 +19,70 @@
 #include "lev_column.h"
 #include "obj_actnpts.h"
 
-RWRK_DATA *mdrwrk;
-
 /*
  * Initializes variables for the rework screen.
  */
-short init_mdrwrk(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode)
+short init_mdrwrk(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata)
 {
     //Creating and clearing mdrwrk variable
-    mdrwrk=(RWRK_DATA *)malloc(sizeof(RWRK_DATA));
-    if (mdrwrk==NULL)
+    workdata->mdrwrk=(struct RWRK_DATA *)malloc(sizeof(struct RWRK_DATA));
+    if (workdata->mdrwrk==NULL)
      die("init_mdrwrk: Cannot allocate memory.");
-    mdrwrk->view=RVM_SLB;
+    workdata->mdrwrk->view=RVM_SLB;
     return true;
 }
 
 /*
  * Deallocates memory for the rework screen.
  */
-void free_mdrwrk(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode)
+void free_mdrwrk(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata)
 {
-  free(mdrwrk);
+  free(workdata->mdrwrk);
 }
 
 /*
  * Covers actions from the rework screen.
  */
-void actions_mdrwrk(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl,int key)
+void actions_mdrwrk(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata,int key)
 {
-    int sx, sy;
     static char usrinput[READ_BUFSIZE];
-    sx = (mapmode->map.x+mapmode->screen.x)*3+mapmode->subtl.x;
-    sy = (mapmode->map.y+mapmode->screen.y)*3+mapmode->subtl.y;
+    struct IPOINT_2D subpos;
+    get_map_subtile_pos(workdata->mapmode,&subpos);
     message_release();
     
-    if (!cursor_actions(scrmode,mapmode,lvl,key))
-    if (!subtl_select_actions(mapmode,key))
+    if (!cursor_actions(scrmode,workdata,key))
+    if (!subtl_select_actions(workdata->mapmode,key))
     {
       switch (key)
       {
         case KEY_TAB:
         case KEY_ESCAPE:
-          end_mdrwrk(scrmode,mapmode,lvl);
+          end_mdrwrk(scrmode,workdata);
           break;
         case KEY_S:
-          mdrwrk->view=RVM_SLB;
+          workdata->mdrwrk->view=RVM_SLB;
           break;
         case KEY_O:
-          mdrwrk->view=RVM_OWN;
+          workdata->mdrwrk->view=RVM_OWN;
           break;
         case KEY_D:
-          mdrwrk->view=RVM_DAT;
+          workdata->mdrwrk->view=RVM_DAT;
           break;
         case KEY_I:
-          mdrwrk->view=RVM_WIB;
+          workdata->mdrwrk->view=RVM_WIB;
           break;
         case KEY_L:
-          mdrwrk->view=RVM_WLB;
+          workdata->mdrwrk->view=RVM_WLB;
           break;
         case KEY_F:
-          mdrwrk->view=RVM_FLG;
+          workdata->mdrwrk->view=RVM_FLG;
           break;
         case KEY_C:
-          write_def_clm_source(lvl,"adi_clm.log");
+          write_def_clm_source(workdata->lvl,"adi_clm.log");
           message_info("Column log file written.");
           break;
         case KEY_T:
-          write_def_tng_source(lvl,"adi_tng.log");
+          write_def_tng_source(workdata->lvl,"adi_tng.log");
           message_info("Things log file written.");
           break;
         case KEY_B:
@@ -97,7 +94,7 @@ void actions_mdrwrk(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,st
             popup_show("Generating cube test map","The process can take some time. Please wait...");
             short auto_upd_memory=datclm_auto_update;
             datclm_auto_update=false;
-            generate_slab_bkgnd_default(lvl,SLAB_TYPE_PATH);
+            generate_slab_bkgnd_default(workdata->lvl,SLAB_TYPE_PATH);
             const int size_x=6;
             const int size_y=5;
             const int limit_x=(MAP_SIZE_X-1)/size_x;
@@ -107,11 +104,11 @@ void actions_mdrwrk(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,st
               {
                 unsigned short cube=(st_cube+k*limit_x+i);
                 if (cube<512)
-                  place_cube_test(lvl,i*size_x+1,k*size_y+1,cube);
+                  place_cube_test(workdata->lvl,i*size_x+1,k*size_y+1,cube);
               }
             datclm_auto_update=auto_upd_memory;
             if (datclm_auto_update)
-              update_datclm_for_whole_map(lvl);
+              update_datclm_for_whole_map(workdata->lvl);
             message_info("Cube test map created.");
           }
           break;
@@ -125,7 +122,7 @@ void actions_mdrwrk(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,st
 /*
  * Action function - start the rework mode.
  */
-short start_mdrwrk(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl)
+short start_mdrwrk(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata)
 {
     scrmode->mode=MD_RWRK;
     return true;
@@ -134,9 +131,9 @@ short start_mdrwrk(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,str
 /*
  * Action function - end the rework mode.
  */
-void end_mdrwrk(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl)
+void end_mdrwrk(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata)
 {
-    mapmode->panel_mode=PV_MODE;
+    workdata->ipanel->mode=PV_MODE;
     scrmode->mode=MD_SLB;
     message_info("Returned to Slab mode.");
 }
@@ -201,26 +198,26 @@ void place_cube_test(struct LEVEL *lvl,int tx,int ty,unsigned short cube)
 /*
  * Draws screen for the rework mode.
  */
-void draw_mdrwrk(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl)
+void draw_mdrwrk(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata)
 {
-    draw_rework_map_area(scrmode,mapmode,lvl,mdrwrk);
-    if (mapmode->panel_mode!=PV_MODE)
-      draw_forced_panel(scrmode,mapmode,lvl,mapmode->panel_mode);
+    draw_rework_map_area(scrmode,workdata->mapmode,workdata->lvl,workdata->mdrwrk);
+    if (workdata->ipanel->mode!=PV_MODE)
+      draw_forced_panel(scrmode,workdata,workdata->ipanel->mode);
     else
-      draw_mdrwrk_panel(scrmode,mapmode,lvl);
-    draw_map_cursor(scrmode,mapmode,lvl,true,true,false);
+      draw_mdrwrk_panel(scrmode,workdata);
+    draw_map_cursor(scrmode,workdata->mapmode,workdata->lvl,true,true,false);
 }
 
-void draw_mdrwrk_panel(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl)
+void draw_mdrwrk_panel(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata)
 {
-    draw_mdclm_panel(scrmode,mapmode,lvl);
+    draw_mdclm_panel(scrmode,workdata);
 }
 
 /*
  * Draws the map area for rework mode.
  * Also clears the right panel.
  */
-void draw_rework_map_area(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl,RWRK_DATA *mdrwrk)
+void draw_rework_map_area(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl,struct RWRK_DATA *mdrwrk)
 {
     int i, k;
     for (k=0; k<scrmode->rows; k++)

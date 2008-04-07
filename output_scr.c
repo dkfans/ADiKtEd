@@ -306,7 +306,7 @@ void screen_reinit_and_update(void)
     SLsmg_reset_smg();
     get_screen_size();
     SLsmg_init_smg();
-    draw_levscr(drawdata.scrmode,drawdata.mapmode,drawdata.lvl);
+    draw_levscr(drawdata.scrmode,drawdata.workdata);
 }
 
 /*

@@ -47,6 +47,11 @@ unsigned char *find_next_thing_on_map(struct LEVEL *lvl, int *tx, int *ty, is_th
 unsigned char *find_next_actnpt_on_map(struct LEVEL *lvl, int *tx, int *ty);
 unsigned char *find_next_stlight_on_map(struct LEVEL *lvl, int *tx, int *ty);
 
+unsigned short get_free_herogate_number(const struct LEVEL *lvl);
+unsigned short get_free_herogate_number_next(const struct LEVEL *lvl,const unsigned short start);
+unsigned short get_free_herogate_number_prev(const struct LEVEL *lvl,const unsigned short start);
+short create_herogate_number_used_arr(const struct LEVEL *lvl,unsigned char **used,unsigned int *used_size);
+
 // Updating objects functions
 void update_obj_for_square(struct LEVEL *lvl, int tx_first, int tx_last,
     int ty_first, int ty_last);

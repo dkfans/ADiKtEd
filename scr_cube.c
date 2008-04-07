@@ -18,19 +18,15 @@
 #include "scr_list.h"
 #include "scr_help.h"
 
-// Variables
-
-MDCUBE_DATA *mdcube;
-
 /*
  * Initializes variables for the mdcube screen.
  * Note: init_list must be called too for the mode to work.
  */
-short init_mdcube(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode)
+short init_mdcube(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata)
 {
     //Creating and clearing mdcube variable
-    mdcube=(MDCUBE_DATA *)malloc(sizeof(MDCUBE_DATA));
-    if (mdcube==NULL)
+    workdata->mdcube=(struct MDCUBE_DATA *)malloc(sizeof(struct MDCUBE_DATA));
+    if (workdata->mdcube==NULL)
      die("init_mdcube: Cannot allocate memory.");
     return true;
 }
@@ -38,34 +34,34 @@ short init_mdcube(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode)
 /*
  * Deallocates memory for the mdcube screen.
  */
-void free_mdcube(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode)
+void free_mdcube(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata)
 {
-  free(mdcube);
+  free(workdata->mdcube);
 }
 
 /*
  * Covers actions from custom cubes screen.
  */
-void actions_mdcube(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl,int key)
+void actions_mdcube(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata,int key)
 {
    //TODO
    //- create mode variable for storing column
    //- load the column at start, and add to level as "custom" at end
    //- draw the "column selector" in right panel
     message_release();
-    if (!actions_list(scrmode,mapmode,lvl,key))
+    if (!actions_list(scrmode,workdata,key))
     {
       switch (key)
       {
         case KEY_TAB:
         case KEY_DEL:
         case KEY_ESCAPE:
-          end_mdcube(scrmode,mapmode,lvl);
+          end_mdcube(scrmode,workdata);
           message_info("Customization cancelled");
           break;
         case KEY_ENTER:
           //TODO
-          end_mdcube(scrmode,mapmode,lvl);
+          end_mdcube(scrmode,workdata);
           message_info("Column cubes set");
           break;
         default:
@@ -78,30 +74,31 @@ void actions_mdcube(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,st
 /*
  * Action function - start the mdcube mode.
  */
-short start_mdcube(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl)
+short start_mdcube(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata)
 {
     short result;
-    result=start_list(scrmode,mapmode,lvl,MD_CUBE);
-    mdcube->cube_idx=1;
-    list->pos=8;
+    result=start_list(scrmode,workdata,MD_CUBE);
+    workdata->mdcube->cube_idx=1;
+    workdata->list->pos=8;
     return result;
 }
 
 /*
  * Action function - end the mdcube mode.
  */
-void end_mdcube(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl)
+void end_mdcube(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata)
 {
-    end_list(scrmode,mapmode,lvl);
+    end_list(scrmode,workdata);
 }
 
 /*
  * Draws screen for the mdcube mode.
  */
-void draw_mdcube(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl)
+void draw_mdcube(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata)
 {
     // Note: get_cubedesc_head shouldn't be used here, because it may contain names
     // which are too long for the list (without shortcuts)
-    draw_numbered_list(get_cube_fullname,scrmode,mapmode,0,CUBE_MAX_INDEX,20);
+    draw_numbered_list(get_cube_fullname,scrmode,workdata,
+        0,CUBE_MAX_INDEX,20);
     set_cursor_pos(get_screen_rows()-1, 17);
 }

@@ -411,13 +411,23 @@ editor, but remember that Adikted will write its version when map is
 saved.
 Therefore you should edit the script after finishing work with
 Adikted, or keep it under other file name.
+
+Press '\wv\s' to \yverify the sctipt\s. You will be informed about
+first error in status line, and the problematic word will be
+highlighted.
+
+Press '\wu\s' to \yupdate the sctipt\s. This will regenerate all the
+commands, fixing any easy-correctable errors and mistakes.
+
+To \yback\s into previous work mode, press \wesc\s or \wtab\s.
+
 [txtrhelp]
 Texture selector help:
 
 This is quite simple - just select the texture from list.
 Texture number will be written into .inf file when saving map.
 
-To cancel selection and exit, press \wesc\s or \wtab\s.
+To \ycancel selection\s and exit, press \wesc\s or \wtab\s.
 [cclmhelp]
 Custom columns mode help:
 
@@ -425,7 +435,7 @@ Select custom columns generation function from the list.
 If you wish to manually set the columns, you should use
 "custom cubes" function instead.
 
-To cancel selection and exit, press \wesc\s or \wtab\s.
+To \ycancel selection\s and exit, press \wesc\s or \wtab\s.
 [cubehelp]
 Custom cubes mode help:
 

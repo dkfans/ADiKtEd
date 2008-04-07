@@ -11,6 +11,7 @@
 #include <stdarg.h>
 #include "input_kb.h"
 #include "output_scr.h"
+#include "scr_actn.h"
 
 char *message_prv;
 char *message;
@@ -318,7 +319,7 @@ void free_messages(void)
 
 void die(const char *format, ...)
 {
-      done(NULL,NULL,NULL);
+      done(&(drawdata.scrmode),drawdata.workdata);
       va_list val;
       va_start(val, format);
       vfprintf(stderr, format, val);
@@ -333,11 +334,15 @@ void die(const char *format, ...)
 /*
  * Clean up all the stuff that init() did.
  */
-void done(struct SCRMODE_DATA **scrmode,struct MAPMODE_DATA **mapmode,struct LEVEL **lvl)
+void done(struct SCRMODE_DATA **scrmode,struct WORKMODE_DATA *workdata)
 {
-    level_deinit(lvl);
-    if ((scrmode!=NULL)&&(mapmode!=NULL))
-      free_levscr(scrmode,mapmode);
+    if (workdata!=NULL)
+    {
+        if (workdata->lvl!=NULL)
+          level_deinit(&(workdata->lvl));
+        if (scrmode!=NULL)
+          free_levscr(scrmode,workdata);
+    }
     free_messages();
     input_done();
 }

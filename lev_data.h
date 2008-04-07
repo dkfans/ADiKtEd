@@ -251,6 +251,4 @@ void update_level_stats(struct LEVEL *lvl);
 void update_things_stats(struct LEVEL *lvl);
 void update_thing_stats(struct LEVEL *lvl,const unsigned char *thing,short change);
 
-//extern struct LEVEL *lvl;
-
 #endif // ADIKT_LEVDATA_H

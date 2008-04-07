@@ -71,8 +71,7 @@ enum borderStyle {bsSingle,bsDouble,bsSolid};
 //The structure with data required for drawing function
 struct DRAW_DATA {
     struct SCRMODE_DATA *scrmode;
-    struct MAPMODE_DATA *mapmode;
-    struct LEVEL *lvl;
+    struct WORKMODE_DATA *workdata;
 };
 
 extern struct DRAW_DATA drawdata;

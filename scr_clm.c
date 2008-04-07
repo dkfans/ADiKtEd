@@ -20,7 +20,7 @@
 /*
  * Initializes variables for the column screen.
  */
-short init_mdclm(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode)
+short init_mdclm(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata)
 {
     return true;
 }
@@ -28,7 +28,7 @@ short init_mdclm(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode)
 /*
  * Deallocates memory for the column screen.
  */
-void free_mdclm(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode)
+void free_mdclm(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata)
 {
 }
 
@@ -36,30 +36,30 @@ void free_mdclm(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode)
 /*
  * Covers actions from the column screen.
  */
-void actions_mdclm(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl,int key)
+void actions_mdclm(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata,int key)
 {
     message_release();
     
-    if (!cursor_actions(scrmode,mapmode,lvl,key))
-    if (!subtl_select_actions(mapmode,key))
+    if (!cursor_actions(scrmode,workdata,key))
+    if (!subtl_select_actions(workdata->mapmode,key))
     {
       switch (key)
       {
         case KEY_TAB:
         case KEY_ESCAPE:
-          mdend[MD_CLM](scrmode,mapmode,lvl);
+          mdend[MD_CLM](scrmode,workdata);
           break;
         case KEY_U: // Update all things/dat/clm/w?b
-          action_update_all_datclm(scrmode,mapmode,lvl);
+          action_update_all_datclm(scrmode,workdata);
           break;
         case KEY_A: // update dat/clm/w?b of selected tile
-          action_delele_custclm_and_update(scrmode,mapmode,lvl);
+          action_delele_custclm_and_update(scrmode,workdata);
           break;
         case KEY_M: // manual-set mode
-          mdstart[MD_CCLM](scrmode,mapmode,lvl);
+          mdstart[MD_CCLM](scrmode,workdata);
           break;
         case KEY_B: // cube mode
-          mdstart[MD_CUBE](scrmode,mapmode,lvl);
+          mdstart[MD_CUBE](scrmode,workdata);
           break;
         default:
           message_info("Unrecognized clm key code: %d",key);
@@ -71,7 +71,7 @@ void actions_mdclm(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,str
 /*
  * Action function - start the column mode.
  */
-short start_mdclm(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl)
+short start_mdclm(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata)
 {
     scrmode->mode=MD_CLM;
     scrmode->usrinput_type=SI_NONE;
@@ -81,9 +81,9 @@ short start_mdclm(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,stru
 /*
  * Action function - end the column mode.
  */
-void end_mdclm(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl)
+void end_mdclm(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata)
 {
-    mapmode->panel_mode=PV_MODE;
+    workdata->ipanel->mode=PV_MODE;
     scrmode->usrinput_type=SI_NONE;
     scrmode->usrinput_pos=0;
     scrmode->usrinput[0]='\0';
@@ -91,9 +91,10 @@ void end_mdclm(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct 
     message_info("Returned to Slab mode.");
 }
 
-int display_dat_subtiles(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,
-    struct LEVEL *lvl,int scr_row, int scr_col,short compressed,int ty,int tx)
+int display_dat_subtiles(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata,
+    int scr_row, int scr_col,short compressed,int ty,int tx)
 {
+    struct IPOINT_2D *subtl=&(workdata->mapmode->subtl);
     int i, k;
     int color;
     // Display .dat stuff for this tile
@@ -109,17 +110,17 @@ int display_dat_subtiles(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmo
             int sx=tx*3+i;
             set_cursor_pos(scr_row, scr_col+i*5);
             
-            if ((i==mapmode->subtl.x) && (k==mapmode->subtl.y) &&
+            if ((i==subtl->x) && (k==subtl->y) &&
              ((scrmode->mode==MD_CLM)||(scrmode->mode==MD_RWRK)) )
                 color=PRINT_COLOR_BLACK_ON_LGREY;
             else
                 color=PRINT_COLOR_LGREY_ON_BLACK;
             screen_setcolor(color);
-            if (mapmode->dat_view_mode==2)
+            if (workdata->ipanel->dat_view_mode==2)
                 screen_printf("%4u",
-                        (unsigned int)get_dat_subtile(lvl,sx,sy));
+                        (unsigned int)get_dat_subtile(workdata->lvl,sx,sy));
             else
-                screen_printf("%04X",(unsigned int)get_dat_val(lvl,sx,sy));
+                screen_printf("%04X",(unsigned int)get_dat_val(workdata->lvl,sx,sy));
         }
         scr_row++;
         if (!compressed)
@@ -131,36 +132,35 @@ int display_dat_subtiles(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmo
 /*
  * Draws screen for the column mode.
  */
-void draw_mdclm(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl)
+void draw_mdclm(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata)
 {
-    draw_map_area(scrmode,mapmode,lvl,true,true,false);
-    if (mapmode->panel_mode!=PV_MODE)
-      draw_forced_panel(scrmode,mapmode,lvl,mapmode->panel_mode);
+    draw_map_area(scrmode,workdata->mapmode,workdata->lvl,true,true,false);
+    if (workdata->ipanel->mode!=PV_MODE)
+      draw_forced_panel(scrmode,workdata,workdata->ipanel->mode);
     else
-      draw_mdclm_panel(scrmode,mapmode,lvl);
-    draw_map_cursor(scrmode,mapmode,lvl,true,true,false);
+      draw_mdclm_panel(scrmode,workdata);
+    draw_map_cursor(scrmode,workdata->mapmode,workdata->lvl,true,true,false);
 }
 
-void draw_mdclm_panel(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl)
+void draw_mdclm_panel(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata)
 {
-    int tx, ty;
-    tx = mapmode->screen.x+mapmode->map.x;
-    ty = mapmode->screen.y+mapmode->map.y;
-    int sx, sy;
-    sx = tx*3+mapmode->subtl.x;
-    sy = ty*3+mapmode->subtl.y;
-    int clm_idx=get_dat_subtile(lvl,sx,sy);
+    struct IPOINT_2D tilpos;
+    get_map_tile_pos(workdata->mapmode,&tilpos);
+    struct IPOINT_2D subpos;
+    get_map_subtile_pos(workdata->mapmode,&subpos);
+    struct LEVEL *lvl=workdata->lvl;
+    int clm_idx=get_dat_subtile(lvl,subpos.x,subpos.y);
     char *clmentry;
     clmentry = lvl->clm[clm_idx%COLUMN_ENTRIES];
     int pos_y;
     pos_y=display_column(clmentry, clm_idx,0,scrmode->cols+3);
     set_cursor_pos(pos_y-3, scrmode->cols+23);
-    screen_printf_toeol("WIB anim.: %03X", get_subtl_wib(lvl,sx,sy));
+    screen_printf_toeol("WIB anim.: %03X", get_subtl_wib(lvl,subpos.x,subpos.y));
     set_cursor_pos(pos_y-2, scrmode->cols+23);
-    screen_printf("Tile WLB:  %03X", get_tile_wlb(lvl, tx, ty));
+    screen_printf("Tile WLB:  %03X", get_tile_wlb(lvl,tilpos.x,tilpos.y));
     set_cursor_pos(pos_y-1, scrmode->cols+23);
-    screen_printf("Subtl.FLG: %03X", get_subtl_flg(lvl,sx,sy));
-    display_rpanel_bottom(scrmode,mapmode,lvl);
+    screen_printf("Subtl.FLG: %03X", get_subtl_flg(lvl,subpos.x,subpos.y));
+    display_rpanel_bottom(scrmode,workdata);
 }
 
 int display_column(unsigned char *clmentry,int clm_idx, int scr_row, int scr_col)
@@ -196,24 +196,23 @@ int display_column(unsigned char *clmentry,int clm_idx, int scr_row, int scr_col
     return scr_row;
 }
 
-void action_update_all_datclm(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl)
+void action_update_all_datclm(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata)
 {
-          update_slab_owners(lvl);
-          update_datclm_for_whole_map(lvl);
+          update_slab_owners(workdata->lvl);
+          update_datclm_for_whole_map(workdata->lvl);
           message_info("DAT/CLM/W?B entries updated for whole map.");
 }
 
-void action_delele_custclm_and_update(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl)
+void action_delele_custclm_and_update(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata)
 {
-    int sx, sy;
-    sx = (mapmode->map.x+mapmode->screen.x)*3+mapmode->subtl.x;
-    sy = (mapmode->map.y+mapmode->screen.y)*3+mapmode->subtl.y;
+    struct IPOINT_2D tilpos;
+    get_map_tile_pos(workdata->mapmode,&tilpos);
     //Deleting custom columns - to enable auto-update
-    cust_cols_del_for_tile(lvl,sx/3,sy/3);
+    cust_cols_del_for_tile(workdata->lvl,tilpos.x,tilpos.y);
     //Updating
-    update_datclm_for_slab(lvl, sx/3,sy/3);
-    update_tile_wib_entries(lvl,sx/3,sy/3);
-    update_tile_wlb_entry(lvl,sx/3,sy/3);
-    update_tile_flg_entries(lvl,sx/3,sy/3);
-    message_info("Updated DAT/CLM/W?B entries of slab %d,%d.",sx/3,sy/3);
+    update_datclm_for_slab(workdata->lvl, tilpos.x,tilpos.y);
+    update_tile_wib_entries(workdata->lvl,tilpos.x,tilpos.y);
+    update_tile_wlb_entry(workdata->lvl,tilpos.x,tilpos.y);
+    update_tile_flg_entries(workdata->lvl,tilpos.x,tilpos.y);
+    message_info("Updated DAT/CLM/W?B entries of slab %d,%d.",tilpos.x,tilpos.y);
 }

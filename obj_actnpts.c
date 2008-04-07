@@ -142,7 +142,7 @@ unsigned char *create_actnpt(struct LEVEL *lvl, unsigned int sx, unsigned int sy
       actnpt[i]=0;
     set_actnpt_subtpos(actnpt,0x80,0x80);
     set_actnpt_subtile(actnpt,(unsigned char)sx,(unsigned char)sy);
-    set_actnpt_number(actnpt,get_free_acttnpt_number(lvl));
+    set_actnpt_number(actnpt,get_free_actnpt_number(lvl));
     set_actnpt_range_subtile(actnpt,5);
     return actnpt;
 }
@@ -171,18 +171,70 @@ unsigned char *create_actnpt_copy(unsigned int sx, unsigned int sy,unsigned char
 }
 
 /*
- * Sweeps action points to find an unused action point number
+ * Sweeps action points to find an unused action point number.
  */
-unsigned short get_free_acttnpt_number(struct LEVEL *lvl)
+unsigned short get_free_actnpt_number(const struct LEVEL *lvl)
+{
+    get_free_actnpt_number_next(lvl,1);
+}
+
+/*
+ * Sweeps action points to find an unused action point number,
+ * not smaller than given number
+ */
+unsigned short get_free_actnpt_number_next(const struct LEVEL *lvl,const unsigned short start)
+{
+    unsigned int used_size=start+16;
+    unsigned char *used=NULL;
+    if (!create_actnpt_number_used_arr(lvl,&used,&used_size))
+        return start;
+    int new_num=start;
+    while (new_num<used_size)
+    {
+      if (used[new_num]==0) break;
+      new_num++;
+    }
+    free(used);
+    return new_num;
+}
+
+/*
+ * Sweeps action points to find an unused action point number,
+ * not larger than given number
+ */
+unsigned short get_free_actnpt_number_prev(const struct LEVEL *lvl,const unsigned short start)
+{
+    unsigned int used_size=start+2;
+    unsigned char *used=NULL;
+    if (!create_actnpt_number_used_arr(lvl,&used,&used_size))
+        return start;
+    int new_num=start;
+    while (new_num>1)
+    {
+      if (used[new_num]==0) break;
+      new_num--;
+    }
+    free(used);
+    return new_num;
+}
+
+/*
+ * Creates an array which contains number of uses of each action point number.
+ * the array is never smaller than starting value of 'size'; the function may
+ * enlarge 'size' and create larger array in some cases.
+ * Note: numbering starts at 1, not 0; used[0] is used for 'out of bounds' numbers
+ */
+short create_actnpt_number_used_arr(const struct LEVEL *lvl,unsigned char **used,unsigned int *used_size)
 {
     //Preparing array bounds
     int arr_entries_x=MAP_SIZE_X*MAP_SUBNUM_X;
     int arr_entries_y=MAP_SIZE_Y*MAP_SUBNUM_Y;
     int k;
-    int used_size=lvl->apt_total_count+16;
-    unsigned char *used=malloc(used_size*sizeof(unsigned char));
-    for (k=0;k<used_size;k++)
-      used[k]=0;
+    *used_size=max(lvl->apt_total_count+16,*used_size);
+    *used=malloc((*used_size)*sizeof(unsigned char));
+    if (*used==NULL) return false;
+    for (k=0;k<(*used_size);k++)
+      (*used)[k]=0;
     int cy, cx;
     for (cy=0; cy<arr_entries_y; cy++)
     {
@@ -193,15 +245,14 @@ unsigned short get_free_acttnpt_number(struct LEVEL *lvl)
           {
                 char *actnpt=get_actnpt(lvl,cx,cy,k);
                 unsigned short cnum=get_actnpt_number(actnpt);
-                if (cnum<used_size) used[cnum]=1;
+                if (cnum<(*used_size))
+                  (*used)[cnum]++;
+                else
+                  (*used)[0]++;
           }
       }
     }
-    // Note: numbering starts at 1, not 0
-    int new_num=1;
-    while (used[new_num]>0) new_num++;
-    free(used);
-    return new_num;
+    return true;
 }
 
 unsigned char get_stlight_subtile_x(unsigned char *stlight)

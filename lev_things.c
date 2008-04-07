@@ -75,11 +75,13 @@ short things_verify(struct LEVEL *lvl, char *err_msg,struct IPOINT_2D *errpt)
             sprintf(err_msg,"%s at slab %d,%d.",child_err_msg,errpt->x,errpt->y);
             return result;
           }
+          unsigned char type_idx=get_thing_type(thing);
           // Checking sensitile again (one check is in thing_verify())
-          if (get_thing_type(thing)==THING_TYPE_ITEM)
+          if (type_idx==THING_TYPE_ITEM)
           {
             int sen_tl;
             sen_tl=get_thing_sensitile(thing);
+            unsigned short stype_idx=get_thing_subtype(thing);
             int auto_sen_tl;
             auto_sen_tl=compute_item_sensitile(lvl,thing);
             if ((sen_tl!=auto_sen_tl)&&(!is_torchcndl(thing))&&(!is_spinningtng(thing))&&
@@ -87,10 +89,10 @@ short things_verify(struct LEVEL *lvl, char *err_msg,struct IPOINT_2D *errpt)
             {
               errpt->x=i/MAP_SUBNUM_X;
               errpt->y=j/MAP_SUBNUM_Y;
-              sprintf(err_msg,"%s at slab %d,%d.","Sensitive tile incorrectly set",errpt->x,errpt->y);
+              sprintf(err_msg,"%s for %s at slab %d,%d.","Sensitive tile incorrectly set",
+              get_item_subtype_fullname(stype_idx),errpt->x,errpt->y);
               return VERIF_WARN;
             }
-            unsigned short stype_idx=get_thing_subtype(thing);
             if (((stype_idx==ITEM_SUBTYPE_GLDHOARD1)||(stype_idx==ITEM_SUBTYPE_GLDHOARD2)||
                 (stype_idx==ITEM_SUBTYPE_GLDHOARD3)||(stype_idx==ITEM_SUBTYPE_GLDHOARD4)||
                 (stype_idx==ITEM_SUBTYPE_GLDHOARD5))&&(slab!=SLAB_TYPE_TREASURE))
@@ -284,14 +286,66 @@ unsigned char compute_door_orientation(const struct LEVEL *lvl, unsigned char *t
  */
 unsigned short get_free_herogate_number(const struct LEVEL *lvl)
 {
+    get_free_herogate_number_next(lvl,1);
+}
+
+/*
+ * Sweeps things to find an unused hero gate number,
+ * not smaller than given number
+ */
+unsigned short get_free_herogate_number_next(const struct LEVEL *lvl,const unsigned short start)
+{
+    unsigned int used_size=start+16;
+    unsigned char *used=NULL;
+    if (!create_herogate_number_used_arr(lvl,&used,&used_size))
+        return start;
+    int new_num=start;
+    while (new_num<used_size)
+    {
+      if (used[new_num]==0) break;
+      new_num++;
+    }
+    free(used);
+    return new_num;
+}
+
+/*
+ * Sweeps things to find an unused hero gate number,
+ * not larger than given number
+ */
+unsigned short get_free_herogate_number_prev(const struct LEVEL *lvl,const unsigned short start)
+{
+    unsigned int used_size=start+2;
+    unsigned char *used=NULL;
+    if (!create_herogate_number_used_arr(lvl,&used,&used_size))
+        return start;
+    int new_num=start;
+    while (new_num>1)
+    {
+      if (used[new_num]==0) break;
+      new_num--;
+    }
+    free(used);
+    return new_num;
+}
+
+/*
+ * Creates an array which contains number of uses of each hero gate number.
+ * the array is never smaller than starting value of 'size'; the function may
+ * enlarge 'size' and create larger array in some cases.
+ * Note: numbering starts at 1, not 0; used[0] is used for 'out of bounds' numbers
+ */
+short create_herogate_number_used_arr(const struct LEVEL *lvl,unsigned char **used,unsigned int *used_size)
+{
     //Preparing array bounds
-    const int arr_entries_x=MAP_SIZE_X*MAP_SUBNUM_X;
-    const int arr_entries_y=MAP_SIZE_Y*MAP_SUBNUM_Y;
+    int arr_entries_x=MAP_SIZE_X*MAP_SUBNUM_X;
+    int arr_entries_y=MAP_SIZE_Y*MAP_SUBNUM_Y;
     int k;
-    int used_size=lvl->stats.hero_gates_count+16;
-    unsigned char *used=malloc(used_size*sizeof(unsigned char));
-    for (k=0;k<used_size;k++)
-      used[k]=0;
+    *used_size=max(lvl->stats.hero_gates_count+16,*used_size);
+    *used=malloc((*used_size)*sizeof(unsigned char));
+    if (*used==NULL) return false;
+    for (k=0;k<(*used_size);k++)
+      (*used)[k]=0;
     int cy, cx;
     for (cy=0; cy<arr_entries_y; cy++)
     {
@@ -304,17 +358,16 @@ unsigned short get_free_herogate_number(const struct LEVEL *lvl)
                 unsigned char stype_idx=get_thing_subtype(thing);
                 if (stype_idx==ITEM_SUBTYPE_HEROGATE)
                 {
-                  unsigned short cnum=-(char)get_thing_level(thing);
-                  if (cnum<used_size) used[cnum]=1;
+                  unsigned short cnum=get_thing_level(thing);
+                  if (cnum<(*used_size))
+                    (*used)[cnum]++;
+                  else
+                    (*used)[0]++;
                 }
           }
       }
     }
-    // Note: numbering starts at 1, not 0
-    int new_num=1;
-    while (used[new_num]>0) new_num++;
-    free(used);
-    return new_num;
+    return true;
 }
 
 /*
@@ -775,7 +828,7 @@ unsigned char *create_item_adv(const struct LEVEL *lvl, unsigned int sx, unsigne
         thing=create_item(lvl,sx,sy,stype_idx);
         set_thing_owner(thing,PLAYER_GOOD);
         //Hero gate must be numbered
-        set_thing_level(thing,(char)(-get_free_herogate_number(lvl)));
+        set_thing_level(thing,get_free_herogate_number(lvl));
         unsigned short sensitile=compute_item_sensitile(lvl,thing);
         set_thing_sensitile(thing,sensitile);
     } else

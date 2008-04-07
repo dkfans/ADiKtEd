@@ -8,11 +8,12 @@
 struct LEVEL;
 struct SCRMODE_DATA;
 struct MAPMODE_DATA;
+struct WORKMODE_DATA;
 
 #define DHFLAG_USE_COLORS 1
 
 // Help variables
-typedef struct {
+struct HELP_DATA {
     int formode;
     int y;
     int rows;
@@ -100,32 +101,30 @@ typedef struct {
     char **trapdesc;
     int cclmdescrows;
     char **cclmdesc;
-  } HELP_DATA;
-
-extern HELP_DATA *help;
+  };
 
 //Functions - init and free
-short init_help(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode);
-void free_help(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode);
-short init_key_help(int mode);
-short init_item_desc(int mode,int itm_idx);
+short init_help(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata);
+void free_help(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata);
+short init_key_help(struct HELP_DATA *help,int mode);
+short init_item_desc(struct HELP_DATA *help,int mode,int itm_idx);
 
 //Functions - for displaying list items
-char *get_cubedesc_head(unsigned short idx);
+char *get_cubedesc_head(struct WORKMODE_DATA *workdata,unsigned short idx);
 
 //Functions - start and stop
-short start_help(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl);
-void end_help(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl);
+short start_help(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata);
+void end_help(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata);
 
 //Functions - actions and screen
-void actions_help(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl,int key);
-void draw_help(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl);
+void actions_help(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata,int key);
+void draw_help(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata);
 
 //Functions - lower level
 void draw_help_line(int posy,int posx,char *text,short flags);
-char *get_random_tip(void);
+char *get_random_tip(const struct HELP_DATA *help);
 
 //Functions - internal
-char ***match_title(char *title, int n);
+char ***match_title(struct HELP_DATA *help,const char *title, const int n);
 
 #endif // ADIKT_SCRHELP_H

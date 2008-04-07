@@ -9,10 +9,11 @@
 #include "var_utils.h"
 #include "input_kb.h"
 #include "draw_map.h"
+#include "lev_script.h"
 
 const char config_filename[]="map.ini";
 
-void read_init(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode)
+void read_init(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata)
 {
     message_log(" read_init: started");
 #if defined(unix) && !defined(GO32)
@@ -72,13 +73,13 @@ void read_init(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode)
       }
       if (!strcmp(buffer, "SHOW_OBJ_RANGE"))
       {
-          mapmode->show_obj_range=atoi(p);
-          message_log(" read_init: show_obj_range set to %d",(int)mapmode->show_obj_range);
+          workdata->mapmode->show_obj_range=atoi(p);
+          message_log(" read_init: show_obj_range set to %d",(int)workdata->mapmode->show_obj_range);
       } else
       if (!strcmp(buffer, "DAT_VIEW_MODE"))
       {
-          mapmode->dat_view_mode=atoi(p);
-          message_log(" read_init: dat_view_mode set to %d",(int)mapmode->dat_view_mode);
+          workdata->ipanel->dat_view_mode=atoi(p);
+          message_log(" read_init: dat_view_mode set to %d",(int)workdata->ipanel->dat_view_mode);
       } else
       if (!strcmp(buffer, "BITMAP_SCALE"))
       {
@@ -87,49 +88,59 @@ void read_init(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode)
       } else
       if (!strcmp(buffer, "LEVEL_PREVIEW"))
       {
-          mapmode->level_preview=atoi(p);
-          message_log(" read_init: level_preview set to %d",(int)mapmode->level_preview);
+          workdata->mapmode->level_preview=atoi(p);
+          message_log(" read_init: level_preview set to %d",(int)workdata->mapmode->level_preview);
       } else
       if (!strcmp(buffer, "FILL_REINFORCED_CORNER"))
       {
-          mapmode->optns.fill_reinforced_corner=atoi(p);
-          message_log(" read_init: fill_reinforced_corner set to %d",(int)mapmode->optns.fill_reinforced_corner);
+          workdata->optns->fill_reinforced_corner=atoi(p);
+          message_log(" read_init: fill_reinforced_corner set to %d",(int)workdata->optns->fill_reinforced_corner);
       } else
       if (!strcmp(buffer, "UNAFFECTED_GEMS"))
       {
-          mapmode->optns.unaffected_gems=atoi(p);
-          message_log(" read_init: unaffected_gems set to %d",(int)mapmode->optns.unaffected_gems);
+          workdata->optns->unaffected_gems=atoi(p);
+          message_log(" read_init: unaffected_gems set to %d",(int)workdata->optns->unaffected_gems);
       } else
       if (!strcmp(buffer, "UNAFFECTED_ROCK"))
       {
-          mapmode->optns.unaffected_rock=atoi(p);
-          message_log(" read_init: unaffected_rock set to %d",(int)mapmode->optns.unaffected_rock);
+          workdata->optns->unaffected_rock=atoi(p);
+          message_log(" read_init: unaffected_rock set to %d",(int)workdata->optns->unaffected_rock);
       } else
       if (!strcmp(buffer, "FRAIL_COLUMNS"))
       {
-          mapmode->optns.frail_columns=atoi(p);
-          message_log(" read_init: frail_columns set to %d",(int)mapmode->optns.frail_columns);
+          workdata->optns->frail_columns=atoi(p);
+          message_log(" read_init: frail_columns set to %d",(int)workdata->optns->frail_columns);
       } else
 
       if (!strcmp(buffer, "TRAPS_LIST_ON_CREATE"))
       {
-          mapmode->traps_list_on_create=atoi(p);
-          message_log(" read_init: traps_list_on_create set to %d",(int)mapmode->traps_list_on_create);
+          workdata->mapmode->traps_list_on_create=atoi(p);
+          message_log(" read_init: traps_list_on_create set to %d",(int)workdata->mapmode->traps_list_on_create);
       } else
       if (!strcmp(buffer, "ROOMEFFECT_LIST_ON_CREATE"))
       {
-          mapmode->roomeffect_list_on_create=atoi(p);
-          message_log(" read_init: roomeffect_list_on_create set to %d",(int)mapmode->roomeffect_list_on_create);
+          workdata->mapmode->roomeffect_list_on_create=atoi(p);
+          message_log(" read_init: roomeffect_list_on_create set to %d",(int)workdata->mapmode->roomeffect_list_on_create);
       } else
       if (!strcmp(buffer, "ITEMS_LIST_ON_CREATE"))
       {
-          mapmode->items_list_on_create=atoi(p);
-          message_log(" read_init: items_list_on_create set to %d",(int)mapmode->items_list_on_create);
+          workdata->mapmode->items_list_on_create=atoi(p);
+          message_log(" read_init: items_list_on_create set to %d",(int)workdata->mapmode->items_list_on_create);
       } else
       if (!strcmp(buffer, "CREATURE_LIST_ON_CREATE"))
       {
-          mapmode->creature_list_on_create=atoi(p);
-          message_log(" read_init: creature_list_on_create set to %d",(int)mapmode->creature_list_on_create);
+          workdata->mapmode->creature_list_on_create=atoi(p);
+          message_log(" read_init: creature_list_on_create set to %d",(int)workdata->mapmode->creature_list_on_create);
+      } else
+      if (!strcmp(buffer, "SCRIPT_LEVEL_SPACES"))
+      {
+          script_level_spaces=atoi(p);
+          message_log(" read_init: script_level_spaces set to %d",(int)script_level_spaces);
+      } else
+      if (!strcmp(buffer, "DISPLAY_FLOAT_POS"))
+      {
+          workdata->ipanel->display_float_pos=atoi(p);
+          message_log(" read_init: display_float_pos set to %d",(int)workdata->ipanel->display_float_pos);
       } else
       if (!strcmp(buffer, "LEVELS_PATH"))
       {
@@ -156,7 +167,7 @@ void read_init(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode)
     message_log(" read_init: finished");
 }
 
-void get_command_line_options(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl,int argc, char **argv)
+void get_command_line_options(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata,int argc, char **argv)
 {
 // Note: Automated commands are now just keys inserted into keyboard input buffer.
 // in the future, this should be a script generated using input parameters
@@ -233,10 +244,10 @@ void get_command_line_options(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *
         } else
         if (get_savout_fname)
         {
-          format_map_fname(lvl->savfname,comnd);
+          format_map_fname(workdata->lvl->savfname,comnd);
         } else
         {
-          format_map_fname(lvl->fname,comnd);
+          format_map_fname(workdata->lvl->fname,comnd);
         }
       }
     }
@@ -249,38 +260,37 @@ void get_command_line_options(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *
  */
 int main(int argc, char **argv)
 {
-    struct LEVEL *lvl;
     //Allocate and set basic configuration variables
     struct SCRMODE_DATA *scrmode;
-    struct MAPMODE_DATA *mapmode;
-    init_levscr_basics(&scrmode,&mapmode);
+    struct WORKMODE_DATA workdata;
+    init_levscr_basics(&scrmode,&workdata);
     // Initialize the message displaying and storing
     init_messages();
     // create object for storing map
-    level_init(&lvl);
+    level_init(&(workdata.lvl));
     // read configuration file
-    read_init(scrmode,mapmode);
+    read_init(scrmode,&workdata);
     // Interpreting command line parameters
-    get_command_line_options(scrmode,mapmode,lvl,argc,argv);
-    level_set_options(lvl,&(mapmode->optns));
+    get_command_line_options(scrmode,&workdata,argc,argv);
+    level_set_options(workdata.lvl,workdata.optns);
     // initing keyboard input and screen output, also all modes.
-    init_levscr_modes(scrmode,mapmode);
+    init_levscr_modes(scrmode,&workdata);
     // Load a map, or start new one
-    if (strlen(lvl->fname)>0)
+    if (strlen(workdata.lvl->fname)>0)
     {
       popup_show("Loading map","Reading map files. Please wait...");
-      load_map(lvl);
+      load_map(workdata.lvl);
     } else
     {
-      start_new_map(lvl);
+      start_new_map(workdata.lvl);
     }
     message_log(" main: entering application loop");
     do 
     {
-      draw_levscr(scrmode,mapmode,lvl);
-      proc_key(scrmode,mapmode,lvl);
+      draw_levscr(scrmode,&workdata);
+      proc_key(scrmode,&workdata);
     } while (!finished);
     message_log(" main: application loop finished");
-    done(&scrmode,&mapmode,&lvl);
+    done(&scrmode,&workdata);
     return 0;
 }

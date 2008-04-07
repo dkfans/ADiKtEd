@@ -27,7 +27,10 @@ short set_actnpt_number(unsigned char *actnpt,unsigned short apt_num);
 
 unsigned char *create_actnpt(struct LEVEL *lvl, unsigned int sx, unsigned int sy);
 unsigned char *create_actnpt_copy(unsigned int sx, unsigned int sy,unsigned char *src);
-unsigned short get_free_acttnpt_number(struct LEVEL *lvl);
+unsigned short get_free_actnpt_number(const struct LEVEL *lvl);
+unsigned short get_free_actnpt_number_next(const struct LEVEL *lvl,const unsigned short start);
+unsigned short get_free_actnpt_number_prev(const struct LEVEL *lvl,const unsigned short start);
+short create_actnpt_number_used_arr(const struct LEVEL *lvl,unsigned char **used,unsigned int *used_size);
 
 unsigned char get_stlight_tilepos_x(unsigned char *stlight);
 short set_stlight_tilepos_x(unsigned char *stlight,unsigned char pos_x);

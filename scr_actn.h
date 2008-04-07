@@ -91,6 +91,16 @@ struct SCRMODE_DATA {
     short input_enabled;
   };
 
+struct INFOPANEL_DATA {
+    //What is drawn on the right panel
+    short mode;
+    // The way DAT entries are shown
+    // 0 for no view, 1 for byte data, 2 for column idx
+    short dat_view_mode;
+    // Display object position/range as float
+    short display_float_pos;
+};
+
 struct MAPMODE_DATA {
     //Marking variables
     short mark;
@@ -111,15 +121,8 @@ struct MAPMODE_DATA {
     int **brighten;
     // Which subtile is being considered in thing and data modes
     struct IPOINT_2D subtl;
-    //What is drawn on the right panel
-    short panel_mode;
-    // The way DAT entries are shown
-    // 0 for no view, 1 for byte data, 2 for column idx
-    short dat_view_mode;
     // Will the range of objects be visible?
     short show_obj_range;
-    // Will the preview of level be visible?
-    short level_preview;
     // Open list when creating trap
     short traps_list_on_create;
     // Open list when creating effect
@@ -128,16 +131,34 @@ struct MAPMODE_DATA {
     short creature_list_on_create;
     // Open list when creating traps, doors, spellbooks, specials, ...
     short items_list_on_create;
+    //Slab keys
+    char *slbkey;
+    // Will the preview of level be visible?
+    short level_preview;
     // Preview of a level, used when opening a level
     struct LEVEL *preview;
-    // Level options - are copied into current level
-    struct LEVOPTIONS optns;
   };
 
-extern void (*actions [])(struct SCRMODE_DATA *,struct MAPMODE_DATA *,struct LEVEL *,int);
-extern void (*mddraw [])(struct SCRMODE_DATA *,struct MAPMODE_DATA *,struct LEVEL *);
-extern short (*mdstart [])(struct SCRMODE_DATA *,struct MAPMODE_DATA *,struct LEVEL *);
-extern void (*mdend [])(struct SCRMODE_DATA *,struct MAPMODE_DATA *,struct LEVEL *);
+struct WORKMODE_DATA {
+    struct LEVEL *lvl;
+    struct MAPMODE_DATA *mapmode;
+    struct TXTED_DATA *editor;
+    struct MDCUBE_DATA *mdcube;
+    struct RWRK_DATA *mdrwrk;
+    struct MDTNG_DATA *mdtng;
+    struct MDSLAB_DATA *mdslab;
+    struct LIST_DATA *list;
+    struct HELP_DATA *help;
+    // Level options - are copied into current level
+    struct LEVOPTIONS *optns;
+    // Right panel configuration
+    struct INFOPANEL_DATA *ipanel;
+  };
+
+extern void (*actions [])(struct SCRMODE_DATA *,struct WORKMODE_DATA *,int);
+extern void (*mddraw [])(struct SCRMODE_DATA *,struct WORKMODE_DATA *);
+extern short (*mdstart [])(struct SCRMODE_DATA *,struct WORKMODE_DATA *);
+extern void (*mdend [])(struct SCRMODE_DATA *,struct WORKMODE_DATA *);
 
 extern const char *modenames[];
 extern const char *longmodenames[];
@@ -147,37 +168,37 @@ extern const char *string_input_msg[];
 extern short finished;
 
 // Screen maintain functions
-void init_levscr_basics(struct SCRMODE_DATA **scrmode,struct MAPMODE_DATA **mapmode);
-void init_levscr_modes(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode);
-void free_levscr(struct SCRMODE_DATA **scrmode,struct MAPMODE_DATA **mapmode);
-void draw_levscr(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl);
+void init_levscr_basics(struct SCRMODE_DATA **scrmode,struct WORKMODE_DATA *workdata);
+void init_levscr_modes(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata);
+void free_levscr(struct SCRMODE_DATA **scrmode,struct WORKMODE_DATA *workdata);
+void draw_levscr(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata);
 
 // Keyboard action functions
-void proc_key(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl);
-short cursor_actions(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl,int key);
+void proc_key(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata);
+short cursor_actions(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata,int key);
 short subtl_select_actions(struct MAPMODE_DATA *mapmode,int key);
-short string_get_actions(struct SCRMODE_DATA *scrmode,int key);
+short string_get_actions(struct SCRMODE_DATA *scrmode,int key,short *text_changed);
 void curposcheck(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode);
 
 // The single actions
-void action_enter_texture_mode(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl);
-void action_generate_bitmap(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl);
-void action_enter_search_mode(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl);
-void action_enter_script_mode(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl);
-void action_toggle_datclm_aupdate(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl);
-void action_toggle_compass_rose(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl);
-void action_create_new_map(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl);
-void action_create_random_backgnd(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl);
-void action_save_map_quick(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl);
-void action_enter_mapsave_mode(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl);
-void action_load_map_quick(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl);
-void action_enter_mapload_mode(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl);
-void action_quit_program(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl);
-void action_enter_help_mode(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl);
+void action_enter_texture_mode(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata);
+void action_generate_bitmap(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata);
+void action_enter_search_mode(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata);
+void action_enter_script_mode(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata);
+void action_toggle_datclm_aupdate(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata);
+void action_toggle_compass_rose(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata);
+void action_create_new_map(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata);
+void action_create_random_backgnd(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata);
+void action_save_map_quick(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata);
+void action_enter_mapsave_mode(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata);
+void action_load_map_quick(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata);
+void action_enter_mapload_mode(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata);
+void action_quit_program(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata);
+void action_enter_help_mode(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata);
 
 // Action/drawing subfunctions
-int change_mode(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl,int new_mode);
-void draw_forced_panel(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl, short panel_mode);
+int change_mode(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata,int new_mode);
+void draw_forced_panel(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata, short panel_mode);
 void draw_map_cursor(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl,short show_ground,short show_rooms,short show_things);
 
 //Clipboard support - lower level
@@ -197,24 +218,30 @@ void clear_clipboard(struct SCRMODE_DATA *scrmode);
 //Lower level functions
 void clear_scrmode(struct SCRMODE_DATA *scrmode);
 void clear_mapmode(struct MAPMODE_DATA *mapmode);
+void clear_infopanel(struct INFOPANEL_DATA *ipanel);
 
-void display_rpanel_bottom(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl);
-int display_mode_keyhelp(int scr_row, int scr_col,int max_row,int mode,int itm_idx);
-void draw_mdempty(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl);
+void display_rpanel_bottom(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata);
+int display_mode_keyhelp(struct HELP_DATA *help, int scr_row, int scr_col,
+    int max_row,int mode,int itm_idx);
+void draw_mdempty(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata);
 
 void show_cursor(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,char cur);
-char *mode_status(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,int mode);
+char *mode_status(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata,int mode);
 short is_simple_mode(int mode);
 
 void mark_check(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode);
 int get_draw_map_tile_color(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl,int tx,int ty,short special,short darken_fg,short brighten_bg);
 int get_screen_color_owned(unsigned char owner,short marked,short darken_fg,short brighten_bg);
 void draw_map_area(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl,short show_ground,short show_rooms,short show_things);
-int get_draw_map_tile_char(struct LEVEL *lvl,int tx,int ty,
-    short show_ground,short show_rooms,short show_things,short force_at);
+int get_draw_map_tile_char(const struct MAPMODE_DATA *mapmode,const struct LEVEL *lvl,
+    int tx,int ty,short show_ground,short show_rooms,short show_things,short force_at);
+
+// Current position on map
+short get_map_subtile_pos(struct MAPMODE_DATA *mapmode,struct IPOINT_2D *subpos);
+short get_map_tile_pos(struct MAPMODE_DATA *mapmode,struct IPOINT_2D *tilpos);
 
 // Some specific actions
-short level_verify_with_highlight(struct LEVEL *lvl,struct MAPMODE_DATA *mapmode);
+short level_verify_with_highlight(struct WORKMODE_DATA *workdata);
 
 // highlight is used for search and showing error position
 int get_tile_highlight(struct MAPMODE_DATA *mapmode, unsigned int tx, unsigned int ty);

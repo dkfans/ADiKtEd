@@ -63,6 +63,17 @@ Press F1 for help.
 TODO before final:
  Fixations in room things parameters (height,other)
  Fixations in room corner graphics
+Version: 0.80b
+ Unrecognized script commands converted to REMarks on update
+ Added SCRIPT_LEVEL_SPACES command in INI file
+ Added verification of script commands with amount of arguments
+ Action point number can be changed using s/x
+ Fixed hero gate numbering (positive number instead of negative)
+ Positions and ranges can be displayed as fixed point numbers
+ Most of the script command parameters are verified
+ Action point/hero grate numbers verified in script file
+ Added colors and highlighting in script mode
+ Little corrections to save/load screens
 Version: 0.75b
  Script file recognition logic extended
  Modified frail columns generation to prevent stucked imps

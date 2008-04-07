@@ -15,32 +15,30 @@ enum rewrk_viewmode
   RVM_FLG   = 0x005,
 };
 
-
-typedef struct {
+struct RWRK_DATA {
   unsigned short view;
-  } RWRK_DATA;
-
-extern RWRK_DATA *mdrwrk;
+  };
 
 struct LEVEL;
 struct SCRMODE_DATA;
 struct MAPMODE_DATA;
+struct WORKMODE_DATA;
 
 //Functions - init and free
-short init_mdrwrk(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode);
-void free_mdrwrk(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode);
+short init_mdrwrk(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata);
+void free_mdrwrk(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata);
 
 //Functions - start and stop
-short start_mdrwrk(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl);
-void end_mdrwrk(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl);
+short start_mdrwrk(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata);
+void end_mdrwrk(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata);
 
 //Functions - actions and screen
-void actions_mdrwrk(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl,int key);
-void draw_mdrwrk(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl);
-void draw_mdrwrk_panel(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl);
+void actions_mdrwrk(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata,int key);
+void draw_mdrwrk(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata);
+void draw_mdrwrk_panel(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata);
 
 //Functions - lower level
-void draw_rework_map_area(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl,RWRK_DATA *mdrwrk);
+void draw_rework_map_area(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl,struct RWRK_DATA *mdrwrk);
 int get_rework_map_tile_char(struct LEVEL *lvl,int sx,int sy,unsigned short view);
 
 //Functions - internal

@@ -8,12 +8,13 @@
 struct LEVEL;
 struct SCRMODE_DATA;
 struct MAPMODE_DATA;
+struct WORKMODE_DATA;
 
 #define USRINPUT_ROWS 4
 
 //Variables for navigating in list screen
 
-typedef struct {
+struct LIST_DATA {
     int prevmode;
     int y; //the first visible row
     int pos; // selected item position (rel. to screen top)
@@ -24,91 +25,92 @@ typedef struct {
     int val2;
     int val3;
     unsigned char *ptr;
-  } LIST_DATA;
-
-extern LIST_DATA *list;
+  };
 
 //Functions - init and free
-short init_list(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode);
-void free_list(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode);
+short init_list(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata);
+void free_list(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata);
 
 //Functions - start and stop
-short start_mdtextr(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl);
-void end_mdtextr(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl);
-short start_mdslbl(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl);
-void end_mdslbl(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl);
-short start_mdcclm(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl);
-void end_mdcclm(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl);
+short start_mdtextr(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata);
+void end_mdtextr(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata);
+short start_mdslbl(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata);
+void end_mdslbl(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata);
+short start_mdcclm(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata);
+void end_mdcclm(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata);
 
-short start_crcrtr(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl);
-void end_crcrtr(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl);
-short start_critem(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl);
-void end_critem(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl);
-short start_edcrtr(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl);
-void end_edcrtr(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl);
-short start_crefct(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl);
-void end_crefct(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl);
-short start_crtrap(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl);
-void end_crtrap(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl);
-short start_editem(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl);
-void end_editem(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl);
-short start_edefct(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl);
-void end_edefct(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl);
-short start_edtrap(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl);
-void end_edtrap(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl);
+short start_crcrtr(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata);
+void end_crcrtr(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata);
+short start_critem(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata);
+void end_critem(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata);
+short start_edcrtr(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata);
+void end_edcrtr(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata);
+short start_crefct(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata);
+void end_crefct(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata);
+short start_crtrap(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata);
+void end_crtrap(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata);
+short start_editem(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata);
+void end_editem(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata);
+short start_edefct(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata);
+void end_edefct(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata);
+short start_edtrap(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata);
+void end_edtrap(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata);
 
-short start_mdsrch(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl);
-void end_mdsrch(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl);
-short start_mdlmap(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl);
-void end_mdlmap(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl);
-short start_mdsmap(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl);
-void end_mdsmap(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl);
+short start_mdsrch(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata);
+void end_mdsrch(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata);
+short start_mdlmap(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata);
+void end_mdlmap(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata);
+short start_mdsmap(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata);
+void end_mdsmap(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata);
 
 //Functions - start and stop, lower level
-short start_list(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl,int lstmode);
-void end_list(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl);
-short start_rplist(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl,int lstmode);
-void end_rplist(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl);
+short start_list(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata,int lstmode);
+void end_list(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata);
+short start_rplist(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata,int lstmode);
+void end_rplist(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata);
 
 //Functions - actions and screen
-void draw_mdtextr(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl);
-void actions_mdtextr(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl,int key);
-void draw_mdcclm(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl);
-void actions_mdcclm(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl,int key);
-void draw_mdcube(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl);
-void actions_mdcube(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl,int key);
-void draw_mdslbl(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl);
-void actions_mdslbl(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl,int key);
+void draw_mdtextr(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata);
+void actions_mdtextr(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata,int key);
+void draw_mdcclm(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata);
+void actions_mdcclm(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata,int key);
+void draw_mdcube(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata);
+void actions_mdcube(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata,int key);
+void draw_mdslbl(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata);
+void actions_mdslbl(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata,int key);
 
-void draw_crcrtr(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl);
-void actions_crcrtr(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl,int key);
-void draw_critem(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl);
-void actions_critem(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl,int key);
-void draw_crefct(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl);
-void actions_crefct(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl,int key);
-void draw_crtrap(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl);
-void actions_crtrap(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl,int key);
-void draw_editem(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl);
-void actions_editem(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl,int key);
-void draw_edcrtr(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl);
-void actions_edcrtr(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl,int key);
-void draw_edefct(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl);
-void actions_edefct(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl,int key);
-void draw_edtrap(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl);
-void actions_edtrap(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl,int key);
+void draw_crcrtr(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata);
+void actions_crcrtr(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata,int key);
+void draw_critem(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata);
+void actions_critem(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata,int key);
+void draw_crefct(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata);
+void actions_crefct(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata,int key);
+void draw_crtrap(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata);
+void actions_crtrap(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata,int key);
+void draw_editem(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata);
+void actions_editem(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata,int key);
+void draw_edcrtr(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata);
+void actions_edcrtr(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata,int key);
+void draw_edefct(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata);
+void actions_edefct(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata,int key);
+void draw_edtrap(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata);
+void actions_edtrap(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata,int key);
 
-void draw_mdsrch(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl);
-void actions_mdsrch(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl,int key);
-void draw_mdlmap(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl);
-void actions_mdlmap(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl,int key);
-void draw_mdsmap(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl);
-void actions_mdsmap(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl,int key);
+void draw_mdsrch(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata);
+void actions_mdsrch(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata,int key);
+void draw_mdlmap(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata);
+void actions_mdlmap(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata,int key);
+void draw_mdsmap(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata);
+void actions_mdsmap(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata,int key);
 
 //Functions - actions and screen, lower level
-short actions_list(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl,int key);
-short actions_rplist(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl,int key);
+short actions_list(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata,int key);
+short actions_rplist(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata,int key);
 void draw_numbered_list(char *(*itemstr)(unsigned short),
-        struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,
+        struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata,
+        unsigned int start_idx,unsigned int end_idx,unsigned int itm_width);
+void draw_rpanel_list(char *(*itemstr)(unsigned short),
+        struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LIST_DATA *list,
         unsigned int start_idx,unsigned int end_idx,unsigned int itm_width);
 
 //Functions - internal

@@ -184,7 +184,7 @@
 #define CREATR_SUBTP_FAIRY     0x0B
 #define CREATR_SUBTP_THEFT     0x0C
 #define CREATR_SUBTP_SMURI     0x0D
-#define CREATR_SUBTP_REAPER    0x0E
+#define CREATR_SUBTP_HORNY     0x0E
 #define CREATR_SUBTP_SKELETON  0x0F
 #define CREATR_SUBTP_TROLL     0x10
 #define CREATR_SUBTP_DRAGON    0x11
@@ -202,6 +202,9 @@
 #define CREATR_SUBTP_TENTCL    0x1D
 #define CREATR_SUBTP_ORC       0x1E
 #define CREATR_SUBTP_FLOAT     0x1F
+// Untested; shouldn't be used
+#define CREATR_SUBTP_NEWA      0x20
+#define CREATR_SUBTP_NEWB      0x21
 
 #define DOOR_SUBTYPE_WOOD      0x01
 #define DOOR_SUBTYPE_BRACED    0x02
