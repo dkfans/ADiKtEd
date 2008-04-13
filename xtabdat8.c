@@ -1,6 +1,22 @@
-// converts picture data from bullfrog's DAT/TAB files into BMPs
-// works with 8bpp files, needs a .dat and a .tab file
+/******************************************************************************/
+// xtabdat8.c - Dungeon Keeper Tools.
+/******************************************************************************/
+// Author:  Tomasz Lis
+// Created: 05 Jul 2005
 
+// Purpose:
+//   Converts picture data from bullfrog's DAT/TAB files into BMPs.
+//   Works with 8bpp files, needs a .dat and a .tab file.
+
+// Comment:
+//   Based on DAT decoding algorithm by Jon Skeet.
+
+//Copying and copyrights:
+//   This program is free software; you can redistribute it and/or modify
+//   it under the terms of the GNU General Public License as published by
+//   the Free Software Foundation; either version 2 of the License, or
+//   (at your option) any later version.
+/******************************************************************************/
 
 #include <stdio.h>
 #include <stdlib.h>

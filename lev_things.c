@@ -1,10 +1,23 @@
-/*
- * lev_things.c
- *
- * Defines routines for maintaining list of TNG entries,
- * provides higher level TNG control than obj_things
- *
- */
+/******************************************************************************/
+// lev_things.c - Dungeon Keeper Tools.
+/******************************************************************************/
+// Author:   Jon Skeet
+// Created:  14 Oct 1997
+// Modified: Tomasz Lis
+
+// Purpose:
+//   Defines routines for maintaining list of TNG entries,
+//   provides higher level TNG control than obj_things
+
+// Comment:
+//   None.
+
+//Copying and copyrights:
+//   This program is free software; you can redistribute it and/or modify
+//   it under the terms of the GNU General Public License as published by
+//   the Free Software Foundation; either version 2 of the License, or
+//   (at your option) any later version.
+/******************************************************************************/
 
 #include "lev_things.h"
 
@@ -286,7 +299,7 @@ unsigned char compute_door_orientation(const struct LEVEL *lvl, unsigned char *t
  */
 unsigned short get_free_herogate_number(const struct LEVEL *lvl)
 {
-    get_free_herogate_number_next(lvl,1);
+    return get_free_herogate_number_next(lvl,1);
 }
 
 /*
@@ -866,6 +879,18 @@ unsigned char *create_item_adv(const struct LEVEL *lvl, unsigned int sx, unsigne
 }
 
 /*
+ * Removes all LGT entries and most of TNG enties for the whole map - all tiles
+ * and subtiles are reset.
+ */
+void remove_automade_obj_for_whole_map(struct LEVEL *lvl)
+{
+    int i,k;
+    for (k=0;k<MAP_SIZE_Y;k++)
+      for (i=0;i<MAP_SIZE_X;i++)
+          remove_automade_obj_for_slab(lvl, i, k);
+}
+
+/*
  * Updates TNG, APT and LGT entries for the whole map - all tiles
  * and subtiles are reset. Additionally, USE values in columns
  * are recomputed to avoid mistakes.
@@ -906,6 +931,75 @@ void update_obj_for_square(struct LEVEL *lvl, int tx_first, int tx_last,
         if ((i>=0) && (k>=0) && (i<MAP_SIZE_X) && (k<MAP_SIZE_Y))
           update_clmaffective_obj_for_slab(lvl, i, k);
       }
+}
+
+void remove_automade_obj_for_slab(struct LEVEL *lvl, int tx, int ty)
+{
+    unsigned short slab=get_tile_slab(lvl,tx,ty);
+    int sx, sy, i;
+    for (sx=tx*3; sx < tx*3+3; sx++)
+      for (sy=ty*3; sy < ty*3+3; sy++)
+      {
+          int last_stlight=get_stlight_subnums(lvl,sx,sy)-1;
+          for (i=last_stlight; i >=0; i--)
+              stlight_del(lvl,sx, sy, i);
+          int last_thing=get_thing_subnums(lvl,sx,sy)-1;
+          for (i=last_thing; i>=0; i--)
+          {
+            char *thing=get_thing(lvl,sx,sy,i);
+            short should_delete=false;
+            int categr=get_thing_subtypes_arridx(thing);
+            switch (categr)
+            {
+            // Categories to leave
+            case THING_CATEGR_CREATR:
+            case THING_CATEGR_SPECIALBOX:
+            case THING_CATEGR_SPELLBOOK:
+            case THING_CATEGR_WRKSHOPBOX:
+            case THING_CATEGR_TRAP:
+            case THING_CATEGR_GOLD:
+                break;
+            // Not-so-easy categories
+            case THING_CATEGR_STATUE:
+            case THING_CATEGR_FURNITURE:
+                if (is_room_inventory(thing) && slab_is_room(slab))
+                  should_delete=true;
+                break;
+            // Do not touch hero gates!
+            case THING_CATEGR_DNCRUCIAL:
+              {
+                unsigned short stype_idx=get_thing_subtype(thing);
+                if (stype_idx!=ITEM_SUBTYPE_HEROGATE)
+                  should_delete=true;
+              };break;
+            // Categories to delete
+            case THING_CATEGR_NULL:
+            case THING_CATEGR_ROOMEFFCT:
+            case THING_CATEGR_ITEMEFFCT:
+            case THING_CATEGR_CREATLAIR:
+            case THING_CATEGR_DOOR:
+            case THING_CATEGR_SPINNTNG:
+            case THING_CATEGR_FOOD:
+            case THING_CATEGR_TORCHCNDL:
+            case THING_CATEGR_HEARTFLAME:
+            case THING_CATEGR_POLEBAR:
+            case THING_CATEGR_ROOMEQUIP:
+            case THING_CATEGR_PWHAND:
+            case THING_CATEGR_UNKNOWN:
+            default:
+                should_delete=true;
+                break;
+            }
+            // If the thing is placed on incorrect place - delete anyway
+            unsigned char expect_slb=get_usual_thing_slab(thing);
+            if ((expect_slb!=slab)&&
+               ((expect_slb!=SLAB_TYPE_CLAIMED)||(slab_is_tall(slab))))
+               should_delete=true;
+            // And the final act...
+            if (should_delete)
+                thing_del(lvl,sx, sy, i);
+          }
+     }
 }
 
 void update_clmaffective_obj_for_slab(struct LEVEL *lvl, int tx, int ty)
@@ -1483,7 +1577,9 @@ void update_things_slb_hatchery_corner(struct LEVEL *lvl, int tx, int ty,
 void update_things_slb_temple_corner(struct LEVEL *lvl, int tx, int ty,
         unsigned char *surr_slb,unsigned char *surr_own)
 {
-    update_thing_slb_room_one_central_item(lvl,tx,ty,ITEM_SUBTYPE_TEMPLESTA,true);
+    unsigned char *thing;
+    thing=update_thing_slb_room_one_central_item(lvl,tx,ty,ITEM_SUBTYPE_TEMPLESTA,true);
+    set_thing_subtile_h(thing,2); // Temple floor is higher than ground
 }
 
 void update_things_slb_workshop_corner(struct LEVEL *lvl, int tx, int ty,

@@ -1,9 +1,22 @@
-/*
- * globals.h header file
- *
- * Defines basic includes and definitions, used in whole program
- *
- */
+/******************************************************************************/
+// dernc.h - Another Dungeon Keeper Map Editor.
+/******************************************************************************/
+// Author:   Jon Skeet
+// Created:  08 sep 1998
+// Modified: Tomasz Lis
+
+// Purpose:
+//   Header file for global definitions.
+
+// Comment:
+//   Defines basic includes and definitions, used in whole program.
+
+//Copying and copyrights:
+//   This program is free software; you can redistribute it and/or modify
+//   it under the terms of the GNU General Public License as published by
+//   the Free Software Foundation; either version 2 of the License, or
+//   (at your option) any later version.
+/******************************************************************************/
 
 #ifndef ADIKT_GLOBALS_H
 #define ADIKT_GLOBALS_H
@@ -51,6 +64,8 @@
 #define DISKPATH_SIZE   256
 #define LINEMSG_SIZE    160
 #define READ_BUFSIZE    256
+
+#define PROGRAM_NAME "ADiKtEd"
 
 // Return values for verification functions
 #define VERIF_ERROR   0

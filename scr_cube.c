@@ -1,10 +1,22 @@
-/*
- * scr_cube.c
- *
- * Defines functions for initializing and displaying the cube screen.
- * This also includes keyboard actions for the screen.
- *
- */
+/******************************************************************************/
+// scr_cube.c - Another Dungeon Keeper Map Editor.
+/******************************************************************************/
+// Author:   Tomasz Lis
+// Created:  27 Oct 2007
+
+// Purpose:
+//   Defines functions for initializing and displaying the cube screen.
+//   This also includes keyboard actions for the screen.
+
+// Comment:
+//   None.
+
+//Copying and copyrights:
+//   This program is free software; you can redistribute it and/or modify
+//   it under the terms of the GNU General Public License as published by
+//   the Free Software Foundation; either version 2 of the License, or
+//   (at your option) any later version.
+/******************************************************************************/
 
 #include "scr_cube.h"
 

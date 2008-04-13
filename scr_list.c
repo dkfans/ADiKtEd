@@ -1,11 +1,23 @@
-/*
- * scr_list.c
- *
- * Defines functions for initializing and displaying any
- * of the list screens.
- * This also includes keyboard actions for the screen.
- *
- */
+/******************************************************************************/
+// scr_list.c - Another Dungeon Keeper Map Editor.
+/******************************************************************************/
+// Author:   Tomasz Lis
+// Created:  05 Jan 2008
+
+// Purpose:
+//   Defines functions for initializing and displaying any
+//   of the list screens.
+//   This also includes keyboard actions for the screen.
+
+// Comment:
+//   None.
+
+//Copying and copyrights:
+//   This program is free software; you can redistribute it and/or modify
+//   it under the terms of the GNU General Public License as published by
+//   the Free Software Foundation; either version 2 of the License, or
+//   (at your option) any later version.
+/******************************************************************************/
 
 #include "scr_list.h"
 
@@ -1373,6 +1385,16 @@ void actions_mdsmap(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata,
             {
               message_error("Map saving cancelled");
               break;
+            }
+            if (workdata->lvl->stats.saves_count==0)
+            {
+              workdata->lvl->info.ver_major++;
+              workdata->lvl->info.ver_minor=0;
+              workdata->lvl->info.ver_rel=0;
+            } else
+            {
+              workdata->lvl->info.ver_minor++;
+              workdata->lvl->info.ver_rel=0;
             }
             save_map(workdata->lvl);
             message_info("Map \"%s\" saved", workdata->lvl->savfname);

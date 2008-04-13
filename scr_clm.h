@@ -1,6 +1,22 @@
-/*
- * scr_clm.h header file for scr_clm.c
- */
+/******************************************************************************/
+// scr_clm.h - Another Dungeon Keeper Map Editor.
+/******************************************************************************/
+// Author:   Jon Skeet
+// Created:  14 Oct 1997
+// Modified: Tomasz Lis
+
+// Purpose:
+//   Header file. Defines exported routines from scr_clm.c
+
+// Comment:
+//   None.
+
+//Copying and copyrights:
+//   This program is free software; you can redistribute it and/or modify
+//   it under the terms of the GNU General Public License as published by
+//   the Free Software Foundation; either version 2 of the License, or
+//   (at your option) any later version.
+/******************************************************************************/
 
 #ifndef ADIKT_SCRCLM_H
 #define ADIKT_SCRCLM_H

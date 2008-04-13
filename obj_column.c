@@ -1,9 +1,21 @@
-/*
- * obj_column.c
- *
- * Functions for maintaining single CLM entries.
- *
- */
+/******************************************************************************/
+// obj_column.c - Dungeon Keeper Tools.
+/******************************************************************************/
+// Author:   Tomasz Lis
+// Created:  12 Dec 2007
+
+// Purpose:
+//   Functions for maintaining single CLM entries.
+
+// Comment:
+//   None.
+
+//Copying and copyrights:
+//   This program is free software; you can redistribute it and/or modify
+//   it under the terms of the GNU General Public License as published by
+//   the Free Software Foundation; either version 2 of the License, or
+//   (at your option) any later version.
+/******************************************************************************/
 
 #include "obj_column.h"
 
@@ -85,7 +97,8 @@ const unsigned short dir_rot_270[]={
       IDIR_SE,IDIR_EAST,IDIR_NE, };
 
 short fill_reinforced_corner=true;
-short frail_columns_enabled=true;
+short frail_columns_near_short=true;
+short frail_columns_near_tall=true;
 
 /*
  * Returns custom column type name as text
@@ -115,7 +128,8 @@ void create_columns_for_slab(struct COLUMN_REC *clm_recs[9],struct LEVOPTIONS *o
         unsigned char *surr_slb,unsigned char *surr_own, unsigned char **surr_tng)
 {
   unsigned short slab=surr_slb[IDIR_CENTR];
-  frail_columns_enabled=optns->frail_columns;
+  frail_columns_near_short=((optns->frail_columns&1)==1);
+  frail_columns_near_tall=((optns->frail_columns&2)==2);
   switch (slab)
   {
     case SLAB_TYPE_ROCK:
@@ -1333,11 +1347,10 @@ void create_columns_slb_doormagic(struct COLUMN_REC *clm_recs[9],
 void modify_frail_columns(struct COLUMN_REC *clm_recs[9],
         unsigned char *surr_slb,unsigned char *surr_own, unsigned char **surr_tng)
 {
-    if (!frail_columns_enabled) return;
     const unsigned short dir_a[]={IDIR_WEST, IDIR_NORTH, IDIR_EAST, IDIR_SOUTH};
     const unsigned short dir_b[]={IDIR_NORTH, IDIR_EAST, IDIR_SOUTH, IDIR_WEST};
     const unsigned short dir_c[]={IDIR_NW, IDIR_NE, IDIR_SE, IDIR_SW};
-    //This decreases probability of column change if there are no adjacent tall slabs
+    //This gives smaller probability of column change if there are no adjacent tall slabs
     int base_prob=33;
     if (slab_is_tall_unclmabl(surr_slb[IDIR_WEST])||slab_is_tall_unclmabl(surr_slb[IDIR_NORTH])||
        slab_is_tall_unclmabl(surr_slb[IDIR_EAST])||slab_is_tall_unclmabl(surr_slb[IDIR_SOUTH]))
@@ -1346,8 +1359,9 @@ void modify_frail_columns(struct COLUMN_REC *clm_recs[9],
     //Let's take all corners at once, in a loop
     for (i=0;i<4;i++)
     {
+      // All the changes near short unclaimable slabs
       if (slab_is_short_unclmabl(surr_slb[dir_a[i]]) &&
-          slab_is_short_unclmabl(surr_slb[dir_b[i]]))
+          slab_is_short_unclmabl(surr_slb[dir_b[i]]) && (frail_columns_near_short))
       {
           if ((surr_slb[dir_a[i]]==SLAB_TYPE_PATH)&&(surr_slb[dir_b[i]]==SLAB_TYPE_PATH)&&
               slab_is_tall(surr_slb[dir_c[i]]))
@@ -1369,13 +1383,19 @@ void modify_frail_columns(struct COLUMN_REC *clm_recs[9],
           {
             if (rnd(100)<base_prob+33)
               fill_column_lava(clm_recs[dir_c[i]], surr_own[IDIR_CENTR]);
-          } else
-          // My own mod - replacing part of gold/gems with dirt if it is near
+          }
+      } else
+      // All the changes near tall unclaimable slabs
+      // These are mods by Tomasz Lis - originally tall slabs do not affect others
+      if (slab_is_tall_unclmabl(surr_slb[dir_a[i]]) &&
+          slab_is_tall_unclmabl(surr_slb[dir_b[i]]) && (frail_columns_near_tall))
+      {
+          // Replacing part of gold/gems with dirt if it is near
           if ((surr_slb[IDIR_CENTR]!=SLAB_TYPE_EARTH)&&(surr_slb[IDIR_CENTR]!=SLAB_TYPE_TORCHDIRT)&&
              ((surr_slb[dir_a[i]]==SLAB_TYPE_EARTH)||(surr_slb[dir_a[i]]==SLAB_TYPE_TORCHDIRT))&&
              ((surr_slb[dir_b[i]]==SLAB_TYPE_EARTH)||(surr_slb[dir_b[i]]==SLAB_TYPE_TORCHDIRT)))
           {
-            if (rnd(100)<base_prob+33)
+            if (rnd(100)<base_prob)
               fill_column_earth(clm_recs[dir_c[i]], surr_own[IDIR_CENTR]);
           }
       }

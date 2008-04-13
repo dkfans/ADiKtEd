@@ -1,6 +1,22 @@
-/*
- * lev_files.h header file for lev_files.c
- */
+/******************************************************************************/
+// lev_files.h - Another Dungeon Keeper Map Editor.
+/******************************************************************************/
+// Author:   Jon Skeet
+// Created:  14 Oct 1997
+// Modified: Tomasz Lis
+
+// Purpose:
+//   Header file. Defines exported routines from lev_files.c
+
+// Comment:
+//   None.
+
+//Copying and copyrights:
+//   This program is free software; you can redistribute it and/or modify
+//   it under the terms of the GNU General Public License as published by
+//   the Free Software Foundation; either version 2 of the License, or
+//   (at your option) any later version.
+/******************************************************************************/
 
 #ifndef ADIKT_LEVFILES_H
 #define ADIKT_LEVFILES_H
@@ -14,6 +30,7 @@
 #define ERR_FILE_TOOSMLL -24
 #define ERR_FILE_BADDATA -25
 #define ERR_INTERNAL     -26
+#define WARN_BAD_COUNT    24
 
 short save_map(struct LEVEL *lvl);
 

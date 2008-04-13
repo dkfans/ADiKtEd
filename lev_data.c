@@ -1,14 +1,28 @@
-/*
- * lev_data.c
- *
- * Defines functions for maintaining the level memory structure.
- * This includes creating elements, deleting them and clearing whole structure.
- *
- */
+/******************************************************************************/
+// lev_data.c - Another Dungeon Keeper Map Editor.
+/******************************************************************************/
+// Author:   Jon Skeet
+// Created:  14 Oct 1997
+// Modified: Tomasz Lis
+
+// Purpose:
+//   Defines functions for maintaining the level memory structure.
+//   This includes creating elements, deleting them and clearing whole structure.
+
+// Comment:
+//   None.
+
+//Copying and copyrights:
+//   This program is free software; you can redistribute it and/or modify
+//   it under the terms of the GNU General Public License as published by
+//   the Free Software Foundation; either version 2 of the License, or
+//   (at your option) any later version.
+/******************************************************************************/
 
 #include "lev_data.h"
 
 #include <math.h>
+#include <time.h>
 #include "globals.h"
 #include "obj_column_def.h"
 #include "obj_slabs.h"
@@ -372,9 +386,29 @@ short level_clear_stats(struct LEVEL *lvl)
     //Stats on objects adding/removal
     lvl->stats.things_removed=0;
     lvl->stats.things_added=0;
+    // Count of saves in this session
+    lvl->stats.saves_count=0;
+    // Number of unsaved changes
+    lvl->stats.unsaved_changes=0;
     return true;
 }
 
+/*
+ * Clears (sets for new map) info for given level.
+ */
+short level_clear_info(struct LEVEL *lvl)
+{
+    // User stats
+    lvl->info.usr_cmds_count=0;
+    // Map creation date
+    lvl->info.creat_date=time(NULL);
+    lvl->info.lastsav_date=lvl->info.creat_date;
+    // Map version
+    lvl->info.ver_major=0;
+    lvl->info.ver_minor=0;
+    lvl->info.ver_rel=0;
+    return true;
+}
 /*
  * clears the structures for storing level which do not have separate
  * clearing function; drops any old pointers, only file name remains;
@@ -461,6 +495,7 @@ short level_clear(struct LEVEL *lvl)
   result&=level_clear_tng(lvl);
   result&=level_clear_datclm(lvl);
   result&=level_clear_stats(lvl);
+  result&=level_clear_info(lvl);
   result&=level_clear_other(lvl);
     message_log(" level_clear: finished");
   return result;
@@ -823,16 +858,19 @@ short level_verify_struct(struct LEVEL *lvl, char *err_msg,struct IPOINT_2D *err
     if (lvl->tng_subnums==NULL)
     {
           strncpy(err_msg,"Null internal object tng_subnums!",LINEMSG_SIZE);
+          errpt->x=-1;errpt->y=-1;
           return VERIF_ERROR;
     }
     if (lvl->apt_subnums==NULL)
     {
           strncpy(err_msg,"Null internal object apt_subnums!",LINEMSG_SIZE);
+          errpt->x=-1;errpt->y=-1;
           return VERIF_ERROR;
     }
     if (lvl->lgt_subnums==NULL)
     {
           strncpy(err_msg,"Null internal object lgt_subnums!",LINEMSG_SIZE);
+          errpt->x=-1;errpt->y=-1;
           return VERIF_ERROR;
     }
     //Sweeping through structures
@@ -885,17 +923,20 @@ short level_verify_struct(struct LEVEL *lvl, char *err_msg,struct IPOINT_2D *err
     {
       if (lvl->clm[i]==NULL)
       {
+        errpt->x=-1;errpt->y=-1;
         sprintf(err_msg,"Null CoLuMn entry at index %d.",i);
         return VERIF_ERROR;
       }
     }
     if ((lvl->clm_hdr==NULL)||(lvl->clm_utilize==NULL))
     {
+      errpt->x=-1;errpt->y=-1;
       sprintf(err_msg,"Null CoLuMn help arrays.");
       return VERIF_ERROR;
     }
     if (lvl->inf>7)
     {
+          errpt->x=-1;errpt->y=-1;
           strncpy(err_msg,"Unexpected value of INF entry.",LINEMSG_SIZE);
           return VERIF_WARN;
     }
@@ -908,6 +949,46 @@ short level_verify_struct(struct LEVEL *lvl, char *err_msg,struct IPOINT_2D *err
  */
 short actnpts_verify(struct LEVEL *lvl, char *err_msg,struct IPOINT_2D *errpt)
 {
+    //Preparing array bounds
+    int arr_entries_x=MAP_SIZE_X*MAP_SUBNUM_X;
+    int arr_entries_y=MAP_SIZE_Y*MAP_SUBNUM_Y;
+    int i, j, k;
+    for (i=0; i < arr_entries_y; i++)
+      for (j=0; j < arr_entries_x; j++)
+      {
+        int actnpt_count=get_actnpt_subnums(lvl,i,j);
+        for (k=0; k <actnpt_count ; k++)
+        {
+            unsigned char *actnpt = get_actnpt(lvl,i,j,k);
+            unsigned char subt_x=get_actnpt_subtile_x(actnpt);
+            unsigned char subt_y=get_actnpt_subtile_y(actnpt);
+            unsigned char subt_r=get_actnpt_range_subtile(actnpt);
+            unsigned short n=get_actnpt_number(actnpt);
+            unsigned short slab=get_tile_slab(lvl,i/MAP_SUBNUM_X,j/MAP_SUBNUM_Y);
+            int col_h=get_subtile_column_height(lvl,i,j);
+            if ((subt_x>=arr_entries_x)||(subt_y>=arr_entries_y))
+            {
+              errpt->x=i/MAP_SUBNUM_X;
+              errpt->y=j/MAP_SUBNUM_Y;
+              sprintf(err_msg,"Action point has bad position data on slab %d,%d.",errpt->x,errpt->y);
+              return VERIF_WARN;
+            }
+            if (subt_r>60)
+            {
+              errpt->x=i/MAP_SUBNUM_X;
+              errpt->y=j/MAP_SUBNUM_Y;
+              sprintf(err_msg,"Action point range too big on slab %d,%d.",errpt->x,errpt->y);
+              return VERIF_WARN;
+            }
+            if ((n<1)||(n>4096))
+            {
+              errpt->x=i/MAP_SUBNUM_X;
+              errpt->y=j/MAP_SUBNUM_Y;
+              sprintf(err_msg,"Incorrect action point number on slab %d,%d.",errpt->x,errpt->y);
+              return VERIF_WARN;
+            }
+        }
+      }
   return VERIF_OK;
 }
 
@@ -973,6 +1054,7 @@ short level_verify_logic(struct LEVEL *lvl, char *err_msg,struct IPOINT_2D *errp
 
     if (hearts[PLAYER_UNSET]>0)
     {
+        errpt->x=-1;errpt->y=-1;
         sprintf(err_msg,"Found %d unowned dungeon heart things.",hearts[PLAYER_UNSET]);
         return VERIF_WARN;
     }
@@ -980,12 +1062,14 @@ short level_verify_logic(struct LEVEL *lvl, char *err_msg,struct IPOINT_2D *errp
     {
       if (hearts[i]>1)
       {
+        errpt->x=-1;errpt->y=-1;
         sprintf(err_msg,"Player %d owns %d dungeon heart things.",i, hearts[i]);
         return VERIF_WARN;
       }
     }
     if (hearts[0]==0)
     {
+        errpt->x=-1;errpt->y=-1;
         sprintf(err_msg,"Human player doesn't have a dungeon heart thing.");
         return VERIF_WARN;
     }
@@ -1337,7 +1421,7 @@ char *get_actnpt(const struct LEVEL *lvl,unsigned int x,unsigned int y,unsigned 
     x %= arr_entries_x;
     y %= arr_entries_y;
     unsigned char *actnpt=NULL;
-    if (num < lvl->apt_subnums[x][y])
+    if (num < get_actnpt_subnums(lvl,x,y))
       actnpt = lvl->apt_lookup[x][y][num];
     return actnpt;
 }
@@ -1355,7 +1439,7 @@ void actnpt_add(struct LEVEL *lvl,unsigned char *actnpt)
     y = get_actnpt_subtile_y(actnpt)%arr_entries_y;
     lvl->apt_total_count++;
     //setting APT entries
-    unsigned int apt_snum=lvl->apt_subnums[x][y];
+    unsigned int apt_snum=get_actnpt_subnums(lvl,x,y);
     apt_snum++;
     lvl->apt_subnums[x][y]=apt_snum;
     lvl->tng_apt_lgt_nums[(x/MAP_SUBNUM_X)][(y/MAP_SUBNUM_Y)]++;
@@ -1381,7 +1465,7 @@ void actnpt_del(struct LEVEL *lvl,unsigned int x, unsigned int y, unsigned int n
     int arr_entries_y=MAP_SIZE_Y*MAP_SUBNUM_Y;
     x%=arr_entries_x;
     y%=arr_entries_y;
-    unsigned int apt_snum=lvl->apt_subnums[x][y];
+    unsigned int apt_snum=get_actnpt_subnums(lvl,x,y);
     if (num >= apt_snum)
       return;
     lvl->apt_total_count--;
@@ -1504,7 +1588,7 @@ short get_object_type(const struct LEVEL *lvl, unsigned int x, unsigned int y, u
       return OBJECT_TYPE_NONE;
     int tng_num=lvl->tng_subnums[x][y];
     if (z<tng_num) return OBJECT_TYPE_THING;
-    int apt_num=lvl->apt_subnums[x][y];
+    int apt_num=get_actnpt_subnums(lvl,x,y);
     if (z<(tng_num+apt_num)) return OBJECT_TYPE_ACTNPT;
     int lgt_num=lvl->lgt_subnums[x][y];
     if (z<(tng_num+apt_num+lgt_num)) return OBJECT_TYPE_STLIGHT;
@@ -1522,7 +1606,7 @@ unsigned char *get_object(const struct LEVEL *lvl,unsigned int x,unsigned int y,
     int tng_num=lvl->tng_subnums[x][y];
     if (z<tng_num)
       return get_thing(lvl,x,y,z);
-    int apt_num=lvl->apt_subnums[x][y];
+    int apt_num=get_actnpt_subnums(lvl,x,y);
     if (z<(tng_num+apt_num))
       return get_actnpt(lvl,x,y,z-tng_num);
     int lgt_num=lvl->lgt_subnums[x][y];
@@ -1548,7 +1632,7 @@ void object_del(struct LEVEL *lvl,unsigned int sx,unsigned int sy,unsigned int z
       thing_del(lvl,sx,sy,z);
       return;
     }
-    int apt_num=lvl->apt_subnums[sx][sy];
+    int apt_num=get_actnpt_subnums(lvl,sx,sy);
     if (z<(tng_num+apt_num))
     {
       actnpt_del(lvl,sx,sy,z-tng_num);
@@ -1570,7 +1654,7 @@ unsigned int get_object_subnums(const struct LEVEL *lvl,unsigned int x,unsigned 
     //Bounding position
     if ((x>=arr_entries_x)||(y>=arr_entries_y))
       return 0;
-    return lvl->tng_subnums[x][y]+lvl->apt_subnums[x][y]+lvl->lgt_subnums[x][y];
+    return lvl->tng_subnums[x][y]+get_actnpt_subnums(lvl,x,y)+lvl->lgt_subnums[x][y];
 }
 
 unsigned int get_object_tilnums(const struct LEVEL *lvl,unsigned int x,unsigned int y)
@@ -1594,7 +1678,7 @@ int get_object_subtl_last(const struct LEVEL *lvl,unsigned int x,unsigned int y,
     last+=lvl->tng_subnums[x][y];
     if (obj_type==OBJECT_TYPE_THING)
       return last;
-    last+=lvl->apt_subnums[x][y];
+    last+=get_actnpt_subnums(lvl,x,y);
     if (obj_type==OBJECT_TYPE_ACTNPT)
       return last;
     last+=lvl->lgt_subnums[x][y];

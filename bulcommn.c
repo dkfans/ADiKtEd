@@ -1,11 +1,23 @@
-/*
- * Common procedures for Bullfrog game tools. These includes
- * little-endian and big-endian reading functions,
- * bitmap writing routines and similar.
- *
- * This is just a module without main().
- */
+/******************************************************************************/
+// bulcommn.c - Dungeon Keeper Tools.
+/******************************************************************************/
+// Author:   Tomasz Lis
+// Created:  10 Mar 2005
 
+// Purpose:
+//   Common procedures for Bullfrog game tools. These includes
+//   little-endian and big-endian reading functions,
+//   bitmap writing routines and similar.
+
+// Comment:
+//   None.
+
+//Copying and copyrights:
+//   This program is free software; you can redistribute it and/or modify
+//   it under the terms of the GNU General Public License as published by
+//   the Free Software Foundation; either version 2 of the License, or
+//   (at your option) any later version.
+/******************************************************************************/
 
 #include <stdio.h>
 #include <stdlib.h>

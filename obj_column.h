@@ -1,9 +1,21 @@
-/*
- * obj_column.h
- *
- * Header file for obj_column.c.
- *
- */
+/******************************************************************************/
+// obj_column.h - Dungeon Keeper Tools.
+/******************************************************************************/
+// Author:   Tomasz Lis
+// Created:  12 Dec 2007
+
+// Purpose:
+//   Header file. Defines exported routines from obj_column.c
+
+// Comment:
+//   None.
+
+//Copying and copyrights:
+//   This program is free software; you can redistribute it and/or modify
+//   it under the terms of the GNU General Public License as published by
+//   the Free Software Foundation; either version 2 of the License, or
+//   (at your option) any later version.
+/******************************************************************************/
 
 #ifndef ADIKT_OBJCOLMN_H
 #define ADIKT_OBJCOLMN_H

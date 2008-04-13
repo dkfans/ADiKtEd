@@ -1,6 +1,21 @@
-/*
- * input_kb.h header file for input_kb.c
- */
+/******************************************************************************/
+// input_kb.h - Platform independence assurance module.
+/******************************************************************************/
+// Author:  Tomasz Lis
+// Created: 12 Dec 2007
+
+// Purpose:
+//   Header file. Defines exported routines from input_kb.c
+
+// Comment:
+//   None.
+
+//Copying and copyrights:
+//   This program is free software; you can redistribute it and/or modify
+//   it under the terms of the GNU General Public License as published by
+//   the Free Software Foundation; either version 2 of the License, or
+//   (at your option) any later version.
+/******************************************************************************/
 
 #ifndef ADIKT_INPUTKB_H
 #define ADIKT_INPUTKB_H

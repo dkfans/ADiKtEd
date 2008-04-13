@@ -1,10 +1,22 @@
-/*
- * scr_txted.c
- *
- * Defines functions for initializing and displaying the scrpt screen.
- * This also includes keyboard actions for the screen.
- *
- */
+/******************************************************************************/
+// scr_txted.c - Another Dungeon Keeper Map Editor.
+/******************************************************************************/
+// Author:   Tomasz Lis
+// Created:  27 Jan 2008
+
+// Purpose:
+//   Defines functions for initializing and displaying the scrpt screen.
+//   This also includes keyboard actions for the screen.
+
+// Comment:
+//   None.
+
+//Copying and copyrights:
+//   This program is free software; you can redistribute it and/or modify
+//   it under the terms of the GNU General Public License as published by
+//   the Free Software Foundation; either version 2 of the License, or
+//   (at your option) any later version.
+/******************************************************************************/
 
 #include "scr_txted.h"
 
@@ -13,6 +25,7 @@
 #include "input_kb.h"
 #include "scr_actn.h"
 #include "lev_data.h"
+#include "lev_script.h"
 
 // Constants
 
@@ -116,7 +129,7 @@ short start_scrpt(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata)
     workdata->editor->y=0;
     workdata->editor->top_row=0;
     workdata->editor->err_row=-1;
-    workdata->editor->err_param=-9;
+    workdata->editor->err_param=ERR_SCRIPTPARAM_WHOLE;
     workdata->editor->script=&(workdata->lvl->script);
     scrmode->mode=MD_SCRP;
     return true;
@@ -129,7 +142,7 @@ void end_scrpt(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata)
 {
     workdata->editor->y=0;
     workdata->editor->err_row=-1;
-    workdata->editor->err_param=-9;
+    workdata->editor->err_param=ERR_SCRIPTPARAM_WHOLE;
     workdata->editor->script=NULL;
     if (scrmode->mode!=workdata->editor->prevmode)
       scrmode->mode=workdata->editor->prevmode;
@@ -173,7 +186,8 @@ void draw_scrpt(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata)
           len=min(ptr-prev_end,LINEMSG_SIZE-1);
           if (len>0)
           {
-            if ((line_num==workdata->editor->err_row)&&(workdata->editor->err_param==-2))
+            if ((line_num==workdata->editor->err_row) &&
+               (workdata->editor->err_param==ERR_SCRIPTPARAM_NARGS))
               screen_setcolor(ccolor->bad);
             else
               screen_setcolor(ccolor->spaces);
@@ -181,7 +195,9 @@ void draw_scrpt(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata)
             wordtxt[len]='\0';
             screen_printf("%s",wordtxt);
           }
-          if ((line_num==workdata->editor->err_row)&&((param_idx==workdata->editor->err_param)||(workdata->editor->err_param<-8)))
+          if ((line_num==workdata->editor->err_row) &&
+             ((param_idx==workdata->editor->err_param) ||
+              (workdata->editor->err_param<=ERR_SCRIPTPARAM_WHOLE)))
             screen_setcolor(ccolor->bad);
           else
           if (param_idx==-1)
@@ -199,7 +215,8 @@ void draw_scrpt(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata)
       len=min(strlen(prev_end),LINEMSG_SIZE-1);
       if (len>0)
       {
-        if ((line_num==workdata->editor->err_row)&&(workdata->editor->err_param==-2))
+        if ((line_num==workdata->editor->err_row) &&
+           (workdata->editor->err_param==ERR_SCRIPTPARAM_NARGS))
           screen_setcolor(ccolor->bad);
         else
           screen_setcolor(ccolor->spaces);
@@ -220,14 +237,14 @@ void script_verify_with_highlight(const struct LEVEL *lvl,struct TXTED_DATA *edi
     strcpy(err_msg,"Unknown error");
     short result;
     int err_line=-1;
-    int err_param=-9;
+    int err_param=ERR_SCRIPTPARAM_WHOLE;
     result=dkscript_verify(lvl,err_msg,&err_line,&err_param);
     switch (result)
     {
       case VERIF_OK:
         message_info("Script verification passed.");
         editor->err_row=-1;
-        editor->err_param=-9;
+        editor->err_param=ERR_SCRIPTPARAM_WHOLE;
         break;
       case VERIF_WARN:
         message_error("Warning: %s",err_msg);

@@ -1,10 +1,22 @@
-/*
- * obj_actnpts.c
- *
- * Functions for maintaining single action points - APT entries,
- * and single static lights - LGT entries.
- *
- */
+/******************************************************************************/
+// obj_actnpts.c - Dungeon Keeper Tools.
+/******************************************************************************/
+// Author:   Tomasz Lis
+// Created:  04 Dec 2007
+
+// Purpose:
+//   Functions for maintaining single action points - APT entries,
+//   and single static lights - LGT entries.
+
+// Comment:
+//   None.
+
+//Copying and copyrights:
+//   This program is free software; you can redistribute it and/or modify
+//   it under the terms of the GNU General Public License as published by
+//   the Free Software Foundation; either version 2 of the License, or
+//   (at your option) any later version.
+/******************************************************************************/
 
 #include "obj_actnpts.h"
 
@@ -240,7 +252,7 @@ short create_actnpt_number_used_arr(const struct LEVEL *lvl,unsigned char **used
     {
       for (cx=0; cx<arr_entries_x; cx++)
       {
-          int num_subs=lvl->apt_subnums[cx][cy];
+          int num_subs=get_actnpt_subnums(lvl,cx,cy);
           for (k=0; k<num_subs; k++)
           {
                 char *actnpt=get_actnpt(lvl,cx,cy,k);

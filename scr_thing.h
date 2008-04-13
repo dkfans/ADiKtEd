@@ -1,6 +1,22 @@
-/*
- * scr_thing.h header file for scr_thing.c
- */
+/******************************************************************************/
+// scr_thing.h - Another Dungeon Keeper Map Editor.
+/******************************************************************************/
+// Author:   Jon Skeet
+// Created:  14 Oct 1997
+// Modified: Tomasz Lis
+
+// Purpose:
+//   Header file. Defines exported routines from scr_thing.c
+
+// Comment:
+//   None.
+
+//Copying and copyrights:
+//   This program is free software; you can redistribute it and/or modify
+//   it under the terms of the GNU General Public License as published by
+//   the Free Software Foundation; either version 2 of the License, or
+//   (at your option) any later version.
+/******************************************************************************/
 
 #ifndef ADIKT_SCRTHING_H
 #define ADIKT_SCRTHING_H
@@ -60,5 +76,7 @@ unsigned char *tng_maketrap(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *w
 unsigned char *tng_makecreature(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata,int sx,int sy,unsigned char stype_idx);
 void tng_change_height(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata, unsigned int sx, unsigned int sy,unsigned int z,int delta_height);
 void tng_change_range(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata, unsigned int sx, unsigned int sy,unsigned int z,int delta_range);
+void tng_change_actnpt_level(struct WORKMODE_DATA *workdata,unsigned char *actnpt,short forward);
+void tng_change_herogate_number(struct WORKMODE_DATA *workdata,unsigned char *thing,short forward);
 
 #endif // ADIKT_SCRTHING_H

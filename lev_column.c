@@ -1,9 +1,22 @@
-/*
- * lev_column.c
- *
- * Functions for maintaining CLM and DAT files.
- *
- */
+/******************************************************************************/
+// lev_column.c - Another Dungeon Keeper Map Editor.
+/******************************************************************************/
+// Author:   Tomasz Lis
+// Created:  21 Jan 2008
+
+// Purpose:
+//   Functions for maintaining CLM and DAT files.
+
+// Comment:
+//   The DAT/CLM generation algorithm was completely rewritten from the
+//   Jon Skeet's version.
+
+//Copying and copyrights:
+//   This program is free software; you can redistribute it and/or modify
+//   it under the terms of the GNU General Public License as published by
+//   the Free Software Foundation; either version 2 of the License, or
+//   (at your option) any later version.
+/******************************************************************************/
 
 #include "lev_column.h"
 
@@ -439,6 +452,9 @@ short columns_verify(struct LEVEL *lvl, char *err_msg,struct IPOINT_2D *errpt)
         {
           errpt->x=sx/MAP_SUBNUM_X;
           errpt->y=sy/MAP_SUBNUM_Y;
+        } else
+        {
+          errpt->x=-1;errpt->y=-1;
         }
         return result;
       }

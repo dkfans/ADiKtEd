@@ -1,13 +1,25 @@
-/*
- * dernc.c   decompress RNC data
- *
- * Compiled normally, this file is a well-behaved, re-entrant code
- * module exporting only `rnc_ulen', `rnc_unpack' and `rnc_error'.
- * Compiled with MAIN_DERNC defined, it's a standalone program which will
- * decompress argv[1] into argv[2].
- *
- * in/out buffers should have 8 redundant "safe bytes" at end.
- */
+/******************************************************************************/
+// dernc.c - RNC compression support.
+/******************************************************************************/
+// Author:   Jon Skeet
+// Created:  14 Oct 1997
+// Modified: Tomasz Lis
+
+// Purpose:
+//   Compiled normally, this file is a well-behaved, re-entrant code
+//   module exporting only `rnc_ulen', `rnc_unpack' and `rnc_error'.
+//   Compiled with MAIN_DERNC defined, it's a standalone program which will
+//   decompress argv[1] into argv[2].
+
+// Comment:
+//   in/out buffers should have 8 redundant "safe bytes" at end.
+
+//Copying and copyrights:
+//   This program is free software; you can redistribute it and/or modify
+//   it under the terms of the GNU General Public License as published by
+//   the Free Software Foundation; either version 2 of the License, or
+//   (at your option) any later version.
+/******************************************************************************/
 
 #ifdef MAIN_DERNC
 # include <stdio.h>

@@ -1,13 +1,27 @@
-/*
- * lev_files.c
- *
- * Defines functions for loading and writing levels from/to disk.
- *
- */
+/******************************************************************************/
+// lev_files.c - Another Dungeon Keeper Map Editor.
+/******************************************************************************/
+// Author:   Jon Skeet
+// Created:  14 Oct 1997
+// Modified: Tomasz Lis
+
+// Purpose:
+//   Defines functions for loading and writing levels from/to disk.
+
+// Comment:
+//   None.
+
+//Copying and copyrights:
+//   This program is free software; you can redistribute it and/or modify
+//   it under the terms of the GNU General Public License as published by
+//   the Free Software Foundation; either version 2 of the License, or
+//   (at your option) any later version.
+/******************************************************************************/
 
 #include "lev_files.h"
 
 #include "globals.h"
+#include "var_utils.h"
 #include "memfile.h"
 #include "obj_column_def.h"
 #include "obj_slabs.h"
@@ -20,23 +34,42 @@
 
 char *load_error(int errcode)
 {
-//    static char str[128];
+    //static char str[LINEMSG_SIZE];
     static char *const errors[] = {
 	"File too small",
 	"Bad data",
 	"Internal error",
-	"Unknown error",
+	"Map rejected",
     };
-//sprintf(str,"%d",errcode);
-//return str;
-    if (errcode>ERR_FILE_TOOSMLL)
+    static char *const warnings[] = {
+	"Bad items count",
+	"Unknown problem",
+    };
+    // Note: remember that errors are negative, warnings positive
+    if ((errcode>ERR_FILE_TOOSMLL)&&(errcode<WARN_BAD_COUNT))
     {
-      return read_file_error(errcode);
+        return read_file_error(errcode);
     }
-    errcode = (-errcode)-ERR_FILE_TOOSMLL;
-    if ((errcode < 0) || (errcode > (sizeof(errors)/sizeof(*errors) - 1)) )
-      errcode = sizeof(errors)/sizeof(*errors) - 1;
-	return errors[errcode];
+    if (errcode<=ERR_FILE_TOOSMLL)
+    {
+        errcode = ERR_FILE_TOOSMLL-errcode;
+        //sprintf(str,"Error code %d",errcode);
+        //return str;
+        const int max_code=(sizeof(errors)/sizeof(*errors) - 1);
+        if ((errcode < 0) || (errcode > max_code) )
+          errcode = max_code;
+        return errors[errcode];
+   }
+    if (errcode>=WARN_BAD_COUNT)
+    {
+        errcode = WARN_BAD_COUNT-errcode;
+        const int max_code=(sizeof(warnings)/sizeof(*warnings) - 1);
+        //sprintf(str,"Warning code %d",errcode);
+        //return str;
+        if ((errcode < 0) || (errcode > max_code) )
+          errcode = max_code;
+        return warnings[errcode];
+   }
 }
 
 /*
@@ -105,6 +138,7 @@ unsigned char **load_subtile_malloc(char *fname, int length,
 
 short load_tng(struct LEVEL *lvl,char *fname)
 {
+    message_log("  load_tng: started");
     struct MEMORY_FILE mem;
     int tng_num;
     int i, j;
@@ -114,11 +148,18 @@ short load_tng(struct LEVEL *lvl,char *fname)
     if (mem.errcode!=MFILE_OK) return mem.errcode;
     if (mem.len<SIZEOF_DK_TNG_HEADER)
     { free(mem.content); return ERR_FILE_TOOSMLL; }
-    //Read the header    
+    short result=ERR_NONE;
+    //Read the header
     tng_num = read_short_le_buf(mem.content);
     // Check everything's cushty
-    if (mem.len != tng_num*SIZEOF_DK_TNG_REC+SIZEOF_DK_TNG_HEADER)
-    { free(mem.content); return ERR_FILE_BADDATA; }
+    unsigned long expect_size=tng_num*SIZEOF_DK_TNG_REC+SIZEOF_DK_TNG_HEADER;
+    if (mem.len != expect_size)
+    {
+        message_log("  load_tng: File length %d, expected %lu (%d things)",mem.len,expect_size,tng_num);
+        // Fixing the problem
+        tng_num=(mem.len-SIZEOF_DK_TNG_HEADER)/SIZEOF_DK_TNG_REC;
+        result=WARN_BAD_COUNT;
+    }
     //Read tng entries
     for (i=0; i < tng_num; i++)
     {
@@ -130,11 +171,12 @@ short load_tng(struct LEVEL *lvl,char *fname)
     if (tng_num != lvl->tng_total_count)
       die("Internal error in load_tng: tng_num=%d tng_total=%d", tng_num, lvl->tng_total_count);
     free (mem.content);
-    return ERR_NONE;
+    return result;
 }
 
 short load_clm(struct LEVEL *lvl,char *fname)
 {
+    message_log("  load_clm: started");
     struct MEMORY_FILE mem;
     int i, j;
     if ((lvl==NULL)||(lvl->clm==NULL)) return ERR_INTERNAL;
@@ -163,6 +205,7 @@ short load_clm(struct LEVEL *lvl,char *fname)
  */
 short load_apt(struct LEVEL *lvl,char *fname)
 {
+    message_log("  load_apt: started");
     struct MEMORY_FILE mem;
     int i;
     unsigned char *actnpt;
@@ -172,11 +215,18 @@ short load_apt(struct LEVEL *lvl,char *fname)
     if (mem.errcode!=MFILE_OK) return mem.errcode;
     if (mem.len < SIZEOF_DK_APT_HEADER)
     { free(mem.content); return ERR_FILE_TOOSMLL; }
+    short result=ERR_NONE;
     long apt_num;
     apt_num = read_long_le_buf(mem.content+0);
     // Check everything's cushty
-    if (mem.len != apt_num*SIZEOF_DK_APT_REC+SIZEOF_DK_APT_HEADER)
-    { free(mem.content); return ERR_FILE_BADDATA; }
+    unsigned long expect_size=apt_num*SIZEOF_DK_APT_REC+SIZEOF_DK_APT_HEADER;
+    if (mem.len != expect_size)
+    {
+        message_log("  load_apt: File length %d, expected %lu (%d items)",mem.len,expect_size,apt_num);
+        // Fixing the problem
+        apt_num=(mem.len-SIZEOF_DK_APT_HEADER)/SIZEOF_DK_APT_REC;
+        result=WARN_BAD_COUNT;
+    }
     for (i=0; i < apt_num; i++)
     {
       actnpt=(unsigned char *)malloc(SIZEOF_DK_APT_REC);
@@ -188,11 +238,12 @@ short load_apt(struct LEVEL *lvl,char *fname)
     if (apt_num != lvl->apt_total_count)
       die("Internal error in load_apt: apt_num=%d apt_total=%d", apt_num, lvl->apt_total_count);
     free (mem.content);
-    return ERR_NONE;
+    return result;
 }
 
 short load_inf(struct LEVEL *lvl,char *fname)
 {
+    message_log("  load_inf: started");
     struct MEMORY_FILE mem;
     mem = read_file(fname);
     //If wrong filesize - pannic
@@ -206,6 +257,7 @@ short load_inf(struct LEVEL *lvl,char *fname)
 
 short load_wib(struct LEVEL *lvl,char *fname)
 {
+    message_log("  load_wib: started");
     //Preparing array bounds
     const int dat_entries_x=MAP_SIZE_X*MAP_SUBNUM_X+1;
     const int dat_entries_y=MAP_SIZE_Y*MAP_SUBNUM_Y+1;
@@ -234,6 +286,7 @@ short load_wib(struct LEVEL *lvl,char *fname)
 
 short load_slb(struct LEVEL *lvl,char *fname)
 {
+    message_log("  load_slb: started");
     //Reading file
     struct MEMORY_FILE mem;
     mem = read_file(fname);
@@ -257,6 +310,7 @@ short load_slb(struct LEVEL *lvl,char *fname)
 
 short load_own(struct LEVEL *lvl,char *fname)
 {
+    message_log("  load_own: started");
     //Preparing array bounds
     int dat_entries_x=MAP_SIZE_X*MAP_SUBNUM_X+1;
     int dat_entries_y=MAP_SIZE_Y*MAP_SUBNUM_Y+1;
@@ -285,6 +339,7 @@ short load_own(struct LEVEL *lvl,char *fname)
 
 short load_dat(struct LEVEL *lvl,char *fname)
 {
+    message_log("  load_dat: started");
     //Preparing array bounds
     const int dat_entries_x=MAP_SIZE_X*MAP_SUBNUM_X+1;
     const int dat_entries_y=MAP_SIZE_Y*MAP_SUBNUM_Y+1;
@@ -312,6 +367,7 @@ short load_dat(struct LEVEL *lvl,char *fname)
 
 short load_txt(struct LEVEL *lvl,char *fname)
 {
+    message_log("  load_txt: started");
     struct MEMORY_FILE mem;
     mem = read_file(fname);
     //If filesize too small - pannic
@@ -377,6 +433,7 @@ short load_txt(struct LEVEL *lvl,char *fname)
  */
 short load_lgt(struct LEVEL *lvl,char *fname)
 {
+    message_log("  load_lgt: started");
     struct MEMORY_FILE mem;
     unsigned char *stlight;
     
@@ -387,12 +444,19 @@ short load_lgt(struct LEVEL *lvl,char *fname)
     if (mem.len < SIZEOF_DK_LGT_HEADER)
     { free(mem.content); return ERR_FILE_TOOSMLL; }
 
+    short result=ERR_NONE;
     lvl->lgt_total_count=0;
     long lgt_num;
     lgt_num = read_long_le_buf(mem.content+0);
+    unsigned long expect_size=lgt_num*SIZEOF_DK_LGT_REC+SIZEOF_DK_LGT_HEADER;
     // Check everything's cushty
-    if (mem.len != lgt_num*SIZEOF_DK_LGT_REC+SIZEOF_DK_LGT_HEADER)
-    { free(mem.content); return ERR_FILE_BADDATA; }
+    if (mem.len != expect_size)
+    {
+        message_log("  load_lgt: File length %d, expected %lu (%d items)",mem.len,expect_size,lgt_num);
+        // Fixing the problem
+        lgt_num=(mem.len-SIZEOF_DK_LGT_HEADER)/SIZEOF_DK_LGT_REC;
+        result=WARN_BAD_COUNT;
+    }
     int i;
     for (i=0; i<lgt_num; i++)
     {
@@ -405,7 +469,7 @@ short load_lgt(struct LEVEL *lvl,char *fname)
     if (lgt_num != lvl->lgt_total_count)
       die("Internal error in load_lgt: lgt_num=%d lgt_total=%d", lgt_num, lvl->lgt_total_count);
     free (mem.content);
-    return ERR_NONE;
+    return result;
 }
 
 /*
@@ -415,6 +479,7 @@ short load_lgt(struct LEVEL *lvl,char *fname)
  */
 short load_wlb(struct LEVEL *lvl,char *fname)
 {
+    message_log("  load_wlb: started");
     struct MEMORY_FILE mem;
     mem = read_file(fname);
     //If wrong filesize - don't load
@@ -438,6 +503,7 @@ short load_wlb(struct LEVEL *lvl,char *fname)
  */
 short load_flg(struct LEVEL *lvl,char *fname)
 {
+    message_log("  load_flg: started");
     //Preparing array bounds
     const int dat_entries_x=MAP_SIZE_X*MAP_SUBNUM_X+1;
     const int dat_entries_y=MAP_SIZE_Y*MAP_SUBNUM_Y+1;
@@ -468,6 +534,7 @@ short load_flg(struct LEVEL *lvl,char *fname)
  */
 unsigned short script_load_and_execute(struct LEVEL *lvl,char *fname,char *err_msg)
 {
+    message_log(" script_load_and_execute: started");
     sprintf(err_msg,"No error");
     struct MEMORY_FILE mem;
     mem = read_file(fname);
@@ -506,7 +573,7 @@ unsigned short script_load_and_execute(struct LEVEL *lvl,char *fname,char *err_m
       short res=execute_script_line(lvl,line,err_msg);
       if (!res)
       {
-        sprintf(err_msg+strlen(err_msg),", line %d",currline);
+        sprintf(err_msg+strlen(err_msg),", line %d",currline+1);
         result=ERR_FILE_BADDATA;
       }
       free(line);
@@ -519,6 +586,7 @@ unsigned short script_load_and_execute(struct LEVEL *lvl,char *fname,char *err_m
 
 short write_slb(struct LEVEL *lvl,char *fname)
 {
+    message_log(" write_slb: starting");
     FILE *fp;
     int i, k;
     fp = fopen (fname, "wb");
@@ -540,6 +608,7 @@ short write_slb(struct LEVEL *lvl,char *fname)
 
 short write_own(struct LEVEL *lvl,char *fname)
 {
+    message_log(" write_own: starting");
     //Preparing array bounds
     const int dat_entries_x=MAP_SIZE_X*MAP_SUBNUM_X+1;
     const int dat_entries_y=MAP_SIZE_Y*MAP_SUBNUM_Y+1;
@@ -566,6 +635,7 @@ short write_own(struct LEVEL *lvl,char *fname)
 
 short write_dat(struct LEVEL *lvl,char *fname)
 {
+    message_log(" write_dat: starting");
     //Preparing array bounds
     const int dat_entries_x=MAP_SIZE_X*MAP_SUBNUM_X+1;
     const int dat_entries_y=MAP_SIZE_Y*MAP_SUBNUM_Y+1;
@@ -593,6 +663,7 @@ short write_dat(struct LEVEL *lvl,char *fname)
 
 short write_flg(struct LEVEL *lvl,char *fname)
 {
+    message_log(" write_flg: starting");
     //Preparing array bounds
     const int dat_entries_x=MAP_SIZE_X*MAP_SUBNUM_X+1;
     const int dat_entries_y=MAP_SIZE_Y*MAP_SUBNUM_Y+1;
@@ -620,6 +691,7 @@ short write_flg(struct LEVEL *lvl,char *fname)
 
 short write_clm(struct LEVEL *lvl,char *fname)
 {
+    message_log(" write_clm: starting");
     FILE *fp;
     int i;
     fp = fopen (fname, "wb");
@@ -641,6 +713,7 @@ short write_clm(struct LEVEL *lvl,char *fname)
  */
 short write_wib(struct LEVEL *lvl,char *fname)
 {
+    message_log(" write_wib: starting");
     //Preparing array bounds
     int dat_entries_x=MAP_SIZE_X*MAP_SUBNUM_X+1;
     int dat_entries_y=MAP_SIZE_Y*MAP_SUBNUM_Y+1;
@@ -667,6 +740,7 @@ short write_wib(struct LEVEL *lvl,char *fname)
  */
 short write_apt(struct LEVEL *lvl,char *fname)
 {
+    message_log(" write_apt: starting");
     //Preparing array bounds
     int arr_entries_x=MAP_SIZE_X*MAP_SUBNUM_X;
     int arr_entries_y=MAP_SIZE_Y*MAP_SUBNUM_Y;
@@ -684,7 +758,7 @@ short write_apt(struct LEVEL *lvl,char *fname)
     {
       for (cx=0; cx<arr_entries_x; cx++)
       {
-          int num_subs=lvl->apt_subnums[cx][cy];
+          int num_subs=get_actnpt_subnums(lvl,cx,cy);
           for (k=0; k<num_subs; k++)
           {
                 char *actnpt=get_actnpt(lvl,cx,cy,k);
@@ -701,6 +775,7 @@ short write_apt(struct LEVEL *lvl,char *fname)
  */
 short write_tng(struct LEVEL *lvl,char *fname)
 {
+    message_log(" write_tng: starting");
     //Preparing array bounds
     int arr_entries_x=MAP_SIZE_X*MAP_SUBNUM_X;
     int arr_entries_y=MAP_SIZE_Y*MAP_SUBNUM_Y;
@@ -729,6 +804,7 @@ short write_tng(struct LEVEL *lvl,char *fname)
  */
 short write_inf(struct LEVEL *lvl,char *fname)
 {
+    message_log(" write_inf: starting");
     FILE *fp;
     int i, j, k;
     fp = fopen (fname, "wb");
@@ -747,7 +823,8 @@ short write_inf(struct LEVEL *lvl,char *fname)
  */
 short write_txt(struct LEVEL *lvl,char *fname)
 {
-   return write_text_file(lvl->script.txt,lvl->script.lines_count,fname);
+    message_log(" write_txt: starting");
+    return write_text_file(lvl->script.txt,lvl->script.lines_count,fname);
 }
 
 /*
@@ -755,6 +832,7 @@ short write_txt(struct LEVEL *lvl,char *fname)
  */
 short write_lgt(struct LEVEL *lvl,char *fname)
 {
+    message_log(" write_lgt: starting");
     //Preparing array bounds
     int arr_entries_x=MAP_SIZE_X*MAP_SUBNUM_X;
     int arr_entries_y=MAP_SIZE_Y*MAP_SUBNUM_Y;
@@ -790,6 +868,7 @@ short write_lgt(struct LEVEL *lvl,char *fname)
  */
 short write_wlb(struct LEVEL *lvl,char *fname)
 {
+    message_log(" write_wlb: starting");
     FILE *fp;
     fp = fopen (fname, "wb");
     if (!fp)
@@ -812,9 +891,11 @@ short write_wlb(struct LEVEL *lvl,char *fname)
  */
 short write_adi_script(struct LEVEL *lvl,char *fname)
 {
+    message_log(" write_adi_script: starting");
    //Creating text lines
    char **lines=NULL;
    int lines_count=0;
+   add_stats_to_script(&lines,&lines_count,lvl);
    add_graffiti_to_script(&lines,&lines_count,lvl);
    add_custom_clms_to_script(&lines,&lines_count,lvl);
    short result;
@@ -903,6 +984,7 @@ short save_map(struct LEVEL *lvl)
       lvl->fname[DISKPATH_SIZE-1]=0;
     }
     free(fnames);
+    lvl->stats.saves_count++;
     message_log(" save_map: finished");
     return result;
 }
@@ -916,6 +998,7 @@ short load_map(struct LEVEL *lvl)
   message_log(" load_map: started");
   char *fnames;
   char *err_msg;
+  char *ifname=NULL;
   level_free(lvl);
   if ((lvl->fname==NULL)||(strlen(lvl->fname)<1))
   {
@@ -928,93 +1011,161 @@ short load_map(struct LEVEL *lvl)
   if ((fnames==NULL)||(err_msg==NULL))
     die("load_map: Out of memory.");
   short result=ERR_NONE;
-  if (result==ERR_NONE)
+  short file_result;
+  if (result>=ERR_NONE)
   {
     sprintf (fnames, "%s.slb", lvl->fname);
-    result=load_slb(lvl,fnames);
+    file_result=load_slb(lvl,fnames);
+    if (file_result!=ERR_NONE)
+    {
+      free(ifname);
+      ifname=prepare_short_fname(fnames,24);
+      result=file_result;
+    }
   }    
-  if (result==ERR_NONE)
+  if (result>=ERR_NONE)
   {
     sprintf (fnames, "%s.own", lvl->fname);
-    result=load_own(lvl,fnames);
+    file_result=load_own(lvl,fnames);
+    if (file_result!=ERR_NONE)
+    {
+      free(ifname);
+      ifname=prepare_short_fname(fnames,24);
+      result=file_result;
+    }
   }    
-  if (result==ERR_NONE)
+  if (result>=ERR_NONE)
   {
     sprintf (fnames, "%s.dat", lvl->fname);
-    result=load_dat(lvl,fnames);
+    file_result=load_dat(lvl,fnames);
+    if (file_result!=ERR_NONE)
+    {
+      free(ifname);
+      ifname=prepare_short_fname(fnames,24);
+      result=file_result;
+    }
   }    
-  if (result==ERR_NONE)
+  if (result>=ERR_NONE)
   {
     sprintf (fnames, "%s.tng", lvl->fname);
-    result=load_tng(lvl, fnames);
+    file_result=load_tng(lvl, fnames);
+    if (file_result!=ERR_NONE)
+    {
+      free(ifname);
+      ifname=prepare_short_fname(fnames,24);
+      result=file_result;
+    }
   }    
-  if (result==ERR_NONE)
+  if (result>=ERR_NONE)
   {
     sprintf (fnames, "%s.apt", lvl->fname);
-    result=load_apt(lvl, fnames);
+    file_result=load_apt(lvl, fnames);
+    if (file_result!=ERR_NONE)
+    {
+      free(ifname);
+      ifname=prepare_short_fname(fnames,24);
+      result=file_result;
+    }
   }    
-  if (result==ERR_NONE)
+  if (result>=ERR_NONE)
   {
     sprintf (fnames, "%s.lgt", lvl->fname);
-    result=load_lgt(lvl,fnames);
+    file_result=load_lgt(lvl,fnames);
+    if (file_result!=ERR_NONE)
+    {
+      char *warn_fname;
+      warn_fname=prepare_short_fname(fnames,24);
+      message_info_force("LGT warning: %s when loading \"%s\" (ignored)",load_error(file_result), warn_fname);
+      free(warn_fname);
+    }
   }    
-  if (result==ERR_NONE)
+  if (result>=ERR_NONE)
   {
     sprintf (fnames, "%s.clm", lvl->fname);
-    result=load_clm(lvl,fnames);
+    file_result=load_clm(lvl,fnames);
+    if (file_result!=ERR_NONE)
+    {
+      free(ifname);
+      ifname=prepare_short_fname(fnames,24);
+      result=file_result;
+    }
   }    
-  if (result==ERR_NONE)
+  if (result>=ERR_NONE)
   {
     sprintf (fnames, "%s.wib", lvl->fname);
-    result=load_wib(lvl,fnames);
+    file_result=load_wib(lvl,fnames);
+    if (file_result!=ERR_NONE)
+    {
+      free(ifname);
+      ifname=prepare_short_fname(fnames,24);
+      result=file_result;
+    }
   }    
-  if (result==ERR_NONE)
+  if (result>=ERR_NONE)
   {
     sprintf (fnames, "%s.txt", lvl->fname);
-    load_txt(lvl,fnames);
+    file_result=load_txt(lvl,fnames);
+    if (file_result!=ERR_NONE)
+    {
+      char *warn_fname;
+      warn_fname=prepare_short_fname(fnames,24);
+      message_info_force("Script warning: %s in \"%s\" (ignored)", load_error(file_result), warn_fname);
+      free(warn_fname);
+    }
   }    
-  if (result==ERR_NONE)
+  if (result>=ERR_NONE)
   {
     sprintf (fnames, "%s.inf", lvl->fname);
     //INFs contain only texture number, so ignore error on loading them
-    load_inf(lvl,fnames);
+    file_result=load_inf(lvl,fnames);
   }    
-  if (result==ERR_NONE)
+  if (result>=ERR_NONE)
   {
     sprintf (fnames, "%s.wlb", lvl->fname);
     //WLBs are not very importand, and may even not exist,
     // so ignore any error when loading them
-    load_wlb(lvl,fnames);
+    file_result=load_wlb(lvl,fnames);
   }    
-  if (result==ERR_NONE)
+  if (result>=ERR_NONE)
   {
     sprintf (fnames, "%s.flg", lvl->fname);
     //FLGs are not very importand, so ignore any error when loading
-    load_flg(lvl,fnames);
+    file_result=load_flg(lvl,fnames);
   }    
-  if (result==ERR_NONE)
+  if (result>=ERR_NONE)
   {
     sprintf (fnames, "%s.adi", lvl->fname);
-    int adi_result=script_load_and_execute(lvl,fnames,err_msg);
-    if (adi_result==ERR_FILE_BADDATA)
-        message_info_force("ADI script warning: %s (load completed)", err_msg);
+    file_result=script_load_and_execute(lvl,fnames,err_msg);
     // Ignore ADI load errors other than "bad data" - ADI file don't have to exist
+    if (file_result==ERR_FILE_BADDATA)
+    {
+      char *warn_fname;
+      warn_fname=prepare_short_fname(fnames,24);
+      message_info_force("ADI script warning: %s in \"%s\" (ignored)", err_msg, warn_fname);
+      free(warn_fname);
+    }
   }    
-  if (result!=ERR_NONE)
+  if (result<ERR_NONE)
   {
       message_error("Error: %s when loading \"%s\"",load_error(result), fnames);
+      free(ifname);
       free(fnames);
       free(err_msg);
       free_map(lvl);
       start_new_map(lvl);
       return false;
+  } else
+  if (result>ERR_NONE)
+  {
+      message_info_force("Warning: %s when loading \"%s\" (ignored)",load_error(result), ifname);
   }
-  if ((result==ERR_NONE)&&(strlen(lvl->savfname)<1))
+  if ((result>=ERR_NONE)&&(strlen(lvl->savfname)<1))
   {
       strncpy(lvl->savfname,lvl->fname,DISKPATH_SIZE);
       lvl->savfname[DISKPATH_SIZE-1]=0;
   }
   update_level_stats(lvl);
+  free(ifname);
   free(fnames);
   free(err_msg);
   message_log(" load_map: finished");
@@ -1042,22 +1193,34 @@ short load_map_preview(struct LEVEL *lvl)
   if ((fnames==NULL)||(err_msg==NULL))
     die("load_map: Out of memory.");
   short result=ERR_NONE;
-  if (result==ERR_NONE)
+  short file_result;
+  if (result>=ERR_NONE)
   {
     sprintf (fnames, "%s.slb", lvl->fname);
-    result=load_slb(lvl,fnames);
+    file_result=load_slb(lvl,fnames);
+    if (file_result!=ERR_NONE)
+    {
+      result=file_result;
+    }
   }    
-  if (result==ERR_NONE)
+  if (result>=ERR_NONE)
   {
     sprintf (fnames, "%s.own", lvl->fname);
-    result=load_own(lvl,fnames);
+    file_result=load_own(lvl,fnames);
+    if (file_result!=ERR_NONE)
+    {
+      result=file_result;
+    }
   }    
   if (result!=ERR_NONE)
   {
       message_info_force("Preview: %s when loading \"%s\"",load_error(result), fnames);
-      free(fnames);
-      free(err_msg);
-      return false;
+      if (result<ERR_NONE)
+      {
+        free(fnames);
+        free(err_msg);
+        return false;
+      }
   }
   if (strlen(lvl->savfname)<1)
   {

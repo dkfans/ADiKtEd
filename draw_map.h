@@ -1,6 +1,21 @@
-/*
- * draw_map.h header file for draw_map.c
- */
+/******************************************************************************/
+// draw_map.h - Graphics draw of Dungeon Keeper map.
+/******************************************************************************/
+// Author:   Tomasz Lis
+// Created:  12 Jan 2008
+
+// Purpose:
+//   Header file. Defines exported routines from draw_map.c
+
+// Comment:
+//   None.
+
+//Copying and copyrights:
+//   This program is free software; you can redistribute it and/or modify
+//   it under the terms of the GNU General Public License as published by
+//   the Free Software Foundation; either version 2 of the License, or
+//   (at your option) any later version.
+/******************************************************************************/
 
 #ifndef ADIKT_DRAWMAP_H
 #define ADIKT_DRAWMAP_H

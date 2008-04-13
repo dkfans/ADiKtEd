@@ -1,9 +1,22 @@
-/*
- * draw_map.c
- *
- * Functions needed to create a graphic view of DK1 map using original textures.
- *
- */
+/******************************************************************************/
+// draw_map.c - Graphics draw of Dungeon Keeper map.
+/******************************************************************************/
+// Author:   Tomasz Lis
+// Created:  12 Jan 2008
+
+// Purpose:
+//   Functions needed to create a graphic view of DK1 map using original
+//   textures.
+
+// Comment:
+//   None.
+
+//Copying and copyrights:
+//   This program is free software; you can redistribute it and/or modify
+//   it under the terms of the GNU General Public License as published by
+//   the Free Software Foundation; either version 2 of the License, or
+//   (at your option) any later version.
+/******************************************************************************/
 
 #include "draw_map.h"
 

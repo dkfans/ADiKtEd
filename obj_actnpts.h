@@ -1,16 +1,31 @@
-/*
- * obj_actnpts.h
- */
+/******************************************************************************/
+// obj_actnpts.h - Dungeon Keeper Tools.
+/******************************************************************************/
+// Author:   Tomasz Lis
+// Created:  04 Dec 2007
+
+// Purpose:
+//   Header file. Defines exported routines from obj_actnpts.c
+
+// Comment:
+//   None.
+
+//Copying and copyrights:
+//   This program is free software; you can redistribute it and/or modify
+//   it under the terms of the GNU General Public License as published by
+//   the Free Software Foundation; either version 2 of the License, or
+//   (at your option) any later version.
+/******************************************************************************/
 
 #ifndef ADIKT_OBJACTNPTS_H
 #define ADIKT_OBJACTNPTS_H
 
 struct LEVEL;
 
-unsigned char get_actnpt_tilepos_x(unsigned char *actnpt);
-short set_actnpt_tilepos_x(unsigned char *actnpt,unsigned char pos_x);
-unsigned char get_actnpt_tilepos_y(unsigned char *actnpt);
-short set_actnpt_tilepos_y(unsigned char *actnpt,unsigned char pos_y);
+unsigned char get_actnpt_subtile_x(unsigned char *actnpt);
+short set_actnpt_subtile_x(unsigned char *actnpt,unsigned char pos_x);
+unsigned char get_actnpt_subtile_y(unsigned char *actnpt);
+short set_actnpt_subtile_y(unsigned char *actnpt,unsigned char pos_y);
 unsigned char get_actnpt_range_subtile(unsigned char *actnpt);
 short set_actnpt_range_subtile(unsigned char *actnpt,unsigned char rng_tl);
 short set_actnpt_tilepos(unsigned char *actnpt,unsigned char pos_x,unsigned char pos_y);

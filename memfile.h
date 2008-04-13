@@ -1,9 +1,22 @@
-/*
- * memfile.h header file
- *
- * header for file.c
- *
- */
+/******************************************************************************/
+// memfile.h - Another Dungeon Keeper Map Editor.
+/******************************************************************************/
+// Author:   Jon Skeet
+// Created:  05 Oct 1997
+// Modified: Tomasz Lis
+
+// Purpose:
+//   Header file. Defines exported routines from memfile.c
+
+// Comment:
+//   None.
+
+//Copying and copyrights:
+//   This program is free software; you can redistribute it and/or modify
+//   it under the terms of the GNU General Public License as published by
+//   the Free Software Foundation; either version 2 of the License, or
+//   (at your option) any later version.
+/******************************************************************************/
 
 #ifndef ADIKT_MEMFILE_H
 #define ADIKT_MEMFILE_H

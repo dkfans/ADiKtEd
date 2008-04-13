@@ -1,6 +1,22 @@
-/*
- * lev_things.h
- */
+/******************************************************************************/
+// lev_things.h - Dungeon Keeper Tools.
+/******************************************************************************/
+// Author:   Jon Skeet
+// Created:  14 Oct 1997
+// Modified: Tomasz Lis
+
+// Purpose:
+//   Header file. Defines exported routines from lev_things.c
+
+// Comment:
+//   None.
+
+//Copying and copyrights:
+//   This program is free software; you can redistribute it and/or modify
+//   it under the terms of the GNU General Public License as published by
+//   the Free Software Foundation; either version 2 of the License, or
+//   (at your option) any later version.
+/******************************************************************************/
 
 #ifndef ADIKT_LEVTHINGS_H
 #define ADIKT_LEVTHINGS_H
@@ -70,6 +86,8 @@ void update_obj_subpos_and_height_for_square(struct LEVEL *lvl, int tx_first, in
     int ty_first, int ty_last);
 short update_things_subpos_and_height_for_slab(struct LEVEL *lvl, int tx, int ty);
 short update_thing_subpos_and_height(unsigned short *clm_height,unsigned char *thing);
+void remove_automade_obj_for_whole_map(struct LEVEL *lvl);
+void remove_automade_obj_for_slab(struct LEVEL *lvl, int tx, int ty);
 
 //Updating room things - lower level function
 void create_things_slb_room(cr_tng_func cr_floor,cr_tng_func cr_edge,

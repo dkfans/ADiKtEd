@@ -1,10 +1,22 @@
-/*
- * output_scr.c
- *
- * Defines functions for initializing and writing output to console screen.
- * This module provides the interface for displaying text for whole program.
- *
- */
+/******************************************************************************/
+// output_scr.c - Platform independence assurance module.
+/******************************************************************************/
+// Author:  Tomasz Lis
+// Created: 12 Dec 2007
+
+// Purpose:
+//   Defines functions for initializing and writing output to console screen.
+//   This module provides the interface for displaying text for whole program.
+
+// Comment:
+//   None.
+
+//Copying and copyrights:
+//   This program is free software; you can redistribute it and/or modify
+//   it under the terms of the GNU General Public License as published by
+//   the Free Software Foundation; either version 2 of the License, or
+//   (at your option) any later version.
+/******************************************************************************/
 
 #include "output_scr.h"
 

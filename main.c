@@ -35,7 +35,7 @@ void read_init(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata)
       return;
     } else
     {
-      message_info_force("Welcome to Adikted. Press F1 for help.");
+      message_info_force("Welcome to %s. Press F1 for help.",PROGRAM_NAME);
     }
     while (fgets(buffer, READ_BUFSIZE-1, fp))
     {

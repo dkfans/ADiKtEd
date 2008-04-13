@@ -317,12 +317,20 @@ Press '\wu\s' to \yupdate\s the dungeon. This will make sure all room objects
 \rOnly things\s will be updated, the .clm and .dat values will stay intact.
 You must press '\wu\s' in slab mode to update them.
 
+Press \wctrl+d\s to \yaggressively clean\s the objects in dungeon. This will
+delete all objects which can be auto-updated with '\wu\s', and even more.
+This fuction may be useful for \yfixing maps\s made using \rUnded\s.
+But it is very aggressive, and will delete many objects that were put on
+the map manually by user. Most of things and all static lights will be
+removed. Many of them may be then re-created by pressing '\wu\s'.
+
 Press '\ws\s' and '\wx\s' to \yincrease/decrease level\s of a highlighted
 creature, the type of a highlighted trap, the type of a 
 highlighted dungeon special, or the type of a spell book.
 This also works on other items (even torches), so try it.
 
-Press '\wS\s' and '\wX\s' to \ychange type\s of a highlighted creature.
+Press '\wS\s' and '\wX\s' to \ychange type\s of a highlighted creature,
+or \ychange number\s of highlighted hero gate or action point.
 
 Alternatively, you can press \wenter\s on most objects to \ychange their\s
 \ytype\s by selecting it from a \rlist screen\s.

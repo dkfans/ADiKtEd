@@ -1,9 +1,21 @@
-/*
- * var_utils.c
- *
- * Various utility functions.
- *
- */
+/******************************************************************************/
+// var_utils.c - Another Dungeon Keeper Map Editor.
+/******************************************************************************/
+// Author:   Tomasz Lis
+// Created:  15 Nov 2007
+
+// Purpose:
+//   Various utility functions.
+
+// Comment:
+//   None.
+
+//Copying and copyrights:
+//   This program is free software; you can redistribute it and/or modify
+//   it under the terms of the GNU General Public License as published by
+//   the Free Software Foundation; either version 2 of the License, or
+//   (at your option) any later version.
+/******************************************************************************/
 
 #include "var_utils.h"
 
@@ -105,7 +117,12 @@ void message_error(const char *format, ...)
     va_list val;
     va_start(val, format);
     char *msg=message_prv;
-    if (msg==NULL) msg=(char *)malloc(LINEMSG_SIZE*sizeof(char));
+    if (msg==NULL)
+    {
+        msg=(char *)malloc(LINEMSG_SIZE*sizeof(char));
+        if (msg==NULL)
+            die("message_error: Cannot allocate memory");
+    }
     message_prv=message;
     message=msg;
     vsprintf(message, format, val);
@@ -128,7 +145,12 @@ void message_info(const char *format, ...)
     va_list val;
     va_start(val, format);
     char *msg=message_prv;
-    if (msg==NULL) msg=(char *)malloc(LINEMSG_SIZE*sizeof(char));
+    if (msg==NULL)
+    {
+        msg=(char *)malloc(LINEMSG_SIZE*sizeof(char));
+        if (msg==NULL)
+            die("message_info: Cannot allocate memory");
+    }
     message_prv=message;
     message=msg;
     vsprintf(message, format, val);
@@ -143,7 +165,12 @@ void message_info_force(const char *format, ...)
     va_list val;
     va_start(val, format);
     char *msg=message_prv;
-    if (msg==NULL) msg=(char *)malloc(LINEMSG_SIZE*sizeof(char));
+    if (msg==NULL)
+    {
+        msg=(char *)malloc(LINEMSG_SIZE*sizeof(char));
+        if (msg==NULL)
+            die("message_info_force: Cannot allocate memory");
+    }
     message_prv=message;
     message=msg;
     vsprintf(message, format, val);
@@ -170,6 +197,8 @@ void popup_show(const char *title,const char *format, ...)
 {
     char *msg;
     msg=(char *)malloc(LINEMSG_SIZE*sizeof(char));
+    if (msg==NULL)
+        die("popup_show: Cannot allocate memory");
     va_list val;
     va_start(val, format);
     vsprintf(msg, format, val);
@@ -242,6 +271,10 @@ char *prepare_short_fname(char *fname, unsigned int maxlen)
     start=strrchr(fname,SEPARATOR[0]);
     if (start==NULL)
         start=fname;
+    else
+        start++;
+    if (start[0]=='\0')
+        start=fname;
     unsigned int len=strlen(start);
     if (len > maxlen)
           len=maxlen;
@@ -249,7 +282,7 @@ char *prepare_short_fname(char *fname, unsigned int maxlen)
     retname=(char *)malloc(len+1);
     if (retname==NULL)
       die("prepare_short_fname: Cannot allocate memory.");
-    strncpy(retname,fname,len);
+    strncpy(retname,start,len);
     retname[len]='\0';
     return retname;
 }
@@ -286,7 +319,7 @@ short set_msglog_fname(char *fname)
     msgout_fp=fopen(msgout_fname,"wb");
     if (msgout_fp!=NULL)
     {
-      fprintf(msgout_fp,"ADiKtEd message log file\r\n");
+      fprintf(msgout_fp,"%s message log file\r\n",PROGRAM_NAME);
       if (message_prv!=NULL)
         fprintf(msgout_fp,"%s\r\n",message_prv);
       if (message!=NULL)
@@ -327,6 +360,7 @@ void die(const char *format, ...)
       message_log_vl(format, val);
       va_end(val);
       fprintf(stderr, "\n");
+      message_log_simp(PROGRAM_NAME " has died");
       free_messages();
       exit(1);
 }
@@ -336,6 +370,7 @@ void die(const char *format, ...)
  */
 void done(struct SCRMODE_DATA **scrmode,struct WORKMODE_DATA *workdata)
 {
+    // Write to log file if it is prepared
     if (workdata!=NULL)
     {
         if (workdata->lvl!=NULL)
@@ -343,6 +378,7 @@ void done(struct SCRMODE_DATA **scrmode,struct WORKMODE_DATA *workdata)
         if (scrmode!=NULL)
           free_levscr(scrmode,workdata);
     }
+    message_log_simp(PROGRAM_NAME " work is done");
     free_messages();
     input_done();
 }

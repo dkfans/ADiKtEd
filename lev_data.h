@@ -1,6 +1,22 @@
-/*
- * lev_data.h header file for lev_data.c
- */
+/******************************************************************************/
+// lev_data.h - Another Dungeon Keeper Map Editor.
+/******************************************************************************/
+// Author:   Jon Skeet
+// Created:  14 Oct 1997
+// Modified: Tomasz Lis
+
+// Purpose:
+//   Header file. Defines exported routines from lev_data.c
+
+// Comment:
+//   None.
+
+//Copying and copyrights:
+//   This program is free software; you can redistribute it and/or modify
+//   it under the terms of the GNU General Public License as published by
+//   the Free Software Foundation; either version 2 of the License, or
+//   (at your option) any later version.
+/******************************************************************************/
 
 #ifndef ADIKT_LEVDATA_H
 #define ADIKT_LEVDATA_H
@@ -91,6 +107,8 @@ struct DK_SCRIPT {
     int lines_count;
 };
 
+// Stats are re-computed on every load and other operations
+
 struct LEVSTATS {
     //Things strats
     int creatures_count;
@@ -107,6 +125,24 @@ struct LEVSTATS {
     //Stats on objects adding/removal
     int things_removed;
     int things_added;
+    // Number of save operations in this session
+    int saves_count;
+    // Number of unsaved changes
+    int unsaved_changes;
+  };
+
+// Info are not re-computed on load, unless the ADI script is missing
+
+struct LEVINFO {
+    // Adikted commands executed by user
+    unsigned long usr_cmds_count;
+    // Map creation date
+    time_t creat_date;
+    time_t lastsav_date;
+    // Map version
+    int ver_major;
+    int ver_minor;
+    int ver_rel;
   };
 
 struct LEVEL {
@@ -163,6 +199,8 @@ struct LEVEL {
     // Elements that are not part of DK levels, but are importand for Adikted
     // Level statistics
     struct LEVSTATS stats;
+    // Level information
+    struct LEVINFO info;
     // Options, which affects level graphic generation, and other stuff
     struct LEVOPTIONS optns;
     // Custom columns definition
@@ -186,6 +224,8 @@ short level_clear_apt(struct LEVEL *lvl);
 short level_clear_lgt(struct LEVEL *lvl);
 short level_clear_datclm(struct LEVEL *lvl);
 short level_clear_other(struct LEVEL *lvl);
+short level_clear_stats(struct LEVEL *lvl);
+short level_clear_info(struct LEVEL *lvl);
 short level_clear_options(struct LEVOPTIONS *optns);
 
 short level_free(struct LEVEL *lvl);

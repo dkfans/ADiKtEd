@@ -1,10 +1,23 @@
-/*
- * scr_actn.c
- *
- * Defines functions for initializing and displaying all the level screens,
- * and also for actions - reading keyboard input and executing commands.
- *
- */
+/******************************************************************************/
+// scr_actn.c - Another Dungeon Keeper Map Editor.
+/******************************************************************************/
+// Author:   Jon Skeet
+// Created:  14 Oct 1997
+// Modified: Tomasz Lis
+
+// Purpose:
+//   Defines functions for initializing and displaying all the level screens,
+//   and also for actions - reading keyboard input and executing commands.
+
+// Comment:
+//   None.
+
+//Copying and copyrights:
+//   This program is free software; you can redistribute it and/or modify
+//   it under the terms of the GNU General Public License as published by
+//   the Free Software Foundation; either version 2 of the License, or
+//   (at your option) any later version.
+/******************************************************************************/
 
 #include "scr_actn.h"
 
@@ -1060,6 +1073,7 @@ void proc_key(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata)
         actions[scrmode->mode%MODES_COUNT](scrmode,workdata,g);
       };break;
     }
+    workdata->lvl->info.usr_cmds_count++;
     message_log(" proc_key: finished");
 }
 
@@ -1450,6 +1464,7 @@ void action_save_map_quick(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *wo
     if (strlen(workdata->lvl->savfname)>0)
     {
         popup_show("Saving map","Writing map files. Please wait...");
+        workdata->lvl->info.ver_rel++;
         save_map(workdata->lvl);
         message_info("Map \"%s\" saved", workdata->lvl->savfname);
     } else

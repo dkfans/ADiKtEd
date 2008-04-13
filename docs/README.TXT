@@ -63,8 +63,18 @@ Press F1 for help.
 TODO before final:
  Fixations in room things parameters (height,other)
  Fixations in room corner graphics
+Version: 0.81b
+ Fixed load error handling bug
+ Corrected to allow loading Unded maps
+ Improved verification algorithm
+ Added ctrl+d (aggressive clean) in thing mode
+ Copyright messages built in source code
+ Changed some default options in INI file
+ Hero gate number can now be changed using s/x
+ Extended ADI internal script format
+ Only 7 script command parameters are not verified yet
 Version: 0.80b
- Unrecognized script commands converted to REMarks on update
+ Unrecognised script commands converted to REMarks on update
  Added SCRIPT_LEVEL_SPACES command in INI file
  Added verification of script commands with amount of arguments
  Action point number can be changed using s/x

@@ -1,9 +1,21 @@
-/*
- * obj_cube.h
- *
- * Header file defining a list of cuber and macros to use them.
- *
- */
+/******************************************************************************/
+// obj_cube.h - Dungeon Keeper Tools.
+/******************************************************************************/
+// Author:   Tomasz Lis
+// Created:  23 Dec 2007
+
+// Purpose:
+//   Header file defining a list of cubes and macros to use them.
+
+// Comment:
+//   None.
+
+//Copying and copyrights:
+//   This program is free software; you can redistribute it and/or modify
+//   it under the terms of the GNU General Public License as published by
+//   the Free Software Foundation; either version 2 of the License, or
+//   (at your option) any later version.
+/******************************************************************************/
 
 #ifndef ADIKT_OBJCUBE_H
 #define ADIKT_OBJCUBE_H

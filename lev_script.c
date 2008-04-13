@@ -1,13 +1,26 @@
-/*
- * lev_script.c
- *
- * Functions for maintaining the level script.
- *
- */
+/******************************************************************************/
+// lev_script.c - Dungeon Keeper Tools.
+/******************************************************************************/
+// Author:   Tomasz Lis
+// Created:  24 Jan 2008
+
+// Purpose:
+//   Functions for maintaining the level script.
+
+// Comment:
+//   None.
+
+//Copying and copyrights:
+//   This program is free software; you can redistribute it and/or modify
+//   it under the terms of the GNU General Public License as published by
+//   the Free Software Foundation; either version 2 of the License, or
+//   (at your option) any later version.
+/******************************************************************************/
 
 #include "lev_script.h"
 
 #include "globals.h"
+#include "var_utils.h"
 #include "lev_data.h"
 #include "obj_column_def.h"
 #include "obj_slabs.h"
@@ -28,9 +41,13 @@ const char *cmd_condit_arr[]={
 // ADiKtEd-specific commands
 const char custom_column_cmdtext[]="CUSTOM_COLUMN";
 const char graffiti_cmdtext[]="GRAFFITI";
+const char leveltimestmp_cmdtext[]="LEVEL_TIMESTAMP";
+const char usrcmnds_count_cmdtext[]="USER_COMMANDS_COUNT";
+const char levversion_cmdtext[]="LEVEL_VERSION";
 // CMD_ADIKTED - adikted specific group
 const char *cmd_adikted_arr[]={
-        "",custom_column_cmdtext,graffiti_cmdtext  //0x000,0x001,0x002
+        "",custom_column_cmdtext,graffiti_cmdtext,  //0x000,0x001,0x002
+        leveltimestmp_cmdtext,usrcmnds_count_cmdtext,levversion_cmdtext,
         };
 
 // Partys - commands
@@ -285,13 +302,26 @@ const char door_steel_cmdtext[]="STEEL";
 const char door_braced_cmdtext[]="BRACED";
 const char door_wood_cmdtext[]="WOOD";
 const char door_magic_cmdtext[]="MAGIC";
+// CMD_DOOR
+const char *cmd_doors_arr[]={
+        "", door_wood_cmdtext, door_braced_cmdtext,  //0x000,0x001,0x002
+        door_steel_cmdtext,door_magic_cmdtext,
+        };
+
 //Workshop - Traps
-const char trap_lava_cmdtext[]="LAVA";
-const char trap_wordpwr_cmdtext[]="WORD_OF_POWER";
-const char trap_lightng_cmdtext[]="LIGHTNING";
-const char trap_gas_cmdtext[]="POISON_GAS";
-const char trap_alarm_cmdtext[]="ALARM";
 const char trap_boulder_cmdtext[]="BOULDER";
+const char trap_alarm_cmdtext[]="ALARM";
+const char trap_gas_cmdtext[]="POISON_GAS";
+const char trap_lightng_cmdtext[]="LIGHTNING";
+const char trap_wordpwr_cmdtext[]="WORD_OF_POWER";
+const char trap_lava_cmdtext[]="LAVA";
+// CMD_TRAP
+const char *cmd_traps_arr[]={
+        "", trap_boulder_cmdtext, trap_alarm_cmdtext,  //0x000,0x001,0x002
+        trap_gas_cmdtext,trap_lightng_cmdtext,trap_wordpwr_cmdtext,
+        trap_lava_cmdtext,
+        };
+
 //Spells
 const char spell_armag_cmdtext[]="POWER_ARMAGEDDON";
 const char spell_possess_cmdtext[]="POWER_POSSESS";
@@ -303,7 +333,7 @@ const char spell_protect_cmdtext[]="POWER_PROTECT";
 const char spell_speed_cmdtext[]="POWER_SPEED";
 const char spell_lightng_cmdtext[]="POWER_LIGHTNING";
 const char spell_holdaud_cmdtext[]="POWER_HOLD_AUDIENCE";
-const char spell_gealcrtr_cmdtext[]="POWER_HEAL_CREATURE";
+const char spell_healcrtr_cmdtext[]="POWER_HEAL_CREATURE";
 const char spell_cavein_cmdtext[]="POWER_CAVE_IN";
 const char spell_callarms_cmdtext[]="POWER_CALL_TO_ARMS";
 const char spell_sight_cmdtext[]="POWER_SIGHT";
@@ -311,6 +341,17 @@ const char spell_slap_cmdtext[]="POWER_SLAP";
 const char spell_obey_cmdtext[]="POWER_OBEY";
 const char spell_imp_cmdtext[]="POWER_IMP";
 const char spell_hand_cmdtext[]="POWER_HAND";
+// CMD_SPELL
+const char *cmd_spells_arr[]={
+        "", spell_hand_cmdtext, spell_imp_cmdtext,  //0x000,0x001,0x002
+        spell_obey_cmdtext,spell_slap_cmdtext,spell_sight_cmdtext,
+        spell_callarms_cmdtext,spell_cavein_cmdtext,spell_healcrtr_cmdtext,
+        spell_holdaud_cmdtext,spell_lightng_cmdtext,spell_speed_cmdtext,
+        spell_protect_cmdtext,spell_conceal_cmdtext,spell_disease_cmdtext,
+        spell_chickn_cmdtext,spell_destrwalls_cmdtext,spell_possess_cmdtext,
+        spell_armag_cmdtext,
+        };
+
 //Players
 const char player_all_cmdtext[]="ALL_PLAYERS";
 const char player_good_cmdtext[]="PLAYER_GOOD";
@@ -393,6 +434,16 @@ const char room_prison_cmdtext[]="PRISON";
 const char room_library_cmdtext[]="RESEARCH";
 const char room_treasure_cmdtext[]="TREASURE";
 const char room_entrance_cmdtext[]="ENTRANCE";
+// CMD_ROOM
+const char *cmd_rooms_arr[]={
+        "", room_entrance_cmdtext, room_treasure_cmdtext,  //0x000,0x001,0x002
+        room_library_cmdtext,room_prison_cmdtext,room_torture_cmdtext,
+        room_training_cmdtext,room_workshp_cmdtext,room_scavng_cmdtext,
+        room_temple_cmdtext,room_graveyrd_cmdtext,room_barracks_cmdtext,
+        room_hatchery_cmdtext,room_lair_cmdtext,room_brige_cmdtext,
+        room_grdpost_cmdtext,
+        };
+
 
 // Orientations
 const char orient_ns_cmdtext[]="ORIENT_NS";
@@ -447,6 +498,20 @@ short script_param_to_int(int *val,const char *param)
   return (n_read==1);
 }
 
+short script_param_to_ulong(unsigned long *val,const char *param)
+{
+  if ((param==NULL)||(val==NULL)) return false;
+  int n_read;
+  if (strncmp(param,"0x",2)==0)
+  {
+    n_read=sscanf(param+2,"%lx",val);
+  } else
+  {
+    n_read=sscanf(param,"%lu",val);
+  }
+  return (n_read==1);
+}
+
 /*
  * Executes command from the CMD_ADIKTED group
  */
@@ -458,7 +523,7 @@ short execute_adikted_command(struct LEVEL *lvl,struct DK_SCRIPT_COMMAND *cmd,ch
     case CUSTOM_COLUMN:
        if (cmd->param_count<14)
        {
-         sprintf(err_msg,"%s requires more parameters",custom_column_cmdtext);
+         sprintf(err_msg,"%s requires more parameters",adikted_cmd_text(cmd->index));
          return false;
        }
        int sx=-1,sy=-1;
@@ -508,7 +573,7 @@ short execute_adikted_command(struct LEVEL *lvl,struct DK_SCRIPT_COMMAND *cmd,ch
       {
        if (cmd->param_count<7)
        {
-         sprintf(err_msg,"%s requires more parameters",graffiti_cmdtext);
+         sprintf(err_msg,"%s requires more parameters",adikted_cmd_text(cmd->index));
          return false;
        }
        int tx=-1,ty=-1,height=0;
@@ -552,10 +617,73 @@ short execute_adikted_command(struct LEVEL *lvl,struct DK_SCRIPT_COMMAND *cmd,ch
        }
        text[textlen]='\0';
        int graf_idx=graffiti_add(lvl,tx,ty,height,text,font,orient,cube);
-       if (graf_idx<0) return false;
+       if (graf_idx<0)
+       {
+         sprintf(err_msg,"Cannot add graffiti");
+         return false;
+       }
+      };return true;
+    case LEVEL_TIMESTAMP:
+      {
+       if (cmd->param_count<2)
+       {
+         sprintf(err_msg,"%s requires more parameters",adikted_cmd_text(cmd->index));
+         return false;
+       }
+       short result=true;
+       unsigned long creat_date;
+       unsigned long lastsav_date;
+       result&=script_param_to_ulong(&creat_date,cmd->params[0]);
+       result&=script_param_to_ulong(&lastsav_date,cmd->params[0]);
+       if (!result)
+       {
+         sprintf(err_msg,"Cannot read level date parameters");
+         return false;
+       }
+       lvl->info.creat_date=creat_date;
+       lvl->info.lastsav_date=lastsav_date;
+      };return true;
+    case USER_CMNDS_COUNT:
+      {
+       if (cmd->param_count<1)
+       {
+         sprintf(err_msg,"%s requires more parameters",adikted_cmd_text(cmd->index));
+         return false;
+       }
+       short result=true;
+       unsigned long ucmdcnt;
+       result&=script_param_to_ulong(&ucmdcnt,cmd->params[0]);
+       if (!result)
+       {
+         sprintf(err_msg,"Cannot read user commands count parameters");
+         return false;
+       }
+       lvl->info.usr_cmds_count=ucmdcnt;
+      };return true;
+    case LEVEL_VERSION:
+      {
+       if (cmd->param_count<3)
+       {
+         sprintf(err_msg,"%s requires more parameters",adikted_cmd_text(cmd->index));
+         return false;
+       }
+       short result=true;
+       int vma,vmi,vre;
+       result&=script_param_to_int(&vma,cmd->params[0]);
+       result&=script_param_to_int(&vmi,cmd->params[1]);
+       result&=script_param_to_int(&vre,cmd->params[2]);
+       if (!result)
+       {
+         sprintf(err_msg,"Cannot read version parameters");
+         return false;
+       }
+       lvl->info.ver_major=vma;
+       lvl->info.ver_minor=vmi;
+       lvl->info.ver_rel=vre;
       };return true;
     default:
       {
+         sprintf(err_msg,"Internal command unrecognized");
       };return false;
     }
 }
@@ -813,17 +941,17 @@ short script_cmd_verify_arg_operator(struct SCRIPT_VERIFY_DATA *scverif,char *er
     return true;
 }
 
-short script_cmd_verify_arg_player(struct SCRIPT_VERIFY_DATA *scverif,char *err_msg,
-        const char *param,int *plyr_idx)
+short script_cmd_verify_arg_singlevar(struct SCRIPT_VERIFY_DATA *scverif,char *err_msg,
+        const char *param,char *param_name,func_cmd_index f_cmd_index,int *res_idx)
 {
     int cmd_idx;
-    cmd_idx=players_cmd_index(param);
+    cmd_idx=f_cmd_index(param);
     if (cmd_idx<0)
     {
-        sprintf(err_msg,"Unrecognized player \"%s\" in script",param);
+        sprintf(err_msg,"Unrecognized %s \"%s\" in script",param_name,param);
         return false;
     }
-    *plyr_idx=cmd_idx;
+    (*res_idx)=cmd_idx;
     return true;
 }
 
@@ -837,12 +965,12 @@ short script_cmd_verify_arg_creatr(struct SCRIPT_VERIFY_DATA *scverif,char *err_
         sprintf(err_msg,"Unrecognized creature \"%s\" in script",param);
         return false;
     }
-    *crtr_idx=cmd_idx;
+    (*crtr_idx)=cmd_idx;
     return true;
 }
 
 short script_cmd_verify_arg_party_objectv(struct SCRIPT_VERIFY_DATA *scverif,char *err_msg,
-        const char *param,const short heading_objctv)
+        const char *param,const short heading_objctv,int *obj_idx)
 {
     int cmd_idx;
     cmd_idx=party_objectv_cmd_index(param);
@@ -862,6 +990,48 @@ short script_cmd_verify_arg_party_objectv(struct SCRIPT_VERIFY_DATA *scverif,cha
         sprintf(err_msg,"Parameter \"%s\" is not %s objective in script",param,whos);
         return false;
     }
+    (*obj_idx)=cmd_idx;
+    return true;
+}
+
+short script_cmd_verify_arg_party_name(struct SCRIPT_VERIFY_DATA *scverif,char *err_msg,
+        const char *param,const short create_new,int *party_idx)
+{
+    int i;
+    if (create_new)
+    {
+        i=0;
+        while (i<MAX_PARTYS)
+        {
+            if (scverif->partys[i]==NULL) break;
+            i++;
+        }
+        if (i>=MAX_PARTYS)
+        {
+            sprintf(err_msg,"Amount of partys in script exceeds %d",MAX_PARTYS);
+            return false;
+        }
+        scverif->partys[i]=strdup(param);
+        (*party_idx)=i;
+    } else
+    {
+        i=0;
+        while (i<MAX_PARTYS)
+        {
+            if (scverif->partys[i]!=NULL)
+            {
+                if (stricmp(param,scverif->partys[i])==0)
+                  break;
+            }
+            i++;
+        }
+        if (i>=MAX_PARTYS)
+        {
+            sprintf(err_msg,"Party \"%s\" used before definition in script",scverif->partys[i]);
+            return false;
+        }
+        (*party_idx)=i;
+    }
     return true;
 }
 
@@ -873,7 +1043,17 @@ short script_cmd_verify_arg_limparam(struct SCRIPT_VERIFY_DATA *scverif,char *er
         sprintf(err_msg,"Invalid %s value \"%s\" in script",param_name,param);
         return false;
     }
-    if (strlen(param)>3)
+    int max_digits=1;
+    unsigned int tmp=max_val;
+    while (true)
+    {
+        tmp=tmp/10;
+        if (tmp>0)
+          max_digits++;
+        else
+          break;
+    }
+    if (strlen(param)>max_digits)
     {
         sprintf(err_msg,"%s value \"%s\" too long in script",param_name,param);
         return false;
@@ -944,6 +1124,28 @@ short script_cmd_verify_arg_unsg_int(struct SCRIPT_VERIFY_DATA *scverif,char *er
     return true;
 }
 
+short script_cmd_verify_arg_logic_int(struct SCRIPT_VERIFY_DATA *scverif,char *err_msg,
+        const char *param,short *logic_val)
+{
+    if (strlen(param)>1)
+    {
+        sprintf(err_msg,"Logic integer value \"%s\" too long in script",param);
+        return false;
+    }
+    if (param[0]=='0')
+    {
+      *logic_val=false;
+      return true;
+    }
+    if (param[0]=='1')
+    {
+      *logic_val=true;
+      return true;
+    }
+    sprintf(err_msg,"Logic value can only be 0 or 1, not \"%s\" in script",param);
+    return false;
+}
+
 short script_cmd_verify_condit(struct SCRIPT_VERIFY_DATA *scverif,char *err_msg,int *err_param,const struct DK_SCRIPT_COMMAND *cmd)
 {
     int plyr_idx;
@@ -953,10 +1155,11 @@ short script_cmd_verify_condit(struct SCRIPT_VERIFY_DATA *scverif,char *err_msg,
     case COND_IF:
         if (!script_cmd_verify_argcount(err_msg,cmd,4))
         {
-            (*err_param)=-2;
+            (*err_param)=ERR_SCRIPTPARAM_NARGS;
             return VERIF_WARN;
         }
-        if (!script_cmd_verify_arg_player(scverif,err_msg,cmd->params[0],&plyr_idx))
+        if (!script_cmd_verify_arg_singlevar(scverif,err_msg,cmd->params[0],
+            "player",players_cmd_index,&plyr_idx))
         {
             (*err_param)=0;
             return VERIF_WARN;
@@ -966,16 +1169,18 @@ short script_cmd_verify_condit(struct SCRIPT_VERIFY_DATA *scverif,char *err_msg,
             (*err_param)=2;
             return VERIF_WARN;
         }
+        //TODO-PARAM
         scverif->level++;
         scverif->total_ifs++;
         break;
     case IF_AVAILABLE:
         if (!script_cmd_verify_argcount(err_msg,cmd,4))
         {
-            (*err_param)=-2;
+            (*err_param)=ERR_SCRIPTPARAM_NARGS;
             return VERIF_WARN;
         }
-        if (!script_cmd_verify_arg_player(scverif,err_msg,cmd->params[0],&plyr_idx))
+        if (!script_cmd_verify_arg_singlevar(scverif,err_msg,cmd->params[0],
+            "player",players_cmd_index,&plyr_idx))
         {
             (*err_param)=0;
             return VERIF_WARN;
@@ -985,13 +1190,14 @@ short script_cmd_verify_condit(struct SCRIPT_VERIFY_DATA *scverif,char *err_msg,
             (*err_param)=2;
             return VERIF_WARN;
         }
+        //TODO-PARAM
         scverif->level++;
         scverif->total_ifs++;
         break;
     case IF_ACTNPT:
         if (!script_cmd_verify_argcount(err_msg,cmd,2))
         {
-            (*err_param)=-2;
+            (*err_param)=ERR_SCRIPTPARAM_NARGS;
             return VERIF_WARN;
         }
         if (!script_cmd_verify_arg_actnpt(scverif,err_msg,cmd->params[0],false,false))
@@ -999,7 +1205,8 @@ short script_cmd_verify_condit(struct SCRIPT_VERIFY_DATA *scverif,char *err_msg,
             (*err_param)=0;
             return VERIF_WARN;
         }
-        if (!script_cmd_verify_arg_player(scverif,err_msg,cmd->params[1],&plyr_idx))
+        if (!script_cmd_verify_arg_singlevar(scverif,err_msg,cmd->params[1],
+            "player",players_cmd_index,&plyr_idx))
         {
             (*err_param)=1;
             return VERIF_WARN;
@@ -1010,7 +1217,7 @@ short script_cmd_verify_condit(struct SCRIPT_VERIFY_DATA *scverif,char *err_msg,
     case COND_ENDIF:
         if (!script_cmd_verify_argcount(err_msg,cmd,0))
         {
-            (*err_param)=-2;
+            (*err_param)=ERR_SCRIPTPARAM_NARGS;
             return VERIF_WARN;
         }
         scverif->level--;
@@ -1032,34 +1239,30 @@ short script_cmd_verify_party(struct SCRIPT_VERIFY_DATA *scverif,char *err_msg,i
     int i;
     int plyr_idx;
     int crtr_idx;
+    int party_idx;
     switch (cmd->index)
     {
     case CREATE_PARTY:
         if (!script_cmd_verify_argcount(err_msg,cmd,1))
         {
-            (*err_param)=-2;
+            (*err_param)=ERR_SCRIPTPARAM_NARGS;
             return VERIF_WARN;
         }
-        i=0;
-        while (i<MAX_PARTYS)
+        if (!script_cmd_verify_arg_party_name(scverif,err_msg,cmd->params[0],
+            true,&party_idx))
         {
-            if (scverif->partys[i]==NULL) break;
-            i++;
-        }
-        if (i>=MAX_PARTYS)
-        {
-            sprintf(err_msg,"Amount of partys in script exceeds %d",MAX_PARTYS);
+            (*err_param)=0;
             return VERIF_WARN;
         }
-        scverif->partys[i]=strdup(cmd->params[0]);
         break;
     case ADD_TUNNELER_TOLEV:
         if (!script_cmd_verify_argcount(err_msg,cmd,6))
         {
-            (*err_param)=-2;
+            (*err_param)=ERR_SCRIPTPARAM_NARGS;
             return VERIF_WARN;
         }
-        if (!script_cmd_verify_arg_player(scverif,err_msg,cmd->params[0],&plyr_idx))
+        if (!script_cmd_verify_arg_singlevar(scverif,err_msg,cmd->params[0],
+            "player",players_cmd_index,&plyr_idx))
         {
             (*err_param)=0;
             return VERIF_WARN;
@@ -1069,9 +1272,40 @@ short script_cmd_verify_party(struct SCRIPT_VERIFY_DATA *scverif,char *err_msg,i
             (*err_param)=1;
             return VERIF_WARN;
         }
-        if (!script_cmd_verify_arg_party_objectv(scverif,err_msg,cmd->params[2],true))
+        if (!script_cmd_verify_arg_party_objectv(scverif,err_msg,cmd->params[2],true,&i))
         {
             (*err_param)=2;
+            return VERIF_WARN;
+        }
+        switch (i)
+        {
+        case OBJCTV_ACTNPT:
+            if (!script_cmd_verify_arg_actnpt(scverif,err_msg,cmd->params[3],true,true))
+            {
+                (*err_param)=3;
+                return VERIF_WARN;
+            }
+            break;
+        case OBJCTV_DUNGEON:
+        case OBJCTV_DNHEART:
+            if (!script_cmd_verify_arg_singlevar(scverif,err_msg,cmd->params[3],
+                "player",players_cmd_index,&plyr_idx))
+            {
+                (*err_param)=3;
+                return VERIF_WARN;
+            }
+            break;
+        case OBJCTV_APPROP_DUNG:
+            if (!script_cmd_verify_arg_limparam(scverif,err_msg,cmd->params[3],
+                "Zero value",0,0))
+            {
+                (*err_param)=3;
+                return VERIF_WARN;
+            }
+            break;
+        default:
+            sprintf(err_msg,"Internal problem with party objective in script");
+            (*err_param)=3;
             return VERIF_WARN;
         }
         if (!script_cmd_verify_arg_experience(scverif,err_msg,cmd->params[4]))
@@ -1088,7 +1322,13 @@ short script_cmd_verify_party(struct SCRIPT_VERIFY_DATA *scverif,char *err_msg,i
     case ADD_TO_PARTY:
         if (!script_cmd_verify_argcount(err_msg,cmd,6))
         {
-            (*err_param)=-2;
+            (*err_param)=ERR_SCRIPTPARAM_NARGS;
+            return VERIF_WARN;
+        }
+        if (!script_cmd_verify_arg_party_name(scverif,err_msg,cmd->params[0],
+            false,&party_idx))
+        {
+            (*err_param)=0;
             return VERIF_WARN;
         }
         if (!script_cmd_verify_arg_creatr(scverif,err_msg,cmd->params[1],&crtr_idx))
@@ -1106,21 +1346,33 @@ short script_cmd_verify_party(struct SCRIPT_VERIFY_DATA *scverif,char *err_msg,i
             (*err_param)=3;
             return VERIF_WARN;
         }
-        if (!script_cmd_verify_arg_party_objectv(scverif,err_msg,cmd->params[4],false))
+        if (!script_cmd_verify_arg_party_objectv(scverif,err_msg,cmd->params[4],false,&i))
         {
             (*err_param)=4;
+            return VERIF_WARN;
+        }
+        if (!script_cmd_verify_arg_gameturn(scverif,err_msg,cmd->params[5]))
+        {
+            (*err_param)=5;
             return VERIF_WARN;
         }
         break;
     case ADD_PARTY_TOLEV:
         if (!script_cmd_verify_argcount(err_msg,cmd,4))
         {
-            (*err_param)=-2;
+            (*err_param)=ERR_SCRIPTPARAM_NARGS;
             return VERIF_WARN;
         }
-        if (!script_cmd_verify_arg_player(scverif,err_msg,cmd->params[0],&plyr_idx))
+        if (!script_cmd_verify_arg_singlevar(scverif,err_msg,cmd->params[0],
+            "player",players_cmd_index,&plyr_idx))
         {
             (*err_param)=0;
+            return VERIF_WARN;
+        }
+        if (!script_cmd_verify_arg_party_name(scverif,err_msg,cmd->params[1],
+            false,&party_idx))
+        {
+            (*err_param)=1;
             return VERIF_WARN;
         }
         if (!script_cmd_verify_arg_actnpt(scverif,err_msg,cmd->params[2],true,true))
@@ -1137,10 +1389,11 @@ short script_cmd_verify_party(struct SCRIPT_VERIFY_DATA *scverif,char *err_msg,i
     case ADD_CREATR_TOLEV:
         if (!script_cmd_verify_argcount(err_msg,cmd,6))
         {
-            (*err_param)=-2;
+            (*err_param)=ERR_SCRIPTPARAM_NARGS;
             return VERIF_WARN;
         }
-        if (!script_cmd_verify_arg_player(scverif,err_msg,cmd->params[0],&plyr_idx))
+        if (!script_cmd_verify_arg_singlevar(scverif,err_msg,cmd->params[0],
+            "player",players_cmd_index,&plyr_idx))
         {
             (*err_param)=0;
             return VERIF_WARN;
@@ -1174,12 +1427,19 @@ short script_cmd_verify_party(struct SCRIPT_VERIFY_DATA *scverif,char *err_msg,i
     case ADD_TUNNELLER_PARTY_TOLEV:
         if (!script_cmd_verify_argcount(err_msg,cmd,7))
         {
-            (*err_param)=-2;
+            (*err_param)=ERR_SCRIPTPARAM_NARGS;
             return VERIF_WARN;
         }
-        if (!script_cmd_verify_arg_player(scverif,err_msg,cmd->params[0],&plyr_idx))
+        if (!script_cmd_verify_arg_singlevar(scverif,err_msg,cmd->params[0],
+            "player",players_cmd_index,&plyr_idx))
         {
             (*err_param)=0;
+            return VERIF_WARN;
+        }
+        if (!script_cmd_verify_arg_party_name(scverif,err_msg,cmd->params[1],
+            false,&party_idx))
+        {
+            (*err_param)=1;
             return VERIF_WARN;
         }
         if (!script_cmd_verify_arg_actnpt(scverif,err_msg,cmd->params[2],true,true))
@@ -1187,9 +1447,40 @@ short script_cmd_verify_party(struct SCRIPT_VERIFY_DATA *scverif,char *err_msg,i
             (*err_param)=2;
             return VERIF_WARN;
         }
-        if (!script_cmd_verify_arg_party_objectv(scverif,err_msg,cmd->params[3],true))
+        if (!script_cmd_verify_arg_party_objectv(scverif,err_msg,cmd->params[3],true,&i))
         {
             (*err_param)=3;
+            return VERIF_WARN;
+        }
+        switch (i)
+        {
+        case OBJCTV_ACTNPT:
+            if (!script_cmd_verify_arg_actnpt(scverif,err_msg,cmd->params[4],true,true))
+            {
+                (*err_param)=4;
+                return VERIF_WARN;
+            }
+            break;
+        case OBJCTV_DUNGEON:
+        case OBJCTV_DNHEART:
+            if (!script_cmd_verify_arg_singlevar(scverif,err_msg,cmd->params[4],
+                "player",players_cmd_index,&plyr_idx))
+            {
+                (*err_param)=4;
+                return VERIF_WARN;
+            }
+            break;
+        case OBJCTV_APPROP_DUNG:
+            if (!script_cmd_verify_arg_limparam(scverif,err_msg,cmd->params[4],
+                "Zero value",0,0))
+            {
+                (*err_param)=4;
+                return VERIF_WARN;
+            }
+            break;
+        default:
+            sprintf(err_msg,"Internal problem with party objective in script");
+            (*err_param)=4;
             return VERIF_WARN;
         }
         if (!script_cmd_verify_arg_experience(scverif,err_msg,cmd->params[5]))
@@ -1214,27 +1505,47 @@ short script_cmd_verify_avail(struct SCRIPT_VERIFY_DATA *scverif,char *err_msg,i
 {
     int plyr_idx;
     int crtr_idx;
+    int i;
+    short logic_val;
     switch (cmd->index)
     {
     case ROOM_AVAIL:
         if (!script_cmd_verify_argcount(err_msg,cmd,4))
         {
-            (*err_param)=-2;
+            (*err_param)=ERR_SCRIPTPARAM_NARGS;
             return VERIF_WARN;
         }
-        if (!script_cmd_verify_arg_player(scverif,err_msg,cmd->params[0],&plyr_idx))
+        if (!script_cmd_verify_arg_singlevar(scverif,err_msg,cmd->params[0],
+            "player",players_cmd_index,&plyr_idx))
         {
             (*err_param)=0;
+            return VERIF_WARN;
+        }
+        if (!script_cmd_verify_arg_singlevar(scverif,err_msg,cmd->params[1],
+            "room",room_cmd_index,&i))
+        {
+            (*err_param)=1;
+            return VERIF_WARN;
+        }
+        if (!script_cmd_verify_arg_logic_int(scverif,err_msg,cmd->params[2],&logic_val))
+        {
+            (*err_param)=2;
+            return VERIF_WARN;
+        }
+        if (!script_cmd_verify_arg_logic_int(scverif,err_msg,cmd->params[3],&logic_val))
+        {
+            (*err_param)=3;
             return VERIF_WARN;
         }
         break;
     case CREATR_AVAIL:
         if (!script_cmd_verify_argcount(err_msg,cmd,4))
         {
-            (*err_param)=-2;
+            (*err_param)=ERR_SCRIPTPARAM_NARGS;
             return VERIF_WARN;
         }
-        if (!script_cmd_verify_arg_player(scverif,err_msg,cmd->params[0],&plyr_idx))
+        if (!script_cmd_verify_arg_singlevar(scverif,err_msg,cmd->params[0],
+            "player",players_cmd_index,&plyr_idx))
         {
             (*err_param)=0;
             return VERIF_WARN;
@@ -1244,40 +1555,103 @@ short script_cmd_verify_avail(struct SCRIPT_VERIFY_DATA *scverif,char *err_msg,i
             (*err_param)=1;
             return VERIF_WARN;
         }
+        if (!script_cmd_verify_arg_logic_int(scverif,err_msg,cmd->params[2],&logic_val))
+        {
+            (*err_param)=2;
+            return VERIF_WARN;
+        }
+        if (!script_cmd_verify_arg_logic_int(scverif,err_msg,cmd->params[3],&logic_val))
+        {
+            (*err_param)=3;
+            return VERIF_WARN;
+        }
         break;
     case MAGIC_AVAIL:
         if (!script_cmd_verify_argcount(err_msg,cmd,4))
         {
-            (*err_param)=-2;
+            (*err_param)=ERR_SCRIPTPARAM_NARGS;
             return VERIF_WARN;
-        }
-        if (!script_cmd_verify_arg_player(scverif,err_msg,cmd->params[0],&plyr_idx))
+         }
+        if (!script_cmd_verify_arg_singlevar(scverif,err_msg,cmd->params[0],
+            "player",players_cmd_index,&plyr_idx))
         {
             (*err_param)=0;
+            return VERIF_WARN;
+        }
+        if (!script_cmd_verify_arg_singlevar(scverif,err_msg,cmd->params[1],
+            "spell",spell_cmd_index,&i))
+        {
+            (*err_param)=1;
+            return VERIF_WARN;
+        }
+        if (!script_cmd_verify_arg_logic_int(scverif,err_msg,cmd->params[2],&logic_val))
+        {
+            (*err_param)=2;
+            return VERIF_WARN;
+        }
+        if (!script_cmd_verify_arg_logic_int(scverif,err_msg,cmd->params[3],&logic_val))
+        {
+            (*err_param)=3;
             return VERIF_WARN;
         }
         break;
     case TRAP_AVAIL:
         if (!script_cmd_verify_argcount(err_msg,cmd,4))
         {
-            (*err_param)=-2;
+            (*err_param)=ERR_SCRIPTPARAM_NARGS;
             return VERIF_WARN;
         }
-        if (!script_cmd_verify_arg_player(scverif,err_msg,cmd->params[0],&plyr_idx))
+        if (!script_cmd_verify_arg_singlevar(scverif,err_msg,cmd->params[0],
+            "player",players_cmd_index,&plyr_idx))
         {
             (*err_param)=0;
             return VERIF_WARN;
         }
-        break;
+        if (!script_cmd_verify_arg_singlevar(scverif,err_msg,cmd->params[1],
+            "trap",trap_cmd_index,&i))
+        {
+            (*err_param)=1;
+            return VERIF_WARN;
+        }
+         if (!script_cmd_verify_arg_logic_int(scverif,err_msg,cmd->params[2],&logic_val))
+        {
+            (*err_param)=2;
+            return VERIF_WARN;
+        }
+        if (!script_cmd_verify_arg_limparam(scverif,err_msg,cmd->params[3],
+            "Traps amount",0,32767))
+        {
+            (*err_param)=3;
+            return VERIF_WARN;
+        }
+       break;
     case DOOR_AVAIL:
         if (!script_cmd_verify_argcount(err_msg,cmd,4))
         {
-            (*err_param)=-2;
+            (*err_param)=ERR_SCRIPTPARAM_NARGS;
             return VERIF_WARN;
         }
-        if (!script_cmd_verify_arg_player(scverif,err_msg,cmd->params[0],&plyr_idx))
+        if (!script_cmd_verify_arg_singlevar(scverif,err_msg,cmd->params[0],
+            "player",players_cmd_index,&plyr_idx))
         {
             (*err_param)=0;
+            return VERIF_WARN;
+        }
+        if (!script_cmd_verify_arg_singlevar(scverif,err_msg,cmd->params[1],
+            "door",door_cmd_index,&i))
+        {
+            (*err_param)=1;
+            return VERIF_WARN;
+        }
+        if (!script_cmd_verify_arg_logic_int(scverif,err_msg,cmd->params[2],&logic_val))
+        {
+            (*err_param)=2;
+            return VERIF_WARN;
+        }
+        if (!script_cmd_verify_arg_limparam(scverif,err_msg,cmd->params[3],
+            "Doors amount",0,32767))
+        {
+            (*err_param)=3;
             return VERIF_WARN;
         }
         break;
@@ -1296,10 +1670,17 @@ short script_cmd_verify_custobj(struct SCRIPT_VERIFY_DATA *scverif,char *err_msg
     case DISPLAY_OBJECTV:
         if (!script_cmd_verify_argcount(err_msg,cmd,2))
         {
-            (*err_param)=-2;
+            (*err_param)=ERR_SCRIPTPARAM_NARGS;
             return VERIF_WARN;
         }
-        if (!script_cmd_verify_arg_player(scverif,err_msg,cmd->params[1],&plyr_idx))
+        if (!script_cmd_verify_arg_limparam(scverif,err_msg,cmd->params[0],
+            "Text index",0,1023))
+        {
+            (*err_param)=0;
+            return VERIF_WARN;
+        }
+        if (!script_cmd_verify_arg_singlevar(scverif,err_msg,cmd->params[1],
+            "player",players_cmd_index,&plyr_idx))
         {
             (*err_param)=1;
             return VERIF_WARN;
@@ -1308,7 +1689,25 @@ short script_cmd_verify_custobj(struct SCRIPT_VERIFY_DATA *scverif,char *err_msg
     case DISPLAY_OBJECTV_WPOS:
         if (!script_cmd_verify_argcount(err_msg,cmd,3))
         {
-            (*err_param)=-2;
+            (*err_param)=ERR_SCRIPTPARAM_NARGS;
+            return VERIF_WARN;
+        }
+        if (!script_cmd_verify_arg_limparam(scverif,err_msg,cmd->params[0],
+            "Text index",0,1023))
+        {
+            (*err_param)=0;
+            return VERIF_WARN;
+        }
+        if (!script_cmd_verify_arg_limparam(scverif,err_msg,cmd->params[1],
+            "Map X coord",0,84))
+        {
+            (*err_param)=1;
+            return VERIF_WARN;
+        }
+        if (!script_cmd_verify_arg_limparam(scverif,err_msg,cmd->params[2],
+            "Map Y coord",0,84))
+        {
+            (*err_param)=2;
             return VERIF_WARN;
         }
         break;
@@ -1316,21 +1715,45 @@ short script_cmd_verify_custobj(struct SCRIPT_VERIFY_DATA *scverif,char *err_msg
         if (cmd->param_count!=2)
           if (!script_cmd_verify_argcount(err_msg,cmd,1))
           {
-            (*err_param)=-2;
+            (*err_param)=ERR_SCRIPTPARAM_NARGS;
             return VERIF_WARN;
           }
+        if (!script_cmd_verify_arg_limparam(scverif,err_msg,cmd->params[0],
+            "Text index",0,1023))
+        {
+            (*err_param)=0;
+            return VERIF_WARN;
+        }
         break;
     case DISPLAY_INFO_WPOS:
         if (!script_cmd_verify_argcount(err_msg,cmd,3))
         {
-            (*err_param)=-2;
+            (*err_param)=ERR_SCRIPTPARAM_NARGS;
+            return VERIF_WARN;
+        }
+        if (!script_cmd_verify_arg_limparam(scverif,err_msg,cmd->params[0],
+            "Text index",0,1023))
+        {
+            (*err_param)=0;
+            return VERIF_WARN;
+        }
+        if (!script_cmd_verify_arg_limparam(scverif,err_msg,cmd->params[1],
+            "Map X coord",0,84))
+        {
+            (*err_param)=1;
+            return VERIF_WARN;
+        }
+        if (!script_cmd_verify_arg_limparam(scverif,err_msg,cmd->params[2],
+            "Map Y coord",0,84))
+        {
+            (*err_param)=2;
             return VERIF_WARN;
         }
         break;
     case BONUS_LEV_TIME:
         if (!script_cmd_verify_argcount(err_msg,cmd,1))
         {
-            (*err_param)=-2;
+            (*err_param)=ERR_SCRIPTPARAM_NARGS;
             return VERIF_WARN;
         }
         if (!script_cmd_verify_arg_gameturn(scverif,err_msg,cmd->params[0]))
@@ -1342,17 +1765,26 @@ short script_cmd_verify_custobj(struct SCRIPT_VERIFY_DATA *scverif,char *err_msg
     case TUTORIAL_FLASH_BTN:
         if (!script_cmd_verify_argcount(err_msg,cmd,2))
         {
-            (*err_param)=-2;
+            (*err_param)=ERR_SCRIPTPARAM_NARGS;
+            return VERIF_WARN;
+        }
+        //TODO-PARAM
+        if (!script_cmd_verify_arg_limparam(scverif,err_msg,cmd->params[0],
+            "Button index",0,255))
+        {
+            (*err_param)=0;
             return VERIF_WARN;
         }
         break;
     case QUICK_OBJECTV:
         if (!script_cmd_verify_argcount(err_msg,cmd,3))
         {
-            (*err_param)=-2;
+            (*err_param)=ERR_SCRIPTPARAM_NARGS;
             return VERIF_WARN;
         }
-        if (!script_cmd_verify_arg_player(scverif,err_msg,cmd->params[2],&plyr_idx))
+        //TODO-PARAM
+        if (!script_cmd_verify_arg_singlevar(scverif,err_msg,cmd->params[2],
+            "player",players_cmd_index,&plyr_idx))
         {
             (*err_param)=2;
             return VERIF_WARN;
@@ -1361,9 +1793,10 @@ short script_cmd_verify_custobj(struct SCRIPT_VERIFY_DATA *scverif,char *err_msg
     case QUICK_INFO:
         if (!script_cmd_verify_argcount(err_msg,cmd,2))
         {
-            (*err_param)=-2;
+            (*err_param)=ERR_SCRIPTPARAM_NARGS;
             return VERIF_WARN;
         }
+        //TODO-PARAM
         break;
     default:
         sprintf(err_msg,"Internal warn - wrong CUSTOBJ script command");
@@ -1382,7 +1815,7 @@ short script_cmd_verify_setup(struct SCRIPT_VERIFY_DATA *scverif,char *err_msg,i
     case SET_GEN_SPEED:
         if (!script_cmd_verify_argcount(err_msg,cmd,1))
         {
-            (*err_param)=-2;
+            (*err_param)=ERR_SCRIPTPARAM_NARGS;
             return VERIF_WARN;
         }
         if (!script_cmd_verify_arg_gameturn(scverif,err_msg,cmd->params[0]))
@@ -1394,10 +1827,11 @@ short script_cmd_verify_setup(struct SCRIPT_VERIFY_DATA *scverif,char *err_msg,i
     case START_MONEY:
         if (!script_cmd_verify_argcount(err_msg,cmd,2))
         {
-            (*err_param)=-2;
+            (*err_param)=ERR_SCRIPTPARAM_NARGS;
             return VERIF_WARN;
         }
-        if (!script_cmd_verify_arg_player(scverif,err_msg,cmd->params[0],&plyr_idx))
+        if (!script_cmd_verify_arg_singlevar(scverif,err_msg,cmd->params[0],
+            "player",players_cmd_index,&plyr_idx))
         {
             (*err_param)=0;
             return VERIF_WARN;
@@ -1411,65 +1845,89 @@ short script_cmd_verify_setup(struct SCRIPT_VERIFY_DATA *scverif,char *err_msg,i
     case COMP_PLAYER:
         if (!script_cmd_verify_argcount(err_msg,cmd,2))
         {
-            (*err_param)=-2;
+            (*err_param)=ERR_SCRIPTPARAM_NARGS;
             return VERIF_WARN;
         }
-        if (!script_cmd_verify_arg_player(scverif,err_msg,cmd->params[0],&plyr_idx))
+        if (!script_cmd_verify_arg_singlevar(scverif,err_msg,cmd->params[0],
+            "player",players_cmd_index,&plyr_idx))
         {
             (*err_param)=0;
+            return VERIF_WARN;
+        }
+        if (!script_cmd_verify_arg_limparam(scverif,err_msg,cmd->params[1],
+            "Computer player",0,10))
+        {
+            (*err_param)=1;
             return VERIF_WARN;
         }
         break;
     case ALLY_PLAYERS:
         if (!script_cmd_verify_argcount(err_msg,cmd,2))
         {
-            (*err_param)=-2;
+            (*err_param)=ERR_SCRIPTPARAM_NARGS;
             return VERIF_WARN;
         }
-        if (!script_cmd_verify_arg_player(scverif,err_msg,cmd->params[0],&plyr_idx))
+        if (!script_cmd_verify_arg_singlevar(scverif,err_msg,cmd->params[0],
+            "player",players_cmd_index,&plyr_idx))
         {
             (*err_param)=0;
             return VERIF_WARN;
         }
-        if (!script_cmd_verify_arg_player(scverif,err_msg,cmd->params[1],&plyr2_idx))
+        if (!script_cmd_verify_arg_singlevar(scverif,err_msg,cmd->params[1],
+            "player",players_cmd_index,&plyr2_idx))
         {
             (*err_param)=1;
+            return VERIF_WARN;
+        }
+        if (plyr_idx==plyr2_idx)
+        {
+            sprintf(err_msg,"Cannot ally player with himself");
+            (*err_param)=ERR_SCRIPTPARAM_WHOLE;
             return VERIF_WARN;
         }
         break;
     case SET_HATE:
         if (!script_cmd_verify_argcount(err_msg,cmd,3))
         {
-            (*err_param)=-2;
+            (*err_param)=ERR_SCRIPTPARAM_NARGS;
             return VERIF_WARN;
         }
         break;
     case RESEARCH:
         if (!script_cmd_verify_argcount(err_msg,cmd,4))
         {
-            (*err_param)=-2;
+            (*err_param)=ERR_SCRIPTPARAM_NARGS;
             return VERIF_WARN;
         }
-        if (!script_cmd_verify_arg_player(scverif,err_msg,cmd->params[0],&plyr_idx))
+        if (!script_cmd_verify_arg_singlevar(scverif,err_msg,cmd->params[0],
+            "player",players_cmd_index,&plyr_idx))
         {
             (*err_param)=0;
             return VERIF_WARN;
         }
+        //TODO-PARAM
         break;
     case SET_COMPUTER_GLOBALS:
         if (!script_cmd_verify_argcount(err_msg,cmd,7))
         {
-            (*err_param)=-2;
+            (*err_param)=ERR_SCRIPTPARAM_NARGS;
+            return VERIF_WARN;
+        }
+        if (!script_cmd_verify_arg_singlevar(scverif,err_msg,cmd->params[0],
+            "player",players_cmd_index,&plyr_idx))
+        {
+            (*err_param)=0;
             return VERIF_WARN;
         }
         break;
     case SET_COMPUTER_CHECKS:
         if (!script_cmd_verify_argcount(err_msg,cmd,7))
         {
-            (*err_param)=-2;
+            (*err_param)=ERR_SCRIPTPARAM_NARGS;
             return VERIF_WARN;
         }
-        if (!script_cmd_verify_arg_player(scverif,err_msg,cmd->params[0],&plyr_idx))
+        if (!script_cmd_verify_arg_singlevar(scverif,err_msg,cmd->params[0],
+            "player",players_cmd_index,&plyr_idx))
         {
             (*err_param)=0;
             return VERIF_WARN;
@@ -1478,10 +1936,11 @@ short script_cmd_verify_setup(struct SCRIPT_VERIFY_DATA *scverif,char *err_msg,i
     case SET_COMPUTER_EVENT:
         if (!script_cmd_verify_argcount(err_msg,cmd,4))
         {
-            (*err_param)=-2;
+            (*err_param)=ERR_SCRIPTPARAM_NARGS;
             return VERIF_WARN;
         }
-        if (!script_cmd_verify_arg_player(scverif,err_msg,cmd->params[0],&plyr_idx))
+        if (!script_cmd_verify_arg_singlevar(scverif,err_msg,cmd->params[0],
+            "player",players_cmd_index,&plyr_idx))
         {
             (*err_param)=0;
             return VERIF_WARN;
@@ -1490,10 +1949,11 @@ short script_cmd_verify_setup(struct SCRIPT_VERIFY_DATA *scverif,char *err_msg,i
     case SET_COMPUTER_PROCESS:
         if (!script_cmd_verify_argcount(err_msg,cmd,7))
         {
-            (*err_param)=-2;
+            (*err_param)=ERR_SCRIPTPARAM_NARGS;
             return VERIF_WARN;
         }
-        if (!script_cmd_verify_arg_player(scverif,err_msg,cmd->params[0],&plyr_idx))
+        if (!script_cmd_verify_arg_singlevar(scverif,err_msg,cmd->params[0],
+            "player",players_cmd_index,&plyr_idx))
         {
             (*err_param)=0;
             return VERIF_WARN;
@@ -1502,10 +1962,11 @@ short script_cmd_verify_setup(struct SCRIPT_VERIFY_DATA *scverif,char *err_msg,i
     case MAX_CREATURES:
         if (!script_cmd_verify_argcount(err_msg,cmd,2))
         {
-            (*err_param)=-2;
+            (*err_param)=ERR_SCRIPTPARAM_NARGS;
             return VERIF_WARN;
         }
-        if (!script_cmd_verify_arg_player(scverif,err_msg,cmd->params[0],&plyr_idx))
+        if (!script_cmd_verify_arg_singlevar(scverif,err_msg,cmd->params[0],
+            "player",players_cmd_index,&plyr_idx))
         {
             (*err_param)=0;
             return VERIF_WARN;
@@ -1526,12 +1987,13 @@ short script_cmd_verify_setup(struct SCRIPT_VERIFY_DATA *scverif,char *err_msg,i
 short script_cmd_verify_triger(struct SCRIPT_VERIFY_DATA *scverif,char *err_msg,int *err_param,const struct DK_SCRIPT_COMMAND *cmd)
 {
     int plyr_idx;
+    int i;
     switch (cmd->index)
     {
     case RESET_ACTNPT:
         if (!script_cmd_verify_argcount(err_msg,cmd,1))
         {
-            (*err_param)=-2;
+            (*err_param)=ERR_SCRIPTPARAM_NARGS;
             return VERIF_WARN;
         }
         if (!script_cmd_verify_arg_actnpt(scverif,err_msg,cmd->params[0],false,false))
@@ -1543,22 +2005,29 @@ short script_cmd_verify_triger(struct SCRIPT_VERIFY_DATA *scverif,char *err_msg,
     case NEXT_CMD_REUSABLE:
         if (!script_cmd_verify_argcount(err_msg,cmd,0))
         {
-            (*err_param)=-2;
+            (*err_param)=ERR_SCRIPTPARAM_NARGS;
             return VERIF_WARN;
         }
         break;
     case SET_FLAG:
         if (!script_cmd_verify_argcount(err_msg,cmd,3))
         {
-            (*err_param)=-2;
+            (*err_param)=ERR_SCRIPTPARAM_NARGS;
             return VERIF_WARN;
         }
-        if (!script_cmd_verify_arg_player(scverif,err_msg,cmd->params[0],&plyr_idx))
+        if (!script_cmd_verify_arg_singlevar(scverif,err_msg,cmd->params[0],
+            "player",players_cmd_index,&plyr_idx))
         {
             (*err_param)=0;
             return VERIF_WARN;
         }
-        if (!script_cmd_verify_arg_limparam(scverif,err_msg,cmd->params[2],"flag",0,255))
+        if (!script_cmd_verify_arg_singlevar(scverif,err_msg,cmd->params[1],
+            "flag",flag_cmd_index,&i))
+        {
+            (*err_param)=1;
+            return VERIF_WARN;
+        }
+        if (!script_cmd_verify_arg_limparam(scverif,err_msg,cmd->params[2],"Flag",0,255))
         {
             (*err_param)=2;
             return VERIF_WARN;
@@ -1567,33 +2036,40 @@ short script_cmd_verify_triger(struct SCRIPT_VERIFY_DATA *scverif,char *err_msg,
     case SET_TIMER:
         if (!script_cmd_verify_argcount(err_msg,cmd,2))
         {
-            (*err_param)=-2;
+            (*err_param)=ERR_SCRIPTPARAM_NARGS;
             return VERIF_WARN;
         }
-        if (!script_cmd_verify_arg_player(scverif,err_msg,cmd->params[0],&plyr_idx))
+        if (!script_cmd_verify_arg_singlevar(scverif,err_msg,cmd->params[0],
+            "player",players_cmd_index,&plyr_idx))
         {
             (*err_param)=0;
+            return VERIF_WARN;
+        }
+        if (!script_cmd_verify_arg_singlevar(scverif,err_msg,cmd->params[1],
+            "timer",timer_cmd_index,&i))
+        {
+            (*err_param)=1;
             return VERIF_WARN;
         }
         break;
     case GAME_LOSE:
         if (!script_cmd_verify_argcount(err_msg,cmd,0))
         {
-            (*err_param)=-2;
+            (*err_param)=ERR_SCRIPTPARAM_NARGS;
             return VERIF_WARN;
         }
         break;
     case GAME_WIN:
         if (!script_cmd_verify_argcount(err_msg,cmd,0))
         {
-            (*err_param)=-2;
+            (*err_param)=ERR_SCRIPTPARAM_NARGS;
             return VERIF_WARN;
         }
         break;
     case SET_MUSIC:
         if (!script_cmd_verify_argcount(err_msg,cmd,1))
         {
-            (*err_param)=-2;
+            (*err_param)=ERR_SCRIPTPARAM_NARGS;
             return VERIF_WARN;
         }
         break;
@@ -1610,19 +2086,25 @@ short script_cmd_verify_crtradj(struct SCRIPT_VERIFY_DATA *scverif,char *err_msg
     int plyr_idx;
     int crtr_idx;
     int crtr2_idx;
+    short logic_val;
     switch (cmd->index)
     {
     case DEAD_CREATURES_RET_TO_POOL:
         if (!script_cmd_verify_argcount(err_msg,cmd,1))
         {
-            (*err_param)=-2;
+            (*err_param)=ERR_SCRIPTPARAM_NARGS;
+            return VERIF_WARN;
+        }
+        if (!script_cmd_verify_arg_logic_int(scverif,err_msg,cmd->params[0],&logic_val))
+        {
+            (*err_param)=0;
             return VERIF_WARN;
         }
         break;
     case ADD_CREATR_TO_POOL:
         if (!script_cmd_verify_argcount(err_msg,cmd,2))
         {
-            (*err_param)=-2;
+            (*err_param)=ERR_SCRIPTPARAM_NARGS;
             return VERIF_WARN;
         }
         if (!script_cmd_verify_arg_creatr(scverif,err_msg,cmd->params[0],&crtr_idx))
@@ -1640,10 +2122,11 @@ short script_cmd_verify_crtradj(struct SCRIPT_VERIFY_DATA *scverif,char *err_msg
     case SET_CREATR_MAX_LEVEL:
         if (!script_cmd_verify_argcount(err_msg,cmd,3))
         {
-            (*err_param)=-2;
+            (*err_param)=ERR_SCRIPTPARAM_NARGS;
             return VERIF_WARN;
         }
-        if (!script_cmd_verify_arg_player(scverif,err_msg,cmd->params[0],&plyr_idx))
+        if (!script_cmd_verify_arg_singlevar(scverif,err_msg,cmd->params[0],
+            "player",players_cmd_index,&plyr_idx))
         {
             (*err_param)=0;
             return VERIF_WARN;
@@ -1662,7 +2145,7 @@ short script_cmd_verify_crtradj(struct SCRIPT_VERIFY_DATA *scverif,char *err_msg
     case SET_CREATR_STRENGTH:
         if (!script_cmd_verify_argcount(err_msg,cmd,2))
         {
-            (*err_param)=-2;
+            (*err_param)=ERR_SCRIPTPARAM_NARGS;
             return VERIF_WARN;
         }
         if (!script_cmd_verify_arg_creatr(scverif,err_msg,cmd->params[0],&crtr_idx))
@@ -1670,7 +2153,7 @@ short script_cmd_verify_crtradj(struct SCRIPT_VERIFY_DATA *scverif,char *err_msg
             (*err_param)=0;
             return VERIF_WARN;
         }
-        if (!script_cmd_verify_arg_limparam(scverif,err_msg,cmd->params[1],"strength",0,255))
+        if (!script_cmd_verify_arg_limparam(scverif,err_msg,cmd->params[1],"Strength",0,255))
         {
             (*err_param)=1;
             return VERIF_WARN;
@@ -1679,7 +2162,7 @@ short script_cmd_verify_crtradj(struct SCRIPT_VERIFY_DATA *scverif,char *err_msg
     case SET_CREATR_HEALTH:
         if (!script_cmd_verify_argcount(err_msg,cmd,2))
         {
-            (*err_param)=-2;
+            (*err_param)=ERR_SCRIPTPARAM_NARGS;
             return VERIF_WARN;
         }
         if (!script_cmd_verify_arg_creatr(scverif,err_msg,cmd->params[0],&crtr_idx))
@@ -1687,7 +2170,7 @@ short script_cmd_verify_crtradj(struct SCRIPT_VERIFY_DATA *scverif,char *err_msg
             (*err_param)=0;
             return VERIF_WARN;
         }
-        if (!script_cmd_verify_arg_limparam(scverif,err_msg,cmd->params[1],"health",0,1024))
+        if (!script_cmd_verify_arg_limparam(scverif,err_msg,cmd->params[1],"Health",0,32767))
         {
             (*err_param)=1;
             return VERIF_WARN;
@@ -1696,7 +2179,7 @@ short script_cmd_verify_crtradj(struct SCRIPT_VERIFY_DATA *scverif,char *err_msg
     case SET_CREATR_ARMOUR:
         if (!script_cmd_verify_argcount(err_msg,cmd,2))
         {
-            (*err_param)=-2;
+            (*err_param)=ERR_SCRIPTPARAM_NARGS;
             return VERIF_WARN;
         }
         if (!script_cmd_verify_arg_creatr(scverif,err_msg,cmd->params[0],&crtr_idx))
@@ -1704,7 +2187,7 @@ short script_cmd_verify_crtradj(struct SCRIPT_VERIFY_DATA *scverif,char *err_msg
             (*err_param)=0;
             return VERIF_WARN;
         }
-        if (!script_cmd_verify_arg_limparam(scverif,err_msg,cmd->params[1],"armour",0,255))
+        if (!script_cmd_verify_arg_limparam(scverif,err_msg,cmd->params[1],"Armour",0,255))
         {
             (*err_param)=1;
             return VERIF_WARN;
@@ -1713,7 +2196,7 @@ short script_cmd_verify_crtradj(struct SCRIPT_VERIFY_DATA *scverif,char *err_msg
     case SET_CREATR_FEAR:
         if (!script_cmd_verify_argcount(err_msg,cmd,2))
         {
-            (*err_param)=-2;
+            (*err_param)=ERR_SCRIPTPARAM_NARGS;
             return VERIF_WARN;
         }
         if (!script_cmd_verify_arg_creatr(scverif,err_msg,cmd->params[0],&crtr_idx))
@@ -1721,7 +2204,7 @@ short script_cmd_verify_crtradj(struct SCRIPT_VERIFY_DATA *scverif,char *err_msg
             (*err_param)=0;
             return VERIF_WARN;
         }
-        if (!script_cmd_verify_arg_limparam(scverif,err_msg,cmd->params[1],"fear",0,255))
+        if (!script_cmd_verify_arg_limparam(scverif,err_msg,cmd->params[1],"Fear",0,255))
         {
             (*err_param)=1;
             return VERIF_WARN;
@@ -1730,7 +2213,7 @@ short script_cmd_verify_crtradj(struct SCRIPT_VERIFY_DATA *scverif,char *err_msg
     case CREATR_SWAP:
         if (!script_cmd_verify_argcount(err_msg,cmd,2))
         {
-            (*err_param)=-2;
+            (*err_param)=ERR_SCRIPTPARAM_NARGS;
             return VERIF_WARN;
         }
         if (!script_cmd_verify_arg_creatr(scverif,err_msg,cmd->params[0],&crtr_idx))
@@ -1740,7 +2223,7 @@ short script_cmd_verify_crtradj(struct SCRIPT_VERIFY_DATA *scverif,char *err_msg
         }
         if (!script_cmd_verify_arg_creatr(scverif,err_msg,cmd->params[1],&crtr2_idx))
         {
-            (*err_param)=0;
+            (*err_param)=1;
             return VERIF_WARN;
         }
         break;
@@ -1772,7 +2255,7 @@ short script_cmd_verify_obsol(struct SCRIPT_VERIFY_DATA *scverif,char *err_msg,i
     case OBSOLT_PRINT:
         if (!script_cmd_verify_argcount(err_msg,cmd,1))
         {
-            (*err_param)=-2;
+            (*err_param)=ERR_SCRIPTPARAM_NARGS;
             return VERIF_WARN;
         }
         break;
@@ -1790,7 +2273,7 @@ short script_cmd_verify_obsol(struct SCRIPT_VERIFY_DATA *scverif,char *err_msg,i
 short txt_verify(const struct LEVEL *lvl, char *err_msg,struct IPOINT_2D *errpt)
 {
     int err_line=-1;
-    int err_param=-9;
+    int err_param=ERR_SCRIPTPARAM_WHOLE;
     short result=dkscript_verify(lvl,err_msg,&err_line,&err_param);
     if (result!=VERIF_OK)
     {
@@ -1871,7 +2354,7 @@ short dkscript_verify(const struct LEVEL *lvl, char *err_msg,int *err_line,int *
             result=VERIF_WARN;
             break;
         case CMD_ADIKTED:
-            sprintf(child_err_msg,"ADiKtEd specific command used in DK script");
+            sprintf(child_err_msg,"%s specific command used in DK script",PROGRAM_NAME);
             result=VERIF_WARN;
             break;
         default:
@@ -1915,8 +2398,11 @@ short execute_script_line(struct LEVEL *lvl,char *line,char *err_msg)
       case CMD_ADIKTED:
           result=execute_adikted_command(lvl,cmd,err_msg);
           break;
+      case CMD_COMMNT:
+          result=true;
+          break;
       default:
-          sprintf(err_msg,"Command is not executable in ADiKtEd");
+          sprintf(err_msg,"Command is not executable in %s",PROGRAM_NAME);
           result=false;
           break;
       }
@@ -2180,33 +2666,36 @@ int recognize_script_word_group_and_idx(int *index,const char *wordtxt,const sho
       *index=cmd_idx;
       return CMD_PAROBJ;
     }
-/*
-    if (cmd_idx>=0)
-    {
-      *index=cmd_idx;
-      return CMD_DOOR;
-    }
-    if (cmd_idx>=0)
-    {
-      *index=cmd_idx;
-      return CMD_TRAP;
-    }
-    if (cmd_idx>=0)
-    {
-      *index=cmd_idx;
-      return CMD_SPELL;
-    }
+    cmd_idx=creatures_cmd_index(wordtxt);
     if (cmd_idx>=0)
     {
       *index=cmd_idx;
       return CMD_CREATR;
     }
+    cmd_idx=door_cmd_index(wordtxt);
+    if (cmd_idx>=0)
+    {
+      *index=cmd_idx;
+      return CMD_DOOR;
+    }
+    cmd_idx=trap_cmd_index(wordtxt);
+    if (cmd_idx>=0)
+    {
+      *index=cmd_idx;
+      return CMD_TRAP;
+    }
+    cmd_idx=spell_cmd_index(wordtxt);
+    if (cmd_idx>=0)
+    {
+      *index=cmd_idx;
+      return CMD_SPELL;
+    }
+    cmd_idx=room_cmd_index(wordtxt);
     if (cmd_idx>=0)
     {
       *index=cmd_idx;
       return CMD_ROOM;
     }
-*/
     cmd_idx=special_cmd_index(wordtxt);
     if (cmd_idx>=0)
     {
@@ -2647,6 +3136,90 @@ const char *creatures_cmd_text(int cmdidx)
     return cmd_creatures_arr[cmdidx];
 }
 
+int room_cmd_index(const char *cmdtext)
+{
+    if ((cmdtext==NULL)||(strlen(cmdtext)<2)) return -1;
+    int i=0;
+    int array_count=sizeof(cmd_rooms_arr)/sizeof(char *);
+    while (i<array_count)
+    {
+      if (stricmp(cmd_rooms_arr[i],cmdtext)==0)
+        return i;
+      i++;
+    }
+    return -1;
+}
+
+const char *room_cmd_text(int cmdidx)
+{
+    int array_count=sizeof(cmd_rooms_arr)/sizeof(char *);
+    if ((cmdidx<0)||(cmdidx>=array_count)) return "X";
+    return cmd_rooms_arr[cmdidx];
+}
+
+int spell_cmd_index(const char *cmdtext)
+{
+    if ((cmdtext==NULL)||(strlen(cmdtext)<2)) return -1;
+    int i=0;
+    int array_count=sizeof(cmd_spells_arr)/sizeof(char *);
+    while (i<array_count)
+    {
+      if (stricmp(cmd_spells_arr[i],cmdtext)==0)
+        return i;
+      i++;
+    }
+    return -1;
+}
+
+const char *spell_cmd_text(int cmdidx)
+{
+    int array_count=sizeof(cmd_spells_arr)/sizeof(char *);
+    if ((cmdidx<0)||(cmdidx>=array_count)) return "X";
+    return cmd_spells_arr[cmdidx];
+}
+
+int trap_cmd_index(const char *cmdtext)
+{
+    if ((cmdtext==NULL)||(strlen(cmdtext)<2)) return -1;
+    int i=0;
+    int array_count=sizeof(cmd_traps_arr)/sizeof(char *);
+    while (i<array_count)
+    {
+      if (stricmp(cmd_traps_arr[i],cmdtext)==0)
+        return i;
+      i++;
+    }
+    return -1;
+}
+
+const char *trap_cmd_text(int cmdidx)
+{
+    int array_count=sizeof(cmd_traps_arr)/sizeof(char *);
+    if ((cmdidx<0)||(cmdidx>=array_count)) return "X";
+    return cmd_traps_arr[cmdidx];
+}
+
+int door_cmd_index(const char *cmdtext)
+{
+    if ((cmdtext==NULL)||(strlen(cmdtext)<2)) return -1;
+    int i=0;
+    int array_count=sizeof(cmd_doors_arr)/sizeof(char *);
+    while (i<array_count)
+    {
+      if (stricmp(cmd_doors_arr[i],cmdtext)==0)
+        return i;
+      i++;
+    }
+    return -1;
+}
+
+const char *door_cmd_text(int cmdidx)
+{
+    int array_count=sizeof(cmd_doors_arr)/sizeof(char *);
+    if ((cmdidx<0)||(cmdidx>=array_count)) return "X";
+    return cmd_doors_arr[cmdidx];
+}
+
 int special_cmd_index(const char *cmdtext)
 {
     if ((cmdtext==NULL)||(strlen(cmdtext)<1)) return -1;
@@ -2989,6 +3562,38 @@ int text_file_linecp_add(char ***lines,int *lines_count,char *text)
     (*lines)[line_idx]=strdup(text);
     (*lines_count)++;
     return line_idx;
+}
+
+short add_stats_to_script(char ***lines,int *lines_count,struct LEVEL *lvl)
+{
+    char *line;
+    char *tmp;
+    char *tmp2;
+    line=(char *)malloc(LINEMSG_SIZE*sizeof(char));
+    tmp=(char *)malloc(LINEMSG_SIZE*sizeof(char));
+    unsigned long curr_time=time(NULL);
+    // Script header
+    tmp2=prepare_short_fname(lvl->savfname,24);
+    sprintf(line,"%s %s script file for %s",rem_cmdtext,PROGRAM_NAME,tmp2);
+    free(tmp2);
+    text_file_linecp_add(lines,lines_count,line);
+    strftime(tmp,LINEMSG_SIZE/2, "%d %b %Y, %H:%M:%S", localtime(&curr_time) );
+    sprintf(line,"%s %s %s",rem_cmdtext,"Automatically generated on",tmp);
+    text_file_linecp_add(lines,lines_count,line);
+    text_file_linecp_add(lines,lines_count,"");
+    // Map version
+    sprintf(line,"%s(%d,%d,%d)",levversion_cmdtext,lvl->info.ver_major,
+        lvl->info.ver_minor,lvl->info.ver_rel);
+    text_file_linecp_add(lines,lines_count,line);
+    // Map creation date
+    sprintf(line,"%s(%lu,%lu)",leveltimestmp_cmdtext,lvl->info.creat_date,curr_time);
+    text_file_linecp_add(lines,lines_count,line);
+    // User commands count
+    sprintf(line,"%s(%lu)",usrcmnds_count_cmdtext,lvl->info.usr_cmds_count);
+    text_file_linecp_add(lines,lines_count,line);
+    free(tmp);
+    free(line);
+    return true;
 }
 
 short add_graffiti_to_script(char ***lines,int *lines_count,struct LEVEL *lvl)

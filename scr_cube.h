@@ -1,6 +1,21 @@
-/*
- * scr_cube.h header file for scr_cube.c
- */
+/******************************************************************************/
+// scr_cube.h - Another Dungeon Keeper Map Editor.
+/******************************************************************************/
+// Author:   Tomasz Lis
+// Created:  27 Oct 2007
+
+// Purpose:
+//   Header file. Defines exported routines from scr_cube.c
+
+// Comment:
+//   None.
+
+//Copying and copyrights:
+//   This program is free software; you can redistribute it and/or modify
+//   it under the terms of the GNU General Public License as published by
+//   the Free Software Foundation; either version 2 of the License, or
+//   (at your option) any later version.
+/******************************************************************************/
 
 #ifndef ADIKT_SCRCUBE_H
 #define ADIKT_SCRCUBE_H

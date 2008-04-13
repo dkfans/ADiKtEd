@@ -1,6 +1,21 @@
-/*
- * lev_script.h header file for lev_script.c
- */
+/******************************************************************************/
+// lev_script.h - Dungeon Keeper Tools.
+/******************************************************************************/
+// Author:   Tomasz Lis
+// Created:  24 Jan 2008
+
+// Purpose:
+//   Header file. Defines exported routines from lev_script.c
+
+// Comment:
+//   None.
+
+//Copying and copyrights:
+//   This program is free software; you can redistribute it and/or modify
+//   it under the terms of the GNU General Public License as published by
+//   the Free Software Foundation; either version 2 of the License, or
+//   (at your option) any later version.
+/******************************************************************************/
 
 #ifndef ADIKT_LEVSCRIPT_H
 #define ADIKT_LEVSCRIPT_H
@@ -284,10 +299,16 @@ enum cmnds_special {
 
 #define MAX_PARTYS 16
 
+#define ERR_SCRIPTPARAM_WHOLE      -9
+#define ERR_SCRIPTPARAM_NARGS      -2
+
 //ADiKtEd specific commands
 enum cmnds_adikted {
     CUSTOM_COLUMN      = 0x001,
     DEFINE_GRAFFITI    = 0x002,
+    LEVEL_TIMESTAMP    = 0x003,
+    USER_CMNDS_COUNT   = 0x004,
+    LEVEL_VERSION      = 0x005,
 };
 
 struct DK_SCRIPT_COMMAND {
@@ -315,6 +336,9 @@ struct SCRIPT_VERIFY_DATA {
 struct DK_SCRIPT;
 struct IPOINT_2D;
 
+typedef int (*func_cmd_index)(const char *cmdtext);
+typedef const char *(*func_cmd_text)(int cmdidx);
+
 extern int script_level_spaces;
 
 //Functions for script analysis
@@ -325,6 +349,8 @@ short decompose_script_command(struct DK_SCRIPT_COMMAND *cmd,const char *text);
 char *recompose_script_command(const struct DK_SCRIPT_COMMAND *cmd);
 //Functions for Adikted script execution
 short execute_script_line(struct LEVEL *lvl,char *line,char *err_msg);
+short add_stats_to_script(char ***lines,int *lines_count,struct LEVEL *lvl);
+short add_graffiti_to_script(char ***lines,int *lines_count,struct LEVEL *lvl);
 //Functions - verification
 short dkscript_verify(const struct LEVEL *lvl, char *err_msg,int *err_line,int *err_param);
 short txt_verify(const struct LEVEL *lvl, char *err_msg,struct IPOINT_2D *errpt);
@@ -372,6 +398,14 @@ int players_cmd_index(const char *cmdtext);
 const char *players_cmd_text(int cmdidx);
 int creatures_cmd_index(const char *cmdtext);
 const char *creatures_cmd_text(int cmdidx);
+int room_cmd_index(const char *cmdtext);
+const char *room_cmd_text(int cmdidx);
+int spell_cmd_index(const char *cmdtext);
+const char *spell_cmd_text(int cmdidx);
+int trap_cmd_index(const char *cmdtext);
+const char *trap_cmd_text(int cmdidx);
+int door_cmd_index(const char *cmdtext);
+const char *door_cmd_text(int cmdidx);
 int operator_cmd_index(const char *cmdtext);
 const char *operator_cmd_text(int cmdidx);
 int variabl_cmd_index(const char *cmdtext);
@@ -392,6 +426,7 @@ void script_command_free(struct DK_SCRIPT_COMMAND *cmd);
 char *get_orientation_shortname(unsigned short orient);
 char *get_font_longname(unsigned short font);
 short script_param_to_int(int *val,const char *param);
+short script_param_to_ulong(unsigned long *val,const char *param);
 const char *script_cmd_text(int group,int cmdidx);
 short is_no_bracket_command(int group,int cmdidx);
 char *script_strword( const char *str, const short whole_rest );

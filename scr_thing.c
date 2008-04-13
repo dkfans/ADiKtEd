@@ -1,10 +1,23 @@
-/*
- * scr_thing.c
- *
- * Defines functions for initializing and displaying the thing screen.
- * This also includes keyboard actions for the screen.
- *
- */
+/******************************************************************************/
+// scr_thing.c - Another Dungeon Keeper Map Editor.
+/******************************************************************************/
+// Author:   Jon Skeet
+// Created:  14 Oct 1997
+// Modified: Tomasz Lis
+
+// Purpose:
+//   Defines functions for initializing and displaying the thing screen.
+//   This also includes keyboard actions for the screen.
+
+// Comment:
+//   None.
+
+//Copying and copyrights:
+//   This program is free software; you can redistribute it and/or modify
+//   it under the terms of the GNU General Public License as published by
+//   the Free Software Foundation; either version 2 of the License, or
+//   (at your option) any later version.
+/******************************************************************************/
 
 #include "scr_thing.h"
 
@@ -236,6 +249,16 @@ void actions_mdtng(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata,i
           workdata->mdtng->obj_ranges_changed=true;
           change_visited_tile(workdata);
           };break;
+        case KEY_CTRL_D: // Delete all things which can be auto-created.
+          {
+          int prev_tng_rmv=workdata->lvl->stats.things_removed;
+          int prev_lgt=workdata->lvl->lgt_total_count;
+          remove_automade_obj_for_whole_map(workdata->lvl);
+          message_info("All %u auto-maintained or noncrucial objects removed.",
+              workdata->lvl->stats.things_removed-prev_tng_rmv+prev_lgt-workdata->lvl->lgt_total_count);
+          workdata->mdtng->obj_ranges_changed=true;
+          change_visited_tile(workdata);
+          };break;
         case KEY_V: // Verify whole map
           level_verify_with_highlight(workdata);
           break;
@@ -299,16 +322,15 @@ void actions_mdtng(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata,i
             {
             case OBJECT_TYPE_THING:
               thing = get_object(workdata->lvl,subpos.x,subpos.y,visiting_z);
-              if (!is_creature(thing))
+              if (switch_thing_subtype(thing,(key==KEY_SHIFT_S)))
               {
-                 message_error("No creature selected");
-                 break;
-              }
-              if (key==KEY_SHIFT_S)
-                set_thing_subtype(thing,get_creature_next(get_thing_subtype(thing)));
-              else
-                set_thing_subtype(thing,get_creature_prev(get_thing_subtype(thing)));
-              message_info("Creature kind changed");
+                message_info("Thing type switched to next.");
+              } else
+                message_error("This thing has no level/type, or its limit is reached.");
+              break;
+            case OBJECT_TYPE_ACTNPT:
+              thing = get_object(workdata->lvl,subpos.x,subpos.y,visiting_z);
+              tng_change_actnpt_level(workdata,thing,(key==KEY_SHIFT_S));
               break;
             default:
               message_error("Can't change type: no \"thing\" selected.");
@@ -1372,18 +1394,27 @@ void action_inc_object_level(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *
         thing = get_object(workdata->lvl,subpos.x,subpos.y,visiting_z);
         if (is_creature(thing))
         {
-            if (get_thing_level(thing)<9)
+            unsigned short crtr_lev=get_thing_level(thing);
+            if (crtr_lev<9)
             {
-                set_thing_level(thing,get_thing_level(thing)+1);
+                set_thing_level(thing,crtr_lev+1);
                 message_info("Creature level increased.");
             } else
                 message_error("Creature level limit reached.");
+        } else
+        if (is_herogate(thing))
+        {
+            tng_change_herogate_number(workdata,thing,true);
+        } else
+        if (is_dnheart(thing))
+        {
+            message_error("Dungeon Heart has no alternative.");
         } else
         if (switch_thing_subtype(thing,true))
         {
             message_info("Item type switched to next.");
         } else
-            message_error("This item has no level/type, or its limit is reached.");
+            message_error("This thing has no level/type, or its limit is reached.");
       };break;
     case OBJECT_TYPE_STLIGHT:
       {
@@ -1408,16 +1439,7 @@ void action_inc_object_level(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *
       {
         unsigned char *actnpt;
         actnpt = get_object(workdata->lvl,subpos.x,subpos.y,visiting_z);
-        unsigned short num=get_actnpt_number(actnpt);
-        unsigned short apt_num=get_free_actnpt_number_next(workdata->lvl,num);
-        if (num!=apt_num)
-        {
-            set_actnpt_number(actnpt,apt_num);
-            message_info("Action point number increased.");
-        } else
-        {
-            message_error("Action point number limit reached.");
-        }
+        tng_change_actnpt_level(workdata,actnpt,true);
       };break;
     default:
         message_error("Can't change level: no thing selected.");
@@ -1439,18 +1461,27 @@ void action_dec_object_level(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *
         thing = get_object(workdata->lvl,subpos.x,subpos.y,visiting_z);
         if (is_creature(thing))
         {
-            if (get_thing_level(thing)>0)
+            unsigned short crtr_lev=get_thing_level(thing);
+            if (crtr_lev>0)
             {
-                set_thing_level(thing,get_thing_level(thing)-1);
+                set_thing_level(thing,crtr_lev-1);
                 message_info("Creature level decreased.");
             } else
             message_error("Creature level limit reached.");
+        } else
+        if (is_herogate(thing))
+        {
+            tng_change_herogate_number(workdata,thing,false);
+        } else
+        if (is_dnheart(thing))
+        {
+            message_error("Dungeon Heart has no alternative.");
         } else
         if (switch_thing_subtype(thing,false))
         {
             message_info("Item type switched to previous.");
         } else
-            message_error("This item has no level/type, or its limit is reached.");
+            message_error("This thing has no level/type, or its limit is reached.");
       };break;
     case OBJECT_TYPE_STLIGHT:
       {
@@ -1471,19 +1502,56 @@ void action_dec_object_level(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *
       {
         unsigned char *actnpt;
         actnpt = get_object(workdata->lvl,subpos.x,subpos.y,visiting_z);
-        unsigned short num=get_actnpt_number(actnpt);
-        unsigned short apt_num=get_free_actnpt_number_prev(workdata->lvl,num);
-        if (num!=apt_num)
-        {
-            set_actnpt_number(actnpt,apt_num);
-            message_info("Action point number decreased.");
-        } else
-        {
-            message_error("Action point number limit reached.");
-        }
+        tng_change_actnpt_level(workdata,actnpt,false);
       };break;
     default:
         message_error("Can't change level: no thing selected.");
         break;
+    }
+}
+
+void tng_change_actnpt_level(struct WORKMODE_DATA *workdata,unsigned char *actnpt,short forward)
+{
+    unsigned short num=get_actnpt_number(actnpt);
+    unsigned short apt_num;
+    if (forward)
+        apt_num=get_free_actnpt_number_next(workdata->lvl,num);
+    else
+        apt_num=get_free_actnpt_number_prev(workdata->lvl,num);
+    if (num!=apt_num)
+    {
+        set_actnpt_number(actnpt,apt_num);
+        char *oper;
+        if (apt_num>num)
+          oper="increased";
+        else
+          oper="decreased";
+        message_info("%s number %s.","Action point",oper);
+    } else
+    {
+        message_error("%s number limit reached.","Action point");
+    }
+}
+
+void tng_change_herogate_number(struct WORKMODE_DATA *workdata,unsigned char *thing,short forward)
+{
+    unsigned short num=get_thing_level(thing);
+    unsigned short newnum;
+    if (forward)
+        newnum=get_free_herogate_number_next(workdata->lvl,num);
+    else
+        newnum=get_free_herogate_number_prev(workdata->lvl,num);
+    if (num!=newnum)
+    {
+        set_thing_level(thing,newnum);
+        char *oper;
+        if (newnum>num)
+          oper="increased";
+        else
+          oper="decreased";
+        message_info("%s number %s.","Hero gate",oper);
+    } else
+    {
+        message_error("%s number limit reached.","Hero gate");
     }
 }
