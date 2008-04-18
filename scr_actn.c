@@ -22,6 +22,7 @@
 #include "scr_actn.h"
 
 #include <math.h>
+#include <strings.h>
 #include "globals.h"
 #include "var_utils.h"
 #include "graffiti.h"
@@ -111,9 +112,6 @@ void init_levscr_basics(struct SCRMODE_DATA **scrmode,struct WORKMODE_DATA *work
     finished=false;
     // random num gen seed selection
     srand(time(0));
-    //Basic configuration variables
-    (*scrmode)->screen_enabled=true;
-    (*scrmode)->input_enabled=true;
     //Creating and clearing screen mode info variable
     *scrmode=(struct SCRMODE_DATA *)malloc(sizeof(struct SCRMODE_DATA));
     if ((*scrmode)==NULL)
@@ -206,14 +204,16 @@ void clear_scrmode(struct SCRMODE_DATA *scrmode)
     scrmode->usrinput_type=SI_NONE;
     scrmode->usrinput_pos=0;
     scrmode->usrinput[0]='\0';
+    scrmode->screen_enabled=true;
+    scrmode->input_enabled=true;
 }
 
 void clear_mapmode(struct MAPMODE_DATA *mapmode)
 {
-    mapmode->mark=false;
-    mapmode->paintmode=false;
-    mapmode->paintown=false;
-    mapmode->paintroom=0;
+    set_marking_disab(mapmode);
+    set_painting_disab(mapmode);
+    mapmode->paintownr=PLAYER_UNSET;
+    mapmode->paintroom=SLAB_TYPE_ROCK;
     mapmode->screen.x=0;
     mapmode->screen.y=0;
     mapmode->map.x=0;
@@ -226,6 +226,7 @@ void clear_mapmode(struct MAPMODE_DATA *mapmode)
     mapmode->roomeffect_list_on_create=1;
     mapmode->items_list_on_create=1;
     mapmode->creature_list_on_create=1;
+    mapmode->eetype=EE_NONE;
     clear_highlight(mapmode);
     clear_brighten(mapmode);
     level_free(mapmode->preview);
@@ -420,6 +421,199 @@ void set_brighten_for_range(struct MAPMODE_DATA *mapmode,
     }
 }
 
+void draw_eegg(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode)
+{
+    if (mapmode->eetype!=EE_TLBIRTH)
+        return;
+    if (rnd(100)<90)
+        return;
+    int all_rows=get_screen_rows();
+    int all_cols=get_screen_cols();
+    int row=(all_rows-20)/2 + (6-rnd(7));
+    int col=(all_cols-38)/2 + (6-rnd(7));
+    screen_setcolor(PRINT_COLOR_LRED_ON_BLACK);
+    set_cursor_pos(row, col+12);
+    screen_printf(".__--\"\"\"--__.");
+    row++;
+    set_cursor_pos(row,col+8);
+    screen_printf("._--'");
+    set_cursor_pos(row,col+24);
+    screen_printf("'--_.");
+    row++;
+    set_cursor_pos(row,col+6);
+    screen_printf(".\"");
+    set_cursor_pos(row,col+29);
+    screen_printf("\".");
+    row++;
+    set_cursor_pos(row,col+4);
+    screen_printf(".\"|\"-.");
+    set_cursor_pos(row,col+27);
+    screen_printf(".-\"|\".");
+    row++;
+    set_cursor_pos(row,col+3);
+    screen_printf("/");
+    set_cursor_pos(row,col+7);
+    screen_printf("\\");
+    set_cursor_pos(row,col+10);
+    screen_printf("\"-.");
+    set_cursor_pos(row,col+24);
+    screen_printf(".-\"");
+    set_cursor_pos(row,col+29);
+    screen_printf("/");
+    set_cursor_pos(row,col+33);
+    screen_printf("\\");
+    row++;
+    set_cursor_pos(row,col+2);
+    screen_printf("/");
+    set_cursor_pos(row,col+8);
+    screen_printf("|");
+    set_cursor_pos(row,col+13);
+    screen_printf("'.");
+    set_cursor_pos(row,col+22);
+    screen_printf(".'");
+    set_cursor_pos(row,col+28);
+    screen_printf("|");
+    set_cursor_pos(row,col+34);
+    screen_printf("\\");
+    row++;
+    set_cursor_pos(row,col+1);
+    screen_printf(".'");
+    set_cursor_pos(row,col+8);
+    screen_printf("|");
+    set_cursor_pos(row,col+15);
+    screen_printf("\"-.");
+    set_cursor_pos(row,col+19);
+    screen_printf(".-\"");
+    set_cursor_pos(row,col+28);
+    screen_printf("|");
+    set_cursor_pos(row,col+34);
+    screen_printf("'.");
+    row++;
+    set_cursor_pos(row,col+1);
+    screen_printf("/");
+    set_cursor_pos(row,col+9);
+    screen_printf("\\");
+    set_cursor_pos(row,col+16);
+    screen_printf(".-v-.");
+    set_cursor_pos(row,col+27);
+    screen_printf("/");
+    set_cursor_pos(row,col+35);
+    screen_printf("\\");
+    row++;
+    set_cursor_pos(row,col);
+    screen_printf("\"");
+    set_cursor_pos(row,col+10);
+    screen_printf("|");
+    set_cursor_pos(row,col+14);
+    screen_printf(".\"");
+    set_cursor_pos(row,col+21);
+    screen_printf("\".");
+    set_cursor_pos(row,col+26);
+    screen_printf("|");
+    set_cursor_pos(row,col+36);
+    screen_printf("\"");
+    row++;
+    set_cursor_pos(row,col);
+    screen_printf("|");
+    set_cursor_pos(row,col+11);
+    screen_printf(")-'");
+    set_cursor_pos(row,col+23);
+    screen_printf("\"-(");
+    set_cursor_pos(row,col+36);
+    screen_printf("|");
+    row++;
+    set_cursor_pos(row,col);
+    screen_printf("|");
+    set_cursor_pos(row,col+8);
+    screen_printf(".-\"");
+    set_cursor_pos(row,col+12);
+    screen_printf("|");
+    set_cursor_pos(row,col+24);
+    screen_printf("|");
+    set_cursor_pos(row,col+26);
+    screen_printf("\"-.");
+    set_cursor_pos(row,col+36);
+    screen_printf("|");
+    row++;
+    set_cursor_pos(row,col);
+    screen_printf("'.");
+    set_cursor_pos(row,col+6);
+    screen_printf(".\"");
+    set_cursor_pos(row,col+12);
+    screen_printf("|");
+    set_cursor_pos(row,col+24);
+    screen_printf("|");
+    set_cursor_pos(row,col+29);
+    screen_printf("\".");
+    set_cursor_pos(row,col+35);
+    screen_printf(".'");
+    row++;
+    set_cursor_pos(row,col+1);
+    screen_printf("\\");
+    set_cursor_pos(row,col+3);
+    screen_printf(".-\"");
+    set_cursor_pos(row,col+13);
+    screen_printf("\\");
+    set_cursor_pos(row,col+23);
+    screen_printf("/");
+    set_cursor_pos(row,col+31);
+    screen_printf("\"-.");
+    set_cursor_pos(row,col+35);
+    screen_printf("/");
+    row++;
+    set_cursor_pos(row, col+1);
+    screen_printf("'=-----------+-------+-----------='");
+    row++;
+    set_cursor_pos(row,col+2);
+    screen_printf("\\");
+    set_cursor_pos(row,col+14);
+    screen_printf("|");
+    set_cursor_pos(row,col+22);
+    screen_printf("|");
+    set_cursor_pos(row,col+34);
+    screen_printf("/");
+    row++;
+    set_cursor_pos(row,col+3);
+    screen_printf("\\");
+    set_cursor_pos(row,col+15);
+    screen_printf("|");
+    set_cursor_pos(row,col+21);
+    screen_printf("|");
+    set_cursor_pos(row,col+33);
+    screen_printf("/");
+    row++;
+    set_cursor_pos(row,col+4);
+    screen_printf("'.");
+    set_cursor_pos(row,col+16);
+    screen_printf("|");
+    set_cursor_pos(row,col+20);
+    screen_printf("|");
+    set_cursor_pos(row,col+31);
+    screen_printf(".'");
+    row++;
+    set_cursor_pos(row,col+6);
+    screen_printf("'.");
+    set_cursor_pos(row,col+16);
+    screen_printf("|");
+    set_cursor_pos(row,col+20);
+    screen_printf("|");
+    set_cursor_pos(row,col+29);
+    screen_printf(".'");
+    row++;
+    set_cursor_pos(row,col+8);
+    screen_printf("\"--__.");
+    set_cursor_pos(row,col+17);
+    screen_printf("\\");
+    set_cursor_pos(row,col+19);
+    screen_printf("/");
+    set_cursor_pos(row,col+23);
+    screen_printf(".__--\"");
+    row++;
+    set_cursor_pos(row, col+13);
+    screen_printf("'\"-__V__-\"'");
+    row++;
+}
+
 /*
  * Draw the whole screen; Draws bottom lines and calls proper function
  * to draw rest of the screen.
@@ -429,7 +623,7 @@ void draw_levscr(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata)
     message_log(" draw_levscr: starting");
     drawdata.scrmode=scrmode;
     drawdata.workdata=workdata;
-    if (workdata->mapmode->mark)
+    if (is_marking_enab(workdata->mapmode))
       mark_check(scrmode,workdata->mapmode);
     set_cursor_visibility(0);
     int all_rows=get_screen_rows();
@@ -558,9 +752,9 @@ char *mode_status(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata,in
       break;
     case MD_SLB:
       sprintf (buffer, "   Position: %2d,%2d", tx,ty);
-      if (workdata->mapmode->mark)
+      if (is_marking_enab(workdata->mapmode))
           strcat (buffer, " (Marking)");
-      else if (workdata->mapmode->paintmode)
+      else if (is_painting_enab(workdata->mapmode))
           strcat (buffer, " (Painting)");
       break;
     case MD_HELP:
@@ -605,7 +799,7 @@ int get_draw_map_tile_color(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *ma
     int hilight=get_tile_highlight(mapmode,tx,ty);
     if (hilight>0) return hilight;
     int own=get_tile_owner(lvl,tx,ty);
-    short marked=((mapmode->mark) && (tx>=mapmode->markr.l) && (tx<=mapmode->markr.r)
+    short marked=((is_marking_enab(mapmode)) && (tx>=mapmode->markr.l) && (tx<=mapmode->markr.r)
                         && (ty>=mapmode->markr.t) && (ty<=mapmode->markr.b));
     int col;
     if (special)
@@ -861,6 +1055,7 @@ void draw_map_area(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,str
       screen_setcolor(PRINT_COLOR_LGREY_ON_BLACK);
       screen_printf_toeol("");
     }
+    draw_eegg(scrmode,mapmode);
 }
 
 /*
@@ -1438,6 +1633,7 @@ void action_load_map_quick(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *wo
           strcpy(workdata->lvl->savfname,"");
           load_map(workdata->lvl);
           clear_highlight(workdata->mapmode);
+          workdata->mdtng->obj_ranges_changed=true;
           change_mode(scrmode,workdata,scrmode->mode);
           message_info("Map \"%s\" reloaded", workdata->lvl->fname);
     } else
@@ -1484,6 +1680,7 @@ void action_create_new_map(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *wo
     free_map(workdata->lvl);
     start_new_map(workdata->lvl);
     clear_highlight(workdata->mapmode);
+    workdata->mdtng->obj_ranges_changed=true;
     change_mode(scrmode,workdata,scrmode->mode);
     message_info_force("New map started");
 }
@@ -1499,6 +1696,7 @@ void action_create_random_backgnd(struct SCRMODE_DATA *scrmode,struct WORKMODE_D
     free_map(workdata->lvl);
     generate_random_map(workdata->lvl);
     clear_highlight(workdata->mapmode);
+    workdata->mdtng->obj_ranges_changed=true;
     change_mode(scrmode,workdata,scrmode->mode);
     message_info_force("Map generation completed");
 }
@@ -1592,6 +1790,91 @@ struct CLIPBOARD *get_clipboard_object(struct SCRMODE_DATA *scrmode,int idx)
           return &(scrmode->clipbrd[i]);
     }
     return NULL;
+}
+
+short is_painting_enab(struct MAPMODE_DATA *mapmode)
+{
+    return (mapmode->paintmode&PNTMD_ENAB==PNTMD_ENAB);
+}
+
+short is_painting_slab(struct MAPMODE_DATA *mapmode)
+{
+    if ((mapmode->paintmode&PNTMD_ENAB)!=PNTMD_ENAB)
+      return false;
+    if ((mapmode->paintmode&PNTMD_SLAB)==PNTMD_SLAB)
+        return true;
+    if ((mapmode->paintmode&PNTMD_RNDWALL)==PNTMD_RNDWALL)
+        return true;
+    return false;
+}
+
+short is_painting_ownr(struct MAPMODE_DATA *mapmode)
+{
+    const short cmpr=PNTMD_ENAB|PNTMD_OWNR;
+    return ((mapmode->paintmode&cmpr)==cmpr);
+}
+
+unsigned short get_painting_slab(struct MAPMODE_DATA *mapmode)
+{
+    if ((mapmode->paintmode&PNTMD_RNDWALL)==PNTMD_RNDWALL)
+        return get_random_wall_slab();
+    return mapmode->paintroom;
+}
+
+unsigned char get_painting_ownr(struct MAPMODE_DATA *mapmode)
+{
+    return mapmode->paintownr;
+}
+
+void set_painting_enab(struct MAPMODE_DATA *mapmode)
+{
+    mapmode->paintmode=PNTMD_ENAB;
+    mapmode->mark=false;
+}
+
+void set_painting_slab(struct MAPMODE_DATA *mapmode,const unsigned short slab)
+{
+    mapmode->paintmode&=(~PNTMD_RNDWALL);
+    mapmode->paintmode|=(PNTMD_ENAB|PNTMD_SLAB);
+    mapmode->paintroom=slab;
+    mapmode->mark=false;
+}
+
+void set_painting_ownr(struct MAPMODE_DATA *mapmode,const unsigned char owner)
+{
+    mapmode->paintmode|=(PNTMD_ENAB|PNTMD_OWNR);
+    mapmode->paintownr=owner;
+    mapmode->mark=false;
+}
+
+void set_painting_rndwall(struct MAPMODE_DATA *mapmode)
+{
+    mapmode->paintmode&=(~PNTMD_SLAB);
+    mapmode->paintmode|=(PNTMD_ENAB|PNTMD_RNDWALL);
+    mapmode->mark=false;
+}
+
+void set_painting_disab(struct MAPMODE_DATA *mapmode)
+{
+    mapmode->paintmode=PNTMD_NONE;
+}
+
+short is_marking_enab(struct MAPMODE_DATA *mapmode)
+{
+    return (mapmode->mark);
+}
+
+void set_marking_disab(struct MAPMODE_DATA *mapmode)
+{
+    mapmode->mark=false;
+}
+
+void set_marking_start(struct MAPMODE_DATA *mapmode,int x,int y)
+{
+    mapmode->mark=true;
+    mapmode->markp.x=x;
+    mapmode->markp.y=y;
+    mapmode->paintmode=PNTMD_NONE;
 }
 
 /*

@@ -137,6 +137,8 @@ void actions_mdrwrk(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata,
 short start_mdrwrk(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata)
 {
     scrmode->mode=MD_RWRK;
+    if (workdata->lvl!=NULL)
+      workdata->lvl->info.usr_mdswtch_count++;
     return true;
 }
 

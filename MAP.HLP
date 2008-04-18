@@ -144,6 +144,11 @@ ownership you selected (or both). To change the paint ownership or
 slab, just press another slab or number key. To stop painting, press
 '\wz\s' again.
 
+If you wish to \yplace any wall\s, use '\wf\s'. This will place fortified wall
+of random type. You can use it in paint mode to create a fortified
+boundary with random walls. Using '\wf\s' in mark mode will fill the
+selected area with one wall type.
+
 To draw some \ygraffiti\s to a dungeon, press '\wd\s'. You can alter its
 \yorientation\s using '\wa\s' - it will swich through 8 possible orientations.
 Press \wdelete\s or \wbackspace\s to \yremove graffiti\s.
@@ -325,12 +330,14 @@ the map manually by user. Most of things and all static lights will be
 removed. Many of them may be then re-created by pressing '\wu\s'.
 
 Press '\ws\s' and '\wx\s' to \yincrease/decrease level\s of a highlighted
-creature, the type of a highlighted trap, the type of a 
+creature, or \ychange number\s of highlighted hero gate or action point.
+These keys also change the type of a highlighted trap, the type of a
 highlighted dungeon special, or the type of a spell book.
 This also works on other items (even torches), so try it.
 
 Press '\wS\s' and '\wX\s' to \ychange type\s of a highlighted creature,
-or \ychange number\s of highlighted hero gate or action point.
+or type of any other item. These keys for some objects works identical
+to '\ws\s' and '\wx\s', but for other they represents alternate change.
 
 Alternatively, you can press \wenter\s on most objects to \ychange their\s
 \ytype\s by selecting it from a \rlist screen\s.
@@ -2913,273 +2920,273 @@ are used to represent every
 earth slab on map.
 
 
-earth bright top L
+\rearth bright top L\s
 
+Standard \yearth cube\s from top,
+but at sides it is brighter on top
+than standard earth.
+It is also dark on left.
 
 
+\rearth bright top C\s
 
+Standard \yearth cube\s from top,
+but at sides it is brighter on top
+than standard earth.
 
 
 
-earth bright top C
+\rearth bright top R\s
 
+Standard \yearth cube\s from top,
+but at sides it is brighter on top
+than standard earth.
+It is also dark on right.
 
 
+\rearth n/water L\s
 
+\yEarth cube\s more green from top,
+like it has some growth on.
 
+It is darker on left.
 
 
-earth bright top R
+\rearth n/water R\s
 
+\yEarth cube\s more green from top,
+like it has some growth on.
 
+It is darker on right.
 
 
+\rearth n/wtr s.top L\s
 
+Standard earth from top, but at side
+it is darker and more green.
 
+It is even darker on left.
 
-earth n/water L
 
+\rearth n/wtr s.top C\s
 
+Standard earth from top, but at side
+it is darker and more green.
 
 
 
 
+\rearth n/wtr s.top R\s
 
-earth n/water R
+Standard earth from top, but at side
+it is darker and more green.
 
+It is even darker on right.
 
 
+\rstone w/earth top 1\s
 
+Dark earth from top.
 
+At side there's \ywhite lit stone\s,
+darker on top.
 
 
-earth n/wtr s.top L
+\rstone w/earth top 2\s
 
+Dark earth from top.
 
+At side there's \ywhite lit stone\s,
+equally bright on all sides.
 
 
+\rwhite stone\s
 
+\yWhite lit stone\s,
+equally bright on all sides.
 
 
-earth n/wtr s.top C
 
 
+\rstone w/earth top 3\s
 
+Dark earth from top.
 
+At side there's \ywhite lit stone\s,
+darker on bottom.
 
 
+\rskulls stack wall TL\s
 
-earth n/wtr s.top R
+Wall relief with \ystack of skulls\s,
+used as room wall for Lair.
 
+This is top left part of the relief.
 
 
+\rskulls stack wall TC\s
 
+Wall relief with \ystack of skulls\s,
+used as room wall for Lair.
 
+This is top center part of the
+relief.
 
+\rskulls stack wall TR\s
 
-stone w/earth top 1
+Wall relief with \ystack of skulls\s,
+used as room wall for Lair.
 
+This is top right part of the
+relief.
 
+\rskulls stack wall UC\s
 
+Wall relief with \ystack of skulls\s,
+used as room wall for Lair.
 
+This is upper center part of the
+relief.
 
+\rskulls stack wall MC\s
 
+Wall relief with \ystack of skulls\s,
+used as room wall for Lair.
 
-stone w/earth top 2
+This is middle center part of the
+relief.
 
+\rskulls stack wall BL\s
 
+Wall relief with \ystack of skulls\s,
+used as room wall for Lair.
 
+This is bottom left part of the
+relief.
 
+\rskulls stack wall BC\s
 
+Wall relief with \ystack of skulls\s,
+used as room wall for Lair.
 
+This is bottom center part of the
+relief.
 
-white stone
+\rskulls stack wall BR\s
 
+Wall relief with \ystack of skulls\s,
+used as room wall for Lair.
 
+This is bottom right part of the
+relief.
 
+\rearth w/torch plate\s
 
+\yStandard earth\s but with torch plate
+visible from all four sides.
 
 
 
-stone w/earth top 3
 
+\rstandard path 1\s
 
+Standard, \ybrown earth\s. Little bit
+green from sides.
 
+Variation 1 with no stones on top.
 
 
+\rstandard path 2\s
 
+Standard, \ybrown earth\s. Little bit
+green from sides.
 
-unknown cube 0x0010
+Variation 2 with no stones on top.
 
 
+\rstandard path 3\s
 
+Standard, \ybrown earth\s. Little bit
+green from sides.
 
+Variation 3 with no stones on top.
 
 
+\rstandard path w/stones 1\s
 
-unknown cube 0x0011
+Standard, \ybrown earth\s. Little bit
+green from sides.
 
+Variation with large stones on top.
 
 
+\rstandard path w/stones 2\s
 
+Standard, \ybrown earth\s. Little bit
+green from sides.
 
+Variation with small stones on top.
 
 
-unknown cube 0x0012
+\rlair floor NW\s
 
+North west corner of \ylair floor\s.
 
 
 
 
 
+\rlair floor NC\s
 
-unknown cube 0x0013
+North edge of \ylair floor\s.
 
 
 
 
 
+\rlair floor NE\s
 
+North east corner of \ylair floor\s.
 
-unknown cube 0x0014
 
 
 
 
+\rlair floor CW\s
 
+West edge of \ylair floor\s.
 
 
-unknown cube 0x0015
 
 
 
+\rlair floor CE\s
 
+East edge of \ylair floor\s.
 
 
 
-unknown cube 0x0016
 
 
+\rlair floor SW\s
 
+South west corner of \ylair floor\s.
 
 
 
 
-unknown cube 0x0017
 
+\rlair floor SC\s
 
+South edge of \ylair floor\s.
 
 
 
 
 
-unknown cube 0x0018
+\rlair floor SE\s
 
-
-
-
-
-
-
-unknown cube 0x0019
-
-
-
-
-
-
-
-unknown cube 0x001a
-
-
-
-
-
-
-
-unknown cube 0x001b
-
-
-
-
-
-
-
-unknown cube 0x001c
-
-
-
-
-
-
-
-unknown cube 0x001d
-
-
-
-
-
-
-
-unknown cube 0x001e
-
-
-
-
-
-
-
-unknown cube 0x001f
-
-
-
-
-
-
-
-unknown cube 0x0020
-
-
-
-
-
-
-
-unknown cube 0x0021
-
-
-
-
-
-
-
-unknown cube 0x0022
-
-
-
-
-
-
-
-unknown cube 0x0023
-
-
-
-
-
-
-
-unknown cube 0x0024
-
-
-
-
-
-
-
-unknown cube 0x0025
-
-
+South east corner of \ylair floor\s.
 
 
 
@@ -3193,277 +3200,277 @@ unknown cube 0x0026
 
 
 
-static water
+\rstatic water\s
 
+Cube with water texture on all
+sides.
 
 
 
 
+\rstatic dark lava\s
 
+The darker lava texture on all
+sides.
 
-static dark lava
 
 
 
+\rstatic bright lava\s
 
+The brighter lava texture on all
+sides.
 
 
 
-static bright lava
 
+\rearth near lava\s
 
+Standard earth from top, but darker
+from sides, and with lava color
+at bottom of the sides.
 
 
 
+\rrock brighter on top\s
 
+\yStandar rock\s, but at top of sides
+it is brighter.
 
-unknown cube 0x002a
 
 
 
+\rstandard rock\s
 
+Just a typical \ystandard rock\s cube.
 
 
 
-unknown cube 0x002b
 
 
+\rrock near lava\s
 
+Standard rock, but at bottom of all
+four sides it has little of lava.
 
 
 
 
-unknown cube 0x002c
+\rstandard path 4\s
 
+Standard path, but little brighter
+at sides.
 
 
 
 
+\rearth near lava 2\s
 
+Darker earth from top and all sides,
+additionally with lava color at
+bottom of the sides.
 
-unknown cube 0x002d
+Has no bottom texture.
 
+\rdark earth 1\s
 
+Standard earth from top darker on
+all sides.
 
+Used for earth colums next to lava.
 
 
+\rstatic gold 1\s
 
+Just a standard gold cube.
 
-unknown cube 0x002e
+Variation 1.
 
 
 
+\rstatic gold 2\s
 
+Just a standard gold cube.
 
+Variation 2.
 
 
-unknown cube 0x002f
 
+\rstatic gold 3\s
 
+Just a standard gold cube.
 
+Variation 3.
 
 
 
+\rgold near lava 1\s
 
-unknown cube 0x0030
+Gold cube, darker than standard one
+on sides. Used near lava.
 
+Variation 1.
 
 
+\rgold near lava 2\s
 
+Gold cube, darker than standard one
+on sides. Used near lava.
 
+Variation 2.
 
 
-unknown cube 0x0031
+\rgold near lava 3\s
 
+Gold cube, darker than standard one
+on sides. Used near lava.
 
+Variation 3.
 
 
+\rmarked cobblestones 1\s
 
+White cobblestones with some
+markings on.
 
+Marking no 1.
 
-unknown cube 0x0032
 
+\rmarked cobblestones 2\s
 
+White cobblestones with some
+markings on.
 
+Marking no 2.
 
 
+\rmarked cobblestones 3\s
 
+White cobblestones with some
+markings on.
 
-unknown cube 0x0033
+Marking no 3.
 
 
+\rmarked cobblestones 4\s
 
+White cobblestones with some
+markings on.
 
+Marking no 4.
 
 
+\rmarked cobblestones 5\s
 
-unknown cube 0x0034
+White cobblestones with some
+markings on.
 
+Marking no 5.
 
 
+\rmarked cobblestones L\s
 
+White cobblestones with some
+markings on.
 
+Marking no 4, a little darker on
+right.
 
+\rmarked cobblestones C\s
 
-unknown cube 0x0035
+White cobblestones with some
+markings on.
 
+Center of the wider relief.
 
 
+\rmarked cobblestones R\s
 
+White cobblestones with some
+markings on.
 
+Marking no 4, a little darker on
+left.
 
+\rmarked cobblestones 1b\s
 
-unknown cube 0x0036
+White cobblestones with some
+markings on.
 
+Marking no 1 darker on bottom.
 
 
+\rmarked cobblestones 4b\s
 
+White cobblestones with some
+markings on.
 
+Marking no 4 darker at sides.
 
 
-unknown cube 0x0037
+\rmarked cobblestones 4\s
 
+White cobblestones with some
+markings on.
 
+Marking no 4.
 
 
+\rmarked cobblestones 4c\s
 
+White cobblestones with some
+markings on.
 
+Marking no 4 darker at bottom.
 
-unknown cube 0x0038
 
+\rcobblestones\s
 
+White cobblestones.
 
 
 
 
 
-unknown cube 0x0039
+\rearth with red mark\s
 
+Earth, little brighter on top of
+sides. At top, there's red square.
 
+Use at center of player0's
+reinforced wall.
 
+\rearth with blue mark\s
 
+Earth, little brighter on top of
+sides. At top, there's blue square.
 
+Use at center of player1's
+reinforced wall.
 
+\rearth with green mark\s
 
-unknown cube 0x003a
+Earth, little brighter on top of
+sides. At top, there's green square.
 
+Use at center of player2's
+reinforced wall.
 
+\rearth with purple mark\s
 
+Earth, little brighter on top of
+sides. At top, there's purple square.
 
+Use at center of player3's
+reinforced wall.
 
+\rearth with white mark\s
 
+Earth, little brighter on top of
+sides. At top, there's white square.
 
-unknown cube 0x003b
-
-
-
-
-
-
-
-unknown cube 0x003c
-
-
-
-
-
-
-
-unknown cube 0x003d
-
-
-
-
-
-
-
-unknown cube 0x003e
-
-
-
-
-
-
-
-unknown cube 0x003f
-
-
-
-
-
-
-
-unknown cube 0x0040
-
-
-
-
-
-
-
-unknown cube 0x0041
-
-
-
-
-
-
-
-unknown cube 0x0042
-
-
-
-
-
-
-
-unknown cube 0x0043
-
-
-
-
-
-
-
-unknown cube 0x0044
-
-
-
-
-
-
-
-unknown cube 0x0045
-
-
-
-
-
-
-
-unknown cube 0x0046
-
-
-
-
-
-
-
-unknown cube 0x0047
-
-
-
-
-
-
-
-unknown cube 0x0048
-
-
-
-
-
-
+Use at center of player4's
+reinforced wall.
 
 unknown cube 0x0049
 
@@ -6345,105 +6352,105 @@ red face flag stone
 
 
 
-lair floor Cntr
+\rlair floor Cntr\s
 
+Standard \ylair floor\s.
 
+This one is completely filled with the
+lair texture on all sides.
 
 
+\rfence brick wall T\s
 
+\yRed brick wall\s, from side has a grid
+made of rusty steel poles.
+Used as top of Graveyard wall.
 
+The poles are ending on top.
 
-fence brick wall T
+\rfence brick wall B\s
 
+\yRed brick wall\s, from side has a grid
+made of rusty steel poles.
+Used as bottom of Graveyard wall.
 
+Darker at bottom.
 
+\rwood floor hole R\s
 
+\yWooden floor\s, from side looks like
+right part of a large hole.
 
+Has water color at bottom.
 
 
-fence brick wall B
+\rwood floor hole L\s
 
+\yWooden floor\s, from side looks like
+left part of a large hole.
 
+Has water color at bottom.
 
 
+\rwood floor hole C\s
 
+\yWooden floor\s, from side looks like
+center of a large hole.
 
+Has water color at bottom.
 
-wood floor hole R
 
+\rwood floor n/lava\s
 
+\yWooden floor\s, from side looks like
+with half of circular hole.
 
+Has lava color at bottom.
 
 
+\rwood floor n/water\s
 
+\yWooden floor\s, from side looks like
+with half of circular hole.
 
-wood floor hole L
+Has water color at bottom.
 
 
+\rvaluable gems 1\s
 
+Purple \ygems cube\s.
+Variation no 1. Gem variations
+are switched to make animated
+effect.
 
 
+\rvaluable gems 2\s
 
+Purple \ygems cube\s.
+Variation no 2. Gem variations
+are switched to make animated
+effect.
 
-wood floor hole C
 
+\rvaluable gems 3\s
 
+Purple \ygems cube\s.
+Variation no 3. Gem variations
+are switched to make animated
+effect.
 
 
+\rvaluable gems 4\s
 
-
-
-wood floor n/lava
-
-
-
-
-
-
-
-wood floor n/water
-
-
-
-
-
-
-
-valuable gems 1
-
-
-
-
-
-
-
-valuable gems 2
-
-
-
-
-
-
-
-valuable gems 3
-
-
-
-
-
-
-
-valuable gems 4
-
-
-
-
-
+Purple \ygems cube\s.
+Variation no 4. Gem variations
+are switched to make animated
+effect.
 
 
 empty cube 0x01bd
 
-
+Shouldn't be used.
 
 
 
@@ -6451,7 +6458,7 @@ empty cube 0x01bd
 
 empty cube 0x01be
 
-
+Shouldn't be used.
 
 
 
@@ -6459,7 +6466,7 @@ empty cube 0x01be
 
 empty cube 0x01bf
 
-
+Shouldn't be used.
 
 
 
@@ -6467,7 +6474,7 @@ empty cube 0x01bf
 
 empty cube 0x01c0
 
-
+Shouldn't be used.
 
 
 
@@ -6475,7 +6482,7 @@ empty cube 0x01c0
 
 empty cube 0x01c1
 
-
+Shouldn't be used.
 
 
 
@@ -6483,7 +6490,7 @@ empty cube 0x01c1
 
 empty cube 0x01c2
 
-
+Shouldn't be used.
 
 
 
@@ -6491,7 +6498,7 @@ empty cube 0x01c2
 
 empty cube 0x01c3
 
-
+Shouldn't be used.
 
 
 
@@ -6499,7 +6506,7 @@ empty cube 0x01c3
 
 empty cube 0x01c4
 
-
+Shouldn't be used.
 
 
 
@@ -6507,7 +6514,7 @@ empty cube 0x01c4
 
 empty cube 0x01c5
 
-
+Shouldn't be used.
 
 
 
@@ -6515,7 +6522,7 @@ empty cube 0x01c5
 
 empty cube 0x01c6
 
-
+Shouldn't be used.
 
 
 
@@ -6523,7 +6530,7 @@ empty cube 0x01c6
 
 empty cube 0x01c7
 
-
+Shouldn't be used.
 
 
 
@@ -6531,7 +6538,7 @@ empty cube 0x01c7
 
 empty cube 0x01c8
 
-
+Shouldn't be used.
 
 
 
@@ -6539,7 +6546,7 @@ empty cube 0x01c8
 
 empty cube 0x01c9
 
-
+Shouldn't be used.
 
 
 
@@ -6547,7 +6554,7 @@ empty cube 0x01c9
 
 empty cube 0x01ca
 
-
+Shouldn't be used.
 
 
 
@@ -6555,7 +6562,7 @@ empty cube 0x01ca
 
 empty cube 0x01cb
 
-
+Shouldn't be used.
 
 
 
@@ -6563,7 +6570,7 @@ empty cube 0x01cb
 
 empty cube 0x01cc
 
-
+Shouldn't be used.
 
 
 
@@ -6571,7 +6578,7 @@ empty cube 0x01cc
 
 empty cube 0x01cd
 
-
+Shouldn't be used.
 
 
 
@@ -6579,7 +6586,7 @@ empty cube 0x01cd
 
 empty cube 0x01ce
 
-
+Shouldn't be used.
 
 
 
@@ -6587,7 +6594,7 @@ empty cube 0x01ce
 
 empty cube 0x01cf
 
-
+Shouldn't be used.
 
 
 
@@ -6595,7 +6602,7 @@ empty cube 0x01cf
 
 empty cube 0x01d0
 
-
+Shouldn't be used.
 
 
 
@@ -6603,7 +6610,7 @@ empty cube 0x01d0
 
 empty cube 0x01d1
 
-
+Shouldn't be used.
 
 
 
@@ -6611,7 +6618,7 @@ empty cube 0x01d1
 
 empty cube 0x01d2
 
-
+Shouldn't be used.
 
 
 
@@ -6619,7 +6626,7 @@ empty cube 0x01d2
 
 empty cube 0x01d3
 
-
+Shouldn't be used.
 
 
 
@@ -6627,7 +6634,7 @@ empty cube 0x01d3
 
 empty cube 0x01d4
 
-
+Shouldn't be used.
 
 
 
@@ -6635,7 +6642,7 @@ empty cube 0x01d4
 
 empty cube 0x01d5
 
-
+Shouldn't be used.
 
 
 
@@ -6643,7 +6650,7 @@ empty cube 0x01d5
 
 empty cube 0x01d6
 
-
+Shouldn't be used.
 
 
 
@@ -6651,7 +6658,7 @@ empty cube 0x01d6
 
 empty cube 0x01d7
 
-
+Shouldn't be used.
 
 
 
@@ -6659,7 +6666,7 @@ empty cube 0x01d7
 
 empty cube 0x01d8
 
-
+Shouldn't be used.
 
 
 
@@ -6667,7 +6674,7 @@ empty cube 0x01d8
 
 empty cube 0x01d9
 
-
+Shouldn't be used.
 
 
 
@@ -6675,7 +6682,7 @@ empty cube 0x01d9
 
 empty cube 0x01da
 
-
+Shouldn't be used.
 
 
 
@@ -6683,7 +6690,7 @@ empty cube 0x01da
 
 empty cube 0x01db
 
-
+Shouldn't be used.
 
 
 
@@ -6691,7 +6698,7 @@ empty cube 0x01db
 
 empty cube 0x01dc
 
-
+Shouldn't be used.
 
 
 
@@ -6699,7 +6706,7 @@ empty cube 0x01dc
 
 empty cube 0x01dd
 
-
+Shouldn't be used.
 
 
 
@@ -6707,7 +6714,7 @@ empty cube 0x01dd
 
 empty cube 0x01de
 
-
+Shouldn't be used.
 
 
 
@@ -6715,7 +6722,7 @@ empty cube 0x01de
 
 empty cube 0x01df
 
-
+Shouldn't be used.
 
 
 
@@ -6723,7 +6730,7 @@ empty cube 0x01df
 
 empty cube 0x01e0
 
-
+Shouldn't be used.
 
 
 
@@ -6731,7 +6738,7 @@ empty cube 0x01e0
 
 empty cube 0x01e1
 
-
+Shouldn't be used.
 
 
 
@@ -6739,7 +6746,7 @@ empty cube 0x01e1
 
 empty cube 0x01e2
 
-
+Shouldn't be used.
 
 
 
@@ -6747,7 +6754,7 @@ empty cube 0x01e2
 
 empty cube 0x01e3
 
-
+Shouldn't be used.
 
 
 
@@ -6755,7 +6762,7 @@ empty cube 0x01e3
 
 empty cube 0x01e4
 
-
+Shouldn't be used.
 
 
 
@@ -6763,7 +6770,7 @@ empty cube 0x01e4
 
 empty cube 0x01e5
 
-
+Shouldn't be used.
 
 
 
@@ -6771,7 +6778,7 @@ empty cube 0x01e5
 
 empty cube 0x01e6
 
-
+Shouldn't be used.
 
 
 
@@ -6779,7 +6786,7 @@ empty cube 0x01e6
 
 empty cube 0x01e7
 
-
+Shouldn't be used.
 
 
 
@@ -6787,7 +6794,7 @@ empty cube 0x01e7
 
 empty cube 0x01e8
 
-
+Shouldn't be used.
 
 
 
@@ -6795,7 +6802,7 @@ empty cube 0x01e8
 
 empty cube 0x01e9
 
-
+Shouldn't be used.
 
 
 
@@ -6803,7 +6810,7 @@ empty cube 0x01e9
 
 empty cube 0x01ea
 
-
+Shouldn't be used.
 
 
 
@@ -6811,7 +6818,7 @@ empty cube 0x01ea
 
 empty cube 0x01eb
 
-
+Shouldn't be used.
 
 
 
@@ -6819,7 +6826,7 @@ empty cube 0x01eb
 
 empty cube 0x01ec
 
-
+Shouldn't be used.
 
 
 
@@ -6827,7 +6834,7 @@ empty cube 0x01ec
 
 empty cube 0x01ed
 
-
+Shouldn't be used.
 
 
 
@@ -6835,7 +6842,7 @@ empty cube 0x01ed
 
 empty cube 0x01ee
 
-
+Shouldn't be used.
 
 
 
@@ -6843,7 +6850,7 @@ empty cube 0x01ee
 
 empty cube 0x01ef
 
-
+Shouldn't be used.
 
 
 
@@ -6851,7 +6858,7 @@ empty cube 0x01ef
 
 empty cube 0x01f0
 
-
+Shouldn't be used.
 
 
 
@@ -6859,7 +6866,7 @@ empty cube 0x01f0
 
 empty cube 0x01f1
 
-
+Shouldn't be used.
 
 
 
@@ -6867,7 +6874,7 @@ empty cube 0x01f1
 
 empty cube 0x01f2
 
-
+Shouldn't be used.
 
 
 
@@ -6875,7 +6882,7 @@ empty cube 0x01f2
 
 empty cube 0x01f3
 
-
+Shouldn't be used.
 
 
 
@@ -6883,7 +6890,7 @@ empty cube 0x01f3
 
 empty cube 0x01f4
 
-
+Shouldn't be used.
 
 
 
@@ -6891,7 +6898,7 @@ empty cube 0x01f4
 
 empty cube 0x01f5
 
-
+Shouldn't be used.
 
 
 
@@ -6899,7 +6906,7 @@ empty cube 0x01f5
 
 empty cube 0x01f6
 
-
+Shouldn't be used.
 
 
 
@@ -6907,7 +6914,7 @@ empty cube 0x01f6
 
 empty cube 0x01f7
 
-
+Shouldn't be used.
 
 
 
@@ -6915,7 +6922,7 @@ empty cube 0x01f7
 
 empty cube 0x01f8
 
-
+Shouldn't be used.
 
 
 
@@ -6923,7 +6930,7 @@ empty cube 0x01f8
 
 empty cube 0x01f9
 
-
+Shouldn't be used.
 
 
 
@@ -6931,7 +6938,7 @@ empty cube 0x01f9
 
 empty cube 0x01fa
 
-
+Shouldn't be used.
 
 
 
@@ -6939,7 +6946,7 @@ empty cube 0x01fa
 
 empty cube 0x01fb
 
-
+Shouldn't be used.
 
 
 
@@ -6947,7 +6954,7 @@ empty cube 0x01fb
 
 empty cube 0x01fc
 
-
+Shouldn't be used.
 
 
 
@@ -6955,7 +6962,7 @@ empty cube 0x01fc
 
 empty cube 0x01fd
 
-
+Shouldn't be used.
 
 
 
@@ -6963,7 +6970,7 @@ empty cube 0x01fd
 
 empty cube 0x01fe
 
-
+Shouldn't be used.
 
 
 
@@ -6971,7 +6978,7 @@ empty cube 0x01fe
 
 empty cube 0x01ff
 
-
+Shouldn't be used.
 
 
 

@@ -86,8 +86,11 @@ void actions_mdclm(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata,i
  */
 short start_mdclm(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata)
 {
+    if (workdata==NULL) return false;
     scrmode->mode=MD_CLM;
     scrmode->usrinput_type=SI_NONE;
+    if ((workdata!=NULL)&&(workdata->lvl!=NULL))
+      workdata->lvl->info.usr_mdswtch_count++;
     return true;
 }
 

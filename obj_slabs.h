@@ -130,8 +130,12 @@ short slab_is_claimedgnd(unsigned short slab_type);
 short slab_needs_adjacent_torch(unsigned short slab_type);
 short slab_verify_entry(unsigned short slab_type, char *err_msg);
 char *get_slab_fullname(unsigned short slb_type);
+unsigned short get_random_wall_slab(void);
 
 short subtl_is_near_tall_slab(struct LEVEL *lvl,unsigned int sx,unsigned int sy);
+
+short place_room_rndpos(struct LEVEL *lvl,const unsigned short rslab,
+    const unsigned char rown,const struct IPOINT_2D *rsize);
 
 char *get_owner_type_fullname(unsigned char own_idx);
 unsigned char get_owner_next(unsigned char plyr_idx);

@@ -136,6 +136,9 @@ struct LEVSTATS {
 struct LEVINFO {
     // Adikted commands executed by user
     unsigned long usr_cmds_count;
+    unsigned long usr_mdswtch_count;
+    unsigned long usr_slbchng_count;
+    unsigned long usr_creatobj_count;
     // Map creation date
     time_t creat_date;
     time_t lastsav_date;

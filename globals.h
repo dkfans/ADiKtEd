@@ -1,5 +1,5 @@
 /******************************************************************************/
-// dernc.h - Another Dungeon Keeper Map Editor.
+// globals.h - Another Dungeon Keeper Map Editor.
 /******************************************************************************/
 // Author:   Jon Skeet
 // Created:  08 sep 1998
@@ -33,6 +33,9 @@
 #include <signal.h>
 #include <sys/ioctl.h>
 #include <termios.h>
+#if !defined(stricmp)
+#define stricmp strcasecmp
+#endif
 #elif defined(MSDOS)
 #include <dos.h>
 #include <process.h>

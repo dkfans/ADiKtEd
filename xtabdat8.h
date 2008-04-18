@@ -54,15 +54,15 @@ struct IMAGELIST {
 
 // Routines
 
-int read_tabfile_data(struct TABFILE *tabf,char *srcfname);
+int read_tabfile_data(struct TABFILE *tabf,const char *srcfname);
 int free_tabfile_data(struct TABFILE *tabf);
-int read_datfile_data(struct DATFILE *datf,char *srcfname);
+int read_datfile_data(struct DATFILE *datf,const char *srcfname);
 int free_datfile_data(struct DATFILE *datf);
-int read_dattab_images(struct IMAGELIST *images,unsigned long *readcount,struct TABFILE *tabf,struct DATFILE *datf,int verbose);
+int read_dattab_images(struct IMAGELIST *images,unsigned long *readcount,struct TABFILE *tabf,struct DATFILE *datf,const int verbose);
 int free_dattab_images(struct IMAGELIST *images);
 int read_dat_image_idx(struct IMAGEITEM *image,unsigned long *readedsize,struct DATFILE *datf,unsigned long off,unsigned int width,unsigned int height);
 
-int create_images_dattab_idx(struct IMAGELIST *images,char *datfname,char *tabfname,int verbose);
+int create_images_dattab_idx(struct IMAGELIST *images,const char *datfname,const char *tabfname,const int verbose);
 
 // Error returns
 

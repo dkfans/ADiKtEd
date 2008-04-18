@@ -63,6 +63,14 @@ Press F1 for help.
 TODO before final:
  Fixations in room things parameters (height,other)
  Fixations in room corner graphics
+Version: 0.82b
+ Added verification to 4 next parameters
+ Improved description of some cubes
+ Added 'f' in slab mode - draw random fortified wall
+ Perfected creation of things in corners of some rooms
+ Fixed the code to compile under linux
+ Fixed memory allocation error (write before allocation)
+ Modified file handling on map miniature generation
 Version: 0.81b
  Fixed load error handling bug
  Corrected to allow loading Unded maps

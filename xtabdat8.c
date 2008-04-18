@@ -96,7 +96,7 @@ int main (int argc, char **argv)
 
 #endif
 
-int create_images_dattab_idx(struct IMAGELIST *images,char *datfname,char *tabfname,int verbose)
+int create_images_dattab_idx(struct IMAGELIST *images,const char *datfname,const char *tabfname,const int verbose)
 {
     if (verbose) printf("Reading TAB file ...");
     //Opening TAB file
@@ -171,7 +171,7 @@ int create_images_dattab_idx(struct IMAGELIST *images,char *datfname,char *tabfn
     return 0;
 }
 
-int read_tabfile_data(struct TABFILE *tabf,char *srcfname)
+int read_tabfile_data(struct TABFILE *tabf,const char *srcfname)
 {
         FILE *tabfp;
         tabfp = fopen (srcfname, "rb");
@@ -206,7 +206,7 @@ int free_tabfile_data(struct TABFILE *tabf)
     tabf->count=0;
 }
 
-int read_datfile_data(struct DATFILE *datf,char *srcfname)
+int read_datfile_data(struct DATFILE *datf,const char *srcfname)
 {
     FILE *datfp;
     datfp = fopen (srcfname, "rb");
@@ -230,7 +230,7 @@ int free_datfile_data(struct DATFILE *datf)
     datf->count=0;
 }
 
-int read_dattab_images(struct IMAGELIST *images,unsigned long *readcount,struct TABFILE *tabf,struct DATFILE *datf,int verbose)
+int read_dattab_images(struct IMAGELIST *images,unsigned long *readcount,struct TABFILE *tabf,struct DATFILE *datf,const int verbose)
 {
     images->count=tabf->count;
     images->items=malloc(sizeof(struct IMAGEITEM)*(images->count));

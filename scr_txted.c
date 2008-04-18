@@ -130,8 +130,10 @@ short start_scrpt(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata)
     workdata->editor->top_row=0;
     workdata->editor->err_row=-1;
     workdata->editor->err_param=ERR_SCRIPTPARAM_WHOLE;
+    if (workdata->lvl==NULL) return false;
     workdata->editor->script=&(workdata->lvl->script);
     scrmode->mode=MD_SCRP;
+    workdata->lvl->info.usr_mdswtch_count++;
     return true;
 }
 

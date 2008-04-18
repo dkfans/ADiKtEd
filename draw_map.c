@@ -31,7 +31,9 @@
 #include "lev_column.h"
 #include "obj_column.h"
 #include "obj_things.h"
+#include "xcubtxtr.h"
 #include "xtabdat8.h"
+#include "xtabjty.h"
 
 /*
  * This array contains color intensity added to bitmap where owners should be visible
@@ -70,101 +72,6 @@ short load_palette(struct PALETTE_ENTRY *pal,char *fname)
         pal[i].g=mem.content[item_pos+1];
         pal[i].r=mem.content[item_pos+0];
         pal[i].o=0;
-    }
-    free(mem.content);
-    return ERR_NONE;
-}
-
-short load_cubedata(struct CUBES_DATA *cubes,char *fname)
-{
-    //Reading file
-    struct MEMORY_FILE mem;
-    mem = read_file(fname);
-    if (mem.errcode!=MFILE_OK) return mem.errcode;
-    if (mem.len<22)
-    {
-      free(mem.content);
-      return ERR_FILE_BADDATA;
-    }
-    cubes->count=read_short_le_buf(mem.content+0);
-    if ((mem.len!=cubes->count*18+4))
-    {
-      free(mem.content);
-      return ERR_FILE_BADDATA;
-    }
-    //Loading the entries
-    cubes->data=malloc(cubes->count*sizeof(struct CUBE_TEXTURES));
-    int i;
-    for (i=0; i<cubes->count; i++)
-    {
-        unsigned int item_pos=i*18+4;
-        unsigned int val;
-        val=read_short_le_buf(mem.content+item_pos+0);
-        cubes->data[i].n=val;
-        val=read_short_le_buf(mem.content+item_pos+2);
-        cubes->data[i].s=val;
-        val=read_short_le_buf(mem.content+item_pos+4);
-        cubes->data[i].w=val;
-        val=read_short_le_buf(mem.content+item_pos+6);
-        cubes->data[i].e=val;
-        val=read_short_le_buf(mem.content+item_pos+ 8);
-        cubes->data[i].t=val;
-        val=read_short_le_buf(mem.content+item_pos+10);
-        cubes->data[i].b=val;
-    }
-    free(mem.content);
-    return ERR_NONE;
-}
-
-short load_textureanim(struct CUBES_DATA *cubes,char *fname)
-{
-    //Reading file
-    struct MEMORY_FILE mem;
-    mem = read_file(fname);
-    if (mem.errcode!=MFILE_OK) return mem.errcode;
-    cubes->anitxcount=(mem.len>>4);
-    if ((mem.len!=(cubes->anitxcount<<4)))
-    {
-      free(mem.content);
-      return ERR_FILE_BADDATA;
-    }
-    //Loading the entries
-    cubes->anitx=malloc(cubes->anitxcount*sizeof(struct CUBE_TXTRANIM));
-    int i,k;
-    for (i=0; i<cubes->anitxcount; i++)
-      for (k=0; k<8; k++)
-      {
-        unsigned int item_pos=i*16 + k*2;
-        unsigned int val;
-        val=read_short_le_buf(mem.content+item_pos);
-        cubes->anitx[i].data[k]=val;
-      }
-    free(mem.content);
-    return ERR_NONE;
-}
-
-short load_texture(struct MAPDRAW_DATA *draw_data,char *fname)
-{
-    unsigned long texture_file_len = (TEXTURE_SIZE_X*TEXTURE_COUNT_X) * (TEXTURE_SIZE_Y*TEXTURE_COUNT_Y);
-    //Reading file
-    struct MEMORY_FILE mem;
-    mem = read_file(fname);
-    if (mem.errcode!=MFILE_OK) return mem.errcode;
-    if ((mem.len!=texture_file_len))
-    {
-      free(mem.content);
-      return ERR_FILE_BADDATA;
-    }
-    // Allocating buffer
-    draw_data->texture=malloc(texture_file_len);
-    if (draw_data->texture==NULL)
-      die("load_texture: Out of memory.");
-    //Loading the entries
-    int i;
-    for (i=0; i<(TEXTURE_SIZE_Y*TEXTURE_COUNT_Y); i++)
-    {
-        unsigned long pos = (TEXTURE_SIZE_X*TEXTURE_COUNT_X) * i;
-        memcpy(draw_data->texture+pos,mem.content+pos,(TEXTURE_SIZE_X*TEXTURE_COUNT_X));
     }
     free(mem.content);
     return ERR_NONE;
@@ -426,7 +333,7 @@ short draw_map_on_buffer(char *dst,const struct LEVEL *lvl,const struct MAPDRAW_
           unsigned char *clmentry;
           clmentry=get_subtile_column(lvl,i,j);
           cube_idx=get_clm_entry_topcube(clmentry);
-          get_top_texture_pos(&texture_pos,&(draw_data->cubes),cube_idx);
+          get_top_texture_pos(&texture_pos,draw_data->cubes,cube_idx);
           dest_pos.x=i*(scaled_txtr_size.x);
           draw_texture_on_buffer(dst,dest_pos,dest_size,draw_data->texture,
               texture_pos,texture_size,single_txtr_size,draw_data->palette,scale);
@@ -609,11 +516,14 @@ short generate_map_bitmap(const char *bmpfname,const struct LEVEL *lvl,const sho
     if (draw_data==NULL)
       die("generate_map_bitmap: Out of memory.");
     // Initializing draw_data values
-    draw_data->cubes.data=NULL;
-    draw_data->cubes.count=0;
-    draw_data->texture=NULL;
+    draw_data->cubes=malloc(sizeof(struct CUBES_DATA));
     draw_data->palette=malloc(256*sizeof(struct PALETTE_ENTRY));
     draw_data->images=malloc(sizeof(struct IMAGELIST));
+    if ((draw_data->cubes==NULL)||(draw_data->palette==NULL)||(draw_data->images==NULL))
+      die("generate_map_bitmap: Out of memory.");
+    draw_data->cubes->data=NULL;
+    draw_data->cubes->count=0;
+    draw_data->texture=NULL;
     if (rescale>3)
     {
       draw_data->ownerpal=owned_area_palette_std;
@@ -652,7 +562,7 @@ short generate_map_bitmap(const char *bmpfname,const struct LEVEL *lvl,const sho
     {
       fnames=NULL;
       format_data_fname(&fnames,"cube.dat");
-      result = (load_cubedata(&(draw_data->cubes),fnames)==ERR_NONE);
+      result = (load_cubedata(draw_data->cubes,fnames)==ERR_NONE);
       if (!result)
           message_error("Error when loading file \"%s\"",fnames);
       free(fnames);
@@ -661,7 +571,7 @@ short generate_map_bitmap(const char *bmpfname,const struct LEVEL *lvl,const sho
     {
       fnames=NULL;
       format_data_fname(&fnames,"tmapanim.dat");
-      result = (load_textureanim(&(draw_data->cubes),fnames)==ERR_NONE);
+      result = (load_textureanim(draw_data->cubes,fnames)==ERR_NONE);
       if (!result)
           message_error("Error when loading file \"%s\"",fnames);
       free(fnames);
@@ -670,7 +580,7 @@ short generate_map_bitmap(const char *bmpfname,const struct LEVEL *lvl,const sho
     {
       fnames=NULL;
       format_data_fname(&fnames,"tmapa%03d.dat",(int)(lvl->inf%8));
-      result = (load_texture(draw_data,fnames)==ERR_NONE);
+      result = (load_texture(&(draw_data->texture),fnames)==ERR_NONE);
       if (!result)
           message_error("Error when loading file \"%s\"",fnames);
       free(fnames);
@@ -717,9 +627,10 @@ short generate_map_bitmap(const char *bmpfname,const struct LEVEL *lvl,const sho
     free(bitmap);
     free_dattab_images(draw_data->images);
     free(draw_data->images);
-    free(draw_data->cubes.data);
+    free(draw_data->cubes->data);
     free(draw_data->texture);
     free(draw_data->palette);
+    free(draw_data->cubes);
     free(draw_data);
     return result;
 }

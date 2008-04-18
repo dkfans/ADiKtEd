@@ -26,8 +26,8 @@ struct IPOINT_2D;
 
 #include "globals.h"
 
-typedef void (*cr_tng_func)(struct LEVEL *lvl, int tx, int ty,
-        unsigned char *surr_slb,unsigned char *surr_own);
+typedef void (*cr_tng_func)(struct LEVEL *lvl, const int tx, const int ty,
+        const unsigned char *surr_slb,const unsigned char *surr_own,const struct UPOINT_2D corner_pos);
 
 short things_verify(struct LEVEL *lvl, char *err_msg,struct IPOINT_2D *errpt);
 
@@ -95,49 +95,71 @@ void create_things_slb_room(cr_tng_func cr_floor,cr_tng_func cr_edge,
         struct LEVEL *lvl, int tx, int ty);
 void create_things_slb_room_simple(cr_tng_func cr_any,
         struct LEVEL *lvl, int tx, int ty);
-void delete_room_things(struct LEVEL *lvl, int tx, int ty,
-        unsigned char *surr_slb,unsigned char *surr_own);
+void delete_room_things(struct LEVEL *lvl, const int tx, const int ty,
+        const unsigned char *surr_slb,const unsigned char *surr_own,
+        const struct UPOINT_2D corner_pos);
 void delete_room_things_subtl(struct LEVEL *lvl, int sx, int sy);
 unsigned char *update_thing_slb_room_one_central_item(struct LEVEL *lvl, int tx, int ty,
         unsigned char itm_stype_idx,short allow_create);
 unsigned char *update_thing_slb_room_one_item_subtl(struct LEVEL *lvl, int sx, int sy,
         unsigned char itm_stype_idx, short torch_mode);
-void update_things_slb_portal_inside(struct LEVEL *lvl, int tx, int ty,
-        unsigned char *surr_slb,unsigned char *surr_own);
-void update_things_slb_treasure_corner(struct LEVEL *lvl, int tx, int ty,
-        unsigned char *surr_slb,unsigned char *surr_own);
-void update_things_slb_training_inside(struct LEVEL *lvl, int tx, int ty,
-        unsigned char *surr_slb,unsigned char *surr_own);
-void update_things_slb_scavenger_inside(struct LEVEL *lvl, int tx, int ty,
-        unsigned char *surr_slb,unsigned char *surr_own);
-void update_things_slb_graveyard_floor(struct LEVEL *lvl, int tx, int ty,
-        unsigned char *surr_slb,unsigned char *surr_own);
-void update_things_slb_graveyard_corner(struct LEVEL *lvl, int tx, int ty,
-        unsigned char *surr_slb,unsigned char *surr_own);
-void update_things_slb_workshop_inside(struct LEVEL *lvl, int tx, int ty,
-        unsigned char *surr_slb,unsigned char *surr_own);
-void update_things_slb_torture_inside(struct LEVEL *lvl, int tx, int ty,
-        unsigned char *surr_slb,unsigned char *surr_own);
-void update_things_slb_torture_edge(struct LEVEL *lvl, int tx, int ty,
-        unsigned char *surr_slb,unsigned char *surr_own);
-void update_things_slb_training_corner(struct LEVEL *lvl, int tx, int ty,
-        unsigned char *surr_slb,unsigned char *surr_own);
-void update_things_slb_scavenger_corner(struct LEVEL *lvl, int tx, int ty,
-        unsigned char *surr_slb,unsigned char *surr_own);
-void update_things_slb_hatchery_corner(struct LEVEL *lvl, int tx, int ty,
-        unsigned char *surr_slb,unsigned char *surr_own);
-void update_things_slb_temple_corner(struct LEVEL *lvl, int tx, int ty,
-        unsigned char *surr_slb,unsigned char *surr_own);
-void update_things_slb_workshop_corner(struct LEVEL *lvl, int tx, int ty,
-        unsigned char *surr_slb,unsigned char *surr_own);
-void update_things_slb_dungheart_corner(struct LEVEL *lvl, int tx, int ty,
-        unsigned char *surr_slb,unsigned char *surr_own);
-void update_things_slb_dungheart_inside(struct LEVEL *lvl, int tx, int ty,
-        unsigned char *surr_slb,unsigned char *surr_own);
-void update_things_slb_guardpost_floor(struct LEVEL *lvl, int tx, int ty,
-        unsigned char *surr_slb,unsigned char *surr_own);
-void update_things_slb_prison(struct LEVEL *lvl, int tx, int ty,
-        unsigned char *surr_slb,unsigned char *surr_own);
+void update_things_slb_portal_inside(struct LEVEL *lvl, const int tx, const int ty,
+        const unsigned char *surr_slb,const unsigned char *surr_own,
+        const struct UPOINT_2D corner_pos);
+void update_things_slb_treasure_corner(struct LEVEL *lvl, const int tx, const int ty,
+        const unsigned char *surr_slb,const unsigned char *surr_own,
+        const struct UPOINT_2D corner_pos);
+void update_things_slb_training_inside(struct LEVEL *lvl, const int tx, const int ty,
+        const unsigned char *surr_slb,const unsigned char *surr_own,
+        const struct UPOINT_2D corner_pos);
+void update_things_slb_scavenger_inside(struct LEVEL *lvl, const int tx, const int ty,
+        const unsigned char *surr_slb,const unsigned char *surr_own,
+        const struct UPOINT_2D corner_pos);
+void update_things_slb_graveyard_floor(struct LEVEL *lvl, const int tx, const int ty,
+        const unsigned char *surr_slb,const unsigned char *surr_own,
+        const struct UPOINT_2D corner_pos);
+void update_things_slb_graveyard_corner(struct LEVEL *lvl, const int tx, const int ty,
+        const unsigned char *surr_slb,const unsigned char *surr_own,
+        const struct UPOINT_2D corner_pos);
+void update_things_slb_workshop_inside(struct LEVEL *lvl, const int tx, const int ty,
+        const unsigned char *surr_slb,const unsigned char *surr_own,
+        const struct UPOINT_2D corner_pos);
+void update_things_slb_torture_inside(struct LEVEL *lvl, const int tx, const int ty,
+        const unsigned char *surr_slb,const unsigned char *surr_own,
+        const struct UPOINT_2D corner_pos);
+void update_things_slb_torture_edge(struct LEVEL *lvl, const int tx, const int ty,
+        const unsigned char *surr_slb,const unsigned char *surr_own,
+        const struct UPOINT_2D corner_pos);
+void update_things_slb_training_corner(struct LEVEL *lvl, const int tx, const int ty,
+        const unsigned char *surr_slb,const unsigned char *surr_own,
+        const struct UPOINT_2D corner_pos);
+void update_things_slb_scavenger_corner(struct LEVEL *lvl, const int tx, const int ty,
+        const unsigned char *surr_slb,const unsigned char *surr_own,
+        const struct UPOINT_2D corner_pos);
+void update_things_slb_hatchery_corner(struct LEVEL *lvl, const int tx, const int ty,
+        const unsigned char *surr_slb,const unsigned char *surr_own,
+        const struct UPOINT_2D corner_pos);
+void update_things_slb_barracks_corner(struct LEVEL *lvl, const int tx, const int ty,
+        const unsigned char *surr_slb,const unsigned char *surr_own,
+        const struct UPOINT_2D corner_pos);
+void update_things_slb_temple_corner(struct LEVEL *lvl, const int tx, const int ty,
+        const unsigned char *surr_slb,const unsigned char *surr_own,
+        const struct UPOINT_2D corner_pos);
+void update_things_slb_workshop_corner(struct LEVEL *lvl, const int tx, const int ty,
+        const unsigned char *surr_slb,const unsigned char *surr_own,
+        const struct UPOINT_2D corner_pos);
+void update_things_slb_dungheart_corner(struct LEVEL *lvl, const int tx, const int ty,
+        const unsigned char *surr_slb,const unsigned char *surr_own,
+        const struct UPOINT_2D corner_pos);
+void update_things_slb_dungheart_inside(struct LEVEL *lvl, const int tx, const int ty,
+        const unsigned char *surr_slb,const unsigned char *surr_own,
+        const struct UPOINT_2D corner_pos);
+void update_things_slb_guardpost_floor(struct LEVEL *lvl, const int tx, const int ty,
+        const unsigned char *surr_slb,const unsigned char *surr_own,
+        const struct UPOINT_2D corner_pos);
+void update_things_slb_prison(struct LEVEL *lvl, const int tx, const int ty,
+        const unsigned char *surr_slb,const unsigned char *surr_own,
+        const struct UPOINT_2D corner_pos);
 
 void remove_noncrucial_room_things(struct LEVEL *lvl, int tx, int ty);
 

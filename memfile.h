@@ -39,7 +39,7 @@ struct MEMORY_FILE
     int errcode;
 };
 
-struct MEMORY_FILE read_file(char *iname);
+struct MEMORY_FILE read_file(const char *iname);
 char *read_file_error(int errcode);
 
 #endif // ADIKT_MEMFILE_H

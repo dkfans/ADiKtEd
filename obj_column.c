@@ -584,7 +584,7 @@ void create_columns_slb_wallbrick(struct COLUMN_REC *clm_recs[9], short *allow_r
 
 /*
  * If some of the walls are next to room, fills the columns with room relief.
- * Modifies allow_relief setting the modified columns to false.
+ * Modifies allow_relief setting of the modified columns to false.
  */
 void fill_columns_slb_roomrelief(struct COLUMN_REC *clm_recs[9], short *allow_relief,
         unsigned char *surr_slb,unsigned char *surr_own, unsigned char **surr_tng)

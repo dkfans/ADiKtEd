@@ -400,6 +400,9 @@ short level_clear_info(struct LEVEL *lvl)
 {
     // User stats
     lvl->info.usr_cmds_count=0;
+    lvl->info.usr_mdswtch_count=0;
+    lvl->info.usr_slbchng_count=0;
+    lvl->info.usr_creatobj_count=0;
     // Map creation date
     lvl->info.creat_date=time(NULL);
     lvl->info.lastsav_date=lvl->info.creat_date;
@@ -1311,6 +1314,21 @@ void free_map(struct LEVEL *lvl)
 
 short level_generate_random_extension(struct LEVEL *lvl,char *ret_msg)
 {
+  short result;
+  const struct IPOINT_2D heart_size={3,3};
+  unsigned char rown;
+  // Trying to place Dungeon Heart
+  // TODO
+  rown=PLAYER0;
+  if (true)
+  {
+      result=place_room_rndpos(lvl,SLAB_TYPE_DUNGHEART,rown,&heart_size);
+      if (result)
+      {
+        sprintf(ret_msg,"Dungeon Heart placed.");
+        return true;
+      }
+  }
   sprintf(ret_msg,"Can't find anything to add.");
   return false;
 }

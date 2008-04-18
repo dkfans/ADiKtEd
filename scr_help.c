@@ -22,6 +22,7 @@
 #include "scr_help.h"
 
 #include "globals.h"
+#include "lev_data.h"
 #include "scr_actn.h"
 #include "output_scr.h"
 #include "input_kb.h"
@@ -425,6 +426,7 @@ char ***match_title(struct HELP_DATA *help,const char *title, const int n)
  */
 short start_help(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata)
 {
+    if (workdata==NULL) return false;
     struct HELP_DATA *help=workdata->help;
     help->formode=scrmode->mode;
     help->y=0;
@@ -517,6 +519,8 @@ short start_help(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata)
     message_info_force("Use arrow keys and page up/down to move, "
       "any other key to return.");
     scrmode->mode=MD_HELP;
+    if (workdata->lvl!=NULL)
+      workdata->lvl->info.usr_mdswtch_count++;
     return true;
 }
 

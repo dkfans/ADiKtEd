@@ -4,7 +4,7 @@ LINK = gcc
 LFLAGS =
 LIBS = -L. -lslang
 RES  = 
-OBJ  = dernc.o memfile.o graffiti.o main.o input_kb.o scr_help.o var_utils.o output_scr.o scr_thing.o graffiti_font.o bulcommn.o lev_data.o lev_files.o obj_slabs.o obj_things.o obj_column.o obj_actnpts.o lev_things.o lev_column.o obj_column_def.o obj_column_per.o scr_list.o scr_slab.o scr_clm.o scr_actn.o scr_txted.o lev_script.o scr_rwrk.o scr_cube.o draw_map.o xtabdat8.o $(RES)
+OBJ  = dernc.o memfile.o graffiti.o main.o input_kb.o scr_help.o var_utils.o output_scr.o scr_thing.o graffiti_font.o bulcommn.o lev_data.o lev_files.o obj_slabs.o obj_things.o obj_column.o obj_actnpts.o lev_things.o lev_column.o obj_column_def.o obj_column_per.o scr_list.o scr_slab.o scr_clm.o scr_actn.o scr_txted.o lev_script.o scr_rwrk.o scr_cube.o draw_map.o xtabdat8.o xtabjty.o xcubtxtr.o $(RES)
 BIN  = map
 RM = rm -f
 
@@ -49,6 +49,8 @@ obj_slabs.o: obj_slabs.c
 obj_things.o: obj_things.c
 draw_map.o: draw_map.c
 xtabdat8.o: xtabdat8.c
+xtabjty.o: xtabjty.c
+xcubtxtr.o: xcubtxtr.c
 
 clean:
 	${RM} $(OBJ) $(BIN)

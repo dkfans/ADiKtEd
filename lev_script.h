@@ -51,6 +51,7 @@ enum cmd_groups {
     CMD_COMP    = 0x01b,
     CMD_PLAYER  = 0x01c,
     CMD_SPECIAL = 0x01d,
+    CMD_OBJTYPE = 0x01e, // type of object; is it spell, room or what
 
     // Adikted - specific
     CMD_ORIENT  = 0x0fe,
@@ -131,14 +132,14 @@ enum cmnds_setup {
     SET_GEN_SPEED       = 0x001,
 // 10 - START_MONEY([player],[a]) AN
     START_MONEY         = 0x002,
-// 16 - COMPUTER_PLAYER([player],[a]) AN
-    COMP_PLAYER         = 0x003,
-// 71 - ALLY_PLAYERS([player],[player]) AA
-    ALLY_PLAYERS        = 0x004,
-// 7 - SET_HATE([a],[a],[a]) NNN
-    SET_HATE            = 0x005,
 // 15 - RESEARCH([player],[research type],[room or spell],[a]) AAAN
-    RESEARCH            = 0x006,
+    RESEARCH            = 0x003,
+// 16 - COMPUTER_PLAYER([player],[a]) AN
+    COMP_PLAYER         = 0x004,
+// 71 - ALLY_PLAYERS([player],[player]) AA
+    ALLY_PLAYERS        = 0x005,
+// 7 - SET_HATE([a],[a],[a]) NNN
+    SET_HATE            = 0x006,
 // 67 - SET_COMPUTER_GLOBALS([player],[a],[a],[a],[a],[a],[a]) ANNNNNN
     SET_COMPUTER_GLOBALS= 0x007,
 // 68 - SET_COMPUTER_CHECKS([player],["ChecksName"],[CheckEvery],[AttackPercent],[CTADuration],[MinForAttack],[LastCheck]) AANNNNN
@@ -209,10 +210,14 @@ enum cmnds_special {
     SPEC_NUMBER        = 0x002,
 };
 
-//Note: Doors, Traps, Spells are defined elswhere
-#define CREATURE             0x07f
-#define ROOM                 0x07e
+// Object types
+enum cmnds_objtypes {
+    OBJTYPE_CREATURE   = 0x001,
+    OBJTYPE_ROOM       = 0x003,
+    OBJTYPE_SPELL      = 0x004,
+};
 
+//Note: Doors, Traps, Spells are defined elswhere
 
 //Variables
 #define ALL_DNGNS_DESTROYED  0x001
@@ -406,6 +411,8 @@ int trap_cmd_index(const char *cmdtext);
 const char *trap_cmd_text(int cmdidx);
 int door_cmd_index(const char *cmdtext);
 const char *door_cmd_text(int cmdidx);
+int objtype_cmd_index(const char *cmdtext);
+const char *objtype_cmd_text(int cmdidx);
 int operator_cmd_index(const char *cmdtext);
 const char *operator_cmd_text(int cmdidx);
 int variabl_cmd_index(const char *cmdtext);

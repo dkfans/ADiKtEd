@@ -1112,9 +1112,13 @@ void update_room_things_on_slab(struct LEVEL *lvl, int tx, int ty)
     case SLAB_TYPE_GUARDPOST:
       create_things_slb_room_simple(update_things_slb_guardpost_floor,lvl,tx,ty);
       break;
+    case SLAB_TYPE_BARRACKS:
+      create_things_slb_room(delete_room_things,delete_room_things,
+        update_things_slb_barracks_corner,delete_room_things,delete_room_things,
+        lvl, tx, ty);
+      break;
     case SLAB_TYPE_LIBRARY:
     case SLAB_TYPE_LAIR:
-    case SLAB_TYPE_BARRACKS:
     default:
       create_things_slb_room_simple(delete_room_things,lvl,tx,ty);
       break;
@@ -1242,28 +1246,43 @@ void create_things_slb_room(cr_tng_func cr_floor,cr_tng_func cr_edge,
         cr_tng_func cr_corner,cr_tng_func cr_inside,cr_tng_func cr_nearinsd,
         struct LEVEL *lvl, int tx, int ty)
 {
+  const unsigned short dir_a[]={IDIR_NORTH, IDIR_NORTH, IDIR_SOUTH, IDIR_SOUTH};
+  const unsigned short dir_b[]={IDIR_WEST, IDIR_EAST, IDIR_EAST, IDIR_WEST};
+  const unsigned short dir_c[]={IDIR_NW, IDIR_NE, IDIR_SE, IDIR_SW};
+  const unsigned short dir_x[]={0, 2, 2, 0};
+  const unsigned short dir_y[]={0, 0, 2, 2};
   unsigned char *surr_slb=(unsigned char *)malloc(9*sizeof(unsigned char));
   unsigned char *surr_own=(unsigned char *)malloc(9*sizeof(unsigned char));
   get_slab_surround(surr_slb,surr_own,NULL,lvl,tx,ty);
   unsigned short slab=surr_slb[IDIR_CENTR];
   unsigned char ownr=surr_own[IDIR_CENTR];
+  struct UPOINT_2D corner_pos={1,1};
   //Checking if completely surrounded
   if ((surr_slb[IDIR_NORTH]==slab)&&(surr_own[IDIR_NORTH]==ownr) &&
       (surr_slb[IDIR_EAST]==slab)&&(surr_own[IDIR_EAST]==ownr) &&
       (surr_slb[IDIR_SOUTH]==slab)&&(surr_own[IDIR_SOUTH]==ownr) &&
       (surr_slb[IDIR_WEST]==slab)&&(surr_own[IDIR_WEST]==ownr))
   {
-      if  ((surr_slb[IDIR_NE]==slab)&&(surr_own[IDIR_NE]==ownr) &&
-           (surr_slb[IDIR_SE]==slab)&&(surr_own[IDIR_SE]==ownr) &&
-           (surr_slb[IDIR_SW]==slab)&&(surr_own[IDIR_SW]==ownr) &&
-           (surr_slb[IDIR_NW]==slab)&&(surr_own[IDIR_NW]==ownr))
+      int i;
+      for (i=0;i<4;i++)
       {
-          cr_inside(lvl,tx,ty,surr_slb,surr_own);
+        if ((surr_slb[dir_c[i]]!=slab)||(surr_own[dir_c[i]]!=ownr))
+        {
+            corner_pos.x=dir_x[i];
+            corner_pos.y=dir_y[i];
+        }
+      }
+      // Doing the work
+      if  ((corner_pos.x==1)||(corner_pos.y==1))
+      {
+          corner_pos.x=dir_x[0];
+          corner_pos.y=dir_y[0];
+          cr_inside(lvl,tx,ty,surr_slb,surr_own,corner_pos);
       } else
       {
           //The 'near inside' columns are usually same that floor,
           //but may differ for rooms with specific corners
-          cr_nearinsd(lvl,tx,ty,surr_slb,surr_own);
+          cr_nearinsd(lvl,tx,ty,surr_slb,surr_own,corner_pos);
       }
       return;
   }
@@ -1272,24 +1291,41 @@ void create_things_slb_room(cr_tng_func cr_floor,cr_tng_func cr_edge,
        (surr_slb[IDIR_NE]==slab)&&(surr_own[IDIR_NE]==ownr) &&
        (surr_slb[IDIR_EAST]==slab)&&(surr_own[IDIR_EAST]==ownr) &&
        (surr_slb[IDIR_SE]==slab)&&(surr_own[IDIR_SE]==ownr) &&
-       (surr_slb[IDIR_SOUTH]==slab)&&(surr_own[IDIR_SOUTH]==ownr)) ||
-      ((surr_slb[IDIR_EAST]==slab)&&(surr_own[IDIR_EAST]==ownr) &&
+       (surr_slb[IDIR_SOUTH]==slab)&&(surr_own[IDIR_SOUTH]==ownr)))
+  {
+      corner_pos.x=dir_x[3];
+      corner_pos.y=dir_y[3];
+  }
+  if (((surr_slb[IDIR_EAST]==slab)&&(surr_own[IDIR_EAST]==ownr) &&
        (surr_slb[IDIR_SE]==slab)&&(surr_own[IDIR_SE]==ownr) &&
        (surr_slb[IDIR_SOUTH]==slab)&&(surr_own[IDIR_SOUTH]==ownr) &&
        (surr_slb[IDIR_SW]==slab)&&(surr_own[IDIR_SW]==ownr) &&
-       (surr_slb[IDIR_WEST]==slab)&&(surr_own[IDIR_WEST]==ownr)) ||
-      ((surr_slb[IDIR_SOUTH]==slab)&&(surr_own[IDIR_SOUTH]==ownr) &&
+       (surr_slb[IDIR_WEST]==slab)&&(surr_own[IDIR_WEST]==ownr)))
+  {
+      corner_pos.x=dir_x[0];
+      corner_pos.y=dir_y[0];
+  }
+  if (((surr_slb[IDIR_SOUTH]==slab)&&(surr_own[IDIR_SOUTH]==ownr) &&
        (surr_slb[IDIR_SW]==slab)&&(surr_own[IDIR_SW]==ownr) &&
        (surr_slb[IDIR_WEST]==slab)&&(surr_own[IDIR_WEST]==ownr) &&
        (surr_slb[IDIR_NW]==slab)&&(surr_own[IDIR_NW]==ownr) &&
-       (surr_slb[IDIR_NORTH]==slab)&&(surr_own[IDIR_NORTH]==ownr)) ||
-      ((surr_slb[IDIR_WEST]==slab)&&(surr_own[IDIR_WEST]==ownr) &&
+       (surr_slb[IDIR_NORTH]==slab)&&(surr_own[IDIR_NORTH]==ownr)))
+  {
+      corner_pos.x=dir_x[1];
+      corner_pos.y=dir_y[1];
+  }
+  if (((surr_slb[IDIR_WEST]==slab)&&(surr_own[IDIR_WEST]==ownr) &&
        (surr_slb[IDIR_NW]==slab)&&(surr_own[IDIR_NW]==ownr) &&
        (surr_slb[IDIR_NORTH]==slab)&&(surr_own[IDIR_NORTH]==ownr) &&
        (surr_slb[IDIR_NE]==slab)&&(surr_own[IDIR_NE]==ownr) &&
        (surr_slb[IDIR_EAST]==slab)&&(surr_own[IDIR_EAST]==ownr)))
   {
-      cr_edge(lvl,tx,ty,surr_slb,surr_own);
+      corner_pos.x=dir_x[2];
+      corner_pos.y=dir_y[2];
+  }
+  if  ((corner_pos.x!=1)&&(corner_pos.y!=1))
+  {
+      cr_edge(lvl,tx,ty,surr_slb,surr_own,corner_pos);
       return;
   }
   //If still nothing, maybe we have same surround from two sides and 1 corner,
@@ -1297,28 +1333,45 @@ void create_things_slb_room(cr_tng_func cr_floor,cr_tng_func cr_edge,
   if (((surr_slb[IDIR_NORTH]==slab)&&(surr_own[IDIR_NORTH]==ownr) &&
        (surr_slb[IDIR_EAST]==slab)&&(surr_own[IDIR_EAST]==ownr) &&
       ((surr_slb[IDIR_SOUTH]!=slab)||(surr_own[IDIR_SOUTH]!=ownr)) &&
-      ((surr_slb[IDIR_WEST]!=slab)||(surr_own[IDIR_WEST]!=ownr))) ||
-
-      ((surr_slb[IDIR_EAST]==slab)&&(surr_own[IDIR_EAST]==ownr) &&
+      ((surr_slb[IDIR_WEST]!=slab)||(surr_own[IDIR_WEST]!=ownr))))
+  {
+      corner_pos.x=dir_x[3];
+      corner_pos.y=dir_y[3];
+  }
+  if (((surr_slb[IDIR_EAST]==slab)&&(surr_own[IDIR_EAST]==ownr) &&
        (surr_slb[IDIR_SOUTH]==slab)&&(surr_own[IDIR_SOUTH]==ownr) &&
       ((surr_slb[IDIR_NORTH]!=slab)||(surr_own[IDIR_NORTH]!=ownr)) &&
-      ((surr_slb[IDIR_WEST]!=slab)||(surr_own[IDIR_WEST]!=ownr))) ||
-
-      ((surr_slb[IDIR_SOUTH]==slab)&&(surr_own[IDIR_SOUTH]==ownr) &&
+      ((surr_slb[IDIR_WEST]!=slab)||(surr_own[IDIR_WEST]!=ownr))))
+  {
+      corner_pos.x=dir_x[0];
+      corner_pos.y=dir_y[0];
+  }
+  if (((surr_slb[IDIR_SOUTH]==slab)&&(surr_own[IDIR_SOUTH]==ownr) &&
        (surr_slb[IDIR_WEST]==slab)&&(surr_own[IDIR_WEST]==ownr) &&
       ((surr_slb[IDIR_NORTH]!=slab)||(surr_own[IDIR_NORTH]!=ownr)) &&
-      ((surr_slb[IDIR_EAST]!=slab)||(surr_own[IDIR_EAST]!=ownr))) ||
-
-      ((surr_slb[IDIR_WEST]==slab)&&(surr_own[IDIR_WEST]==ownr) &&
+      ((surr_slb[IDIR_EAST]!=slab)||(surr_own[IDIR_EAST]!=ownr))))
+  {
+      corner_pos.x=dir_x[1];
+      corner_pos.y=dir_y[1];
+  }
+  if (((surr_slb[IDIR_WEST]==slab)&&(surr_own[IDIR_WEST]==ownr) &&
        (surr_slb[IDIR_NORTH]==slab)&&(surr_own[IDIR_NORTH]==ownr) &&
       ((surr_slb[IDIR_SOUTH]!=slab)||(surr_own[IDIR_SOUTH]!=ownr)) &&
       ((surr_slb[IDIR_EAST]!=slab)||(surr_own[IDIR_EAST]!=ownr))))
   {
-      cr_corner(lvl,tx,ty,surr_slb,surr_own);
+      corner_pos.x=dir_x[2];
+      corner_pos.y=dir_y[2];
+  }
+
+  if  ((corner_pos.x!=1)&&(corner_pos.y!=1))
+  {
+      cr_corner(lvl,tx,ty,surr_slb,surr_own,corner_pos);
       return;
   }
+  corner_pos.x=dir_x[0];
+  corner_pos.y=dir_y[0];
   //If nothing found - update as floor of this room
-  cr_floor(lvl,tx,ty,surr_slb,surr_own);
+  cr_floor(lvl,tx,ty,surr_slb,surr_own,corner_pos);
 }
 
 /*
@@ -1330,14 +1383,16 @@ void create_things_slb_room_simple(cr_tng_func cr_any,
   unsigned char *surr_slb=(unsigned char *)malloc(9*sizeof(unsigned char));
   unsigned char *surr_own=(unsigned char *)malloc(9*sizeof(unsigned char));
   get_slab_surround(surr_slb,surr_own,NULL,lvl,tx,ty);
+  struct UPOINT_2D corner_pos={0,0};
   unsigned short slab=surr_slb[IDIR_CENTR];
   unsigned char ownr=surr_own[IDIR_CENTR];
   //Very simple...
-  cr_any(lvl,tx,ty,surr_slb,surr_own);
+  cr_any(lvl,tx,ty,surr_slb,surr_own,corner_pos);
 }
 
-void delete_room_things(struct LEVEL *lvl, int tx, int ty,
-        unsigned char *surr_slb,unsigned char *surr_own)
+void delete_room_things(struct LEVEL *lvl, const int tx, const int ty,
+        const unsigned char *surr_slb,const unsigned char *surr_own,
+        const struct UPOINT_2D corner_pos)
 {
     int sx, sy;
     for (sx=tx*MAP_SUBNUM_X; sx < (tx+1)*MAP_SUBNUM_X; sx++)
@@ -1367,8 +1422,9 @@ void delete_room_things_subtl(struct LEVEL *lvl, int sx, int sy)
     }
 }
 
-void update_things_slb_portal_inside(struct LEVEL *lvl, int tx, int ty,
-        unsigned char *surr_slb,unsigned char *surr_own)
+void update_things_slb_portal_inside(struct LEVEL *lvl, const int tx, const int ty,
+        const unsigned char *surr_slb,const unsigned char *surr_own,
+        const struct UPOINT_2D corner_pos)
 {
     int sx, sy, i;
     unsigned char *thing_eff=NULL;
@@ -1514,82 +1570,158 @@ unsigned char *update_thing_slb_room_one_item_subtl(struct LEVEL *lvl, int sx, i
     return thing_dst;
 }
 
-void update_things_slb_training_inside(struct LEVEL *lvl, int tx, int ty,
-        unsigned char *surr_slb,unsigned char *surr_own)
+void update_things_slb_training_inside(struct LEVEL *lvl, const int tx, const int ty,
+        const unsigned char *surr_slb,const unsigned char *surr_own,
+        const struct UPOINT_2D corner_pos)
 {
     update_thing_slb_room_one_central_item(lvl,tx,ty,ITEM_SUBTYPE_TRAINPOST,true);
 }
 
-void update_things_slb_scavenger_inside(struct LEVEL *lvl, int tx, int ty,
-        unsigned char *surr_slb,unsigned char *surr_own)
+void update_things_slb_scavenger_inside(struct LEVEL *lvl, const int tx, const int ty,
+        const unsigned char *surr_slb,const unsigned char *surr_own,
+        const struct UPOINT_2D corner_pos)
 {
     update_thing_slb_room_one_central_item(lvl,tx,ty,ITEM_SUBTYPE_SCAVNGEYE,true);
 }
 
-void update_things_slb_graveyard_floor(struct LEVEL *lvl, int tx, int ty,
-        unsigned char *surr_slb,unsigned char *surr_own)
+void update_things_slb_graveyard_floor(struct LEVEL *lvl, const int tx, const int ty,
+        const unsigned char *surr_slb,const unsigned char *surr_own,
+        const struct UPOINT_2D corner_pos)
 {
     update_thing_slb_room_one_central_item(lvl,tx,ty,ITEM_SUBTYPE_GRAVSTONE,true);
 }
 
-void update_things_slb_workshop_inside(struct LEVEL *lvl, int tx, int ty,
-        unsigned char *surr_slb,unsigned char *surr_own)
+void update_things_slb_workshop_inside(struct LEVEL *lvl, const int tx, const int ty,
+        const unsigned char *surr_slb,const unsigned char *surr_own,
+        const struct UPOINT_2D corner_pos)
 {
     update_thing_slb_room_one_central_item(lvl,tx,ty,ITEM_SUBTYPE_WRKSHPMCH,true);
 }
 
-void update_things_slb_torture_inside(struct LEVEL *lvl, int tx, int ty,
-        unsigned char *surr_slb,unsigned char *surr_own)
+void update_things_slb_torture_inside(struct LEVEL *lvl, const int tx, const int ty,
+        const unsigned char *surr_slb,const unsigned char *surr_own,
+        const struct UPOINT_2D corner_pos)
 {
     update_thing_slb_room_one_central_item(lvl,tx,ty,ITEM_SUBTYPE_TORTURER,true);
 }
 
-void update_things_slb_treasure_corner(struct LEVEL *lvl, int tx, int ty,
-        unsigned char *surr_slb,unsigned char *surr_own)
+void update_things_slb_treasure_corner(struct LEVEL *lvl, const int tx, const int ty,
+        const unsigned char *surr_slb,const unsigned char *surr_own,
+        const struct UPOINT_2D corner_pos)
 {
     update_thing_slb_room_one_central_item(lvl,tx,ty,ITEM_SUBTYPE_CANDLSTCK,true);
 }
 
-void update_things_slb_torture_edge(struct LEVEL *lvl, int tx, int ty,
-        unsigned char *surr_slb,unsigned char *surr_own)
+void update_things_slb_torture_edge(struct LEVEL *lvl, const int tx, const int ty,
+        const unsigned char *surr_slb,const unsigned char *surr_own,
+        const struct UPOINT_2D corner_pos)
 {
     update_thing_slb_room_one_central_item(lvl,tx,ty,ITEM_SUBTYPE_TORTSPIKE,true);
 }
 
-void update_things_slb_training_corner(struct LEVEL *lvl, int tx, int ty,
-        unsigned char *surr_slb,unsigned char *surr_own)
+void update_things_slb_training_corner(struct LEVEL *lvl, const int tx, const int ty,
+        const unsigned char *surr_slb,const unsigned char *surr_own,
+        const struct UPOINT_2D corner_pos)
 {
     update_thing_slb_room_one_central_item(lvl,tx,ty,ITEM_SUBTYPE_TORCH,true);
 }
 
-void update_things_slb_scavenger_corner(struct LEVEL *lvl, int tx, int ty,
-        unsigned char *surr_slb,unsigned char *surr_own)
+void update_things_slb_scavenger_corner(struct LEVEL *lvl, const int tx, const int ty,
+        const unsigned char *surr_slb,const unsigned char *surr_own,
+        const struct UPOINT_2D corner_pos)
 {
     update_thing_slb_room_one_central_item(lvl,tx,ty,ITEM_SUBTYPE_TORCH,true);
 }
 
-void update_things_slb_hatchery_corner(struct LEVEL *lvl, int tx, int ty,
-        unsigned char *surr_slb,unsigned char *surr_own)
+void update_things_slb_hatchery_corner(struct LEVEL *lvl, const int tx, const int ty,
+        const unsigned char *surr_slb,const unsigned char *surr_own,
+        const struct UPOINT_2D corner_pos)
 {
     update_thing_slb_room_one_central_item(lvl,tx,ty,ITEM_SUBTYPE_TORCH,true);
 }
 
-void update_things_slb_temple_corner(struct LEVEL *lvl, int tx, int ty,
-        unsigned char *surr_slb,unsigned char *surr_own)
+void update_things_slb_temple_corner(struct LEVEL *lvl, const int tx, const int ty,
+        const unsigned char *surr_slb,const unsigned char *surr_own,
+        const struct UPOINT_2D corner_pos)
 {
     unsigned char *thing;
     thing=update_thing_slb_room_one_central_item(lvl,tx,ty,ITEM_SUBTYPE_TEMPLESTA,true);
     set_thing_subtile_h(thing,2); // Temple floor is higher than ground
 }
 
-void update_things_slb_workshop_corner(struct LEVEL *lvl, int tx, int ty,
-        unsigned char *surr_slb,unsigned char *surr_own)
+void update_things_slb_workshop_corner(struct LEVEL *lvl, const int tx, const int ty,
+        const unsigned char *surr_slb,const unsigned char *surr_own,
+        const struct UPOINT_2D corner_pos)
 {
     update_thing_slb_room_one_central_item(lvl,tx,ty,ITEM_SUBTYPE_ANVIL,true);
 }
 
-void update_things_slb_dungheart_corner(struct LEVEL *lvl, int tx, int ty,
-        unsigned char *surr_slb,unsigned char *surr_own)
+void update_things_slb_barracks_corner(struct LEVEL *lvl, const int tx, const int ty,
+        const unsigned char *surr_slb,const unsigned char *surr_own,
+        const struct UPOINT_2D corner_pos)
+{
+    int sx, sy, i;
+    short allow_torch=0;
+    if (slab_is_wall(surr_slb[(1)*3+(corner_pos.x)]))
+        allow_torch|=1;
+    if (slab_is_wall(surr_slb[(corner_pos.y)*3+(1)]))
+        allow_torch|=2;
+    unsigned char *thing_trch=NULL;
+    for (sx=tx*MAP_SUBNUM_X; sx < (tx+1)*MAP_SUBNUM_X; sx++)
+      for (sy=ty*MAP_SUBNUM_Y; sy < (ty+1)*MAP_SUBNUM_Y; sy++)
+      {
+          int last_thing=get_thing_subnums(lvl,sx,sy)-1;
+          for (i=last_thing; i>=0; i--)
+          {
+            unsigned char *thing=get_thing(lvl,sx,sy,i);
+            if (is_room_inventory(thing))
+            {
+                unsigned char type_idx=get_thing_type(thing);
+                unsigned char stype_idx=get_thing_subtype(thing);
+                // If we found torch, and that's the first one, and we are allowed to have it - then keep the torch.
+                if ((type_idx==THING_TYPE_ITEM)&&(is_torch_stype(stype_idx))&&(allow_torch>0)&&(thing_trch==NULL))
+                {
+                  thing_trch=thing;
+                  continue;
+                } else
+                {
+                  thing_del(lvl,sx, sy, i);
+                }
+            }
+          }
+     }
+    if (allow_torch>0)
+    {
+      if ((allow_torch&1)==1)
+      {
+        sx=tx*MAP_SUBNUM_X+corner_pos.x;
+        sy=ty*MAP_SUBNUM_Y+1;
+      } else
+      {
+        sx=tx*MAP_SUBNUM_X+1;
+        sy=ty*MAP_SUBNUM_Y+corner_pos.y;
+      }
+      if (thing_trch==NULL)
+      {
+        thing_trch=create_item_adv(lvl,sx,sy,ITEM_SUBTYPE_TORCH);
+        thing_add(lvl,thing_trch);
+      } else
+      {
+        set_thing_owner(thing_trch,get_tile_owner(lvl,tx,ty));
+        if (allow_torch<3)
+          set_thing_subtile(thing_trch,sx,sy);
+        //Sensitive tile
+        unsigned short sensitile=compute_torch_sensitile(lvl,thing_trch);
+        set_thing_sensitile(thing_trch,sensitile);
+      }
+    }
+    sx=tx*MAP_SUBNUM_X+2-corner_pos.x;
+    sy=ty*MAP_SUBNUM_Y+2-corner_pos.y;
+}
+
+void update_things_slb_dungheart_corner(struct LEVEL *lvl, const int tx, const int ty,
+        const unsigned char *surr_slb,const unsigned char *surr_own,
+        const struct UPOINT_2D corner_pos)
 {
     unsigned char flame_stype;
     switch (surr_own[IDIR_CENTR])
@@ -1615,17 +1747,18 @@ void update_things_slb_dungheart_corner(struct LEVEL *lvl, int tx, int ty,
     if (flame_stype!=0)
       update_thing_slb_room_one_central_item(lvl,tx,ty,flame_stype,true);
     else
-      delete_room_things(lvl,tx,ty,surr_slb,surr_own);
+      delete_room_things(lvl,tx,ty,surr_slb,surr_own,corner_pos);
 }
 
-void update_things_slb_dungheart_inside(struct LEVEL *lvl, int tx, int ty,
-        unsigned char *surr_slb,unsigned char *surr_own)
+void update_things_slb_dungheart_inside(struct LEVEL *lvl, const int tx, const int ty,
+        const unsigned char *surr_slb,const unsigned char *surr_own,
+        const struct UPOINT_2D corner_pos)
 {
     unsigned char own=surr_own[IDIR_CENTR];
     if (own>=PLAYERS_COUNT) own=PLAYER_UNSET;
     if (own==PLAYER_UNSET)
     {
-      delete_room_things(lvl,tx,ty,surr_slb,surr_own);
+      delete_room_things(lvl,tx,ty,surr_slb,surr_own,corner_pos);
       return;
     }
     //Array for storing players heart count
@@ -1637,14 +1770,21 @@ void update_things_slb_dungheart_inside(struct LEVEL *lvl, int tx, int ty,
     update_thing_slb_room_one_central_item(lvl,tx,ty,ITEM_SUBTYPE_DNHEART,(hearts[own]==0));
 }
 
-void update_things_slb_graveyard_corner(struct LEVEL *lvl, int tx, int ty,
-        unsigned char *surr_slb,unsigned char *surr_own)
+void update_things_slb_graveyard_corner(struct LEVEL *lvl, const int tx, const int ty,
+        const unsigned char *surr_slb,const unsigned char *surr_own,
+        const struct UPOINT_2D corner_pos)
 {
     int sx, sy, i;
     const unsigned char itm_stype_idx=ITEM_SUBTYPE_GRAVSTONE;
     const unsigned char eff_stype_idx=ROOMEFC_SUBTP_DRYICE;
+    short allow_torch=0;
+    if (slab_is_wall(surr_slb[(1)*3+(corner_pos.x)]))
+        allow_torch|=1;
+    if (slab_is_wall(surr_slb[(corner_pos.y)*3+(1)]))
+        allow_torch|=2;
     unsigned char *thing_dst=NULL;
     unsigned char *thing_eff=NULL;
+    unsigned char *thing_trch=NULL;
     for (sx=tx*MAP_SUBNUM_X; sx < (tx+1)*MAP_SUBNUM_X; sx++)
       for (sy=ty*MAP_SUBNUM_Y; sy < (ty+1)*MAP_SUBNUM_Y; sy++)
       {
@@ -1662,11 +1802,15 @@ void update_things_slb_graveyard_corner(struct LEVEL *lvl, int tx, int ty,
                 if ((type_idx==THING_TYPE_ROOMEFFECT)&&(stype_idx==eff_stype_idx)&&(thing_eff==NULL))
                   thing_eff=thing;
                 else
-                // If we found torch, and we're searching for something else - leave the torch.
-                if ((type_idx==THING_TYPE_ITEM)&&(is_torch_stype(stype_idx))&&(!is_torch_stype(itm_stype_idx)))
+                // If we found torch, and that's the first one, and we are allowed to have it - then keep the torch.
+                if ((type_idx==THING_TYPE_ITEM)&&(is_torch_stype(stype_idx))&&(allow_torch>0)&&(thing_trch==NULL))
+                {
+                  thing_trch=thing;
                   continue;
-                else
+                } else
+                {
                   thing_del(lvl,sx, sy, i);
+                }
             }
           }
      }
@@ -1680,7 +1824,33 @@ void update_things_slb_graveyard_corner(struct LEVEL *lvl, int tx, int ty,
     {
       set_thing_owner(thing_dst,get_tile_owner(lvl,tx,ty));
     }
-//TODO: put the dry ice effect on right position!
+    if (allow_torch>0)
+    {
+      if ((allow_torch&1)==1)
+      {
+        sx=tx*MAP_SUBNUM_X+corner_pos.x;
+        sy=ty*MAP_SUBNUM_Y+1;
+      } else
+      {
+        sx=tx*MAP_SUBNUM_X+1;
+        sy=ty*MAP_SUBNUM_Y+corner_pos.y;
+      }
+      if (thing_trch==NULL)
+      {
+        thing_trch=create_item_adv(lvl,sx,sy,ITEM_SUBTYPE_TORCH);
+        thing_add(lvl,thing_trch);
+      } else
+      {
+        set_thing_owner(thing_trch,get_tile_owner(lvl,tx,ty));
+        if (allow_torch<3)
+          set_thing_subtile(thing_trch,sx,sy);
+        //Sensitive tile
+        unsigned short sensitile=compute_torch_sensitile(lvl,thing_trch);
+        set_thing_sensitile(thing_trch,sensitile);
+      }
+    }
+    sx=tx*MAP_SUBNUM_X+2-corner_pos.x;
+    sy=ty*MAP_SUBNUM_Y+2-corner_pos.y;
     if (thing_eff==NULL)
     {
       thing_eff=create_roomeffect(lvl,sx,sy,eff_stype_idx);
@@ -1692,8 +1862,9 @@ void update_things_slb_graveyard_corner(struct LEVEL *lvl, int tx, int ty,
     }
 }
 
-void update_things_slb_guardpost_floor(struct LEVEL *lvl, int tx, int ty,
-        unsigned char *surr_slb,unsigned char *surr_own)
+void update_things_slb_guardpost_floor(struct LEVEL *lvl, const int tx, const int ty,
+        const unsigned char *surr_slb,const unsigned char *surr_own,
+        const struct UPOINT_2D corner_pos)
 {
     unsigned char flag_stype;
     switch (surr_own[IDIR_CENTR])
@@ -1720,8 +1891,9 @@ void update_things_slb_guardpost_floor(struct LEVEL *lvl, int tx, int ty,
     set_thing_subtile_h(thing,2);
 }
 
-void update_things_slb_prison(struct LEVEL *lvl, int tx, int ty,
-        unsigned char *surr_slb,unsigned char *surr_own)
+void update_things_slb_prison(struct LEVEL *lvl, const int tx, const int ty,
+        const unsigned char *surr_slb,const unsigned char *surr_own,
+        const struct UPOINT_2D corner_pos)
 {
   unsigned short slab=surr_slb[IDIR_CENTR];
   unsigned char ownr=surr_own[IDIR_CENTR];

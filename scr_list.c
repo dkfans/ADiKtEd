@@ -177,6 +177,8 @@ short start_list(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata,int
     workdata->list->val3=0;
     workdata->list->ptr=NULL;
     scrmode->mode=lstmode;
+    if (workdata->lvl!=NULL)
+      workdata->lvl->info.usr_mdswtch_count++;
     message_info("Use arrow keys and page up/down to move, "
       "enter to choose.");
     return true;
@@ -209,6 +211,8 @@ short start_rplist(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata,i
     workdata->list->val2=0;
     workdata->list->val3=0;
     scrmode->mode=lstmode;
+    if (workdata->lvl!=NULL)
+      workdata->lvl->info.usr_mdswtch_count++;
     message_info("Use arrow keys and page up/down to move, "
       "or enter number with keyboard.");
     return true;

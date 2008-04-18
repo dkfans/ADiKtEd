@@ -23,6 +23,8 @@
 // RNC compression magic identifier
 #define RNC_SIGNATURE_STR "RNC\001"
 
+#define ERR_NONE           0
+
 // Routines
 
 long file_length (char *path);

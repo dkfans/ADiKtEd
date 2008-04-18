@@ -21,6 +21,7 @@
 
 #include "scr_thing.h"
 
+#include <math.h>
 #include "globals.h"
 #include "scr_help.h"
 #include "output_scr.h"
@@ -163,6 +164,7 @@ void actions_mdtng(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata,i
           message_info("Added action point %d",(unsigned int)get_actnpt_number(thing));
           set_visited_obj_lastof(workdata,OBJECT_TYPE_ACTNPT);
           set_brighten_for_actnpt(workdata->mapmode,thing);
+          workdata->lvl->info.usr_creatobj_count++;
           break;
         case KEY_SHIFT_L: // Add static light
           thing = create_stlight(subpos.x,subpos.y);
@@ -170,6 +172,7 @@ void actions_mdtng(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata,i
           message_info("Added static light");
           set_visited_obj_lastof(workdata,OBJECT_TYPE_STLIGHT);
           set_brighten_for_stlight(workdata->mapmode,thing);
+          workdata->lvl->info.usr_creatobj_count++;
           break;
         case KEY_K: // Copy thing to clipboard
           {
@@ -214,6 +217,7 @@ void actions_mdtng(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata,i
                 if (is_roomeffect(thing))
                     set_brighten_for_thing(workdata->mapmode,thing);
                 set_visited_obj_lastof(workdata,OBJECT_TYPE_THING);
+                workdata->lvl->info.usr_creatobj_count++;
                 break;
             case OBJECT_TYPE_ACTNPT:
                 thing = create_actnpt_copy(subpos.x,subpos.y,clip_itm->data);
@@ -221,6 +225,7 @@ void actions_mdtng(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata,i
                 set_brighten_for_actnpt(workdata->mapmode,thing);
                 message_info("Action point pasted from clipboard at subtile %d,%d",subpos.x,subpos.y);
                 set_visited_obj_lastof(workdata,OBJECT_TYPE_ACTNPT);
+                workdata->lvl->info.usr_creatobj_count++;
                 break;
             case OBJECT_TYPE_STLIGHT:
                 thing = create_stlight_copy(subpos.x,subpos.y,clip_itm->data);
@@ -228,6 +233,7 @@ void actions_mdtng(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata,i
                 message_info("Static light pasted from clipboard at subtile %d,%d",subpos.x,subpos.y);
                 set_brighten_for_stlight(workdata->mapmode,thing);
                 set_visited_obj_lastof(workdata,OBJECT_TYPE_STLIGHT);
+                workdata->lvl->info.usr_creatobj_count++;
                 break;
             default:
                 message_error("Internal error: can't paste this object type.");
@@ -399,6 +405,8 @@ short start_mdtng(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata)
     workdata->mdtng->obj_ranges_changed=true;
     scrmode->usrinput_type=SI_NONE;
     scrmode->mode=MD_TNG;
+    if (workdata->lvl!=NULL)
+      workdata->lvl->info.usr_mdswtch_count++;
     return true;
 }
 
@@ -550,7 +558,7 @@ int display_object_posparam(const short display_float_pos,const char *param_name
 {
     if (display_float_pos)
     {
-      int subtl_frac=round(((float)subtpos) / 2.56);
+      int subtl_frac=floor(((float)subtpos)/2.56 + 0.5);
       if (subtl_frac>99) subtl_frac=99;
       screen_setcolor(PRINT_COLOR_LGREY_ON_BLACK);
       screen_printf("%s: ",param_name);
@@ -580,9 +588,9 @@ int display_object_posxy(const short display_float_pos,int scr_col, int scr_row,
     {
       screen_setcolor(PRINT_COLOR_LGREY_ON_BLACK);
       set_cursor_pos(scr_row++, scr_col);
-      int subtl_x_frac=round(((float)subtpos_x) / 2.56);
+      int subtl_x_frac=floor(((float)subtpos_x)/2.56 + 0.5);
       if (subtl_x_frac>99) subtl_x_frac=99;
-      int subtl_y_frac=round(((float)subtpos_y) / 2.56);
+      int subtl_y_frac=floor(((float)subtpos_y)/2.56 + 0.5);
       if (subtl_y_frac>99) subtl_y_frac=99;
       screen_printf("Subtile: ");
       screen_setcolor(PRINT_COLOR_LCYAN_ON_BLACK);
@@ -1103,6 +1111,7 @@ unsigned char *tng_makeitem(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *w
     thing_add(workdata->lvl,thing);
     set_visited_obj_lastof(workdata,OBJECT_TYPE_THING);
     message_info("Item added: %s",get_item_subtype_fullname(stype_idx));
+    workdata->lvl->info.usr_creatobj_count++;
     return thing;
 }
 
@@ -1119,6 +1128,7 @@ unsigned char *tng_makeroomeffect(struct SCRMODE_DATA *scrmode,struct WORKMODE_D
     message_info("Room Effect added to map at (%d,%d)",sx,sy);
     set_visited_obj_lastof(workdata,OBJECT_TYPE_THING);
     set_brighten_for_thing(workdata->mapmode,thing);
+    workdata->lvl->info.usr_creatobj_count++;
     return thing;
 }
 
@@ -1134,6 +1144,7 @@ unsigned char *tng_maketrap(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *w
     thing_add(workdata->lvl,thing);
     message_info("Trap added to map at (%d,%d)",sx,sy);
     set_visited_obj_lastof(workdata,OBJECT_TYPE_THING);
+    workdata->lvl->info.usr_creatobj_count++;
     return thing;
 }
 
@@ -1145,6 +1156,7 @@ unsigned char *tng_makecreature(struct SCRMODE_DATA *scrmode,struct WORKMODE_DAT
     // Show the new thing
     set_visited_obj_lastof(workdata,OBJECT_TYPE_THING);
     message_info("Creature added to map at (%d,%d)",sx,sy);
+    workdata->lvl->info.usr_creatobj_count++;
     return thing;
 }
 

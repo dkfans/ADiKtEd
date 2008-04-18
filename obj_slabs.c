@@ -145,6 +145,39 @@ void update_slab_owners(struct LEVEL *lvl)
 }
 
 /*
+ * Places room of given size and player at random position.
+ * Tries to select position far from other players.
+ * Used mainly for putting Dungeon Hearts.
+ */
+short place_room_rndpos(struct LEVEL *lvl,const unsigned short rslab,
+    const unsigned char rown,const struct IPOINT_2D *rsize)
+{
+    int surrnd_size=20;
+    struct IPOINT_2D rpos;
+    while (surrnd_size>4)
+    {
+      int lottery_count;
+      for (lottery_count=0;lottery_count<16;lottery_count++)
+      {
+        rpos.x=(surrnd_size>>1)+1+rnd(MAP_SIZE_X-surrnd_size);
+        rpos.y=(surrnd_size>>1)+1+rnd(MAP_SIZE_Y-surrnd_size);
+//TODO!!!!!!!!!!!
+/*
+4 Check if there's no enemy/short slab/rock in range of surrnd_size
+5 Check if there IS short slab/rock in range of surrnd_size+5
+6 if conditions met - goto 20
+
+20 get random position within surrnd_size rectangle (whole heart must fit inside surrnd_size)
+21 put the heart
+*/
+      }
+      surrnd_size--;
+    }
+    // If we're here, this means we couldn't find place for heart.
+    return false;
+}
+
+/*
  * Returns square owner name string
  */
 char *get_owner_type_fullname(unsigned char own_idx)
@@ -244,6 +277,14 @@ short slab_is_wall(unsigned short slab_type)
     int idx=arr_ushort_pos(slabs_walls,slab_type,array_count);
     if (idx>=0) return true;
     return false;
+}
+
+unsigned short get_random_wall_slab(void)
+{
+     int array_count=sizeof(slabs_walls)/sizeof(unsigned short);
+    //All walls are listed in slabs_walls array
+    int idx=rnd(array_count);
+    return slabs_walls[idx];
 }
 
 short slab_is_wealth(unsigned short slab_type)

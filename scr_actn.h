@@ -78,6 +78,21 @@ enum adikt_level_preview
   LPREV_SAVE   = 0x002,
 };
 
+enum adikt_paintmode
+{
+  PNTMD_NONE      = 0x00,
+  PNTMD_ENAB      = 0x01,
+  PNTMD_SLAB      = 0x02,
+  PNTMD_OWNR      = 0x04,
+  PNTMD_RNDWALL   = 0x08,
+};
+
+enum adikt_eetype
+{
+  EE_NONE      = 0x00,
+  EE_TLBIRTH   = 0x01,
+};
+
 struct CLIPBOARD {
     int dtype;
     unsigned char *data;
@@ -123,8 +138,8 @@ struct MAPMODE_DATA {
     struct IPOINT_2D markp;
     //Painting properties
     short paintmode;
-    short paintown;
-    unsigned char paintroom;
+    unsigned char paintownr;
+    unsigned short paintroom;
     // Location of cursor on screen (where appropriate)
     struct IPOINT_2D screen;
     // Location of top left corner of screen in map (where appropriate)
@@ -149,6 +164,7 @@ struct MAPMODE_DATA {
     short items_list_on_create;
     //Slab keys
     char *slbkey;
+    short eetype;
     // Will the preview of level be visible?
     short level_preview;
     // Preview of a level, used when opening a level
@@ -245,7 +261,24 @@ void show_cursor(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,char 
 char *mode_status(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata,int mode);
 short is_simple_mode(int mode);
 
+// Paint function support
+short is_painting_enab(struct MAPMODE_DATA *mapmode);
+short is_painting_slab(struct MAPMODE_DATA *mapmode);
+short is_painting_ownr(struct MAPMODE_DATA *mapmode);
+unsigned short get_painting_slab(struct MAPMODE_DATA *mapmode);
+unsigned char get_painting_ownr(struct MAPMODE_DATA *mapmode);
+void set_painting_enab(struct MAPMODE_DATA *mapmode);
+void set_painting_slab(struct MAPMODE_DATA *mapmode,const unsigned short slab);
+void set_painting_ownr(struct MAPMODE_DATA *mapmode,const unsigned char owner);
+void set_painting_rndwall(struct MAPMODE_DATA *mapmode);
+void set_painting_disab(struct MAPMODE_DATA *mapmode);
+
+// Mark function support
+short is_marking_enab(struct MAPMODE_DATA *mapmode);
+void set_marking_disab(struct MAPMODE_DATA *mapmode);
+void set_marking_start(struct MAPMODE_DATA *mapmode,int x,int y);
 void mark_check(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode);
+
 int get_draw_map_tile_color(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl,int tx,int ty,short special,short darken_fg,short brighten_bg);
 int get_screen_color_owned(unsigned char owner,short marked,short darken_fg,short brighten_bg);
 void draw_map_area(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl,short show_ground,short show_rooms,short show_things);

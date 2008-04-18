@@ -21,6 +21,7 @@
 
 #include "scr_slab.h"
 
+#include <time.h>
 #include "globals.h"
 #include "output_scr.h"
 #include "input_kb.h"
@@ -37,12 +38,17 @@
  */
 short init_mdslab(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata)
 {
+    if (workdata==NULL) return false;
     //Creating mdslab variable
     workdata->mdslab=(struct MDSLAB_DATA *)malloc(sizeof(struct MDSLAB_DATA));
     if (workdata->mdslab==NULL)
      die("init_mdslab: Cannot allocate memory.");
     //Initialize keys for displaying and putting slabs
     init_mdslab_keys(scrmode,workdata);
+    time_t curr_time=time(NULL);
+    struct tm *curr_tm=localtime(&curr_time);
+    if ((curr_tm->tm_mday==25)&&(curr_tm->tm_mon==4))
+      workdata->mapmode->eetype=EE_TLBIRTH;
     return true;
 }
 
@@ -102,17 +108,14 @@ void actions_mdslab(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata,
           free(msg);
           break;
         case KEY_CTRL_SPACE:
-          if (workdata->mapmode->mark)
+          if (is_marking_enab(workdata->mapmode))
           {
-            workdata->mapmode->mark=false;
+            set_marking_disab(workdata->mapmode);
           } else
           {
-            workdata->mapmode->mark=true;
-            workdata->mapmode->paintmode=false;
-            workdata->mapmode->markp.y=ty;
-            workdata->mapmode->markp.x=tx;
+            set_marking_start(workdata->mapmode,tx,ty);
           }
-          message_info("Mark mode %s",workdata->mapmode->mark?"on":"off");
+          message_info("Mark mode %s",is_marking_enab(workdata->mapmode)?"on":"off");
           break;
         case KEY_DEL: // Delete graffiti if there is any here
           d = graffiti_idx(workdata->lvl,tx,ty);
@@ -128,7 +131,7 @@ void actions_mdslab(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata,
             slb_next_graffiti_orient(workdata->lvl,graffiti_idx(workdata->lvl,tx,ty));
           break;
         case KEY_D: // Add/view graffiti down
-            if ((workdata->mapmode->mark) || (workdata->mapmode->paintmode))
+            if ((is_marking_enab(workdata->mapmode)) || is_painting_enab(workdata->mapmode))
             {
               message_error("Can't draw graffiti whilst painting or marking");
               return;
@@ -170,20 +173,22 @@ void actions_mdslab(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata,
             message_error("Nothing to increase");
           break;
         case KEY_Z:
-            if (workdata->mapmode->paintmode==false)
+            if (!is_painting_enab(workdata->mapmode))
             {
-              workdata->mapmode->paintmode=true;
-              workdata->mapmode->paintown=-1;
-              workdata->mapmode->paintroom=255;
-              workdata->mapmode->mark=false;
+              set_painting_enab(workdata->mapmode);
             } else
             {
-              workdata->mapmode->paintmode=false;
+              set_painting_disab(workdata->mapmode);
             }
-            message_info("Paint mode %s",workdata->mapmode->paintmode?"on":"off");
+            message_info("Paint mode %s",(is_painting_enab(workdata->mapmode))?"on":"off");
             break;
         case KEY_ESCAPE:
             message_info(get_random_tip(workdata->help));
+            break;
+        case KEY_F:
+            slb_place_room(workdata,get_random_wall_slab());
+            if (is_painting_enab(workdata->mapmode))
+              set_painting_rndwall(workdata->mapmode);
             break;
         default:
             {
@@ -191,8 +196,8 @@ void actions_mdslab(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata,
               if ((key < workdata->mdslab->placenkeys) && (placekeys[key]!=255))
               {
                 slb_place_room(workdata,placekeys[key]);
-                if (workdata->mapmode->paintmode)
-                  workdata->mapmode->paintroom=placekeys[key];
+                if (is_painting_enab(workdata->mapmode))
+                  set_painting_slab(workdata->mapmode,placekeys[key]);
               } else
               {
               message_info("Unrecognized slb key code: %d",key);
@@ -211,6 +216,8 @@ short start_mdslab(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata)
 {
     scrmode->mode=MD_SLB;
     scrmode->usrinput_type=SI_NONE;
+    if (workdata->lvl!=NULL)
+      workdata->lvl->info.usr_mdswtch_count++;
     return true;
 }
 
@@ -219,8 +226,8 @@ short start_mdslab(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata)
  */
 void end_mdslab(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata)
 {
-    workdata->mapmode->mark=false;
-    workdata->mapmode->paintmode=false;
+    set_marking_disab(workdata->mapmode);
+    set_painting_disab(workdata->mapmode);
     workdata->ipanel->mode=PV_MODE;
     scrmode->usrinput_type=SI_NONE;
     scrmode->usrinput_pos=0;
@@ -232,13 +239,10 @@ void end_mdslab(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata)
  */
 void slbposcheck(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata)
 {
-    if (workdata->mapmode->paintmode)
-    {
-      if (workdata->mapmode->paintroom != 255)
-          slb_place_room(workdata,workdata->mapmode->paintroom);
-      if (workdata->mapmode->paintown >= 0)
-          change_ownership(workdata,(char)(workdata->mapmode->paintown));
-    }
+    if (is_painting_slab(workdata->mapmode))
+        slb_place_room(workdata,get_painting_slab(workdata->mapmode));
+    if (is_painting_ownr(workdata->mapmode))
+        change_ownership(workdata,get_painting_ownr(workdata->mapmode));
 }
 
 /*
@@ -250,7 +254,7 @@ void slb_place_room(struct WORKMODE_DATA *workdata,unsigned char room)
 {
     int markr,markb;
     int markl,markt;
-    if (workdata->mapmode->mark)
+    if (is_marking_enab(workdata->mapmode))
     {
       markr=workdata->mapmode->markr.r;
       markb=workdata->mapmode->markr.b;
@@ -277,6 +281,7 @@ void slb_place_room(struct WORKMODE_DATA *workdata,unsigned char room)
 //          unsigned char oldslb;
 //          oldslb = get_tile_slab(lvl,tile_x,tile_y);
           set_tile_slab(workdata->lvl,tile_x,tile_y,room);
+          workdata->lvl->info.usr_slbchng_count++;
       }
     if (obj_auto_update)
       update_obj_for_square(workdata->lvl, markl-1, markr+1, markt-1, markb+1);
@@ -284,7 +289,7 @@ void slb_place_room(struct WORKMODE_DATA *workdata,unsigned char room)
       update_datclm_for_square(workdata->lvl, markl-1, markr+1, markt-1, markb+1);
     if (obj_auto_update)
       update_obj_subpos_and_height_for_square(workdata->lvl, markl-1, markr+1, markt-1, markb+1);
-    workdata->mapmode->mark=false;
+    set_marking_disab(workdata->mapmode);
 }
 
 /*
@@ -298,7 +303,7 @@ void change_ownership(struct WORKMODE_DATA *workdata,unsigned char purchaser)
     if ((tx >= MAP_SIZE_X) || (tx >= MAP_SIZE_Y) ||
         (tx < 0) || (ty < 0))
       return;
-    if (!workdata->mapmode->mark)
+    if (!is_marking_enab(workdata->mapmode))
     {
       set_tile_owner(workdata->lvl,tx,ty,purchaser);
       if (obj_auto_update)
@@ -322,7 +327,7 @@ void change_ownership(struct WORKMODE_DATA *workdata,unsigned char purchaser)
       update_datclm_for_square(workdata->lvl, workdata->mapmode->markr.l-1, workdata->mapmode->markr.r+1, workdata->mapmode->markr.t-1, workdata->mapmode->markr.b+1);
     if (obj_auto_update)
       update_obj_subpos_and_height_for_square(workdata->lvl, workdata->mapmode->markr.l-1, workdata->mapmode->markr.r+1, workdata->mapmode->markr.t-1, workdata->mapmode->markr.b+1);
-    workdata->mapmode->mark=false;
+    set_marking_disab(workdata->mapmode);
 }
 
 /*
@@ -330,7 +335,8 @@ void change_ownership(struct WORKMODE_DATA *workdata,unsigned char purchaser)
  */
 void slb_change_ownership(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata,unsigned char purchaser)
 {
-    workdata->mapmode->paintown=purchaser;
+    if (is_painting_enab(workdata->mapmode))
+        set_painting_ownr(workdata->mapmode,purchaser);
     change_ownership(workdata,purchaser);
     message_info("Slab owner changed to %s",get_owner_type_fullname(purchaser));
 }
@@ -552,6 +558,8 @@ short start_mdgrafit(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata
 {
     scrmode->mode=MD_GRFT;
     scrmode->usrinput_type=SI_GRAFT;
+    if (workdata->lvl!=NULL)
+      workdata->lvl->info.usr_mdswtch_count++;
     message_info("Graffiti mode started");
     return true;
 }

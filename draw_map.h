@@ -23,11 +23,8 @@
 #include "globals.h"
 
 struct LEVEL;
-
-#define TEXTURE_SIZE_X 32
-#define TEXTURE_SIZE_Y 32
-#define TEXTURE_COUNT_X 8
-#define TEXTURE_COUNT_Y 68
+struct CUBES_DATA;
+struct IMAGELIST;
 
 struct PALETTE_ENTRY {
     unsigned char r;
@@ -36,36 +33,8 @@ struct PALETTE_ENTRY {
     unsigned char o;
 };
 
-struct CUBES_DATA {
-    struct CUBE_TEXTURES *data;
-    int count;
-    struct CUBE_TXTRANIM *anitx;
-    int anitxcount;
-};
-
-//Texture indices for every side of a cube
-struct CUBE_TEXTURES {
-       //north
-    unsigned int n;
-       //south
-    unsigned int s;
-       //west
-    unsigned int w;
-       //east
-    unsigned int e;
-       //top
-    unsigned int t;
-       //bottom
-    unsigned int b;
-};
-
-//Animated texture - indices of textures which are swiching
-struct CUBE_TXTRANIM {
-    unsigned int data[8];
-};
-
 struct MAPDRAW_DATA {
-    struct CUBES_DATA cubes;
+    struct CUBES_DATA *cubes;
     unsigned char *texture;
     struct PALETTE_ENTRY *palette;
     struct PALETTE_ENTRY *ownerpal;

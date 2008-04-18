@@ -20,14 +20,18 @@
 
 #include "memfile.h"
 
-#include "globals.h"
-#include "var_utils.h"
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <ctype.h>
+#include <limits.h>
+#include <time.h>
 #include "dernc.h"
 
 /*
  * Read a file, possibly compressed, and decompress it if necessary.
  */
-struct MEMORY_FILE read_file(char *iname)
+struct MEMORY_FILE read_file(const char *iname)
 {
     FILE *ifp;
     unsigned long plen, ulen, alloc_len;

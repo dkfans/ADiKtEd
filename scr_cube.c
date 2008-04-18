@@ -89,6 +89,7 @@ void actions_mdcube(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata,
 short start_mdcube(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata)
 {
     short result;
+    if (workdata==NULL) return false;
     result=start_list(scrmode,workdata,MD_CUBE);
     workdata->mdcube->cube_idx=1;
     workdata->list->pos=8;
