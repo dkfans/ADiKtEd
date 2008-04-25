@@ -936,6 +936,24 @@ void fill_column_earthground(struct COLUMN_REC *clm_rec, unsigned char owner)
          CUBE_PATH_SMOOTH1 +rnd(5), 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0);
 }
 
+/*
+ * Ground for any wall to put on top; near water version
+ */
+void fill_column_wallground_nearwater(struct COLUMN_REC *clm_rec, unsigned char owner)
+{
+     fill_column_rec_sim(clm_rec, 0, CUBE_PATH_SMOOTH3,
+         0x075, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0);
+}
+
+/*
+ * Ground for any wall to put on top; near lava version
+ */
+void fill_column_wallground_nearlava(struct COLUMN_REC *clm_rec, unsigned char owner)
+{
+     fill_column_rec_sim(clm_rec, 0, CUBE_PATH_SMOOTH3,
+         0x076, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0);
+}
+
 void fill_column_gold(struct COLUMN_REC *clm_rec, unsigned char owner)
 {
      fill_column_rec_sim(clm_rec, 0, CUBE_PATH_SMOOTH3,
@@ -1025,6 +1043,58 @@ void place_column_wall_cobblestones_mk(struct COLUMN_REC *clm_rec, unsigned char
   clm_rec->height=compute_clm_rec_height(clm_rec);
 }
 
+void place_column_wall_redsmbrick_b(struct COLUMN_REC *clm_rec, unsigned char owner)
+{
+  int pos=clm_rec->height-4;
+  if (pos<0) pos=clm_rec->height;
+  if (pos>4) pos=4;
+  clm_rec->c[pos+0]=0x053;
+  clm_rec->c[pos+1]=0x050;
+  clm_rec->c[pos+2]=0x050;
+  clm_rec->c[pos+3]=0x04e;
+  clm_rec->solid=compute_clm_rec_solid(clm_rec);
+  clm_rec->height=compute_clm_rec_height(clm_rec);
+}
+
+void place_column_wall_redsmbrick_dkbtm(struct COLUMN_REC *clm_rec, unsigned char owner)
+{
+  int pos=clm_rec->height-4;
+  if (pos<0) pos=clm_rec->height;
+  if (pos>4) pos=4;
+  clm_rec->c[pos+0]=0x052;
+  clm_rec->c[pos+1]=0x048+rnd(3);
+  clm_rec->c[pos+2]=0x048+rnd(3);
+  clm_rec->c[pos+3]=0x04d;
+  clm_rec->solid=compute_clm_rec_solid(clm_rec);
+  clm_rec->height=compute_clm_rec_height(clm_rec);
+}
+
+void place_column_wall_redsmbrick_c(struct COLUMN_REC *clm_rec, unsigned char owner)
+{
+  int pos=clm_rec->height-4;
+  if (pos<0) pos=clm_rec->height;
+  if (pos>4) pos=4;
+  clm_rec->c[pos+0]=0x051;
+  clm_rec->c[pos+1]=0x04f;
+  clm_rec->c[pos+2]=0x04f;
+  clm_rec->c[pos+3]=0x04c;
+  clm_rec->solid=compute_clm_rec_solid(clm_rec);
+  clm_rec->height=compute_clm_rec_height(clm_rec);
+}
+
+void place_column_wall_redsmbrick(struct COLUMN_REC *clm_rec, unsigned char owner)
+{
+  int pos=clm_rec->height-4;
+  if (pos<0) pos=clm_rec->height;
+  if (pos>4) pos=4;
+  clm_rec->c[pos+0]=0x048+rnd(3);
+  clm_rec->c[pos+1]=0x048+rnd(3);
+  clm_rec->c[pos+2]=0x048+rnd(3);
+  clm_rec->c[pos+3]=0x04d;
+  clm_rec->solid=compute_clm_rec_solid(clm_rec);
+  clm_rec->height=compute_clm_rec_height(clm_rec);
+}
+
 void fill_column_wall_redsmbrick_b(struct COLUMN_REC *clm_rec, unsigned char owner)
 {
      fill_column_rec_sim(clm_rec, 0, CUBE_PATH_SMOOTH3,
@@ -1041,6 +1111,30 @@ void fill_column_wall_redsmbrick_c(struct COLUMN_REC *clm_rec, unsigned char own
 {
      fill_column_rec_sim(clm_rec, 0, CUBE_PATH_SMOOTH3,
          CUBE_PATH_SMOOTH1 +rnd(5), 0x051, 0x04f, 0x04f, 0x04c, 0, 0, 0);
+}
+
+void fill_column_wall_redsmbrick_a_nearwater(struct COLUMN_REC *clm_rec, unsigned char owner)
+{
+     fill_column_rec_sim(clm_rec, 0, CUBE_PATH_SMOOTH3,
+         0x075, 0x048+rnd(3), 0x048+rnd(3), 0x048+rnd(3), 0x04d, 0, 0, 0);
+}
+
+void fill_column_wall_redsmbrick_a_nearlava(struct COLUMN_REC *clm_rec, unsigned char owner)
+{
+     fill_column_rec_sim(clm_rec, 0, CUBE_PATH_SMOOTH3,
+         0x076, 0x048+rnd(3), 0x048+rnd(3), 0x048+rnd(3), 0x04d, 0, 0, 0);
+}
+
+void fill_column_wall_redsmbrick_c_nearwater(struct COLUMN_REC *clm_rec, unsigned char owner)
+{
+     fill_column_rec_sim(clm_rec, 0, CUBE_PATH_SMOOTH3,
+         0x075, 0x04f, 0x04f, 0x04f, 0x04c, 0, 0, 0);
+}
+
+void fill_column_wall_redsmbrick_c_nearlava(struct COLUMN_REC *clm_rec, unsigned char owner)
+{
+     fill_column_rec_sim(clm_rec, 0, CUBE_PATH_SMOOTH3,
+         0x076, 0x04f, 0x04f, 0x04f, 0x04c, 0, 0, 0);
 }
 
 void fill_column_wall_drapebrick_a(struct COLUMN_REC *clm_rec, unsigned char owner)
@@ -1765,6 +1859,17 @@ void place_column_wall_graveyard_c(struct COLUMN_REC *clm_rec, unsigned char own
   clm_rec->height=compute_clm_rec_height(clm_rec);
 }
 
+void place_column_wall_lair_a(struct COLUMN_REC *clm_rec, unsigned char owner)
+{
+  int pos=clm_rec->height-4;
+  if (pos<0) pos=0;
+  if (pos>4) pos=4;
+  clm_rec->c[pos+0]=CUBE_BRICK_SKLSTW2L;
+  clm_rec->c[pos+3]=CUBE_BRICK_SKLSTW1L;
+  clm_rec->solid=compute_clm_rec_solid(clm_rec);
+  clm_rec->height=compute_clm_rec_height(clm_rec);
+}
+
 void place_column_wall_lair_b(struct COLUMN_REC *clm_rec, unsigned char owner)
 {
   int pos=clm_rec->height-4;
@@ -1774,6 +1879,52 @@ void place_column_wall_lair_b(struct COLUMN_REC *clm_rec, unsigned char owner)
   clm_rec->c[pos+1]=CUBE_BRICK_SKULSTM;
   clm_rec->c[pos+2]=CUBE_BRICK_SKULSTT;
   clm_rec->c[pos+3]=CUBE_BRICK_SKLSTW1C;
+  clm_rec->solid=compute_clm_rec_solid(clm_rec);
+  clm_rec->height=compute_clm_rec_height(clm_rec);
+}
+
+void place_column_wall_lair_c(struct COLUMN_REC *clm_rec, unsigned char owner)
+{
+  int pos=clm_rec->height-4;
+  if (pos<0) pos=0;
+  if (pos>4) pos=4;
+  clm_rec->c[pos+0]=CUBE_BRICK_SKLSTW2R;
+  clm_rec->c[pos+3]=CUBE_BRICK_SKLSTW1R;
+  clm_rec->solid=compute_clm_rec_solid(clm_rec);
+  clm_rec->height=compute_clm_rec_height(clm_rec);
+}
+
+void place_column_wall_laircrnr_a(struct COLUMN_REC *clm_rec, unsigned char owner)
+{
+  int pos=clm_rec->height-4;
+  if (pos<0) pos=0;
+  if (pos>4) pos=4;
+  clm_rec->c[pos+0]=CUBE_BRICK_SKLSTW2L;
+  clm_rec->c[pos+3]=0x0a0;
+  clm_rec->solid=compute_clm_rec_solid(clm_rec);
+  clm_rec->height=compute_clm_rec_height(clm_rec);
+}
+
+void place_column_wall_laircrnr_b(struct COLUMN_REC *clm_rec, unsigned char owner)
+{
+  int pos=clm_rec->height-4;
+  if (pos<0) pos=0;
+  if (pos>4) pos=4;
+  clm_rec->c[pos+0]=CUBE_BRICK_SKLSTW2C;
+  clm_rec->c[pos+1]=CUBE_BRICK_SKULSTM;
+  clm_rec->c[pos+2]=CUBE_BRICK_SKULSTT;
+  clm_rec->c[pos+3]=0x0a1;
+  clm_rec->solid=compute_clm_rec_solid(clm_rec);
+  clm_rec->height=compute_clm_rec_height(clm_rec);
+}
+
+void place_column_wall_laircrnr_c(struct COLUMN_REC *clm_rec, unsigned char owner)
+{
+  int pos=clm_rec->height-4;
+  if (pos<0) pos=0;
+  if (pos>4) pos=4;
+  clm_rec->c[pos+0]=CUBE_BRICK_SKLSTW2R;
+  clm_rec->c[pos+3]=0x0a2;
   clm_rec->solid=compute_clm_rec_solid(clm_rec);
   clm_rec->height=compute_clm_rec_height(clm_rec);
 }
@@ -1898,7 +2049,15 @@ void place_column_wall_barracks_b(struct COLUMN_REC *clm_rec, unsigned char owne
   if (pos<0) pos=0;
   if (pos>5) pos=5;
   clm_rec->c[pos+0]=CUBE_BRICK_COOPERBC;
-  clm_rec->c[pos+1]=CUBE_BRICK_COOPERMC;
+    switch (owner)
+    {
+    case PLAYER0:    clm_rec->c[pos+1]=CUBE_BRICK_COOPRMCR; break;
+    case PLAYER1:    clm_rec->c[pos+1]=0x1ab; break;
+    case PLAYER2:    clm_rec->c[pos+1]=0x1ac; break;
+    case PLAYER3:    clm_rec->c[pos+1]=0x1ad; break;
+    case PLAYER_GOOD:clm_rec->c[pos+1]=0x1af; break;
+    default:         clm_rec->c[pos+1]=0x0ae; break;
+    }
   clm_rec->c[pos+2]=CUBE_BRICK_COOPERTC;
   clm_rec->solid=compute_clm_rec_solid(clm_rec);
   clm_rec->height=compute_clm_rec_height(clm_rec);

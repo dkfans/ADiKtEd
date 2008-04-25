@@ -107,6 +107,8 @@ void fill_column_water(struct COLUMN_REC *clm_rec, unsigned char owner);
 void fill_column_earthground(struct COLUMN_REC *clm_rec, unsigned char owner);
 void fill_column_rockground(struct COLUMN_REC *clm_rec, unsigned char owner);
 void fill_column_rock_gndlev(struct COLUMN_REC *clm_rec, unsigned char owner);
+void fill_column_wallground_nearwater(struct COLUMN_REC *clm_rec, unsigned char owner);
+void fill_column_wallground_nearlava(struct COLUMN_REC *clm_rec, unsigned char owner);
 
 // Placing doors
 
@@ -141,9 +143,18 @@ void fill_column_wall_centr(struct COLUMN_REC *clm_rec, unsigned char owner);
 void fill_column_wall_cobblestones(struct COLUMN_REC *clm_rec, unsigned char owner);
 void place_column_wall_cobblestones(struct COLUMN_REC *clm_rec, unsigned char owner);
 void place_column_wall_cobblestones_mk(struct COLUMN_REC *clm_rec, unsigned char owner);
+void place_column_wall_redsmbrick_b(struct COLUMN_REC *clm_rec, unsigned char owner);
+void place_column_wall_redsmbrick_dkbtm(struct COLUMN_REC *clm_rec, unsigned char owner);
+void place_column_wall_redsmbrick_c(struct COLUMN_REC *clm_rec, unsigned char owner);
+void place_column_wall_redsmbrick(struct COLUMN_REC *clm_rec, unsigned char owner);
 void fill_column_wall_redsmbrick_b(struct COLUMN_REC *clm_rec, unsigned char owner);
 void fill_column_wall_redsmbrick_a(struct COLUMN_REC *clm_rec, unsigned char owner);
 void fill_column_wall_redsmbrick_c(struct COLUMN_REC *clm_rec, unsigned char owner);
+void fill_column_wall_redsmbrick_a_nearwater(struct COLUMN_REC *clm_rec, unsigned char owner);
+void fill_column_wall_redsmbrick_a_nearlava(struct COLUMN_REC *clm_rec, unsigned char owner);
+void fill_column_wall_redsmbrick_c_nearwater(struct COLUMN_REC *clm_rec, unsigned char owner);
+void fill_column_wall_redsmbrick_c_nearlava(struct COLUMN_REC *clm_rec, unsigned char owner);
+
 void fill_column_wall_drapebrick_a(struct COLUMN_REC *clm_rec, unsigned char owner);
 void fill_column_wall_drapebrick_b(struct COLUMN_REC *clm_rec, unsigned char owner);
 void fill_column_wall_drapebrick_c(struct COLUMN_REC *clm_rec, unsigned char owner);
@@ -223,7 +234,12 @@ void place_column_wall_scavenger_c(struct COLUMN_REC *clm_rec, unsigned char own
 void place_column_wall_graveyard_a(struct COLUMN_REC *clm_rec, unsigned char owner);
 void place_column_wall_graveyard_b(struct COLUMN_REC *clm_rec, unsigned char owner);
 void place_column_wall_graveyard_c(struct COLUMN_REC *clm_rec, unsigned char owner);
+void place_column_wall_lair_a(struct COLUMN_REC *clm_rec, unsigned char owner);
 void place_column_wall_lair_b(struct COLUMN_REC *clm_rec, unsigned char owner);
+void place_column_wall_lair_c(struct COLUMN_REC *clm_rec, unsigned char owner);
+void place_column_wall_laircrnr_a(struct COLUMN_REC *clm_rec, unsigned char owner);
+void place_column_wall_laircrnr_b(struct COLUMN_REC *clm_rec, unsigned char owner);
+void place_column_wall_laircrnr_c(struct COLUMN_REC *clm_rec, unsigned char owner);
 void place_column_wall_workshop_a(struct COLUMN_REC *clm_rec, unsigned char owner);
 void place_column_wall_workshop_b(struct COLUMN_REC *clm_rec, unsigned char owner);
 void place_column_wall_workshop_c(struct COLUMN_REC *clm_rec, unsigned char owner);

@@ -191,8 +191,11 @@ short init_help(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata)
  */
 void free_help(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata)
 {
+  message_log(" free_help: starting");
+  if ((workdata==NULL)||(workdata->help==NULL)) return;
   //We could do more than that...
   free(workdata->help);
+  workdata->help=NULL;
 }
 
 /*

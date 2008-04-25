@@ -1,56 +1,29 @@
-CC = gcc
-CFLAGS = -c -O -I.
-LINK = gcc
-LFLAGS =
-LIBS = -L. -lslang
-RES  = 
-OBJ  = dernc.o memfile.o graffiti.o main.o input_kb.o scr_help.o var_utils.o output_scr.o scr_thing.o graffiti_font.o bulcommn.o lev_data.o lev_files.o obj_slabs.o obj_things.o obj_column.o obj_actnpts.o lev_things.o lev_column.o obj_column_def.o obj_column_per.o scr_list.o scr_slab.o scr_clm.o scr_actn.o scr_txted.o lev_script.o scr_rwrk.o scr_cube.o draw_map.o xtabdat8.o xtabjty.o xcubtxtr.o $(RES)
-BIN  = map
-RM = rm -f
+#To create a debug executable, run with the command:
+# make DEBUG
 
-all: map
+CC            = gcc
+CFLAGS        = -c -O -I.
+CFLAGS-DEBUG  = -c -g -I.
+LINK          = gcc
+LFLAGS        =
+LFLAGS-DEBUG  =
+LIBS          = -L. -lslang
+SRC           = dernc.c memfile.c graffiti.c main.c input_kb.c scr_help.c var_utils.c output_scr.c scr_thing.c graffiti_font.c bulcommn.c lev_data.c lev_files.c obj_slabs.c obj_things.c obj_column.c obj_actnpts.c lev_things.c lev_column.c obj_column_def.c obj_column_per.c scr_list.c scr_slab.c scr_clm.c scr_actn.c scr_txted.c lev_script.c scr_rwrk.c scr_cube.c draw_map.c xtabdat8.c xtabjty.c xcubtxtr.c
+OBJ           = $(SRC:.c=.o)
+BIN           = map
+RM            = rm -f
+
+all: $(SRC) $(BIN)
+
+$(BIN): $(OBJ)
+   $(LINK) $(if $(filter yes, $(DEBUGME)),$(LFLAGS-DEBUG),$(LFLAGS)) -o $@ $(OBJ) $(LIBS)
 
 .c.o:
-	$(CC) $(CFLAGS) $*.c
-
-map: $(OBJ)
-	$(LINK) -o $(BIN) $(OBJ) $(LIBS)
-
-dernc.o: dernc.c
-memfile.o: memfile.c
-graffiti.o: graffiti.c
-internal.o: internal.c
-main.o: main.c
-input_kb.o: input_kb.c
-scr_help.o: scr_help.c
-scr_rwrk.o: scr_rwrk.c
-scr_cube.o: scr_cube.c
-scr_list.o: scr_list.c
-scr_slab.o: scr_slab.c
-scr_clm.o: scr_clm.c
-scr_actn.o: scr_actn.c
-scr_txted.o: scr_txted.c
-scr_level.o: scr_level.c
-scr_thing.o: scr_thing.c
-var_utils.o: var_utils.c
-output_scr.o: output_scr.c
-graffiti_font.o: graffiti_font.c
-bulcommn.o: bulcommn.c
-lev_data.o: lev_data.c
-lev_files.o: lev_files.c
-lev_things.o: lev_things.c
-lev_column.o: lev_column.c
-lev_script.o: lev_script.c
-obj_actnpts.o: obj_actnpts.c
-obj_column.o: obj_column.c
-obj_column_def.o: obj_column_def.c
-obj_column_per.o: obj_column_per.c
-obj_slabs.o: obj_slabs.c
-obj_things.o: obj_things.c
-draw_map.o: draw_map.c
-xtabdat8.o: xtabdat8.c
-xtabjty.o: xtabjty.c
-xcubtxtr.o: xcubtxtr.c
+   $(CC) $(if $(filter yes, $(DEBUGME)),$(CFLAGS-DEBUG),$(CFLAGS)) $< -o $@
 
 clean:
-	${RM} $(OBJ) $(BIN)
+   find . -name \*~ -print | xargs ${RM}
+   find . -name \*.o -print | xargs ${RM}
+   find . -name \*.a -print | xargs ${RM}
+   find . -name \*.dep -print | xargs ${RM}
+   ${RM} $(BIN)

@@ -370,7 +370,6 @@ void die(const char *format, ...)
  */
 void done(struct SCRMODE_DATA **scrmode,struct WORKMODE_DATA *workdata)
 {
-    // Write to log file if it is prepared
     if (workdata!=NULL)
     {
         if (workdata->lvl!=NULL)
@@ -378,6 +377,7 @@ void done(struct SCRMODE_DATA **scrmode,struct WORKMODE_DATA *workdata)
         if (scrmode!=NULL)
           free_levscr(scrmode,workdata);
     }
+    // Write to log file if it is prepared
     message_log_simp(PROGRAM_NAME " work is done");
     free_messages();
     input_done();

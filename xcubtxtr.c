@@ -103,7 +103,7 @@ short write_cubedata(struct CUBES_DATA *cubes,const char *fname)
     int i, k;
     fp = fopen (fname, "wb");
     if (fp==NULL)
-      return XCUTX_CANNOT_OPEN;
+      return XCUTX_CANT_OPEN;
     //Writing header
     write_long_le_file(fp,cubes->count);
     for (i=0; i<cubes->count; i++)
@@ -175,7 +175,7 @@ short load_texture(unsigned char **texture,const char *fname)
     // Allocating buffer
     (*texture)=malloc(texture_file_len);
     if ((*texture)==NULL)
-      die("load_texture: Out of memory.");
+      return XCUTX_MALLOC_ERR;
     //Loading the entries
     int i;
     for (i=0; i<(TEXTURE_SIZE_Y*TEXTURE_COUNT_Y); i++)

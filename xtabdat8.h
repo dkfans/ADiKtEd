@@ -20,6 +20,16 @@
 #ifndef BULL_XTABDAT8_H
 #define BULL_XTABDAT8_H
 
+// Error returns
+
+#define XTABDAT8_COLOUR_LEAK 2
+#define XTABDAT8_ENDOFBUFFER 4
+#define XTABDAT8_NOMEMORY    8
+#define XTABDAT8_CANT_OPEN   9
+#define XTABDAT8_CANT_READ  10
+#define XTABDAT8_MALLOC_ERR 11
+#define XTABDAT8_INTERNAL   12
+
 // Data types
 
 struct TABFILE_ITEM {
@@ -56,19 +66,18 @@ struct IMAGELIST {
 
 int read_tabfile_data(struct TABFILE *tabf,const char *srcfname);
 int free_tabfile_data(struct TABFILE *tabf);
-int read_datfile_data(struct DATFILE *datf,const char *srcfname);
-int free_datfile_data(struct DATFILE *datf);
+
+short read_datfile_data(struct DATFILE *datf,const char *srcfname);
+short write_datfile_data(const struct DATFILE *datf,const char *dstfname);
+short alloc_datfile_data(struct DATFILE *datf,unsigned long filelength);
+short free_datfile_data(struct DATFILE *datf);
+
 int read_dattab_images(struct IMAGELIST *images,unsigned long *readcount,struct TABFILE *tabf,struct DATFILE *datf,const int verbose);
 int free_dattab_images(struct IMAGELIST *images);
-int read_dat_image_idx(struct IMAGEITEM *image,unsigned long *readedsize,struct DATFILE *datf,unsigned long off,unsigned int width,unsigned int height);
+int read_dat_image_idx(struct IMAGEITEM *image,unsigned long *readedsize,
+    const struct DATFILE *datf,const unsigned long off,
+    const unsigned int width,const unsigned int height);
 
 int create_images_dattab_idx(struct IMAGELIST *images,const char *datfname,const char *tabfname,const int verbose);
-
-// Error returns
-
-#define XTABDAT8_COLOUR_LEAK 2
-#define XTABDAT8_ENDOFBUFFER 4
-#define XTABDAT8_NOMEMORY 8
-
 
 #endif

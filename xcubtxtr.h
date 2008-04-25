@@ -24,7 +24,7 @@
 // There should be no more than 32 errors (up to -31)
 // values to 23 are reserved by read_file and RNC library
 #define XCUTX_FILE_BADDATA  1
-#define XCUTX_CANNOT_OPEN   2
+#define XCUTX_CANT_OPEN     2
 #define XCUTX_MALLOC_ERR    3
 #define XCUTX_INTERNAL      4
 

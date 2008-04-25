@@ -206,28 +206,56 @@ int free_tabfile_data(struct TABFILE *tabf)
     tabf->count=0;
 }
 
-int read_datfile_data(struct DATFILE *datf,const char *srcfname)
+short alloc_datfile_data(struct DATFILE *datf,unsigned long filelength)
+{
+    datf->filelength=filelength;
+    datf->data=malloc(filelength);
+    if (datf->data==NULL)
+    {
+        datf->filelength=0;
+        return XTABDAT8_MALLOC_ERR;
+    }
+    return ERR_NONE;
+}
+
+/*
+ * Reads Bullfrog's DAT file from DAT/TAB pair. Note that "count" is
+ * not always valid.
+ */
+short read_datfile_data(struct DATFILE *datf,const char *srcfname)
 {
     FILE *datfp;
     datfp = fopen (srcfname, "rb");
-    if (!datfp) return 1;
+    if (datfp==NULL) return XTABDAT8_CANT_OPEN;
     datf->count=read_short_le_file(datfp)-1;
     datf->filelength=file_length_opened(datfp);
     datf->data=malloc(datf->filelength);
-    if (!datf->data) { fclose(datfp);return 2; }
+    if (datf->data==NULL) { fclose(datfp);return XTABDAT8_MALLOC_ERR; }
     fseek(datfp, 0, SEEK_SET);
     unsigned long readed=fread(datf->data, 1, datf->filelength, datfp);
     fclose(datfp);
-    if (readed < datf->filelength) return 3;
-    return 0;
+    if (readed < datf->filelength) return XTABDAT8_CANT_READ;
+    return ERR_NONE;
 }
 
-int free_datfile_data(struct DATFILE *datf)
+short write_datfile_data(const struct DATFILE *datf,const char *dstfname)
+{
+    FILE *datfp;
+    datfp = fopen(dstfname, "wb");
+    if (datfp==NULL)
+        return XTABDAT8_CANT_OPEN;
+    fwrite (datf->data, datf->filelength, 1, datfp);
+    fclose(datfp);
+    return ERR_NONE;
+}
+
+short free_datfile_data(struct DATFILE *datf)
 {
     free(datf->data);
     datf->data=NULL;
     datf->filelength=0;
     datf->count=0;
+    return ERR_NONE;
 }
 
 int read_dattab_images(struct IMAGELIST *images,unsigned long *readcount,struct TABFILE *tabf,struct DATFILE *datf,const int verbose)
@@ -297,7 +325,9 @@ int free_dattab_images(struct IMAGELIST *images)
     images->count=0;
 }
 
-int read_dat_image_idx(struct IMAGEITEM *image,unsigned long *readedsize,struct DATFILE *datf,unsigned long off,unsigned int width,unsigned int height)
+int read_dat_image_idx(struct IMAGEITEM *image,unsigned long *readedsize,
+    const struct DATFILE *datf,const unsigned long off,
+    const unsigned int width,const unsigned int height)
 {
     //Filling image structure
     {

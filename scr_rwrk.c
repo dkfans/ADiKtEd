@@ -49,7 +49,10 @@ short init_mdrwrk(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata)
  */
 void free_mdrwrk(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata)
 {
+  message_log(" free_mdrwrk: starting");
+  if ((workdata==NULL)||(workdata->mdrwrk==NULL)) return;
   free(workdata->mdrwrk);
+  workdata->mdrwrk=NULL;
 }
 
 /*

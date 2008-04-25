@@ -451,7 +451,7 @@ void create_columns_slb_skulls_on_claimed(struct COLUMN_REC *clm_recs[9],
 void create_columns_slb_wallbrick(struct COLUMN_REC *clm_recs[9], short *allow_relief,
         unsigned char *surr_slb,unsigned char *surr_own, unsigned char **surr_tng)
 {
-//TODO: near water and near lava support
+//TODO: add shadow to central cobblestones near water and lava
   const unsigned short dir_a[]={IDIR_WEST, IDIR_NORTH, IDIR_EAST, IDIR_SOUTH};
   const unsigned short dir_b[]={IDIR_NORTH, IDIR_EAST, IDIR_SOUTH, IDIR_WEST};
   const unsigned short dir_c[]={IDIR_NW, IDIR_NE, IDIR_SE, IDIR_SW};
@@ -467,13 +467,27 @@ void create_columns_slb_wallbrick(struct COLUMN_REC *clm_recs[9], short *allow_r
   //Corner slabs - white brick, small red brick or clear earth
   for (i=0;i<4;i++)
   {
+    // Place the floor
+    if ((surr_slb[dir_a[i]]==SLAB_TYPE_WATER) || (surr_slb[dir_b[i]]==SLAB_TYPE_WATER))
+      fill_column_wallground_nearwater(clm_recs[dir_c[i]], surr_own[IDIR_CENTR]);
+    else
+    if ((surr_slb[dir_a[i]]==SLAB_TYPE_LAVA) || (surr_slb[dir_b[i]]==SLAB_TYPE_LAVA))
+      fill_column_wallground_nearlava(clm_recs[dir_c[i]], surr_own[IDIR_CENTR]);
+    else
+      fill_column_earthground(clm_recs[dir_c[i]], surr_own[IDIR_CENTR]);
     // If we're surrounded by our wall, and there is something short also - red brick
     if (((slab_is_wall(surr_slb[dir_a[i]])&&surrnd_not_enemy(surr_own,dir_a[i]))
        &&((slab_is_short(surr_slb[dir_b[i]]))||(!surrnd_not_enemy(surr_own,dir_b[i]))))
        ||((slab_is_wall(surr_slb[dir_b[i]])&&surrnd_not_enemy(surr_own,dir_b[i]))
        &&((slab_is_short(surr_slb[dir_a[i]]))||(!surrnd_not_enemy(surr_own,dir_a[i])))))
     {
-        fill_column_wall_redsmbrick_a(clm_recs[dir_c[i]], surr_own[IDIR_CENTR]);
+      //Note: can't use modify_liquid_surrounding() because more than one cube changes near water
+      //corner columns
+        if ((surr_slb[dir_a[i]]==SLAB_TYPE_WATER) || (surr_slb[dir_b[i]]==SLAB_TYPE_WATER) ||
+            (surr_slb[dir_a[i]]==SLAB_TYPE_LAVA) || (surr_slb[dir_b[i]]==SLAB_TYPE_LAVA))
+          place_column_wall_redsmbrick(clm_recs[dir_c[i]], surr_own[IDIR_CENTR]);
+        else
+          place_column_wall_redsmbrick_dkbtm(clm_recs[dir_c[i]], surr_own[IDIR_CENTR]);
     } else
     // If we're surrounded by our wall, and there are doors in front - red brick, but without relief
     if (((slab_is_wall(surr_slb[dir_a[i]])&&surrnd_not_enemy(surr_own,dir_a[i]))
@@ -481,7 +495,7 @@ void create_columns_slb_wallbrick(struct COLUMN_REC *clm_recs[9], short *allow_r
        ||((slab_is_wall(surr_slb[dir_b[i]])&&surrnd_not_enemy(surr_own,dir_b[i]))
        &&((slab_is_door(surr_slb[dir_a[i]]))||(!surrnd_not_enemy(surr_own,dir_a[i])))))
     {
-        fill_column_wall_redsmbrick_a(clm_recs[dir_c[i]], surr_own[IDIR_CENTR]);
+        place_column_wall_redsmbrick_dkbtm(clm_recs[dir_c[i]], surr_own[IDIR_CENTR]);
         if (slab_is_door(surr_slb[dir_a[i]]))
           allow_relief[dir_a[i]]=false;
         if (slab_is_door(surr_slb[dir_b[i]]))
@@ -495,7 +509,6 @@ void create_columns_slb_wallbrick(struct COLUMN_REC *clm_recs[9], short *allow_r
       if ((fill_reinforced_corner)&&(slab_is_short(surr_slb[dir_c[i]]))
           &&(!(surr_slb[dir_c[i]]==SLAB_TYPE_PATH)))
       {
-        fill_column_earthground(clm_recs[dir_c[i]], surr_own[IDIR_CENTR]);
         if (fill_reinforced_corner==1)
           place_column_wall_cobblestones(clm_recs[dir_c[i]], surr_own[IDIR_CENTR]);
         else
@@ -509,15 +522,24 @@ void create_columns_slb_wallbrick(struct COLUMN_REC *clm_recs[9], short *allow_r
     } else
     // Finally - if there's something short, like ground - use the white brick
     {
-      fill_column_earthground(clm_recs[dir_c[i]], surr_own[IDIR_CENTR]);
       place_column_wall_cobblestones(clm_recs[dir_c[i]], surr_own[IDIR_CENTR]);
       allow_relief[dir_a[i]]=false;
       allow_relief[dir_b[i]]=false;
       allow_relief[dir_c[i]]=false;
     }
   }
-
   // And the remaining, middle slabs
+  for (i=0;i<4;i++)
+  {
+    // Place the floor
+    if (surr_slb[dir_a[i]]==SLAB_TYPE_WATER)
+      fill_column_wallground_nearwater(clm_recs[dir_a[i]], surr_own[IDIR_CENTR]);
+    else
+    if (surr_slb[dir_a[i]]==SLAB_TYPE_LAVA)
+      fill_column_wallground_nearlava(clm_recs[dir_a[i]], surr_own[IDIR_CENTR]);
+    else
+      fill_column_earthground(clm_recs[dir_a[i]], surr_own[IDIR_CENTR]);
+  }
   //These cannot be taken in simple 'for' loop, because different directions uses
   // different fill_column_wall_redsmbrick_* functions.
   if ((slab_is_wall(surr_slb[IDIR_NORTH])&&surrnd_not_enemy(surr_own,IDIR_NORTH))
@@ -526,13 +548,20 @@ void create_columns_slb_wallbrick(struct COLUMN_REC *clm_recs[9], short *allow_r
     fill_column_earth(clm_recs[IDIR_NORTH],surr_own[IDIR_CENTR]);
     allow_relief[IDIR_NORTH]=false;
   } else
+  if ((surr_slb[IDIR_NORTH]==SLAB_TYPE_WATER)||(surr_slb[IDIR_NORTH]==SLAB_TYPE_LAVA))
   {
-    if (allow_relief[IDIR_NE])
-      // just standard red brick
-      fill_column_wall_redsmbrick_c(clm_recs[IDIR_NORTH], surr_own[IDIR_CENTR]);
+    if (allow_relief[IDIR_NORTH])
+      place_column_wall_cobblestones(clm_recs[IDIR_NORTH], surr_own[IDIR_CENTR]);
     else
-      // the "b" brick has dark edge from this view
-      fill_column_wall_redsmbrick_b(clm_recs[IDIR_NORTH], surr_own[IDIR_CENTR]);
+      place_column_wall_redsmbrick(clm_recs[IDIR_NORTH], surr_own[IDIR_CENTR]);
+    allow_relief[IDIR_NORTH]=false;
+  } else
+  if (allow_relief[IDIR_NE])
+  { // just standard red brick
+    place_column_wall_redsmbrick_c(clm_recs[IDIR_NORTH], surr_own[IDIR_CENTR]);
+  } else
+  { // the "b" brick has dark edge from this view
+    place_column_wall_redsmbrick_b(clm_recs[IDIR_NORTH], surr_own[IDIR_CENTR]);
   }
 
   if ((slab_is_wall(surr_slb[IDIR_EAST])&&surrnd_not_enemy(surr_own,IDIR_EAST))
@@ -541,13 +570,20 @@ void create_columns_slb_wallbrick(struct COLUMN_REC *clm_recs[9], short *allow_r
     fill_column_earth(clm_recs[IDIR_EAST],surr_own[IDIR_CENTR]);
     allow_relief[IDIR_EAST]=false;
   } else
+  if ((surr_slb[IDIR_EAST]==SLAB_TYPE_WATER)||(surr_slb[IDIR_EAST]==SLAB_TYPE_LAVA))
   {
-    if (allow_relief[IDIR_SE])
-      // just standard red brick
-      fill_column_wall_redsmbrick_c(clm_recs[IDIR_EAST], surr_own[IDIR_CENTR]);
+    if (allow_relief[IDIR_EAST])
+      place_column_wall_cobblestones(clm_recs[IDIR_EAST], surr_own[IDIR_CENTR]);
     else
-      // the "b" brick has dark edge from this view
-      fill_column_wall_redsmbrick_b(clm_recs[IDIR_EAST], surr_own[IDIR_CENTR]);
+      place_column_wall_redsmbrick(clm_recs[IDIR_EAST], surr_own[IDIR_CENTR]);
+    allow_relief[IDIR_EAST]=false;
+  } else
+  if (allow_relief[IDIR_SE])
+  {   // just standard red brick
+      place_column_wall_redsmbrick_c(clm_recs[IDIR_EAST], surr_own[IDIR_CENTR]);
+  } else
+  {   // the "b" brick has dark edge from this view
+      place_column_wall_redsmbrick_b(clm_recs[IDIR_EAST], surr_own[IDIR_CENTR]);
   }
 
   if ((slab_is_wall(surr_slb[IDIR_SOUTH])&&surrnd_not_enemy(surr_own,IDIR_SOUTH))
@@ -556,13 +592,20 @@ void create_columns_slb_wallbrick(struct COLUMN_REC *clm_recs[9], short *allow_r
     fill_column_earth(clm_recs[IDIR_SOUTH],surr_own[IDIR_CENTR]);
     allow_relief[IDIR_SOUTH]=false;
   } else
+  if ((surr_slb[IDIR_SOUTH]==SLAB_TYPE_WATER)||(surr_slb[IDIR_SOUTH]==SLAB_TYPE_LAVA))
   {
-    if (allow_relief[IDIR_SW])
-      // just standard red brick
-      fill_column_wall_redsmbrick_b(clm_recs[IDIR_SOUTH], surr_own[IDIR_CENTR]);
+    if (allow_relief[IDIR_SOUTH])
+      place_column_wall_cobblestones(clm_recs[IDIR_SOUTH], surr_own[IDIR_CENTR]);
     else
-      // the "c" brick has dark edge from this view
-      fill_column_wall_redsmbrick_c(clm_recs[IDIR_SOUTH], surr_own[IDIR_CENTR]);
+      place_column_wall_redsmbrick(clm_recs[IDIR_SOUTH], surr_own[IDIR_CENTR]);
+    allow_relief[IDIR_SOUTH]=false;
+  } else
+  if (allow_relief[IDIR_SW])
+  {   // just standard red brick
+      place_column_wall_redsmbrick_b(clm_recs[IDIR_SOUTH], surr_own[IDIR_CENTR]);
+  } else
+  {   // the "c" brick has dark edge from this view
+      place_column_wall_redsmbrick_c(clm_recs[IDIR_SOUTH], surr_own[IDIR_CENTR]);
   }
 
   if ((slab_is_wall(surr_slb[IDIR_WEST])&&surrnd_not_enemy(surr_own,IDIR_WEST))
@@ -571,13 +614,20 @@ void create_columns_slb_wallbrick(struct COLUMN_REC *clm_recs[9], short *allow_r
     fill_column_earth(clm_recs[IDIR_WEST],surr_own[IDIR_CENTR]);
     allow_relief[IDIR_WEST]=false;
   } else
+  if ((surr_slb[IDIR_WEST]==SLAB_TYPE_WATER)||(surr_slb[IDIR_WEST]==SLAB_TYPE_LAVA))
   {
-    if (allow_relief[IDIR_NW])
-      // just standard red brick
-      fill_column_wall_redsmbrick_b(clm_recs[IDIR_WEST], surr_own[IDIR_CENTR]);
+    if (allow_relief[IDIR_WEST])
+      place_column_wall_cobblestones(clm_recs[IDIR_WEST], surr_own[IDIR_CENTR]);
     else
-      // the "c" brick has dark edge from this view
-      fill_column_wall_redsmbrick_c(clm_recs[IDIR_WEST], surr_own[IDIR_CENTR]);
+      place_column_wall_redsmbrick(clm_recs[IDIR_WEST], surr_own[IDIR_CENTR]);
+    allow_relief[IDIR_WEST]=false;
+  } else
+  if (allow_relief[IDIR_NW])
+  {   // just standard red brick
+      place_column_wall_redsmbrick_b(clm_recs[IDIR_WEST], surr_own[IDIR_CENTR]);
+  } else
+  {   // the "c" brick has dark edge from this view
+      place_column_wall_redsmbrick_c(clm_recs[IDIR_WEST], surr_own[IDIR_CENTR]);
   }
   //No frail columns switching on reinforced wall, so we're done.
 }
@@ -592,15 +642,24 @@ void fill_columns_slb_roomrelief(struct COLUMN_REC *clm_recs[9], short *allow_re
   const unsigned short dir_a[]={IDIR_NW,   IDIR_NW,   IDIR_NE,   IDIR_SW};
   const unsigned short dir_b[]={IDIR_WEST, IDIR_NORTH,IDIR_EAST, IDIR_SOUTH};
   const unsigned short dir_c[]={IDIR_SW,   IDIR_NE,   IDIR_SE,   IDIR_SE};
+  const unsigned short dir_d[]={IDIR_NORTH,IDIR_WEST, IDIR_NORTH,IDIR_WEST,};
+  const unsigned short dir_e[]={IDIR_SOUTH,IDIR_EAST, IDIR_SOUTH,IDIR_EAST,};
   int i;
   for (i=0;i<4;i++)
   {
     unsigned short slab=surr_slb[dir_b[i]];
     if ((allow_relief[dir_b[i]])&&(slab_is_room(slab)))
     {
-      //TODO: set edge and corner properly
+      //TODO: check edge and corner if they're set properly
       short corner=false;
       short edge=false;
+      // 'edge' means that the wall starts/ends/changes direction after current slab
+      if (((!slab_is_short(surr_slb[dir_d[i]]))&&(surrnd_not_enemy(surr_own,dir_d[i])))
+        ||((!slab_is_short(surr_slb[dir_e[i]]))&&(surrnd_not_enemy(surr_own,dir_e[i]))))
+        edge=true;
+      // 'corner' means that the room ends after current slab
+      if ((!slab_is_room(surr_slb[dir_a[i]]))||(!slab_is_room(surr_slb[dir_c[i]])))
+        corner=true;
       if (fill_side_columns_room_relief(clm_recs[dir_a[i]],clm_recs[dir_b[i]],
           clm_recs[dir_c[i]],slab,surr_own[IDIR_CENTR],corner,edge))
         allow_relief[dir_b[i]]=false;
@@ -628,24 +687,42 @@ short fill_side_columns_room_relief(struct COLUMN_REC *clm_reca,struct COLUMN_RE
     return true;
   case SLAB_TYPE_TREASURE:
     fill_column_wall_drapebrick_a(clm_reca,owner);
-    place_column_wall_treasure_a(clm_reca,owner);
     fill_column_wall_drapebrick_b(clm_recb,owner);
-    place_column_wall_treasure_b(clm_recb,owner);
     fill_column_wall_drapebrick_c(clm_recc,owner);
-    place_column_wall_treasure_c(clm_recc,owner);
+    if (!corner)
+    {
+      place_column_wall_treasure_a(clm_reca,owner);
+      place_column_wall_treasure_b(clm_recb,owner);
+      place_column_wall_treasure_c(clm_recc,owner);
+    }
     return true;
   case SLAB_TYPE_LIBRARY:
     fill_column_wall_drapebrick_a(clm_reca,owner);
-    place_column_wall_library_a(clm_reca,owner);
     fill_column_wall_drapebrick_b(clm_recb,owner);
-    place_column_wall_library_b(clm_recb,owner);
     fill_column_wall_drapebrick_c(clm_recc,owner);
-    place_column_wall_library_c(clm_recc,owner);
+    if (corner)
+    {
+      //TODO
+    } else
+    {
+      place_column_wall_library_a(clm_reca,owner);
+      place_column_wall_library_b(clm_recb,owner);
+      place_column_wall_library_c(clm_recc,owner);
+    }
     return true;
   case SLAB_TYPE_PRISONCASE:
-    place_column_wall_prison_a(clm_reca,owner);
-    place_column_wall_prison_b(clm_recb,owner);
-    place_column_wall_prison_c(clm_recc,owner);
+    if (corner)
+    {
+      fill_column_wall_drapebrick_a(clm_reca,owner);
+      fill_column_wall_drapebrick_b(clm_recb,owner);
+      fill_column_wall_drapebrick_c(clm_recc,owner);
+      // TODO
+    } else
+    {
+      place_column_wall_prison_a(clm_reca,owner);
+      place_column_wall_prison_b(clm_recb,owner);
+      place_column_wall_prison_c(clm_recc,owner);
+    }
     return true;
   case SLAB_TYPE_TORTURE:
     place_column_wall_torture_a(clm_reca,owner);
@@ -654,29 +731,59 @@ short fill_side_columns_room_relief(struct COLUMN_REC *clm_reca,struct COLUMN_RE
     return true;
   case SLAB_TYPE_TRAINING:
     fill_column_wall_drapebrick_a(clm_reca,owner);
-    place_column_wall_training_a(clm_reca,owner);
     fill_column_wall_drapebrick_b(clm_recb,owner);
-    place_column_wall_training_b(clm_recb,owner);
     fill_column_wall_drapebrick_c(clm_recc,owner);
-    place_column_wall_training_c(clm_recc,owner);
+    if (corner)
+    {
+      //TODO
+    } else
+    {
+      place_column_wall_training_a(clm_reca,owner);
+      place_column_wall_training_b(clm_recb,owner);
+      place_column_wall_training_c(clm_recc,owner);
+    }
     return true;
   case SLAB_TYPE_WORKSHOP:
-    place_column_wall_workshop_a(clm_reca,owner);
-    place_column_wall_workshop_b(clm_recb,owner);
-    place_column_wall_workshop_c(clm_recc,owner);
+    if (corner)
+    {
+      fill_column_wall_drapebrick_a(clm_reca,owner);
+      fill_column_wall_drapebrick_b(clm_recb,owner);
+      fill_column_wall_drapebrick_c(clm_recc,owner);
+      // TODO
+    } else
+    {
+      place_column_wall_workshop_a(clm_reca,owner);
+      place_column_wall_workshop_b(clm_recb,owner);
+      place_column_wall_workshop_c(clm_recc,owner);
+    }
     return true;
   case SLAB_TYPE_SCAVENGER:
     fill_column_wall_drapebrick_a(clm_reca,owner);
-    place_column_wall_scavenger_a(clm_reca,owner);
     fill_column_wall_drapebrick_b(clm_recb,owner);
-    place_column_wall_scavenger_b(clm_recb,owner);
     fill_column_wall_drapebrick_c(clm_recc,owner);
-    place_column_wall_scavenger_c(clm_recc,owner);
+    if (corner)
+    {
+      //TODO
+    } else
+    {
+      place_column_wall_scavenger_a(clm_reca,owner);
+      place_column_wall_scavenger_b(clm_recb,owner);
+      place_column_wall_scavenger_c(clm_recc,owner);
+    }
     return true;
   case SLAB_TYPE_TEMPLE:
-    place_column_wall_temple_a(clm_reca,owner);
-    place_column_wall_temple_b(clm_recb,owner);
-    place_column_wall_temple_c(clm_recc,owner);
+    if (corner)
+    {
+      fill_column_wall_drapebrick_a(clm_reca,owner);
+      fill_column_wall_drapebrick_b(clm_recb,owner);
+      fill_column_wall_drapebrick_c(clm_recc,owner);
+      // TODO
+    } else
+    {
+      place_column_wall_temple_a(clm_reca,owner);
+      place_column_wall_temple_b(clm_recb,owner);
+      place_column_wall_temple_c(clm_recc,owner);
+    }
     return true;
   case SLAB_TYPE_GRAVEYARD:
     fill_column_wall_drapebrick_a(clm_reca,owner);
@@ -688,21 +795,53 @@ short fill_side_columns_room_relief(struct COLUMN_REC *clm_reca,struct COLUMN_RE
     return true;
   case SLAB_TYPE_HATCHERY:
     fill_column_wall_drapebrick_a(clm_reca,owner);
-    place_column_wall_hatchery_a(clm_reca,owner);
     fill_column_wall_drapebrick_b(clm_recb,owner);
-    place_column_wall_hatchery_b(clm_recb,owner);
     fill_column_wall_drapebrick_c(clm_recc,owner);
-    place_column_wall_hatchery_c(clm_recc,owner);
+    if (corner)
+    {
+      //TODO
+    } else
+    {
+      place_column_wall_hatchery_a(clm_reca,owner);
+      place_column_wall_hatchery_b(clm_recb,owner);
+      place_column_wall_hatchery_c(clm_recc,owner);
+    }
     return true;
   case SLAB_TYPE_LAIR:
-    place_column_wall_lair_b(clm_recb,owner);
+    if (corner)
+    {
+      place_column_wall_laircrnr_a(clm_reca,owner);
+      place_column_wall_laircrnr_b(clm_recb,owner);
+      place_column_wall_laircrnr_c(clm_recc,owner);
+    } else
+    {
+      place_column_wall_lair_a(clm_reca,owner);
+      place_column_wall_lair_b(clm_recb,owner);
+      place_column_wall_lair_c(clm_recc,owner);
+    }
     return true;
   case SLAB_TYPE_BARRACKS:
-    place_column_wall_barracks_a(clm_reca,owner);
-    place_column_wall_barracks_b(clm_recb,owner);
-    place_column_wall_barracks_c(clm_recc,owner);
+    if (corner)
+    {
+      fill_column_wall_drapebrick_a(clm_reca,owner);
+      fill_column_wall_drapebrick_b(clm_recb,owner);
+      fill_column_wall_drapebrick_c(clm_recc,owner);
+      // TODO
+    } else
+    {
+      place_column_wall_barracks_a(clm_reca,owner);
+      place_column_wall_barracks_b(clm_recb,owner);
+      place_column_wall_barracks_c(clm_recc,owner);
+    }
     return true;
   case SLAB_TYPE_DUNGHEART:
+    if (corner)
+    {
+      fill_column_wall_drapebrick_a(clm_reca,owner);
+      fill_column_wall_drapebrick_b(clm_recb,owner);
+      fill_column_wall_drapebrick_c(clm_recc,owner);
+    }
+    return true;
   case SLAB_TYPE_BRIDGE:
   case SLAB_TYPE_GUARDPOST:
   default:

@@ -57,8 +57,11 @@ short init_mdslab(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata)
  */
 void free_mdslab(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata)
 {
-  free(workdata->mdslab);
+  message_log(" free_mdslab: starting");
+  if ((workdata==NULL)||(workdata->mdslab==NULL)) return;
   free_mdslab_keys(scrmode,workdata);
+  free(workdata->mdslab);
+  workdata->mdslab=NULL;
 }
 
 /*
@@ -429,23 +432,24 @@ void init_mdslab_keys(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdat
 
     if (sizeof(room_keys)/sizeof(*room_keys) != sizeof(room_types)/sizeof(*room_types))
       die("init_keys: Number of rooms doesn't match number of keys");
-    workdata->mdslab->placenkeys=1;
     i=0;
+    unsigned int nkeys=1;
     while (room_keys[i])
     {
-      if (room_keys[i] > workdata->mdslab->placenkeys)
-        workdata->mdslab->placenkeys=room_keys[i];
+      if (room_keys[i] > nkeys)
+        nkeys=room_keys[i];
       i++;
     }
-    workdata->mdslab->placenkeys++;
-    workdata->mdslab->placekeys=(unsigned char *)malloc(workdata->mdslab->placenkeys*sizeof(char));
-    if (!workdata->mdslab->placekeys)
+    nkeys++;
+    workdata->mdslab->placekeys=(unsigned char *)malloc(nkeys*sizeof(char));
+    if ((workdata->mdslab->placekeys)==NULL)
       die("init_keys: Can't alloc memory for key table");
 
      // I don't *think* 255 is used by slb... if it is, we can always put
      // the key in manually in slbactions
-    for (i=0; i < workdata->mdslab->placenkeys; i++)
+    for (i=0; i < nkeys; i++)
       workdata->mdslab->placekeys[i]=255;
+    workdata->mdslab->placenkeys=nkeys;
     i=0;
     while (room_keys[i])
     {
@@ -478,8 +482,11 @@ void init_mdslab_keys(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdat
  */
 void free_mdslab_keys(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata)
 {
-    free(workdata->mdslab->placekeys);
-    free(workdata->mapmode->slbkey);
+    if (workdata==NULL) return;
+    if (workdata->mdslab!=NULL)
+      free(workdata->mdslab->placekeys);
+    if (workdata->mapmode!=NULL)
+      free(workdata->mapmode->slbkey);
 }
 
 /*

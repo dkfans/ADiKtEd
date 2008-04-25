@@ -51,7 +51,10 @@ short init_mdtng(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata)
  */
 void free_mdtng(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata)
 {
+  message_log(" free_mdtng: starting");
+  if ((workdata==NULL)||(workdata->mdtng==NULL)) return;
   free(workdata->mdtng);
+  workdata->mdtng=NULL;
 }
 
 void change_visited_tile(struct WORKMODE_DATA *workdata)

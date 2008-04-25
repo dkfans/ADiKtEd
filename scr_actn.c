@@ -253,6 +253,7 @@ void free_levscr(struct SCRMODE_DATA **scrmode,struct WORKMODE_DATA *workdata)
     free_mdslab(*scrmode,workdata);
     free_mdrwrk(*scrmode,workdata);
     // Main screen variables
+    message_log(" free_levscr: mode variables freed");
     //Freeing mapmode structure
     if (workdata->mapmode->hilight!=NULL)
     {

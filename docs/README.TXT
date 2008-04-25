@@ -63,6 +63,12 @@ Press F1 for help.
 TODO before final:
  Fixations in room things parameters (height,other)
  Fixations in room corner graphics
+Version: 0.83b
+ Fixed memory freeing error (shouldn't hang on exit)
+ Updated file handling on map miniature generation
+ Fixed Wall around Scavenger Room and Barracks
+ Better reinforced wall near lava and water
+ Better reinforced wall in corners of some rooms
 Version: 0.82b
  Added verification to 4 next parameters
  Improved description of some cubes

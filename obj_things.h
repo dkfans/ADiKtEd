@@ -25,17 +25,18 @@
 
 //Things - most of the game objects is stored as thing
 #define THING_TYPE_NONE        0x00
-#define THING_TYPE_ITEM        0x01
+#define THING_TYPE_ITEM        0x01 // called "object" in the game
+#define THING_TYPE_SHOT        0x02
+#define THING_TYPE_EFFCTELEM   0x03 // "effect element" (?)
+#define THING_TYPE_DEADCRTR    0x04 // dead creature
 #define THING_TYPE_CREATURE    0x05
-#define THING_TYPE_ROOMEFFECT  0x07
+#define THING_TYPE_ROOMEFFECT  0x07 // called "effect generator" in the game
 #define THING_TYPE_TRAP        0x08
 #define THING_TYPE_DOOR        0x09
-//Note: game engine informs of more thing types:
-//effect_element, effect_generator, ambient_sound,
-//shot, dead_creature, cave_in
-//There is no evidence that these items can be created
-//in maps (I've tried)
+#define THING_TYPE_AMBNITSND   0x0c // ambient sound
+#define THING_TYPE_CAVEIN      0x0d
 
+// sub-types for items
 #define ITEM_SUBTYPE_NULL      0x00
 #define ITEM_SUBTYPE_BARREL    0x01
 #define ITEM_SUBTYPE_TORCH     0x02
