@@ -5,9 +5,9 @@ CPP  = g++.exe
 CC   = gcc.exe
 WINDRES = windres.exe
 RES  = map_private.res
-OBJ  = dernc.o graffiti.o main.o input_kb.o scr_help.o var_utils.o output_scr.o scr_thing.o graffiti_font.o bulcommn.o lev_data.o lev_files.o obj_slabs.o obj_things.o obj_column.o obj_actnpts.o lev_things.o lev_column.o obj_column_per.o scr_list.o scr_slab.o scr_clm.o scr_actn.o scr_txted.o lev_script.o scr_rwrk.o scr_cube.o draw_map.o xtabdat8.o obj_column_def.o memfile.o xcubtxtr.o xtabjty.o $(RES)
-LINKOBJ  = dernc.o graffiti.o main.o input_kb.o scr_help.o var_utils.o output_scr.o scr_thing.o graffiti_font.o bulcommn.o lev_data.o lev_files.o obj_slabs.o obj_things.o obj_column.o obj_actnpts.o lev_things.o lev_column.o obj_column_per.o scr_list.o scr_slab.o scr_clm.o scr_actn.o scr_txted.o lev_script.o scr_rwrk.o scr_cube.o draw_map.o xtabdat8.o obj_column_def.o memfile.o xcubtxtr.o xtabjty.o $(RES)
-LIBS =  -L"D:/ProgsNT/Dev-Cpp/lib" ../../../ProgsNT/Dev-Cpp/lib/libslang.a  -march=pentium-mmx -mmmx 
+OBJ  = main.o input_kb.o scr_help.o output_scr.o scr_thing.o scr_list.o scr_slab.o scr_clm.o scr_actn.o scr_txted.o scr_rwrk.o scr_cube.o var_utils.o $(RES)
+LINKOBJ  = main.o input_kb.o scr_help.o output_scr.o scr_thing.o scr_list.o scr_slab.o scr_clm.o scr_actn.o scr_txted.o scr_rwrk.o scr_cube.o var_utils.o $(RES)
+LIBS =  -L"D:/ProgsNT/Dev-Cpp/lib" ../../../ProgsNT/Dev-Cpp/lib/libslang.a libadikted/liblibadikted.a  -march=pentium-mmx -mmmx 
 INCS =  -I"D:/ProgsNT/Dev-Cpp/include" 
 CXXINCS =  -I"D:/ProgsNT/Dev-Cpp/lib/gcc/mingw32/3.4.2/include"  -I"D:/ProgsNT/Dev-Cpp/include/c++/3.4.2/backward"  -I"D:/ProgsNT/Dev-Cpp/include/c++/3.4.2/mingw32"  -I"D:/ProgsNT/Dev-Cpp/include/c++/3.4.2"  -I"D:/ProgsNT/Dev-Cpp/include" 
 BIN  = map.exe
@@ -26,12 +26,6 @@ clean: clean-custom
 $(BIN): $(OBJ)
 	$(CC) $(LINKOBJ) -o "map.exe" $(LIBS)
 
-dernc.o: dernc.c
-	$(CC) -c dernc.c -o dernc.o $(CFLAGS)
-
-graffiti.o: graffiti.c
-	$(CC) -c graffiti.c -o graffiti.o $(CFLAGS)
-
 main.o: main.c
 	$(CC) -c main.c -o main.o $(CFLAGS)
 
@@ -41,47 +35,11 @@ input_kb.o: input_kb.c
 scr_help.o: scr_help.c
 	$(CC) -c scr_help.c -o scr_help.o $(CFLAGS)
 
-var_utils.o: var_utils.c
-	$(CC) -c var_utils.c -o var_utils.o $(CFLAGS)
-
 output_scr.o: output_scr.c
 	$(CC) -c output_scr.c -o output_scr.o $(CFLAGS)
 
 scr_thing.o: scr_thing.c
 	$(CC) -c scr_thing.c -o scr_thing.o $(CFLAGS)
-
-graffiti_font.o: graffiti_font.c
-	$(CC) -c graffiti_font.c -o graffiti_font.o $(CFLAGS)
-
-bulcommn.o: bulcommn.c
-	$(CC) -c bulcommn.c -o bulcommn.o $(CFLAGS)
-
-lev_data.o: lev_data.c
-	$(CC) -c lev_data.c -o lev_data.o $(CFLAGS)
-
-lev_files.o: lev_files.c
-	$(CC) -c lev_files.c -o lev_files.o $(CFLAGS)
-
-obj_slabs.o: obj_slabs.c
-	$(CC) -c obj_slabs.c -o obj_slabs.o $(CFLAGS)
-
-obj_things.o: obj_things.c
-	$(CC) -c obj_things.c -o obj_things.o $(CFLAGS)
-
-obj_column.o: obj_column.c
-	$(CC) -c obj_column.c -o obj_column.o $(CFLAGS)
-
-obj_actnpts.o: obj_actnpts.c
-	$(CC) -c obj_actnpts.c -o obj_actnpts.o $(CFLAGS)
-
-lev_things.o: lev_things.c
-	$(CC) -c lev_things.c -o lev_things.o $(CFLAGS)
-
-lev_column.o: lev_column.c
-	$(CC) -c lev_column.c -o lev_column.o $(CFLAGS)
-
-obj_column_per.o: obj_column_per.c
-	$(CC) -c obj_column_per.c -o obj_column_per.o $(CFLAGS)
 
 scr_list.o: scr_list.c
 	$(CC) -c scr_list.c -o scr_list.o $(CFLAGS)
@@ -98,32 +56,14 @@ scr_actn.o: scr_actn.c
 scr_txted.o: scr_txted.c
 	$(CC) -c scr_txted.c -o scr_txted.o $(CFLAGS)
 
-lev_script.o: lev_script.c
-	$(CC) -c lev_script.c -o lev_script.o $(CFLAGS)
-
 scr_rwrk.o: scr_rwrk.c
 	$(CC) -c scr_rwrk.c -o scr_rwrk.o $(CFLAGS)
 
 scr_cube.o: scr_cube.c
 	$(CC) -c scr_cube.c -o scr_cube.o $(CFLAGS)
 
-draw_map.o: draw_map.c
-	$(CC) -c draw_map.c -o draw_map.o $(CFLAGS)
-
-xtabdat8.o: xtabdat8.c
-	$(CC) -c xtabdat8.c -o xtabdat8.o $(CFLAGS)
-
-obj_column_def.o: obj_column_def.c
-	$(CC) -c obj_column_def.c -o obj_column_def.o $(CFLAGS)
-
-memfile.o: memfile.c
-	$(CC) -c memfile.c -o memfile.o $(CFLAGS)
-
-xcubtxtr.o: xcubtxtr.c
-	$(CC) -c xcubtxtr.c -o xcubtxtr.o $(CFLAGS)
-
-xtabjty.o: xtabjty.c
-	$(CC) -c xtabjty.c -o xtabjty.o $(CFLAGS)
+var_utils.o: var_utils.c
+	$(CC) -c var_utils.c -o var_utils.o $(CFLAGS)
 
 map_private.res: map_private.rc 
 	$(WINDRES) -i map_private.rc --input-format=rc -o map_private.res -O coff 

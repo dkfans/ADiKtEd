@@ -20,9 +20,9 @@
 
 #include "input_kb.h"
 
-#include "globals.h"
-#include "output_scr.h"
 #include <slang.h>
+#include "output_scr.h"
+#include "libadikted/globals.h"
 
 short input_initied=false;
 short disable_sounds=false;

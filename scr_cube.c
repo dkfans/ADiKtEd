@@ -20,12 +20,12 @@
 
 #include "scr_cube.h"
 
-#include "globals.h"
-#include "obj_column_def.h"
+#include "libadikted/globals.h"
+#include "libadikted/obj_column_def.h"
 #include "output_scr.h"
 #include "input_kb.h"
-#include "obj_cube.h"
-#include "obj_column.h"
+#include "libadikted/obj_cube.h"
+#include "libadikted/obj_column.h"
 #include "scr_actn.h"
 #include "scr_list.h"
 #include "scr_help.h"

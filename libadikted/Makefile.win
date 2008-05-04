@@ -1,0 +1,103 @@
+# Project: libadikted
+# Makefile created by Dev-C++ 4.9.9.2
+
+CPP  = g++.exe
+CC   = gcc.exe
+WINDRES = windres.exe
+RES  = libadikted_private.res
+OBJ  = libadi_main.o bulcommn.o dernc.o draw_map.o graffiti.o graffiti_font.o lev_column.o lev_data.o lev_files.o lev_script.o lev_things.o memfile.o obj_actnpts.o obj_column.o obj_column_def.o obj_column_per.o obj_slabs.o obj_things.o xcubtxtr.o xtabdat8.o xtabjty.o msg_log.o arr_utils.o $(RES)
+LINKOBJ  = libadi_main.o bulcommn.o dernc.o draw_map.o graffiti.o graffiti_font.o lev_column.o lev_data.o lev_files.o lev_script.o lev_things.o memfile.o obj_actnpts.o obj_column.o obj_column_def.o obj_column_per.o obj_slabs.o obj_things.o xcubtxtr.o xtabdat8.o xtabjty.o msg_log.o arr_utils.o $(RES)
+LIBS =  -L"D:/ProgsNT/Dev-Cpp/lib" --no-export-all-symbols --add-stdcall-alias  -march=i486 
+INCS =  -I"D:/ProgsNT/Dev-Cpp/include" 
+CXXINCS =  -I"D:/ProgsNT/Dev-Cpp/lib/gcc/mingw32/3.4.2/include"  -I"D:/ProgsNT/Dev-Cpp/include/c++/3.4.2/backward"  -I"D:/ProgsNT/Dev-Cpp/include/c++/3.4.2/mingw32"  -I"D:/ProgsNT/Dev-Cpp/include/c++/3.4.2"  -I"D:/ProgsNT/Dev-Cpp/include" 
+BIN  = libadikted.dll
+CXXFLAGS = $(CXXINCS) -DBUILDING_DLL=1   -march=i486
+CFLAGS = $(INCS) -DBUILDING_DLL=1   -march=i486
+RM = rm -f
+
+.PHONY: all all-before all-after clean clean-custom
+
+all: all-before libadikted.dll all-after
+
+
+clean: clean-custom
+	${RM} $(OBJ) $(BIN)
+
+DLLWRAP=dllwrap.exe
+DEFFILE=liblibadikted.def
+STATICLIB=liblibadikted.a
+
+$(BIN): $(LINKOBJ)
+	$(DLLWRAP) --output-def $(DEFFILE) --implib $(STATICLIB) $(LINKOBJ) $(LIBS) -o $(BIN)
+
+libadi_main.o: libadi_main.c
+	$(CC) -c libadi_main.c -o libadi_main.o $(CFLAGS)
+
+bulcommn.o: bulcommn.c
+	$(CC) -c bulcommn.c -o bulcommn.o $(CFLAGS)
+
+dernc.o: dernc.c
+	$(CC) -c dernc.c -o dernc.o $(CFLAGS)
+
+draw_map.o: draw_map.c
+	$(CC) -c draw_map.c -o draw_map.o $(CFLAGS)
+
+graffiti.o: graffiti.c
+	$(CC) -c graffiti.c -o graffiti.o $(CFLAGS)
+
+graffiti_font.o: graffiti_font.c
+	$(CC) -c graffiti_font.c -o graffiti_font.o $(CFLAGS)
+
+lev_column.o: lev_column.c
+	$(CC) -c lev_column.c -o lev_column.o $(CFLAGS)
+
+lev_data.o: lev_data.c
+	$(CC) -c lev_data.c -o lev_data.o $(CFLAGS)
+
+lev_files.o: lev_files.c
+	$(CC) -c lev_files.c -o lev_files.o $(CFLAGS)
+
+lev_script.o: lev_script.c
+	$(CC) -c lev_script.c -o lev_script.o $(CFLAGS)
+
+lev_things.o: lev_things.c
+	$(CC) -c lev_things.c -o lev_things.o $(CFLAGS)
+
+memfile.o: memfile.c
+	$(CC) -c memfile.c -o memfile.o $(CFLAGS)
+
+obj_actnpts.o: obj_actnpts.c
+	$(CC) -c obj_actnpts.c -o obj_actnpts.o $(CFLAGS)
+
+obj_column.o: obj_column.c
+	$(CC) -c obj_column.c -o obj_column.o $(CFLAGS)
+
+obj_column_def.o: obj_column_def.c
+	$(CC) -c obj_column_def.c -o obj_column_def.o $(CFLAGS)
+
+obj_column_per.o: obj_column_per.c
+	$(CC) -c obj_column_per.c -o obj_column_per.o $(CFLAGS)
+
+obj_slabs.o: obj_slabs.c
+	$(CC) -c obj_slabs.c -o obj_slabs.o $(CFLAGS)
+
+obj_things.o: obj_things.c
+	$(CC) -c obj_things.c -o obj_things.o $(CFLAGS)
+
+xcubtxtr.o: xcubtxtr.c
+	$(CC) -c xcubtxtr.c -o xcubtxtr.o $(CFLAGS)
+
+xtabdat8.o: xtabdat8.c
+	$(CC) -c xtabdat8.c -o xtabdat8.o $(CFLAGS)
+
+xtabjty.o: xtabjty.c
+	$(CC) -c xtabjty.c -o xtabjty.o $(CFLAGS)
+
+msg_log.o: msg_log.c
+	$(CC) -c msg_log.c -o msg_log.o $(CFLAGS)
+
+arr_utils.o: arr_utils.c
+	$(CC) -c arr_utils.c -o arr_utils.o $(CFLAGS)
+
+libadikted_private.res: libadikted_private.rc 
+	$(WINDRES) -i libadikted_private.rc --input-format=rc -o libadikted_private.res -O coff 

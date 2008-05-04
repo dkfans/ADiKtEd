@@ -2689,8 +2689,16 @@ walk through the slab.
 This will create a slab with rock
 view, but containing a hole which
 will allow creatures to go through.
+Ground of the hole will look like
+path.
 
+\rRock with claimed cave\s
 
+This will create a slab with rock
+view, but containing a hole which
+will allow creatures to go through.
+Ground of the hole will have claimed
+floor.
 
 \rSkulls on Lava\s
 

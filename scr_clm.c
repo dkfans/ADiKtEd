@@ -21,14 +21,14 @@
 
 #include "scr_clm.h"
 
-#include "globals.h"
-#include "obj_column_def.h"
+#include "libadikted/globals.h"
+#include "libadikted/obj_column_def.h"
 #include "output_scr.h"
 #include "input_kb.h"
 #include "scr_actn.h"
-#include "obj_slabs.h"
-#include "obj_column.h"
-#include "lev_data.h"
+#include "libadikted/obj_slabs.h"
+#include "libadikted/obj_column.h"
+#include "libadikted/lev_data.h"
 
 /*
  * Initializes variables for the column screen.
@@ -214,6 +214,7 @@ int display_column(unsigned char *clmentry,int clm_idx, int scr_row, int scr_col
 
 void action_update_all_datclm(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata)
 {
+          popup_show("Updating DAT/CLM for whole map","Regenarating whole map can take some time. Please wait...");
           update_slab_owners(workdata->lvl);
           update_datclm_for_whole_map(workdata->lvl);
           message_info("DAT/CLM/W?B entries updated for whole map.");

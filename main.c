@@ -2,26 +2,22 @@
  * main.c   contains main() and initialization functions
  */
 
-#include "globals.h"
+#include "libadikted/globals.h"
+#include "libadikted/arr_utils.h"
 #include "scr_actn.h"
-#include "lev_data.h"
+#include "libadikted/lev_data.h"
 #include "scr_help.h"
-#include "var_utils.h"
 #include "input_kb.h"
-#include "draw_map.h"
-#include "lev_script.h"
+#include "libadikted/draw_map.h"
+#include "libadikted/lev_script.h"
 
 const char config_filename[]="map.ini";
 
 void read_init(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata)
 {
     message_log(" read_init: started");
-#if defined(unix) && !defined(GO32)
-    levels_path="."SEPARATOR"levels";
-#else
-    levels_path="."SEPARATOR"levels";
-#endif
-    data_path="."SEPARATOR"data";
+    workdata->optns->levels_path=strdup("."SEPARATOR"levels");
+    workdata->optns->data_path=strdup("."SEPARATOR"data");
     char buffer[READ_BUFSIZE];
     char *p;
     int l;
@@ -83,8 +79,8 @@ void read_init(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata)
       } else
       if (!strcmp(buffer, "BITMAP_SCALE"))
       {
-          bitmap_rescale=atoi(p);
-          message_log(" read_init: bitmap_rescale set to %d",(int)bitmap_rescale);
+          workdata->optns->picture.rescale=atoi(p);
+          message_log(" read_init: bitmap_rescale set to %d",(int)workdata->optns->picture.rescale);
       } else
       if (!strcmp(buffer, "LEVEL_PREVIEW"))
       {
@@ -134,8 +130,8 @@ void read_init(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata)
       } else
       if (!strcmp(buffer, "SCRIPT_LEVEL_SPACES"))
       {
-          script_level_spaces=atoi(p);
-          message_log(" read_init: script_level_spaces set to %d",(int)script_level_spaces);
+          workdata->optns->script.level_spaces=atoi(p);
+          message_log(" read_init: script_level_spaces set to %d",(int)workdata->optns->script.level_spaces);
       } else
       if (!strcmp(buffer, "DISPLAY_FLOAT_POS"))
       {
@@ -144,21 +140,23 @@ void read_init(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata)
       } else
       if (!strcmp(buffer, "LEVELS_PATH"))
       {
-          levels_path=strdup(p);
-          l = strlen(levels_path);
-          if (l)
-            if (levels_path[l-1]==SEPARATOR[0])
-                levels_path[l-1]=0;
-          message_log(" read_init: levels_path set to \"%s\"",levels_path);
+          free(workdata->optns->levels_path);
+          workdata->optns->levels_path=strdup(p);
+          l = strlen(workdata->optns->levels_path);
+          if (l>0)
+            if (workdata->optns->levels_path[l-1]==SEPARATOR[0])
+                workdata->optns->levels_path[l-1]=0;
+          message_log(" read_init: levels_path set to \"%s\"",workdata->optns->levels_path);
       } else
       if (!strcmp(buffer, "DATA_PATH"))
       {
-          data_path=strdup(p);
-          l = strlen(data_path);
-          if (l)
-            if (data_path[l-1]==SEPARATOR[0])
-                data_path[l-1]=0;
-          message_log(" read_init: data_path set to \"%s\"",data_path);
+          free(workdata->optns->data_path);
+          workdata->optns->data_path=strdup(p);
+          l = strlen(workdata->optns->data_path);
+          if (l>0)
+            if (workdata->optns->data_path[l-1]==SEPARATOR[0])
+                workdata->optns->data_path[l-1]=0;
+          message_log(" read_init: data_path set to \"%s\"",workdata->optns->data_path);
       } else
       {
           message_info_force("Bad command \"%s\" in file \"%s\".",buffer,config_filename);
@@ -214,8 +212,8 @@ void get_command_line_options(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA 
         } else
         if (strcmp(comnd+1,"du")==0)
         {
-          datclm_auto_update=false;
-          obj_auto_update=false;
+          workdata->lvl->optns.datclm_auto_update=false;
+          workdata->lvl->optns.obj_auto_update=false;
         } else
         if (strcmp(comnd+1,"dvid")==0)
         {
@@ -244,10 +242,10 @@ void get_command_line_options(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA 
         } else
         if (get_savout_fname)
         {
-          format_map_fname(workdata->lvl->savfname,comnd);
+          format_map_fname(workdata->lvl->savfname,comnd,workdata->optns->levels_path);
         } else
         {
-          format_map_fname(workdata->lvl->fname,comnd);
+          format_map_fname(workdata->lvl->fname,comnd,workdata->optns->levels_path);
         }
       }
     }
@@ -282,6 +280,7 @@ int main(int argc, char **argv)
       load_map(workdata.lvl);
     } else
     {
+      popup_show("Starting new map","Generating empty map. Please wait...");
       start_new_map(workdata.lvl);
     }
     message_log(" main: entering application loop");

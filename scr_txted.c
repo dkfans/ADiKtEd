@@ -20,12 +20,12 @@
 
 #include "scr_txted.h"
 
-#include "globals.h"
+#include "libadikted/globals.h"
 #include "output_scr.h"
 #include "input_kb.h"
 #include "scr_actn.h"
-#include "lev_data.h"
-#include "lev_script.h"
+#include "libadikted/lev_data.h"
+#include "libadikted/lev_script.h"
 
 // Constants
 
@@ -93,7 +93,7 @@ void actions_scrpt(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata,i
       break;
     case KEY_U:
       recompute_script_levels(&(workdata->lvl->script));
-      recompose_script(&(workdata->lvl->script));
+      recompose_script(&(workdata->lvl->script),&(workdata->optns->script));
       break;
         case KEY_V: // Verify whole map
           script_verify_with_highlight(workdata->lvl,workdata->editor);
@@ -176,9 +176,9 @@ void draw_scrpt(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata)
       {
         ccolor=&script_std_colors;
       }
-      char *prev_end=txt_line;
+      char const *prev_end=txt_line;
       int param_idx=-1;
-      char *ptr;
+      char const *ptr;
       unsigned int ptr_len;
       short got_word;
       int len;

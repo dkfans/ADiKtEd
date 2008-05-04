@@ -23,9 +23,10 @@
 
 #include <math.h>
 #include <strings.h>
-#include "globals.h"
+#include "libadikted/globals.h"
 #include "var_utils.h"
-#include "graffiti.h"
+#include "libadikted/graffiti.h"
+#include "libadikted/msg_log.h"
 #include "output_scr.h"
 #include "input_kb.h"
 #include "scr_thing.h"
@@ -36,10 +37,10 @@
 #include "scr_txted.h"
 #include "scr_rwrk.h"
 #include "scr_cube.h"
-#include "obj_slabs.h"
-#include "obj_things.h"
-#include "obj_column.h"
-#include "lev_data.h"
+#include "libadikted/obj_slabs.h"
+#include "libadikted/obj_things.h"
+#include "libadikted/obj_column.h"
+#include "libadikted/lev_data.h"
 
 void (*actions [])(struct SCRMODE_DATA *,struct WORKMODE_DATA *,int)={
      actions_mdslab, actions_mdtng,  actions_crcrtr,  actions_critem,
@@ -646,8 +647,16 @@ void draw_levscr(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata)
     int tx=workdata->mapmode->screen.x+workdata->mapmode->map.x;
     int ty=workdata->mapmode->screen.y+workdata->mapmode->map.y;
     set_cursor_pos(all_rows-1, 0);
-    screen_setcolor(PRINT_COLOR_LGREY_ON_BLACK);
+    if ((message_hold_get())&&(message_getcount_get()<1))
+    {
+        speaker_beep();
+        screen_setcolor(PRINT_COLOR_LRED_ON_BLACK);
+    } else
+    {
+        screen_setcolor(PRINT_COLOR_LGREY_ON_BLACK);
+    }
     screen_printf_toeol(message_get());
+    screen_setcolor(PRINT_COLOR_LGREY_ON_BLACK);
     message_log(" draw_levscr: executing screen-specific subfunction");
     mddraw[scrmode->mode%MODES_COUNT](scrmode,workdata);
     set_cursor_pos(all_rows-1, all_cols-1);
@@ -1719,8 +1728,8 @@ void action_toggle_compass_rose(struct SCRMODE_DATA *scrmode,struct WORKMODE_DAT
 
 void action_toggle_datclm_aupdate(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata)
 {
-    datclm_auto_update=!datclm_auto_update;
-    if (datclm_auto_update)
+    workdata->lvl->optns.datclm_auto_update=!(workdata->lvl->optns.datclm_auto_update);
+    if (workdata->lvl->optns.datclm_auto_update)
         message_info_force("Automatic update of DAT/CLM/WIB enabled");
     else
         message_info_force("Auto DAT/CLM/WIB update disabled - manual with \"u\"");

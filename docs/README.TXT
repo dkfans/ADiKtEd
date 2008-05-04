@@ -63,6 +63,10 @@ Press F1 for help.
 TODO before final:
  Fixations in room things parameters (height,other)
  Fixations in room corner graphics
+Version: 0.90b
+ Isolated map editing library
+ Corrected error message on bad arguments of some commands
+ Added one new custom column (idea by Gonadsonfire)
 Version: 0.83b
  Fixed memory freeing error (shouldn't hang on exit)
  Updated file handling on map miniature generation

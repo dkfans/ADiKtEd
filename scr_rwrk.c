@@ -20,16 +20,16 @@
 
 #include "scr_rwrk.h"
 
-#include "globals.h"
+#include "libadikted/globals.h"
 #include "output_scr.h"
 #include "input_kb.h"
 #include "scr_actn.h"
-#include "obj_slabs.h"
-#include "obj_column.h"
-#include "lev_data.h"
-#include "lev_files.h"
-#include "lev_column.h"
-#include "obj_actnpts.h"
+#include "libadikted/obj_slabs.h"
+#include "libadikted/obj_column.h"
+#include "libadikted/lev_data.h"
+#include "libadikted/lev_files.h"
+#include "libadikted/lev_column.h"
+#include "libadikted/obj_actnpts.h"
 
 /*
  * Initializes variables for the rework screen.
@@ -107,8 +107,8 @@ void actions_mdrwrk(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata,
             sscanf(usrinput,"%d",&st_cube);
             int i,k;
             popup_show("Generating cube test map","The process can take some time. Please wait...");
-            short auto_upd_memory=datclm_auto_update;
-            datclm_auto_update=false;
+            short auto_upd_memory=workdata->lvl->optns.datclm_auto_update;
+            workdata->lvl->optns.datclm_auto_update=false;
             generate_slab_bkgnd_default(workdata->lvl,SLAB_TYPE_PATH);
             const int size_x=6;
             const int size_y=5;
@@ -121,9 +121,12 @@ void actions_mdrwrk(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata,
                 if (cube<512)
                   place_cube_test(workdata->lvl,i*size_x+1,k*size_y+1,cube);
               }
-            datclm_auto_update=auto_upd_memory;
-            if (datclm_auto_update)
+            workdata->lvl->optns.datclm_auto_update=auto_upd_memory;
+            if (workdata->lvl->optns.datclm_auto_update)
+            {
+              popup_show("Updating DAT/CLM for whole map","Regenarating whole map can take some time. Please wait...");
               update_datclm_for_whole_map(workdata->lvl);
+            }
             message_info("Cube test map created.");
           }
           break;

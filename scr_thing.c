@@ -22,16 +22,16 @@
 #include "scr_thing.h"
 
 #include <math.h>
-#include "globals.h"
+#include "libadikted/globals.h"
 #include "scr_help.h"
 #include "output_scr.h"
 #include "input_kb.h"
 #include "scr_actn.h"
-#include "lev_data.h"
-#include "lev_things.h"
-#include "obj_things.h"
-#include "obj_actnpts.h"
-#include "obj_slabs.h"
+#include "libadikted/lev_data.h"
+#include "libadikted/lev_things.h"
+#include "libadikted/obj_things.h"
+#include "libadikted/obj_actnpts.h"
+#include "libadikted/obj_slabs.h"
 
 /*
  * Initializes variables for the tng screen.

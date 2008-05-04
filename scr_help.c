@@ -21,8 +21,8 @@
 
 #include "scr_help.h"
 
-#include "globals.h"
-#include "lev_data.h"
+#include "libadikted/globals.h"
+#include "libadikted/lev_data.h"
 #include "scr_actn.h"
 #include "output_scr.h"
 #include "input_kb.h"

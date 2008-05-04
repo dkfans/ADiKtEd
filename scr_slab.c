@@ -22,15 +22,15 @@
 #include "scr_slab.h"
 
 #include <time.h>
-#include "globals.h"
+#include "libadikted/globals.h"
 #include "output_scr.h"
 #include "input_kb.h"
 #include "scr_actn.h"
-#include "lev_data.h"
+#include "libadikted/lev_data.h"
 #include "scr_help.h"
-#include "obj_things.h"
-#include "obj_slabs.h"
-#include "graffiti.h"
+#include "libadikted/obj_things.h"
+#include "libadikted/obj_slabs.h"
+#include "libadikted/graffiti.h"
 #include "scr_thing.h"
 
 /*
@@ -82,6 +82,7 @@ void actions_mdslab(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata,
           mdstart[MD_SLBL](scrmode,workdata);
           break;
         case KEY_U: // Update all things/dat/clm/w?b
+          popup_show("Updating DAT/CLM for whole map","Regenarating whole map can take some time. Please wait...");
           update_slab_owners(workdata->lvl);
           update_datclm_for_whole_map(workdata->lvl);
           message_info("All DAT/CLM/W?B entries updated.");
@@ -286,11 +287,11 @@ void slb_place_room(struct WORKMODE_DATA *workdata,unsigned char room)
           set_tile_slab(workdata->lvl,tile_x,tile_y,room);
           workdata->lvl->info.usr_slbchng_count++;
       }
-    if (obj_auto_update)
+    if (workdata->lvl->optns.obj_auto_update)
       update_obj_for_square(workdata->lvl, markl-1, markr+1, markt-1, markb+1);
-    if (datclm_auto_update)
+    if (workdata->lvl->optns.datclm_auto_update)
       update_datclm_for_square(workdata->lvl, markl-1, markr+1, markt-1, markb+1);
-    if (obj_auto_update)
+    if (workdata->lvl->optns.obj_auto_update)
       update_obj_subpos_and_height_for_square(workdata->lvl, markl-1, markr+1, markt-1, markb+1);
     set_marking_disab(workdata->mapmode);
 }
@@ -309,11 +310,11 @@ void change_ownership(struct WORKMODE_DATA *workdata,unsigned char purchaser)
     if (!is_marking_enab(workdata->mapmode))
     {
       set_tile_owner(workdata->lvl,tx,ty,purchaser);
-      if (obj_auto_update)
+      if (workdata->lvl->optns.obj_auto_update)
         update_obj_for_square_radius1(workdata->lvl,tx,ty);
-      if (datclm_auto_update)
+      if (workdata->lvl->optns.datclm_auto_update)
         update_datclm_for_square_radius1(workdata->lvl,tx,ty);
-      if (obj_auto_update)
+      if (workdata->lvl->optns.obj_auto_update)
         update_obj_subpos_and_height_for_square_radius1(workdata->lvl,tx,ty);
       return;
     }
@@ -324,11 +325,11 @@ void change_ownership(struct WORKMODE_DATA *workdata,unsigned char purchaser)
     for (tx=workdata->mapmode->markr.l; tx<=workdata->mapmode->markr.r; tx++)
       for (ty=workdata->mapmode->markr.t; ty<=workdata->mapmode->markr.b; ty++)
           set_tile_owner(workdata->lvl,tx,ty,purchaser);
-    if (obj_auto_update)
+    if (workdata->lvl->optns.obj_auto_update)
       update_obj_for_square(workdata->lvl, workdata->mapmode->markr.l-1, workdata->mapmode->markr.r+1, workdata->mapmode->markr.t-1, workdata->mapmode->markr.b+1);
-    if (datclm_auto_update)
+    if (workdata->lvl->optns.datclm_auto_update)
       update_datclm_for_square(workdata->lvl, workdata->mapmode->markr.l-1, workdata->mapmode->markr.r+1, workdata->mapmode->markr.t-1, workdata->mapmode->markr.b+1);
-    if (obj_auto_update)
+    if (workdata->lvl->optns.obj_auto_update)
       update_obj_subpos_and_height_for_square(workdata->lvl, workdata->mapmode->markr.l-1, workdata->mapmode->markr.r+1, workdata->mapmode->markr.t-1, workdata->mapmode->markr.b+1);
     set_marking_disab(workdata->mapmode);
 }

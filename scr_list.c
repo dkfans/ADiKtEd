@@ -21,18 +21,18 @@
 
 #include "scr_list.h"
 
-#include "globals.h"
+#include "libadikted/globals.h"
 #include "output_scr.h"
 #include "input_kb.h"
-#include "lev_data.h"
+#include "libadikted/lev_data.h"
 #include "scr_actn.h"
 #include "scr_help.h"
 #include "scr_thing.h"
-#include "obj_things.h"
-#include "obj_column.h"
-#include "obj_slabs.h"
-#include "lev_things.h"
-#include "lev_column.h"
+#include "libadikted/obj_things.h"
+#include "libadikted/obj_column.h"
+#include "libadikted/obj_slabs.h"
+#include "libadikted/lev_things.h"
+#include "libadikted/lev_column.h"
 
 /*
  * Initializes variables for the list screen.
@@ -681,7 +681,7 @@ void draw_mdtextr(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata)
 void draw_mdcclm(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata)
 {
     draw_numbered_list(get_custom_column_fullname,scrmode,workdata,
-        0,CUST_CLM_GEN_MAX_INDEX,18);
+        0,CUST_CLM_GEN_MAX_INDEX,20);
     set_cursor_pos(get_screen_rows()-1, 17);
 }
 
@@ -1282,7 +1282,8 @@ void actions_mdlmap(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata,
         case KEY_ENTER:
           {
             popup_show("Loading map","Reading map files. Please wait...");
-            short fname_ok=format_map_fname(workdata->lvl->fname,scrmode->usrinput);
+            short fname_ok=format_map_fname(workdata->lvl->fname,
+                scrmode->usrinput,workdata->optns->levels_path);
             mdend[MD_LMAP](scrmode,workdata);
             if (!fname_ok)
             {
@@ -1303,7 +1304,8 @@ void actions_mdlmap(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata,
     }
     if (load_preview)
     {
-      format_map_fname(workdata->mapmode->preview->fname,scrmode->usrinput);
+      format_map_fname(workdata->mapmode->preview->fname,
+          scrmode->usrinput,workdata->optns->levels_path);
       if ((workdata->mapmode->level_preview&LPREV_LOAD) == LPREV_LOAD)
       {
         if (load_map_preview(workdata->mapmode->preview))
@@ -1383,7 +1385,8 @@ void actions_mdsmap(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata,
           {
 
             popup_show("Saving map","Writing map files. Please wait...");
-            short fname_ok=format_map_fname(workdata->lvl->savfname,scrmode->usrinput);
+            short fname_ok=format_map_fname(workdata->lvl->savfname,
+                scrmode->usrinput,workdata->optns->levels_path);
             mdend[MD_LMAP](scrmode,workdata);
             if (!fname_ok)
             {
@@ -1410,7 +1413,8 @@ void actions_mdsmap(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata,
     }
     if (load_preview)
     {
-      format_map_fname(workdata->mapmode->preview->fname,scrmode->usrinput);
+      format_map_fname(workdata->mapmode->preview->fname,
+          scrmode->usrinput,workdata->optns->levels_path);
       if ((workdata->mapmode->level_preview&LPREV_SAVE) == LPREV_SAVE)
       {
         if (load_map_preview(workdata->mapmode->preview))
