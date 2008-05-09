@@ -714,7 +714,7 @@ short script_cmd_verify_argcount(char *err_msg,const struct DK_SCRIPT_COMMAND *c
     {
       if (prop_count>0)
       {
-        const char *cmd_text=script_cmd_text(cmd->group,cmd->index);
+        const char *cmd_text=script_cmd_text(cmd->group,cmd->index,"(unknown)");
         if (strlen(cmd_text) <= 16)
           sprintf(err_msg,"Script command \"%s\" requires %d arguments, has %d",
             cmd_text,prop_count,cmd->param_count);
@@ -733,11 +733,11 @@ short script_cmd_verify_argcount(char *err_msg,const struct DK_SCRIPT_COMMAND *c
         return false;
       } else
       {
-        const char *cmd_text=script_cmd_text(cmd->group,cmd->index);
+        const char *cmd_text=script_cmd_text(cmd->group,cmd->index,"(unknown)");
         if (strlen(cmd_text) <= 16)
           sprintf(err_msg,"Script command \"%s\" shouldn't have arguments",
-            cmd_text);
-          else
+              cmd_text);
+        else
           sprintf(err_msg,"Script command shouldn't have arguments");
         return false;
       }
@@ -1276,6 +1276,11 @@ short script_cmd_verify_arg_quotparam(struct SCRIPT_VERIFY_DATA *scverif,char *e
           sprintf(err_msg,"Text parameter should be closed in quote");
         return false;
     }
+    if (strlen(param) > 255)
+    {
+        sprintf(err_msg,"Text parameter is longer than 255 chars");
+        return false;
+    }
     return true;
 }
 
@@ -1707,7 +1712,9 @@ short script_cmd_verify_party(struct SCRIPT_VERIFY_DATA *scverif,char *err_msg,i
         case OBJCTV_DUNGEON:
         case OBJCTV_DNHEART:
              // In these cases, [head for] stores player index
-            if (!script_cmd_verify_arg_unsg_int(scverif,err_msg,cmd->params[3],0,5))
+            if (!script_cmd_verify_arg_limparam(scverif,err_msg,cmd->params[3],
+                "Player index",0,5))
+            //if (!script_cmd_verify_arg_unsg_int(scverif,err_msg,cmd->params[3],0,5))
             {
                 (*err_param)=3;
                 return VERIF_WARN;
@@ -1882,7 +1889,9 @@ short script_cmd_verify_party(struct SCRIPT_VERIFY_DATA *scverif,char *err_msg,i
         case OBJCTV_DUNGEON:
         case OBJCTV_DNHEART:
              // In these cases, [head for] stores player index
-            if (!script_cmd_verify_arg_unsg_int(scverif,err_msg,cmd->params[4],0,5))
+            if (!script_cmd_verify_arg_limparam(scverif,err_msg,cmd->params[4],
+                "Player index",0,5))
+            //if (!script_cmd_verify_arg_unsg_int(scverif,err_msg,cmd->params[4],0,5))
             {
                 (*err_param)=4;
                 return VERIF_WARN;
@@ -3374,7 +3383,7 @@ short is_no_bracket_command(int group,int cmdidx)
 char *recompose_script_command(const struct DK_SCRIPT_COMMAND *cmd,const struct SCRIPT_OPTIONS *optns)
 {
     if (cmd==NULL) return strdup("");
-    const char *cmd_name=script_cmd_text(cmd->group,cmd->index);
+    const char *cmd_name=script_cmd_text(cmd->group,cmd->index,rem_cmdtext);
     int len;
     len=(cmd->level*optns->level_spaces)+strlen(cmd_name)+2;
     int param_idx;
@@ -3412,6 +3421,7 @@ char *recompose_script_command(const struct DK_SCRIPT_COMMAND *cmd,const struct 
     int last_param=cmd->param_count-1;
     for (param_idx=0;param_idx<last_param;param_idx++)
     {
+       renew_cmd_param(cmd,param_idx,optns);
        strcat(text,cmd->params[param_idx]);
        if ((param_idx>0)&&(cmd->group==CMD_CONDIT)&&
           ((cmd->index==COND_IF)||(cmd->index==IF_AVAILABLE)))
@@ -3420,16 +3430,72 @@ char *recompose_script_command(const struct DK_SCRIPT_COMMAND *cmd,const struct 
          strcat(text,",");
     }
     if (last_param>=0)
+    {
+        renew_cmd_param(cmd,last_param,optns);
         strcat(text,cmd->params[last_param]);
+    }
     if (!no_bracket)
         strcat(text,")");
     return text;
 }
 
-const char *script_cmd_text(int group,int cmdidx)
+/*
+ * Renews the script parameter; returns true if it was renewed, false if left
+ * without changes.
+ */
+short renew_cmd_param(const struct DK_SCRIPT_COMMAND *cmd,const unsigned int param_idx,
+    const struct SCRIPT_OPTIONS *optns)
+{
+  if ((cmd == NULL) || (param_idx >= cmd->param_count))
+      return false;
+  char *wordtxt=cmd->params[param_idx];
+  int par_idx;
+  int par_group;
+  par_group=recognize_script_word_group_and_idx(&par_idx,wordtxt,true);
+  if (par_idx<0)
+      return false;
+  const char *nword=script_cmd_text(par_group,par_idx,wordtxt);
+  wordtxt=strdup(nword);
+  if (wordtxt==NULL)
+      return false;
+  free(cmd->params[param_idx]);
+  cmd->params[param_idx]=wordtxt;
+}
+
+const char *script_cmd_text(const int group,const int cmdidx,const char *prev_val)
 {
     switch (group)
     {
+    // Parameters
+    case CMD_COMP:
+      return comp_plyr_cmd_text(cmdidx);
+    case CMD_PLAYER:
+      return players_cmd_text(cmdidx);
+    case CMD_OPERATR:
+      return operator_cmd_text(cmdidx);
+    case CMD_OBJTYPE:
+      return objtype_cmd_text(cmdidx);
+    case CMD_VARIBL:
+      return variabl_cmd_text(cmdidx);
+    case CMD_TIMER:
+      return timer_cmd_text(cmdidx);
+    case CMD_FLAG:
+      return flag_cmd_text(cmdidx);
+    case CMD_PAROBJ:
+      return party_objectv_cmd_text(cmdidx);
+    case CMD_CREATR:
+      return creatures_cmd_text(cmdidx);
+    case CMD_DOOR:
+      return door_cmd_text(cmdidx);
+    case CMD_TRAP:
+      return trap_cmd_text(cmdidx);
+    case CMD_SPELL:
+      return spell_cmd_text(cmdidx);
+    case CMD_ROOM:
+      return room_cmd_text(cmdidx);
+    case CMD_SPECIAL:
+      return special_cmd_text(cmdidx,prev_val);
+    // Commands
     case CMD_CONDIT:
       return condit_cmd_text(cmdidx);
     case CMD_PARTY:
@@ -3448,12 +3514,12 @@ const char *script_cmd_text(int group,int cmdidx)
       return commnt_cmd_text(cmdidx);
     case CMD_OBSOLT:
       return obsolt_cmd_text(cmdidx);
-
+    // Special/adikted specific
     case CMD_ADIKTED:
       return adikted_cmd_text(cmdidx);
     case CMD_UNKNOWN:
     default:
-      return rem_cmdtext;
+        return prev_val;
     }
 }
 

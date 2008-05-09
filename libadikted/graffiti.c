@@ -347,6 +347,12 @@ void graffiti_clear_from_columns(struct LEVEL *lvl,int graf_idx)
     graf->fin_tile.y=fin_ty;
 }
 
+unsigned int get_graffiti_count(struct LEVEL *lvl)
+{
+    if (lvl==NULL) return 0;
+    return lvl->graffiti_count;
+}
+
 struct DK_GRAFFITI *get_graffiti(struct LEVEL *lvl, int graf_idx)
 {
     if ((graf_idx<0)||(graf_idx>=lvl->graffiti_count)) return NULL;

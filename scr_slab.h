@@ -46,7 +46,8 @@ void end_mdgrafit(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata);
 //Functions - actions and screen
 void actions_mdslab(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata,int key);
 void draw_mdslab(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata);
-void draw_mdslab_panel(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata);
+void draw_mdslab_panel(const struct SCRMODE_DATA *scrmode,
+    const struct WORKMODE_DATA *workdata);
 void actions_mdgrafit(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata,int key);
 void draw_mdgrafit(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata);
 

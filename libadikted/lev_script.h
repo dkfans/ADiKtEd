@@ -353,6 +353,8 @@ DLLIMPORT short recompute_script_levels(struct DK_SCRIPT *script);
 DLLIMPORT short decompose_script_command(struct DK_SCRIPT_COMMAND *cmd,
     const char *text,const struct SCRIPT_OPTIONS *optns);
 DLLIMPORT char *recompose_script_command(const struct DK_SCRIPT_COMMAND *cmd,const struct SCRIPT_OPTIONS *optns);
+short renew_cmd_param(const struct DK_SCRIPT_COMMAND *cmd,const unsigned int param_idx,
+    const struct SCRIPT_OPTIONS *optns);
 //Functions for Adikted script execution
 DLLIMPORT short execute_script_line(struct LEVEL *lvl,char *line,char *err_msg);
 DLLIMPORT short add_stats_to_script(char ***lines,int *lines_count,struct LEVEL *lvl);
@@ -367,62 +369,60 @@ DLLIMPORT int text_file_line_add(char ***lines,int *lines_count,char *text);
 DLLIMPORT int text_file_linecp_add(char ***lines,int *lines_count,char *text);
 
 //Lower level - for obtaining index of a command/parameter - adikted specific
-DLLIMPORT int adikted_cmd_index(const char *cmdtext);
+int adikted_cmd_index(const char *cmdtext);
 DLLIMPORT const char *adikted_cmd_text(int cmdidx);
-DLLIMPORT int orient_cmd_index(const char *cmdtext);
+int orient_cmd_index(const char *cmdtext);
 DLLIMPORT const char *orient_cmd_text(int cmdidx);
 DLLIMPORT unsigned short get_orientation_next(unsigned short orient);
-DLLIMPORT int font_cmd_index(const char *cmdtext);
+int font_cmd_index(const char *cmdtext);
 DLLIMPORT const char *font_cmd_text(int cmdidx);
 //Lower level - for obtaining index of a command - dk commands
-DLLIMPORT int condit_cmd_index(const char *cmdtext);
+int condit_cmd_index(const char *cmdtext);
 DLLIMPORT const char *condit_cmd_text(int cmdidx);
-DLLIMPORT int party_cmd_index(const char *cmdtext);
+int party_cmd_index(const char *cmdtext);
 DLLIMPORT const char *party_cmd_text(int cmdidx);
-DLLIMPORT int avail_cmd_index(const char *cmdtext);
+int avail_cmd_index(const char *cmdtext);
 DLLIMPORT const char *avail_cmd_text(int cmdidx);
-DLLIMPORT int custobj_cmd_index(const char *cmdtext);
+int custobj_cmd_index(const char *cmdtext);
 DLLIMPORT const char *custobj_cmd_text(int cmdidx);
-DLLIMPORT int setup_cmd_index(const char *cmdtext);
+int setup_cmd_index(const char *cmdtext);
 DLLIMPORT const char *setup_cmd_text(int cmdidx);
-DLLIMPORT int triger_cmd_index(const char *cmdtext);
+int triger_cmd_index(const char *cmdtext);
 DLLIMPORT const char *triger_cmd_text(int cmdidx);
-DLLIMPORT int crtradj_cmd_index(const char *cmdtext);
+int crtradj_cmd_index(const char *cmdtext);
 DLLIMPORT const char *crtradj_cmd_text(int cmdidx);
-DLLIMPORT int obsolt_cmd_index(const char *cmdtext);
+int obsolt_cmd_index(const char *cmdtext);
 DLLIMPORT const char *obsolt_cmd_text(int cmdidx);
-DLLIMPORT int commnt_cmd_index(const char *cmdtext);
+int commnt_cmd_index(const char *cmdtext);
 DLLIMPORT const char *commnt_cmd_text(int cmdidx);
 //Lower level - for obtaining index of a parameter - dk command parameters
-DLLIMPORT int special_cmd_index(const char *cmdtext);
+int special_cmd_index(const char *cmdtext);
 DLLIMPORT const char *special_cmd_text(int cmdidx,const char *param);
-DLLIMPORT int operator_cmd_index(const char *cmdtext);
-DLLIMPORT const char *operator_cmd_text(int cmdidx);
-DLLIMPORT int comp_plyr_cmd_index(const char *cmdtext);
+int comp_plyr_cmd_index(const char *cmdtext);
 DLLIMPORT const char *comp_plyr_cmd_text(int cmdidx);
-DLLIMPORT int players_cmd_index(const char *cmdtext);
+int players_cmd_index(const char *cmdtext);
 DLLIMPORT const char *players_cmd_text(int cmdidx);
-DLLIMPORT int creatures_cmd_index(const char *cmdtext);
+int creatures_cmd_index(const char *cmdtext);
 DLLIMPORT const char *creatures_cmd_text(int cmdidx);
-DLLIMPORT int room_cmd_index(const char *cmdtext);
+int room_cmd_index(const char *cmdtext);
 DLLIMPORT const char *room_cmd_text(int cmdidx);
-DLLIMPORT int spell_cmd_index(const char *cmdtext);
+int spell_cmd_index(const char *cmdtext);
 DLLIMPORT const char *spell_cmd_text(int cmdidx);
-DLLIMPORT int trap_cmd_index(const char *cmdtext);
+int trap_cmd_index(const char *cmdtext);
 DLLIMPORT const char *trap_cmd_text(int cmdidx);
-DLLIMPORT int door_cmd_index(const char *cmdtext);
+int door_cmd_index(const char *cmdtext);
 DLLIMPORT const char *door_cmd_text(int cmdidx);
-DLLIMPORT int objtype_cmd_index(const char *cmdtext);
+int objtype_cmd_index(const char *cmdtext);
 DLLIMPORT const char *objtype_cmd_text(int cmdidx);
-DLLIMPORT int operator_cmd_index(const char *cmdtext);
+int operator_cmd_index(const char *cmdtext);
 DLLIMPORT const char *operator_cmd_text(int cmdidx);
-DLLIMPORT int variabl_cmd_index(const char *cmdtext);
+int variabl_cmd_index(const char *cmdtext);
 DLLIMPORT const char *variabl_cmd_text(int cmdidx);
-DLLIMPORT int timer_cmd_index(const char *cmdtext);
+int timer_cmd_index(const char *cmdtext);
 DLLIMPORT const char *timer_cmd_text(int cmdidx);
-DLLIMPORT int flag_cmd_index(const char *cmdtext);
+int flag_cmd_index(const char *cmdtext);
 DLLIMPORT const char *flag_cmd_text(int cmdidx);
-DLLIMPORT int party_objectv_cmd_index(const char *cmdtext);
+int party_objectv_cmd_index(const char *cmdtext);
 DLLIMPORT const char *party_objectv_cmd_text(int cmdidx);
 
 //Other lower level functions
@@ -435,7 +435,7 @@ DLLIMPORT char *get_orientation_shortname(unsigned short orient);
 DLLIMPORT char *get_font_longname(unsigned short font);
 DLLIMPORT short script_param_to_int(int *val,const char *param);
 DLLIMPORT short script_param_to_ulong(unsigned long *val,const char *param);
-DLLIMPORT const char *script_cmd_text(int group,int cmdidx);
+DLLIMPORT const char *script_cmd_text(const int group,const int cmdidx,const char *prev_val);
 DLLIMPORT short is_no_bracket_command(int group,int cmdidx);
 DLLIMPORT char *script_strword( const char *str, const short whole_rest );
 DLLIMPORT short script_strword_pos( char const **ptr, unsigned int *ptr_len,

@@ -144,6 +144,9 @@ struct LEVOPTIONS {
     // File handling variables
     char *levels_path;
     char *data_path;
+    // True means that APT/TNG will load all objects if file size of TNG/APT
+    // is larger than it should
+    short load_redundant_objects;
     // Map picture generation options
     struct MAPDRAW_OPTIONS picture;
     // Level script options

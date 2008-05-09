@@ -164,7 +164,8 @@ short load_tng(struct LEVEL *lvl,char *fname)
     {
         message_log("  load_tng: File length %d, expected %lu (%d things)",mem.len,expect_size,tng_num);
         // Fixing the problem
-        tng_num=(mem.len-SIZEOF_DK_TNG_HEADER)/SIZEOF_DK_TNG_REC;
+        if ((lvl->optns.load_redundant_objects)||(mem.len < expect_size))
+          tng_num=(mem.len-SIZEOF_DK_TNG_HEADER)/SIZEOF_DK_TNG_REC;
         result=WARN_BAD_COUNT;
     }
     //Read tng entries
@@ -234,7 +235,8 @@ short load_apt(struct LEVEL *lvl,char *fname)
     {
         message_log("  load_apt: File length %d, expected %lu (%d items)",mem.len,expect_size,apt_num);
         // Fixing the problem
-        apt_num=(mem.len-SIZEOF_DK_APT_HEADER)/SIZEOF_DK_APT_REC;
+        if ((lvl->optns.load_redundant_objects)||(mem.len < expect_size))
+          apt_num=(mem.len-SIZEOF_DK_APT_HEADER)/SIZEOF_DK_APT_REC;
         result=WARN_BAD_COUNT;
     }
     for (i=0; i < apt_num; i++)
@@ -470,7 +472,8 @@ short load_lgt(struct LEVEL *lvl,char *fname)
     {
         message_log("  load_lgt: File length %d, expected %lu (%d items)",mem.len,expect_size,lgt_num);
         // Fixing the problem
-        lgt_num=(mem.len-SIZEOF_DK_LGT_HEADER)/SIZEOF_DK_LGT_REC;
+        if ((lvl->optns.load_redundant_objects)||(mem.len < expect_size))
+          lgt_num=(mem.len-SIZEOF_DK_LGT_HEADER)/SIZEOF_DK_LGT_REC;
         result=WARN_BAD_COUNT;
     }
     int i;

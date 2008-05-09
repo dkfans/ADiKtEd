@@ -28,6 +28,7 @@
 #include "scr_actn.h"
 #include "libadikted/obj_slabs.h"
 #include "libadikted/obj_column.h"
+#include "libadikted/lev_column.h"
 #include "libadikted/lev_data.h"
 
 /*
@@ -89,8 +90,7 @@ short start_mdclm(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata)
     if (workdata==NULL) return false;
     scrmode->mode=MD_CLM;
     scrmode->usrinput_type=SI_NONE;
-    if ((workdata!=NULL)&&(workdata->lvl!=NULL))
-      workdata->lvl->info.usr_mdswtch_count++;
+    inc_info_usr_mdswtch_count(workdata->lvl);
     return true;
 }
 
@@ -107,8 +107,9 @@ void end_mdclm(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata)
     message_info("Returned to Slab mode.");
 }
 
-int display_dat_subtiles(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata,
-    int scr_row, int scr_col,short compressed,int ty,int tx)
+int display_dat_subtiles(const struct SCRMODE_DATA *scrmode,
+    const struct WORKMODE_DATA *workdata,int scr_row, int scr_col,
+    const short compressed,const int ty,const int tx)
 {
     struct IPOINT_2D *subtl=&(workdata->mapmode->subtl);
     int i, k;
@@ -167,7 +168,7 @@ void draw_mdclm_panel(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdat
     struct LEVEL *lvl=workdata->lvl;
     int clm_idx=get_dat_subtile(lvl,subpos.x,subpos.y);
     char *clmentry;
-    clmentry = lvl->clm[clm_idx%COLUMN_ENTRIES];
+    clmentry = get_subtile_column(lvl,subpos.x,subpos.y);
     int pos_y;
     pos_y=display_column(clmentry, clm_idx,0,scrmode->cols+3);
     set_cursor_pos(pos_y-3, scrmode->cols+23);

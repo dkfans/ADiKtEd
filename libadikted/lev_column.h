@@ -85,6 +85,7 @@ DLLIMPORT short set_cust_col(struct LEVEL *lvl,int sx,int sy,struct DK_CUSTOM_CL
 DLLIMPORT struct DK_CUSTOM_CLM *create_cust_col(void);
 DLLIMPORT short cust_col_del(struct LEVEL *lvl, int sx, int sy);
 DLLIMPORT int cust_cols_del_for_tile(struct LEVEL *lvl, int tx, int ty);
+DLLIMPORT unsigned int get_cust_clm_count(struct LEVEL *lvl);
 
 //INF file and textures
 DLLIMPORT char *get_texture_fullname(unsigned short inf_type);

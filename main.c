@@ -4,12 +4,13 @@
 
 #include "libadikted/globals.h"
 #include "libadikted/arr_utils.h"
-#include "scr_actn.h"
-#include "libadikted/lev_data.h"
-#include "scr_help.h"
-#include "input_kb.h"
 #include "libadikted/draw_map.h"
 #include "libadikted/lev_script.h"
+#include "libadikted/lev_data.h"
+#include "scr_actn.h"
+#include "scr_help.h"
+#include "scr_txted.h"
+#include "input_kb.h"
 
 const char config_filename[]="map.ini";
 
@@ -97,6 +98,11 @@ void read_init(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata)
           workdata->optns->unaffected_gems=atoi(p);
           message_log(" read_init: unaffected_gems set to %d",(int)workdata->optns->unaffected_gems);
       } else
+      if (!strcmp(buffer, "LOAD_REDUNDANT_OBJECTS"))
+      {
+          workdata->optns->load_redundant_objects=atoi(p);
+          message_log(" read_init: load_redundant_objects set to %d",(int)workdata->optns->load_redundant_objects);
+      } else
       if (!strcmp(buffer, "UNAFFECTED_ROCK"))
       {
           workdata->optns->unaffected_rock=atoi(p);
@@ -137,6 +143,15 @@ void read_init(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata)
       {
           workdata->ipanel->display_float_pos=atoi(p);
           message_log(" read_init: display_float_pos set to %d",(int)workdata->ipanel->display_float_pos);
+      } else
+      if (!strcmp(buffer, "SCRIPT_WORD_WRAP"))
+      {
+          workdata->editor->word_wrap=atoi(p);
+          message_log(" read_init: word_wrap set to %d",(int)workdata->editor->word_wrap);
+      } else
+      if (!strcmp(buffer, "MESSAGE_LOG"))
+      {
+          set_msglog_fname(p);
       } else
       if (!strcmp(buffer, "LEVELS_PATH"))
       {
@@ -212,8 +227,8 @@ void get_command_line_options(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA 
         } else
         if (strcmp(comnd+1,"du")==0)
         {
-          workdata->lvl->optns.datclm_auto_update=false;
-          workdata->lvl->optns.obj_auto_update=false;
+          set_datclm_auto_update(workdata->lvl,false);
+          set_obj_auto_update(workdata->lvl,false);
         } else
         if (strcmp(comnd+1,"dvid")==0)
         {
@@ -242,10 +257,10 @@ void get_command_line_options(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA 
         } else
         if (get_savout_fname)
         {
-          format_map_fname(workdata->lvl->savfname,comnd,workdata->optns->levels_path);
+          format_lvl_savfname(workdata->lvl,comnd);
         } else
         {
-          format_map_fname(workdata->lvl->fname,comnd,workdata->optns->levels_path);
+          format_lvl_fname(workdata->lvl,comnd);
         }
       }
     }
@@ -268,13 +283,15 @@ int main(int argc, char **argv)
     level_init(&(workdata.lvl));
     // read configuration file
     read_init(scrmode,&workdata);
+    // partial options set - required to propagate paths from config file
+    level_set_options(workdata.lvl,workdata.optns);
     // Interpreting command line parameters
     get_command_line_options(scrmode,&workdata,argc,argv);
     level_set_options(workdata.lvl,workdata.optns);
     // initing keyboard input and screen output, also all modes.
     init_levscr_modes(scrmode,&workdata);
     // Load a map, or start new one
-    if (strlen(workdata.lvl->fname)>0)
+    if (strlen(get_lvl_fname(workdata.lvl))>0)
     {
       popup_show("Loading map","Reading map files. Please wait...");
       load_map(workdata.lvl);

@@ -61,8 +61,9 @@ int display_action_point(unsigned char *actnpt, int x, int scr_row, int max_row,
         short display_float_pos);
 int display_static_light(unsigned char *stlight, int x, int y, int max_row, short display_float_pos);
 int display_obj_stats(struct SCRMODE_DATA *scrmode,const struct WORKMODE_DATA *workdata, int scr_row, int scr_col);
-int display_tng_subtiles(struct SCRMODE_DATA *scrmode,const struct WORKMODE_DATA *workdata,
-    const struct LEVEL *lvl, int scr_row, int scr_col,short compressed,int ty,int tx);
+int display_tng_subtiles(const struct SCRMODE_DATA *scrmode,
+    const struct WORKMODE_DATA *workdata, const struct LEVEL *lvl,
+    int scr_row, int scr_col,const short compressed,const int ty,const int tx);
 
 //Functions - internal
 char get_thing_char(const struct LEVEL *lvl, int x, int y);

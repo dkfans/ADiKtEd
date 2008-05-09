@@ -4,28 +4,28 @@
 CPP  = g++.exe
 CC   = gcc.exe
 WINDRES = windres.exe
-RES  = libadikted_private.res
+RES  = adikted_private.res
 OBJ  = libadi_main.o bulcommn.o dernc.o draw_map.o graffiti.o graffiti_font.o lev_column.o lev_data.o lev_files.o lev_script.o lev_things.o memfile.o obj_actnpts.o obj_column.o obj_column_def.o obj_column_per.o obj_slabs.o obj_things.o xcubtxtr.o xtabdat8.o xtabjty.o msg_log.o arr_utils.o $(RES)
 LINKOBJ  = libadi_main.o bulcommn.o dernc.o draw_map.o graffiti.o graffiti_font.o lev_column.o lev_data.o lev_files.o lev_script.o lev_things.o memfile.o obj_actnpts.o obj_column.o obj_column_def.o obj_column_per.o obj_slabs.o obj_things.o xcubtxtr.o xtabdat8.o xtabjty.o msg_log.o arr_utils.o $(RES)
 LIBS =  -L"D:/ProgsNT/Dev-Cpp/lib" --no-export-all-symbols --add-stdcall-alias  -march=i486 
 INCS =  -I"D:/ProgsNT/Dev-Cpp/include" 
 CXXINCS =  -I"D:/ProgsNT/Dev-Cpp/lib/gcc/mingw32/3.4.2/include"  -I"D:/ProgsNT/Dev-Cpp/include/c++/3.4.2/backward"  -I"D:/ProgsNT/Dev-Cpp/include/c++/3.4.2/mingw32"  -I"D:/ProgsNT/Dev-Cpp/include/c++/3.4.2"  -I"D:/ProgsNT/Dev-Cpp/include" 
-BIN  = libadikted.dll
+BIN  = adikted.dll
 CXXFLAGS = $(CXXINCS) -DBUILDING_DLL=1   -march=i486
 CFLAGS = $(INCS) -DBUILDING_DLL=1   -march=i486
 RM = rm -f
 
 .PHONY: all all-before all-after clean clean-custom
 
-all: all-before libadikted.dll all-after
+all: all-before adikted.dll all-after
 
 
 clean: clean-custom
 	${RM} $(OBJ) $(BIN)
 
 DLLWRAP=dllwrap.exe
-DEFFILE=liblibadikted.def
-STATICLIB=liblibadikted.a
+DEFFILE=libadikted.def
+STATICLIB=libadikted.a
 
 $(BIN): $(LINKOBJ)
 	$(DLLWRAP) --output-def $(DEFFILE) --implib $(STATICLIB) $(LINKOBJ) $(LIBS) -o $(BIN)
@@ -99,5 +99,5 @@ msg_log.o: msg_log.c
 arr_utils.o: arr_utils.c
 	$(CC) -c arr_utils.c -o arr_utils.o $(CFLAGS)
 
-libadikted_private.res: libadikted_private.rc 
-	$(WINDRES) -i libadikted_private.rc --input-format=rc -o libadikted_private.res -O coff 
+adikted_private.res: adikted_private.rc 
+	$(WINDRES) -i adikted_private.rc --input-format=rc -o adikted_private.res -O coff 

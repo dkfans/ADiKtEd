@@ -91,6 +91,14 @@ extern const int idir_subtl_y[];
 #define GRAFF_FONT_ADICLSSC    0x01
 #define GRAFF_FONT_ADISIZE8    0x02
 
+enum STATS_LINE_TYPE {
+    STLT_NONE     = 0,
+    STLT_HEADER   = 1,
+    STLT_MAINITEM = 2,
+    STLT_SUBITEM  = 3,
+    STLT_EMPTY    = 4,
+     };
+
 struct DK_GRAFFITI {
     struct IPOINT_2D tile;
     char *text;
@@ -270,6 +278,16 @@ DLLIMPORT unsigned int get_object_tilnums(const struct LEVEL *lvl,unsigned int x
 DLLIMPORT int get_object_subtl_last(const struct LEVEL *lvl,unsigned int x,unsigned int y,short obj_type);
 DLLIMPORT void update_object_owners(struct LEVEL *lvl);
 
+DLLIMPORT unsigned int get_lgt_total_count(struct LEVEL *lvl);
+DLLIMPORT unsigned int get_apt_total_count(struct LEVEL *lvl);
+DLLIMPORT unsigned int get_tng_total_count(struct LEVEL *lvl);
+DLLIMPORT short get_datclm_auto_update(struct LEVEL *lvl);
+DLLIMPORT short switch_datclm_auto_update(struct LEVEL *lvl);
+DLLIMPORT short set_datclm_auto_update(struct LEVEL *lvl,short val);
+DLLIMPORT short get_obj_auto_update(struct LEVEL *lvl);
+DLLIMPORT short switch_obj_auto_update(struct LEVEL *lvl);
+DLLIMPORT short set_obj_auto_update(struct LEVEL *lvl,short val);
+
 DLLIMPORT short get_subtl_wib(struct LEVEL *lvl, unsigned int sx, unsigned int sy);
 DLLIMPORT void set_subtl_wib(struct LEVEL *lvl, unsigned int sx, unsigned int sy, short nval);
 
@@ -290,8 +308,31 @@ DLLIMPORT void set_dat_val(struct LEVEL *lvl, int sx, int sy, unsigned int d);
 DLLIMPORT unsigned short get_subtl_flg(struct LEVEL *lvl, unsigned int sx, unsigned int sy);
 DLLIMPORT void set_subtl_flg(struct LEVEL *lvl, unsigned int sx, unsigned int sy,unsigned short nval);
 
+DLLIMPORT short set_lvl_fname(struct LEVEL *lvl,char *fname);
+DLLIMPORT short format_lvl_fname(struct LEVEL *lvl,char *namefmt);
+DLLIMPORT char *get_lvl_fname(struct LEVEL *lvl);
+DLLIMPORT short set_lvl_savfname(struct LEVEL *lvl,char *fname);
+DLLIMPORT short format_lvl_savfname(struct LEVEL *lvl,char *namefmt);
+DLLIMPORT char *get_lvl_savfname(struct LEVEL *lvl);
+
+DLLIMPORT struct DK_SCRIPT *get_lvl_script(struct LEVEL *lvl);
+DLLIMPORT struct LEVSTATS *get_lvl_stats(struct LEVEL *lvl);
+
+DLLIMPORT unsigned long inc_info_usr_mdswtch_count(struct LEVEL *lvl);
+DLLIMPORT unsigned long inc_info_usr_cmds_count(struct LEVEL *lvl);
+DLLIMPORT unsigned long inc_info_usr_slbchng_count(struct LEVEL *lvl);
+DLLIMPORT unsigned long inc_info_usr_creatobj_count(struct LEVEL *lvl);
+
+DLLIMPORT unsigned int inc_info_ver_major(struct LEVEL *lvl);
+DLLIMPORT unsigned int inc_info_ver_minor(struct LEVEL *lvl);
+DLLIMPORT unsigned int inc_info_ver_rel(struct LEVEL *lvl);
+
 DLLIMPORT void update_level_stats(struct LEVEL *lvl);
 DLLIMPORT void update_things_stats(struct LEVEL *lvl);
 DLLIMPORT void update_thing_stats(struct LEVEL *lvl,const unsigned char *thing,short change);
+DLLIMPORT short get_level_objstats_textln(struct LEVEL *lvl,char *stat_buf,const int line_num);
+
+DLLIMPORT unsigned char get_lvl_inf(struct LEVEL *lvl);
+DLLIMPORT short set_lvl_inf(struct LEVEL *lvl,unsigned char ninf);
 
 #endif // ADIKT_LEVDATA_H

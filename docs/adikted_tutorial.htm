@@ -24,17 +24,17 @@ div.clearleft { clear: left; line-height: 0; height: 0; }
 
 <h1>ADiKtEd Tutorial</h1>
 
-<p>Adikted is a text mode tool, which makes it a little harder to use at first.
+<p>ADiKtEd is a text mode tool, which makes it a little harder to use at first.
 But after You'll get familiar with all functions, you will see that using
 keyboard in text mode is in fact faster than editing map with mouse in
 graphic-based editor.</p>
 
 <p>This tutorial will guide you through creating a new level.</p>
 
-<p>Please note that it was last renewed on version 0.70b, and if you're using
+<p>Please note that it was last renewed on version 0.80b, and if you're using
 different version, there may be differences in commands and view.
 You can always download the newest version from
-<a href="https://sourceforge.net/project/showfiles.php?group_id=212954">Adikted project at SourceForge</a>.</p>
+<a href="https://sourceforge.net/project/showfiles.php?group_id=212954">ADiKtEd project at SourceForge</a>.</p>
 
 <h3>Getting started</h3>
 
@@ -45,18 +45,19 @@ hard disk.To do this, go into the "keeper" directory,
 and create the directories "ldata" and "levels". Copy
 x:\keeper\ldata\*.* and x:\keeper\levels\*.* into these directories
 respectively (replacing x: with the drive letter of your CD-Rom).
-Now edit Keeper.cfg so it points to your installation. For example,<br>
+Then remove Read-only attribute from all copied files.
+Now edit <b>Keeper.cfg</b> so it points to your installation. For example,<br>
 <tt>INSTALL_PATH=C:\Program&nbsp;Files\Bullfrog\Keeper</tt> or <br/>
 <tt>INSTALL_PATH=C:\games\keeper</tt>.</li>
 
-<li>Go into the directory containing map.* (which is Adikted), and edit map.ini.
+<li>Go into the directory containing map.* (which is ADiKtEd), and edit <b>map.ini</b>.
 Change the "LEVELS_PATH" line so it points to your new "levels" directory.
-This will enable you to load the original maps if you start Adikted with
+This will enable you to load the original maps if you start ADiKtEd with
 a level number (eg&nbsp;"map&nbsp;15" will load level&nbsp;15 if you have set
 things up correctly).<div class="clearright"></div></li>
 
 <li><div class="rightfloatbox"><img src="dk_adikted_tutorial_areas.png"/></div>
-Start up Adikted by just typing "map" then return.</li>
+Start up ADiKtEd by just typing "map" then return.</li>
 
 <li>If all is well, a screen will come up with two blue lines, one down the
 middle, and one along the bottom, dividing the screen into three
@@ -141,7 +142,9 @@ grey on black.</li>
 The information area should give you an idea of what to press to
 get specific tiles... basically you press the key it shows you!
 There is one exception to this, which is graffiti. We'll come onto
-that later.</li>
+that later.<br/>
+If&nbsp;you don't like pressing keys to place rooms, you can also press the <b>Enter</b>
+key - this will show you a list where you can select any room using <b>arrow keys</b>.</li>
 
 <li>Create a few small rooms, and put walls round them. Leave a path
 of claimed land (<b>spaces</b>) to get from room to room though! It's often
@@ -221,9 +224,11 @@ affairs. So press <b>0</b> and try moving around again.</li>
 <li>Made the wall? Good stuff... now you want to put down the
 paintbrush. Press <b>z</b> again, and you'll stop painting.</li>
 
-<li>"What if I want to change walls during painting?" No problem.
+<li>"What if I want to change walls during painting?" No&nbsp;problem.
 Just press a different key - you can paint with any of the normal
-tiles, and any of the ownerships. Try painting a corridor from the
+tiles, and any of the ownerships. You can also press <b>f</b> to
+paint random fortified wall - this will try to use different wall
+every time you move. Try painting a corridor from the
 lair to the rest of your dungeon.</li>
 
 <li>Note that pressing <b>home</b>/<b>end</b>/<b>page&nbsp;up</b>/<b>page&nbsp;down</b>,
@@ -338,11 +343,11 @@ Get rid of all the things you've created so far.</li>
 things (if in Thing mode) in the level - this makes sure every slab
 looks like it should, or that all the training posts, torturers,
 torches etc are in the right place.
-Don't worry about it too much - Adikted does an automatic update when
+Don't worry about it too much - ADiKtEd does an automatic update when
 you're changing the level. But if you see some graphic errors,
 or the Official Editor acts strangely, you can update the level
 to make everything work right. The automatic update may be disabled
-to speed-up Adikted - in this case you should update the map before
+to speed-up ADiKtEd - in this case you should update the map before
 saving.</li>
 
 <li>Press <b>tab</b> to get out of thing mode.</li>
@@ -350,7 +355,7 @@ saving.</li>
 
 <h3>Graffiti</h3>
 <ol>
-<li>Now onto a special feature of Adikted - graffiti. Fancy writing
+<li>Now onto a special feature of ADiKtEd - graffiti. Fancy writing
 a message on a wall? Dead easy.</li>
 <li>In slab mode, press <b>d</b> to draw some graffiti. Go on, press it now.</li>
 <li>You'll be asked to type in a message. Type in a pithy epigram...
@@ -368,16 +373,16 @@ The graffiti is quite a nice effect, but I'd recommend using it sparingly.</li>
 
 <h3>Ready to go!</h3>
 <ol>
-<li>You know how to use Adikted to edit levels now. Create a small
+<li>You know how to use ADiKtEd to edit levels now. Create a small
 level (you really only need a dungeon heart, and maybe try another
 room).</li>
 
 <li>Finished already? That was quick... press <b>ctrl+s</b> to save your
-level. Adikted will ask you for a filename. I recommend saving it in
+level. ADiKtEd will ask you for a filename. I recommend saving it in
 a temporary file first - I usually use newmap - rather than saving
 straight over the original DK files to start with. If there's
 anything wrong with the dungeon, such as the human player not having
-a dungeon heart, Adikted will warn you with a beep and a message,
+a dungeon heart, ADiKtEd will warn you with a beep and a message,
 but still save the level.</li>
 
 <li>Press <b>ctrl+q</b> to quit.</li>
@@ -396,16 +401,16 @@ I recommend using level 1, as it's easy to get to.</li>
 New Game (if you copied it over level 1) and see what happens.
 It may well instantly say you've won the game - that's 'cos you haven't
 changed the level script. The script would require a different
-tutorial... it doesn't really matter as far as Adikted is concerned
+tutorial... it doesn't really matter as far as ADiKtEd is concerned
 though. To learn about the script, check Official Editor documentation.</li>
 
 <li>You're now ready to go back and design a proper level to fox all
-your friends. Remember, you can press F1 at (almost!) any time in Adikted and
+your friends. Remember, you can press F1 at (almost!) any time in ADiKtEd and
 get help for whichever mode you're in. Inside the help, you will find many
 options that are not mentioned in this tutorial - don't forget to check it.
-Good luck, and I hope you enjoy using Adikted!</li>
+Good luck, and I hope you enjoy using ADiKtEd!</li>
 
-<li>Tip: Use <b>ctrl+l</b> to load a level within Adikted, and <b>ctrl+n</b> to
+<li>Tip: Use <b>ctrl+l</b> to load a level within ADiKtEd, and <b>ctrl+n</b> to
 start a new level.</li>
 
 <li>Tip: Use <b>ctrl+r</b> to automatically generate a level background.</li>

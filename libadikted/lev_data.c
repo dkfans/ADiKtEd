@@ -311,6 +311,7 @@ short level_clear_options(struct LEVOPTIONS *optns)
     optns->obj_auto_update=true;
     optns->levels_path=NULL;
     optns->data_path=NULL;
+    optns->load_redundant_objects=true;
     optns->picture.rescale=4;
     optns->picture.data_path=NULL;
     optns->script.level_spaces=4;
@@ -2010,4 +2011,336 @@ void update_thing_stats(struct LEVEL *lvl,const unsigned char *thing,short chang
               lvl->stats.things_added+=change;
           else
               lvl->stats.things_removed-=change;
+}
+
+unsigned int get_lgt_total_count(struct LEVEL *lvl)
+{
+    if (lvl==NULL) return 0;
+    return lvl->lgt_total_count;
+}
+
+unsigned int get_apt_total_count(struct LEVEL *lvl)
+{
+    if (lvl==NULL) return 0;
+    return lvl->apt_total_count;
+}
+
+unsigned int get_tng_total_count(struct LEVEL *lvl)
+{
+    if (lvl==NULL) return 0;
+    return lvl->tng_total_count;
+}
+
+short get_datclm_auto_update(struct LEVEL *lvl)
+{
+    if (lvl==NULL) return false;
+    return lvl->optns.datclm_auto_update;
+}
+
+short switch_datclm_auto_update(struct LEVEL *lvl)
+{
+    if (lvl==NULL) return false;
+    short nval=!(lvl->optns.datclm_auto_update);
+    lvl->optns.datclm_auto_update=nval;
+    return nval;
+}
+
+short set_datclm_auto_update(struct LEVEL *lvl,short val)
+{
+    if (lvl==NULL) return false;
+    lvl->optns.datclm_auto_update=val;
+    return true;
+}
+
+short get_obj_auto_update(struct LEVEL *lvl)
+{
+    if (lvl==NULL) return false;
+    return lvl->optns.obj_auto_update;
+}
+
+short switch_obj_auto_update(struct LEVEL *lvl)
+{
+    if (lvl==NULL) return false;
+    short nval=!(lvl->optns.obj_auto_update);
+    lvl->optns.obj_auto_update=nval;
+    return nval;
+}
+
+short set_obj_auto_update(struct LEVEL *lvl,short val)
+{
+    if (lvl==NULL) return false;
+    lvl->optns.obj_auto_update=val;
+    return true;
+}
+
+short set_lvl_fname(struct LEVEL *lvl,char *fname)
+{
+    if (lvl==NULL) return false;
+    if (fname == NULL)
+    {
+      free(lvl->fname);
+      lvl->fname=NULL;
+    }
+    free(lvl->fname);
+    lvl->fname=strdup(fname);
+    if (lvl->fname==NULL)
+      return false;
+    return true;
+}
+
+short format_lvl_fname(struct LEVEL *lvl,char *namefmt)
+{
+    if (lvl==NULL) return false;
+    if (namefmt == NULL)
+    {
+      free(lvl->fname);
+      lvl->fname=NULL;
+    }
+    free(lvl->fname);
+    lvl->fname=(char *)malloc(DISKPATH_SIZE*sizeof(char));
+    if (lvl->fname==NULL)
+      return false;
+    return format_map_fname(lvl->fname,namefmt,lvl->optns.levels_path);
+}
+
+char *get_lvl_fname(struct LEVEL *lvl)
+{
+    if (lvl==NULL) return "";
+    if (lvl->fname == NULL)
+      return "";
+    return lvl->fname;
+}
+
+short set_lvl_savfname(struct LEVEL *lvl,char *fname)
+{
+    if (lvl==NULL) return false;
+    if (fname == NULL)
+    {
+      free(lvl->savfname);
+      lvl->savfname=NULL;
+    }
+    free(lvl->savfname);
+    lvl->savfname=strdup(fname);
+    if (lvl->savfname==NULL)
+      return false;
+    return true;
+}
+
+short format_lvl_savfname(struct LEVEL *lvl,char *namefmt)
+{
+    if (lvl==NULL) return false;
+    if (namefmt == NULL)
+    {
+      free(lvl->savfname);
+      lvl->savfname=NULL;
+    }
+    free(lvl->savfname);
+    lvl->savfname=(char *)malloc(DISKPATH_SIZE*sizeof(char));
+    if (lvl->savfname==NULL)
+      return false;
+    return format_map_fname(lvl->savfname,namefmt,lvl->optns.levels_path);
+}
+
+char *get_lvl_savfname(struct LEVEL *lvl)
+{
+    if (lvl==NULL) return "";
+    if (lvl->savfname == NULL)
+      return "";
+    return lvl->savfname;
+}
+
+struct DK_SCRIPT *get_lvl_script(struct LEVEL *lvl)
+{
+    if (lvl==NULL) return NULL;
+    return &(lvl->script);
+}
+
+struct LEVSTATS *get_lvl_stats(struct LEVEL *lvl)
+{
+    if (lvl==NULL) return NULL;
+    return &(lvl->stats);
+}
+
+unsigned long inc_info_usr_mdswtch_count(struct LEVEL *lvl)
+{
+    if (lvl==NULL) return false;
+    lvl->info.usr_mdswtch_count++;
+    return lvl->info.usr_mdswtch_count;
+}
+
+unsigned long inc_info_usr_slbchng_count(struct LEVEL *lvl)
+{
+    if (lvl==NULL) return false;
+    lvl->info.usr_slbchng_count++;
+    return lvl->info.usr_slbchng_count;
+}
+
+unsigned long inc_info_usr_cmds_count(struct LEVEL *lvl)
+{
+    if (lvl==NULL) return false;
+    lvl->info.usr_cmds_count++;
+    return lvl->info.usr_cmds_count;
+}
+
+unsigned long inc_info_usr_creatobj_count(struct LEVEL *lvl)
+{
+    if (lvl==NULL) return false;
+    lvl->info.usr_creatobj_count++;
+    return lvl->info.usr_creatobj_count;
+}
+
+unsigned int inc_info_ver_major(struct LEVEL *lvl)
+{
+    if (lvl==NULL) return false;
+    lvl->info.ver_major++;
+    lvl->info.ver_minor=0;
+    lvl->info.ver_rel=0;
+    return lvl->info.ver_major;
+}
+
+unsigned int inc_info_ver_minor(struct LEVEL *lvl)
+{
+    if (lvl==NULL) return false;
+    lvl->info.ver_minor++;
+    lvl->info.ver_rel=0;
+    return lvl->info.ver_minor;
+}
+
+unsigned int inc_info_ver_rel(struct LEVEL *lvl)
+{
+    if (lvl==NULL) return false;
+    lvl->info.ver_rel++;
+    return lvl->info.ver_rel++;
+}
+
+unsigned char get_lvl_inf(struct LEVEL *lvl)
+{
+    if (lvl==NULL) return 0;
+    return lvl->inf;
+}
+
+short set_lvl_inf(struct LEVEL *lvl,unsigned char ninf)
+{
+    if (lvl==NULL) return false;
+    lvl->inf=ninf;
+    return true;
+}
+
+/*
+ * Formats object statistics text line. Returns type of the line.
+ */
+short get_level_objstats_textln(struct LEVEL *lvl,char *stat_buf,const int line_num)
+{
+    struct LEVSTATS *stats=get_lvl_stats(lvl);
+    switch (line_num)
+    {
+    case 0:
+        sprintf(stat_buf,"Map objects statistics");
+        return STLT_HEADER;
+    case 1:
+        sprintf(stat_buf,"Static lights:%4d",get_lgt_total_count(lvl));
+        return STLT_MAINITEM;
+    case 2:
+        sprintf(stat_buf,"Graffiti:%5d",get_graffiti_count(lvl));
+        return STLT_MAINITEM;
+    case 3:
+        sprintf(stat_buf,"Action points:%4d",get_apt_total_count(lvl));
+        return STLT_MAINITEM;
+    case 4:
+        sprintf(stat_buf,"Cust.clms:%4d",get_cust_clm_count(lvl));
+        return STLT_MAINITEM;
+    case 5:
+        sprintf(stat_buf,"Things on map:%4d",get_tng_total_count(lvl));
+        return STLT_HEADER;
+    case 6:
+        sprintf(stat_buf,"Creatures:%6d",stats->creatures_count);
+        return STLT_SUBITEM;
+    case 7:
+        sprintf(stat_buf,"Traps:%4d",stats->traps_count);
+        return STLT_SUBITEM;
+    case 8:
+        sprintf(stat_buf,"Room Effcts:%4d",stats->roomeffects_count);
+        return STLT_SUBITEM;
+    case 9:
+        sprintf(stat_buf,"Doors:%4d",stats->doors_count);
+        return STLT_SUBITEM;
+    case 10:
+        sprintf(stat_buf,"Room things:%4d",stats->room_things_count);
+        return STLT_SUBITEM;
+    case 11:
+        sprintf(stat_buf,"Items:%4d",stats->items_count);
+        return STLT_SUBITEM;
+    case 12:
+        sprintf(stat_buf,"Detailed items");
+        return STLT_HEADER;
+    case 13:
+        sprintf(stat_buf,"Dung hearts:%4d",stats->dn_hearts_count);
+        return STLT_SUBITEM;
+    case 14:
+        sprintf(stat_buf,"Hero gates:%3d",stats->hero_gates_count);
+        return STLT_SUBITEM;
+    case 15:
+        sprintf(stat_buf,"%9s:%6d",get_thing_category_shortname(THING_CATEGR_ITEMEFFCT),
+          stats->things_count[THING_CATEGR_ITEMEFFCT]);
+        return STLT_SUBITEM;
+    case 16:
+        sprintf(stat_buf,"%9s:%4d",get_thing_category_shortname(THING_CATEGR_CREATLAIR),
+          stats->things_count[THING_CATEGR_CREATLAIR]);
+        return STLT_SUBITEM;
+    case 17:
+        sprintf(stat_buf,"%9s:%6d",get_thing_category_shortname(THING_CATEGR_SPECIALBOX),
+          stats->things_count[THING_CATEGR_SPECIALBOX]);
+        return STLT_SUBITEM;
+    case 18:
+        sprintf(stat_buf,"%9s:%4d",get_thing_category_shortname(THING_CATEGR_SPELLBOOK),
+          stats->things_count[THING_CATEGR_SPELLBOOK]);
+        return STLT_SUBITEM;
+    case 19:
+        sprintf(stat_buf,"%9s:%6d",get_thing_category_shortname(THING_CATEGR_WRKSHOPBOX),
+          stats->things_count[THING_CATEGR_WRKSHOPBOX]);
+        return STLT_SUBITEM;
+    case 20:
+        sprintf(stat_buf,"%9s:%4d",get_thing_category_shortname(THING_CATEGR_SPINNTNG),
+          stats->things_count[THING_CATEGR_SPINNTNG]);
+        return STLT_SUBITEM;
+    case 21:
+        sprintf(stat_buf,"%9s:%6d",get_thing_category_shortname(THING_CATEGR_FOOD),
+          stats->things_count[THING_CATEGR_FOOD]);
+        return STLT_SUBITEM;
+    case 22:
+        sprintf(stat_buf,"%9s:%4d",get_thing_category_shortname(THING_CATEGR_GOLD),
+          stats->things_count[THING_CATEGR_GOLD]);
+        return STLT_SUBITEM;
+    case 23:
+        sprintf(stat_buf,"%9s:%6d",get_thing_category_shortname(THING_CATEGR_TORCHCNDL),
+          stats->things_count[THING_CATEGR_TORCHCNDL]);
+        return STLT_SUBITEM;
+    case 24:
+        sprintf(stat_buf,"%9s:%4d",get_thing_category_shortname(THING_CATEGR_HEARTFLAME),
+          stats->things_count[THING_CATEGR_HEARTFLAME]);
+        return STLT_SUBITEM;
+    case 25:
+        sprintf(stat_buf,"%9s:%6d",get_thing_category_shortname(THING_CATEGR_POLEBAR),
+          stats->things_count[THING_CATEGR_POLEBAR]);
+        return STLT_SUBITEM;
+    case 26:
+        sprintf(stat_buf,"%9s:%4d",get_thing_category_shortname(THING_CATEGR_STATUE),
+          stats->things_count[THING_CATEGR_STATUE]);
+        return STLT_SUBITEM;
+    case 27:
+        sprintf(stat_buf,"%9s:%6d",get_thing_category_shortname(THING_CATEGR_FURNITURE),
+          stats->things_count[THING_CATEGR_FURNITURE]);
+        return STLT_SUBITEM;
+    case 28:
+        sprintf(stat_buf,"%9s:%4d",get_thing_category_shortname(THING_CATEGR_ROOMEQUIP),
+          stats->things_count[THING_CATEGR_ROOMEQUIP]);
+        return STLT_SUBITEM;
+    case 29:
+        sprintf(stat_buf,"%9s:%6d",get_thing_category_shortname(THING_CATEGR_PWHAND),
+          stats->things_count[THING_CATEGR_PWHAND]);
+        return STLT_SUBITEM;
+    default:
+        stat_buf[0]='\0';
+        return STLT_NONE;
+    }
 }

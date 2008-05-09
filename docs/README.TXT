@@ -63,6 +63,13 @@ Press F1 for help.
 TODO before final:
  Fixations in room things parameters (height,other)
  Fixations in room corner graphics
+Version: 0.91b
+ A little renaming in the ADiKtEd library
+ Created functions to make the library more independent
+ Added Home/end keys in script mode
+ Script update function now updates arguments
+ Line break (only into two lines) in script viewer
+ New INI option for loading UnDed maps
 Version: 0.90b
  Isolated map editing library
  Corrected error message on bad arguments of some commands

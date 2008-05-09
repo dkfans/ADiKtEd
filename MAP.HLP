@@ -418,6 +418,7 @@ To locate specials, press ctrl+f and select them.
 You can highlight all creatures by pressing ctrl+f.
 To highlight all action points, press ctrl+f.
 You can find a specific object using ctrl+f.
+To view the level script, press ctrl+t.
 [scrphelp]
 Script editor help:
 
@@ -433,6 +434,10 @@ highlighted.
 
 Press '\wu\s' to \yupdate the sctipt\s. This will regenerate all the
 commands, fixing any easy-correctable errors and mistakes.
+
+Note that script errors which can be automatically corrected
+with '\wu\s' are \rnot always detected\s by verification ('\wv\s' key).
+Such errors include missing brackets and commas.
 
 To \yback\s into previous work mode, press \wesc\s or \wtab\s.
 

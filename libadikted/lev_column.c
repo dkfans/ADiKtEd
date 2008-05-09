@@ -989,6 +989,12 @@ short set_cust_col(struct LEVEL *lvl,int sx,int sy,struct DK_CUSTOM_CLM *ccol)
     return true;
 }
 
+unsigned int get_cust_clm_count(struct LEVEL *lvl)
+{
+    if (lvl==NULL) return 0;
+    return lvl->cust_clm_count;
+}
+
 /*
  * Creates a new custom column and fills its properties.
  * The new object is not added to LEVEL structure.

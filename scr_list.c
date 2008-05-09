@@ -177,8 +177,7 @@ short start_list(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata,int
     workdata->list->val3=0;
     workdata->list->ptr=NULL;
     scrmode->mode=lstmode;
-    if (workdata->lvl!=NULL)
-      workdata->lvl->info.usr_mdswtch_count++;
+    inc_info_usr_mdswtch_count(workdata->lvl);
     message_info("Use arrow keys and page up/down to move, "
       "enter to choose.");
     return true;
@@ -211,8 +210,7 @@ short start_rplist(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata,i
     workdata->list->val2=0;
     workdata->list->val3=0;
     scrmode->mode=lstmode;
-    if (workdata->lvl!=NULL)
-      workdata->lvl->info.usr_mdswtch_count++;
+    inc_info_usr_mdswtch_count(workdata->lvl);
     message_info("Use arrow keys and page up/down to move, "
       "or enter number with keyboard.");
     return true;
@@ -473,7 +471,7 @@ void actions_mdtextr(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata
           message_info("Texture change cancelled");
           break;
         case KEY_ENTER:
-          workdata->lvl->inf=workdata->list->pos;
+          set_lvl_inf(workdata->lvl,workdata->list->pos);
           mdend[MD_TXTR](scrmode,workdata);
           message_info("Texture changed");
           break;
@@ -616,7 +614,7 @@ short start_mdtextr(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata)
     short result;
     result=start_list(scrmode,workdata,MD_TXTR);
     scrmode->usrinput_type=SI_NONE;
-    workdata->list->pos=workdata->lvl->inf;
+    workdata->list->pos=get_lvl_inf(workdata->lvl);
     message_log(" start_mdtextr: completed");
     return result;
 }
@@ -1282,8 +1280,7 @@ void actions_mdlmap(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata,
         case KEY_ENTER:
           {
             popup_show("Loading map","Reading map files. Please wait...");
-            short fname_ok=format_map_fname(workdata->lvl->fname,
-                scrmode->usrinput,workdata->optns->levels_path);
+            short fname_ok=format_lvl_fname(workdata->lvl,scrmode->usrinput);
             mdend[MD_LMAP](scrmode,workdata);
             if (!fname_ok)
             {
@@ -1291,11 +1288,11 @@ void actions_mdlmap(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata,
               break;
             }
             free_map(workdata->lvl);
-            strcpy(workdata->lvl->savfname,"");
+            format_lvl_savfname(workdata->lvl,"");
             load_map(workdata->lvl);
             clear_highlight(workdata->mapmode);
             change_mode(scrmode,workdata,scrmode->mode);
-            message_info("Map \"%s\" loaded", workdata->lvl->fname);
+            message_info("Map \"%s\" loaded", get_lvl_fname(workdata->lvl));
           };break;
         default:
           message_info("Unrecognized \"%s\" key code: %d",longmodenames[MD_LMAP],key);
@@ -1304,8 +1301,7 @@ void actions_mdlmap(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata,
     }
     if (load_preview)
     {
-      format_map_fname(workdata->mapmode->preview->fname,
-          scrmode->usrinput,workdata->optns->levels_path);
+      format_lvl_fname(workdata->mapmode->preview,scrmode->usrinput);
       if ((workdata->mapmode->level_preview&LPREV_LOAD) == LPREV_LOAD)
       {
         if (load_map_preview(workdata->mapmode->preview))
@@ -1385,26 +1381,23 @@ void actions_mdsmap(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata,
           {
 
             popup_show("Saving map","Writing map files. Please wait...");
-            short fname_ok=format_map_fname(workdata->lvl->savfname,
-                scrmode->usrinput,workdata->optns->levels_path);
+            short fname_ok=format_lvl_savfname(workdata->lvl,scrmode->usrinput);
             mdend[MD_LMAP](scrmode,workdata);
             if (!fname_ok)
             {
               message_error("Map saving cancelled");
               break;
             }
-            if (workdata->lvl->stats.saves_count==0)
+            struct LEVSTATS *stats=get_lvl_stats(workdata->lvl);
+            if (stats->saves_count==0)
             {
-              workdata->lvl->info.ver_major++;
-              workdata->lvl->info.ver_minor=0;
-              workdata->lvl->info.ver_rel=0;
+              inc_info_ver_major(workdata->lvl);
             } else
             {
-              workdata->lvl->info.ver_minor++;
-              workdata->lvl->info.ver_rel=0;
+              inc_info_ver_minor(workdata->lvl);
             }
             save_map(workdata->lvl);
-            message_info("Map \"%s\" saved", workdata->lvl->savfname);
+            message_info("Map \"%s\" saved", get_lvl_savfname(workdata->lvl));
           };break;
         default:
           message_info("Unrecognized \"%s\" key code: %d",longmodenames[MD_SMAP],key);
@@ -1413,8 +1406,7 @@ void actions_mdsmap(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata,
     }
     if (load_preview)
     {
-      format_map_fname(workdata->mapmode->preview->fname,
-          scrmode->usrinput,workdata->optns->levels_path);
+      format_lvl_fname(workdata->mapmode->preview,scrmode->usrinput);
       if ((workdata->mapmode->level_preview&LPREV_SAVE) == LPREV_SAVE)
       {
         if (load_map_preview(workdata->mapmode->preview))

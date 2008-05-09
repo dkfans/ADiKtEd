@@ -1,5 +1,5 @@
 [Project]
-FileName=libadikted.dev
+FileName=adikted.dev
 Name=libadikted
 UnitCount=45
 Type=3
@@ -7,7 +7,7 @@ Ver=1
 ObjFiles=
 Includes=
 Libs=
-PrivateResource=libadikted_private.rc
+PrivateResource=adikted_private.rc
 ResourceIncludes=
 MakeIncludes=
 Compiler=-DBUILDING_DLL=1_@@_
@@ -43,7 +43,7 @@ BuildCmd=
 Major=0
 Minor=9
 Release=1
-Build=1
+Build=2
 LanguageID=1033
 CharsetID=1252
 CompanyName=
@@ -55,7 +55,7 @@ LegalTrademarks=
 OriginalFilename=
 ProductName=Unofficial Bullfrog game tools
 ProductVersion=
-AutoIncBuildNr=0
+AutoIncBuildNr=1
 
 [Unit3]
 FileName=bulcommn.c

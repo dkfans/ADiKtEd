@@ -107,8 +107,8 @@ void actions_mdrwrk(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata,
             sscanf(usrinput,"%d",&st_cube);
             int i,k;
             popup_show("Generating cube test map","The process can take some time. Please wait...");
-            short auto_upd_memory=workdata->lvl->optns.datclm_auto_update;
-            workdata->lvl->optns.datclm_auto_update=false;
+            short auto_upd_memory=get_datclm_auto_update(workdata->lvl);
+            set_datclm_auto_update(workdata->lvl,false);
             generate_slab_bkgnd_default(workdata->lvl,SLAB_TYPE_PATH);
             const int size_x=6;
             const int size_y=5;
@@ -121,8 +121,8 @@ void actions_mdrwrk(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata,
                 if (cube<512)
                   place_cube_test(workdata->lvl,i*size_x+1,k*size_y+1,cube);
               }
-            workdata->lvl->optns.datclm_auto_update=auto_upd_memory;
-            if (workdata->lvl->optns.datclm_auto_update)
+            set_datclm_auto_update(workdata->lvl,auto_upd_memory);
+            if (get_datclm_auto_update(workdata->lvl))
             {
               popup_show("Updating DAT/CLM for whole map","Regenarating whole map can take some time. Please wait...");
               update_datclm_for_whole_map(workdata->lvl);
@@ -143,8 +143,7 @@ void actions_mdrwrk(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata,
 short start_mdrwrk(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata)
 {
     scrmode->mode=MD_RWRK;
-    if (workdata->lvl!=NULL)
-      workdata->lvl->info.usr_mdswtch_count++;
+    inc_info_usr_mdswtch_count(workdata->lvl);
     return true;
 }
 

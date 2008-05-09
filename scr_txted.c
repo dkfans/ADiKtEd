@@ -58,6 +58,7 @@ short init_scrpt(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata)
     workdata->editor=(struct TXTED_DATA *)malloc(sizeof(struct TXTED_DATA));
     if (workdata->editor==NULL)
      die("init_scrpt: Cannot allocate memory.");
+    workdata->editor->word_wrap=true;
     return true;
 }
 
@@ -75,26 +76,41 @@ void free_scrpt(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata)
  */
 void actions_scrpt(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata,int key)
 {
-    int rows;
-    rows=workdata->editor->script->lines_count;
+    int lines_count;
+    int line_y=workdata->editor->y;
+    message_release();
+    lines_count=workdata->editor->script->lines_count;
     switch (key)
     {
     case KEY_UP:
-      workdata->editor->y--;
+      line_y--;
       break;
     case KEY_DOWN:
-      workdata->editor->y++;
+      line_y++;
       break;
     case KEY_PGUP:
-      workdata->editor->y-=scrmode->rows-1;
+      line_y-=scrmode->rows-1;
       break;
     case KEY_PGDOWN:
-      workdata->editor->y+=scrmode->rows-1;
+      line_y+=scrmode->rows-1;
       break;
+    case KEY_HOME:
+      line_y=0;
+      break;
+    case KEY_END:
+      line_y=lines_count-1;
+      break;
+
     case KEY_U:
-      recompute_script_levels(&(workdata->lvl->script));
-      recompose_script(&(workdata->lvl->script),&(workdata->optns->script));
-      break;
+      {
+        struct DK_SCRIPT *scrpt=get_lvl_script(workdata->lvl);
+        recompute_script_levels(scrpt);
+        short retcode=recompose_script(scrpt,&(workdata->optns->script));
+        if (retcode)
+          message_info("Script recomposed successfully");
+        else
+          message_error("Error occured during the update");
+      };break;
         case KEY_V: // Verify whole map
           script_verify_with_highlight(workdata->lvl,workdata->editor);
           break;
@@ -103,17 +119,29 @@ void actions_scrpt(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata,i
       end_scrpt(scrmode,workdata);
       message_info("Returned to last work mode");
       break;
+    default:
+      message_info("Unrecognized script editor key code: %d",key);
+      speaker_beep();
     }
     //Fixing y
-    if (workdata->editor->y >= rows)
-      workdata->editor->y=rows-1;
-    if (workdata->editor->y < 0)
-      workdata->editor->y=0;
+    if (line_y >= lines_count)
+      line_y=lines_count-1;
+    if (line_y < 0)
+      line_y=0;
+    workdata->editor->y=line_y;
+    // Finding which row we need to see for the command at y to be visible
+    int rows=workdata->editor->total_rows_count;
+    int curr_row=0;
+    int curr_count;
+    int i;
+    for (i=0;i<line_y;i++)
+        curr_row+=workdata->editor->line_rows[i];
+    curr_count=workdata->editor->line_rows[line_y];
     //Fixing top_row based on y
-    if (workdata->editor->top_row+scrmode->rows < workdata->editor->y+1)
-        workdata->editor->top_row=workdata->editor->y-scrmode->rows+1;
-    if (workdata->editor->top_row > workdata->editor->y)
-        workdata->editor->top_row=workdata->editor->y;
+    if (workdata->editor->top_row+scrmode->rows < curr_row+curr_count)
+        workdata->editor->top_row=curr_row-scrmode->rows+curr_count;
+    if (workdata->editor->top_row > curr_row)
+        workdata->editor->top_row=curr_row;
     if (workdata->editor->top_row+scrmode->rows > rows)
       workdata->editor->top_row=rows-scrmode->rows;
     if (workdata->editor->top_row < 0)
@@ -125,15 +153,51 @@ void actions_scrpt(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata,i
  */
 short start_scrpt(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata)
 {
+    if (workdata==NULL) return false;
+    struct DK_SCRIPT *script=get_lvl_script(workdata->lvl);
+    if (script==NULL) return false;
     workdata->editor->prevmode=scrmode->mode;
     workdata->editor->y=0;
     workdata->editor->top_row=0;
     workdata->editor->err_row=-1;
     workdata->editor->err_param=ERR_SCRIPTPARAM_WHOLE;
-    if (workdata->lvl==NULL) return false;
-    workdata->editor->script=&(workdata->lvl->script);
+    workdata->editor->script=script;
+    workdata->editor->line_rows=NULL;
+    if (!recompute_editor_lines(workdata->editor,script,get_screen_cols()))
+        return false;
     scrmode->mode=MD_SCRP;
-    workdata->lvl->info.usr_mdswtch_count++;
+    inc_info_usr_mdswtch_count(workdata->lvl);
+    return true;
+}
+
+short recompute_editor_lines(struct TXTED_DATA *editor,const struct DK_SCRIPT *script,
+    const unsigned int scr_width)
+{
+    free(editor->line_rows);
+    editor->line_rows=(int *)malloc((script->lines_count+1)*sizeof(unsigned int));
+    if (editor->line_rows==NULL) return false;
+    editor->scr_width=scr_width;
+    unsigned int all_lines=script->lines_count;
+    unsigned int total_rows=0;
+    int line_num;
+    for (line_num=0;line_num<all_lines;line_num++)
+    {
+        char *txt_line;
+        txt_line=editor->script->txt[line_num];
+        int ln_rows=1;
+// Note: the word wrap works only if '\t' is converted into one space.
+// this is because there's no proper strlen function which counts tab as
+// more than 1 char
+        if (editor->word_wrap)
+        {
+          if (strlen(txt_line)>scr_width)
+            ln_rows++;
+        }
+        editor->line_rows[line_num]=ln_rows;
+        total_rows+=ln_rows;
+    }
+    editor->line_rows[all_lines]=0;
+    editor->total_rows_count=total_rows;
     return true;
 }
 
@@ -146,6 +210,8 @@ void end_scrpt(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata)
     workdata->editor->err_row=-1;
     workdata->editor->err_param=ERR_SCRIPTPARAM_WHOLE;
     workdata->editor->script=NULL;
+    free(workdata->editor->line_rows);
+    workdata->editor->total_rows_count=0;
     if (scrmode->mode!=workdata->editor->prevmode)
       scrmode->mode=workdata->editor->prevmode;
     else
@@ -153,39 +219,125 @@ void end_scrpt(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata)
 }
 
 /*
- * Draws screen for the scrpt mode.
+ * Works like strncpy, but replaces any control characters with '_' or spaces.
+ * Always ends the destination with '\0' char. Returns number of characters
+ * processed from source string (it may be different that destination length!).
+ * Replaces '\t' with constant amount of spaces given in tab_len.
+ */
+int strncpy_skipctrl(char *destination, const char *source, size_t num, const int tab_len)
+{
+    if (destination==NULL) return 0;
+    if (source==NULL)
+    {
+      destination[0]='\0';
+      return 0;
+    }
+    int src_idx=0;
+    int dst_idx=0;
+    int i;
+    while (dst_idx<num)
+    {
+      char chr=source[src_idx];
+      if (chr=='\0') break;
+      if (chr=='\t')
+      {
+        for (i=0;i<tab_len;i++)
+        {
+          destination[dst_idx]=' ';
+          dst_idx++;
+        }
+      } else
+      if ((unsigned char)chr<(unsigned char)' ')
+      {
+        destination[dst_idx]='_';
+        dst_idx++;
+      } else
+      {
+        destination[dst_idx]=chr;
+        dst_idx++;
+      }
+      src_idx++;
+    }
+    destination[dst_idx]='\0';
+    return src_idx;
+}
+
+/*
+ * Draws screen for the script mode.
  */
 void draw_scrpt(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata)
 {
     int i;
-    int rows;
-    rows=workdata->editor->script->lines_count;
+    int lines_count;
+    lines_count=workdata->editor->script->lines_count;
+    int top_row;
+    top_row=workdata->editor->top_row;
+    long line_num=0;
+    long curr_row=0;
+    long line_rows;
+    if (lines_count>line_num)
+      line_rows=workdata->editor->line_rows[line_num];
+    else
+      line_rows=1;
+    while ((curr_row+line_rows) <= top_row)
+    {
+      curr_row+=line_rows;
+      line_num++;
+      if (line_num>=lines_count)
+        break;
+      line_rows=workdata->editor->line_rows[line_num];
+    }
+    int curr_lnrow=top_row-curr_row;
+    if (curr_lnrow<0) curr_lnrow=0;
+    // Looping through screen lines
     char wordtxt[LINEMSG_SIZE];
+    short new_line=true;
+    char *txt_line;
+    const struct TXTED_COLORS *ccolor;
+    short got_word;
+    char const *prev_end;
+    int param_idx;
+    char const *ptr;
+    unsigned int ptr_len;
+    int max_param_len;
     for (i=0; i < scrmode->rows; i++)
     {
-      char *txt_line="";
-      long line_num=workdata->editor->top_row+i;
-      if (line_num < rows)
-          txt_line=workdata->editor->script->txt[line_num];
       set_cursor_pos(i,0);
-      const struct TXTED_COLORS *ccolor;
-      if (line_num==workdata->editor->y)
+      if (new_line)
       {
-        ccolor=&script_hl_colors;
+        if (line_num < lines_count)
+            txt_line=workdata->editor->script->txt[line_num];
+        else
+            txt_line="";
+        if (line_num==workdata->editor->y)
+            ccolor=&script_hl_colors;
+        else
+            ccolor=&script_std_colors;
+        got_word=script_strword_pos(&ptr,&ptr_len,txt_line,false);
+        prev_end=txt_line;
+        param_idx=-1;
+        max_param_len=min(workdata->editor->scr_width,LINEMSG_SIZE-1);
+        new_line=false;
       } else
       {
-        ccolor=&script_std_colors;
+          int remain_len;
+          if (ptr<prev_end)
+            remain_len=strlen(ptr);
+          else
+            remain_len=strlen(prev_end);
+          while (max_param_len>(remain_len+1))
+          {
+            screen_printf(" ");
+            max_param_len--;
+          }
       }
-      char const *prev_end=txt_line;
-      int param_idx=-1;
-      char const *ptr;
-      unsigned int ptr_len;
-      short got_word;
       int len;
-      got_word=script_strword_pos(&ptr,&ptr_len,txt_line,false);
       while (got_word)
       {
-          len=min(ptr-prev_end,LINEMSG_SIZE-1);
+          //Drawing free spaces between parameters
+          int word_len;
+          word_len=ptr-prev_end;
+          len=min(word_len,max_param_len);
           if (len>0)
           {
             if ((line_num==workdata->editor->err_row) &&
@@ -193,10 +345,13 @@ void draw_scrpt(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata)
               screen_setcolor(ccolor->bad);
             else
               screen_setcolor(ccolor->spaces);
-            strncpy(wordtxt,prev_end,len);
-            wordtxt[len]='\0';
+            int real_len=strncpy_skipctrl(wordtxt,prev_end,len,1);
             screen_printf("%s",wordtxt);
+            max_param_len-=real_len;
+            prev_end+=len;
           }
+          if (word_len>len)
+            break;
           if ((line_num==workdata->editor->err_row) &&
              ((param_idx==workdata->editor->err_param) ||
               (workdata->editor->err_param<=ERR_SCRIPTPARAM_WHOLE)))
@@ -206,28 +361,73 @@ void draw_scrpt(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata)
             screen_setcolor(ccolor->command);
           else
             screen_setcolor(ccolor->param_text);
-          len=min(ptr_len,LINEMSG_SIZE-1);
-          strncpy(wordtxt,ptr,len);
-          wordtxt[len]='\0';
-          screen_printf("%s",wordtxt);
-          prev_end=ptr+ptr_len;
-          got_word=script_strword_pos(&ptr,&ptr_len,NULL,false);
-          param_idx++;
+          //Drawing the parameter
+          len=min(ptr_len,max_param_len);
+          if (len>0)
+          {
+            // If there is end of a word near, and another line will be drawn,
+            // then break the line there.
+            if ((ptr_len>max_param_len)&&((curr_lnrow+1)<line_rows))
+            {
+              int max_back=ptr_len-1;
+              if (max_back>8) max_back=8;
+              int i;
+              for (i=1;i<max_back;i++)
+                if ((unsigned char)ptr[len-i]<=(unsigned char)' ')
+                {
+                  len=len+1-i;
+                  break;
+                }
+            }
+            int real_len=strncpy_skipctrl(wordtxt,ptr,len,1);
+            screen_printf("%s",wordtxt);
+            max_param_len-=real_len;
+          }
+          if (ptr_len>len)
+          {
+            //Remove printed length from parameter length
+            ptr+=len;
+            ptr_len-=len;
+            //Setting this will skip first part of the loop (drawing free spaces)
+            prev_end=ptr;
+            break;
+          } else
+          {
+            prev_end=ptr+len;
+            got_word=script_strword_pos(&ptr,&ptr_len,NULL,false);
+            param_idx++;
+          }
       }
-      len=min(strlen(prev_end),LINEMSG_SIZE-1);
-      if (len>0)
+      if (got_word)
       {
-        if ((line_num==workdata->editor->err_row) &&
-           (workdata->editor->err_param==ERR_SCRIPTPARAM_NARGS))
-          screen_setcolor(ccolor->bad);
-        else
-          screen_setcolor(ccolor->spaces);
-        strncpy(wordtxt,prev_end,len);
-        wordtxt[len]='\0';
-        screen_printf("%s",wordtxt);
+          max_param_len=min(workdata->editor->scr_width,LINEMSG_SIZE-1);
+      } else
+      {
+        len=min(strlen(prev_end),LINEMSG_SIZE-1);
+        if (len>0)
+        {
+          if ((line_num==workdata->editor->err_row) &&
+             (workdata->editor->err_param==ERR_SCRIPTPARAM_NARGS))
+            screen_setcolor(ccolor->bad);
+          else
+            screen_setcolor(ccolor->spaces);
+          strncpy_skipctrl(wordtxt,prev_end,len,1);
+          screen_printf("%s",wordtxt);
+        }
       }
       screen_setcolor(ccolor->comment);
       screen_printf_toeol("");
+      curr_lnrow++;
+      if (curr_lnrow>=line_rows)
+      {
+        line_num++;
+        if (line_num < lines_count)
+          line_rows=workdata->editor->line_rows[line_num];
+        else
+          line_rows=1;
+        curr_lnrow=0;
+        new_line=true;
+      }
     }
     set_cursor_pos(get_screen_rows()-1, get_screen_cols()-1);
 }

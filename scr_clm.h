@@ -44,8 +44,9 @@ void action_update_all_datclm(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA 
 void action_delele_custclm_and_update(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata);
 
 //Functions - lower level
-int display_dat_subtiles(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata,
-    int scr_row, int scr_col,short compressed,int ty,int tx);
+int display_dat_subtiles(const struct SCRMODE_DATA *scrmode,
+    const struct WORKMODE_DATA *workdata,int scr_row, int scr_col,
+    const short compressed,const int ty,const int tx);
 int display_column(unsigned char *clmentry,int clm_idx, int scr_row, int scr_col);
 
 //Functions - internal

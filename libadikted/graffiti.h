@@ -31,6 +31,7 @@ struct DK_GRAFFITI;
 DLLIMPORT short level_free_graffiti(struct LEVEL *lvl);
 DLLIMPORT int place_graffiti_on_slab(struct COLUMN_REC *clm_recs[9],struct LEVEL *lvl, int tx, int ty);
 
+DLLIMPORT unsigned int get_graffiti_count(struct LEVEL *lvl);
 DLLIMPORT struct DK_GRAFFITI *get_graffiti(struct LEVEL *lvl, int graf_idx);
 DLLIMPORT char *get_graffiti_text(struct LEVEL *lvl,unsigned int num);
 DLLIMPORT int graffiti_idx(struct LEVEL *lvl, int tx, int ty);

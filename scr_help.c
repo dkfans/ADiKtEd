@@ -522,8 +522,7 @@ short start_help(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata)
     message_info_force("Use arrow keys and page up/down to move, "
       "any other key to return.");
     scrmode->mode=MD_HELP;
-    if (workdata->lvl!=NULL)
-      workdata->lvl->info.usr_mdswtch_count++;
+    inc_info_usr_mdswtch_count(workdata->lvl);
     return true;
 }
 

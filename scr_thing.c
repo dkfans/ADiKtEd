@@ -167,7 +167,7 @@ void actions_mdtng(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata,i
           message_info("Added action point %d",(unsigned int)get_actnpt_number(thing));
           set_visited_obj_lastof(workdata,OBJECT_TYPE_ACTNPT);
           set_brighten_for_actnpt(workdata->mapmode,thing);
-          workdata->lvl->info.usr_creatobj_count++;
+          inc_info_usr_creatobj_count(workdata->lvl);
           break;
         case KEY_SHIFT_L: // Add static light
           thing = create_stlight(subpos.x,subpos.y);
@@ -175,7 +175,7 @@ void actions_mdtng(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata,i
           message_info("Added static light");
           set_visited_obj_lastof(workdata,OBJECT_TYPE_STLIGHT);
           set_brighten_for_stlight(workdata->mapmode,thing);
-          workdata->lvl->info.usr_creatobj_count++;
+          inc_info_usr_creatobj_count(workdata->lvl);
           break;
         case KEY_K: // Copy thing to clipboard
           {
@@ -220,7 +220,7 @@ void actions_mdtng(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata,i
                 if (is_roomeffect(thing))
                     set_brighten_for_thing(workdata->mapmode,thing);
                 set_visited_obj_lastof(workdata,OBJECT_TYPE_THING);
-                workdata->lvl->info.usr_creatobj_count++;
+                inc_info_usr_creatobj_count(workdata->lvl);
                 break;
             case OBJECT_TYPE_ACTNPT:
                 thing = create_actnpt_copy(subpos.x,subpos.y,clip_itm->data);
@@ -228,7 +228,7 @@ void actions_mdtng(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata,i
                 set_brighten_for_actnpt(workdata->mapmode,thing);
                 message_info("Action point pasted from clipboard at subtile %d,%d",subpos.x,subpos.y);
                 set_visited_obj_lastof(workdata,OBJECT_TYPE_ACTNPT);
-                workdata->lvl->info.usr_creatobj_count++;
+                inc_info_usr_creatobj_count(workdata->lvl);
                 break;
             case OBJECT_TYPE_STLIGHT:
                 thing = create_stlight_copy(subpos.x,subpos.y,clip_itm->data);
@@ -236,7 +236,7 @@ void actions_mdtng(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata,i
                 message_info("Static light pasted from clipboard at subtile %d,%d",subpos.x,subpos.y);
                 set_brighten_for_stlight(workdata->mapmode,thing);
                 set_visited_obj_lastof(workdata,OBJECT_TYPE_STLIGHT);
-                workdata->lvl->info.usr_creatobj_count++;
+                inc_info_usr_creatobj_count(workdata->lvl);
                 break;
             default:
                 message_error("Internal error: can't paste this object type.");
@@ -248,23 +248,25 @@ void actions_mdtng(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata,i
           };break;
         case KEY_U: // Update all things
           { //Storing stats on objects adding/removal
-          int prev_tng_rmv=workdata->lvl->stats.things_removed;
-          int prev_tng_add=workdata->lvl->stats.things_added;
+          struct LEVSTATS *stats=get_lvl_stats(workdata->lvl);
+          int prev_tng_rmv=stats->things_removed;
+          int prev_tng_add=stats->things_added;
           update_slab_owners(workdata->lvl);
           update_obj_for_whole_map(workdata->lvl);
           update_obj_subpos_and_height_for_whole_map(workdata->lvl);
           message_info("Auto-maintained TNG entries updated, %u added, %u removed.",
-              workdata->lvl->stats.things_added-prev_tng_add,workdata->lvl->stats.things_removed-prev_tng_rmv);
+              stats->things_added-prev_tng_add,stats->things_removed-prev_tng_rmv);
           workdata->mdtng->obj_ranges_changed=true;
           change_visited_tile(workdata);
           };break;
         case KEY_CTRL_D: // Delete all things which can be auto-created.
           {
-          int prev_tng_rmv=workdata->lvl->stats.things_removed;
-          int prev_lgt=workdata->lvl->lgt_total_count;
+          struct LEVSTATS *stats=get_lvl_stats(workdata->lvl);
+          int prev_tng_rmv=stats->things_removed;
+          int prev_lgt=get_lgt_total_count(workdata->lvl);
           remove_automade_obj_for_whole_map(workdata->lvl);
           message_info("All %u auto-maintained or noncrucial objects removed.",
-              workdata->lvl->stats.things_removed-prev_tng_rmv+prev_lgt-workdata->lvl->lgt_total_count);
+              stats->things_removed-prev_tng_rmv+prev_lgt-get_lgt_total_count(workdata->lvl));
           workdata->mdtng->obj_ranges_changed=true;
           change_visited_tile(workdata);
           };break;
@@ -408,8 +410,7 @@ short start_mdtng(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata)
     workdata->mdtng->obj_ranges_changed=true;
     scrmode->usrinput_type=SI_NONE;
     scrmode->mode=MD_TNG;
-    if (workdata->lvl!=NULL)
-      workdata->lvl->info.usr_mdswtch_count++;
+    inc_info_usr_mdswtch_count(workdata->lvl);
     return true;
 }
 
@@ -912,100 +913,60 @@ int display_static_light(unsigned char *stlight, int x, int scr_row, int max_row
 
 int display_obj_stats(struct SCRMODE_DATA *scrmode,const struct WORKMODE_DATA *workdata, int scr_row, int scr_col)
 {
+    char stat_buf[LINEMSG_SIZE];
     struct LEVEL *lvl=workdata->lvl;
     int m, i;
-    int scr_col1=scr_col+2;
     int scr_col2=scr_col+20;
+    int scr_col_sub1=scr_col+2;
+    int scr_col_sub2=scr_col2+1;
     screen_setcolor(PRINT_COLOR_LGREY_ON_BLACK);
-    set_cursor_pos(scr_row++, scr_col);
-    screen_printf("%s","Map objects statistics");
-    set_cursor_pos(scr_row, scr_col);
-    screen_printf("Static lights:%4d",lvl->lgt_total_count);
-    set_cursor_pos(scr_row++, scr_col2);
-    screen_printf("Graffiti:%5d",lvl->graffiti_count);
-    set_cursor_pos(scr_row, scr_col);
-    screen_printf("Action points:%4d",lvl->apt_total_count);
-    set_cursor_pos(scr_row++, scr_col2);
-    screen_printf("Cust.clms:%4d",lvl->cust_clm_count);
-    set_cursor_pos(scr_row++, scr_col);
-    screen_printf("Things on map:%4d",lvl->tng_total_count);
-    scr_col2++;
-    if (scrmode->rows >= scr_row+TNGDAT_ROWS+3)
-    {
-      set_cursor_pos(scr_row, scr_col1);
-      screen_printf("Creatures:%6d",lvl->stats.creatures_count);
-      set_cursor_pos(scr_row++, scr_col2);
-      screen_printf("Traps:%4d",lvl->stats.traps_count);
-      set_cursor_pos(scr_row, scr_col1);
-      screen_printf("Room Effcts:%4d",lvl->stats.roomeffects_count);
-      set_cursor_pos(scr_row++, scr_col2);
-      screen_printf("Doors:%4d",lvl->stats.doors_count);
-      set_cursor_pos(scr_row, scr_col1);
-      screen_printf("Room things:%4d",lvl->stats.room_things_count);
-      set_cursor_pos(scr_row++, scr_col2);
-      screen_printf("Items:%4d",lvl->stats.items_count);
-    }
-    if (scrmode->rows >= scr_row+TNGDAT_ROWS+9)
-    {
-      set_cursor_pos(scr_row++, scr_col);
-      screen_printf("%s","Detailed items");
-      set_cursor_pos(scr_row, scr_col2);
-      screen_printf("Hero gates:%3d",lvl->stats.hero_gates_count);
-      set_cursor_pos(scr_row++, scr_col1);
-      screen_printf("Dung hearts:%4d",lvl->stats.dn_hearts_count);
-
-      set_cursor_pos(scr_row, scr_col1);
-      screen_printf("%9s:%6d",get_thing_category_shortname(THING_CATEGR_ITEMEFFCT),
-          lvl->stats.things_count[THING_CATEGR_ITEMEFFCT]);
-      set_cursor_pos(scr_row++, scr_col2);
-      screen_printf("%9s:%4d",get_thing_category_shortname(THING_CATEGR_CREATLAIR),
-          lvl->stats.things_count[THING_CATEGR_CREATLAIR]);
-      set_cursor_pos(scr_row, scr_col1);
-      screen_printf("%9s:%6d",get_thing_category_shortname(THING_CATEGR_SPECIALBOX),
-          lvl->stats.things_count[THING_CATEGR_SPECIALBOX]);
-      set_cursor_pos(scr_row++, scr_col2);
-      screen_printf("%9s:%4d",get_thing_category_shortname(THING_CATEGR_SPELLBOOK),
-          lvl->stats.things_count[THING_CATEGR_SPELLBOOK]);
-      set_cursor_pos(scr_row, scr_col1);
-      screen_printf("%9s:%6d",get_thing_category_shortname(THING_CATEGR_WRKSHOPBOX),
-          lvl->stats.things_count[THING_CATEGR_WRKSHOPBOX]);
-      set_cursor_pos(scr_row++, scr_col2);
-      screen_printf("%9s:%4d",get_thing_category_shortname(THING_CATEGR_SPINNTNG),
-          lvl->stats.things_count[THING_CATEGR_SPINNTNG]);
-      set_cursor_pos(scr_row, scr_col1);
-      screen_printf("%9s:%6d",get_thing_category_shortname(THING_CATEGR_FOOD),
-          lvl->stats.things_count[THING_CATEGR_FOOD]);
-      set_cursor_pos(scr_row++, scr_col2);
-      screen_printf("%9s:%4d",get_thing_category_shortname(THING_CATEGR_GOLD),
-          lvl->stats.things_count[THING_CATEGR_GOLD]);
-      set_cursor_pos(scr_row, scr_col1);
-      screen_printf("%9s:%6d",get_thing_category_shortname(THING_CATEGR_TORCHCNDL),
-          lvl->stats.things_count[THING_CATEGR_TORCHCNDL]);
-      set_cursor_pos(scr_row++, scr_col2);
-      screen_printf("%9s:%4d",get_thing_category_shortname(THING_CATEGR_HEARTFLAME),
-          lvl->stats.things_count[THING_CATEGR_HEARTFLAME]);
-      set_cursor_pos(scr_row, scr_col1);
-      screen_printf("%9s:%6d",get_thing_category_shortname(THING_CATEGR_POLEBAR),
-          lvl->stats.things_count[THING_CATEGR_POLEBAR]);
-      set_cursor_pos(scr_row++, scr_col2);
-      screen_printf("%9s:%4d",get_thing_category_shortname(THING_CATEGR_STATUE),
-          lvl->stats.things_count[THING_CATEGR_STATUE]);
-      set_cursor_pos(scr_row, scr_col1);
-      screen_printf("%9s:%6d",get_thing_category_shortname(THING_CATEGR_FURNITURE),
-          lvl->stats.things_count[THING_CATEGR_FURNITURE]);
-      set_cursor_pos(scr_row++, scr_col2);
-      screen_printf("%9s:%4d",get_thing_category_shortname(THING_CATEGR_ROOMEQUIP),
-          lvl->stats.things_count[THING_CATEGR_ROOMEQUIP]);
-      set_cursor_pos(scr_row, scr_col1);
-      screen_printf("%9s:%6d",get_thing_category_shortname(THING_CATEGR_PWHAND),
-          lvl->stats.things_count[THING_CATEGR_PWHAND]);
-      scr_row++;
-    }
+    int line_num=0;
+    int mainitem_count=0;
+    int subitem_count=0;
+    do {
+      short line_type=get_level_objstats_textln(lvl,stat_buf,line_num);
+      if (line_type==STLT_NONE) break;
+      if ((line_type==STLT_HEADER)&&(scrmode->rows < scr_row+TNGDAT_ROWS+2))
+          break;
+      switch (line_type)
+      {
+      case STLT_HEADER:
+        set_cursor_pos(scr_row++, scr_col);
+        mainitem_count=0;
+        subitem_count=0;
+        break;
+      case STLT_MAINITEM:
+        if ((mainitem_count%2)>0)
+          set_cursor_pos(scr_row++, scr_col2);
+        else
+          set_cursor_pos(scr_row, scr_col);
+        mainitem_count++;
+        subitem_count=0;
+        break;
+      case STLT_SUBITEM:
+        if ((subitem_count%2)>0)
+          set_cursor_pos(scr_row++, scr_col_sub2);
+        else
+          set_cursor_pos(scr_row, scr_col_sub1);
+        mainitem_count=0;
+        subitem_count++;
+        break;
+      case STLT_EMPTY:
+      default:
+        mainitem_count=0;
+        subitem_count=0;
+        break;
+      }
+      screen_printf("%s",stat_buf);
+      line_num++;
+    } while (scrmode->rows > scr_row+TNGDAT_ROWS);
+    scr_row++;
     return scr_row;
 }
 
-int display_tng_subtiles(struct SCRMODE_DATA *scrmode,const struct WORKMODE_DATA *workdata,
-    const struct LEVEL *lvl, int scr_row, int scr_col,short compressed,int ty,int tx)
+int display_tng_subtiles(const struct SCRMODE_DATA *scrmode,
+    const struct WORKMODE_DATA *workdata, const struct LEVEL *lvl,
+    int scr_row, int scr_col,const short compressed,const int ty,const int tx)
 {
     set_cursor_pos(scr_row, scr_col);
     screen_setcolor(PRINT_COLOR_LGREY_ON_BLACK);
@@ -1114,7 +1075,7 @@ unsigned char *tng_makeitem(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *w
     thing_add(workdata->lvl,thing);
     set_visited_obj_lastof(workdata,OBJECT_TYPE_THING);
     message_info("Item added: %s",get_item_subtype_fullname(stype_idx));
-    workdata->lvl->info.usr_creatobj_count++;
+    inc_info_usr_creatobj_count(workdata->lvl);
     return thing;
 }
 
@@ -1131,7 +1092,7 @@ unsigned char *tng_makeroomeffect(struct SCRMODE_DATA *scrmode,struct WORKMODE_D
     message_info("Room Effect added to map at (%d,%d)",sx,sy);
     set_visited_obj_lastof(workdata,OBJECT_TYPE_THING);
     set_brighten_for_thing(workdata->mapmode,thing);
-    workdata->lvl->info.usr_creatobj_count++;
+    inc_info_usr_creatobj_count(workdata->lvl);
     return thing;
 }
 
@@ -1147,7 +1108,7 @@ unsigned char *tng_maketrap(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *w
     thing_add(workdata->lvl,thing);
     message_info("Trap added to map at (%d,%d)",sx,sy);
     set_visited_obj_lastof(workdata,OBJECT_TYPE_THING);
-    workdata->lvl->info.usr_creatobj_count++;
+    inc_info_usr_creatobj_count(workdata->lvl);
     return thing;
 }
 
@@ -1159,7 +1120,7 @@ unsigned char *tng_makecreature(struct SCRMODE_DATA *scrmode,struct WORKMODE_DAT
     // Show the new thing
     set_visited_obj_lastof(workdata,OBJECT_TYPE_THING);
     message_info("Creature added to map at (%d,%d)",sx,sy);
-    workdata->lvl->info.usr_creatobj_count++;
+    inc_info_usr_creatobj_count(workdata->lvl);
     return thing;
 }
 

@@ -111,7 +111,7 @@ void message_info(const char *format, ...)
     va_list val;
     va_start(val, format);
     char *msg=message_prv;
-    if (msg==NULL)
+    if ((msg==NULL)||(message_hold))
     {
         msg=(char *)malloc(LINEMSG_SIZE*sizeof(char));
         if (msg==NULL)

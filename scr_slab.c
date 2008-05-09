@@ -220,8 +220,7 @@ short start_mdslab(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata)
 {
     scrmode->mode=MD_SLB;
     scrmode->usrinput_type=SI_NONE;
-    if (workdata->lvl!=NULL)
-      workdata->lvl->info.usr_mdswtch_count++;
+    inc_info_usr_mdswtch_count(workdata->lvl);
     return true;
 }
 
@@ -285,13 +284,13 @@ void slb_place_room(struct WORKMODE_DATA *workdata,unsigned char room)
 //          unsigned char oldslb;
 //          oldslb = get_tile_slab(lvl,tile_x,tile_y);
           set_tile_slab(workdata->lvl,tile_x,tile_y,room);
-          workdata->lvl->info.usr_slbchng_count++;
+          inc_info_usr_slbchng_count(workdata->lvl);
       }
-    if (workdata->lvl->optns.obj_auto_update)
+    if (get_obj_auto_update(workdata->lvl))
       update_obj_for_square(workdata->lvl, markl-1, markr+1, markt-1, markb+1);
-    if (workdata->lvl->optns.datclm_auto_update)
+    if (get_datclm_auto_update(workdata->lvl))
       update_datclm_for_square(workdata->lvl, markl-1, markr+1, markt-1, markb+1);
-    if (workdata->lvl->optns.obj_auto_update)
+    if (get_obj_auto_update(workdata->lvl))
       update_obj_subpos_and_height_for_square(workdata->lvl, markl-1, markr+1, markt-1, markb+1);
     set_marking_disab(workdata->mapmode);
 }
@@ -310,11 +309,11 @@ void change_ownership(struct WORKMODE_DATA *workdata,unsigned char purchaser)
     if (!is_marking_enab(workdata->mapmode))
     {
       set_tile_owner(workdata->lvl,tx,ty,purchaser);
-      if (workdata->lvl->optns.obj_auto_update)
+      if (get_obj_auto_update(workdata->lvl))
         update_obj_for_square_radius1(workdata->lvl,tx,ty);
-      if (workdata->lvl->optns.datclm_auto_update)
+      if (get_datclm_auto_update(workdata->lvl))
         update_datclm_for_square_radius1(workdata->lvl,tx,ty);
-      if (workdata->lvl->optns.obj_auto_update)
+      if (get_obj_auto_update(workdata->lvl))
         update_obj_subpos_and_height_for_square_radius1(workdata->lvl,tx,ty);
       return;
     }
@@ -325,12 +324,12 @@ void change_ownership(struct WORKMODE_DATA *workdata,unsigned char purchaser)
     for (tx=workdata->mapmode->markr.l; tx<=workdata->mapmode->markr.r; tx++)
       for (ty=workdata->mapmode->markr.t; ty<=workdata->mapmode->markr.b; ty++)
           set_tile_owner(workdata->lvl,tx,ty,purchaser);
-    if (workdata->lvl->optns.obj_auto_update)
-      update_obj_for_square(workdata->lvl, workdata->mapmode->markr.l-1, workdata->mapmode->markr.r+1, workdata->mapmode->markr.t-1, workdata->mapmode->markr.b+1);
-    if (workdata->lvl->optns.datclm_auto_update)
-      update_datclm_for_square(workdata->lvl, workdata->mapmode->markr.l-1, workdata->mapmode->markr.r+1, workdata->mapmode->markr.t-1, workdata->mapmode->markr.b+1);
-    if (workdata->lvl->optns.obj_auto_update)
-      update_obj_subpos_and_height_for_square(workdata->lvl, workdata->mapmode->markr.l-1, workdata->mapmode->markr.r+1, workdata->mapmode->markr.t-1, workdata->mapmode->markr.b+1);
+      if (get_obj_auto_update(workdata->lvl))
+          update_obj_for_square(workdata->lvl, workdata->mapmode->markr.l-1, workdata->mapmode->markr.r+1, workdata->mapmode->markr.t-1, workdata->mapmode->markr.b+1);
+      if (get_datclm_auto_update(workdata->lvl))
+          update_datclm_for_square(workdata->lvl, workdata->mapmode->markr.l-1, workdata->mapmode->markr.r+1, workdata->mapmode->markr.t-1, workdata->mapmode->markr.b+1);
+      if (get_obj_auto_update(workdata->lvl))
+          update_obj_subpos_and_height_for_square(workdata->lvl, workdata->mapmode->markr.l-1, workdata->mapmode->markr.r+1, workdata->mapmode->markr.t-1, workdata->mapmode->markr.b+1);
     set_marking_disab(workdata->mapmode);
 }
 
@@ -495,15 +494,21 @@ void free_mdslab_keys(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdat
  */
 void draw_mdslab(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata)
 {
+    message_log(" draw_mdslab: drawing map");
     draw_map_area(scrmode,workdata->mapmode,workdata->lvl,true,true,false);
     if (workdata->ipanel->mode!=PV_MODE)
+    {
+      message_log(" draw_mdslab: drawing forced panel");
       draw_forced_panel(scrmode,workdata,workdata->ipanel->mode);
-    else
+    } else
+    {
+      message_log(" draw_mdslab: drawing standard panel");
       draw_mdslab_panel(scrmode,workdata);
+    }
     draw_map_cursor(scrmode,workdata->mapmode,workdata->lvl,true,true,false);
 }
 
-void draw_mdslab_panel(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata)
+void draw_mdslab_panel(const struct SCRMODE_DATA *scrmode,const struct WORKMODE_DATA *workdata)
 {
     int tx,ty;
     tx=workdata->mapmode->map.x+workdata->mapmode->screen.x;
@@ -513,9 +518,11 @@ void draw_mdslab_panel(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workda
     int graff_idx=graffiti_idx(workdata->lvl,tx,ty);
     if (graff_idx<0)
     {
+//        message_log(" draw_mdslab_panel: not on graffiti");
         scr_row=display_mode_keyhelp(workdata->help,scr_row,scr_col,scrmode->rows-TNGDAT_ROWS-2,scrmode->mode,0);
     } else
     {
+//        message_log(" draw_mdslab_panel: drawing graffiti");
         scr_row=display_graffiti(workdata->lvl,scr_row,scr_col,graff_idx);
     }
     if (scrmode->rows >= scr_row+TNGDAT_ROWS+3)
@@ -527,6 +534,7 @@ void draw_mdslab_panel(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workda
         screen_setcolor(PRINT_COLOR_WHITE_ON_BLACK);
         screen_printf("%s",get_slab_fullname(slb_type));
     }
+//    message_log(" draw_mdslab_panel: drawing bottom");
     display_rpanel_bottom(scrmode,workdata);
 }
 
@@ -537,8 +545,7 @@ int display_graffiti(struct LEVEL *lvl,int scr_row, int scr_col,int graff_idx)
     screen_setcolor(PRINT_COLOR_LGREY_ON_BLACK);
     set_cursor_pos(scr_row++, scr_col);
     screen_printf("%s %d","Graffiti",graff_idx+1);
-    if (graff_idx>=lvl->graffiti_count) return scr_row;
-    struct DK_GRAFFITI *graf=lvl->graffiti[graff_idx];
+    struct DK_GRAFFITI *graf=get_graffiti(lvl,graff_idx);
     if (graf==NULL) return scr_row;
     set_cursor_pos(scr_row, scr_col1);
     screen_printf("Position: %d,%d",graf->tile.x,graf->tile.y);
@@ -566,8 +573,7 @@ short start_mdgrafit(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata
 {
     scrmode->mode=MD_GRFT;
     scrmode->usrinput_type=SI_GRAFT;
-    if (workdata->lvl!=NULL)
-      workdata->lvl->info.usr_mdswtch_count++;
+    inc_info_usr_mdswtch_count(workdata->lvl);
     message_info("Graffiti mode started");
     return true;
 }

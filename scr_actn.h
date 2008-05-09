@@ -252,7 +252,8 @@ void clear_scrmode(struct SCRMODE_DATA *scrmode);
 void clear_mapmode(struct MAPMODE_DATA *mapmode);
 void clear_infopanel(struct INFOPANEL_DATA *ipanel);
 
-void display_rpanel_bottom(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata);
+void display_rpanel_bottom(const struct SCRMODE_DATA *scrmode,
+    const struct WORKMODE_DATA *workdata);
 int display_mode_keyhelp(struct HELP_DATA *help, int scr_row, int scr_col,
     int max_row,int mode,int itm_idx);
 void draw_mdempty(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata);

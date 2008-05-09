@@ -155,6 +155,9 @@ void init_levscr_basics(struct SCRMODE_DATA **scrmode,struct WORKMODE_DATA *work
     if (workdata->ipanel==NULL)
      die("init_levscr: Cannot allocate memory.");
     clear_infopanel(workdata->ipanel);
+    // init modes - create text editor structures
+    if (!init_scrpt(*scrmode,workdata))
+     die("init_levscr: init_scrpt returned with error.");
     int i;
     (*scrmode)->automated_commands=malloc(READ_BUFSIZE*sizeof(unsigned int));
     for (i=0; i < READ_BUFSIZE; i++)
@@ -177,8 +180,6 @@ void init_levscr_modes(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workda
     init_help(scrmode,workdata);
     // init modes - create list structures
     init_list(scrmode,workdata);
-    // init modes - create text editor structures
-    init_scrpt(scrmode,workdata);
     // init modes - create column structures
     init_mdclm(scrmode,workdata);
     // init modes - create thing structures
@@ -188,8 +189,12 @@ void init_levscr_modes(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workda
     // initialize slab mode
     //(this includes slbkey required for all screens containing map)
     init_mdslab(scrmode,workdata);
-    //Init rework mode
+    // Init rework mode
     init_mdrwrk(scrmode,workdata);
+    // Copy options into level preview structure
+    level_set_options(workdata->mapmode->preview,workdata->optns);
+    // Note: the modes which are not initied here, are initied earlier
+    // in init_levscr_basics
     message_log(" init_levscr_modes: finished");
 }
 
@@ -336,8 +341,8 @@ void clear_brighten(struct MAPMODE_DATA *mapmode)
 void update_brighten(struct LEVEL *lvl,struct MAPMODE_DATA *mapmode)
 {
     //Estimating number of objects we'll have to compute
-    unsigned int ranged_obj=lvl->lgt_total_count+lvl->apt_total_count+
-        lvl->tng_total_count/6;
+    unsigned int ranged_obj=get_lgt_total_count(lvl)+get_apt_total_count(lvl)+
+        get_tng_total_count(lvl)/6;
     //If this may take more than second, display information
     if (ranged_obj>96)
       popup_show("Updating object ranges for whole map","Sweeping through all objects can take some time. Please wait...");
@@ -1124,7 +1129,7 @@ void draw_rpanel_usrinput(const struct SCRMODE_DATA *scrmode,const char *inp_mes
  * Draws bottom part of the right panel. This contains DAT/TNG entries,
  * or string input field.
  */
-void display_rpanel_bottom(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata)
+void display_rpanel_bottom(const struct SCRMODE_DATA *scrmode,const struct WORKMODE_DATA *workdata)
 {
     int tx, ty;
     tx = workdata->mapmode->screen.x+workdata->mapmode->map.x;
@@ -1278,7 +1283,7 @@ void proc_key(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata)
         actions[scrmode->mode%MODES_COUNT](scrmode,workdata,g);
       };break;
     }
-    workdata->lvl->info.usr_cmds_count++;
+    inc_info_usr_cmds_count(workdata->lvl);
     message_log(" proc_key: finished");
 }
 
@@ -1636,16 +1641,16 @@ void action_load_map_quick(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *wo
         message_info("You can't load from here.");
         return;
     }
-    if (strlen(workdata->lvl->fname)>0)
+    if (strlen(get_lvl_fname(workdata->lvl))>0)
     {
           popup_show("Reloading map","Reading map files. Please wait...");
           free_map(workdata->lvl);
-          strcpy(workdata->lvl->savfname,"");
+          set_lvl_savfname(workdata->lvl,"");
           load_map(workdata->lvl);
           clear_highlight(workdata->mapmode);
           workdata->mdtng->obj_ranges_changed=true;
           change_mode(scrmode,workdata,scrmode->mode);
-          message_info("Map \"%s\" reloaded", workdata->lvl->fname);
+          message_info("Map \"%s\" reloaded", get_lvl_fname(workdata->lvl));
     } else
           message_error("Map name is empty, cannot load last loaded.");
 }
@@ -1667,12 +1672,12 @@ void action_save_map_quick(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *wo
         message_info("You can't save from here.");
         return;
     }
-    if (strlen(workdata->lvl->savfname)>0)
+    if (strlen(get_lvl_savfname(workdata->lvl))>0)
     {
         popup_show("Saving map","Writing map files. Please wait...");
-        workdata->lvl->info.ver_rel++;
+        inc_info_ver_rel(workdata->lvl);
         save_map(workdata->lvl);
-        message_info("Map \"%s\" saved", workdata->lvl->savfname);
+        message_info("Map \"%s\" saved", get_lvl_savfname(workdata->lvl));
     } else
     {
           message_error("Map name is empty, please save as.");
@@ -1728,8 +1733,8 @@ void action_toggle_compass_rose(struct SCRMODE_DATA *scrmode,struct WORKMODE_DAT
 
 void action_toggle_datclm_aupdate(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata)
 {
-    workdata->lvl->optns.datclm_auto_update=!(workdata->lvl->optns.datclm_auto_update);
-    if (workdata->lvl->optns.datclm_auto_update)
+    short nval=switch_datclm_auto_update(workdata->lvl);
+    if (nval)
         message_info_force("Automatic update of DAT/CLM/WIB enabled");
     else
         message_info_force("Auto DAT/CLM/WIB update disabled - manual with \"u\"");
