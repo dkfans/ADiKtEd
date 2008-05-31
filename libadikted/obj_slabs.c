@@ -71,11 +71,15 @@ const unsigned char owners_list[]={
 
 const unsigned short slabs_space[]={
     SLAB_TYPE_PATH, SLAB_TYPE_CLAIMED, SLAB_TYPE_LAVA,
-    SLAB_TYPE_WATER
+    SLAB_TYPE_WATER,
+};
+
+const unsigned short slabs_liquid[]={
+    SLAB_TYPE_LAVA, SLAB_TYPE_WATER,
 };
 
 const unsigned short slabs_short_unclmabl[]={
-    SLAB_TYPE_PATH, SLAB_TYPE_LAVA, SLAB_TYPE_WATER
+    SLAB_TYPE_PATH, SLAB_TYPE_LAVA, SLAB_TYPE_WATER,
 };
 
 const unsigned short slabs_wealth[]={
@@ -89,7 +93,7 @@ const unsigned short slabs_tall_unclmabl[]={
 
 const unsigned short slabs_walls[]={
     SLAB_TYPE_WALLDRAPE, SLAB_TYPE_WALLTORCH, SLAB_TYPE_WALLWTWINS,
-    SLAB_TYPE_WALLWWOMAN, SLAB_TYPE_WALLPAIRSHR
+    SLAB_TYPE_WALLWWOMAN, SLAB_TYPE_WALLPAIRSHR,
 };
 
 const unsigned short slabs_rooms[]={
@@ -98,7 +102,7 @@ const unsigned short slabs_rooms[]={
     SLAB_TYPE_DUNGHEART, SLAB_TYPE_WORKSHOP, SLAB_TYPE_SCAVENGER,
     SLAB_TYPE_TEMPLE, SLAB_TYPE_GRAVEYARD, SLAB_TYPE_HATCHERY,
     SLAB_TYPE_LAIR, SLAB_TYPE_BARRACKS, SLAB_TYPE_BRIDGE,
-    SLAB_TYPE_GUARDPOST
+    SLAB_TYPE_GUARDPOST,
 };
 
 const unsigned short slabs_doors[]={
@@ -340,6 +344,15 @@ short slab_is_space(unsigned short slab_type)
     return false;
 }
 
+short slab_is_liquid(unsigned short slab_type)
+{
+     int array_count=sizeof(slabs_liquid)/sizeof(unsigned short);
+    //All such things are listed in slabs_liquid array
+    int idx=arr_ushort_pos(slabs_liquid,slab_type,array_count);
+    if (idx>=0) return true;
+    return false;
+}
+
 short slab_is_tall_unclmabl(unsigned short slab_type)
 {
      int array_count=sizeof(slabs_tall_unclmabl)/sizeof(unsigned short);
@@ -352,7 +365,7 @@ short slab_is_tall_unclmabl(unsigned short slab_type)
 short slab_is_short_unclmabl(unsigned short slab_type)
 {
      int array_count=sizeof(slabs_short_unclmabl)/sizeof(unsigned short);
-    //All such things are listed in slabs_space array
+    //All such things are listed in slabs_x array
     int idx=arr_ushort_pos(slabs_short_unclmabl,slab_type,array_count);
     if (idx>=0) return true;
     return false;
@@ -398,6 +411,20 @@ short slab_is_clmabl(unsigned short slab_type)
     return true;
 }
 
+/*
+ * Returns if the slab can have torch on.
+ */
+short slab_allows_torch(unsigned short slab_type)
+{
+    if (!slab_is_short(slab_type)) return false;
+    if (slab_is_room(slab_type)) return false;
+    if (slab_is_liquid(slab_type)) return false;
+    return true;
+}
+
+/*
+ * Returns if the slab should have torch near it.
+ */
 short slab_needs_adjacent_torch(unsigned short slab_type)
 {
     if (slab_type==SLAB_TYPE_TORCHDIRT) return true;

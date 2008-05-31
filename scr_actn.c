@@ -229,7 +229,7 @@ void clear_mapmode(struct MAPMODE_DATA *mapmode)
     mapmode->level_preview=LPREV_LOAD;
     mapmode->show_obj_range=1;
     mapmode->traps_list_on_create=1;
-    mapmode->roomeffect_list_on_create=1;
+    mapmode->effectgen_list_on_create=1;
     mapmode->items_list_on_create=1;
     mapmode->creature_list_on_create=1;
     mapmode->eetype=EE_NONE;
@@ -358,7 +358,7 @@ void update_brighten(struct LEVEL *lvl,struct MAPMODE_DATA *mapmode)
           for (i=last_obj; i>=0; i--)
           {
             unsigned char *thing=get_thing(lvl,curr_sx,curr_sy,i);
-            if (is_roomeffect(thing))
+            if (is_effectgen(thing))
             {
               set_brighten_for_thing(mapmode,thing);
             }

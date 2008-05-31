@@ -164,7 +164,7 @@ short load_tng(struct LEVEL *lvl,char *fname)
     {
         message_log("  load_tng: File length %d, expected %lu (%d things)",mem.len,expect_size,tng_num);
         // Fixing the problem
-        if ((lvl->optns.load_redundant_objects)||(mem.len < expect_size))
+        if (((lvl->optns.load_redundant_objects&EXLD_THING)==EXLD_THING)||(mem.len < expect_size))
           tng_num=(mem.len-SIZEOF_DK_TNG_HEADER)/SIZEOF_DK_TNG_REC;
         result=WARN_BAD_COUNT;
     }
@@ -235,7 +235,7 @@ short load_apt(struct LEVEL *lvl,char *fname)
     {
         message_log("  load_apt: File length %d, expected %lu (%d items)",mem.len,expect_size,apt_num);
         // Fixing the problem
-        if ((lvl->optns.load_redundant_objects)||(mem.len < expect_size))
+        if (((lvl->optns.load_redundant_objects&EXLD_ACTNPT)==EXLD_ACTNPT)||(mem.len < expect_size))
           apt_num=(mem.len-SIZEOF_DK_APT_HEADER)/SIZEOF_DK_APT_REC;
         result=WARN_BAD_COUNT;
     }
@@ -388,6 +388,7 @@ short load_txt(struct LEVEL *lvl,char *fname)
     message_log("  load_txt: started");
     struct MEMORY_FILE mem;
     mem = read_file(fname);
+//    message_log("  load_txt: file readed");
     //If filesize too small - pannic
     lvl->script.lines_count=0;
     if (mem.errcode!=MFILE_OK) return mem.errcode;
@@ -397,6 +398,7 @@ short load_txt(struct LEVEL *lvl,char *fname)
     unsigned char *ptr=mem.content;
     unsigned char *ptr_end=mem.content+mem.len;
     int lines_count=0;
+//    message_log("  load_txt: counting lines");
     while (ptr>=content)
     {
       ptr=memchr(ptr, 0x0a, (char *)ptr_end-(char *)ptr );
@@ -408,6 +410,7 @@ short load_txt(struct LEVEL *lvl,char *fname)
     ptr=mem.content;
     int currline;
     currline=0;
+//    message_log("  load_txt: breaking text into %d lines",lines_count);
     while (currline<lines_count)
     {
       if (ptr>=ptr_end) ptr=ptr_end-1;
@@ -426,6 +429,7 @@ short load_txt(struct LEVEL *lvl,char *fname)
       ptr=nptr+1;
       currline++;
     }
+//    message_log("  load_txt: deleting empty lines");
     int nonempty_lines=lines_count-1;
     // Delete empty lines at end
     while ((nonempty_lines>=0)&&((lvl->script.txt[nonempty_lines][0])=='\0'))
@@ -442,6 +446,7 @@ short load_txt(struct LEVEL *lvl,char *fname)
     lvl->script.lines_count=lines_count;
     free (mem.content);
     decompose_script(&(lvl->script),&(lvl->optns.script));
+    script_decomposed_to_params(&(lvl->script),&(lvl->optns.script));
     return ERR_NONE;
 }
 
@@ -472,7 +477,7 @@ short load_lgt(struct LEVEL *lvl,char *fname)
     {
         message_log("  load_lgt: File length %d, expected %lu (%d items)",mem.len,expect_size,lgt_num);
         // Fixing the problem
-        if ((lvl->optns.load_redundant_objects)||(mem.len < expect_size))
+        if (((lvl->optns.load_redundant_objects&EXLD_STLGHT)==EXLD_STLGHT)||(mem.len < expect_size))
           lgt_num=(mem.len-SIZEOF_DK_LGT_HEADER)/SIZEOF_DK_LGT_REC;
         result=WARN_BAD_COUNT;
     }

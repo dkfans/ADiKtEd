@@ -10,8 +10,8 @@ Libs=
 PrivateResource=adikted_private.rc
 ResourceIncludes=
 MakeIncludes=
-Compiler=-DBUILDING_DLL=1_@@_
-CppCompiler=-DBUILDING_DLL=1_@@_
+Compiler=-DBUILD_DLL_@@_
+CppCompiler=-DBUILD_DLL_@@_
 Linker=--no-export-all-symbols --add-stdcall-alias_@@_
 IsCpp=0
 Icon=
@@ -43,7 +43,7 @@ BuildCmd=
 Major=0
 Minor=9
 Release=1
-Build=2
+Build=103
 LanguageID=1033
 CharsetID=1252
 CompanyName=

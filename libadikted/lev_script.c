@@ -2929,6 +2929,7 @@ short execute_script_line(struct LEVEL *lvl,char *line,char *err_msg)
 
 short decompose_script(struct DK_SCRIPT *script,const struct SCRIPT_OPTIONS *optns)
 {
+  message_log("  decompose_script: started");
   if (script==NULL) return false;
   int i;
   for (i=0;i<script->lines_count;i++)
@@ -3025,6 +3026,502 @@ int get_script_command_level(const char *text,const struct SCRIPT_OPTIONS *optns
     if (nspac>0)
       lev++;
     return lev;
+}
+
+/*
+ * Analyzes single decomposed script command and adjusts DK_SCRIPT_PARAMETERS;
+ */
+short script_decomposed_to_params_cmd_condit(struct DK_SCRIPT_PARAMETERS *par,
+    struct DK_SCRIPT_COMMAND *cmd,const struct SCRIPT_OPTIONS *optns)
+{
+    int plyr_idx;
+    int conditvar_type;
+    int conditvar_idx;
+    int cmpvar_type;
+    int cmpvar_idx;
+    int opertr_idx;
+    int actnpt_num;
+//TODO
+    switch (cmd->index)
+    {
+    case COND_IF:
+        par->end_level++;
+        if (cmd->param_count<4)
+            return false;
+        plyr_idx=players_cmd_index(cmd->params[0]);
+        opertr_idx=operator_cmd_index(cmd->params[2]);
+        if ((plyr_idx<0)||(opertr_idx<0))
+            return false;
+        conditvar_idx=-1;
+        cmpvar_idx-1;
+        conditvar_type=recognize_script_word_group_and_idx(&conditvar_idx,cmd->params[1],true);
+        cmpvar_type=recognize_script_word_group_and_idx(&cmpvar_idx,cmd->params[3],true);
+        if ((conditvar_idx<0)||(cmpvar_idx<0))
+            return false;
+        break;
+    case IF_AVAILABLE:
+        par->end_level++;
+        if (cmd->param_count<4)
+            return false;
+        plyr_idx=players_cmd_index(cmd->params[0]);
+        opertr_idx=operator_cmd_index(cmd->params[2]);
+        if ((plyr_idx<0)||(opertr_idx<0))
+            return false;
+        conditvar_idx=-1;
+        cmpvar_idx-1;
+        conditvar_type=recognize_script_word_group_and_idx(&conditvar_idx,cmd->params[1],true);
+        cmpvar_type=recognize_script_word_group_and_idx(&cmpvar_idx,cmd->params[3],true);
+        if ((conditvar_idx<0)||(cmpvar_idx<0))
+            return false;
+        break;
+    case IF_ACTNPT:
+        par->end_level++;
+        if (cmd->param_count<2)
+            return false;
+        if (!script_param_to_int(&actnpt_num,cmd->params[0]))
+            return false;
+        plyr_idx=players_cmd_index(cmd->params[1]);
+        if (plyr_idx<0)
+            return false;
+        break;
+    case COND_ENDIF:
+        par->end_level--;
+        break;
+    default:
+        return false;
+    }
+  return true;
+}
+
+/*
+ * Analyzes single decomposed script command and adjusts DK_SCRIPT_PARAMETERS;
+ */
+short script_decomposed_to_params_cmd_party(struct DK_SCRIPT_PARAMETERS *par,
+    struct DK_SCRIPT_COMMAND *cmd,const struct SCRIPT_OPTIONS *optns)
+{
+//TODO
+  return true;
+}
+
+/*
+ * Analyzes single decomposed script command and adjusts DK_SCRIPT_PARAMETERS;
+ */
+short script_decomposed_to_params_cmd_avail(struct DK_SCRIPT_PARAMETERS *par,
+    struct DK_SCRIPT_COMMAND *cmd,const struct SCRIPT_OPTIONS *optns)
+{
+    int plyr_idx;
+    int object_idx;
+    int logic_val;
+    int amount;
+    short available;
+    int i;
+    switch (cmd->index)
+    {
+    case ROOM_AVAIL:
+        if (cmd->param_count<4)
+            return false;
+        plyr_idx=players_cmd_index(cmd->params[0]);
+        object_idx=room_cmd_index(cmd->params[1]);
+        if ((plyr_idx<0)||(object_idx<0))
+            return false;
+        if (!script_param_to_int(&logic_val,cmd->params[2]))
+            return false;
+        if (!script_param_to_int(&amount,cmd->params[3]))
+            return false;
+        if (amount)
+            available=AVAIL_INSTANT;
+        else
+        if (logic_val)
+            available=AVAIL_RESEARCH;
+        else
+            available=AVAIL_NO;
+        if (plyr_idx<PLAYERS_COUNT)
+        {
+            par->player[plyr_idx].room_avail[object_idx]=available;
+        } else
+        if (plyr_idx==PLAYER_ALL)
+        {
+            for (i=0;i<PLAYERS_COUNT;i++)
+              par->player[i].room_avail[object_idx]=available;
+        } else
+        {
+            return false;
+        }
+        break;
+    case CREATR_AVAIL:
+        if (cmd->param_count<4)
+            return false;
+        plyr_idx=players_cmd_index(cmd->params[0]);
+        object_idx=creatures_cmd_index(cmd->params[1]);
+        if ((plyr_idx<0)||(object_idx<0))
+            return false;
+        if (!script_param_to_int(&logic_val,cmd->params[2]))
+            return false;
+        if (!script_param_to_int(&amount,cmd->params[3]))
+            return false;
+        if (amount)
+            available=AVAIL_INSTANT;
+        else
+        if (logic_val)
+            available=AVAIL_RESEARCH;
+        else
+            available=AVAIL_NO;
+        if (plyr_idx<PLAYERS_COUNT)
+        {
+            par->player[plyr_idx].creature_avail[object_idx]=available;
+        } else
+        if (plyr_idx==PLAYER_ALL)
+        {
+            for (i=0;i<PLAYERS_COUNT;i++)
+              par->player[i].creature_avail[object_idx]=available;
+        } else
+        {
+            return false;
+        }
+        break;
+    case MAGIC_AVAIL:
+        if (cmd->param_count<4)
+            return false;
+        plyr_idx=players_cmd_index(cmd->params[0]);
+        object_idx=spell_cmd_index(cmd->params[1]);
+        if ((plyr_idx<0)||(object_idx<0))
+            return false;
+        if (!script_param_to_int(&logic_val,cmd->params[2]))
+            return false;
+        if (!script_param_to_int(&amount,cmd->params[3]))
+            return false;
+        if (amount)
+            available=AVAIL_INSTANT;
+        else
+        if (logic_val)
+            available=AVAIL_RESEARCH;
+        else
+            available=AVAIL_NO;
+        if (plyr_idx<PLAYERS_COUNT)
+        {
+            par->player[plyr_idx].spell_avail[object_idx]=available;
+        } else
+        if (plyr_idx==PLAYER_ALL)
+        {
+            for (i=0;i<PLAYERS_COUNT;i++)
+              par->player[i].spell_avail[object_idx]=available;
+        } else
+        {
+            return false;
+        }
+        break;
+    case TRAP_AVAIL:
+        if (cmd->param_count<4)
+            return false;
+        plyr_idx=players_cmd_index(cmd->params[0]);
+        object_idx=trap_cmd_index(cmd->params[1]);
+        if ((plyr_idx<0)||(object_idx<0))
+            return false;
+        if (!script_param_to_int(&logic_val,cmd->params[2]))
+            return false;
+        if (!script_param_to_int(&amount,cmd->params[3]))
+            return false;
+        if (plyr_idx<PLAYERS_COUNT)
+        {
+            par->player[plyr_idx].trap_avail[object_idx]=(logic_val!=0);
+            par->player[plyr_idx].trap_amount[object_idx]=amount;
+        } else
+        if (plyr_idx==PLAYER_ALL)
+        {
+            for (i=0;i<PLAYERS_COUNT;i++)
+            {
+              par->player[i].trap_avail[object_idx]=(logic_val!=0);
+              par->player[i].trap_amount[object_idx]=amount;
+            }
+        } else
+        {
+            return false;
+        }
+       break;
+    case DOOR_AVAIL:
+        if (cmd->param_count<4)
+            return false;
+        plyr_idx=players_cmd_index(cmd->params[0]);
+        object_idx=door_cmd_index(cmd->params[1]);
+        if ((plyr_idx<0)||(object_idx<0))
+            return false;
+        if (!script_param_to_int(&logic_val,cmd->params[2]))
+            return false;
+        if (!script_param_to_int(&amount,cmd->params[3]))
+            return false;
+        if (plyr_idx<PLAYERS_COUNT)
+        {
+            par->player[plyr_idx].door_avail[object_idx]=(logic_val!=0);
+            par->player[plyr_idx].door_amount[object_idx]=amount;
+        } else
+        if (plyr_idx==PLAYER_ALL)
+        {
+            for (i=0;i<PLAYERS_COUNT;i++)
+            {
+              par->player[i].door_avail[object_idx]=(logic_val!=0);
+              par->player[i].door_amount[object_idx]=amount;
+            }
+        } else
+        {
+            return false;
+        }
+        break;
+    default:
+        return false;
+    }
+  return true;
+}
+/*
+ * Analyzes single decomposed script command and adjusts DK_SCRIPT_PARAMETERS;
+ */
+short script_decomposed_to_params_cmd_custobj(struct DK_SCRIPT_PARAMETERS *par,
+    struct DK_SCRIPT_COMMAND *cmd,const struct SCRIPT_OPTIONS *optns)
+{
+//TODO
+  return true;
+}
+/*
+ * Analyzes single decomposed script command and adjusts DK_SCRIPT_PARAMETERS;
+ */
+short script_decomposed_to_params_cmd_setup(struct DK_SCRIPT_PARAMETERS *par,
+    struct DK_SCRIPT_COMMAND *cmd,const struct SCRIPT_OPTIONS *optns)
+{
+    int obj_type;
+    int i;
+    int plyr_idx;
+    int plyr2_idx;
+    int amount;
+    int type_idx;
+    switch (cmd->index)
+    {
+    case SET_GEN_SPEED:
+        if (cmd->param_count<1)
+            return false;
+        if (!script_param_to_int(&amount,cmd->params[0]))
+            return false;
+        par->portal_gen_speed=amount;
+        break;
+    case START_MONEY:
+        if (cmd->param_count<2)
+            return false;
+        plyr_idx=players_cmd_index(cmd->params[0]);
+        if (plyr_idx<0)
+            return false;
+        if (!script_param_to_int(&amount,cmd->params[1]))
+            return false;
+        if (plyr_idx<PLAYERS_COUNT)
+        {
+            par->player[plyr_idx].start_gold=amount;
+        } else
+        if (plyr_idx==PLAYER_ALL)
+        {
+            for (i=0;i<PLAYERS_COUNT;i++)
+                par->player[i].start_gold=amount;
+        } else
+        {
+            return false;
+        }
+        break;
+    case COMP_PLAYER:
+        if (cmd->param_count<2)
+            return false;
+        plyr_idx=players_cmd_index(cmd->params[0]);
+        if (plyr_idx<0)
+            return false;
+        if (!script_param_to_int(&amount,cmd->params[1]))
+            return false;
+        if (plyr_idx<PLAYERS_COUNT)
+        {
+           par->player[plyr_idx].computer_player=amount;
+        } else
+        if (plyr_idx==PLAYER_ALL)
+        {
+            for (i=0;i<PLAYERS_COUNT;i++)
+               par->player[i].computer_player=amount;
+        } else
+        {
+            return false;
+        }
+        break;
+    case ALLY_PLAYERS:
+        if (cmd->param_count<2)
+            return false;
+        plyr_idx=players_cmd_index(cmd->params[0]);
+        plyr2_idx=players_cmd_index(cmd->params[1]);
+        if ((plyr_idx<0)||(plyr2_idx<0))
+            return false;
+        if ((plyr_idx<PLAYERS_COUNT)&&(plyr2_idx<PLAYERS_COUNT))
+        {
+            par->player[plyr_idx].ally[plyr2_idx]=1;
+            par->player[plyr2_idx].ally[plyr_idx]=1;
+        } else
+        {
+            return false;
+        }
+        break;
+    case SET_HATE:
+        if (cmd->param_count<3)
+            return false;
+        //TODO
+        return false;
+        break;
+    case RESEARCH:
+        if (cmd->param_count<4)
+            return false;
+        plyr_idx=players_cmd_index(cmd->params[0]);
+        if (plyr_idx<0)
+            return false;
+        type_idx=objtype_cmd_index(cmd->params[1]);
+        if (type_idx<0)
+            return false;
+        //TODO
+        return false;
+        break;
+    case SET_COMPUTER_GLOBALS:
+        if (cmd->param_count<7)
+            return false;
+        plyr_idx=players_cmd_index(cmd->params[0]);
+        if ((plyr_idx<0))
+            return false;
+        //TODO
+        return false;
+        break;
+    case SET_COMPUTER_CHECKS:
+        if (cmd->param_count<7)
+            return false;
+        plyr_idx=players_cmd_index(cmd->params[0]);
+        if ((plyr_idx<0))
+            return false;
+        //TODO
+        return false;
+        break;
+    case SET_COMPUTER_EVENT:
+        if (cmd->param_count<4)
+            return false;
+        plyr_idx=players_cmd_index(cmd->params[0]);
+        if ((plyr_idx<0))
+            return false;
+        //TODO
+        return false;
+        break;
+    case SET_COMPUTER_PROCESS:
+        if (cmd->param_count<7)
+            return false;
+        plyr_idx=players_cmd_index(cmd->params[0]);
+        if ((plyr_idx<0))
+            return false;
+        //TODO
+        return false;
+        break;
+    case MAX_CREATURES:
+        if (cmd->param_count<2)
+            return false;
+        plyr_idx=players_cmd_index(cmd->params[0]);
+        if ((plyr_idx<0))
+            return false;
+        if (!script_param_to_int(&amount,cmd->params[1]))
+            return false;
+        if (plyr_idx<PLAYERS_COUNT)
+        {
+            par->player[plyr_idx].max_creatures=amount;
+        } else
+        if (plyr_idx==PLAYER_ALL)
+        {
+            for (i=0;i<PLAYERS_COUNT;i++)
+                par->player[i].max_creatures=amount;
+        } else
+        {
+            return false;
+        }
+        break;
+    default:
+        return false;
+    }
+  return true;
+}
+/*
+ * Analyzes single decomposed script command and adjusts DK_SCRIPT_PARAMETERS;
+ */
+short script_decomposed_to_params_cmd_triger(struct DK_SCRIPT_PARAMETERS *par,
+    struct DK_SCRIPT_COMMAND *cmd,const struct SCRIPT_OPTIONS *optns)
+{
+//TODO
+  return true;
+}
+/*
+ * Analyzes single decomposed script command and adjusts DK_SCRIPT_PARAMETERS;
+ */
+short script_decomposed_to_params_cmd_crtradj(struct DK_SCRIPT_PARAMETERS *par,
+    struct DK_SCRIPT_COMMAND *cmd,const struct SCRIPT_OPTIONS *optns)
+{
+//TODO
+  return true;
+}
+
+/*
+ * Analyzes single decomposed script command and adjusts DK_SCRIPT_PARAMETERS;
+ */
+short script_decomposed_to_params_cmd(struct DK_SCRIPT_PARAMETERS *par,
+    struct DK_SCRIPT_COMMAND *cmd,const struct SCRIPT_OPTIONS *optns)
+{
+    switch (cmd->group)
+    {
+    case CMD_CONDIT:
+            return script_decomposed_to_params_cmd_condit(par,cmd,optns);
+            break;
+    case CMD_PARTY:
+            return script_decomposed_to_params_cmd_party(par,cmd,optns);
+            break;
+    case CMD_AVAIL:
+            return script_decomposed_to_params_cmd_avail(par,cmd,optns);
+            break;
+    case CMD_CUSTOBJ:
+            return script_decomposed_to_params_cmd_custobj(par,cmd,optns);
+            break;
+    case CMD_SETUP:
+            return script_decomposed_to_params_cmd_setup(par,cmd,optns);
+            break;
+    case CMD_TRIGER:
+            return script_decomposed_to_params_cmd_triger(par,cmd,optns);
+            break;
+    case CMD_CRTRADJ:
+            return script_decomposed_to_params_cmd_crtradj(par,cmd,optns);
+            break;
+    case CMD_COMMNT:
+            return true;
+    case CMD_OBSOLT:
+            return true;
+    case CMD_UNKNOWN:
+    case CMD_ADIKTED:
+        default:
+            return false;
+            break;
+        }
+}
+
+/*
+ * Converts decomposed script commands into DK_SCRIPT_PARAMETERS;
+ * automatically clears (but not allocates) DK_SCRIPT_PARAMETERS struct at start.
+ */
+short script_decomposed_to_params(struct DK_SCRIPT *script,const struct SCRIPT_OPTIONS *optns)
+{
+  if (script==NULL) return false;
+  short result;
+  // Clearing the struct
+  result=level_clear_script_param(&(script->par));
+  int i;
+  // Now filling
+  for (i=0;i<script->lines_count;i++)
+  {
+      //message_log("  script_decomposed_to_params: recognizing line %d",i);
+      result&=script_decomposed_to_params_cmd(&(script->par),script->list[i],optns);
+  }
+  return result;
+}
+
+short script_params_to_decomposed(struct DK_SCRIPT *script,const struct SCRIPT_OPTIONS *optns)
+{
+//TODO
 }
 
 short script_strword_pos( char const **ptr, unsigned int *ptr_len, const char *str, const short whole_rest )
@@ -3523,6 +4020,11 @@ const char *script_cmd_text(const int group,const int cmdidx,const char *prev_va
     }
 }
 
+int adikted_cmd_arrsize()
+{
+  return sizeof(cmd_adikted_arr)/sizeof(char *);
+}
+
 int adikted_cmd_index(const char *cmdtext)
 {
     if ((cmdtext==NULL)||(strlen(cmdtext)<2)) return -1;
@@ -3542,6 +4044,11 @@ const char *adikted_cmd_text(int cmdidx)
     int array_count=sizeof(cmd_adikted_arr)/sizeof(char *);
     if ((cmdidx<0)||(cmdidx>=array_count)) return rem_cmdtext;
     return cmd_adikted_arr[cmdidx];
+}
+
+int condit_cmd_arrsize()
+{
+  return sizeof(cmd_condit_arr)/sizeof(char *);
 }
 
 int condit_cmd_index(const char *cmdtext)
@@ -3565,6 +4072,11 @@ const char *condit_cmd_text(int cmdidx)
     return cmd_condit_arr[cmdidx];
 }
 
+int flag_cmd_arrsize()
+{
+  return sizeof(cmd_flag_arr)/sizeof(char *);
+}
+
 int flag_cmd_index(const char *cmdtext)
 {
     if ((cmdtext==NULL)||(strlen(cmdtext)<2)) return -1;
@@ -3584,6 +4096,11 @@ const char *flag_cmd_text(int cmdidx)
     int array_count=sizeof(cmd_flag_arr)/sizeof(char *);
     if ((cmdidx<0)||(cmdidx>=array_count)) return rem_cmdtext;
     return cmd_flag_arr[cmdidx];
+}
+
+int party_objectv_cmd_arrsize()
+{
+  return sizeof(cmd_party_objectv_arr)/sizeof(char *);
 }
 
 int party_objectv_cmd_index(const char *cmdtext)
@@ -3607,6 +4124,11 @@ const char *party_objectv_cmd_text(int cmdidx)
     return cmd_party_objectv_arr[cmdidx];
 }
 
+int party_cmd_arrsize()
+{
+  return sizeof(cmd_party_arr)/sizeof(char *);
+}
+
 int party_cmd_index(const char *cmdtext)
 {
     if ((cmdtext==NULL)||(strlen(cmdtext)<2)) return -1;
@@ -3626,6 +4148,11 @@ const char *party_cmd_text(int cmdidx)
     int array_count=sizeof(cmd_party_arr)/sizeof(char *);
     if ((cmdidx<0)||(cmdidx>=array_count)) return rem_cmdtext;
     return cmd_party_arr[cmdidx];
+}
+
+int avail_cmd_arrsize()
+{
+  return sizeof(cmd_avail_arr)/sizeof(char *);
 }
 
 int avail_cmd_index(const char *cmdtext)
@@ -3649,6 +4176,11 @@ const char *avail_cmd_text(int cmdidx)
     return cmd_avail_arr[cmdidx];
 }
 
+int comp_plyr_cmd_arrsize()
+{
+  return sizeof(cmd_comp_plyr_arr)/sizeof(char *);
+}
+
 int comp_plyr_cmd_index(const char *cmdtext)
 {
     if ((cmdtext==NULL)||(strlen(cmdtext)<2)) return -1;
@@ -3668,6 +4200,11 @@ const char *comp_plyr_cmd_text(int cmdidx)
     int array_count=sizeof(cmd_comp_plyr_arr)/sizeof(char *);
     if ((cmdidx<0)||(cmdidx>=array_count)) return rem_cmdtext;
     return cmd_comp_plyr_arr[cmdidx];
+}
+
+int players_cmd_arrsize()
+{
+  return sizeof(cmd_players_arr)/sizeof(char *);
 }
 
 int players_cmd_index(const char *cmdtext)
@@ -3691,6 +4228,11 @@ const char *players_cmd_text(int cmdidx)
     return cmd_players_arr[cmdidx];
 }
 
+int creatures_cmd_arrsize()
+{
+  return sizeof(cmd_creatures_arr)/sizeof(char *);
+}
+
 int creatures_cmd_index(const char *cmdtext)
 {
     if ((cmdtext==NULL)||(strlen(cmdtext)<2)) return -1;
@@ -3710,6 +4252,11 @@ const char *creatures_cmd_text(int cmdidx)
     int array_count=sizeof(cmd_creatures_arr)/sizeof(char *);
     if ((cmdidx<0)||(cmdidx>=array_count)) return "X";
     return cmd_creatures_arr[cmdidx];
+}
+
+int room_cmd_arrsize()
+{
+  return sizeof(cmd_rooms_arr)/sizeof(char *);
 }
 
 int room_cmd_index(const char *cmdtext)
@@ -3733,6 +4280,11 @@ const char *room_cmd_text(int cmdidx)
     return cmd_rooms_arr[cmdidx];
 }
 
+int spell_cmd_arrsize()
+{
+  return sizeof(cmd_spells_arr)/sizeof(char *);
+}
+
 int spell_cmd_index(const char *cmdtext)
 {
     if ((cmdtext==NULL)||(strlen(cmdtext)<2)) return -1;
@@ -3752,6 +4304,11 @@ const char *spell_cmd_text(int cmdidx)
     int array_count=sizeof(cmd_spells_arr)/sizeof(char *);
     if ((cmdidx<0)||(cmdidx>=array_count)) return "X";
     return cmd_spells_arr[cmdidx];
+}
+
+int trap_cmd_arrsize()
+{
+  return sizeof(cmd_traps_arr)/sizeof(char *);
 }
 
 int trap_cmd_index(const char *cmdtext)
@@ -3775,6 +4332,11 @@ const char *trap_cmd_text(int cmdidx)
     return cmd_traps_arr[cmdidx];
 }
 
+int door_cmd_arrsize()
+{
+  return sizeof(cmd_doors_arr)/sizeof(char *);
+}
+
 int door_cmd_index(const char *cmdtext)
 {
     if ((cmdtext==NULL)||(strlen(cmdtext)<2)) return -1;
@@ -3794,6 +4356,11 @@ const char *door_cmd_text(int cmdidx)
     int array_count=sizeof(cmd_doors_arr)/sizeof(char *);
     if ((cmdidx<0)||(cmdidx>=array_count)) return "X";
     return cmd_doors_arr[cmdidx];
+}
+
+int special_cmd_arrsize()
+{
+  return 2;
 }
 
 int special_cmd_index(const char *cmdtext)
@@ -3819,6 +4386,11 @@ const char *special_cmd_text(int cmdidx,const char *cmdtext)
     }
 }
 
+int operator_cmd_arrsize()
+{
+  return sizeof(cmd_operator_arr)/sizeof(char *);
+}
+
 int operator_cmd_index(const char *cmdtext)
 {
     if ((cmdtext==NULL)||(strlen(cmdtext)<1)) return -1;
@@ -3838,6 +4410,11 @@ const char *operator_cmd_text(int cmdidx)
     int array_count=sizeof(cmd_operator_arr)/sizeof(char *);
     if ((cmdidx<0)||(cmdidx>=array_count)) return rem_cmdtext;
     return cmd_operator_arr[cmdidx];
+}
+
+int objtype_cmd_arrsize()
+{
+  return sizeof(cmd_objtype_arr)/sizeof(char *);
 }
 
 int objtype_cmd_index(const char *cmdtext)
@@ -3861,6 +4438,11 @@ const char *objtype_cmd_text(int cmdidx)
     return cmd_objtype_arr[cmdidx];
 }
 
+int variabl_cmd_arrsize()
+{
+  return sizeof(cmd_variabl_arr)/sizeof(char *);
+}
+
 int variabl_cmd_index(const char *cmdtext)
 {
     if ((cmdtext==NULL)||(strlen(cmdtext)<2)) return -1;
@@ -3880,6 +4462,11 @@ const char *variabl_cmd_text(int cmdidx)
     int array_count=sizeof(cmd_variabl_arr)/sizeof(char *);
     if ((cmdidx<0)||(cmdidx>=array_count)) return rem_cmdtext;
     return cmd_variabl_arr[cmdidx];
+}
+
+int timer_cmd_arrsize()
+{
+  return sizeof(cmd_timer_arr)/sizeof(char *);
 }
 
 int timer_cmd_index(const char *cmdtext)
@@ -3903,6 +4490,11 @@ const char *timer_cmd_text(int cmdidx)
     return cmd_timer_arr[cmdidx];
 }
 
+int custobj_cmd_arrsize()
+{
+  return sizeof(cmd_custobj_arr)/sizeof(char *);
+}
+
 int custobj_cmd_index(const char *cmdtext)
 {
     if ((cmdtext==NULL)||(strlen(cmdtext)<2)) return -1;
@@ -3922,6 +4514,11 @@ const char *custobj_cmd_text(int cmdidx)
     int array_count=sizeof(cmd_custobj_arr)/sizeof(char *);
     if ((cmdidx<0)||(cmdidx>=array_count)) return rem_cmdtext;
     return cmd_custobj_arr[cmdidx];
+}
+
+int setup_cmd_arrsize()
+{
+  return sizeof(cmd_setup_arr)/sizeof(char *);
 }
 
 int setup_cmd_index(const char *cmdtext)
@@ -3945,6 +4542,11 @@ const char *setup_cmd_text(int cmdidx)
     return cmd_setup_arr[cmdidx];
 }
 
+int triger_cmd_arrsize()
+{
+  return sizeof(cmd_triger_arr)/sizeof(char *);
+}
+
 int triger_cmd_index(const char *cmdtext)
 {
     if ((cmdtext==NULL)||(strlen(cmdtext)<2)) return -1;
@@ -3964,6 +4566,11 @@ const char *triger_cmd_text(int cmdidx)
     int array_count=sizeof(cmd_triger_arr)/sizeof(char *);
     if ((cmdidx<0)||(cmdidx>=array_count)) return rem_cmdtext;
     return cmd_triger_arr[cmdidx];
+}
+
+int crtradj_cmd_arrsize()
+{
+  return sizeof(cmd_crtradj_arr)/sizeof(char *);
 }
 
 int crtradj_cmd_index(const char *cmdtext)
@@ -3987,6 +4594,11 @@ const char *crtradj_cmd_text(int cmdidx)
     return cmd_crtradj_arr[cmdidx];
 }
 
+int obsolt_cmd_arrsize()
+{
+  return sizeof(cmd_obsolt_arr)/sizeof(char *);
+}
+
 int obsolt_cmd_index(const char *cmdtext)
 {
     if ((cmdtext==NULL)||(strlen(cmdtext)<2)) return -1;
@@ -4006,6 +4618,11 @@ const char *obsolt_cmd_text(int cmdidx)
     int array_count=sizeof(cmd_obsolt_arr)/sizeof(char *);
     if ((cmdidx<0)||(cmdidx>=array_count)) return rem_cmdtext;
     return cmd_obsolt_arr[cmdidx];
+}
+
+int commnt_cmd_arrsize()
+{
+  return sizeof(cmd_commnt_arr)/sizeof(char *);
 }
 
 int commnt_cmd_index(const char *cmdtext)
@@ -4030,6 +4647,11 @@ const char *commnt_cmd_text(int cmdidx)
     return cmd_commnt_arr[cmdidx];
 }
 
+int orient_cmd_arrsize()
+{
+  return sizeof(cmd_orient_arr)/sizeof(char *);
+}
+
 int orient_cmd_index(const char *cmdtext)
 {
     if ((cmdtext==NULL)||(strlen(cmdtext)<2)) return -1;
@@ -4049,6 +4671,11 @@ const char *orient_cmd_text(int cmdidx)
     int array_count=sizeof(cmd_orient_arr)/sizeof(char *);
     if ((cmdidx<0)||(cmdidx>=array_count)) return rem_cmdtext;
     return cmd_orient_arr[cmdidx];
+}
+
+int font_cmd_arrsize()
+{
+  return sizeof(cmd_font_arr)/sizeof(char *);
 }
 
 int font_cmd_index(const char *cmdtext)

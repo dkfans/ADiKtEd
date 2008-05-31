@@ -1,0 +1,810 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+  <title>Another Dungeon Keeper map Editor Manual</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=us-ascii">
+  <link rel="stylesheet" type="text/css" href="dk_docs_style.css" />
+
+<style type="text/css">
+
+.rightfloatbox{
+  margin-right: 5%;
+  float: right;
+}
+
+.leftfloatbox{
+  margin-left: 5%;
+  float: left;
+}
+
+div.clearright { clear: right; line-height: 0; height: 0; } 
+div.clearleft { clear: left; line-height: 0; height: 0; } 
+
+</style>
+
+</head>
+
+<body>
+
+<p class="main_title">Another Dungeon Keeper map Editor Manual&nbsp;v1.0</p>
+
+<p class="main_subtitle">Created by ADiKtEd authors</p>
+
+<br clear="all"/>
+
+<h1><a name="manual_toc">Contents</a></h1>
+
+<br/>
+
+<p class="toc1">Contents</p>
+<p class="toc1"><a href="#adiman_preface">1.0 Preface</a></p>
+<p class="toc1"><a href="#adiman_install">2.0 Installation</a></p>
+
+<p class="toc1"><a href="#adiman_tutorial">3.0 Quick start</a></p>
+<p class="toc2"><a href="#adiman_tutorial_start">3.1 Getting started</a></p>
+<p class="toc2"><a href="#adiman_tutorial_start">3.2 Movement and window size</a></p>
+<p class="toc2"><a href="#adiman_tutorial_slab">3.3 Placing tiles</a></p>
+<p class="toc2"><a href="#adiman_tutorial_mark">3.4 Marking</a></p>
+<p class="toc2"><a href="#adiman_tutorial_paint">3.5 Painting</a></p>
+<p class="toc2"><a href="#adiman_tutorial_things">3.6 Things</a></p>
+<p class="toc2"><a href="#adiman_tutorial_update">3.7 Updating level elements</a></p>
+<p class="toc2"><a href="#adiman_tutorial_graff">3.8 Graffiti</a></p>
+<p class="toc2"><a href="#adiman_tutorial_loadsave">3.9 Loading and saving</a></p>
+
+<p class="toc1"><a href="#adiman_mapfix">4.0 Fixing maps</a></p>
+<p class="toc2"><a href="#adiman_mapfix_unded">4.1 UnDed and early ADiKtEd maps</a></p>
+<p class="toc2"><a href="#adiman_mapfix_badcnt">4.2 Bad items count when loading "MAPFILE"</a></p>
+<p class="toc2"><a href="#adiman_mapfix_cantopen">4.3 Cannot open file when loading "MAPFILE"</a></p>
+<p class="toc2"><a href="#adiman_mapfix_senstl">4.4 Thing has wrong sensitive tile number at slab X,Y</a></p>
+<p class="toc2"><a href="#adiman_mapfix_tngsolid">4.5 Thing trapped in solid column on slab X,Y</a></p>
+<p class="toc2"><a href="#adiman_mapfix_script">4.6 Problems in script</a></p>
+<p class="toc2"><a href="#adiman_mapfix_datclm">4.7 Problems in column or DAT file</a></p>
+<p class="toc2"><a href="#adiman_mapfix_other">4.8 Other problems</a></p>
+
+<p class="toc1"><a href="#adiman_keys">5.0 Keys</a></p>
+<p class="toc1"><a href="#adiman_credits">6.0 Credits</a></p>
+<p class="toc1"><a href="#adiman_changelog">7.0 Changes log</a></p>
+<p class="toc1"><a href="#adiman_refs">8.0 References</a></p>
+
+<br clear="all"/><br/>
+
+<h1><a name="adiman_preface">1.0 Preface</a></h1>
+<br/>
+
+<p class="std">ADiKtEd is a text mode tool, which makes it a little harder to use at first.
+But after You'll get familiar with all functions, you will see that using
+keyboard in text mode is in fact faster than editing map with mouse in
+graphic-based editor.</p>
+<br/>
+
+<p class="std">Please note that this documentation was last renewed on version 0.80b,
+and if you're using different version, there may be differences in commands and view.
+You can always download the newest version from
+<a href="https://sourceforge.net/projects/adikted/">ADiKtEd project at SourceForge</a>.</p>
+
+<br clear="all"/><br/>
+
+<h1><a name="adiman_install">1.0 Installation</a></h1>
+<br/>
+
+<div class="rightfloatbox"><img src="dk_adikted_tutorial_keepercfg.png"/></div>
+<p class="std">Make sure you have Dungeon Keeper installed completely on your
+hard disk. To&nbsp;do this, go&nbsp;into the "keeper" directory,
+and create the directories "ldata" and&nbsp;"levels".</p>
+<p class="std">Copy x:\keeper\ldata\*.* and x:\keeper\levels\*.* into these directories
+respectively (replacing x: with the drive letter of your CD-Rom).
+Then remove Read-only attribute from all copied files.</p>
+<p class="std">Now edit <b>Keeper.cfg</b> so it points to your installation. For example,</p>
+<pre class="snip">INSTALL_PATH=C:\Program&nbsp;Files\Bullfrog\Keeper</pre>
+<p class="std">or</p>
+<pre class="snip">INSTALL_PATH=C:\games\keeper</pre>
+<br/>
+
+<p class="std">On any problems, check the instructions
+in&nbsp;<a href="dk_editor_hdinst.htm">Mapmakers Installation Instructions</a>
+which accompanies this manual.</p>
+<br/>
+
+<p class="std">When all maps are on hard drive, go&nbsp;into the directory containing
+<b>map.*</b> (which is ADiKtEd), and edit <b>map.ini</b>.
+Change&nbsp;the "LEVELS_PATH" line so it&nbsp;points to your new "levels"&nbsp;directory.
+This&nbsp;will enable you to load the original maps if you start ADiKtEd with
+a&nbsp;level number (eg&nbsp;"map&nbsp;15" will load level&nbsp;15 if&nbsp;you have set
+things up correctly).<div class="clearright"></div></p>
+<br/>
+
+<p class="std">You are now ready to run the editor.
+Go into its directory and double click on <b>map.exe</b> to start.</p>
+<p class="std">Another&nbsp;way to run it is to open console window,
+go into ADiKtEd directory and type <b>map</b>.</p>
+<br/>
+<br/>
+<p class="std"><b>Note:</b>
+Mouse is not&nbsp;supported in&nbsp;ADiKtEd.
+All&nbsp;commands must be entered using keyboard.</p>
+
+<br clear="all"/><br/>
+
+<h1><a name="adiman_tutorial">3.0 Quick start</a></h1>
+<br/>
+
+<p class="std">This tutorial will guide you through creating a new level.</p>
+
+<br clear="all"/><br/>
+
+<h2><a name="adiman_tutorial_start">3.1 Getting started</a></h2>
+<br/>
+
+<div class="rightfloatbox"><img src="dk_adikted_tutorial_areas.png"/></div>
+
+<p class="std">Start up ADiKtEd by double click on <b>map.exe</b>, or typing "map" then enter
+in console window.</p>
+<br/>
+
+<p class="std">If&nbsp;all is&nbsp;well, a&nbsp;screen will come up with two blue lines, one&nbsp;down the
+middle, and&nbsp;one along the bottom, dividing the screen into three
+areas: the map area (the&nbsp;left side of the&nbsp;screen), the&nbsp;information area
+(the&nbsp;right side of the&nbsp;screen), and the message line (at&nbsp;the bottom).</p>
+<br/>
+
+<p class="std">The&nbsp;message line should have a welcome message on it.
+The&nbsp;left side of the screen should have dark grey # characters 
+on the top and left, and dots elsewhere.<br/>
+By looking at the key in the information area, you should 
+be able to see that this means there is rock to the top and left, 
+and earth elsewhere. In fact, there is rock all round the dungeon -
+it's just you can only see the top left corner of the dungeon to
+start with.</p>
+<br/>
+
+<p class="std">The very top left corner of the screen should be highlighted.
+This is your cursor. The next section will tell you how you can move
+around with it.</p>
+
+<br clear="all"/><br/>
+
+<h2><a name="adiman_tutorial_start">3.2 Movement and window size</a></h2>
+<br/>
+
+<h3>Movement</h3>
+<br/>
+
+<p class="std">As you may have guessed (or tried already), using the arrow keys
+moves the cursor around. However, if you want to go a long way, this
+can take a long time. Use <b>home</b>/<b>end</b>/<b>page&nbsp;up</b>/<b>page&nbsp;down</b>
+to move faster.
+On some operating systems, pressing <b>ctrl</b> with any movement key
+will make it go further too.</p>
+<br/>
+
+<p class="std"><b>Note:</b> You can see exactly where you are
+with the "Position" indicator on the dividing line at the bottom.</p>
+<div class="clearright"></div>
+<br/>
+
+<h3>Window size</h3>
+<br/>
+
+<div class="rightfloatbox"><img src="dk_adikted_tutorial_screensize.png"/></div>
+
+<p class="std">When the cursor reaches the edge of the map area, moving it
+further will scroll the map. Try moving around until you've seen the
+whole border. The furthest you can go in each direction is 84, so
+the bottom right hand corner of the map is 84,84.</p>
+<br/>
+
+<p class="std">On some lame operating systems, you can't resize the ADiKtEd window
+to see more of the map tiles. If&nbsp;you're using Ms&nbsp;Windows, and you
+wish ADiKtEd window to be bigger, click on the icon on its window title&nbsp;bar
+and press "Properties". Now go to the "Layout" tab, as shown on the image.
+If&nbsp;you think your screen is big enough to let you see the whole map,
+enter the window size: Width=125, Height=87. Make sure that "Screen buffer size"
+values are identical to those in "Window size", then press&nbsp;OK, and confirm
+that you want to modify the shortcut to keep the new size every time you
+run ADiKtEd. If&nbsp;there is not&nbsp;enough space, but you&nbsp;want to view the whole map
+anyway, you can switch to "Font" tab of the "Properties" window, and select
+font size&nbsp;"6x8".</p>
+
+<br clear="all"/><br/>
+
+<h2><a name="adiman_tutorial_slab">3.3 Placing tiles</a></h2>
+<br/>
+
+<p class="std">The dungeon is pretty boring at the moment, right? Time to do
+something about that. Find a nice spot somewhere easy to find (near
+the top left corner, for instance) - but not right on the edge.
+As&nbsp;a&nbsp;rule, don't get rid of the rock on the edge.
+I'm not saying anything <b>will</b> go wrong, but it might -
+I don't know how Dungeon Keeper reacts at the edges.</p>
+<br/>
+
+<p class="std">Press <b>t</b> for treasure room, and sure enough a <b>t</b>
+will appear on the map, under your cursor.</p>
+<br/>
+
+<p class="std">Now if you move away from it, you'll see
+it's grey on a black background. That means it's not owned by
+anyone. Move back onto it, and press 0. Now when you move away,
+you'll see it's white on a red background. This means that it
+belongs to player 0 - the human player. There are 5 players -
+players 0-3 are the Dungeon Keepers, player 4 is the Lord of the
+Land (spit). Pressing the number of a player sets that square to be
+theirs.</p>
+<br/>
+
+<p class="std">Note that you can't make anyone own rock or earth - they are
+always unclaimed. If you will claim them, they will return to unclaimed
+state on saving or updating dungeon. They are a darker grey than other
+tiles to remind you of this. This means you should place something before
+you own it. Pressing <b>5</b> also "unclaims" something. If you move back over the
+<b>t</b>, and press <b>5</b>, then move away, it will have gone back to being
+grey on black.</p>
+<br/>
+<div class="clearright"></div>
+
+<div class="rightfloatbox"><img src="dk_adikted_tutorial_legend.png"/></div>
+
+<p class="std">The information area should give you an idea of what to press to
+get specific tiles... basically you press the key it shows you!
+There is one exception to this, which is graffiti. We'll come onto
+that later.<br/>
+If&nbsp;you don't like pressing keys to place rooms, you can also press the <b>Enter</b>
+key - this will show you a list where you can select any room using <b>arrow keys</b>.</p>
+
+<p class="std">Create a few small rooms, and put walls round them. Leave a path
+of claimed land (<b>spaces</b>) to get from room to room though! It's often
+easiest to create the rooms themselves first, then say who owns them
+later.</p>
+
+<br clear="all"/><br/>
+
+<h2><a name="adiman_tutorial_mark">3.4 Marking</a></h2>
+<br/>
+
+<p class="std">If you created any large rooms, you may have found it fairly
+timeconsuming. There must be a quicker way... it's a pretty big map,
+after all! Well, of course, having said that, there's <i>bound</i>
+to be. It's called marking, and you do it like this:</p>
+
+<ol>
+<li class="std">Find a spare bit of earth where you might want to create a big
+room... a large lair maybe.</li>
+
+<div class="clearright"></div>
+
+<li class="std"><div class="rightfloatbox"><img src="dk_adikted_tutorial_marking.png"/></div>
+Press <b>ctrl+space</b>. On the dividing line, it should tell you that
+you're now marking, and on the message line it will say,
+"Mark mode on".</li>
+
+<li class="std">Move around a bit... a white rectangle should appear between the
+cursor and where you first pressed <b>ctrl+space</b>.</li>
+
+<li class="std">Mark out a nice big area... you want your creatures to have lots
+of room, don't you?</li>
+
+<li class="std">Press <b>L</b>, and the white rectangle should be replaced by a lots of
+lair tiles.</li>
+</ol>
+
+<p class="std">If you've put the new lair over earth, it will be unowned... you
+need to set the ownership on the whole lot. Again, you can use mark
+mode.</p>
+
+<ol>
+<li class="std">Press <b>ctrl+space</b> to enter Mark mode.</li>
+
+<li class="std">Move around so the rectangle covers the whole lair, and press <b>0</b>.
+Surprise surprise, the lair should now be white on a red background.</li>
+</ol>
+
+<p class="std"><b>Tip:</b> If you ever start marking then want to stop, press <b>ctrl+space</b> again.</p>
+<br/>
+
+<p class="std"><b>Tip:</b> You can save lots of time by laying out a lot of dungeon,
+then marking the whole area to be owned by a player. The ownership
+of rocks or earth will be reverted when saving, so don't worry!</p>
+
+<br clear="all"/><br/>
+
+<h2><a name="adiman_tutorial_paint">3.5 Painting</a></h2>
+<br/>
+
+<p class="std">Now, to make your creatures nice and safe, you may want a wall
+round the lair. You <b>could</b> mark out a long thin rectangle for
+each wall, but that would be a bit of a pain - you need to do each
+one twice, remember - once for the wall, once for the ownership.
+What you could really do with is being able to just move the cursor
+around, leaving a trail of walls behind...</p>
+
+<ol>
+<li class="std">Move to the edge of the lair, where you want to start laying
+a&nbsp;wall.</li>
+
+<div class="clearright"></div>
+
+<li class="std"><div class="rightfloatbox"><img src="dk_adikted_tutorial_painting.png"/></div>
+Press <b>z</b>. On the dividing line and message lines, there will now
+be indications that you're painting. Try moving around...</li>
+
+<li class="std"><i>Nothing's happening!</i> Don't worry, this isn't a bug... you
+haven't told the editor what you want to paint with. Move back to
+where you want to start laying the wall, and we'll try again.</li>
+
+<li class="std">Press <b>*</b>, and start moving around again. Lo and behold, a trail
+of walls will be left.</li>
+
+<li class="std"><i>"What about ownership?"</i> I hear you cry. Good point. The&nbsp;walls
+you're laying at the moment are unowned - not a good state of
+affairs. So&nbsp;press&nbsp;<b>0</b> and try moving around again.</li>
+
+<li class="std">Made the wall? Good stuff... now you want to put down the
+paintbrush. Press <b>z</b> again, and you'll stop painting.</li>
+</ol>
+
+<p class="std"><i>"What if I want to change walls during painting?"</i><br/>
+No&nbsp;problem.
+Just&nbsp;press a different key - you can paint with any of the normal
+tiles, and any of the ownerships. You&nbsp;can also press <b>f</b> to
+paint random fortified wall - this will try to use different wall
+every time you move. Try&nbsp;painting a corridor from the
+lair to the rest of your dungeon.</p>
+<br/>
+
+<p class="std"><b>Note:</b> Pressing <b>home</b>/<b>end</b>/<b>page&nbsp;up</b>/<b>page&nbsp;down</b>,
+or <b>ctrl</b> and the <b>arrow keys</b> in paint mode won't lay a trail,
+as the cursor just jumpsfrom one place to another.</p>
+<br/>
+
+<p class="std">Create a few more rooms, until you're fairly happy with your
+dungeon layout.</p>
+
+<br clear="all"/><br/>
+
+<h2><a name="adiman_tutorial_things">3.6 Things</a></h2>
+<br/>
+
+<p class="std"><i>Now, everyone knows there's more to Dungeon Keeper than rooms.
+What about creatures, gold, spells, torches, etc?</i><br/>
+Well, it's time to introduce you to "thing&nbsp;mode".</p>
+<br/>
+
+<p class="std">Press <b>tab</b>.</p>
+<br/>
+
+<p class="std">The background colours will have stayed the same, but just about
+everything else will have changed. Slabs will be simplified and
+only show&nbsp;<b>#</b> and&nbsp;<b>.</b>, but other characters, as&nbsp;<b>r</b>
+and&nbsp;<b>1</b>s will appear. The key on the right will have changed,
+and a rectangle will have appeared under the ".tng entries" section
+in the information area.</p>
+<br/>
+
+<p class="std">Explanation time: where there are numbers or letters, there are "things".
+"Things" are objects of various different natures: spell books,
+creatures, gold, dry ice effects, traps - a whole lot of stuff. You
+can find out the details of these by moving over them.</p>
+<br/>
+
+<p class="std">If there aren't any numbers or letters on the screen, press
+<b>tab</b> again to go back to slab mode. Draw out a big training room
+(and own it), then press <b>tab</b> to go back into thing mode.</p>
+<br/>
+
+<p class="std">Move over a square with a number on, and have a look at the
+information area.</p>
+<br/>
+
+<p class="std">In the ".tng&nbsp;entries" section there will be a short word somewhere.
+If you're on the training room, it will probably say "Trinr".
+You want to highlight that. If it's already within the
+white rectangle, you've got it already and there will be a whole
+load of other information. Either way, you need to learn how to move
+the highlighter around.</p>
+<br/>
+
+<p class="std">Make sure <b>num-lock</b> is on. Now use the number pad <b>1</b>-<b>9</b>.
+You will see the rectangle will move to the place corresponding to the key
+you press. Have a play around for a minute, then highlight the word
+you see there.</p>
+<br/>
+
+<p class="std">There should be some information in the top half of the
+information panel. You can ignore the three lines of hex digits at
+the top - they're for detailed hackery, and probably won't concern
+you. Similarly, the position information may not interest you, but
+the rest should come in handy. You'll be able to see what kind of
+object you're looking at, and any other useful stuff about it.
+Different objects can be altered in different ways:</p>
+
+<ol>
+<li class="std"><b>Doors:</b> go back into slab mode (with tab), and place a door. Come
+back into thing mode, and take a look. It should tell you what type
+of door you placed, and that's it's unlocked. Press <b><tt>l</tt></b> to lock it -
+pressing <b><tt>l</tt></b> again will unlock it.</li>
+
+<li class="std"><b>Creatures:</b> Stay on the door you've just created,
+and press <b>c</b>.
+A&nbsp;list of creatures will come up. Select one of them,
+then press return. A&nbsp;short name for the creature will come up in the
+highlighted spot, and the information will change. Also,&nbsp;there'll be
+a couple of numbers in brackets just below the highlighter. That&nbsp;shows
+which thing you're looking at on that subtile (each tile has nine subtiles),
+and how many things there are there. Press&nbsp;<b><tt>/</tt></b> to
+change back to the door, and you'll see that's thing no.&nbsp;1 (assuming
+there was nothing there beforehand).</li>
+
+<li class="std">Press&nbsp;<b><tt>/</tt></b> again to cycle through to the creature again.
+You&nbsp;can now change the creature's level by pressing&nbsp;<b>s</b> and&nbsp;<b>x</b>.
+Try&nbsp;it.</li>
+
+<li class="std"><b>Dungeon specials:</b> change the position of the highlighter to any 
+empty spot (just for convenience) and press <b>d</b>. A "reveal map"
+dungeon special will come up. Press <b>s</b> and <b>x</b> to change
+which dungeon special the thing is.</li>
+
+<li class="std"><b>Spell books:</b> Press <b>b</b> to create a spellbook. The first one will
+be the Hand of Evil spell. Press <b>s</b> and <b>x</b> to change
+to a different spell.</li>
+
+<li class="std"><b>Gold:</b> Press <b>g</b> to create a pot of gold worth 500, or <b>G</b> to create
+one worth only 250. You can also use <b>s</b> and <b>x</b> to change
+the value.</li>
+
+<li class="std"><b>Traps:</b> Press <b>t</b> to create a trap. Again, press <b>s</b> and <b>x</b>
+to change the trap type.</li>
+
+<li class="std"><b>Trap boxes:</b> Press <b>T</b> to create a trap box (to be picked up by
+your imps). Use <b>s</b> and <b>x</b> to change the type.</li>
+
+<li class="std"><b>Hero gate:</b> Press <b>H</b> to create a hero gate.</li>
+
+<li class="std"><b>Dungeon heart:</b> If you will create a 3x3 heart room in "Slab mode",
+the "dungeon heart thing" will be placed automatically at center.
+If you wish to make a smaller heart pedestal, or place it in some
+specific place of large pedestal, you can use <b>h</b> in thing
+mode to place dungeon heart.</li>
+
+<li class="std"><b>Action points:</b> Action points are used by the level script.
+Press&nbsp;<b>a</b> to add an&nbsp;action point - the information panel will tell you which
+number it&nbsp;is, for use when you write your level script.</li>
+</ol>
+
+<p class="std"><i>"Aargh! Now I've got loads of things all over the place!"</i><br/>
+Right. You&nbsp;want to delete them, don't&nbsp;you? Well,&nbsp;move over a square with a
+thing&nbsp;in, highlight it and press <b>delete</b>. Hey&nbsp;presto, it vanishes.
+Get&nbsp;rid of all the things you've created so far.</p>
+<br/>
+
+<p class="std">Press <b>tab</b> to get out of thing mode.</p>
+
+<br clear="all"/><br/>
+
+<h2><a name="adiman_tutorial_update">3.7 Updating level elements</a></h2>
+<br/>
+
+<p class="std">Pressing&nbsp;<b>u</b> will update the graphic (if&nbsp;in Slab&nbsp;mode)
+or things (if&nbsp;in Thing&nbsp;mode) of the level - this makes sure every slab
+looks like it should, or that all the training posts, torturers,
+torches etc are in the right place.</p>
+<br/>
+
+<p class="std">Don't&nbsp;worry about it too much - ADiKtEd does an automatic update when
+you're changing the level. But&nbsp;if you see some graphic errors,
+or the Official Editor acts strangely, you can update the level
+to make everything work right. The&nbsp;automatic update may be disabled
+to speed-up ADiKtEd - in this case you should update the map before
+saving.</p>
+
+<br clear="all"/><br/>
+
+<h2><a name="adiman_tutorial_graff">3.8 Graffiti</a></h2>
+<br/>
+
+<p class="std">Now&nbsp;onto a special feature of ADiKtEd - graffiti. Fancy writing
+a message on a&nbsp;wall? Dead&nbsp;easy.</p>
+
+<ol>
+<li class="std">In slab mode, press <b>d</b> to draw some graffiti. Go on, press it now.</li>
+<li class="std">You'll be asked to type in a message. Type in a pithy epigram...
+or failing that, any old nonsense. Press return at the end.</li>
+<li class="std">Eye-catching, isn't it? Yes, the purple @ signs mean graffiti.
+When you're over graffiti, the information area says what it is.</li>
+<li class="std">You can always remove graffiti by pressing <b>delete</b>.</li>
+</ol>
+
+<p class="std"><b>Note:</b> Single graffiti is visible only from one side of the tile,
+for example if it has WE (west-east) orientation, it will only
+be visible from south. To&nbsp;see the text from both sides, you have to
+create two graffiti items with oposite orientation (like WE and EW).</p>
+<br/>
+
+<p class="std">You can change graffiti orientation with <b>a</b>.
+The&nbsp;graffiti is quite a nice effect, but I'd recommend using it sparingly.</p>
+
+<br clear="all"/><br/>
+
+<h2><a name="adiman_tutorial_loadsave">3.9 Loading and saving</a></h2>
+<br/>
+
+<p class="std">You know how to use ADiKtEd to edit levels now. Create a small
+level (you&nbsp;really only need a Dungeon&nbsp;Heart, and maybe try another room).</p>
+<br/>
+
+<p class="std">Finished already? That&nbsp;was quick...</p>
+
+<ol>
+<li class="std">Press&nbsp;<b>ctrl+s</b> to save your
+level. ADiKtEd&nbsp;will ask you for a filename.<br/>
+I&nbsp;recommend saving it in
+a temporary file first - I usually use <i>newmap</i> - rather than saving
+straight over the original DK files to start with. If&nbsp;there's
+anything wrong with the dungeon, such as the human player not having
+a dungeon heart, ADiKtEd will warn you with a beep and a message,
+but still save the level.</li>
+
+<li class="std">Press <b>ctrl+q</b> to quit.</li>
+</ol>
+
+<li class="std">If you want to edit the level again, type:</p>
+<pre class="snip">map newmap</pre>
+<li class="std">(replacing "newmap" with whatever you called your level).
+Your&nbsp;level should appear in all its glory.<br/>
+Edit&nbsp;it until you're happy. Save&nbsp;and quit again.</li>
+<br/>
+
+<p class="std">Now&nbsp;copy your level files over to the levels directory, with a
+command like this:<br/>
+<tt>copy newmap.* c:\games\keeper\levels\map00001.*</tt><br/>
+I recommend using level 1, as it's easy to get to.</p>
+<br/>
+
+<li class="std">Fire&nbsp;up Dungeon Keeper, and you're ready to go... press Start
+New Game (if&nbsp;you copied&nbsp;it over level&nbsp;1) and see what happens.
+It&nbsp;may well instantly say you've won the game - that's&nbsp;'cos you haven't
+changed the level script. The&nbsp;script would require a different
+tutorial... it&nbsp;doesn't really matter as far as ADiKtEd is concerned
+though. To&nbsp;learn about the script, check <a href="dk_scripting_ref.htm">Dungeon Keeper
+Script Commands Reference</a>.</p>
+<br/>
+
+<p class="std">You're&nbsp;now ready to go back and design a proper level to fox all
+your friends. Remember,&nbsp;you can press F1 at (almost!) any time in ADiKtEd and
+get help for whichever mode you're in. Inside&nbsp;the help, you will find many
+options that are not mentioned in this tutorial - don't forget to check it.
+Good&nbsp;luck, and I hope you enjoy using ADiKtEd!</p>
+<br/>
+
+<p class="std"><b>Tip:</b> Use <b>ctrl+l</b> to load a level within ADiKtEd,
+and <b>ctrl+n</b> to start a new level.</p>
+<br/>
+
+<p class="std"><b>Tip:</b> Use <b>ctrl+r</b> to automatically generate a level background.</p>
+
+<br clear="all"/><br/>
+
+<h1><a name="adiman_mapfix">4.0 Fixing maps</a></h1>
+<br/>
+
+<p class="std">In this chapter you will learn what to do if a warning is generated
+when saving map, or if there is a problem during map verification.</p>
+
+<br clear="all"/><br/>
+
+<h2><a name="adiman_mapfix_unded">4.1 UnDed and early ADiKtEd maps</a></h2>
+<br/>
+
+<p class="std">Map which were made using UnDed, or early version of ADiKtEd,
+have many values incorrectly set, which may lead to various problems during the game.
+ADiKtEd tries to check all properties of things, slabs and other map elements
+for sanity. If&nbsp;a&nbsp;possible problem is found, a&nbsp;warning message
+is displayed in ADiKtEd.</p>
+<br/>
+
+<p class="std">Still, not all of the problems can be detected with ADiKtEd.
+Therefore&nbsp;if you have a&nbsp;map made in UnDed or ADiKtEd lower than&nbsp;0.60,
+you should always perform these steps before even verifying the map:</p>
+
+<ol>
+<li class="std">Make sure you are in slab mode.</li>
+<li class="std">Press '<b>u</b>' in slab mode to update the level graphics (DAT/CLM files).</li>
+<li class="std">Enter thing mode (<b>TAB</b> key)</li>
+<li class="std">Press '<b>u</b>' in thing mode to fix things which are auto-created.</li>
+<li class="std">Press <b>F5</b> to save changes made to the map.
+ You&nbsp;will probably see a warning message, but the map will be saved anyway.</li>
+</ol>
+
+<p class="std">Now, as all basic errors are fixed, you can use '<b>v</b>' to verify
+the map. If&nbsp;any problem is found, you will see an&nbsp;error message in the
+status line. Otherwise, a message will appear:</p>
+<br/>
+
+<pre class="snip">Level verification passed.</pre>
+<br/>
+
+<p class="std">You&nbsp;will have to fix all errors, one by one, untill you will
+see this message. Remember that you can always save and exit, leaving some errors
+for later. Rest&nbsp;of this chapter will learn you how to deal with some specific
+error messages.</p>
+
+<br clear="all"/><br/>
+
+<h2><a name="adiman_mapfix_badcnt">4.2 Bad items count when loading "MAPFILE"</a></h2>
+<br/>
+
+<p class="std">This&nbsp;warning is very common on UnDed maps.
+You&nbsp;don't have to do anything special to fix the problem - ADiKtEd will
+set proper count automatically when saving map.</p>
+
+<br clear="all"/><br/>
+
+<h2><a name="adiman_mapfix_cantopen">4.3 Cannot open file when loading "MAPFILE"</a></h2>
+<br/>
+
+<p class="std">The&nbsp;problem is that one of the level files is missing.
+If&nbsp;this is a warning message, and the&nbsp;map was opened anyway, then
+the file will be re-created on saving.</p>
+<br/>
+
+<p class="std">If&nbsp;the map couldn't be opened
+because of this problem, then one of the crucial files is destroyed.
+This&nbsp;usually means the map is lost.</p>
+
+<br clear="all"/><br/>
+
+<h2><a name="adiman_mapfix_senstl">4.4 Thing has wrong sensitive tile number at slab X,Y</a></h2>
+<br/>
+
+<p class="std">This&nbsp;is a very common problem which can be found even
+in some original maps. Every 'thing' on the map has a tile which can affect it.
+Sometimes it is same with the thing position, sometimes it is set to none,
+and sometimes it can be set to somewhere around. For&nbsp;example, a torch
+has usually sensitive tile set to the earth/wall slab which it is on.
+This&nbsp;is why if you will dig the earth/wall, then the torch will disappear.</p>
+
+<p>Having sensitive tile incorrectly set may cause serious graphics problems.
+This is why you should always fix the value. Follow these steps to fix
+sensitive tile number of a thing:</p>
+
+<ol>
+<li class="std">Enter thing mode, select the problematic thing.</li>
+<li class="std">Press '<b>k</b>' to copy the thing into clipboard.</li>
+<li class="std">Press <b>DEL</b> to delete the old thing.</li>
+<li class="std">Press '<b>y</b>' to paste thing from clipboard onto the map.</li>
+</ol>
+
+<p class="std">When pasting from clipboard, position and sensitive tile of
+the thing is automatically updated. The thing should now have sensitive tile
+properly set.</p>
+
+<br clear="all"/><br/>
+
+<h2><a name="adiman_mapfix_tngsolid">4.5 Thing trapped in solid column on slab X,Y</a></h2>
+<br/>
+
+<p class="std">Things should only be placed on short slabs, like path or claimed ground.
+If&nbsp;a&nbsp;thing is placed inside solid cube, this warning is generated.
+There are two possible reasons: the thing is placed on subtile with tall column,
+or its height is set incorrectly.</p>
+<br/>
+
+<p class="std">To&nbsp;fix the problem, first check if the slab on which thing lays
+contains tall column in the place. If there is a column of height grater than&nbsp;2,
+then you should move your thing into another subtile. Use&nbsp;copy and paste functions
+to move the thing into place with lower ground.</p>
+<br/>
+
+<p class="std">If&nbsp;the thing already is on a subtile with short column,
+then use '<b>[</b>' and&nbsp;'<b>]</b>' to change its height and make it to be
+over the ground level.</p>
+<br/>
+
+<br clear="all"/><br/>
+
+<h2><a name="adiman_mapfix_script">4.6 Problems in script</a></h2>
+<br/>
+
+<p class="std">Script problems usually can't be solved in ADiKtEd. To&nbsp;fix
+a mistake in script, you must exit ADiKtEd and edit the .TXT file in external
+editor. You&nbsp;can use the editing utility from DKTools pack, or&nbsp;just any
+text editor, ie. Notepad.</p>
+
+<br clear="all"/><br/>
+
+<h2><a name="adiman_mapfix_datclm">4.7 Problems in column or DAT file</a></h2>
+<br/>
+
+<p class="std">These problems can usually be solved by updating the level
+(pressing&nbsp;'<b>u</b>') in&nbsp;Slab mode.</p>
+
+<br clear="all"/><br/>
+
+<h2><a name="adiman_mapfix_other">4.8 Other problems</a></h2>
+<br/>
+
+<p class="std">ADiKtEd can show you hundreds of warning messages, and only a few
+of them were explained here. If&nbsp;you will see a message which does not fit
+any of the topics, and you can't understand it, please contact ADiKtEd developers.</p>
+
+<br clear="all"/><br/>
+
+<h1><a name="adiman_keys">5.0 Keys</a></h1>
+<br/>
+
+<p class="std">The following keys are shortcut keys for all work modes:</p>
+<br/>
+
+<table class="tbparam" style="width:480px;">
+<tbody><tr>
+<td class="tbparhd"><p class="tbparht">Command</p></td>
+<td class="tbparhd" style="width:64px;"><p class="tbparht">Key</p></td>
+</tr>
+<tr> <td class="tbparct">Help for current work mode</td> <td class="tbparct">F1</td> </tr>
+<tr> <td class="tbparct">Quit ADiKtEd</td> <td class="tbparct">ctrl+q</td> </tr>
+<tr> <td class="tbparct">Load map</td> <td class="tbparct">ctrl+l</td> </tr>
+<tr> <td class="tbparct">Re-load current map</td> <td class="tbparct">F7</td> </tr>
+<tr> <td class="tbparct">Save on last file name</td> <td class="tbparct">F5</td> </tr>
+<tr> <td class="tbparct">Save the map with new name</td> <td class="tbparct">ctrl+s</td> </tr>
+<tr> <td class="tbparct">Generate new, empty map</td> <td class="tbparct">ctrl+n</td> </tr>
+<tr> <td class="tbparct">Generate random map background</td> <td class="tbparct">ctrl+r</td> </tr>
+<tr> <td class="tbparct">Toggle Compass Rose</td> <td class="tbparct">ctrl+p</td> </tr>
+<tr> <td class="tbparct">Disable/Enable automatic updates of level&nbsp;graphics</td> <td class="tbparct">ctrl+u</td> </tr>
+<tr> <td class="tbparct">Enter Script mode</td> <td class="tbparct">ctrl+t</td> </tr>
+<tr> <td class="tbparct">Search for object type</td> <td class="tbparct">ctrl+f</td> </tr>
+<tr> <td class="tbparct">Generate bitmap miniature</td> <td class="tbparct">ctrl+b</td> </tr>
+<tr> <td class="tbparct">Enter texture selection mode</td> <td class="tbparct">ctrl+e</td> </tr>
+<tr> <td class="tbparct">Switch between Slab mode and Thing mode</td> <td class="tbparct">Tab</td> </tr>
+</table>
+
+<br/>
+<p class="std">All other keys, specific for various work modes, can be always
+found by reading the help screen under <b>F1</b> key.</p>
+
+<br clear="all"/><br/>
+
+<h1><a name="adiman_credits">6.0 Credits</a></h1>
+<br/>
+
+<p class="std"><b>Original author:</b> Jon Skeet,
+ <a href="mailto:skeet@pobox.com">skeet@pobox.com</a></p>
+<br/>
+<p class="std"><b>Second developer:</b> Tomasz Lis,
+ <a href="mailto:listom@gmail.com">listom@gmail.com</a></p>
+<br/>
+<p class="std"><b>Documentation:</b> Tomasz Lis</p>
+
+<br clear="all"/><br/>
+
+<h1><a name="adiman_changelog">7.0 Changes log</a></h1>
+
+<br/>
+
+<h4>Version 1.1</h4>
+<ul>
+<li class="std">Added explanation of some verification warnings</li>
+</ul>
+
+<h4>Version 1.0</h4>
+<ul>
+<li class="std">Created based on ADiKtEd Tutorial</li>
+</ul>
+
+<br clear="all"/><br/>
+
+<h1><a name="adiman_refs">8.0 References</a></h1>
+
+<br/>
+<ol>
+<li class="std"><a href="index.htm">Dungeon Keeper Mapmaker's Documentation</a></li>
+<li class="std"><a href="dk_scripting_ref.htm">Dungeon Keeper Script Commands Reference</a></li>
+<li class="std"><a href="dk_editor_hdinst.htm">Mapmakers Installation Instructions</a></li>
+<li class="std"><a href="https://sourceforge.net/projects/adikted/">ADiKtEd project page at SourceForge</a></li>
+<li class="std"><a href="http://www.yoda.arachsys.com/dk/index.html">Dungeon Keeper Extras page</a></li>
+</ol>
+
+<br clear="all"/><br/>
+
+</body>
+</html>

@@ -36,10 +36,10 @@ DLLIMPORT is_thing_subtype get_search_tngtype_func(unsigned short idx);
 DLLIMPORT char *get_search_objtype_name(unsigned short idx);
 DLLIMPORT unsigned short get_search_objtype_count(void);
 DLLIMPORT unsigned char *find_next_object_on_map(struct LEVEL *lvl, int *tx, int *ty, unsigned short srch_idx);
-DLLIMPORT short subtl_in_roomeffect_range(struct LEVEL *lvl,unsigned int sx,unsigned int sy);
+DLLIMPORT short subtl_in_effectgen_range(struct LEVEL *lvl,unsigned int sx,unsigned int sy);
 
 DLLIMPORT unsigned char *create_door(struct LEVEL *lvl, unsigned int sx, unsigned int sy, unsigned char stype_idx);
-DLLIMPORT unsigned char *create_roomeffect(const struct LEVEL *lvl,unsigned int sx, unsigned int sy, unsigned char stype_idx);
+DLLIMPORT unsigned char *create_effectgen(const struct LEVEL *lvl,unsigned int sx, unsigned int sy, unsigned char stype_idx);
 DLLIMPORT unsigned char *create_creature(const struct LEVEL *lvl,unsigned int sx, unsigned int sy, unsigned char stype_idx);
 DLLIMPORT unsigned char *create_trap(const struct LEVEL *lvl,unsigned int sx, unsigned int sy, unsigned char stype_idx);
 DLLIMPORT unsigned char *create_item_adv(const struct LEVEL *lvl, unsigned int sx, unsigned int sy, unsigned char stype_idx);
@@ -52,7 +52,7 @@ DLLIMPORT short set_door_lock(struct LEVEL *lvl, unsigned char *thing, unsigned 
 DLLIMPORT unsigned char get_door_lock(unsigned char *thing);
 DLLIMPORT unsigned char compute_door_orientation(const struct LEVEL *lvl, unsigned char *thing);
 DLLIMPORT unsigned short compute_torch_sensitile(const struct LEVEL *lvl, unsigned char *thing);
-DLLIMPORT unsigned short compute_roomeffect_sensitile(const struct LEVEL *lvl, unsigned char *thing);
+DLLIMPORT unsigned short compute_effectgen_sensitile(const struct LEVEL *lvl, unsigned char *thing);
 DLLIMPORT unsigned short compute_item_sensitile(const struct LEVEL *lvl, unsigned char *thing);
 DLLIMPORT unsigned short get_free_indexedthing_number(const struct LEVEL *lvl);
 DLLIMPORT short owned_things_count(int *count,struct LEVEL *lvl,

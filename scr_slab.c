@@ -31,6 +31,7 @@
 #include "libadikted/obj_things.h"
 #include "libadikted/obj_slabs.h"
 #include "libadikted/graffiti.h"
+#include "libadikted/obj_column_def.h"
 #include "scr_thing.h"
 
 /*
@@ -533,6 +534,17 @@ void draw_mdslab_panel(const struct SCRMODE_DATA *scrmode,const struct WORKMODE_
         screen_printf(".slb entry:%3d ",slb_type);
         screen_setcolor(PRINT_COLOR_WHITE_ON_BLACK);
         screen_printf("%s",get_slab_fullname(slb_type));
+        if (slb_type==SLAB_TYPE_BRIDGE)
+        {
+          screen_setcolor(PRINT_COLOR_LGREY_ON_BLACK);
+          screen_printf(" on ");
+          screen_setcolor(PRINT_COLOR_WHITE_ON_BLACK);
+          unsigned short wlb_val=get_tile_wlb(workdata->lvl,tx,ty);
+          if (wlb_val==TILE_WLB_LAVA)
+            screen_printf("%s",get_slab_fullname(SLAB_TYPE_LAVA));
+          else
+            screen_printf("%s",get_slab_fullname(SLAB_TYPE_WATER));
+      }
     }
 //    message_log(" draw_mdslab_panel: drawing bottom");
     display_rpanel_bottom(scrmode,workdata);

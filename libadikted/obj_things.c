@@ -51,7 +51,7 @@ Thing data block:
 */
 
 const char *thing_fullnames[]={"Nothing", "Item/decoration", "unknown 2",
-    "unknown 3", "unknown 4", "Creature", "unknown 6", "Room effect",
+    "unknown 3", "unknown 4", "Creature", "unknown 6", "Effect Generatr",
     "Trap", "Door"};
 const char *thing_shortnames[]={"empty", "thing", "unkn2",
     "unkn3", "unkn4", "crtur", "unkn6", "effct", "trap", "door"};
@@ -71,7 +71,7 @@ const char *creature_fullnames[]={"", "Wizard", "Barbarian",
     "Skeleton", "Troll", "Dragon", "Demon Spawn", "Fly", "Dark Mistress",
     "Warlock", "Bile Demon", "Imp", "Beetle", "Vampire", "Spider",
     "Hell Hound", "Ghost", "Tentacle", "Orc", "Floating spirit"};
-const char *roomeffects[]={"unknown 0", "Lava", "Dripping water",
+const char *effectgenrts[]={"unknown 0", "Lava", "Dripping water",
     "Rock Fall", "Entrance Ice", "Dry ice", "unknown 6", "unknown 7",
     "unknown 8"};
 
@@ -98,9 +98,9 @@ const unsigned char door_types[]={
       DOOR_SUBTYPE_WOOD,DOOR_SUBTYPE_BRACED,
       DOOR_SUBTYPE_IRON,DOOR_SUBTYPE_MAGIC};
 
-const unsigned char roomefct_types[]={
-      ROOMEFC_SUBTP_LAVA,ROOMEFC_SUBTP_DRIPWTR,ROOMEFC_SUBTP_ROCKFAL,
-      ROOMEFC_SUBTP_ENTRICE,ROOMEFC_SUBTP_DRYICE,
+const unsigned char efctgen_types[]={
+      EFCTGEN_SUBTP_LAVA,EFCTGEN_SUBTP_DRIPWTR,EFCTGEN_SUBTP_ROCKFAL,
+      EFCTGEN_SUBTP_ENTRICE,EFCTGEN_SUBTP_DRYICE,
       };
 
 // Groups used for defining categories (every item is defined in exactly one group)
@@ -209,7 +209,7 @@ const unsigned char items_torches[]={
 typedef unsigned int (*thing_subtype_counter)(void);
 
 const is_thing_subtype thing_subtype_tests[]={
-      is_nulltng,       is_roomeffect,    is_itemeffect,
+      is_nulltng,       is_effectgen,     is_itemeffect,
       is_creature,      is_crtrlair,      is_trap,
       is_door,          is_dngspecbox,    is_spellbook,
       is_wrkshopbox,    is_spinningtng,   is_food,
@@ -229,7 +229,7 @@ const is_item_subtype item_subtype_tests[]={
       };
 
 const char *thing_subtype_fullnames[]={
-      "Null Things",       "Room Effects",      "Item Effects",
+      "Null Things",       "Effect Generator",  "Item Effects",
       "Creatures",         "Creature Lairs",    "Traps",
       "Doors",             "Dung.Special boxes","Spell Books",       
       "Workshop Boxes",    "Spinning Things",   "Food (Chickens)",
@@ -239,7 +239,7 @@ const char *thing_subtype_fullnames[]={
       };
 
 const char *thing_subtype_shortnames[]={
-      "Null Tngs", "Room Eff",  "Itm Effct",
+      "Null Tngs", "EffectGen", "Itm Effct",
       "Creatures", "Lairs",     "Traps",
       "Doors",     "Dn.Specls", "Spl Books",       
       "WrkshpBxs", "Spinn.Tng", "Chickens",
@@ -249,7 +249,7 @@ const char *thing_subtype_shortnames[]={
       };
 
 const thing_subtype_counter thing_subtype_count[]={
-      get_nulltng_count,       get_roomeffect_count,    get_itemeffect_count,
+      get_nulltng_count,       get_effectgen_count,     get_itemeffect_count,
       get_creature_count,      get_crtrlair_count,      get_trap_count,
       get_door_count,          get_dngspecbox_count,    get_spellbook_count,
       get_wrkshopbox_count,    get_spinningtng_count,   get_food_count,
@@ -259,7 +259,7 @@ const thing_subtype_counter thing_subtype_count[]={
       };
 
 const thing_subtype_arrayindex thing_subtype_arridx[]={
-      get_nulltng_arridx,       get_roomeffect_arridx,    get_itemeffect_arridx,
+      get_nulltng_arridx,       get_effectgen_arridx,     get_itemeffect_arridx,
       get_creature_arridx,      get_crtrlair_arridx,      get_trap_arridx,
       get_door_arridx,          get_dngspecbox_arridx,    get_spellbook_arridx,
       get_wrkshopbox_arridx,    get_spinningtng_arridx,   get_food_arridx,
@@ -269,7 +269,7 @@ const thing_subtype_arrayindex thing_subtype_arridx[]={
       };
 
 const thing_subtype_arrayitem thing_subtype_arritm[]={
-      get_nulltng_arritm,       get_roomeffect_arritm,    get_itemeffect_arritm,
+      get_nulltng_arritm,       get_effectgen_arritm,     get_itemeffect_arritm,
       get_creature_arritm,      get_crtrlair_arritm,      get_trap_arritm,
       get_door_arritm,          get_dngspecbox_arritm,    get_spellbook_arritm,
       get_wrkshopbox_arritm,    get_spinningtng_arritm,   get_food_arritm,
@@ -448,7 +448,7 @@ unsigned int get_thing_range_adv(const unsigned char *thing)
       return (1<<8);
     case THING_TYPE_CREATURE:
       return (4<<8);
-    case THING_TYPE_ROOMEFFECT:
+    case THING_TYPE_EFFECTGEN:
       return ((unsigned int)get_thing_range_subtile(thing)<<8)+get_thing_range_subtpos(thing);
     case THING_TYPE_TRAP:
       return (4<<8);
@@ -651,25 +651,25 @@ unsigned char get_usual_thing_slab(unsigned char *thing)
       return SLAB_TYPE_CLAIMED;
   case THING_TYPE_ITEM:
       return get_usual_item_slab(stype_idx);
-  case THING_TYPE_ROOMEFFECT:
+  case THING_TYPE_EFFECTGEN:
       {
         switch (stype_idx)
         {
-        case ROOMEFC_SUBTP_LAVA:
+        case EFCTGEN_SUBTP_LAVA:
             return SLAB_TYPE_LAVA;
-        case ROOMEFC_SUBTP_DRIPWTR:
+        case EFCTGEN_SUBTP_DRIPWTR:
             //return SLAB_TYPE_WATER;
             //Changed because this is sometimes placed as "user-made effect"
             // (usually on lava)
             return SLAB_TYPE_CLAIMED;
-        case ROOMEFC_SUBTP_ROCKFAL:
+        case EFCTGEN_SUBTP_ROCKFAL:
             return SLAB_TYPE_PATH;
-        case ROOMEFC_SUBTP_ENTRICE:
+        case EFCTGEN_SUBTP_ENTRICE:
             //return SLAB_TYPE_PORTAL;
             //Changed because this is sometimes placed as "user-made effect"
             // (usually on hero gates)
             return SLAB_TYPE_CLAIMED;
-        case ROOMEFC_SUBTP_DRYICE:
+        case EFCTGEN_SUBTP_DRYICE:
             //return SLAB_TYPE_GRAVEYARD;
             //Changed because this is sometimes placed as "user-made effect"
             //(on dyngeon specials and in other places)
@@ -813,8 +813,8 @@ unsigned char *create_thing_copy(const struct LEVEL *lvl,unsigned int sx, unsign
     unsigned char stype_idx=get_thing_subtype(thing);
     set_thing_subtpos(thing,((sx%MAP_SUBNUM_X)*0x40+0x40),((sy%MAP_SUBNUM_Y)*0x40+0x40));
     set_thing_subtile(thing,(unsigned char)sx,(unsigned char)sy);
-    if (type_idx==THING_TYPE_ROOMEFFECT)
-      set_thing_sensitile(thing,compute_roomeffect_sensitile(lvl,thing));
+    if (type_idx==THING_TYPE_EFFECTGEN)
+      set_thing_sensitile(thing,compute_effectgen_sensitile(lvl,thing));
     if (type_idx==THING_TYPE_ITEM)
       set_thing_sensitile(thing,compute_item_sensitile(lvl,thing));
     return thing;
@@ -1375,29 +1375,29 @@ unsigned char get_door_prev(const unsigned char stype_idx)
 }
 
 /*
- * Returns if the thing is a room effect
+ * Returns if the thing is a effect generator
  */
-short is_roomeffect(const unsigned char *thing)
+short is_effectgen(const unsigned char *thing)
 {
-    if (get_thing_type(thing) == THING_TYPE_ROOMEFFECT)
+    if (get_thing_type(thing) == THING_TYPE_EFFECTGEN)
       return true;
     return false;
 }
 
-int get_roomeffect_arridx(const unsigned char stype_idx)
+int get_effectgen_arridx(const unsigned char stype_idx)
 {
-    unsigned char *arr=(unsigned char *)roomefct_types;
-    int array_count=get_roomeffect_count();
+    unsigned char *arr=(unsigned char *)efctgen_types;
+    int array_count=get_effectgen_count();
     //searching for the subtype in array of this category
     char *pos=memchr(arr,stype_idx,array_count);
     if (pos==NULL) return -1;
     return ((long)pos-(long)arr)/sizeof(unsigned char);
 }
 
-unsigned char get_roomeffect_arritm(const int arr_itm)
+unsigned char get_effectgen_arritm(const int arr_itm)
 {
-    unsigned char *arr=(unsigned char *)roomefct_types;
-    int array_count=get_roomeffect_count();
+    unsigned char *arr=(unsigned char *)efctgen_types;
+    int array_count=get_effectgen_count();
     if (arr_itm<0)
         return arr[0];
     if (arr_itm>=array_count)
@@ -1405,36 +1405,36 @@ unsigned char get_roomeffect_arritm(const int arr_itm)
     return arr[arr_itm];
 }
 
-unsigned int get_roomeffect_count(void)
+unsigned int get_effectgen_count(void)
 {
-     return sizeof(roomefct_types)/sizeof(unsigned char);
+     return sizeof(efctgen_types)/sizeof(unsigned char);
 }
 
 /*
- * Returns subtype of a next room effect type
+ * Returns subtype of a next effect generator type
  */
-unsigned char get_roomeffect_next(const unsigned char stype_idx)
+unsigned char get_effectgen_next(const unsigned char stype_idx)
 {
-     int array_count=sizeof(roomefct_types)/sizeof(unsigned char);
-    //find the effect in roomefct_types array
-    unsigned char *pos=memchr(roomefct_types,stype_idx,array_count);
+     int array_count=sizeof(efctgen_types)/sizeof(unsigned char);
+    //find the effect in efctgen_types array
+    unsigned char *pos=memchr(efctgen_types,stype_idx,array_count);
     if (pos!=NULL) pos+=sizeof(unsigned char);
-    if ((pos<roomefct_types)||(pos>=roomefct_types+sizeof(roomefct_types)))
-      pos=(unsigned char *)roomefct_types;
+    if ((pos<efctgen_types)||(pos>=efctgen_types+sizeof(efctgen_types)))
+      pos=(unsigned char *)efctgen_types;
     return *pos;
 }
 
 /*
- * Returns subtype of a previous room effect type
+ * Returns subtype of a previous effect generator type
  */
-unsigned char get_roomeffect_prev(const unsigned char stype_idx)
+unsigned char get_effectgen_prev(const unsigned char stype_idx)
 {
-     int array_count=sizeof(roomefct_types)/sizeof(unsigned char);
-    //find the effect in roomefct_types array
-    unsigned char *pos=memchr(roomefct_types,stype_idx,array_count);
+     int array_count=sizeof(efctgen_types)/sizeof(unsigned char);
+    //find the effect in efctgen_types array
+    unsigned char *pos=memchr(efctgen_types,stype_idx,array_count);
     if (pos!=NULL) pos-=sizeof(unsigned char);
-    if ((pos<roomefct_types)||(pos>=roomefct_types+sizeof(roomefct_types)))
-      pos=(unsigned char *)roomefct_types+(array_count-1)*sizeof(unsigned char);
+    if ((pos<efctgen_types)||(pos>=efctgen_types+sizeof(efctgen_types)))
+      pos=(unsigned char *)efctgen_types+(array_count-1)*sizeof(unsigned char);
     return *pos;
 }
 
@@ -2428,11 +2428,11 @@ short is_room_inventory(const unsigned char *thing)
 {
   switch (get_thing_type(thing))
   {
-  case THING_TYPE_ROOMEFFECT:
+  case THING_TYPE_EFFECTGEN:
       switch (get_thing_subtype(thing))
       {
-      case ROOMEFC_SUBTP_ENTRICE:  // Entrance ice room effect
-      case ROOMEFC_SUBTP_DRYICE:   //Graveyard dry ice
+      case EFCTGEN_SUBTP_ENTRICE:  // Entrance ice effect generator
+      case EFCTGEN_SUBTP_DRYICE:   //Graveyard dry ice
         return true;
       }
       return false;
@@ -3074,13 +3074,13 @@ char *get_thing_category_shortname(const unsigned short arr_idx)
 }
 
 /*
- * Returns room effect description string
+ * Returns effect generator description string
  */
-char *get_roomeffect_subtype_fullname(const unsigned short stype_idx)
+char *get_effectgen_subtype_fullname(const unsigned short stype_idx)
 {
-     int types_count=sizeof(roomeffects)/sizeof(char *);
+     int types_count=sizeof(effectgenrts)/sizeof(char *);
      if (stype_idx<types_count)
-       return (char *)roomeffects[stype_idx];
+       return (char *)effectgenrts[stype_idx];
      else
        return "unknown(?!)";
 }
@@ -3090,7 +3090,7 @@ short item_verify(unsigned char *thing, char *err_msg)
   unsigned char stype_idx=get_thing_subtype(thing);
   switch (get_item_category(stype_idx))
   {
-    case THING_CATEGR_ROOMEFFCT:
+    case THING_CATEGR_EFFCTGEN:
     case THING_CATEGR_ITEMEFFCT:
     case THING_CATEGR_CREATR:
     case THING_CATEGR_CREATLAIR:
@@ -3156,12 +3156,12 @@ short creature_verify(unsigned char *thing, char *err_msg)
   return VERIF_OK;
 }
 
-short roomeffect_verify(unsigned char *thing, char *err_msg)
+short effectgen_verify(unsigned char *thing, char *err_msg)
 {
   unsigned char stype_idx=get_thing_subtype(thing);
-  if ((stype_idx>ROOMEFC_SUBTP_DRYICE)||(stype_idx<ROOMEFC_SUBTP_LAVA))
+  if ((stype_idx>EFCTGEN_SUBTP_DRYICE)||(stype_idx<EFCTGEN_SUBTP_LAVA))
   {
-      sprintf(err_msg,"Unknown room effect subtype (%d)",(int)stype_idx);
+      sprintf(err_msg,"Unknown effect generator subtype (%d)",(int)stype_idx);
       return VERIF_WARN;
   }
   int sen_tl;
@@ -3181,9 +3181,9 @@ short roomeffect_verify(unsigned char *thing, char *err_msg)
       sen_tly=sen_tl/MAP_SIZE_X;
       if (((tx<sen_tlx-1)||(tx>sen_tlx+1)||
            (ty<sen_tly-1)||(ty>sen_tly+1)) &&
-           (stype_idx!=ROOMEFC_SUBTP_ENTRICE))
+           (stype_idx!=EFCTGEN_SUBTP_ENTRICE))
       {
-          sprintf(err_msg,"Room effect has wrong sensitive tile number");
+          sprintf(err_msg,"Effect generator has wrong sensitive tile number");
           return VERIF_WARN;
       }
   }
@@ -3229,8 +3229,8 @@ short thing_verify(unsigned char *thing, char *err_msg)
       return item_verify(thing, err_msg);
     case THING_TYPE_CREATURE:
       return creature_verify(thing, err_msg);
-    case THING_TYPE_ROOMEFFECT:
-      return roomeffect_verify(thing, err_msg);
+    case THING_TYPE_EFFECTGEN:
+      return effectgen_verify(thing, err_msg);
     case THING_TYPE_TRAP:
       return trap_verify(thing, err_msg);
     case THING_TYPE_DOOR:

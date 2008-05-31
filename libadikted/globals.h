@@ -41,9 +41,9 @@
 #include <process.h>
 #endif
 
-#if BUILDING_DLL
+#if defined(BUILD_DLL)
 # define DLLIMPORT __declspec (dllexport)
-#else // Not BUILDING_DLL
+#else // Not defined BUILD_DLL
 # define DLLIMPORT __declspec (dllimport)
 #endif
 

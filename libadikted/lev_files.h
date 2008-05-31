@@ -33,6 +33,12 @@
 #define ERR_INTERNAL     -27
 #define WARN_BAD_COUNT    24
 
+enum EXTRA_OBJ_LOAD {
+   EXLD_THING  = 0x01,
+   EXLD_ACTNPT = 0x02,
+   EXLD_STLGHT = 0x04,
+     };
+
 DLLIMPORT short save_map(struct LEVEL *lvl);
 
 DLLIMPORT short load_map(struct LEVEL *lvl);

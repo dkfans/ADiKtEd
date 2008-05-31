@@ -13,7 +13,7 @@
 Doors - \ww\sood, \wi\sron, \wb\sraced, \wm\sagic
 [tngkeyhelp]
 \wa\s:Action pt \wL\s:St light  \wc\s:Creature
-\we\s:Room efct \wb\s:Spell bk  \wg\s:Gold
+\we\s:Effct gen \wb\s:Spell bk  \wg\s:Gold
 \wd\s:Dng specl \wT\s:Trap box  \wt\s:Trap
 \wh\s:Dng heart \wH\s:Hero gate \wr\s:Torch
 \wf\s:Chicken
@@ -43,7 +43,7 @@ be set to that of the tile you
 are placing it in.
 
 [efctkeyhelp]
-Room Effect add/edit mode:
+Effect Generator add/edit mode:
 
 Select the effect type which
 you wish to have in level.
@@ -220,13 +220,13 @@ The item will be added to the slot that was highlighted in
 To \ycancel\s, press \wtab\s or \wdelete\s.
 
 [efcthelp]
-Room Effect selection and options help:
+Effect Generator selection and options help:
 
 A list will appear on the screen of all the available effects.
 Simply \yselect the type\s you want to create/change into with
 \warrow keys\s, then press \wenter\s.
 
-\rIf creating new\s room effect, it will be added to the slot that
+\rIf creating new\s effect generator, it will be added to the slot that
 was highlighted in "thing" mode.
 
 To \ycancel\s, press \wtab\s or \wdelete\s.
@@ -249,7 +249,7 @@ To \ycancel\s, press \wtab\s or \wdelete\s.
 \yMove around\s as in slab mode.
 The ownership backgrounds are similar to slab mode, but some
 background colors are brighter - these are tiles within range
-of action points, room effects and static lights. The map slabs
+of action points, effect generators and static lights. The map slabs
 view is simplified - you won't see all the different items from
 slab mode, but only three background terrain types:
 '#' for rock, '.' for earth, walls, gold etc (tall slabs),
@@ -283,7 +283,7 @@ creature).
 
 Press '\wt\s' to create a \ytrap\s (change the type using '\ws\s' and '\wx\s').
 
-Press '\we\s' to create \yroom effect\s (change the type using '\ws\s' and '\wx\s').
+Press '\we\s' to create \yeffect generator\s (change the type using '\ws\s' and '\wx\s').
 
 Press '\wL\s' to create \ystatic light\s. Change its range with '\w-\s' and '\w+\s',
 and height with '\w[\s' and '\w]\s'.
@@ -317,8 +317,8 @@ Items which have assiciated key are listed on right panel. These include:
  Press '\wT\s' to create a \ytrap box\s (a non-placed trap). Change the type
  using '\ws\s' and '\wx\s'.
 
-Press '\wu\s' to \yupdate\s the dungeon. This will make sure all room objects
-(training posts, spikes, torturers, etc) are placed appropriately.
+Press '\wu\s' to \yupdate\s objects in the dungeon. This will make sure all room
+objects (training posts, spikes, torturers, etc) are placed appropriately.
 \rOnly things\s will be updated, the .clm and .dat values will stay intact.
 You must press '\wu\s' in slab mode to update them.
 
@@ -350,7 +350,7 @@ Please note that ADiKtEd will allow you to place things inside of
 solid columns, so be careful.
 
 Press '\w-\s' and '\w+\s' to \ychange range\s of highlighted object. This
-has effects mainly on action points, static lights and room effects.
+has effects mainly on action points, static lights and effect generators.
 
 Press '\wl\s' to \ylock/unlock\s a highlighted door.
 
@@ -1882,7 +1882,7 @@ placed on any slab.
 Looks exactly like Dragon Lair.
 This lair will act just as a
 graphic addition. Imps don't
-require sleep so the never use
+require sleep so they never use
 lair.
 
 \rBug Lair\s

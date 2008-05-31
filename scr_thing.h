@@ -72,7 +72,7 @@ int get_visited_obj_idx(struct WORKMODE_DATA *workdata);
 void set_visited_obj_idx(struct WORKMODE_DATA *workdata,int obj_idx);
 void set_visited_obj_lastof(struct WORKMODE_DATA *workdata,short obj_type);
 unsigned char *tng_makeitem(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata,int sx,int sy,unsigned char stype_idx);
-unsigned char *tng_makeroomeffect(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata,int sx,int sy,unsigned char stype_idx);
+unsigned char *tng_makeeffectgen(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata,int sx,int sy,unsigned char stype_idx);
 unsigned char *tng_maketrap(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata,int sx,int sy,unsigned char stype_idx);
 unsigned char *tng_makecreature(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata,int sx,int sy,unsigned char stype_idx);
 void tng_change_height(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata, unsigned int sx, unsigned int sy,unsigned int z,int delta_height);

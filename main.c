@@ -119,10 +119,10 @@ void read_init(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata)
           workdata->mapmode->traps_list_on_create=atoi(p);
           message_log(" read_init: traps_list_on_create set to %d",(int)workdata->mapmode->traps_list_on_create);
       } else
-      if (!strcmp(buffer, "ROOMEFFECT_LIST_ON_CREATE"))
+      if (!strcmp(buffer, "EFFECTGEN_LIST_ON_CREATE"))
       {
-          workdata->mapmode->roomeffect_list_on_create=atoi(p);
-          message_log(" read_init: roomeffect_list_on_create set to %d",(int)workdata->mapmode->roomeffect_list_on_create);
+          workdata->mapmode->effectgen_list_on_create=atoi(p);
+          message_log(" read_init: effectgen_list_on_create set to %d",(int)workdata->mapmode->effectgen_list_on_create);
       } else
       if (!strcmp(buffer, "ITEMS_LIST_ON_CREATE"))
       {

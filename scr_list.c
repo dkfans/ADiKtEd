@@ -692,8 +692,8 @@ void draw_mdslbl(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata)
 
 void draw_crefct(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata)
 {
-    draw_numbered_list(get_roomeffect_subtype_fullname,scrmode,workdata,
-        1,ROOMEFC_SUBTP_DRYICE,15);
+    draw_numbered_list(get_effectgen_subtype_fullname,scrmode,workdata,
+        1,EFCTGEN_SUBTP_DRYICE,15);
     int scr_row=scrmode->rows-4;
     int scr_col1=scrmode->cols+3;
     // Display more info about the creature
@@ -701,7 +701,7 @@ void draw_crefct(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata)
     {
       screen_setcolor(PRINT_COLOR_LGREY_ON_BLACK);
       set_cursor_pos(scr_row++, scr_col1);
-      screen_printf_toeol("Room Effect parameters");
+      screen_printf_toeol("Effect Generator params");
       set_cursor_pos(scr_row++, scr_col1);
       screen_setcolor(PRINT_COLOR_LGREY_ON_BLACK);
       screen_printf("Owner   (o): ");
@@ -730,7 +730,7 @@ void actions_crefct(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata,
           struct IPOINT_2D subpos;
           get_map_subtile_pos(workdata->mapmode,&subpos);
           unsigned char *thing;
-          thing=tng_makeroomeffect(scrmode,workdata,subpos.x,subpos.y,workdata->list->pos+1);
+          thing=tng_makeeffectgen(scrmode,workdata,subpos.x,subpos.y,workdata->list->pos+1);
           mdend[MD_CEFC](scrmode,workdata);
         };break;
         default:
@@ -903,13 +903,13 @@ void actions_edefct(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata,
         case KEY_DEL:
         case KEY_ESCAPE:
           mdend[MD_EFCT](scrmode,workdata);
-          message_info("Room Effect edit cancelled");
+          message_info("Effect Generator edit cancelled");
           break;
         case KEY_ENTER:
           set_thing_subtype(workdata->list->ptr,workdata->list->pos+1);
           set_thing_owner(workdata->list->ptr,workdata->list->val2);
           mdend[MD_EFCT](scrmode,workdata);
-          message_info("Room Effect properties changed");
+          message_info("Effect Generator properties changed");
           break;
         default:
           message_info("Unrecognized edit effect key code: %d",key);
@@ -1069,7 +1069,7 @@ short start_edefct(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata)
     thing=get_object(workdata->lvl,subpos.x,subpos.y,get_visited_obj_idx(workdata));
     // Note: we're not checking if the object is a thing - it have to be thing
     // but let's make sure it is an effect
-    if (!is_roomeffect(thing))
+    if (!is_effectgen(thing))
     {
       message_error("Can't edit effect - wrong object type");
       return false;

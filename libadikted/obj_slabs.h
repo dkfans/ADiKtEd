@@ -129,6 +129,8 @@ DLLIMPORT short slab_is_short_clmabl(unsigned short slab_type);
 DLLIMPORT short slab_is_short_unclmabl(unsigned short slab_type);
 DLLIMPORT short slab_is_clmabl(unsigned short slab_type);
 DLLIMPORT short slab_is_claimedgnd(unsigned short slab_type);
+DLLIMPORT short slab_is_liquid(unsigned short slab_type);
+DLLIMPORT short slab_allows_torch(unsigned short slab_type);
 DLLIMPORT short slab_needs_adjacent_torch(unsigned short slab_type);
 DLLIMPORT short slab_verify_entry(unsigned short slab_type, char *err_msg);
 DLLIMPORT char *get_slab_fullname(unsigned short slb_type);

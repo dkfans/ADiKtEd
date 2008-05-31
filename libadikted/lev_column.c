@@ -542,13 +542,31 @@ void update_tile_wlb_entry(struct LEVEL *lvl, int tx, int ty)
   unsigned short wlb_val;
   unsigned short slab;
   slab=get_tile_slab(lvl,tx,ty);
-  if (slab==SLAB_TYPE_LAVA)
+  switch (slab)
+  {
+  case SLAB_TYPE_LAVA:
     wlb_val=TILE_WLB_LAVA;
-  else
-  if (slab==SLAB_TYPE_WATER)
+    break;
+  case SLAB_TYPE_WATER:
     wlb_val=TILE_WLB_WATER;
-  else
+    break;
+  case SLAB_TYPE_BRIDGE:
+    wlb_val=get_tile_wlb(lvl,tx,ty);
+    if ((wlb_val!=TILE_WLB_LAVA)&&(wlb_val!=TILE_WLB_WATER))
+    {
+      // Value is obviously wrong; try to recognize correct value
+      int sib_water=slab_siblings_oftype(lvl,tx,ty,SLAB_TYPE_WATER);
+      int sib_lava=slab_siblings_oftype(lvl,tx,ty,SLAB_TYPE_LAVA);
+      if (sib_lava>sib_water)
+        wlb_val=TILE_WLB_LAVA;
+      else
+        wlb_val=TILE_WLB_WATER;
+    }
+    break;
+  default:
     wlb_val=TILE_WLB_SOLID;
+    break;
+  }
   set_tile_wlb(lvl,tx,ty,wlb_val);
 }
 

@@ -1,12 +1,14 @@
+# Project: adikted
+
 #To create a debug executable, run with the command:
 # make DEBUG
 
 CC				= gcc
-CFLAGS			= -c -O -I.
-CFLAGS-DEBUG	= -c -g -I.
+CFLAGS                          = -c -O -I.
+CFLAGS-DEBUG                    = -c -g -I.
 LINK				= gcc
-LFLAGS			= 
-LFLAGS-DEBUG	= 
+LFLAGS                          = 
+LFLAGS-DEBUG                    = 
 LIBS				= -L. -lslang -ladikted
 SRC				= main.c input_kb.c scr_help.c output_scr.c scr_thing.c scr_list.c scr_slab.c scr_clm.c scr_actn.c scr_txted.c scr_rwrk.c scr_cube.c var_utils.c
 OBJ				= $(SRC:.c=.o)
@@ -23,7 +25,4 @@ $(BIN): $(OBJ)
 
 clean:
 	${RM} $(OBJ)
-	find . -name \*~ -print | xargs ${RM}
-	find . -name \*.a -print | xargs ${RM}
-	find . -name \*.dep -print | xargs ${RM}
 	${RM} $(BIN)

@@ -43,11 +43,11 @@ enum adikt_workmode
   MD_LMAP   = 0x00d, // Open map with preview mode
   MD_SMAP   = 0x00e, // Save map with preview mode
   MD_GRFT   = 0x00f, // Graffiti input mode
-  MD_CEFC   = 0x010, // Create Room Effect mode
+  MD_CEFC   = 0x010, // Create Effect Generator mode
   MD_CTRP   = 0x011, // Create Trap mode
   MD_EITM   = 0x012, // Edit Item mode
   MD_ECRT   = 0x013, // Edit Creature mode
-  MD_EFCT   = 0x014, // Edit Room Effect mode
+  MD_EFCT   = 0x014, // Edit Effect Generator mode
   MD_ETRP   = 0x015, // Edit Trap mode
 };
 
@@ -157,7 +157,7 @@ struct MAPMODE_DATA {
     // Open list when creating trap
     short traps_list_on_create;
     // Open list when creating effect
-    short roomeffect_list_on_create;
+    short effectgen_list_on_create;
     // Open list when creating creature
     short creature_list_on_create;
     // Open list when creating traps, doors, spellbooks, specials, ...

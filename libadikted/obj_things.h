@@ -30,11 +30,17 @@
 #define THING_TYPE_EFFCTELEM   0x03 // "effect element" (?)
 #define THING_TYPE_DEADCRTR    0x04 // dead creature
 #define THING_TYPE_CREATURE    0x05
-#define THING_TYPE_ROOMEFFECT  0x07 // called "effect generator" in the game
+#define THING_TYPE_EFFECTGEN   0x07 // called "effect generator" in the game
 #define THING_TYPE_TRAP        0x08
 #define THING_TYPE_DOOR        0x09
 #define THING_TYPE_AMBNITSND   0x0c // ambient sound
 #define THING_TYPE_CAVEIN      0x0d
+
+// Count of existing subtypes (max index+1)
+#define ITEM_STYPES_COUNT      0x87
+#define CREATR_STYPES_COUNT    0x22
+#define TRAP_STYPES_COUNT      0x0d
+#define DOOR_STYPES_COUNT      0x05
 
 // sub-types for items
 #define ITEM_SUBTYPE_NULL      0x00
@@ -181,11 +187,11 @@
 #define ITEM_SUBTYPE_SPELLARMG 0x86
 
 //Effects (all listed)
-#define ROOMEFC_SUBTP_LAVA     0x01
-#define ROOMEFC_SUBTP_DRIPWTR  0x02
-#define ROOMEFC_SUBTP_ROCKFAL  0x03
-#define ROOMEFC_SUBTP_ENTRICE  0x04
-#define ROOMEFC_SUBTP_DRYICE   0x05
+#define EFCTGEN_SUBTP_LAVA     0x01
+#define EFCTGEN_SUBTP_DRIPWTR  0x02
+#define EFCTGEN_SUBTP_ROCKFAL  0x03
+#define EFCTGEN_SUBTP_ENTRICE  0x04
+#define EFCTGEN_SUBTP_DRYICE   0x05
 
 //Creature types (all listed)
 #define CREATR_SUBTP_WIZRD     0x01
@@ -251,7 +257,7 @@
 // the UNKNOWN category must be the last one, and THING_CATEGR_COUNT
 // must be set to the count of categories
 #define THING_CATEGR_NULL       0x00
-#define THING_CATEGR_ROOMEFFCT  0x01
+#define THING_CATEGR_EFFCTGEN   0x01
 #define THING_CATEGR_ITEMEFFCT  0x02
 #define THING_CATEGR_CREATR     0x03
 #define THING_CATEGR_CREATLAIR  0x04
@@ -324,10 +330,10 @@ DLLIMPORT short is_nulltng_stype(const unsigned char stype_idx);
 DLLIMPORT int get_nulltng_arridx(const unsigned char stype_idx);
 DLLIMPORT unsigned char get_nulltng_arritm(const int arr_itm);
 DLLIMPORT unsigned int get_nulltng_count(void);
-DLLIMPORT short is_roomeffect(const unsigned char *thing);
-DLLIMPORT int get_roomeffect_arridx(const unsigned char stype_idx);
-DLLIMPORT unsigned char get_roomeffect_arritm(const int arr_itm);
-DLLIMPORT unsigned int get_roomeffect_count(void);
+DLLIMPORT short is_effectgen(const unsigned char *thing);
+DLLIMPORT int get_effectgen_arridx(const unsigned char stype_idx);
+DLLIMPORT unsigned char get_effectgen_arritm(const int arr_itm);
+DLLIMPORT unsigned int get_effectgen_count(void);
 DLLIMPORT short is_itemeffect(const unsigned char *thing);
 DLLIMPORT short is_itemeffect_stype(const unsigned char stype_idx);
 DLLIMPORT int get_itemeffect_arridx(const unsigned char stype_idx);
@@ -469,7 +475,7 @@ DLLIMPORT char *get_trap_subtype_fullname(const unsigned short stype_idx);
 DLLIMPORT char *get_door_subtype_fullname(const unsigned short stype_idx);
 DLLIMPORT char *get_thing_category_fullname(const unsigned short arr_idx);
 DLLIMPORT char *get_thing_category_shortname(const unsigned short arr_idx);
-DLLIMPORT char *get_roomeffect_subtype_fullname(const unsigned short stype_idx);
+DLLIMPORT char *get_effectgen_subtype_fullname(const unsigned short stype_idx);
 
 DLLIMPORT int get_thing_subtypes_arridx(const unsigned char *thing);
 DLLIMPORT unsigned int get_thing_subtypes_count(const unsigned short arr_idx);

@@ -1,0 +1,180 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=us-ascii">
+  <title>Dungeon Keeper Official Editor Manual</title>
+  <link rel="stylesheet" type="text/css" href="dk_docs_style.css" />
+</head>
+
+<body lang="EN">
+
+<p class="main_title">Dungeon Keeper Mapmakers Installation Instructions&nbsp;v1.0</p>
+
+<p class="main_subtitle">Created by fans</p>
+
+<br clear="all"/>
+
+<h1><a name="manual_toc">Contents</a></h1>
+
+<br/>
+
+<p class="toc1">Contents</p>
+<p class="toc1"><a href="#mminst_info">1.0 Introduction</a></p>
+<p class="toc1"><a href="#mminst_hdcopy">2.0 Copying files to HD</a></p>
+<p class="toc2"><a href="#mminst_bfedit">2.1 Official Bullfrog Editor</a></p>
+<p class="toc2"><a href="#mminst_adikted">2.2 Adikted</a></p>
+<p class="toc2"><a href="#mminst_unded">2.3 Unded</a></p>
+<p class="toc1"><a href="#mminst_changelog">3.0 Changes log</a></p>
+<p class="toc1"><a href="#mminst_refs">4.0 References</a></p>
+
+<br clear="all"/><br/>
+
+<h1><a name="mminst_info">1.0 Introduction</a></h1>
+
+<br/>
+<p class="std">After installation, Dungeon Keeper uses various files from CD to run.
+This includes map files - and may become a problem if you want to modify these maps.
+Files on Dungeon Keeper CD are not writeable, so you have to configure the game to
+use map files from your hard drive before editing anything. This instruction will
+guide you through the process.</p>
+<br/>
+
+<br clear="all"/><br/>
+
+<h2><a name="mminst_hdcopy">2.0 Copying files to HD</a></h2>
+<br/>
+
+<p class="std">First, make sure that you have Dungeon Keeper installed, and that you
+know where the game is located on your hard drive.</p>
+<br/>
+
+<p class="std">Next, copy over the entire Levels, Ldata and Data directories from the
+Keeper directory of the CD to your Keeper directory on your hard disk.</p>
+<br/>
+
+<p class="std">Then, go to your Keeper directory on your hard disk. You will
+see a file called <i>keeper.cfg</i>. Open this in text editor (like notepad) and find
+the line starting with INSTALL_PATH=. This tells the computer where the Data and Levels
+directories are on the CD. Now that you have copied them to your hard disk,
+you will need to alter this line. Change it so that it points to your Keeper directory 
+e.g.</p>
+<br/>
+<p class="snip">INSTALL_PATH=c:\program files\bullfrog\keeper\</p>
+<br/>
+
+<p class="std">Lastly all the files in the Levels directory within the Keeper directory on 
+your hard disk are currently set to read only. This will cause problems with 
+the editor if you want to alter them. To change this in Ms Windows, go to this directory and
+select all the files in it. Then right click on the files to bring up the file
+menu. This may take a while due to the amount of files. When the menu appears,
+click on the properties option. The properties panel will appear and you will see
+at the bottom a tick box with 'Read-only' to the left of it. Click on the box to
+remove the tick and click on the 'OK' button.</p>
+<br/>
+
+<p class="std">Now your levels are ready to be edited, you only need a program to
+edit them. There are three such programs available, and their installation is discussed
+in remaining sections of this instruction.</p>
+
+<br clear="all"/><br/>
+
+<h2><a name="mminst_bfedit">2.1 Official Bullfrog Editor</a></h2>
+
+<br/>
+<p class="std">On the cd will be a directory called Editor. Go to this
+directory and you will see a file called &quot;editor.exe&quot;. Copy
+this file and paste it into the Keeper directory on your hard
+disk.</p>
+<br/>
+
+<p class="std">Then copy over the contents of the editor &quot;Data&quot; subdirectory
+(inside the &quot;Editor&quot; directory of your cd) to the &quot;Data&quot; subdirectory
+(inside the Keeper directory) on your hard disk.</p>
+<br/>
+
+<p class="std">Then copy over the contents of the editor &quot;Levels&quot; subdirectory
+(inside the &quot;Editor&quot; directory of your cd) to the &quot;Levels&quot; subdirectory
+(inside the Keeper directory) on your hard disk.</p>
+<br/>
+
+<p class="std">After performing these steps, you should be able to run
+Official Bullfrog Editor by executing &quot;editor.exe&quot;.</p>
+<br/>
+
+<br clear="all"/><br/>
+
+<h2><a name="mminst_adikted">2.2 Adikted</a></h2>
+
+<br/>
+<p class="std">Unzip the program and put all the &quot;map.*&quot; files in the same directory
+and edit &quot;map.ini&quot; as appropriate (you should change paths to your DK files;
+you can also change other parameters if you want).</p>
+<br/>
+
+<p class="std">After performing these steps, you should be able to run
+Adikted by executing &quot;map.exe&quot;. On&nbsp;any problems, read the documentation
+placed in &quot;docs&quot; subdirectory.</p>
+<br/>
+
+<br clear="all"/><br/>
+
+<h2><a name="mminst_unded">2.3 Unded</a></h2>
+
+<br/>
+<p class="std">Unzip the program into any directory; it doesn't really matter.</p>
+<br/>
+
+<p class="std">To jump to a level that you have edited, you will need a program called
+&quot;ch-dkc12.zip&quot;. You should find it inside the zip file you downloaded.<br/>
+Unzip it into your Dungeon Keeper Directory.
+It&nbsp;is a program which will edit one of your savegame files, and let you jump
+to any level.
+Use&nbsp;it to edit a savegame file and jump to the level that you have edited.</p>
+<br/>
+
+<p class="std">WARNING: You should back up your savegames first as the program
+overwrites them.  The &quot;ch-dkc12.zip&quot; was created by a bloke called <i>cyberhead</i>.
+Alternativly, if you don't want to use that program, you can edit the multiplayer levels.
+These&nbsp;are all numbered 50 upwards.
+Start&nbsp;Dungeon Keeper with the switch &quot;-1player&quot;, so for example if you have
+the dos version type:</p>
+<p class="snip">keeper -1player</p>
+<p class="std">and for the win95 version type:</p>
+<p class="snip">keeper95 -1player</p>
+<p class="std">Start a new multiplayer game and select the option '1player' from the
+service menu. Select your level from the map.
+You&nbsp;will be taken to the level you have edited.</p>
+<br/>
+
+<br clear="all"/><br/>
+
+<h1><a name="mminst_changelog">3.0 Changes log</a></h1>
+
+<br/>
+
+<br/>
+<h4>Version 1.1</h4>
+<ul>
+<li class="std">Added installation instructions for Adikted and Unded</li>
+</ul>
+
+<br/>
+<h4>Version 1.0</h4>
+<ul>
+<li class="std">Written based on Official Map Editor for Dungeon Keeper documentation</li>
+</ul>
+
+<br clear="all"/><br/>
+
+<h1><a name="mminst_refs">3.0 References</a></h1>
+
+<br/>
+<ol>
+<li class="std"><a href="index.htm">Dungeon Keeper Mapmaker's Documentation</a></li>
+<li class="std"><a href="dk_scripting_ref.htm">Dungeon Keeper Script Commands Reference</a></li>
+</ol>
+
+<br clear="all"/><br/>
+
+</body>
+</html>

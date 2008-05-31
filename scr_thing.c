@@ -155,11 +155,11 @@ void actions_mdtng(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata,i
         case KEY_SHIFT_T: // Create trap box
           tng_makeitem(scrmode,workdata,subpos.x,subpos.y,ITEM_SUBTYPE_TBBOULDER);
           break;
-        case KEY_E: // Add room effect
-          if (workdata->mapmode->roomeffect_list_on_create)
+        case KEY_E: // Add effect gererator
+          if (workdata->mapmode->effectgen_list_on_create)
             mdstart[MD_CEFC](scrmode,workdata);
           else
-            tng_makeroomeffect(scrmode,workdata,subpos.x,subpos.y,ROOMEFC_SUBTP_DRIPWTR);
+            tng_makeeffectgen(scrmode,workdata,subpos.x,subpos.y,EFCTGEN_SUBTP_DRIPWTR);
           break;
         case KEY_A: // Add action point
           thing = create_actnpt(workdata->lvl, subpos.x,subpos.y);
@@ -217,7 +217,7 @@ void actions_mdtng(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata,i
                 thing = create_thing_copy(workdata->lvl,subpos.x,subpos.y,clip_itm->data);
                 thing_add(workdata->lvl,thing);
                 message_info("Thing pasted from clipboard at subtile %d,%d",subpos.x,subpos.y);
-                if (is_roomeffect(thing))
+                if (is_effectgen(thing))
                     set_brighten_for_thing(workdata->mapmode,thing);
                 set_visited_obj_lastof(workdata,OBJECT_TYPE_THING);
                 inc_info_usr_creatobj_count(workdata->lvl);
@@ -348,10 +348,10 @@ void actions_mdtng(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata,i
               break;
             }
           };break;
-        case KEY_S: // Change level of creature/trap/special/spell/lair/room efct
+        case KEY_S: // Change level of creature/trap/special/spell/lair/efct gen
           action_inc_object_level(scrmode,workdata);
           break;
-        case KEY_X: // Change level of creature/trap/special/spell/lair/room efct
+        case KEY_X: // Change level of creature/trap/special/spell/lair/efct gen
           action_dec_object_level(scrmode,workdata);
           break;
         case KEY_SLASH: // Cycle through highlighted things
@@ -506,7 +506,7 @@ char get_thing_char(const struct LEVEL *lvl, int x, int y)
             {
             case THING_TYPE_CREATURE:
               return 'c';
-            case THING_TYPE_ROOMEFFECT:
+            case THING_TYPE_EFFECTGEN:
               return 'e';
             case THING_TYPE_TRAP:
               return 't';
@@ -667,10 +667,10 @@ int display_thing(struct HELP_DATA *help,unsigned char *thing, int scr_col, int 
     screen_setcolor(PRINT_COLOR_LGREY_ON_BLACK);
     display_object_posparam(display_float_pos,"Altitude",
         get_thing_subtile_h(thing),get_thing_subtpos_h(thing));
-    // Only room effects and doors have sensitive tile.
+    // Only effect generators and doors have sensitive tile.
     // but Traps, doors and creatures may have a number written in same way
     // on this position - to check
-    if ((type_idx==THING_TYPE_ROOMEFFECT)||(type_idx==THING_TYPE_ITEM))
+    if ((type_idx==THING_TYPE_EFFECTGEN)||(type_idx==THING_TYPE_ITEM))
     {
         set_cursor_pos(scr_row++, scr_col);
         int sen_tl=get_thing_sensitile(thing);
@@ -762,14 +762,14 @@ int display_thing(struct HELP_DATA *help,unsigned char *thing, int scr_col, int 
           screen_printf("Locked");
       screen_setcolor(PRINT_COLOR_LGREY_ON_BLACK);
     };break;
-    // Room effect
-    case THING_TYPE_ROOMEFFECT:
+    // effect generator
+    case THING_TYPE_EFFECTGEN:
     {
       unsigned short stype_idx=get_thing_subtype(thing);
       set_cursor_pos(scr_row++, scr_col);
       screen_printf("Kind : ");
       screen_setcolor(PRINT_COLOR_LRED_ON_BLACK);
-      screen_printf(get_roomeffect_subtype_fullname(stype_idx));
+      screen_printf(get_effectgen_subtype_fullname(stype_idx));
       set_cursor_pos(scr_row++, scr_col);
       screen_setcolor(PRINT_COLOR_LGREY_ON_BLACK);
       scr_row+=display_object_posparam(display_float_pos,"Range",
@@ -1079,17 +1079,17 @@ unsigned char *tng_makeitem(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *w
     return thing;
 }
 
-unsigned char *tng_makeroomeffect(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata,int sx,int sy,unsigned char stype_idx)
+unsigned char *tng_makeeffectgen(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata,int sx,int sy,unsigned char stype_idx)
 {
     unsigned char *thing;
-    thing = create_roomeffect(workdata->lvl,sx,sy,stype_idx);
+    thing = create_effectgen(workdata->lvl,sx,sy,stype_idx);
     if (thing==NULL)
     {
-        message_error("Cannot create Room Effect");
+        message_error("Cannot create Effect Generator");
         return NULL;
     }
     thing_add(workdata->lvl,thing);
-    message_info("Room Effect added to map at (%d,%d)",sx,sy);
+    message_info("Effect Generator added to map at (%d,%d)",sx,sy);
     set_visited_obj_lastof(workdata,OBJECT_TYPE_THING);
     set_brighten_for_thing(workdata->mapmode,thing);
     inc_info_usr_creatobj_count(workdata->lvl);
@@ -1223,10 +1223,23 @@ void tng_change_range(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdat
       tile_limit=MAP_SIZE_X/2;
       break;
     case OBJECT_TYPE_THING:
-      rng=get_thing_range_subtile(obj);
-      subrng=get_thing_range_subtpos(obj)+delta_range;
-      tile_limit=MAP_SIZE_X/2;
-      break;
+      {
+        switch (get_thing_type(obj))
+        {
+        case THING_TYPE_EFFECTGEN:
+          rng=get_thing_range_subtile(obj);
+          subrng=get_thing_range_subtpos(obj)+delta_range;
+          tile_limit=MAP_SIZE_X/2;
+          break;
+        case THING_TYPE_ITEM:
+        case THING_TYPE_CREATURE:
+        case THING_TYPE_DOOR:
+        case THING_TYPE_TRAP:
+        default:
+          message_error("Selected thing have no range");
+          return;
+        }
+      };break;
     default:
       message_error("Cannot recognize object");
       return;
@@ -1309,7 +1322,7 @@ void action_edit_object(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workd
         case THING_TYPE_ITEM:
             mdstart[MD_EITM](scrmode,workdata);
             break;
-        case THING_TYPE_ROOMEFFECT:
+        case THING_TYPE_EFFECTGEN:
             mdstart[MD_EFCT](scrmode,workdata);
             break;
         case THING_TYPE_DOOR:

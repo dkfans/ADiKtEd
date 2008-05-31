@@ -109,8 +109,62 @@ struct DK_GRAFFITI {
     unsigned short cube;
   };
 
+struct DK_SCRIPT_PLAYER {
+    unsigned int max_creatures;
+    unsigned long start_gold;
+    int computer_player;
+    unsigned short *ally;
+    unsigned short *creature_avail;
+    unsigned short *room_avail;
+    unsigned short *spell_avail;
+    unsigned short *trap_avail;
+    unsigned short *door_avail;
+    unsigned int *trap_amount;
+    unsigned int *door_amount;
+};
+
+struct DK_SCRIPT_PARTYMEMBER {
+    short type;
+    unsigned short level;
+    unsigned long gold;
+    unsigned short objctiv;
+    unsigned long cntdown;
+  };
+
+struct DK_SCRIPT_PARTY {
+    char *name;
+    struct DK_SCRIPT_PARTYMEMBER *member;
+    unsigned short count;
+  };
+
+struct DK_SCRIPT_ADDEVENT {
+    unsigned short owner;
+    unsigned short type; //CREATURE/PARTY/TUNNELLER/TUNNELLER_PARTY
+    struct DK_SCRIPT_PARTYMEMBER leader; //type<0 means he's not there
+    int actnpt;         //where the creature/party is added
+    char *partyname;    //should be NULL for CREATURE and TUNNELLER
+    unsigned short num; //number of copies of creature/party
+  };
+
+struct DK_SCRIPT_PARAMETERS {
+       // Single values
+    unsigned long portal_gen_speed;
+    int end_level; //This should be 0 if all loops are closed properly
+       // Arrays with indices PLAYER0..PLAYER_UNSET
+    struct DK_SCRIPT_PLAYER *player;
+       // Other constant-size arrays
+    unsigned int *creature_pool;
+       // Dynamic structures
+    struct DK_SCRIPT_ADDEVENT *addevent;
+    unsigned int addevent_count;
+    struct DK_SCRIPT_PARTY *party;
+    unsigned int party_count;
+    //TODO - action points/hero gates code
+  };
+
 struct DK_SCRIPT {
     struct DK_SCRIPT_COMMAND **list;
+    struct DK_SCRIPT_PARAMETERS par;
     char **txt;  // The whole script stored as txt
     int lines_count;
 };
@@ -120,7 +174,7 @@ struct DK_SCRIPT {
 struct LEVSTATS {
     //Things strats
     int creatures_count;
-    int roomeffects_count;
+    int effectgenrts_count;
     int traps_count;
     int doors_count;
     int items_count;
@@ -237,10 +291,13 @@ short level_clear_datclm(struct LEVEL *lvl);
 short level_clear_other(struct LEVEL *lvl);
 short level_clear_stats(struct LEVEL *lvl);
 short level_clear_info(struct LEVEL *lvl);
+short level_clear_script(struct LEVEL *lvl);
+DLLIMPORT short level_clear_script_param(struct DK_SCRIPT_PARAMETERS *par);
 DLLIMPORT short level_clear_options(struct LEVOPTIONS *optns);
 
 DLLIMPORT short level_free(struct LEVEL *lvl);
 short level_free_tng(struct LEVEL *lvl);
+DLLIMPORT short level_free_script_param(struct DK_SCRIPT_PARAMETERS *par);
 
 DLLIMPORT short level_verify(struct LEVEL *lvl, char *actn_name,struct IPOINT_2D *errpt);
 DLLIMPORT short level_verify_struct(struct LEVEL *lvl, char *err_msg,struct IPOINT_2D *errpt);

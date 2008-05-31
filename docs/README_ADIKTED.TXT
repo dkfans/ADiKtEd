@@ -4,7 +4,7 @@ Adikted Dungeon Keeper Map Editor
 Note - there is now a tutorial available for Adikted, at
 http://www.yoda.arachsys.com/dk/tutorial.html.
 A version of this is also within this distribution,
-called adikted_tutorial.html. You may wish to print this out.
+called dk_adikted_manual.htm. You may wish to print this out.
 
 Here's the Win32 version executable. Just put all the
 files in the same directory, edit map.ini as appropriate (you should
@@ -63,6 +63,13 @@ Press F1 for help.
 TODO before final:
  Fixations in room things parameters (height,other)
  Fixations in room corner graphics
+Version: 0.92b
+ Minor changes to INI commands and defaults
+ Disabled changing range of objects which don't have it
+ Changed name "room effect" into "effect generator"
+ Extra torches are no longer placed in rooms
+ Bridge can now recognize if its put on water or lava
+ Tutorial replaced by larger manual
 Version: 0.91b
  A little renaming in the ADiKtEd library
  Created functions to make the library more independent

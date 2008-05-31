@@ -1,0 +1,284 @@
+ /* Style Definitions for Dungeon Keeper Documentation */
+
+p.std, li.std, div.std, tr.std
+        {margin:0cm;
+        punctuation-wrap:simple;
+        text-autospace:none;
+        font-size:12.0pt;
+        font-family:Arial;}
+
+h1
+        {margin-top:0cm;
+        margin-right:0cm;
+        margin-bottom:0cm;
+        margin-left:0pt;
+        page-break-after:avoid;
+        punctuation-wrap:simple;
+        text-autospace:none;
+        border:none;
+        font-size:28.0pt;
+        font-family:Arial;
+        font-variant:small-caps;
+        border-bottom:solid windowtext 2.0pt;
+        padding:0cm 0cm 1.0pt 0cm;
+}
+
+h2
+        {margin-top:0cm;
+        margin-right:0cm;
+        margin-bottom:0cm;
+        margin-left:0pt;
+        page-break-after:avoid;
+        punctuation-wrap:simple;
+        text-autospace:none;
+        border:none;
+        padding:0cm;
+        font-size:22.0pt;
+        font-family:Arial;
+        font-variant:small-caps;
+        border-bottom:solid windowtext 1.0pt;
+        padding:0cm 0cm 1.0pt 0cm;
+}
+
+h3
+        {margin-top:0cm;
+        margin-right:0cm;
+        margin-bottom:0cm;
+        margin-left:0pt;
+        page-break-after:avoid;
+        punctuation-wrap:simple;
+        text-autospace:none;
+        border:none;
+        padding:0cm;
+        font-size:18.0pt;
+        font-family:Arial;
+        font-variant:small-caps;
+        border-bottom:solid windowtext 0.6pt;
+        padding:0cm 0cm 1.0pt 0cm;
+}
+
+h4
+        {margin-top:0cm;
+        margin-right:0cm;
+        margin-bottom:0cm;
+        margin-left:0pt;
+        page-break-after:avoid;
+        punctuation-wrap:simple;
+        text-autospace:none;
+        border:none;
+        padding:0cm;
+        font-size:16.0pt;
+        font-family:Arial;
+        font-variant:small-caps;}
+
+p.toc1, li.toc1, div.toc1
+        {margin-top:6.0pt;
+        margin-right:0cm;
+        margin-bottom:6.0pt;
+        margin-left:0pt;
+        tab-stops:right dotted 307.6pt;
+        punctuation-wrap:simple;
+        text-autospace:none;
+        font-size:16.0pt;
+        font-family:Arial;
+        font-variant:small-caps;
+        font-weight:bold;}
+
+p.toc2, li.toc2, div.toc2
+        {margin-top:0cm;
+        margin-right:0cm;
+        margin-bottom:0cm;
+        margin-left:0pt;
+        tab-stops:right dotted 307.6pt;
+        punctuation-wrap:simple;
+        text-autospace:none;
+        font-size:12.0pt;
+        font-family:Arial;
+        text-transform:uppercase;
+        font-variant:normal;
+        font-weight:bold;}
+
+p.toc3, li.toc3, div.toc3
+        {
+        margin-top:0cm;
+        margin-right:0cm;
+        margin-bottom:0cm;
+        margin-left:0pt;
+        margin-bottom:.0001pt;
+        tab-stops:right dotted 307.6pt;
+        punctuation-wrap:simple;
+        text-autospace:none;
+        font-size:12.0pt;
+        font-family:Arial;
+        font-variant:small-caps;
+        font-weight:bold;
+}
+p.toc4, li.toc4, div.toc4
+        {
+        margin-top:0cm;
+        margin-right:0cm;
+        margin-bottom:0cm;
+        margin-left:0pt;
+        tab-stops:right dotted 307.6pt;
+        punctuation-wrap:simple;
+        text-autospace:none;
+        font-size:12.0pt;
+        font-family:Arial;
+}
+
+p.toc5, li.toc5, div.toc5
+        {
+        margin-top:0cm;
+        margin-right:0cm;
+        margin-bottom:0cm;
+        margin-left:0pt;
+        tab-stops:right dotted 307.6pt;
+        punctuation-wrap:simple;
+        text-autospace:none;
+        font-size:13.0pt;
+        font-family:"Courier New";
+        font-variant:normal;
+        font-weight:bold;
+}
+
+p.main_title
+        {margin-top:0cm;
+        margin-right:0cm;
+        margin-bottom:0cm;
+        font-variant: normal;
+        text-transform:uppercase;
+        margin-left:0pt;
+        text-align:center;
+        punctuation-wrap:simple;
+        text-autospace:none;
+        border:none;
+        padding:0cm;
+        font-size:36.0pt;
+        font-family:Arial;
+        font-variant:small-caps;
+        font-weight:bold;
+}
+
+p.main_subtitle
+        {margin-top:0cm;
+        margin-right:0cm;
+        margin-bottom:0cm;
+        margin-left:0pt;
+        text-transform:uppercase;
+        text-align:center;
+        punctuation-wrap:simple;
+        text-autospace:none;
+        border:none;
+        padding:0cm;
+        font-size:18.0pt;
+        font-family:Arial;
+        font-variant:normal;
+        font-weight:bold;
+}
+
+p.tlsnip, li.tlsnip, div.tlsnip
+        {
+        margin-top:0cm;
+        margin-right:0cm;
+        margin-bottom:0cm;
+        margin-left:0pt;
+        punctuation-wrap:simple;
+        text-autospace:none;
+        font-size:16.0pt;
+        font-family:"Courier New";
+        font-weight:bold;
+}
+
+p.stlsnip, li.stlsnip, div.stlsnip
+        {
+        margin-top:0cm;
+        margin-right:0cm;
+        margin-bottom:0cm;
+        margin-left:0pt;
+        punctuation-wrap:simple;
+        text-autospace:none;
+        font-size:12.0pt;
+        font-family:"Courier New";
+        font-weight:bold;
+}
+
+p.snip, li.snip, div.snip, pre.snip
+        {
+        margin:0cm;
+        padding-left:5%;
+        background:#CCCCCC;
+        punctuation-wrap:simple;
+        text-autospace:none;
+        font-size:12.0pt;
+        font-family:"Courier New";
+}
+
+p.embed, li.embed, div.embed, pre.embed
+        {
+        margin-tob:0px;
+        margin-bottom:0px;
+        margin-left:10%;
+        margin-right:10%;
+        border:none;
+        border-bottom:solid windowtext 1.0pt;
+        border-top:solid windowtext 1.0pt;
+        padding-top:5px;
+        padding-bottom:5px;
+}
+
+table.tbembed
+        {
+        margin-tob:0px;
+        margin-bottom:0px;
+        margin-left:auto;
+        margin-right:auto;
+        border:none;
+        width: 480px;
+        border-bottom:solid windowtext 1.0pt;
+        border-top:solid windowtext 1.0pt;
+        padding-top:5px;
+        padding-bottom:5px;
+}
+
+table.tbparam
+        {
+        margin-tob:0px;
+        margin-bottom:0px;
+        margin-left:auto;
+        margin-right:auto;
+        border-collapse:collapse;
+        border:solid windowtext 0.75pt;
+}
+
+tr.tbparhd, td.tbparhd
+        {
+        border:solid windowtext 0.75pt;
+        background:black;
+        padding:0cm 5.4pt 0cm 5.4pt
+}
+
+tr.tbparct, td.tbparct
+        {
+        border:solid windowtext 0.75pt;
+        padding:0cm 5.4pt 0cm 5.4pt
+}
+
+p.tbparht
+        {margin:0cm;
+        punctuation-wrap:simple;
+        text-autospace:none;
+        font-size:12.0pt;
+        font-family:Arial;
+        color:white;
+        font-weight:bold;
+}
+
+p.cidx, li.cidx, div.cidx, pre.cidx, a.cidx
+        {
+        padding-left:1%;
+        punctuation-wrap:simple;
+        text-autospace:none;
+        font-size:12.0pt;
+        font-family:"Courier New";
+}
+

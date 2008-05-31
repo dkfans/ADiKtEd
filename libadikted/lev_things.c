@@ -33,7 +33,7 @@
 const is_thing_subtype search_tngtype_func[]={
       is_spellbook,is_dngspecbox,is_crtrlair,
       is_trapbox,is_trap,is_creature,
-      is_door,is_roomeffect,is_statue,
+      is_door,is_effectgen,is_statue,
       is_furniture,is_food,is_gold,
       is_torch,is_heartflame,is_polebar,
       is_lit_thing,is_herogate,is_dnheart,
@@ -43,7 +43,7 @@ const is_thing_subtype search_tngtype_func[]={
 const char *search_tngtype_names[]={
       "Spell books","Dung.Specials","Creature lairs",
       "Trap boxes","Deployed traps","Creatures",
-      "Deployed doors","Room effects","Statues",
+      "Deployed doors","Effect Generatr","Statues",
       "Furniture items","Food (chickens)","Gold things",
       "Torches","Heart flames","Poles and bars",
       "Lit things","Hero gates","Dungeon hearts",
@@ -69,7 +69,7 @@ short things_verify(struct LEVEL *lvl, char *err_msg,struct IPOINT_2D *errpt)
       {
         unsigned short slab=get_tile_slab(lvl, i/MAP_SUBNUM_X, j/MAP_SUBNUM_Y);
         unsigned int creatures_on_subtl=0;
-        unsigned int roomeffects_on_subtl=0;
+        unsigned int effectgenrts_on_subtl=0;
         unsigned int traps_on_subtl=0;
         unsigned int lit_things_on_subtl=0;
         unsigned int doors_on_subtl=0;
@@ -133,7 +133,7 @@ short things_verify(struct LEVEL *lvl, char *err_msg,struct IPOINT_2D *errpt)
           }
           if (is_creature(thing))  creatures_on_subtl++;
           if (is_trap(thing))  traps_on_subtl++;
-          if (is_roomeffect(thing))  roomeffects_on_subtl++;
+          if (is_effectgen(thing))  effectgenrts_on_subtl++;
           if (is_lit_thing(thing))  lit_things_on_subtl++;
           if (is_door(thing)) doors_on_subtl++;
           if (is_spellbook(thing)||is_dngspecbox(thing)||is_trapbox(thing)
@@ -144,8 +144,8 @@ short things_verify(struct LEVEL *lvl, char *err_msg,struct IPOINT_2D *errpt)
             err_objcount="five creature";
         if (traps_on_subtl>3)
             err_objcount="three traps";
-        if (roomeffects_on_subtl>3)
-            err_objcount="three room effects";
+        if (effectgenrts_on_subtl>3)
+            err_objcount="three effect genertrs";
         if (lit_things_on_subtl>2)
             err_objcount="two lit things";
         if (doors_on_subtl>1)
@@ -584,9 +584,9 @@ unsigned short compute_torch_sensitile(const struct LEVEL *lvl, unsigned char *t
 }
 
 /*
- * Returns an acceptable value of sensitive tile for room effect
+ * Returns an acceptable value of sensitive tile for effect generator
  */
-unsigned short compute_roomeffect_sensitile(const struct LEVEL *lvl, unsigned char *thing)
+unsigned short compute_effectgen_sensitile(const struct LEVEL *lvl, unsigned char *thing)
 {
     unsigned short sx=get_thing_subtile_x(thing);
     unsigned short sy=get_thing_subtile_y(thing);
@@ -611,8 +611,8 @@ unsigned short compute_item_sensitile(const struct LEVEL *lvl, unsigned char *th
     int categr=get_thing_subtypes_arridx(thing);
     switch (categr)
     {
-    case THING_CATEGR_ROOMEFFCT:
-         return compute_roomeffect_sensitile(lvl, thing);
+    case THING_CATEGR_EFFCTGEN:
+         return compute_effectgen_sensitile(lvl, thing);
     case THING_CATEGR_STATUE:
     case THING_CATEGR_HEARTFLAME:
     case THING_CATEGR_ROOMEQUIP:
@@ -742,17 +742,17 @@ unsigned char *create_doorkey(const struct LEVEL *lvl, unsigned int sx, unsigned
 }
 
 /*
- * Creates a new thing of type room effect
+ * Creates a new thing of type effect generator
  */
-unsigned char *create_roomeffect(const struct LEVEL *lvl,unsigned int sx, unsigned int sy, unsigned char stype_idx)
+unsigned char *create_effectgen(const struct LEVEL *lvl,unsigned int sx, unsigned int sy, unsigned char stype_idx)
 {
     unsigned char *thing;
     thing = create_thing(sx,sy);
-    set_thing_type(thing,THING_TYPE_ROOMEFFECT);
+    set_thing_type(thing,THING_TYPE_EFFECTGEN);
     set_thing_subtype(thing,stype_idx);
     set_thing_owner(thing,get_tile_owner(lvl,sx/MAP_SUBNUM_X,sy/MAP_SUBNUM_Y));
     set_thing_range_subtile(thing,5);
-    unsigned short sensitile=compute_roomeffect_sensitile(lvl,thing);
+    unsigned short sensitile=compute_effectgen_sensitile(lvl,thing);
     set_thing_sensitile(thing,sensitile);
     return thing;
 }
@@ -974,7 +974,7 @@ void remove_automade_obj_for_slab(struct LEVEL *lvl, int tx, int ty)
               };break;
             // Categories to delete
             case THING_CATEGR_NULL:
-            case THING_CATEGR_ROOMEFFCT:
+            case THING_CATEGR_EFFCTGEN:
             case THING_CATEGR_ITEMEFFCT:
             case THING_CATEGR_CREATLAIR:
             case THING_CATEGR_DOOR:
@@ -1216,9 +1216,7 @@ void update_torch_things_near_slab(struct LEVEL *lvl, int tx, int ty)
     cur_ty=ty+idir_subtl_y[i]-1;
     unsigned short slab;
     slab=get_tile_slab(lvl,cur_tx,cur_ty);
-    allow_torch[i]=slab_is_short(slab);
-    if (slab==SLAB_TYPE_LAVA)
-      allow_torch[i]=false;
+    allow_torch[i]=slab_allows_torch(slab);
   }
   // Well, let's just make torch where it can be made
   for (i=0;i<4;i++)
@@ -1439,11 +1437,11 @@ void update_things_slb_portal_inside(struct LEVEL *lvl, const int tx, const int 
             if (is_room_inventory(thing))
             {
                 unsigned char stype_idx=get_thing_subtype(thing);
-                if (is_roomeffect(thing)&&(stype_idx==ROOMEFC_SUBTP_ENTRICE)&&(thing_eff==NULL))
+                if (is_effectgen(thing)&&(stype_idx==EFCTGEN_SUBTP_ENTRICE)&&(thing_eff==NULL))
                   thing_eff=thing;
                 else
                 //Let's leave two entrance ice effects - we sometimes use two of them
-                if (is_roomeffect(thing)&&(stype_idx==ROOMEFC_SUBTP_ENTRICE)&&(thing_eff2==NULL))
+                if (is_effectgen(thing)&&(stype_idx==EFCTGEN_SUBTP_ENTRICE)&&(thing_eff2==NULL))
                   thing_eff2=thing;
                 else
                 thing_del(lvl,sx, sy, i);
@@ -1454,7 +1452,7 @@ void update_things_slb_portal_inside(struct LEVEL *lvl, const int tx, const int 
     sy=ty*MAP_SUBNUM_Y+1;
     if (thing_eff==NULL)
     {
-      thing_eff=create_roomeffect(lvl,sx,sy, ROOMEFC_SUBTP_ENTRICE);
+      thing_eff=create_effectgen(lvl,sx,sy, EFCTGEN_SUBTP_ENTRICE);
       thing_add(lvl,thing_eff);
     } else
     {
@@ -1776,7 +1774,7 @@ void update_things_slb_graveyard_corner(struct LEVEL *lvl, const int tx, const i
 {
     int sx, sy, i;
     const unsigned char itm_stype_idx=ITEM_SUBTYPE_GRAVSTONE;
-    const unsigned char eff_stype_idx=ROOMEFC_SUBTP_DRYICE;
+    const unsigned char eff_stype_idx=EFCTGEN_SUBTP_DRYICE;
     short allow_torch=0;
     if (slab_is_wall(surr_slb[(1)*3+(corner_pos.x)]))
         allow_torch|=1;
@@ -1799,7 +1797,7 @@ void update_things_slb_graveyard_corner(struct LEVEL *lvl, const int tx, const i
                 if ((type_idx==THING_TYPE_ITEM)&&(stype_idx==itm_stype_idx)&&(thing_dst==NULL))
                   thing_dst=thing;
                 else
-                if ((type_idx==THING_TYPE_ROOMEFFECT)&&(stype_idx==eff_stype_idx)&&(thing_eff==NULL))
+                if ((type_idx==THING_TYPE_EFFECTGEN)&&(stype_idx==eff_stype_idx)&&(thing_eff==NULL))
                   thing_eff=thing;
                 else
                 // If we found torch, and that's the first one, and we are allowed to have it - then keep the torch.
@@ -1853,7 +1851,7 @@ void update_things_slb_graveyard_corner(struct LEVEL *lvl, const int tx, const i
     sy=ty*MAP_SUBNUM_Y+2-corner_pos.y;
     if (thing_eff==NULL)
     {
-      thing_eff=create_roomeffect(lvl,sx,sy,eff_stype_idx);
+      thing_eff=create_effectgen(lvl,sx,sy,eff_stype_idx);
       thing_add(lvl,thing_eff);
     } else
     {
@@ -2121,9 +2119,9 @@ void remove_noncrucial_room_things(struct LEVEL *lvl,int tx, int ty)
 
 /*
  * Returns TRUE if subtile with given coordinates is within range of
- * any room effect on map.
+ * any effect generator on map.
  */
-short subtl_in_roomeffect_range(struct LEVEL *lvl,unsigned int sx,unsigned int sy)
+short subtl_in_effectgen_range(struct LEVEL *lvl,unsigned int sx,unsigned int sy)
 {
     const int arr_entries_x=MAP_SIZE_X*MAP_SUBNUM_X;
     const int arr_entries_y=MAP_SIZE_Y*MAP_SUBNUM_Y;
@@ -2135,7 +2133,7 @@ short subtl_in_roomeffect_range(struct LEVEL *lvl,unsigned int sx,unsigned int s
           for (i=last_thing; i>=0; i--)
           {
             char *thing=get_thing(lvl,curr_sx,curr_sy,i);
-            if (is_roomeffect(thing))
+            if (is_effectgen(thing))
               if (subtl_in_thing_range(thing,sx,sy))
                 return true;
           }

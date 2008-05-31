@@ -11,8 +11,8 @@ LIBS =  -L"D:/ProgsNT/Dev-Cpp/lib" --no-export-all-symbols --add-stdcall-alias  
 INCS =  -I"D:/ProgsNT/Dev-Cpp/include" 
 CXXINCS =  -I"D:/ProgsNT/Dev-Cpp/lib/gcc/mingw32/3.4.2/include"  -I"D:/ProgsNT/Dev-Cpp/include/c++/3.4.2/backward"  -I"D:/ProgsNT/Dev-Cpp/include/c++/3.4.2/mingw32"  -I"D:/ProgsNT/Dev-Cpp/include/c++/3.4.2"  -I"D:/ProgsNT/Dev-Cpp/include" 
 BIN  = adikted.dll
-CXXFLAGS = $(CXXINCS) -DBUILDING_DLL=1   -march=i486
-CFLAGS = $(INCS) -DBUILDING_DLL=1   -march=i486
+CXXFLAGS = $(CXXINCS) -DBUILD_DLL   -march=i486
+CFLAGS = $(INCS) -DBUILD_DLL   -march=i486
 RM = rm -f
 
 .PHONY: all all-before all-after clean clean-custom

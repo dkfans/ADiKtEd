@@ -274,6 +274,36 @@ short level_init(struct LEVEL **lvl_ptr)
       }
     }
   }
+  { // allocating script structures
+    int idx;
+    lvl->script.par.player=(struct DK_SCRIPT_PLAYER *)malloc(PLAYERS_COUNT*sizeof(struct DK_SCRIPT_PLAYER));
+    lvl->script.par.creature_pool=(unsigned int *)malloc(creatures_cmd_arrsize()*sizeof(unsigned int));
+    if ((lvl->script.par.player==NULL)||(lvl->script.par.creature_pool==NULL))
+    {
+        message_error("level_init: Cannot alloc script params memory");
+        return false;
+    }
+    // Double arrays with first indices PLAYER0..PLAYER_UNSET
+    for (idx=0;idx<PLAYERS_COUNT;idx++)
+    {
+      lvl->script.par.player[idx].ally=(unsigned short *)malloc(PLAYERS_COUNT*sizeof(unsigned short));
+      lvl->script.par.player[idx].creature_avail=(unsigned short *)malloc(creatures_cmd_arrsize()*sizeof(unsigned short));
+      lvl->script.par.player[idx].room_avail=(unsigned short *)malloc(room_cmd_arrsize()*sizeof(unsigned short));
+      lvl->script.par.player[idx].spell_avail=(unsigned short *)malloc(spell_cmd_arrsize()*sizeof(unsigned short));
+      lvl->script.par.player[idx].trap_avail=(unsigned short *)malloc(trap_cmd_arrsize()*sizeof(unsigned short));
+      lvl->script.par.player[idx].door_avail=(unsigned short *)malloc(door_cmd_arrsize()*sizeof(unsigned short));
+      lvl->script.par.player[idx].trap_amount=(unsigned int *)malloc(trap_cmd_arrsize()*sizeof(unsigned int));
+      lvl->script.par.player[idx].door_amount=(unsigned int *)malloc(door_cmd_arrsize()*sizeof(unsigned int));
+      if ((lvl->script.par.player[idx].ally==NULL)||(lvl->script.par.player[idx].creature_avail==NULL)||
+          (lvl->script.par.player[idx].room_avail==NULL)||(lvl->script.par.player[idx].spell_avail==NULL)||
+          (lvl->script.par.player[idx].trap_avail==NULL)||(lvl->script.par.player[idx].door_avail==NULL)||
+          (lvl->script.par.player[idx].trap_amount==NULL)||(lvl->script.par.player[idx].door_amount==NULL))
+      {
+          message_error("level_init: Cannot alloc script params entries");
+          return false;
+      }
+    }
+  }
   { //allocating cust.columns structures
     lvl->cust_clm_lookup= (struct DK_CUSTOM_CLM ***)malloc(dat_entries_y*sizeof(struct DK_CUSTOM_CLM **));
     if (lvl->cust_clm_lookup==NULL)
@@ -454,7 +484,7 @@ short level_clear_datclm(struct LEVEL *lvl)
 short level_clear_stats(struct LEVEL *lvl)
 {
     lvl->stats.creatures_count=0;
-    lvl->stats.roomeffects_count=0;
+    lvl->stats.effectgenrts_count=0;
     lvl->stats.traps_count=0;
     lvl->stats.doors_count=0;
     lvl->stats.items_count=0;
@@ -495,6 +525,75 @@ short level_clear_info(struct LEVEL *lvl)
     lvl->info.ver_rel=0;
     return true;
 }
+
+/*
+ * Clears (via zeroing) TXT script info for given level.
+ */
+short level_clear_script(struct LEVEL *lvl)
+{
+    message_log("  level_clear_script: started");
+    lvl->script.list=NULL;
+    lvl->script.txt=NULL;
+    lvl->script.lines_count=0;
+    // Zeroing DK_SCRIPT_PARAMETERS struct
+    return level_clear_script_param(&(lvl->script.par));
+}
+
+/*
+ * Clears (via zeroing) given script parameters struct.
+ */
+short level_clear_script_param(struct DK_SCRIPT_PARAMETERS *par)
+{
+    par->portal_gen_speed=600;
+    par->end_level=0;
+    int i;
+    int max_idx;
+    for (i=0;i<PLAYERS_COUNT;i++)
+    {
+      // Arrays with indices PLAYER0..PLAYER_UNSET
+      par->player[i].max_creatures=0;
+      par->player[i].start_gold=0;
+      par->player[i].computer_player=-1;
+      // Double arrays with first indices PLAYER0..PLAYER_UNSET
+      int k;
+      for (k=0;k<PLAYERS_COUNT;k++)
+      {
+        par->player[i].ally[k]=false;
+      }
+      max_idx=creatures_cmd_arrsize();
+      for (k=0;k<max_idx;k++)
+      {
+        par->player[i].creature_avail[k]=AVAIL_NO;
+      }
+      max_idx=trap_cmd_arrsize();
+      for (k=0;k<max_idx;k++)
+      {
+        par->player[i].trap_avail[k]=AVAIL_NO;
+        par->player[i].trap_amount[k]=0;
+      }
+      max_idx=door_cmd_arrsize();
+      for (k=0;k<max_idx;k++)
+      {
+        par->player[i].door_avail[k]=AVAIL_NO;
+        par->player[i].door_amount[k]=0;
+      }
+      max_idx=room_cmd_arrsize();
+      for (k=0;k<max_idx;k++)
+      {
+        par->player[i].room_avail[k]=AVAIL_NO;
+      }
+      max_idx=spell_cmd_arrsize();
+      for (k=0;k<max_idx;k++)
+      {
+        par->player[i].spell_avail[k]=AVAIL_NO;
+      }
+    }
+    max_idx=creatures_cmd_arrsize();
+    for (i=0;i<max_idx;i++)
+      par->creature_pool[i]=0;
+    return true;
+}
+
 /*
  * clears the structures for storing level which do not have separate
  * clearing function; drops any old pointers, only file name remains;
@@ -547,11 +646,6 @@ short level_clear_other(struct LEVEL *lvl)
     // INF file is easy
     lvl->inf=0x00;
 
-    // TXT script file
-    lvl->script.list=NULL;
-    lvl->script.txt=NULL;
-    lvl->script.lines_count=0;
-
     // The Adikted-custom elements
     if (lvl->cust_clm_lookup!=NULL)
     {
@@ -582,9 +676,35 @@ short level_clear(struct LEVEL *lvl)
   result&=level_clear_datclm(lvl);
   result&=level_clear_stats(lvl);
   result&=level_clear_info(lvl);
+  result&=level_clear_script(lvl);
   result&=level_clear_other(lvl);
     message_log(" level_clear: finished");
   return result;
+}
+
+/*
+ * frees all sub-structures of given DK_SCRIPT_PARAMETERS
+ */
+short level_free_script_param(struct DK_SCRIPT_PARAMETERS *par)
+{
+  message_log(" level_free_script_param: starting");
+  int idx;
+  free(par->creature_pool);
+  // Double arrays with first indices PLAYER0..PLAYER_UNSET
+//  message_log(" level_free_script_param: freeing 2d player arrays");
+  for (idx=0;idx<PLAYERS_COUNT;idx++)
+  {
+    free(par->player[idx].ally);
+    free(par->player[idx].creature_avail);
+//    free(par->player[idx].room_avail);
+//    free(par->player[idx].spell_avail);
+    free(par->player[idx].trap_avail);
+    free(par->player[idx].door_avail);
+    free(par->player[idx].trap_amount);
+    free(par->player[idx].door_amount);
+  }
+  free(par->player);
+  return true;
 }
 
 /*
@@ -605,7 +725,7 @@ short level_deinit(struct LEVEL **lvl_ptr)
     const int dat_entries_x=MAP_SIZE_X*MAP_SUBNUM_X+1;
     const int dat_entries_y=MAP_SIZE_Y*MAP_SUBNUM_Y+1;
 
-    //Freeing SLB structure
+//    message_log(" level_deinit: Freeing SLB structure");
     if (lvl->slb!=NULL)
     {
       int i;
@@ -614,7 +734,7 @@ short level_deinit(struct LEVEL **lvl_ptr)
       free(lvl->slb);
     }
 
-    //Freeing OWN structure
+//    message_log(" level_deinit: Freeing OWN structure");
     if (lvl->own!=NULL)
     {
       int i;
@@ -623,7 +743,7 @@ short level_deinit(struct LEVEL **lvl_ptr)
       free(lvl->own);
     }
 
-    //Freeing DAT structure
+//    message_log(" level_deinit: Freeing DAT structure");
     if (lvl->dat!=NULL)
     {
       int i;
@@ -632,7 +752,7 @@ short level_deinit(struct LEVEL **lvl_ptr)
       free (lvl->dat);
     }
 
-    //Freeing WIB structure
+//    message_log(" level_deinit: Freeing WIB structure");
     if (lvl->wib!=NULL)
     {
       int i;
@@ -641,7 +761,7 @@ short level_deinit(struct LEVEL **lvl_ptr)
       free (lvl->wib);
     }
 
-    //Freeing FLG structure
+//    message_log(" level_deinit: Freeing FLG structure");
     if (lvl->flg!=NULL)
     {
       int i;
@@ -650,7 +770,7 @@ short level_deinit(struct LEVEL **lvl_ptr)
       free (lvl->flg);
     }
 
-    //Freeing "things" structure
+//    message_log(" level_deinit: Freeing \"things\" structure");
     if (lvl->tng_apt_lgt_nums!=NULL)
     {
       int i;
@@ -673,7 +793,7 @@ short level_deinit(struct LEVEL **lvl_ptr)
       free(lvl->tng_subnums);
     }
 
-    //Freeing action points structure
+//    message_log(" level_deinit: Freeing action points structure");
     if (lvl->apt_lookup!=NULL)
     {
       int i;
@@ -689,7 +809,7 @@ short level_deinit(struct LEVEL **lvl_ptr)
       free(lvl->apt_subnums);
     }
 
-    //Freeing static lights structure
+//    message_log(" level_deinit: Freeing static lights structure");
     if (lvl->lgt_lookup!=NULL)
     {
       int i;
@@ -705,7 +825,7 @@ short level_deinit(struct LEVEL **lvl_ptr)
       free(lvl->lgt_subnums);
     }
 
-    //Freeing column structure
+//    message_log(" level_deinit: Freeing column structure");
     if (lvl->clm!=NULL)
     {
       int i;
@@ -716,7 +836,7 @@ short level_deinit(struct LEVEL **lvl_ptr)
       free(lvl->clm_utilize);
     }
 
-    //Freeing WLB structure
+//    message_log(" level_deinit: Freeing WLB structure");
     if (lvl->wlb!=NULL)
     {
       int i;
@@ -725,7 +845,9 @@ short level_deinit(struct LEVEL **lvl_ptr)
       free(lvl->wlb);
     }
 
-    //Freeing cust.columns structure
+    level_free_script_param(&(lvl->script.par));
+
+//    message_log(" level_deinit: Freeing cust.columns structure");
     if (lvl->cust_clm_lookup!=NULL)
     {
       int i;
@@ -1983,8 +2105,8 @@ void update_thing_stats(struct LEVEL *lvl,const unsigned char *thing,short chang
           case THING_TYPE_CREATURE:
               lvl->stats.creatures_count+=change;
               break;
-          case THING_TYPE_ROOMEFFECT:
-              lvl->stats.roomeffects_count+=change;
+          case THING_TYPE_EFFECTGEN:
+              lvl->stats.effectgenrts_count+=change;
               break;
           case THING_TYPE_TRAP:
               lvl->stats.traps_count+=change;
@@ -2259,7 +2381,7 @@ short get_level_objstats_textln(struct LEVEL *lvl,char *stat_buf,const int line_
         sprintf(stat_buf,"Traps:%4d",stats->traps_count);
         return STLT_SUBITEM;
     case 8:
-        sprintf(stat_buf,"Room Effcts:%4d",stats->roomeffects_count);
+        sprintf(stat_buf,"EffctGens:%4d",stats->effectgenrts_count);
         return STLT_SUBITEM;
     case 9:
         sprintf(stat_buf,"Doors:%4d",stats->doors_count);
