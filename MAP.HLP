@@ -439,6 +439,8 @@ Note that script errors which can be automatically corrected
 with '\wu\s' are \rnot always detected\s by verification ('\wv\s' key).
 Such errors include missing brackets and commas.
 
+Press \wctrl+t\s to enter \yscript generator\s. Warning: It is unfinished!
+
 To \yback\s into previous work mode, press \wesc\s or \wtab\s.
 
 [txtrhelp]

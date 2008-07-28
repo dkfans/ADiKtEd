@@ -38,6 +38,7 @@ struct TXTED_DATA {
     unsigned int total_rows_count;  // Count of lines on screen taken by all commands
     short word_wrap;          // Should the long lines be wrapped
     int scr_width;            // Width of the area where script is drawn
+    short gen_flags;          // Script generator flags
   };
 
 struct TXTED_COLORS {

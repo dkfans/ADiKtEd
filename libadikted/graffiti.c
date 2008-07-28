@@ -1,21 +1,18 @@
 /******************************************************************************/
-// graffiti.c - Another Dungeon Keeper Map Editor.
-/******************************************************************************/
-// Author:   Jon Skeet
-// Created:  14 Oct 1997
-// Modified: Tomasz Lis
-
-// Purpose:
-//   Module for handling wall graffities.
-
-// Comment:
-//   None.
-
-//Copying and copyrights:
-//   This program is free software; you can redistribute it and/or modify
-//   it under the terms of the GNU General Public License as published by
-//   the Free Software Foundation; either version 2 of the License, or
-//   (at your option) any later version.
+/** @file graffiti.c
+ * Wall graffiti support for levels.
+ * @par Purpose:
+ *     Module for handling wall graffities in levels.
+ * @par Comment:
+ *     None.
+ * @author   Jon Skeet, Tomasz Lis
+ * @date     14 Oct 1997 - 22 Jul 2008
+ * @par  Copying and copyrights:
+ *     This program is free software; you can redistribute it and/or modify
+ *     it under the terms of the GNU General Public License as published by
+ *     the Free Software Foundation; either version 2 of the License, or
+ *     (at your option) any later version.
+ */
 /******************************************************************************/
 
 #include "graffiti.h"
@@ -27,8 +24,10 @@
 #include "obj_slabs.h"
 #include "obj_column.h"
 
-/*
- * Frees the whole graffiti structure
+/**
+ * Frees the whole graffiti structure.
+ * @param lvl Pointer to the LEVEL structure.
+ * @return Returns ERR_NONE on success, error code on failure.
  */
 short level_free_graffiti(struct LEVEL *lvl)
 {
@@ -40,20 +39,29 @@ short level_free_graffiti(struct LEVEL *lvl)
     }
     if (lvl->graffiti_count>0)
       free(lvl->graffiti);
+    return ERR_NONE;
 }
 
-/*
- * Returns index of first graffiti at given tile, or -1 if not found.
+/**
+ * Searches for graffiti at given tile and returns its index.
+ * @param lvl Pointer to the LEVEL structure.
+ * @param tx,ty Map tile coordinates.
+ * @return Returns index of first graffiti at given tile, or -1 if not found.
  */
 int graffiti_idx(struct LEVEL *lvl, int tx, int ty)
 {
     return graffiti_idx_next(lvl, tx, ty,-1);
 }
 
-/*
- * Returns index of next graffiti at given tile,
- * the one after prev_idx; or -1 if not found.
- * To get first graffiti, prev_idx must be -1.
+/**
+ * Searches for next graffiti at given tile and returns its index.
+ * @param lvl Pointer to the LEVEL structure.
+ * @param tx Map tile coordinate, in range 0-MAP_MAXINDEX_X.
+ * @param ty Map tile coordinate, in range 0-MAP_MAXINDEX_Y.
+ * @param prev_idx index if the graffiti previously found.
+ *     To get first graffiti, prev_idx must be -1.
+ * @return Returns index of next graffiti at given tile,
+ *     the one after prev_idx; or -1 if not found.
  */
 int graffiti_idx_next(struct LEVEL *lvl, int tx, int ty, int prev_idx)
 {
@@ -72,6 +80,13 @@ int graffiti_idx_next(struct LEVEL *lvl, int tx, int ty, int prev_idx)
     return -1;
 }
 
+/**
+ * Gets text message of graffiti with given index.
+ * @param lvl Pointer to the LEVEL structure.
+ * @param num Graffiti index.
+ * @return Returns graffiti message string,
+ *     or empty string ("") on error.
+ */
 char *get_graffiti_text(struct LEVEL *lvl,unsigned int num)
 {
     if ((num>=lvl->graffiti_count) || (num<0))
@@ -79,6 +94,13 @@ char *get_graffiti_text(struct LEVEL *lvl,unsigned int num)
     return lvl->graffiti[num]->text;
 }
 
+/**
+ * Deletes graffiti with given index.
+ * The graffiti is removed from structure, and its memory is freed.
+ * Level graphics is not updated by this function.
+ * @param lvl Pointer to the LEVEL structure.
+ * @param num Graffiti index.
+ */
 void graffiti_del(struct LEVEL *lvl,unsigned int num)
 {
     int i;
@@ -103,9 +125,15 @@ void graffiti_del(struct LEVEL *lvl,unsigned int num)
              (graff_max_idx)*sizeof(struct DK_GRAFFITI *));
 }
 
-/*
+/**
  * Creates a new graffiti and fills its all properties.
  * The graffiti is not added to LEVEL structure.
+ * @param tx Map tile coordinate, in range 0-MAP_MAXINDEX_X.
+ * @param ty Map tile coordinate, in range 0-MAP_MAXINDEX_Y.
+ * @param text The message text which is duplicated into graffiti.
+ * @param lvl Pointer to the LEVEL structure.
+ * @param orient Graffiti orientation, from GRAFFITI_ORIENT enumeration.
+ * @return Returns the new graffiti, or NULL on error.
  */
 struct DK_GRAFFITI *create_graffiti(int tx, int ty, char *text, const struct LEVEL *lvl, int orient)
 {
@@ -129,9 +157,12 @@ struct DK_GRAFFITI *create_graffiti(int tx, int ty, char *text, const struct LEV
     return graf;
 }
 
-/*
+/**
  * Adds graffiti object to level data, without filling the graffiti
  * nor updating slabs.
+ * @param lvl Pointer to the LEVEL structure.
+ * @param graf Pointer to the DK_GRAFFITI structure to add.
+ * @return Returns the index at which graffiti is added, or -1 on error.
  */
 int graffiti_add_obj(struct LEVEL *lvl,struct DK_GRAFFITI *graf)
 {
@@ -150,10 +181,14 @@ int graffiti_add_obj(struct LEVEL *lvl,struct DK_GRAFFITI *graf)
     return graf_idx;
 }
 
-/*
+/**
  * Sets orientation of given graffiti, updating its dimensions and height.
  * Graffiti don't have to be in the LEVEL structure, but must have
  * tx,ty,font and text properties set.
+ * @param graf Pointer to the DK_GRAFFITI structure to update.
+ * @param lvl Pointer to the LEVEL structure.
+ * @param orient New graffiti orientation, from GRAFFITI_ORIENT enumeration.
+ * @return Returns ERR_NONE on success, error code on failure.
  */
 short set_graffiti_orientation(struct DK_GRAFFITI *graf,const struct LEVEL *lvl,unsigned short orient)
 {
@@ -260,12 +295,15 @@ short set_graffiti_orientation(struct DK_GRAFFITI *graf,const struct LEVEL *lvl,
            graf->height=graf_h;
            break;
     }
-    return true;
+    return ERR_NONE;
 }
 
-/*
- * Sets new height to the graffiti; makes sure the parameter will be
- * in appropiate range. Returns the new height set for graffiti.
+/**
+ * Sets new height to the graffiti. Makes sure the parameter will be
+ * in appropiate range.
+ * @param graf Pointer to the DK_GRAFFITI structure to update.
+ * @param height New graffiti height.
+ * @return Returns the new height set for graffiti.
  */
 int set_graffiti_height(struct DK_GRAFFITI *graf,int height)
 {
@@ -293,8 +331,17 @@ int set_graffiti_height(struct DK_GRAFFITI *graf,int height)
     return height;
 }
 
-/*
- * Creates and adds graffiti.
+/**
+ * Creates and adds graffiti to the level.
+ * @param lvl Pointer to the LEVEL structure.
+ * @param tx Map tile coordinate, in range 0-MAP_MAXINDEX_X.
+ * @param ty Map tile coordinate, in range 0-MAP_MAXINDEX_Y.
+ * @param height Graffiti height.
+ * @param text The graffiti message text.
+ * @param font Graffiti font, from GRAFFITI_FONT enumeration.
+ * @param orient Graffiti orientation, from GRAFFITI_ORIENT enumeration.
+ * @param cube Index of the cube used to draw graffiti text.
+ * @return Returns the index at which graffiti is added, or -1 on error.
  */
 int graffiti_add(struct LEVEL *lvl,int tx, int ty,int height, char *text,int font,
       unsigned short orient,unsigned short cube)
@@ -307,13 +354,18 @@ int graffiti_add(struct LEVEL *lvl,int tx, int ty,int height, char *text,int fon
     graf->cube=cube;
     int graf_idx=graffiti_add_obj(lvl,graf);
     if (graf_idx<0)
+    {
+      free(graf->text);
       free(graf);
+    }
     return graf_idx;
 }
 
-/*
-* Updates CLM entries to make the graffiti visible.
-*/
+/**
+ * Updates CLM entries to make the graffiti visible.
+ * @param lvl Pointer to the LEVEL structure.
+ * @param graf_idx Graffiti index.
+ */
 void graffiti_update_columns(struct LEVEL *lvl,int graf_idx)
 {
     if (graf_idx<0) return;
@@ -323,9 +375,12 @@ void graffiti_update_columns(struct LEVEL *lvl,int graf_idx)
     update_datclm_for_square(lvl,graf->tile.x,graf->fin_tile.x,graf->tile.y,graf->fin_tile.y);
 }
 
-/*
-* Updates CLM entries, removing graffiti from them.
-*/
+/**
+ * Updates CLM entries, removing graffiti from them.
+ * This makes the graffiti invisuble and ready to be deleted.
+ * @param lvl Pointer to the LEVEL structure.
+ * @param graf_idx Graffiti index.
+ */
 void graffiti_clear_from_columns(struct LEVEL *lvl,int graf_idx)
 {
     if (graf_idx<0) return;
@@ -347,20 +402,34 @@ void graffiti_clear_from_columns(struct LEVEL *lvl,int graf_idx)
     graf->fin_tile.y=fin_ty;
 }
 
+/**
+ * Gets amount of graffitties in the level.
+ * @param lvl Pointer to the LEVEL structure.
+ * @return Returns graffities count for the level.
+ */
 unsigned int get_graffiti_count(struct LEVEL *lvl)
 {
     if (lvl==NULL) return 0;
     return lvl->graffiti_count;
 }
 
+/**
+ * Gets the graffiti structure for given graffiti index.
+ * @param lvl Pointer to the LEVEL structure.
+ * @param graf_idx Graffiti index.
+ * @return Returns DK_GRAFFITI structure pointer, NULL on error.
+ */
 struct DK_GRAFFITI *get_graffiti(struct LEVEL *lvl, int graf_idx)
 {
     if ((graf_idx<0)||(graf_idx>=lvl->graffiti_count)) return NULL;
     return lvl->graffiti[graf_idx];
 }
 
-/*
+/**
  * Computes graffiti text length in subtiles, for given font.
+ * @param font Graffiti font, from GRAFFITI_FONT enumeration.
+ * @param text The graffiti message text.
+ * @return Returns length of the graffiti, in subtiles.
  */
 int compute_graffiti_subtl_length(unsigned short font,char *text)
 {
@@ -391,8 +460,11 @@ int compute_graffiti_subtl_length(unsigned short font,char *text)
     return subtl_len;
 }
 
-/*
- * Returns graffiti height, in cubes (or subtiles).
+/**
+ * Returns graffiti text height in subtiles, for given font.
+ * @param font Graffiti font, from GRAFFITI_FONT enumeration.
+ * @param text The graffiti message text.
+ * @return Returns graffiti height, in cubes (or subtiles).
  */
 int get_graffiti_cube_height(unsigned short font,char *text)
 {
@@ -409,6 +481,12 @@ int get_graffiti_cube_height(unsigned short font,char *text)
   }
 }
 
+/**
+ * Returns graffiti character for given font.
+ * @param font Graffiti font, from GRAFFITI_FONT enumeration.
+ * @param chr The text character.
+ * @return Returns font character to use for making graffiti visible.
+ */
 const unsigned char *get_font_char(unsigned short font,char chr)
 {
   switch (font)
@@ -422,8 +500,13 @@ const unsigned char *get_font_char(unsigned short font,char chr)
   }
 }
 
-/*
- * Draws graffiti on given columns array. Returns num of changed entries.
+/**
+ * Draws graffiti on given columns array.
+ * @param clm_recs Comumn entries array.
+ * @param lvl Pointer to the LEVEL structure.
+ * @param tx Map tile coordinate, in range 0-MAP_MAXINDEX_X.
+ * @param ty Map tile coordinate, in range 0-MAP_MAXINDEX_Y.
+ * @return Returns num of changed entries.
  */
 int place_graffiti_on_slab(struct COLUMN_REC *clm_recs[9],struct LEVEL *lvl, int tx, int ty)
 {
@@ -508,6 +591,17 @@ int place_graffiti_on_slab(struct COLUMN_REC *clm_recs[9],struct LEVEL *lvl, int
     return mod_clms;
 }
 
+/**
+ * Places graffiti on top of given column.
+ * @param clm_rec Comumn entry struct pointer.
+ * @param font Graffiti font, from GRAFFITI_FONT enumeration.
+ * @param height Graffiti height.
+ * @param text The graffiti message text.
+ * @param graf_subtl The subtile at which we're placing.
+ * @param graf_subtl_h The subtile at which we're placing, on height.
+ * @param cube Index of the cube to place as graffiti.
+ * @return Returns true on success.
+ */
 short place_graffiti_on_clm_top(struct COLUMN_REC *clm_rec,unsigned short font,
         unsigned short height,char *text,int graf_subtl,int graf_subtl_h,
         unsigned short cube)
@@ -526,7 +620,7 @@ short place_graffiti_on_clm_top(struct COLUMN_REC *clm_rec,unsigned short font,
         if ((i<=graf_subtl)&&(i+chr_clms_count>graf_subtl))
         {
             //clm_pos starts with 1, not with 0 (because chars[][0] is
-            // the number of columns in letter)
+            // the number of columns in a letter)
             clm_pos=graf_subtl-i+1;
             break;
         }
@@ -547,6 +641,16 @@ short place_graffiti_on_clm_top(struct COLUMN_REC *clm_rec,unsigned short font,
     return true;
 }
 
+/**
+ * Places graffiti on side of given column.
+ * @param clm_rec Comumn entry struct pointer.
+ * @param font Graffiti font, from GRAFFITI_FONT enumeration.
+ * @param height Graffiti height.
+ * @param text The graffiti message text.
+ * @param graf_subtl The subtile at which we're placing.
+ * @param cube Index of the cube to place as graffiti.
+ * @return Returns true on success.
+ */
 short place_graffiti_on_column(struct COLUMN_REC *clm_rec,unsigned short font,
         unsigned short height,char *text,int graf_subtl,unsigned short cube)
 {

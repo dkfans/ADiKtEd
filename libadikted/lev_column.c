@@ -1,21 +1,19 @@
 /******************************************************************************/
-// lev_column.c - Another Dungeon Keeper Map Editor.
-/******************************************************************************/
-// Author:   Tomasz Lis
-// Created:  21 Jan 2008
-
-// Purpose:
-//   Functions for maintaining CLM and DAT files.
-
-// Comment:
-//   The DAT/CLM generation algorithm was completely rewritten from the
-//   Jon Skeet's version.
-
-//Copying and copyrights:
-//   This program is free software; you can redistribute it and/or modify
-//   it under the terms of the GNU General Public License as published by
-//   the Free Software Foundation; either version 2 of the License, or
-//   (at your option) any later version.
+/** @file lev_column.c
+ * Level graphics (DAT/CLM) handling module.
+ * @par Purpose:
+ *     Functions for maintaining CLM and DAT files.
+ * @par Comment:
+ *     The DAT/CLM generation algorithm was completely rewritten from the
+ *     Jon Skeet's version.
+ * @author   Tomasz Lis
+ * @date     21 Jan 2008 - 22 Jul 2008
+ * @par  Copying and copyrights:
+ *     This program is free software; you can redistribute it and/or modify
+ *     it under the terms of the GNU General Public License as published by
+ *     the Free Software Foundation; either version 2 of the License, or
+ *     (at your option) any later version.
+ */
 /******************************************************************************/
 
 #include "lev_column.h"
@@ -37,14 +35,22 @@ char const INF_BRESTS_LTEXT[]="Big breasts";
 char const INF_RGANCNT_LTEXT[]="Rough Ancient";
 char const INF_SKULL_LTEXT[]="Skull relief";
 
+/**
+ * Text names of standard textures.
+ */
 const char * const inf_texture_fullnames[]={
       INF_STANDARD_LTEXT,INF_ANCIENT_LTEXT,INF_WINTER_LTEXT,
       INF_SNAKE_LTEXT,INF_FACE_LTEXT,INF_BRESTS_LTEXT,
       INF_RGANCNT_LTEXT,INF_SKULL_LTEXT,
       };
 
-/*
+/**
  * Sets a CLM entry of index num, using simplified parameters.
+ * @param lvl Pointer to the LEVEL structure.
+ * @param num Column index in the LEVEL structure.
+ * @param use Value of use parameter.
+ * @param base Index of base cube.
+ * @param c0,c1,c2,c3,c4,c5,c6,c7 Indices of cubes making the column.
  */
 void set_clm(struct LEVEL *lvl, int num, unsigned int use, int base,
         int c0, int c1, int c2, int c3, int c4, int c5, int c6, int c7)
@@ -58,8 +64,18 @@ void set_clm(struct LEVEL *lvl, int num, unsigned int use, int base,
     free_column_rec(clm_rec);
 }
 
-/*
+/**
  * Sets a CLM entry of index num, allows specifying all parameters.
+ * @param lvl Pointer to the LEVEL structure.
+ * @param num Column index in the LEVEL structure.
+ * @param use Value of use parameter.
+ * @param permanent Value of permanent parameter.
+ * @param lintel Value of lintel parameter.
+ * @param height The column height.
+ * @param solid The column solid mask.
+ * @param base Index of base cube.
+ * @param orientation Column orientation.
+ * @param c0,c1,c2,c3,c4,c5,c6,c7 Indices of cubes making the column.
  */
 void set_clm_ent_idx(struct LEVEL *lvl,int num, unsigned int use, int permanent,
         int lintel, int height, unsigned int solid, int base, int orientation,
@@ -75,8 +91,15 @@ void set_clm_ent_idx(struct LEVEL *lvl,int num, unsigned int use, int permanent,
     free_column_rec(clm_rec);
 }
 
-/*
+/**
  * Searches CLM structure for given column; if not found, creates it.
+ * @param lvl Pointer to the LEVEL structure.
+ * @param clm_rec Pointer at searched column.
+ * @return Returns index if the column which consists of cubes
+ *     identical to those from clm_rec parameter.
+       If such column is not found, creates it and returns
+       index of the new column. On error returns 0 (column 0 is never
+       used, so this indicates error).
  */
 int column_find_or_create(struct LEVEL *lvl,struct COLUMN_REC *clm_rec)
 {
@@ -119,8 +142,11 @@ int column_find_or_create(struct LEVEL *lvl,struct COLUMN_REC *clm_rec)
   return num;
 }
 
-/*
+/**
  * Tries to find unused entry in CLM structure and returns its index.
+ * @param lvl Pointer to the LEVEL structure.
+ * @return Returns index of the first unused column, or -1 if there are
+ *     no more unused column entries.
  */
 int column_get_free_index(struct LEVEL *lvl)
 {
@@ -136,10 +162,11 @@ int column_get_free_index(struct LEVEL *lvl)
   return -1;
 }
 
-/*
- * Updates DAT, CLM and w?b entries for the whole map - all tiles
+/**
+ * Updates DAT, CLM and w?b entries for the whole map. All tiles
  * and subtiles are reset. Additionally, USE values in columns
  * are recomputed to avoid mistakes.
+ * @param lvl Pointer to the LEVEL structure.
  */
 void update_datclm_for_whole_map(struct LEVEL *lvl)
 {
@@ -167,9 +194,13 @@ void update_datclm_for_whole_map(struct LEVEL *lvl)
     update_clm_utilize_counters(lvl);
 }
 
-/*
- * Updates DAT, CLM and w?b entries for given map tile coordinates
- * and also updates enties in all neightbour squares
+/**
+ * Updates DAT, CLM and w?b entries for given tile and around it.
+ * Updates map tile at given coordinates, and also enties
+ * in all neightbour squares.
+ * @see update_datclm_for_square
+ * @param lvl Pointer to the LEVEL structure.
+ * @param tx,ty Map tile coordinates, in range 0-MAP_MAXINDEX_X/Y.
  */
 void update_datclm_for_square_radius1(struct LEVEL *lvl, int tx, int ty)
 {
@@ -199,8 +230,13 @@ void update_datclm_for_square_radius1(struct LEVEL *lvl, int tx, int ty)
       }
 }
 
-/*
- * Updates DAT, CLM and w?b entries for given map tile coordinates range
+/**
+ * Updates DAT, CLM and w?b entries for given map tile coordinates range.
+ * Updates all tiles inside given rectangle.
+ * @see update_datclm_for_square_radius1
+ * @param lvl Pointer to the LEVEL structure.
+ * @param tx_first,ty_first Top left map tile coordinates, in range 0-MAP_MAXINDEX_X/Y.
+ * @param tx_last,ty_last Bottom right map tile coordinates, in range tx/y_first-MAP_MAXINDEX_X/Y.
  */
 void update_datclm_for_square(struct LEVEL *lvl, int tx_first, int tx_last,
     int ty_first, int ty_last)
@@ -231,9 +267,12 @@ void update_datclm_for_square(struct LEVEL *lvl, int tx_first, int tx_last,
       }
 }
 
-/*
- * Updates DAT and CLM entries for given map position (whole tile)
+/**
+ * Updates DAT and CLM entries for given map position (whole tile).
  * You will probably also need to update W?B entries.
+ * @see update_datclm_for_square
+ * @param lvl Pointer to the LEVEL structure.
+ * @param tx,ty Map tile coordinates, in range 0-MAP_MAXINDEX_X/Y.
  */
 void update_datclm_for_slab(struct LEVEL *lvl, int tx, int ty)
 {
@@ -261,11 +300,17 @@ void update_datclm_for_slab(struct LEVEL *lvl, int tx, int ty)
   free(surr_tng);
 }
 
-/*
+/**
  * Returns slab surrounding information, needed for CLM generation.
+ * @see update_datclm_for_slab
+ * @param surr_slb The slab surrounding array.
+ * @param surr_own The owner surrounding array.
+ * @param surr_tng The thing surrounding array.
+ * @param lvl Pointer to the LEVEL structure.
+ * @param tx,ty Map tile coordinates, in range 0-MAP_MAXINDEX_X/Y.
  */
 void get_slab_surround(unsigned char *surr_slb,unsigned char *surr_own,
-        unsigned char **surr_tng,const struct LEVEL *lvl,int x, int y)
+        unsigned char **surr_tng,const struct LEVEL *lvl,int tx, int ty)
 {
     //Note: the surround[] array indexing must be set in a way
     // that gives right directions if IDIR_* constants are used.
@@ -287,7 +332,7 @@ void get_slab_surround(unsigned char *surr_slb,unsigned char *surr_own,
       for (k=-1;k<=1;k++)
       {
           s_idx=i+1+(k+1)*3;
-          if ((x+i<0)||(y+k<0)||(x+i>=MAP_MAXINDEX_X)||(y+k>=MAP_MAXINDEX_Y))
+          if ((tx+i<0)||(ty+k<0)||(tx+i>=MAP_MAXINDEX_X)||(ty+k>=MAP_MAXINDEX_Y))
           {
             if (surr_slb!=NULL)
               surr_slb[s_idx]=SLAB_TYPE_ROCK;
@@ -297,10 +342,10 @@ void get_slab_surround(unsigned char *surr_slb,unsigned char *surr_own,
           else
           {
             if (surr_slb!=NULL)
-              surr_slb[s_idx]=get_tile_slab(lvl,x+i,y+k);
+              surr_slb[s_idx]=get_tile_slab(lvl,tx+i,ty+k);
             if (surr_own!=NULL)
             {
-              surr_own[s_idx]=get_tile_owner(lvl,x+i,y+k);
+              surr_own[s_idx]=get_tile_owner(lvl,tx+i,ty+k);
               if (surr_own[s_idx]>PLAYER_UNSET)
                   surr_own[s_idx]=PLAYER_UNSET;
             }
@@ -321,8 +366,8 @@ void get_slab_surround(unsigned char *surr_slb,unsigned char *surr_own,
           if (k>1) s_idx+=2*3;
           else if (k>-1) s_idx+=(k+1)*3;
           //Now searching for the correct thing to place there
-          int sx=x*MAP_SUBNUM_X+i+1;
-          int sy=y*MAP_SUBNUM_Y+k+1;
+          int sx=tx*MAP_SUBNUM_X+i+1;
+          int sy=ty*MAP_SUBNUM_Y+k+1;
           int tng_num;
           if ((sx<0)||(sy<0)||(sx>=arr_entries_x)||(sy>=arr_entries_y))
             continue;
@@ -338,10 +383,15 @@ void get_slab_surround(unsigned char *surr_slb,unsigned char *surr_own,
     }
 }
 
-/*
+/**
+ * Sets given columns as new DAT/CLM entries for given tile.
  * Retrieves indices for given columns (possibly adds new columns to LEVEL structure)
  * then uses them to update the (tx,ty) tile. Properly updates USE/UTILIZE information
  * for both old and new columns.
+ * @see set_new_datclm_entry
+ * @param lvl Pointer to the LEVEL structure.
+ * @param tx,ty Map tile coordinates, in range 0-MAP_MAXINDEX_X/Y.
+ * @param clm_recs New column records for all subtiles of given tile.
  */
 void set_new_datclm_values(struct LEVEL *lvl, int tx, int ty, struct COLUMN_REC *clm_recs[9])
 {
@@ -352,42 +402,22 @@ void set_new_datclm_values(struct LEVEL *lvl, int tx, int ty, struct COLUMN_REC 
       int sy=ty*MAP_SUBNUM_Y+idir_subtl_y[i];
       set_new_datclm_entry(lvl,sx,sy,clm_recs[i]);
   }
-/*
-  int i,k;
-  //Updating previously used columns
-  for (k=0;k<MAP_SUBNUM_Y;k++)
-    for (i=0;i<MAP_SUBNUM_X;i++)
-    {
-      unsigned int clmidx;
-      clmidx=get_dat_subtile(lvl, tx*MAP_SUBNUM_X+i, ty*MAP_SUBNUM_Y+k);
-      clm_utilize_dec(lvl,clmidx);
-    }
-
-  // Saving columns, retrieving DAT indices
-  //and updating 'utilize' counter
-  int dat_entries[9];
-  for (i=0;i<9;i++)
-  {
-      int new_dat;
-      new_dat=column_find_or_create(lvl,clm_recs[i]);
-      dat_entries[i]=new_dat;
-      clm_utilize_inc(lvl,new_dat);
-  }
-  // Saving DAT indices
-  set_dat(lvl,tx,ty, dat_entries[IDIR_NW],   dat_entries[IDIR_NORTH], dat_entries[IDIR_NE],
-                     dat_entries[IDIR_WEST], dat_entries[IDIR_CENTR], dat_entries[IDIR_EAST],
-                     dat_entries[IDIR_SW],   dat_entries[IDIR_SOUTH], dat_entries[IDIR_SE]);
-*/
 }
 
-/*
+/**
+ * Sets given column as new DAT/CLM entry for one single column.
  * Retrieves index for given column (possibly adds new column to LEVEL structure)
  * then uses it to update the (sx,sy) subtile. Properly updates USE/UTILIZE information
  * for both old and new columns.
+ * @see set_new_datclm_values
+ * @param lvl Pointer to the LEVEL structure.
+ * @param sx,sy Map subtile coordinates.
+ * @param clm_rec New column record for given subtile.
  */
 void set_new_datclm_entry(struct LEVEL *lvl, int sx, int sy, struct COLUMN_REC *clm_rec)
 {
   unsigned int clmidx;
+  //Updating previously used column
   clmidx=get_dat_subtile(lvl, sx, sy);
   clm_utilize_dec(lvl,clmidx);
   // Saving column, retrieving DAT index
@@ -399,8 +429,12 @@ void set_new_datclm_entry(struct LEVEL *lvl, int sx, int sy, struct COLUMN_REC *
   set_dat_subtile(lvl,sx,sy,dat_entry);
 }
 
-/*
- * Decreases UTILIZE and USE values for column on given index
+/**
+ * Decreases UTILIZE and USE values for column on given index.
+ * @see set_new_datclm_values
+ * @see clm_utilize_inc
+ * @param lvl Pointer to the LEVEL structure.
+ * @param clmidx Column index.
  */
 void clm_utilize_dec(struct LEVEL *lvl, int clmidx)
 {
@@ -419,8 +453,12 @@ void clm_utilize_dec(struct LEVEL *lvl, int clmidx)
   }
 }
 
-/*
- * Increases UTILIZE and USE values for column on given index
+/**
+ * Increases UTILIZE and USE values for column on given index.
+ * @see set_new_datclm_values
+ * @see clm_utilize_dec
+ * @param lvl Pointer to the LEVEL structure.
+ * @param clmidx Column index.
  */
 void clm_utilize_inc(struct LEVEL *lvl, int clmidx)
 {
@@ -433,9 +471,14 @@ void clm_utilize_inc(struct LEVEL *lvl, int clmidx)
     clm_entry_use_inc(clmentry);
 }
 
-/*
- * Verifies column values. Returns VERIF_ERROR,
- * VERIF_WARN or VERIF_OK
+/**
+ * Verifies column values. On error returns description message and
+ * map coordinates of the problem.
+ * @param lvl Pointer to the LEVEL structure.
+ * @param err_msg Error message output buffer.
+ * @param errpt Coordinates of the map tile containing the error.
+ * @return Returns VERIF_ERROR, VERIF_WARN or VERIF_OK.
+ *     If a problem was found, sets err_msg and errpt accordingly.
  */
 short columns_verify(struct LEVEL *lvl, char *err_msg,struct IPOINT_2D *errpt)
 {
@@ -467,11 +510,12 @@ short columns_verify(struct LEVEL *lvl, char *err_msg,struct IPOINT_2D *errpt)
   return VERIF_OK;
 }
 
-/*
- * Sweeps through all CLM entries and recomputes their UTILIZE counters,
- * without changing the USE property in columns. Should be called after
+/**
+ * Sweeps through all CLM entries and recomputes their UTILIZE counters.
+ * Makes no changes to the USE property in columns. Should be called after
  * loading DAT file. It doesn't really use CLM structure, so may be
- * called before loading CLM.
+ * called before loading CLM - needs only DAT file.
+ * @param lvl Pointer to the LEVEL structure.
  */
 void update_clm_utilize_counters(struct LEVEL *lvl)
 {
@@ -495,8 +539,10 @@ void update_clm_utilize_counters(struct LEVEL *lvl)
     }
 }
 
-/*
- * Updates WIB animation entries for all subtiles of given tile
+/**
+ * Updates WIB animation entries for all subtiles of given tile.
+ * @param lvl Pointer to the LEVEL structure.
+ * @param tx,ty Map tile coordinates, in range 0-MAP_MAXINDEX_X/Y.
  */
 void update_tile_wib_entries(struct LEVEL *lvl, int tx, int ty)
 {
@@ -534,8 +580,10 @@ void update_tile_wib_entries(struct LEVEL *lvl, int tx, int ty)
   free_column_rec(clm_rec_nw);
 }
 
-/*
- * Updates WLB entry for given tile
+/**
+ * Updates WLB entry for given tile.
+ * @param lvl Pointer to the LEVEL structure.
+ * @param tx,ty Map tile coordinates, in range 0-MAP_MAXINDEX_X/Y.
  */
 void update_tile_wlb_entry(struct LEVEL *lvl, int tx, int ty)
 {
@@ -570,8 +618,10 @@ void update_tile_wlb_entry(struct LEVEL *lvl, int tx, int ty)
   set_tile_wlb(lvl,tx,ty,wlb_val);
 }
 
-/*
- * Updates FLG entries for all subtiles of given tile
+/**
+ * Updates FLG entries for all subtiles of given tile.
+ * @param lvl Pointer to the LEVEL structure.
+ * @param tx,ty Map tile coordinates, in range 0-MAP_MAXINDEX_X/Y.
  */
 void update_tile_flg_entries(struct LEVEL *lvl, int tx, int ty)
 {
@@ -618,6 +668,12 @@ void update_tile_flg_entries(struct LEVEL *lvl, int tx, int ty)
     }
 }
 
+/**
+ * Computes FLG value for given slab.
+ * @param slab Slab value.
+ * @param corner Corner flag.
+ * @return Returns FLG value for given slab.
+ */
 unsigned short compute_flg_for_tile(unsigned short slab,short corner)
 {
   if (slab_is_wall(slab))
@@ -650,9 +706,11 @@ unsigned short compute_flg_for_tile(unsigned short slab,short corner)
   }
 }
  
-/*
- * Returns a column entry from column on given subtile;
- * On error returns NULL
+/**
+ * Gets a column entry on given subtile.
+ * @param lvl Pointer to the LEVEL structure.
+ * @param sx,sy Map subtile coordinates.
+ * @return Returns column entry for given subtile. On error returns NULL.
  */
 unsigned char *get_subtile_column(const struct LEVEL *lvl, int sx, int sy)
 {
@@ -665,9 +723,12 @@ unsigned char *get_subtile_column(const struct LEVEL *lvl, int sx, int sy)
   return (unsigned char *)(lvl->clm[clmidx]);
 }
 
-/*
- * Fills a column entry with values from column on given subtile;
- * On error returns false and fills clm_rec with rock
+/**
+ * Fills given column record with values from column on given subtile.
+ * @param lvl Pointer to the LEVEL structure.
+ * @param clm_rec Destination column record to fill with data from given subtile.
+ * @param sx,sy Map subtile coordinates.
+ * @return Returns true on success. On error returns false and fills clm_rec with rock.
  */
 short get_subtile_column_rec(const struct LEVEL *lvl, struct COLUMN_REC *clm_rec, int sx, int sy)
 {
@@ -683,6 +744,12 @@ short get_subtile_column_rec(const struct LEVEL *lvl, struct COLUMN_REC *clm_rec
   return true;
 }
 
+/**
+ * Gets height of column on given subtile.
+ * @param lvl Pointer to the LEVEL structure.
+ * @param sx,sy Map subtile coordinates.
+ * @return Returns height of column at given subtile.
+ */
 unsigned short get_subtile_column_height(struct LEVEL *lvl, int sx, int sy)
 {
   unsigned char *clmentry;
@@ -692,6 +759,12 @@ unsigned short get_subtile_column_height(struct LEVEL *lvl, int sx, int sy)
   return get_clm_entry_height(clmentry);
 }
 
+/**
+ * Gets solid mask of column on given subtile.
+ * @param lvl Pointer to the LEVEL structure.
+ * @param sx,sy Map subtile coordinates.
+ * @return Returns solid mask of column at given subtile.
+ */
 unsigned short get_subtile_column_solid(struct LEVEL *lvl, int sx, int sy)
 {
   unsigned char *clmentry;
@@ -701,10 +774,12 @@ unsigned short get_subtile_column_solid(struct LEVEL *lvl, int sx, int sy)
   return get_clm_entry_solid(clmentry);
 }
 
-/*
- * Sets a DAT value for one subtile. (cx,cy) is a subtile position to fill,
- * d is a column index that we want put on this subtile.
- * Warning: the USE variable of every column is unaffected by this function.
+/**
+ * Sets a DAT value for one subtile.
+ * @param lvl Pointer to the LEVEL structure.
+ * @param sx,sy Map subtile position to fill.
+ * @param d Column index that we want put on this subtile.
+ * @warning This function does not change the USE variable of any column.
  */
 void set_dat_subtile(struct LEVEL *lvl, int sx, int sy, int d)
 {
@@ -713,9 +788,11 @@ void set_dat_subtile(struct LEVEL *lvl, int sx, int sy, int d)
     set_dat_val(lvl,sx,sy,val);
 }
 
-/*
- * Returns a DAT entry for one subtile. (cx,cy) is a subtile position we want
- * to probe, function returns a column index.
+/**
+ * Gets a DAT value for one subtile.
+ * @param lvl Pointer to the LEVEL structure.
+ * @param sx,sy Map subtile position  we want to probe.
+ * @return Function returns a column index.
  */
 unsigned int get_dat_subtile(const struct LEVEL *lvl, const unsigned int sx, const unsigned int sy)
 {          
@@ -725,10 +802,14 @@ unsigned int get_dat_subtile(const struct LEVEL *lvl, const unsigned int sx, con
     return val&0x0ffff;
 }
 
-/*
- * Sets a DAT value for one whole tile. (x,y) is a tile position to fill,
- * other parameters are column indices that we want put on each subtile.
- * Warning: the USE variable of every column is unaffected by this function.
+/**
+ * Sets a DAT value for one whole tile.
+ * @param lvl Pointer to the LEVEL structure.
+ * @param x,y Map tile position to fill.
+ * @param tl,tm,tr Top columns indices for the tile.
+ * @param ml,mm,mr Middle columns indices for the tile.
+ * @param bl,bm,br Bottom columns indices for the tile.
+ * @warning This function does not change the USE variable of any column.
  */
 void set_dat(struct LEVEL *lvl, int x, int y, int tl, int tm, int tr,
             int ml, int mm, int mr, int bl, int bm, int br)
@@ -744,19 +825,28 @@ void set_dat(struct LEVEL *lvl, int x, int y, int tl, int tm, int tr,
     set_dat_subtile(lvl, x*3+2, y*3+2, br);
 }
 
-/*
- * Sets same DAT value for whole tile
- * Warning: the USE variable of every column is unaffected by this function.
+/**
+ * Sets same DAT value for all subtiles of a tile.
+ * @param lvl Pointer to the LEVEL structure.
+ * @param x,y Map tile position to fill.
+ * @param d Column index to put on all subtiles.
+ * @warning This function does not change the USE variable of any column.
  */
 void set_dat_unif (struct LEVEL *lvl, int x, int y, int d)
 {
     set_dat (lvl, x, y, d, d, d, d, d, d, d, d, d);
 }
 
-/*
+/**
+ * Searches for next subtile which uses column of given index.
  * Starts searching at a subtile after (sx,sy). Finds the next subtile containing
- * given clm_index and returns it in (sx,sy). On error/cannot find, returns (-1,-1)/
- * if (-1,-1) is given at start, searches from (0,0).
+ * given clm_index and returns it in (sx,sy). On error/cannot find,
+ * sets (sx,sy) to (-1,-1). If (-1,-1) is given at start, searches from (0,0).
+ * @param lvl Pointer to the LEVEL structure.
+ * @param sx,sy Map subtile position to start search. Position of the subtile
+ *     found is also returned here.
+ * @param clm_idx Column index that we want to find.
+ * @return Returns true if a column was found.
  */
 short find_dat_entry(const struct LEVEL *lvl, int *sx, int *sy, const unsigned int clm_idx)
 {
@@ -775,9 +865,14 @@ short find_dat_entry(const struct LEVEL *lvl, int *sx, int *sy, const unsigned i
   return true;
 }
 
-/*
- * Verifies DAT values. Returns VERIF_ERROR,
- * VERIF_WARN or VERIF_OK
+/**
+ * Verifies DAT values. On error returns description message and
+ * map coordinates of the problem.
+ * @param lvl Pointer to the LEVEL structure.
+ * @param err_msg Error message output buffer.
+ * @param errpt Coordinates of the map tile containing the error.
+ * @return Returns VERIF_ERROR, VERIF_WARN or VERIF_OK.
+ *     If a problem was found, sets err_msg and errpt accordingly.
  */
 short dat_verify(struct LEVEL *lvl, char *err_msg,struct IPOINT_2D *errpt)
 {
@@ -801,8 +896,13 @@ short dat_verify(struct LEVEL *lvl, char *err_msg,struct IPOINT_2D *errpt)
   return VERIF_OK;
 }
 
-/*
- * Returns if the column entry is used, or unused and can be overwritten.
+/**
+ * Returns if the column entry is used.
+ * If the column is unused, it can be overwritten by new one.
+ * @param lvl Pointer to the LEVEL structure.
+ * @param clmidx Index of column to check.
+ * @return Returns false if the entry is unused and not permanent.
+ *     Otherwise, returns true.
  */
 short clm_entry_is_used(const struct LEVEL *lvl,unsigned int clmidx)
 {
@@ -813,6 +913,15 @@ short clm_entry_is_used(const struct LEVEL *lvl,unsigned int clmidx)
     return (lvl->clm_utilize[clmidx]>0)||(permanent);
 }
 
+/**
+ * Updates last column on map.
+ * The last column does not have corresponding slab entry,
+ * so it requires special treatment. This function sets all the
+ * columns on right and bottom egde to a look of given slab.
+ * @param lvl Pointer to the LEVEL structure.
+ * @param slab Slab entry which should be used for making columns.
+ * @return On success, returns ERR_NONE.
+ */
 short update_dat_last_column(struct LEVEL *lvl, unsigned short slab)
 {
   //Preparing array bounds
@@ -844,10 +953,17 @@ short update_dat_last_column(struct LEVEL *lvl, unsigned short slab)
   free(surr_slb);
   free(surr_own);
   free(surr_tng);
+  return ERR_NONE;
 }
 
-/*
- * Returns if the slab has any custom columns on it. This includes Graffiti.
+/**
+ * Returns if the tile has any custom columns on it.
+ * Returns true if there is at least one custom column on the tile.
+ * This includes any Graffiti.
+ * @param lvl Pointer to the LEVEL structure.
+ * @param tx,ty Map tile coordinates to check.
+ * @return Returns false if there are no custom columns on given tile.
+ *     Otherwise, returns true.
  */
 short slab_has_custom_columns(struct LEVEL *lvl, int tx, int ty)
 {
@@ -858,9 +974,13 @@ short slab_has_custom_columns(struct LEVEL *lvl, int tx, int ty)
     return false;
 }
 
-/*
- * Updates custom columns for a slab. Returns number of changed columns.
- * Note: also updates graffiti.
+/**
+ * Updates custom columns for a slab.
+ * @param clm_recs Column records to update.
+ * @param lvl Pointer to the LEVEL structure.
+ * @param tx,ty Map tile coordinates at which the columns will be put.
+ * @return Returns number of changed columns.
+ * @note Also updates graffiti.
  */
 int update_custom_columns_for_slab(struct COLUMN_REC *clm_recs[9],struct LEVEL *lvl, int tx, int ty)
 {
@@ -872,9 +992,13 @@ int update_custom_columns_for_slab(struct COLUMN_REC *clm_recs[9],struct LEVEL *
     return mod_clms;
 }
 
-/*
- * Draws custom columns on given columns array. Returns num of changed entries.
- * draws only the cust_col, no graffiti.
+/**
+ * Draws custom columns on given columns array.
+ * Draws only the cust_col, no graffiti.
+ * @param clm_recs Column records to update.
+ * @param lvl Pointer to the LEVEL structure.
+ * @param tx,ty Map tile coordinates at which the columns will be put.
+ * @return Returns num of changed entries.
  */
 int place_cust_clms_on_slab(struct COLUMN_REC *clm_recs[9],struct LEVEL *lvl, int tx, int ty)
 {
@@ -898,10 +1022,14 @@ int place_cust_clms_on_slab(struct COLUMN_REC *clm_recs[9],struct LEVEL *lvl, in
     return mod_clms;
 }
 
-/*
+/**
  * Adds custom column object to level data, or updates existing custom column.
  * Also updates the real level DAT/CLM entries where the column is put.
- * Returns true on success.
+ * @see set_cust_col
+ * @param lvl Pointer to the LEVEL structure.
+ * @param sx,sy Map subtile coordinates at which the custom columns will be put.
+ * @param ccol Custom column entry to add.
+ * @return Returns true on success.
  */
 short cust_col_add_or_update(struct LEVEL *lvl,int sx,int sy,struct DK_CUSTOM_CLM *ccol)
 {
@@ -925,13 +1053,11 @@ short cust_col_add_or_update(struct LEVEL *lvl,int sx,int sy,struct DK_CUSTOM_CL
     return true;
 }
 
-
-
-
-
-
-/*
- * Returns number of cust.columns at a tile.
+/**
+ * Gives number of custom columns at a tile.
+ * @param lvl Pointer to the LEVEL structure.
+ * @param tx,ty Map tile coordinates at which the custom columns count.
+ * @return Returns num of custom columns at tile.
  */
 int cust_cols_num_on_tile(struct LEVEL *lvl, int tx, int ty)
 {
@@ -946,9 +1072,13 @@ int cust_cols_num_on_tile(struct LEVEL *lvl, int tx, int ty)
     return count;
 }
 
-/*
+/**
  * Returns custom column on given subtile.
  * If no cust.column there, returns NULL.
+ * @see get_cust_col_rec
+ * @param lvl Pointer to the LEVEL structure.
+ * @param sx,sy Map subtile containing the column we want.
+ * @return Returns the custom column entry, or NULL.
  */
 struct DK_CUSTOM_CLM *get_cust_col(struct LEVEL *lvl, int sx, int sy)
 {
@@ -963,9 +1093,13 @@ struct DK_CUSTOM_CLM *get_cust_col(struct LEVEL *lvl, int sx, int sy)
     return lvl->cust_clm_lookup[sx][sy];
 }
 
-/*
+/**
  * Returns COLUMN_REC of custom column on given subtile.
  * If no cust.column there, returns NULL.
+ * @see get_cust_col
+ * @param lvl Pointer to the LEVEL structure.
+ * @param sx,sy Map subtile containing the column we want.
+ * @return Returns the COLUMN_REC entry, or NULL.
  */
 struct COLUMN_REC *get_cust_col_rec(struct LEVEL *lvl, int sx, int sy)
 {
@@ -974,9 +1108,12 @@ struct COLUMN_REC *get_cust_col_rec(struct LEVEL *lvl, int sx, int sy)
     return ccol->rec;
 }
 
-/*
+/**
  * Returns WIB entry of custom column on given subtile.
  * If no cust.column there, returns COLUMN_WIB_SKEW.
+ * @param lvl Pointer to the LEVEL structure.
+ * @param sx,sy Map subtile containing the column we want WIB entry for.
+ * @return Returns the WIB entry, or COLUMN_WIB_SKEW.
  */
 unsigned short get_cust_col_wib_entry(struct LEVEL *lvl, int sx, int sy)
 {
@@ -985,10 +1122,15 @@ unsigned short get_cust_col_wib_entry(struct LEVEL *lvl, int sx, int sy)
     return ccol->wib_val;
 }
 
-/*
+/**
  * Adds custom column object to level data, without filling the column
  * nor updating slabs. Adds the given column pointer without
- * making a copy of it. Returns true on success.
+ * making a copy of it.
+ * @see cust_col_add_or_update
+ * @param lvl Pointer to the LEVEL structure.
+ * @param sx,sy Map subtile containing the column we want WIB entry for.
+ * @param ccol Custom column entry to add.
+ * @return Returns true on success.
  */
 short set_cust_col(struct LEVEL *lvl,int sx,int sy,struct DK_CUSTOM_CLM *ccol)
 {
@@ -1007,15 +1149,21 @@ short set_cust_col(struct LEVEL *lvl,int sx,int sy,struct DK_CUSTOM_CLM *ccol)
     return true;
 }
 
+/**
+ * Gives number of all custom columns in the whole level.
+ * @param lvl Pointer to the LEVEL structure.
+ * @return Returns total amount of custom columns.
+ */
 unsigned int get_cust_clm_count(struct LEVEL *lvl)
 {
     if (lvl==NULL) return 0;
     return lvl->cust_clm_count;
 }
 
-/*
+/**
  * Creates a new custom column and fills its properties.
  * The new object is not added to LEVEL structure.
+ * @return Returns pointer to the new DK_CUSTOM_CLM structure, or NULL on error.
  */
 struct DK_CUSTOM_CLM *create_cust_col(void)
 {
@@ -1032,10 +1180,12 @@ struct DK_CUSTOM_CLM *create_cust_col(void)
     return ccol;
 }
 
-/*
+/**
  * Removes custom column from level and frees its memory.
  * The level graphic (DAT/CLM) is not updated.
- * Returns if there was anything to remove.
+ * @param lvl Pointer to the LEVEL structure.
+ * @param sx,sy Map subtile containing the custom column to delete.
+ * @return Returns true if there was anything to remove.
  */
 short cust_col_del(struct LEVEL *lvl, int sx, int sy)
 {
@@ -1059,10 +1209,12 @@ short cust_col_del(struct LEVEL *lvl, int sx, int sy)
     return true;
 }
 
-/*
+/**
  * Removes custom columns for whole tile, deallocates memory.
  * The level graphic (DAT/CLM) is not updated.
- * Returns num. of deleted cust.columns.
+ * @param lvl Pointer to the LEVEL structure.
+ * @param tx,ty Map tile coordinates at which we're deleting all custom columns.
+ * @return Returns number of deleted custom columns.
  */
 int cust_cols_del_for_tile(struct LEVEL *lvl, int tx, int ty)
 {
@@ -1078,7 +1230,9 @@ int cust_cols_del_for_tile(struct LEVEL *lvl, int tx, int ty)
 }
 
 /*
- * Returns texture type name string
+ * Returns texture type name string.
+ * @param inf_type The texture index (INF entry).
+ * @return Returns the full text name for given texture.
  */
 char *get_texture_fullname(unsigned short inf_type)
 {

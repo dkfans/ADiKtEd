@@ -294,7 +294,7 @@ int main(int argc, char **argv)
     if (strlen(get_lvl_fname(workdata.lvl))>0)
     {
       popup_show("Loading map","Reading map files. Please wait...");
-      load_map(workdata.lvl);
+      user_load_map(workdata.lvl,true);
     } else
     {
       popup_show("Starting new map","Generating empty map. Please wait...");

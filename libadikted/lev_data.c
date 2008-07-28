@@ -1,22 +1,20 @@
 /******************************************************************************/
-// lev_data.c - Another Dungeon Keeper Map Editor.
-/******************************************************************************/
-// Author:   Jon Skeet
-// Created:  14 Oct 1997
-// Modified: Tomasz Lis
-
-// Purpose:
-//   Defines functions for maintaining the level memory structure.
-//   This includes creating elements, deleting them and clearing whole structure.
-
-// Comment:
-//   None.
-
-//Copying and copyrights:
-//   This program is free software; you can redistribute it and/or modify
-//   it under the terms of the GNU General Public License as published by
-//   the Free Software Foundation; either version 2 of the License, or
-//   (at your option) any later version.
+/** @file lev_data.c
+ * Struct definitions and LEVEL structure handling routines.
+ * @par Purpose:
+ *     Defines functions for maintaining the level memory structure.
+ *     This includes creating elements, deleting them and clearing
+ *     whole structure.
+ * @par Comment:
+ *     None.
+ * @author   Jon Skeet, Tomasz Lis
+ * @date     14 Oct 1997 - 22 Jul 2008
+ * @par  Copying and copyrights:
+ *     This program is free software; you can redistribute it and/or modify
+ *     it under the terms of the GNU General Public License as published by
+ *     the Free Software Foundation; either version 2 of the License, or
+ *     (at your option) any later version.
+ */
 /******************************************************************************/
 
 #include "lev_data.h"
@@ -40,11 +38,13 @@ const int idir_subtl_y[]={
     1, 1, 1,
     2, 2, 2,};
 
-//struct LEVEL *lvl=NULL;
+const char default_map_name[]="Unnamed %Y.%m.%d map";
 
-/*
- * creates object for storing one level; allocates memory and inits
- * the values to zero; drops any previous pointers without deallocating;
+/**
+ * Creates object for storing one level. Allocates memory and inits
+ * the values to zero; drops any previous pointers without deallocating.
+ * @param lvl_ptr Double pointer to the new level structure.
+ * @return Returns false on error, true on success.
  */
 short level_init(struct LEVEL **lvl_ptr)
 {
@@ -288,6 +288,7 @@ short level_init(struct LEVEL **lvl_ptr)
     {
       lvl->script.par.player[idx].ally=(unsigned short *)malloc(PLAYERS_COUNT*sizeof(unsigned short));
       lvl->script.par.player[idx].creature_avail=(unsigned short *)malloc(creatures_cmd_arrsize()*sizeof(unsigned short));
+      lvl->script.par.player[idx].creature_maxlvl=(int *)malloc(creatures_cmd_arrsize()*sizeof(int));
       lvl->script.par.player[idx].room_avail=(unsigned short *)malloc(room_cmd_arrsize()*sizeof(unsigned short));
       lvl->script.par.player[idx].spell_avail=(unsigned short *)malloc(spell_cmd_arrsize()*sizeof(unsigned short));
       lvl->script.par.player[idx].trap_avail=(unsigned short *)malloc(trap_cmd_arrsize()*sizeof(unsigned short));
@@ -295,6 +296,7 @@ short level_init(struct LEVEL **lvl_ptr)
       lvl->script.par.player[idx].trap_amount=(unsigned int *)malloc(trap_cmd_arrsize()*sizeof(unsigned int));
       lvl->script.par.player[idx].door_amount=(unsigned int *)malloc(door_cmd_arrsize()*sizeof(unsigned int));
       if ((lvl->script.par.player[idx].ally==NULL)||(lvl->script.par.player[idx].creature_avail==NULL)||
+          (lvl->script.par.player[idx].creature_maxlvl==NULL)||
           (lvl->script.par.player[idx].room_avail==NULL)||(lvl->script.par.player[idx].spell_avail==NULL)||
           (lvl->script.par.player[idx].trap_avail==NULL)||(lvl->script.par.player[idx].door_avail==NULL)||
           (lvl->script.par.player[idx].trap_amount==NULL)||(lvl->script.par.player[idx].door_amount==NULL))
@@ -327,9 +329,11 @@ short level_init(struct LEVEL **lvl_ptr)
   return level_clear(lvl);
 }
 
-/*
+/**
  * Clears options for given level. This one is not executed
  * when clearing the level, only when making new one.
+ * @param optns The LEVOPTIONS structure to clear.
+ * @return Returns ERR_NONE on success, error code on failure.
  */
 short level_clear_options(struct LEVOPTIONS *optns)
 {
@@ -345,45 +349,57 @@ short level_clear_options(struct LEVOPTIONS *optns)
     optns->picture.rescale=4;
     optns->picture.data_path=NULL;
     optns->script.level_spaces=4;
-    return true;
+    return ERR_NONE;
 }
 
+/**
+ * Sets all options for the LEVEL structure from another LEVOPTIONS.
+ * Copies the whole LEVOPTIONS structure into the one in LEVEL.
+ * @param lvl Pointer to the LEVEL structure.
+ * @param optns The LEVOPTIONS structure to copy from.
+ * @return Returns ERR_NONE on success, error code on failure.
+ */
 short level_set_options(struct LEVEL *lvl,struct LEVOPTIONS *optns)
 {
-      memcpy(&(lvl->optns),optns,sizeof(struct LEVOPTIONS));
+    memcpy(&(lvl->optns),optns,sizeof(struct LEVOPTIONS));
+    return ERR_NONE;
 }
 
-/*
- * clears the "things" structure for storing level; drops any old pointers
- * without deallocating them; requies level_init() to be run first;
+/**
+ * Clears the "things" structure for storing level. Drops any old pointers
+ * without deallocating them. Requies level_init() to be run first.
+ * @param lvl Pointer to the LEVEL structure.
+ * @return Returns true on success, false on failure.
  */
 short level_clear_tng(struct LEVEL *lvl)
 {
-    //Preparing array bounds
-    int arr_entries_x=MAP_SIZE_X*MAP_SUBNUM_X;
-    int arr_entries_y=MAP_SIZE_Y*MAP_SUBNUM_Y;
-    //Clearing single variables
-    lvl->tng_total_count=0;
-    //Clearing pointer arrays
-    int i,j;
-    for (i=0; i<arr_entries_y; i++)
+  //Preparing array bounds
+  int arr_entries_x=MAP_SIZE_X*MAP_SUBNUM_X;
+  int arr_entries_y=MAP_SIZE_Y*MAP_SUBNUM_Y;
+  //Clearing single variables
+  lvl->tng_total_count=0;
+  //Clearing pointer arrays
+  int i,j;
+  for (i=0; i<arr_entries_y; i++)
       for (j=0; j<arr_entries_x; j++)
       {
           lvl->tng_lookup[i][j]=NULL;
           lvl->tng_subnums[i][j]=0;
       }
-    for (i=0; i<MAP_SIZE_Y; i++)
+  for (i=0; i<MAP_SIZE_Y; i++)
       for (j=0; j<MAP_SIZE_X; j++)
           lvl->tng_apt_lgt_nums[i][j]=0;
 
-    //Clearing related stats variables
-    lvl->stats.hero_gates_count=0;
+  //Clearing related stats variables
+  lvl->stats.hero_gates_count=0;
   return true;
 }
 
-/*
- * clears the "actions" structure for storing level; drops any old pointers
- * without deallocating them; requies level_init() to be run first;
+/**
+ * clears the "actions" structure for storing level. Drops any old pointers
+ * without deallocating them. Requies level_init() to be run first.
+ * @param lvl Pointer to the LEVEL structure.
+ * @return Returns true on success, false on failure.
  */
 short level_clear_apt(struct LEVEL *lvl)
 {
@@ -403,9 +419,11 @@ short level_clear_apt(struct LEVEL *lvl)
   return true;
 }
 
-/*
- * clears the "lights" structure for storing level; drops any old pointers
- * without deallocating them; requies level_init() to be run first;
+/**
+ * clears the "lights" structure for storing level. Drops any old pointers
+ * without deallocating them. Requies level_init() to be run first.
+ * @param lvl Pointer to the LEVEL structure.
+ * @return Returns true on success, false on failure.
  */
 short level_clear_lgt(struct LEVEL *lvl)
 {
@@ -425,9 +443,11 @@ short level_clear_lgt(struct LEVEL *lvl)
   return true;
 }
 
-/*
- * clears the "column" structure for storing level; will not drop any pointers;
- * requies level_init() to be run first;
+/**
+ * Clears the "column" structure for storing level. Will not drop any pointers.
+ * Requies level_init() to be run first.
+ * @param lvl Pointer to the LEVEL structure.
+ * @return Returns true on success, false on failure.
  */
 short level_clear_datclm(struct LEVEL *lvl)
 {
@@ -446,7 +466,7 @@ short level_clear_datclm(struct LEVEL *lvl)
     }
     //Clearing CLM header
     memset(lvl->clm_hdr,0,SIZEOF_DK_CLM_HEADER);
-    write_long_le_buf(lvl->clm_hdr+0,COLUMN_ENTRIES);
+    write_int32_le_buf(lvl->clm_hdr+0,COLUMN_ENTRIES);
     // Setting all DAT entries to one, first column
     // (it is unused in all maps)
     for (k=0; k<dat_entries_y; k++)
@@ -478,8 +498,10 @@ short level_clear_datclm(struct LEVEL *lvl)
     return true;
 }
 
-/*
+/**
  * Clears (via zeroing) stats for given level.
+ * @param lvl Pointer to the LEVEL structure.
+ * @return Returns true on success, false on failure.
  */
 short level_clear_stats(struct LEVEL *lvl)
 {
@@ -506,8 +528,10 @@ short level_clear_stats(struct LEVEL *lvl)
     return true;
 }
 
-/*
+/**
  * Clears (sets for new map) info for given level.
+ * @param lvl Pointer to the LEVEL structure.
+ * @return Returns true on success, false on failure.
  */
 short level_clear_info(struct LEVEL *lvl)
 {
@@ -523,11 +547,21 @@ short level_clear_info(struct LEVEL *lvl)
     lvl->info.ver_major=0;
     lvl->info.ver_minor=0;
     lvl->info.ver_rel=0;
+    int name_len=strlen(default_map_name)+10;
+    char *name_text=malloc(name_len);
+    if (name_text!=NULL)
+        strftime(name_text,name_len, default_map_name, localtime(&(lvl->info.creat_date)) );
+    lvl->info.name_text=name_text;
+    lvl->info.desc_text=NULL;
+    lvl->info.author_text=NULL;
+    lvl->info.editor_text=NULL;
     return true;
 }
 
-/*
+/**
  * Clears (via zeroing) TXT script info for given level.
+ * @param lvl Pointer to the LEVEL structure.
+ * @return Returns true on success, false on failure.
  */
 short level_clear_script(struct LEVEL *lvl)
 {
@@ -539,8 +573,10 @@ short level_clear_script(struct LEVEL *lvl)
     return level_clear_script_param(&(lvl->script.par));
 }
 
-/*
+/**
  * Clears (via zeroing) given script parameters struct.
+ * @param par Pointer to the DK_SCRIPT_PARAMETERS structure.
+ * @return Returns true on success, false on failure.
  */
 short level_clear_script_param(struct DK_SCRIPT_PARAMETERS *par)
 {
@@ -564,6 +600,7 @@ short level_clear_script_param(struct DK_SCRIPT_PARAMETERS *par)
       for (k=0;k<max_idx;k++)
       {
         par->player[i].creature_avail[k]=AVAIL_NO;
+        par->player[i].creature_maxlvl[k]=-1;
       }
       max_idx=trap_cmd_arrsize();
       for (k=0;k<max_idx;k++)
@@ -594,10 +631,13 @@ short level_clear_script_param(struct DK_SCRIPT_PARAMETERS *par)
     return true;
 }
 
-/*
- * clears the structures for storing level which do not have separate
- * clearing function; drops any old pointers, only file name remains;
- * without deallocating them; requies level_init() to be run first;
+/**
+ * Clears minor LEVEL substructures.
+ * Clears the structures for storing level which do not have separate
+ * clearing function. Drops any old pointers without deallocating them,
+ * only file name remains. Requies level_init() to be run first.
+ * @param lvl Pointer to the LEVEL structure.
+ * @return Returns true on success, false on error.
  */
 short level_clear_other(struct LEVEL *lvl)
 {
@@ -661,10 +701,12 @@ short level_clear_other(struct LEVEL *lvl)
     return true;
 }
 
-/*
- * clears the whole object for storing level; drops any old pointers
- * without deallocating them; requies level_init() to be run first;
- * leaves only optns struct unaffected;
+/**
+ * Clears the whole object for storing level. Drops any old pointers
+ * without deallocating them. Requies level_init() to be run first.
+ * Leaves only optns struct unaffected.
+ * @param lvl Pointer to the LEVEL structure.
+ * @return Returns true on success, false on error.
  */
 short level_clear(struct LEVEL *lvl)
 {
@@ -682,8 +724,10 @@ short level_clear(struct LEVEL *lvl)
   return result;
 }
 
-/*
- * frees all sub-structures of given DK_SCRIPT_PARAMETERS
+/**
+ * Frees all sub-structures of given DK_SCRIPT_PARAMETERS.
+ * @param par Pointer to the DK_SCRIPT_PARAMETERS structure.
+ * @return Returns true on success, false on error.
  */
 short level_free_script_param(struct DK_SCRIPT_PARAMETERS *par)
 {
@@ -696,8 +740,9 @@ short level_free_script_param(struct DK_SCRIPT_PARAMETERS *par)
   {
     free(par->player[idx].ally);
     free(par->player[idx].creature_avail);
-//    free(par->player[idx].room_avail);
-//    free(par->player[idx].spell_avail);
+    free(par->player[idx].creature_maxlvl);
+    free(par->player[idx].room_avail);
+    free(par->player[idx].spell_avail);
     free(par->player[idx].trap_avail);
     free(par->player[idx].door_avail);
     free(par->player[idx].trap_amount);
@@ -707,10 +752,13 @@ short level_free_script_param(struct DK_SCRIPT_PARAMETERS *par)
   return true;
 }
 
-/*
- * frees structures for storing level; frees only the memory
+/**
+ * Frees structures for storing level. Frees only the memory
  * allocated by level_init(); to free the content of loaded level,
- * you must call level_free() first;
+ * you must call level_free() first.
+ * @see level_free
+ * @param lvl_ptr Double pointer to the LEVEL structure.
+ * @return Returns true on success, false on error.
  */
 short level_deinit(struct LEVEL **lvl_ptr)
 {
@@ -858,6 +906,11 @@ short level_deinit(struct LEVEL **lvl_ptr)
     
     //TODO: free graffiti
 
+    free(lvl->info.name_text);
+    free(lvl->info.desc_text);
+    free(lvl->info.author_text);
+    free(lvl->info.editor_text);
+
     free(lvl->fname);
     free(lvl->savfname);
 
@@ -868,10 +921,12 @@ short level_deinit(struct LEVEL **lvl_ptr)
     return true;
 }
 
-/*
- * frees "things" structure for storing level; disposes only data pointers,
+/**
+ * Frees "things" structure for storing level. Disposes only data pointers,
  * the array structure remains intact (as after level_init(), but values
- * are not cleared)
+ * are not cleared).
+ * @param lvl Pointer to the LEVEL structure.
+ * @return Returns true on success, false on error.
  */
 short level_free_tng(struct LEVEL *lvl)
 {
@@ -895,10 +950,12 @@ short level_free_tng(struct LEVEL *lvl)
   return true;
 }
 
-/*
- * frees "action points" structure for storing level; disposes only data pointers,
+/**
+ * Frees "action points" structure for storing level. Disposes only data pointers,
  * the array structure remains intact (as after level_init(), but values
- * are not cleared)
+ * are not cleared).
+ * @param lvl Pointer to the LEVEL structure.
+ * @return Returns true on success, false on error.
  */
 short level_free_apt(struct LEVEL *lvl)
 {
@@ -922,10 +979,12 @@ short level_free_apt(struct LEVEL *lvl)
   return true;
 }
 
-/*
- * frees TXT structure for storing level script; disposes only data pointers,
+/**
+ * Frees TXT structure for storing level script. Disposes only data pointers,
  * the array structure remains intact (as after level_init(), but values
- * are not cleared)
+ * are not cleared).
+ * @param lvl Pointer to the LEVEL structure.
+ * @return Returns true on success, false on error.
  */
 short level_free_txt(struct LEVEL *lvl)
 {
@@ -942,10 +1001,33 @@ short level_free_txt(struct LEVEL *lvl)
   return true;
 }
 
-/*
- * frees LGT structure for storing level lights; disposes only data pointers,
+/**
+ * Frees any text file loaded as lines.
+ * Pointer value and lines count is cleared.
+ * @param lines Pointer to the lines array.
+ * @param lines_count Amount of allocated lines.
+ * @return Returns true on success, false on error.
+ */
+short free_text_file(char ***lines,int *lines_count)
+{
+  int idx=(*lines_count);
+  while (idx>0)
+  {
+    idx--;
+    free((*lines)[idx]);
+  }
+  free(*lines);
+  (*lines)=NULL;
+  (*lines_count)=0;
+  return true;
+}
+
+/**
+ * Frees LGT structure for storing level lights. Disposes only data pointers,
  * the array structure remains intact (as after level_init(), but values
- * are not cleared)
+ * are not cleared).
+ * @param lvl Pointer to the LEVEL structure.
+ * @return Returns true on success, false on error.
  */
 short level_free_lgt(struct LEVEL *lvl)
 {
@@ -969,10 +1051,13 @@ short level_free_lgt(struct LEVEL *lvl)
   return true;
 }
 
-/*
- * frees structures for storing level; frees only data pointers,
+/**
+ * Frees structures for storing level. Frees only data pointers,
  * the array structure remains intact (as after level_init(), but values
- * are not cleared - use level_clear() to set nulls to pointers)
+ * are not cleared - use level_clear() to set NULLs to pointers).
+ * @see level_clear
+ * @param lvl Pointer to the LEVEL structure.
+ * @return Returns true on success, false on error.
  */
 short level_free(struct LEVEL *lvl)
 {
@@ -987,6 +1072,27 @@ short level_free(struct LEVEL *lvl)
   return result;
 }
 
+/**
+ * Returns DK_SCRIPT_PARAMETERS struct for given level.
+ * @param lvl Pointer to the LEVEL structure.
+ * @return Returns pointer to DK_SCRIPT_PARAMETERS, or NULL on error.
+ */
+struct DK_SCRIPT_PARAMETERS *level_get_script_param(struct LEVEL *lvl)
+{
+  if (lvl==NULL)
+    return NULL;
+  return &(lvl->script.par);
+}
+
+/**
+ * Verifies the whole level. On error adds description message to the
+ * error messages log.
+ * @param lvl Pointer to the LEVEL structure.
+ * @param actn_name Name of the action which invoked verification.
+ * @param errpt Coordinates of the map tile containing the error.
+ * @return Returns VERIF_ERROR, VERIF_WARN or VERIF_OK.
+ *     If a problem was found, adds error message and sets errpt accordingly.
+ */
 short level_verify(struct LEVEL *lvl, char *actn_name,struct IPOINT_2D *errpt)
 {
   char err_msg[LINEMSG_SIZE];
@@ -1053,9 +1159,13 @@ short level_verify(struct LEVEL *lvl, char *actn_name,struct IPOINT_2D *errpt)
   }
 }
 
-/*
- * Verifies internal LEVEL structure integrity. Returns VERIF_ERROR,
- * VERIF_WARN or VERIF_OK
+/**
+ * Verifies internal LEVEL structure integrity.
+ * @param lvl Pointer to the LEVEL structure.
+ * @param err_msg Error message output buffer.
+ * @param errpt Coordinates of the map tile containing the error.
+ * @return Returns VERIF_ERROR, VERIF_WARN or VERIF_OK.
+ *     If a problem was found, sets err_msg and errpt accordingly.
  */
 short level_verify_struct(struct LEVEL *lvl, char *err_msg,struct IPOINT_2D *errpt)
 {
@@ -1151,9 +1261,13 @@ short level_verify_struct(struct LEVEL *lvl, char *err_msg,struct IPOINT_2D *err
   return VERIF_OK;
 }
 
-/*
- * Verifies action points parameters. Returns VERIF_ERROR,
- * VERIF_WARN or VERIF_OK
+/**
+ * Verifies action points parameters.
+ * @param lvl Pointer to the LEVEL structure.
+ * @param err_msg Error message output buffer.
+ * @param errpt Coordinates of the map tile containing the error.
+ * @return Returns VERIF_ERROR, VERIF_WARN or VERIF_OK.
+ *     If a problem was found, sets err_msg and errpt accordingly.
  */
 short actnpts_verify(struct LEVEL *lvl, char *err_msg,struct IPOINT_2D *errpt)
 {
@@ -1200,9 +1314,13 @@ short actnpts_verify(struct LEVEL *lvl, char *err_msg,struct IPOINT_2D *errpt)
   return VERIF_OK;
 }
 
-/*
- * Verifies various logic aspects of a map. Returns VERIF_ERROR,
- * VERIF_WARN or VERIF_OK
+/**
+ * Verifies various logic aspects of a map.
+ * @param lvl Pointer to the LEVEL structure.
+ * @param err_msg Error message output buffer.
+ * @param errpt Coordinates of the map tile containing the error.
+ * @return Returns VERIF_ERROR, VERIF_WARN or VERIF_OK.
+ *     If a problem was found, sets err_msg and errpt accordingly.
  */
 short level_verify_logic(struct LEVEL *lvl, char *err_msg,struct IPOINT_2D *errpt)
 {
@@ -1284,10 +1402,12 @@ short level_verify_logic(struct LEVEL *lvl, char *err_msg,struct IPOINT_2D *errp
   return VERIF_OK;
 }
 
-/*
- * Fills SLB/OWN structure with "default" background,
- * unowned "def_slab" surrounded by rock.
+/**
+ * Fills SLB/OWN structure with "default" background.
+ * The default is unowned "def_slab" surrounded by rock.
  * DAT/CLM values are not updated here.
+ * @param lvl Pointer to the LEVEL structure.
+ * @param def_slab Default slab.
  */
 void generate_slab_bkgnd_default(struct LEVEL *lvl,unsigned short def_slab)
 {
@@ -1326,10 +1446,11 @@ void generate_slab_bkgnd_default(struct LEVEL *lvl,unsigned short def_slab)
       set_subtl_owner(lvl,sx,sy,PLAYER_UNSET);
 }
 
-/*
- * Fills SLB/OWN structure with "random" background,
- * map made of earth with random rock at borders.
+/**
+ * Fills SLB/OWN structure with "random" background.
+ * The resulting map is made of earth with random rock at borders.
  * DAT/CLM values are not updated here.
+ * @param lvl Pointer to the LEVEL structure.
  */
 void generate_slab_bkgnd_random(struct LEVEL *lvl)
 {
@@ -1464,9 +1585,10 @@ void generate_slab_bkgnd_random(struct LEVEL *lvl)
           set_tile_owner(lvl, i, j, PLAYER_UNSET);
 }
 
-/*
- * creates new level;  requies the memory to be allocated by level_init();
- * calls level_clear(), but not level_free() at start;
+/**
+ * Creates new level. Requies the memory to be allocated by level_init().
+ * Calls level_clear(), but not level_free() at start.
+ * @param lvl Pointer to the LEVEL structure.
  */
 void start_new_map(struct LEVEL *lvl)
 {
@@ -1493,6 +1615,11 @@ void start_new_map(struct LEVEL *lvl)
     message_log(" start_new_map: finished");
 }
 
+/**
+ * Creates random level. Requies the memory to be allocated by level_init().
+ * Calls level_clear(), but not level_free() at start.
+ * @param lvl Pointer to the LEVEL structure.
+ */
 void generate_random_map(struct LEVEL *lvl)
 {
     level_clear(lvl);
@@ -1511,12 +1638,23 @@ void generate_random_map(struct LEVEL *lvl)
     update_level_stats(lvl);
 }
 
+/**
+ * Frees the level data stored in LEVEL structure.
+ * Then clears LEVEL allowing to reuse it.
+ * @param lvl Pointer to the LEVEL structure.
+ */
 void free_map(struct LEVEL *lvl)
 {
     level_free(lvl);
     level_clear(lvl);
 }
 
+/**
+ * Adds random extension to the level.
+ * @param lvl Pointer to the LEVEL structure.
+ * @param ret_msg Text message returned by function.
+ * @todo This one is unfinished.
+ */
 short level_generate_random_extension(struct LEVEL *lvl,char *ret_msg)
 {
   short result;
@@ -1538,23 +1676,33 @@ short level_generate_random_extension(struct LEVEL *lvl,char *ret_msg)
   return false;
 }
 
-char *get_thing(const struct LEVEL *lvl,unsigned int x,unsigned int y,unsigned int num)
+/**
+ * Returns thing data for thing at given position.
+ * @param lvl Pointer to the LEVEL structure.
+ * @param sx,sy Subtile at which the thing is.
+ * @param num Index of thing on the subtile.
+ * @return Returns the thing data, or NULL on error.
+ */
+char *get_thing(const struct LEVEL *lvl,unsigned int sx,unsigned int sy,unsigned int num)
 {
     //Preparing array bounds
     unsigned int arr_entries_x=MAP_SIZE_X*MAP_SUBNUM_X;
     unsigned int arr_entries_y=MAP_SIZE_Y*MAP_SUBNUM_Y;
     //Bounding position
-    x %= arr_entries_x;
-    y %= arr_entries_y;
+    sx %= arr_entries_x;
+    sy %= arr_entries_y;
     unsigned char *thing=NULL;
-    if (num < lvl->tng_subnums[x][y])
-      thing = lvl->tng_lookup[x][y][num];
+    if (num < lvl->tng_subnums[sx][sy])
+      thing = lvl->tng_lookup[sx][sy][num];
     return thing;
 }
 
-/*
- * Adds a thing to the structure. Returns its index in structure.
+/**
+ * Adds a thing to the structure and returns its index.
  * Also updates statistics.
+ * @param lvl Pointer to the LEVEL structure.
+ * @param thing Pointer to the thing data to add.
+ * @return Returns the index at which thing is added, or -1 on error.
  */
 int thing_add(struct LEVEL *lvl,unsigned char *thing)
 {
@@ -1584,78 +1732,101 @@ int thing_add(struct LEVEL *lvl,unsigned char *thing)
     return new_idx;
 }
 
-/*
+/**
  * Removes given thing from the LEVEL structure, updates counter variables.
  * Also frees memory allocated for the thing.
+ * @param lvl Pointer to the LEVEL structure.
+ * @param sx,sy Subtile at which the thing is.
+ * @param num Index of thing on the subtile.
  */
-void thing_del(struct LEVEL *lvl,unsigned int x, unsigned int y, unsigned int num)
+void thing_del(struct LEVEL *lvl,unsigned int sx, unsigned int sy, unsigned int num)
 {
     //Preparing array bounds
     unsigned int arr_entries_x=MAP_SIZE_X*MAP_SUBNUM_X;
     unsigned int arr_entries_y=MAP_SIZE_Y*MAP_SUBNUM_Y;
     //Bounding position
-    if ((x>=arr_entries_x)||(y>=arr_entries_y)) return;
+    if ((sx>=arr_entries_x)||(sy>=arr_entries_y)) return;
     unsigned char *thing;
-    thing = lvl->tng_lookup[x][y][num];
-    thing_drop(lvl,x,y,num);
-    free (thing);
+    thing = lvl->tng_lookup[sx][sy][num];
+    thing_drop(lvl,sx,sy,num);
+    free(thing);
 }
 
-/*
+/**
  * Removes given thing from the LEVEL structure, updates counter variables.
  * Does not frees memory allocated for the thing - just drops the pointers.
  * Updates thing statistics.
+ * @param lvl Pointer to the LEVEL structure.
+ * @param sx,sy Subtile at which the thing is.
+ * @param num Index of thing on the subtile.
  */
-void thing_drop(struct LEVEL *lvl,unsigned int x, unsigned int y, unsigned int num)
+void thing_drop(struct LEVEL *lvl,unsigned int sx, unsigned int sy, unsigned int num)
 {
     //Preparing array bounds
     unsigned int arr_entries_x=MAP_SIZE_X*MAP_SUBNUM_X;
     unsigned int arr_entries_y=MAP_SIZE_Y*MAP_SUBNUM_Y;
     //Bounding position
-    if ((x>=arr_entries_x)||(y>=arr_entries_y)) return;
+    if ((sx>=arr_entries_x)||(sy>=arr_entries_y)) return;
     int i;
-    if (num >= lvl->tng_subnums[x][y])
+    if (num >= lvl->tng_subnums[sx][sy])
       return;
     lvl->tng_total_count--;
     unsigned char *thing;
-    thing = lvl->tng_lookup[x][y][num];
+    thing = lvl->tng_lookup[sx][sy][num];
     update_thing_stats(lvl,thing,-1);
-    for (i=num; i < lvl->tng_subnums[x][y]-1; i++)
-      lvl->tng_lookup[x][y][i]=lvl->tng_lookup[x][y][i+1];
-    lvl->tng_subnums[x][y]--;
-    lvl->tng_apt_lgt_nums[x/3][y/3]--;
-    lvl->tng_lookup[x][y]=(unsigned char **)realloc(lvl->tng_lookup[x][y], 
-                        lvl->tng_subnums[x][y]*sizeof(char *));
+    for (i=num; i < lvl->tng_subnums[sx][sy]-1; i++)
+      lvl->tng_lookup[sx][sy][i]=lvl->tng_lookup[sx][sy][i+1];
+    lvl->tng_subnums[sx][sy]--;
+    lvl->tng_apt_lgt_nums[sx/3][sy/3]--;
+    lvl->tng_lookup[sx][sy]=(unsigned char **)realloc(lvl->tng_lookup[sx][sy], 
+                        lvl->tng_subnums[sx][sy]*sizeof(char *));
 }
 
-unsigned int get_thing_subnums(const struct LEVEL *lvl,unsigned int x,unsigned int y)
+/**
+ * Gives amount of things existing at given subtile.
+ * @param lvl Pointer to the LEVEL structure.
+ * @param sx,sy Subtile at which we're counting thing.
+ * @return Amount of things on the subtile.
+ */
+unsigned int get_thing_subnums(const struct LEVEL *lvl,unsigned int sx,unsigned int sy)
 {
     //Preparing array bounds
     unsigned int arr_entries_x=MAP_SIZE_X*MAP_SUBNUM_X;
     unsigned int arr_entries_y=MAP_SIZE_Y*MAP_SUBNUM_Y;
     //Bounding position
-    if ((x>=arr_entries_x)||(y>=arr_entries_y)) return 0;
-    return lvl->tng_subnums[x][y];
+    if ((sx>=arr_entries_x)||(sy>=arr_entries_y)) return 0;
+    return lvl->tng_subnums[sx][sy];
 }
 
-char *get_actnpt(const struct LEVEL *lvl,unsigned int x,unsigned int y,unsigned int num)
+/**
+ * Returns action point data for action point at given position.
+ * @param lvl Pointer to the LEVEL structure.
+ * @param sx,sy Subtile at which the action point is.
+ * @param num Index of action point on the subtile.
+ * @return Returns the action point data, or NULL on error.
+ */
+char *get_actnpt(const struct LEVEL *lvl,unsigned int sx,unsigned int sy,unsigned int num)
 {
     //Preparing array bounds
     unsigned int arr_entries_x=MAP_SIZE_X*MAP_SUBNUM_X;
     unsigned int arr_entries_y=MAP_SIZE_Y*MAP_SUBNUM_Y;
     //Bounding position
-    x %= arr_entries_x;
-    y %= arr_entries_y;
+    sx %= arr_entries_x;
+    sy %= arr_entries_y;
     unsigned char *actnpt=NULL;
-    if (num < get_actnpt_subnums(lvl,x,y))
-      actnpt = lvl->apt_lookup[x][y][num];
+    if (num < get_actnpt_subnums(lvl,sx,sy))
+      actnpt = lvl->apt_lookup[sx][sy][num];
     return actnpt;
 }
 
-/*
- * Adds a given action point to the LEVEL structure, updates counter variables
+/**
+ * Adds a given action point to the LEVEL structure.
+ * Updates counter variables.
+ * @param lvl Pointer to the LEVEL structure.
+ * @param actnpt Pointer to the action point data to add.
+ * @return Returns the index at which action point is added, or -1 on error.
  */
-void actnpt_add(struct LEVEL *lvl,unsigned char *actnpt)
+int actnpt_add(struct LEVEL *lvl,unsigned char *actnpt)
 {
     //Preparing array bounds
     int arr_entries_x=MAP_SIZE_X*MAP_SUBNUM_X;
@@ -1677,69 +1848,89 @@ void actnpt_add(struct LEVEL *lvl,unsigned char *actnpt)
     if (lvl->apt_lookup[x][y]==NULL)
     {
         message_error("actnpt_add: Cannot allocate memory");
-        return;
+        return -1;
     }
     unsigned int new_idx=apt_snum-1;
     lvl->apt_lookup[x][y][new_idx]=actnpt;
+    return new_idx;
 }
 
-/*
- * Removes given action point from the LEVEL structure, updates counter variables.
+/**
+ * Removes given action point from the LEVEL structure. Updates counter variables.
  * Also frees memory allocated for the action point.
+ * @param lvl Pointer to the LEVEL structure.
+ * @param sx,sy Subtile at which the action point is.
+ * @param num Index of action point on the subtile.
  */
-void actnpt_del(struct LEVEL *lvl,unsigned int x, unsigned int y, unsigned int num)
+void actnpt_del(struct LEVEL *lvl,unsigned int sx, unsigned int sy, unsigned int num)
 {
     //Preparing array bounds
     int arr_entries_x=MAP_SIZE_X*MAP_SUBNUM_X;
     int arr_entries_y=MAP_SIZE_Y*MAP_SUBNUM_Y;
-    x%=arr_entries_x;
-    y%=arr_entries_y;
-    unsigned int apt_snum=get_actnpt_subnums(lvl,x,y);
+    sx%=arr_entries_x;
+    sy%=arr_entries_y;
+    unsigned int apt_snum=get_actnpt_subnums(lvl,sx,sy);
     if (num >= apt_snum)
       return;
     lvl->apt_total_count--;
     unsigned char *actnpt;
-    actnpt = lvl->apt_lookup[x][y][num];
+    actnpt = lvl->apt_lookup[sx][sy][num];
     free(actnpt);
     int i;
     apt_snum--;
     for (i=num; i < apt_snum; i++)
-      lvl->apt_lookup[x][y][i]=lvl->apt_lookup[x][y][i+1];
-    lvl->apt_subnums[x][y]=apt_snum;
-    lvl->tng_apt_lgt_nums[x/MAP_SUBNUM_X][y/MAP_SUBNUM_Y]--;
-    lvl->apt_lookup[x][y]=(unsigned char **)realloc(lvl->apt_lookup[x][y], 
+      lvl->apt_lookup[sx][sy][i]=lvl->apt_lookup[sx][sy][i+1];
+    lvl->apt_subnums[sx][sy]=apt_snum;
+    lvl->tng_apt_lgt_nums[sx/MAP_SUBNUM_X][sy/MAP_SUBNUM_Y]--;
+    lvl->apt_lookup[sx][sy]=(unsigned char **)realloc(lvl->apt_lookup[sx][sy], 
                         apt_snum*sizeof(char *));
 }
 
-unsigned int get_actnpt_subnums(const struct LEVEL *lvl,unsigned int x,unsigned int y)
+/**
+ * Gives amount of action points existing at given subtile.
+ * @param lvl Pointer to the LEVEL structure.
+ * @param sx,sy Subtile at which we're counting action points.
+ * @return Amount of action points on the subtile.
+ */
+unsigned int get_actnpt_subnums(const struct LEVEL *lvl,unsigned int sx,unsigned int sy)
 {
     //Preparing array bounds
     unsigned int arr_entries_x=MAP_SIZE_X*MAP_SUBNUM_X;
     unsigned int arr_entries_y=MAP_SIZE_Y*MAP_SUBNUM_Y;
     //Bounding position
-    x %= arr_entries_x;
-    y %= arr_entries_y;
-    return lvl->apt_subnums[x][y];
+    sx %= arr_entries_x;
+    sy %= arr_entries_y;
+    return lvl->apt_subnums[sx][sy];
 }
 
-char *get_stlight(const struct LEVEL *lvl,unsigned int x,unsigned int y,unsigned int num)
+/**
+ * Returns static light data for light at given position.
+ * @param lvl Pointer to the LEVEL structure.
+ * @param sx,sy Subtile at which the static light is.
+ * @param num Index of static light on the subtile.
+ * @return Returns the static light data, or NULL on error.
+ */
+char *get_stlight(const struct LEVEL *lvl,unsigned int sx,unsigned int sy,unsigned int num)
 {
     //Preparing array bounds
     unsigned int arr_entries_x=MAP_SIZE_X*MAP_SUBNUM_X;
     unsigned int arr_entries_y=MAP_SIZE_Y*MAP_SUBNUM_Y;
     //Bounding position
-    x %= arr_entries_x;
-    y %= arr_entries_y;
+    sx %= arr_entries_x;
+    sy %= arr_entries_y;
     unsigned char *stlight=NULL;
-    if (num < lvl->lgt_subnums[x][y])
-      stlight = lvl->lgt_lookup[x][y][num];
+    if (num < lvl->lgt_subnums[sx][sy])
+      stlight = lvl->lgt_lookup[sx][sy][num];
     return stlight;
 }
 
-/*
- * Adds a given static light to the LEVEL structure, updates counter variables
+/**
+ * Adds a given static light to the LEVEL structure. Updates counter variables.
+ * @param lvl Pointer to the LEVEL structure.
+ * @param stlight Pointer to the static light data to add.
+ * @return Returns the index at which static light is added, or -1 on error.
  */
-void stlight_add(struct LEVEL *lvl,unsigned char *stlight)
+int stlight_add(struct LEVEL *lvl,unsigned char *stlight)
 {
     //Preparing array bounds
     int arr_entries_x=MAP_SIZE_X*MAP_SUBNUM_X;
@@ -1761,94 +1952,126 @@ void stlight_add(struct LEVEL *lvl,unsigned char *stlight)
     if (lvl->lgt_lookup[x][y]==NULL)
     {
         message_error("stlight_add: Cannot allocate memory");
-        return;
+        return -1;
     }
     unsigned int new_idx=lgt_snum-1;
     lvl->lgt_lookup[x][y][new_idx]=stlight;
+    return new_idx;
 }
 
-/*
- * Removes given static light from the LEVEL structure, updates counter variables.
+/**
+ * Removes given static light from the LEVEL structure. Updates counter variables.
  * Also frees memory allocated for the static light.
+ * @param lvl Pointer to the LEVEL structure.
+ * @param sx,sy Subtile at which the static light is.
+ * @param num Index of static light on the subtile.
  */
-void stlight_del(struct LEVEL *lvl,unsigned int x, unsigned int y, unsigned int num)
+void stlight_del(struct LEVEL *lvl,unsigned int sx, unsigned int sy, unsigned int num)
 {
     //Preparing array bounds
     int arr_entries_x=MAP_SIZE_X*MAP_SUBNUM_X;
     int arr_entries_y=MAP_SIZE_Y*MAP_SUBNUM_Y;
-    x%=arr_entries_x;
-    y%=arr_entries_y;
-    unsigned int lgt_snum=lvl->lgt_subnums[x][y];
+    sx%=arr_entries_x;
+    sy%=arr_entries_y;
+    unsigned int lgt_snum=lvl->lgt_subnums[sx][sy];
     if (num >= lgt_snum)
       return;
     lvl->lgt_total_count--;
     unsigned char *stlight;
-    stlight = lvl->lgt_lookup[x][y][num];
-    free(lvl->lgt_lookup[x][y][num]);
+    stlight = lvl->lgt_lookup[sx][sy][num];
+    free(lvl->lgt_lookup[sx][sy][num]);
     int i;
     lgt_snum--;
     for (i=num; i < lgt_snum; i++)
-      lvl->lgt_lookup[x][y][i]=lvl->lgt_lookup[x][y][i+1];
-    lvl->lgt_subnums[x][y]=lgt_snum;
-    lvl->tng_apt_lgt_nums[x/MAP_SUBNUM_X][y/MAP_SUBNUM_Y]--;
-    lvl->lgt_lookup[x][y]=(unsigned char **)realloc(lvl->lgt_lookup[x][y], 
+      lvl->lgt_lookup[sx][sy][i]=lvl->lgt_lookup[sx][sy][i+1];
+    lvl->lgt_subnums[sx][sy]=lgt_snum;
+    lvl->tng_apt_lgt_nums[sx/MAP_SUBNUM_X][sy/MAP_SUBNUM_Y]--;
+    lvl->lgt_lookup[sx][sy]=(unsigned char **)realloc(lvl->lgt_lookup[sx][sy], 
                         lgt_snum*sizeof(char *));
 }
 
-unsigned int get_stlight_subnums(const struct LEVEL *lvl,unsigned int x,unsigned int y)
+/**
+ * Gives amount of static lights existing at given subtile.
+ * @param lvl Pointer to the LEVEL structure.
+ * @param sx,sy Subtile at which we're counting static lights.
+ * @return Amount of static lights on the subtile.
+ */
+unsigned int get_stlight_subnums(const struct LEVEL *lvl,unsigned int sx,unsigned int sy)
 {
     //Preparing array bounds
     unsigned int arr_entries_x=MAP_SIZE_X*MAP_SUBNUM_X;
     unsigned int arr_entries_y=MAP_SIZE_Y*MAP_SUBNUM_Y;
     //Bounding position
-    x %= arr_entries_x;
-    y %= arr_entries_y;
-    return lvl->lgt_subnums[x][y];
+    sx %= arr_entries_x;
+    sy %= arr_entries_y;
+    return lvl->lgt_subnums[sx][sy];
 }
 
-/*
+/**
  * Checks what type the object is. Objects are action points, things or lights.
- * Returns one of OBJECT_TYPE_* value
+ * This function merges things, action points and static lights,
+ * treating them all just as 'objects'.
+ * @param lvl Pointer to the LEVEL structure.
+ * @param sx,sy Subtile at which the object is.
+ * @param z Index of the object. Things have lowest indices, then comes
+ *     action points and static lights.
+ * @return Returns one of OBJECT_TYPE_* value.
  */
-short get_object_type(const struct LEVEL *lvl, unsigned int x, unsigned int y, unsigned int z)
+short get_object_type(const struct LEVEL *lvl, unsigned int sx, unsigned int sy, unsigned int z)
 {
     //Preparing array bounds
     int arr_entries_x=MAP_SIZE_X*MAP_SUBNUM_X;
     int arr_entries_y=MAP_SIZE_Y*MAP_SUBNUM_Y;
     //Bounding indices
-    if ((x>=arr_entries_x)||(y>=arr_entries_y))
+    if ((sx>=arr_entries_x)||(sy>=arr_entries_y))
       return OBJECT_TYPE_NONE;
-    int tng_num=lvl->tng_subnums[x][y];
+    int tng_num=lvl->tng_subnums[sx][sy];
     if (z<tng_num) return OBJECT_TYPE_THING;
-    int apt_num=get_actnpt_subnums(lvl,x,y);
+    int apt_num=get_actnpt_subnums(lvl,sx,sy);
     if (z<(tng_num+apt_num)) return OBJECT_TYPE_ACTNPT;
-    int lgt_num=lvl->lgt_subnums[x][y];
+    int lgt_num=lvl->lgt_subnums[sx][sy];
     if (z<(tng_num+apt_num+lgt_num)) return OBJECT_TYPE_STLIGHT;
     return OBJECT_TYPE_NONE;
 }
 
-unsigned char *get_object(const struct LEVEL *lvl,unsigned int x,unsigned int y,unsigned int z)
+/**
+ * Returns data for specific object at given position.
+ * This function merges things, action points and static lights,
+ * treating them all just as 'objects'.
+ * @param lvl Pointer to the LEVEL structure.
+ * @param sx,sy Subtile at which the object is.
+ * @param z Index of the object. Things have lowest indices, then comes
+ *     action points and static lights.
+ * @return Returns the object data, or NULL on error.
+ */
+unsigned char *get_object(const struct LEVEL *lvl,unsigned int sx,unsigned int sy,unsigned int z)
 {
     //Preparing array bounds
     int arr_entries_x=MAP_SIZE_X*MAP_SUBNUM_X;
     int arr_entries_y=MAP_SIZE_Y*MAP_SUBNUM_Y;
     //Bounding indices
-    if ((x>=arr_entries_x)||(y>=arr_entries_y))
+    if ((sx>=arr_entries_x)||(sy>=arr_entries_y))
       return NULL;
-    int tng_num=lvl->tng_subnums[x][y];
+    int tng_num=lvl->tng_subnums[sx][sy];
     if (z<tng_num)
-      return get_thing(lvl,x,y,z);
-    int apt_num=get_actnpt_subnums(lvl,x,y);
+      return get_thing(lvl,sx,sy,z);
+    int apt_num=get_actnpt_subnums(lvl,sx,sy);
     if (z<(tng_num+apt_num))
-      return get_actnpt(lvl,x,y,z-tng_num);
-    int lgt_num=lvl->lgt_subnums[x][y];
+      return get_actnpt(lvl,sx,sy,z-tng_num);
+    int lgt_num=lvl->lgt_subnums[sx][sy];
     if (z<(tng_num+apt_num+lgt_num))
-      return get_stlight(lvl,x,y,z-tng_num-apt_num);
+      return get_stlight(lvl,sx,sy,z-tng_num-apt_num);
     return NULL;
 }
 
-/*
+/**
  * Deletes object with given coordinates and index.
+ * This function merges things, action points and static lights,
+ * treating them all just as 'objects'.
+ * @param lvl Pointer to the LEVEL structure.
+ * @param sx,sy Subtile at which the object is.
+ * @param z Index of the object. Things have lowest indices, then comes
+ *     action points and static lights.
  */
 void object_del(struct LEVEL *lvl,unsigned int sx,unsigned int sy,unsigned int z)
 {
@@ -1878,47 +2101,74 @@ void object_del(struct LEVEL *lvl,unsigned int sx,unsigned int sy,unsigned int z
     }
 }
 
-unsigned int get_object_subnums(const struct LEVEL *lvl,unsigned int x,unsigned int y)
+/**
+ * Gives amount of objects existing at given subtile.
+ * This function merges things, action points and static lights,
+ * treating them all just as 'objects'.
+ * @param lvl Pointer to the LEVEL structure.
+ * @param sx,sy Subtile at which we're counting objects.
+ * @return Amount of objects on the subtile.
+ */
+unsigned int get_object_subnums(const struct LEVEL *lvl,unsigned int sx,unsigned int sy)
 {
     //Preparing array bounds
     unsigned int arr_entries_x=MAP_SIZE_X*MAP_SUBNUM_X;
     unsigned int arr_entries_y=MAP_SIZE_Y*MAP_SUBNUM_Y;
     //Bounding position
-    if ((x>=arr_entries_x)||(y>=arr_entries_y))
+    if ((sx>=arr_entries_x)||(sy>=arr_entries_y))
       return 0;
-    return lvl->tng_subnums[x][y]+get_actnpt_subnums(lvl,x,y)+lvl->lgt_subnums[x][y];
+    return lvl->tng_subnums[sx][sy]+get_actnpt_subnums(lvl,sx,sy)+lvl->lgt_subnums[sx][sy];
 }
 
-unsigned int get_object_tilnums(const struct LEVEL *lvl,unsigned int x,unsigned int y)
+/**
+ * Gives amount of objects existing at given tile.
+ * This function merges things, action points and static lights,
+ * treating them all just as 'objects'.
+ * @param lvl Pointer to the LEVEL structure.
+ * @param tx,ty Tile at which we're counting objects.
+ * @return Amount of objects on the tile.
+ */
+unsigned int get_object_tilnums(const struct LEVEL *lvl,unsigned int tx,unsigned int ty)
 {
     if (lvl->tng_apt_lgt_nums==NULL) return 0;
-    return lvl->tng_apt_lgt_nums[x%MAP_SIZE_X][y%MAP_SIZE_Y];
+    return lvl->tng_apt_lgt_nums[tx%MAP_SIZE_X][ty%MAP_SIZE_Y];
 }
 
-/*
- * Returns index of the last object with given type. May return -1 if no object found.
+/**
+ * Gives index of the last object with given type.
+ * @param lvl Pointer to the LEVEL structure.
+ * @param sx,sy Subtile at which the object is.
+ * @param obj_type Type of the object, one of OBJECT_TYPE_* values.
+ * @return Returns index of the last object with given type.
+ *     May return -1 if no object found.
  */
-int get_object_subtl_last(const struct LEVEL *lvl,unsigned int x,unsigned int y,short obj_type)
+int get_object_subtl_last(const struct LEVEL *lvl,unsigned int sx,unsigned int sy,short obj_type)
 {
     //Preparing array bounds
     unsigned int arr_entries_x=MAP_SIZE_X*MAP_SUBNUM_X;
     unsigned int arr_entries_y=MAP_SIZE_Y*MAP_SUBNUM_Y;
     //Bounding position
-    if ((x>=arr_entries_x)||(y>=arr_entries_y))
+    if ((sx>=arr_entries_x)||(sy>=arr_entries_y))
       return 0;
     int last=-1;
-    last+=lvl->tng_subnums[x][y];
+    last+=lvl->tng_subnums[sx][sy];
     if (obj_type==OBJECT_TYPE_THING)
       return last;
-    last+=get_actnpt_subnums(lvl,x,y);
+    last+=get_actnpt_subnums(lvl,sx,sy);
     if (obj_type==OBJECT_TYPE_ACTNPT)
       return last;
-    last+=lvl->lgt_subnums[x][y];
+    last+=lvl->lgt_subnums[sx][sy];
     if (obj_type==OBJECT_TYPE_STLIGHT)
       return last;
-    return get_object_subnums(lvl,x,y)-1;
+    return get_object_subnums(lvl,sx,sy)-1;
 }
 
+/**
+ * Gives WIBble value for a subtile.
+ * @param lvl Pointer to the LEVEL structure.
+ * @param sx,sy Map subtile at which we want the WIB value.
+ * @return Returns WIB value.
+ */
 short get_subtl_wib(struct LEVEL *lvl, unsigned int sx, unsigned int sy)
 {
     //Preparing array bounds
@@ -1930,6 +2180,12 @@ short get_subtl_wib(struct LEVEL *lvl, unsigned int sx, unsigned int sy)
     return lvl->wib[sx][sy];
 }
 
+/**
+ * Sets WIBble value for a subtile.
+ * @param lvl Pointer to the LEVEL structure.
+ * @param sx,sy Map subtile at which we want to set WIB value.
+ * @param nval New value for the subtile wibble.
+ */
 void set_subtl_wib(struct LEVEL *lvl, unsigned int sx, unsigned int sy, short nval)
 {
     //Preparing array bounds
@@ -1941,6 +2197,12 @@ void set_subtl_wib(struct LEVEL *lvl, unsigned int sx, unsigned int sy, short nv
     lvl->wib[sx][sy]=nval;
 }
 
+/**
+ * Gives WLB (Water-Lava Block) value for a tile.
+ * @param lvl Pointer to the LEVEL structure.
+ * @param tx,ty Map tile at which we want the WLB value.
+ * @return Returns WLB value.
+ */
 short get_tile_wlb(struct LEVEL *lvl, unsigned int tx, unsigned int ty)
 {
     //Bounding position
@@ -1949,6 +2211,12 @@ short get_tile_wlb(struct LEVEL *lvl, unsigned int tx, unsigned int ty)
     return lvl->wlb[tx][ty];
 }
 
+/**
+ * Sets WLB (Water-Lava Block) value for a tile.
+ * @param lvl Pointer to the LEVEL structure.
+ * @param tx,ty Map tile at which we want to set WLB value.
+ * @param nval New value for the tile WLB.
+ */
 void set_tile_wlb(struct LEVEL *lvl, unsigned int tx, unsigned int ty, short nval)
 {
     //Bounding position
@@ -1956,6 +2224,12 @@ void set_tile_wlb(struct LEVEL *lvl, unsigned int tx, unsigned int ty, short nva
     lvl->wlb[tx][ty]=nval;
 }
 
+/**
+ * Gives owner (OWN value) for a subtile.
+ * @param lvl Pointer to the LEVEL structure.
+ * @param sx,sy Map subtile at which we want the owner value.
+ * @return Returns subtile owner index.
+ */
 unsigned char get_subtl_owner(const struct LEVEL *lvl, unsigned int sx, unsigned int sy)
 {
     //Preparing array bounds
@@ -1967,6 +2241,12 @@ unsigned char get_subtl_owner(const struct LEVEL *lvl, unsigned int sx, unsigned
     return lvl->own[sx][sy];
 }
 
+/**
+ * Sets owner (OWN value) for a subtile.
+ * @param lvl Pointer to the LEVEL structure.
+ * @param sx,sy Map subtile at which we want to set owner value.
+ * @param nval New value for the subtile owner.
+ */
 void set_subtl_owner(struct LEVEL *lvl, unsigned int sx, unsigned int sy, unsigned char nval)
 {
     //Preparing array bounds
@@ -1977,11 +2257,24 @@ void set_subtl_owner(struct LEVEL *lvl, unsigned int sx, unsigned int sy, unsign
     lvl->own[sx][sy]=nval;
 }
 
+/**
+ * Gives owner (OWN value) for a tile.
+ * @param lvl Pointer to the LEVEL structure.
+ * @param tx,ty Map tile at which we want the owner value.
+ * @return Returns owner index for subtile at centre of given tile.
+ */
 unsigned char get_tile_owner(const struct LEVEL *lvl, unsigned int tx, unsigned int ty)
 {
     return get_subtl_owner(lvl,tx*MAP_SUBNUM_X+1,ty*MAP_SUBNUM_Y+1);
 }
 
+/**
+ * Sets owner (OWN value) for a tile. Sets given owner value for
+ * all subtiles on given tile.
+ * @param lvl Pointer to the LEVEL structure.
+ * @param tx,ty Map tile at which we want to set owner value.
+ * @param nval New value for the tile owner.
+ */
 void set_tile_owner(struct LEVEL *lvl, unsigned int tx, unsigned int ty, unsigned char nval)
 {
     int subtl_x,subtl_y;
@@ -1990,6 +2283,12 @@ void set_tile_owner(struct LEVEL *lvl, unsigned int tx, unsigned int ty, unsigne
         set_subtl_owner(lvl,tx*MAP_SUBNUM_X+subtl_x,ty*MAP_SUBNUM_Y+subtl_y,nval);
 }
 
+/**
+ * Gives slab (SLB value) for a tile.
+ * @param lvl Pointer to the LEVEL structure.
+ * @param tx,ty Map tile at which we want the slab value.
+ * @return Returns tile slab value.
+ */
 unsigned short get_tile_slab(const struct LEVEL *lvl, unsigned int tx, unsigned int ty)
 {
     if (lvl->slb==NULL) return SLAB_TYPE_ROCK;
@@ -1998,8 +2297,13 @@ unsigned short get_tile_slab(const struct LEVEL *lvl, unsigned int tx, unsigned 
     return lvl->slb[tx][ty];
 }
 
-/*
+/**
  * Sets a new value to SLB item, without updating DAT or CLM or anything.
+ * To update level graphics after putting slab, use user_set_slab() instead.
+ * @see user_set_slab
+ * @param lvl Pointer to the LEVEL structure.
+ * @param tx,ty Map tile at which we want to set slab value.
+ * @param nval New value for the tile slab.
  */
 void set_tile_slab(struct LEVEL *lvl, unsigned int tx, unsigned int ty, unsigned short nval)
 {
@@ -2008,9 +2312,11 @@ void set_tile_slab(struct LEVEL *lvl, unsigned int tx, unsigned int ty, unsigned
     lvl->slb[tx][ty]=nval;
 }
 
-/*
- * Returns raw DAT value value for one subtile.
- * Warning: the USE variable of every column is unaffected by this function.
+/**
+ * Returns raw DAT value for one subtile.
+ * @param lvl Pointer to the LEVEL structure.
+ * @param sx,sy Map subtile at which we want the DAT value.
+ * @return Returns raw DAT value.
  */
 unsigned int get_dat_val(const struct LEVEL *lvl, const unsigned int sx, const unsigned int sy)
 {
@@ -2022,9 +2328,12 @@ unsigned int get_dat_val(const struct LEVEL *lvl, const unsigned int sx, const u
     return lvl->dat[sx][sy];
 }
 
-/*
- * Sets a DAT value for one subtile. (cx,cy) is a subtile position to fill,
- * d is the raw value. Low level - sets the RAW value, not column index.
+/**
+ * Sets a DAT value for one subtile.
+ * Low level - sets the RAW value, not column index.
+ * @param lvl Pointer to the LEVEL structure.
+ * @param sx,sy Map subtile at which we want to set DAT value.
+ * @param d Raw DAT value to set.
  */
 void set_dat_val(struct LEVEL *lvl, int sx, int sy, unsigned int d)
 {
@@ -2036,8 +2345,11 @@ void set_dat_val(struct LEVEL *lvl, int sx, int sy, unsigned int d)
     lvl->dat[sx][sy]=d;
 }
 
-/*
+/**
  * Returns FLG value for one subtile.
+ * @param lvl Pointer to the LEVEL structure.
+ * @param sx,sy Map subtile at which we want the FLG value.
+ * @return Returns FLG value.
  */
 unsigned short get_subtl_flg(struct LEVEL *lvl, unsigned int sx, unsigned int sy)
 {
@@ -2049,9 +2361,11 @@ unsigned short get_subtl_flg(struct LEVEL *lvl, unsigned int sx, unsigned int sy
     return lvl->flg[sx][sy];
 }
 
-/*
- * Sets a FLG value for one subtile. (cx,cy) is a subtile position to fill,
- * nval is the value.
+/**
+ * Sets a FLG value for one subtile.
+ * @param lvl Pointer to the LEVEL structure.
+ * @param sx,sy Map subtile at which we want to set FLG value.
+ * @param nval FLG value to set.
  */
 void set_subtl_flg(struct LEVEL *lvl, unsigned int sx, unsigned int sy,unsigned short nval)
 {
@@ -2063,9 +2377,10 @@ void set_subtl_flg(struct LEVEL *lvl, unsigned int sx, unsigned int sy,unsigned 
     lvl->flg[sx][sy]=nval;
 }
 
-/*
- * Updates some statistics about the level; The update includes
- * "utilize" values of columns
+/**
+ * Updates some statistics about the level. The update includes
+ * "utilize" values of columns.
+ * @param lvl Pointer to the LEVEL structure.
  */
 void update_level_stats(struct LEVEL *lvl)
 {
@@ -2073,6 +2388,11 @@ void update_level_stats(struct LEVEL *lvl)
      update_things_stats(lvl);
 }
 
+/**
+ * Updates statistics about the level. Does not updates
+ * "utilize" values of columns.
+ * @param lvl Pointer to the LEVEL structure.
+ */
 void update_things_stats(struct LEVEL *lvl)
 {
     //Preparing array bounds
@@ -2096,6 +2416,13 @@ void update_things_stats(struct LEVEL *lvl)
     }
 }
 
+/**
+ * Updates statistics about the thing.
+ * @param lvl Pointer to the LEVEL structure.
+ * @param thing Pointer to the thing data.
+ * @param change How the amount of such things have changes.
+ *     Positive if the thing was added, negative if removed.
+ */
 void update_thing_stats(struct LEVEL *lvl,const unsigned char *thing,short change)
 {
           if (thing==NULL) return;
@@ -2135,30 +2462,55 @@ void update_thing_stats(struct LEVEL *lvl,const unsigned char *thing,short chang
               lvl->stats.things_removed-=change;
 }
 
+/**
+ * Returns total number of static lights on the level.
+ * @param lvl Pointer to the LEVEL structure.
+ * @return Returns total number of static lights.
+ */
 unsigned int get_lgt_total_count(struct LEVEL *lvl)
 {
     if (lvl==NULL) return 0;
     return lvl->lgt_total_count;
 }
 
+/**
+ * Returns total number of action points on the level.
+ * @param lvl Pointer to the LEVEL structure.
+ * @return Returns total number of action points.
+ */
 unsigned int get_apt_total_count(struct LEVEL *lvl)
 {
     if (lvl==NULL) return 0;
     return lvl->apt_total_count;
 }
 
+/**
+ * Returns total number of things on the level.
+ * @param lvl Pointer to the LEVEL structure.
+ * @return Returns total number of things.
+ */
 unsigned int get_tng_total_count(struct LEVEL *lvl)
 {
     if (lvl==NULL) return 0;
     return lvl->tng_total_count;
 }
 
+/**
+ * Returns state of the datclm_auto_update option for the level.
+ * @param lvl Pointer to the LEVEL structure.
+ * @return Returns state of datclm_auto_update.
+ */
 short get_datclm_auto_update(struct LEVEL *lvl)
 {
     if (lvl==NULL) return false;
     return lvl->optns.datclm_auto_update;
 }
 
+/**
+ * Switches state of the datclm_auto_update option for the level.
+ * @param lvl Pointer to the LEVEL structure.
+ * @return Returns new state of datclm_auto_update.
+ */
 short switch_datclm_auto_update(struct LEVEL *lvl)
 {
     if (lvl==NULL) return false;
@@ -2167,6 +2519,12 @@ short switch_datclm_auto_update(struct LEVEL *lvl)
     return nval;
 }
 
+/**
+ * Sets state of the datclm_auto_update option for the level.
+ * @param lvl Pointer to the LEVEL structure.
+ * @param val New state of the option.
+ * @return Returns true if datclm_auto_update was successfully changed.
+ */
 short set_datclm_auto_update(struct LEVEL *lvl,short val)
 {
     if (lvl==NULL) return false;
@@ -2174,12 +2532,22 @@ short set_datclm_auto_update(struct LEVEL *lvl,short val)
     return true;
 }
 
+/**
+ * Returns state of the obj_auto_update option for the level.
+ * @param lvl Pointer to the LEVEL structure.
+ * @return Returns state of obj_auto_update.
+ */
 short get_obj_auto_update(struct LEVEL *lvl)
 {
     if (lvl==NULL) return false;
     return lvl->optns.obj_auto_update;
 }
 
+/**
+ * Switches state of the obj_auto_update option for the level.
+ * @param lvl Pointer to the LEVEL structure.
+ * @return Returns new state of obj_auto_update.
+ */
 short switch_obj_auto_update(struct LEVEL *lvl)
 {
     if (lvl==NULL) return false;
@@ -2188,6 +2556,12 @@ short switch_obj_auto_update(struct LEVEL *lvl)
     return nval;
 }
 
+/**
+ * Sets state of the obj_auto_update option for the level.
+ * @param lvl Pointer to the LEVEL structure.
+ * @param val New state of the option.
+ * @return Returns true if obj_auto_update was successfully changed.
+ */
 short set_obj_auto_update(struct LEVEL *lvl,short val)
 {
     if (lvl==NULL) return false;
@@ -2195,6 +2569,12 @@ short set_obj_auto_update(struct LEVEL *lvl,short val)
     return true;
 }
 
+/**
+ * Sets map file name for the level.
+ * @param lvl Pointer to the LEVEL structure.
+ * @param fname The new file name, which is copied to the level.
+ * @return Returns true on success, false on error.
+ */
 short set_lvl_fname(struct LEVEL *lvl,char *fname)
 {
     if (lvl==NULL) return false;
@@ -2210,6 +2590,13 @@ short set_lvl_fname(struct LEVEL *lvl,char *fname)
     return true;
 }
 
+/**
+ * Sets map file name for the level, using given format string.
+ * The string may be map file name, or map number.
+ * @param lvl Pointer to the LEVEL structure.
+ * @param namefmt The new file name, which is copied to the level.
+ * @return Returns true on success, false on error.
+ */
 short format_lvl_fname(struct LEVEL *lvl,char *namefmt)
 {
     if (lvl==NULL) return false;
@@ -2225,6 +2612,11 @@ short format_lvl_fname(struct LEVEL *lvl,char *namefmt)
     return format_map_fname(lvl->fname,namefmt,lvl->optns.levels_path);
 }
 
+/**
+ * Returns map file name for the level.
+ * @param lvl Pointer to the LEVEL structure.
+ * @return Returns map file name, or "" on error.
+ */
 char *get_lvl_fname(struct LEVEL *lvl)
 {
     if (lvl==NULL) return "";
@@ -2233,6 +2625,12 @@ char *get_lvl_fname(struct LEVEL *lvl)
     return lvl->fname;
 }
 
+/**
+ * Sets map file name for saving the level.
+ * @param lvl Pointer to the LEVEL structure.
+ * @param fname The new file name to save on.
+ * @return Returns true on success, false on error.
+ */
 short set_lvl_savfname(struct LEVEL *lvl,char *fname)
 {
     if (lvl==NULL) return false;
@@ -2248,6 +2646,13 @@ short set_lvl_savfname(struct LEVEL *lvl,char *fname)
     return true;
 }
 
+/**
+ * Sets map save file name for the level, using given format string.
+ * The string may be map file name, or map number.
+ * @param lvl Pointer to the LEVEL structure.
+ * @param namefmt The save file name, which is copied to the level.
+ * @return Returns true on success, false on error.
+ */
 short format_lvl_savfname(struct LEVEL *lvl,char *namefmt)
 {
     if (lvl==NULL) return false;
@@ -2263,6 +2668,11 @@ short format_lvl_savfname(struct LEVEL *lvl,char *namefmt)
     return format_map_fname(lvl->savfname,namefmt,lvl->optns.levels_path);
 }
 
+/**
+ * Returns save file name for the level.
+ * @param lvl Pointer to the LEVEL structure.
+ * @return Returns save file name, or "" on error.
+ */
 char *get_lvl_savfname(struct LEVEL *lvl)
 {
     if (lvl==NULL) return "";
@@ -2271,18 +2681,96 @@ char *get_lvl_savfname(struct LEVEL *lvl)
     return lvl->savfname;
 }
 
+/**
+ * Returns text name of the level, from LIF file.
+ * @param lvl Pointer to the LEVEL structure.
+ * @return Returns text name of the level, or "" on error.
+ */
+char *get_lif_name_text(struct LEVEL *lvl)
+{
+    if (lvl==NULL) return "";
+    if (lvl->info.name_text == NULL)
+      return "";
+    return lvl->info.name_text;
+}
+
+/**
+ * Sets text name of the level, from LIF file.
+ * Directly sets the name pointer, without duplicating it.
+ * @param lvl Pointer to the LEVEL structure.
+ * @param name New text name of the level.
+ * @return Returns true on success, false on error.
+ */
+short set_lif_name_text(struct LEVEL *lvl,char *name)
+{
+    if (lvl==NULL) return false;
+    free(lvl->info.name_text);
+    lvl->info.name_text=name;
+    return true;
+}
+
+/**
+ * Sets path at which maps are. The path should be without ending slash,
+ * and will be used only if map name to load/save doesn't have its own path.
+ * @param lvl Pointer to the LEVEL structure.
+ * @param lvpath The new path for levels folder.
+ * @return Returns true on success, false on error.
+ */
+short set_levels_path(struct LEVEL *lvl,char *lvpath)
+{
+    if (lvl==NULL) return false;
+    if (lvpath == NULL)
+    {
+      free(lvl->optns.levels_path);
+      lvl->optns.levels_path=NULL;
+      return true;
+    }
+    free(lvl->optns.levels_path);
+    lvl->optns.levels_path=strdup(lvpath);
+    if (lvl->optns.levels_path==NULL)
+      return false;
+    return true;
+}
+
+/**
+ * Returns path to folder with levels.
+ * @param lvl Pointer to the LEVEL structure.
+ * @return Returns path text, or NULL on error.
+ */
+char *get_levels_path(struct LEVEL *lvl)
+{
+    if (lvl==NULL) return NULL;
+    return lvl->optns.levels_path;
+}
+
+/**
+ * Returns pointer to the level script structure.
+ * @param lvl Pointer to the LEVEL structure.
+ * @return Returns pointer to DK_SCRIPT, or NULL on error.
+ */
 struct DK_SCRIPT *get_lvl_script(struct LEVEL *lvl)
 {
     if (lvl==NULL) return NULL;
     return &(lvl->script);
 }
 
+/**
+ * Returns pointer to the level statistics structure.
+ * @param lvl Pointer to the LEVEL structure.
+ * @return Returns pointer to LEVSTATS, or NULL on error.
+ */
 struct LEVSTATS *get_lvl_stats(struct LEVEL *lvl)
 {
     if (lvl==NULL) return NULL;
     return &(lvl->stats);
 }
 
+/**
+ * Increases mode switches counter.
+ * Used for user commands statistics for the level.
+ * @param lvl Pointer to the LEVEL structure.
+ * @return Returns the current mode switches count.
+ */
 unsigned long inc_info_usr_mdswtch_count(struct LEVEL *lvl)
 {
     if (lvl==NULL) return false;
@@ -2290,6 +2778,12 @@ unsigned long inc_info_usr_mdswtch_count(struct LEVEL *lvl)
     return lvl->info.usr_mdswtch_count;
 }
 
+/**
+ * Increases SLB changes counter.
+ * Used for user commands statistics for the level.
+ * @param lvl Pointer to the LEVEL structure.
+ * @return Returns the current SLB changes count.
+ */
 unsigned long inc_info_usr_slbchng_count(struct LEVEL *lvl)
 {
     if (lvl==NULL) return false;
@@ -2297,6 +2791,12 @@ unsigned long inc_info_usr_slbchng_count(struct LEVEL *lvl)
     return lvl->info.usr_slbchng_count;
 }
 
+/**
+ * Increases total user commands counter.
+ * Used for user commands statistics for the level.
+ * @param lvl Pointer to the LEVEL structure.
+ * @return Returns the current user commands count.
+ */
 unsigned long inc_info_usr_cmds_count(struct LEVEL *lvl)
 {
     if (lvl==NULL) return false;
@@ -2304,6 +2804,12 @@ unsigned long inc_info_usr_cmds_count(struct LEVEL *lvl)
     return lvl->info.usr_cmds_count;
 }
 
+/**
+ * Increases user objects created counter.
+ * Used for user commands statistics for the level.
+ * @param lvl Pointer to the LEVEL structure.
+ * @return Returns the current objects created count.
+ */
 unsigned long inc_info_usr_creatobj_count(struct LEVEL *lvl)
 {
     if (lvl==NULL) return false;
@@ -2311,6 +2817,11 @@ unsigned long inc_info_usr_creatobj_count(struct LEVEL *lvl)
     return lvl->info.usr_creatobj_count;
 }
 
+/**
+ * Increases major version number for the level.
+ * @param lvl Pointer to the LEVEL structure.
+ * @return Returns the current major version number.
+ */
 unsigned int inc_info_ver_major(struct LEVEL *lvl)
 {
     if (lvl==NULL) return false;
@@ -2320,6 +2831,11 @@ unsigned int inc_info_ver_major(struct LEVEL *lvl)
     return lvl->info.ver_major;
 }
 
+/**
+ * Increases minor version number for the level.
+ * @param lvl Pointer to the LEVEL structure.
+ * @return Returns the current minor version number.
+ */
 unsigned int inc_info_ver_minor(struct LEVEL *lvl)
 {
     if (lvl==NULL) return false;
@@ -2328,6 +2844,11 @@ unsigned int inc_info_ver_minor(struct LEVEL *lvl)
     return lvl->info.ver_minor;
 }
 
+/**
+ * Increases version release number for the level.
+ * @param lvl Pointer to the LEVEL structure.
+ * @return Returns the current version release number.
+ */
 unsigned int inc_info_ver_rel(struct LEVEL *lvl)
 {
     if (lvl==NULL) return false;
@@ -2335,12 +2856,23 @@ unsigned int inc_info_ver_rel(struct LEVEL *lvl)
     return lvl->info.ver_rel++;
 }
 
+/**
+ * Returns INF entry (texture index) for the level.
+ * @param lvl Pointer to the LEVEL structure.
+ * @return Returns INF entry for the level.
+ */
 unsigned char get_lvl_inf(struct LEVEL *lvl)
 {
     if (lvl==NULL) return 0;
     return lvl->inf;
 }
 
+/**
+ * Sets INF entry (texture index) for the level.
+ * @param lvl Pointer to the LEVEL structure.
+ * @param ninf New INF entry for the level.
+ * @return Returns true on success, false on error.
+ */
 short set_lvl_inf(struct LEVEL *lvl,unsigned char ninf)
 {
     if (lvl==NULL) return false;
@@ -2348,8 +2880,12 @@ short set_lvl_inf(struct LEVEL *lvl,unsigned char ninf)
     return true;
 }
 
-/*
- * Formats object statistics text line. Returns type of the line.
+/**
+ * Formats object statistics text line.
+ * @param lvl Pointer to the LEVEL structure.
+ * @param stat_buf Destination text buffer.
+ * @param line_num Line number to retrieve.
+ * @return Returns type of the line.
  */
 short get_level_objstats_textln(struct LEVEL *lvl,char *stat_buf,const int line_num)
 {
@@ -2381,7 +2917,7 @@ short get_level_objstats_textln(struct LEVEL *lvl,char *stat_buf,const int line_
         sprintf(stat_buf,"Traps:%4d",stats->traps_count);
         return STLT_SUBITEM;
     case 8:
-        sprintf(stat_buf,"EffctGens:%4d",stats->effectgenrts_count);
+        sprintf(stat_buf,"EffctGenrts:%4d",stats->effectgenrts_count);
         return STLT_SUBITEM;
     case 9:
         sprintf(stat_buf,"Doors:%4d",stats->doors_count);
@@ -2465,4 +3001,158 @@ short get_level_objstats_textln(struct LEVEL *lvl,char *stat_buf,const int line_
         stat_buf[0]='\0';
         return STLT_NONE;
     }
+}
+
+/**
+ * Puts a new slab on map. Updates level graphics, things and statistics.
+ * @see set_tile_slab
+ * @param lvl Pointer to the LEVEL structure.
+ * @param tx,ty Map coordinates of the slab to change.
+ * @param nslab New value for the tile slab.
+ * @return Returns true on success, false on error.
+ */
+short user_set_slab(struct LEVEL *lvl, unsigned int tx, unsigned int ty, unsigned short nslab)
+{
+  // Put the slab value
+  set_tile_slab(lvl,tx,ty,nslab);
+  // Update user commands statistics
+  inc_info_usr_slbchng_count(lvl);
+  // Update the level graphics
+  if (get_obj_auto_update(lvl))
+      update_obj_for_square_radius1(lvl,tx,ty);
+  if (get_datclm_auto_update(lvl))
+      update_datclm_for_square_radius1(lvl,tx,ty);
+  if (get_obj_auto_update(lvl))
+      update_obj_subpos_and_height_for_square_radius1(lvl,tx,ty);
+  return true;
+}
+
+/**
+ * Changes owner of one slab on map. Updates level graphics, things and statistics.
+ * @see set_tile_owner
+ * @param lvl Pointer to the LEVEL structure.
+ * @param tx,ty Map coordinates of the owner to change.
+ * @param nown New value for the tile owner.
+ * @return Returns true on success, false on error.
+ */
+short user_set_tile_owner(struct LEVEL *lvl, unsigned int tx, unsigned int ty, unsigned short nown)
+{
+  // Put the slab value
+  set_tile_owner(lvl,tx,ty,nown);
+  // Update user commands statistics
+  inc_info_usr_slbchng_count(lvl);
+  // Update the level graphics
+  if (get_obj_auto_update(lvl))
+      update_obj_for_square_radius1(lvl,tx,ty);
+  if (get_datclm_auto_update(lvl))
+      update_datclm_for_square_radius1(lvl,tx,ty);
+  if (get_obj_auto_update(lvl))
+      update_obj_subpos_and_height_for_square_radius1(lvl,tx,ty);
+  return true;
+}
+
+/**
+ * Puts a rectangle of new slabs on map. Updates level graphics, things and statistics.
+ * @param lvl Pointer to the LEVEL structure.
+ * @param startx,starty Top left of the changed rectangle.
+ * @param endx,endy Bottom right of the changed rectangle.
+ * @param nslab New value for the slab to fill rectangle.
+ * @return Returns true on success, false on error.
+ */
+short user_set_slab_rect(struct LEVEL *lvl, unsigned int startx, unsigned int endx,
+    unsigned int starty, unsigned int endy, unsigned short nslab)
+{
+    // Sanity check
+    if ((endx>MAP_MAXINDEX_X) || (endy>MAP_MAXINDEX_Y) ||
+       (startx>endx) || (starty>endy) )
+    {
+      message_error("Map coordinates out of bounds");
+      return false;
+    }
+    int tile_x,tile_y;
+    for (tile_x=startx; tile_x<=endx; tile_x++)
+      for (tile_y=starty; tile_y<=endy; tile_y++)
+      {
+//          unsigned char oldslb;
+//          oldslb = get_tile_slab(lvl,tile_x,tile_y);
+          set_tile_slab(lvl,tile_x,tile_y,nslab);
+          inc_info_usr_slbchng_count(lvl);
+      }
+    if (get_obj_auto_update(lvl))
+      update_obj_for_square(lvl, startx-1, endx+1, starty-1, endy+1);
+    if (get_datclm_auto_update(lvl))
+      update_datclm_for_square(lvl, startx-1, endx+1, starty-1, endy+1);
+    if (get_obj_auto_update(lvl))
+      update_obj_subpos_and_height_for_square(lvl, startx-1, endx+1, starty-1, endy+1);
+    return true;
+}
+
+/**
+ * Changes owner of a map rectangle. Updates level graphics, things and statistics.
+ * @param lvl Pointer to the LEVEL structure.
+ * @param startx,starty Top left of the changed rectangle.
+ * @param endx,endy Bottom right of the changed rectangle.
+ * @param nown New value for the rectangle owner.
+ * @return Returns true on success, false on error.
+ */
+short user_set_owner_rect(struct LEVEL *lvl, unsigned int startx, unsigned int endx,
+    unsigned int starty, unsigned int endy, unsigned short nown)
+{
+    // Sanity check
+    if ((endx>MAP_MAXINDEX_X) || (endy>MAP_MAXINDEX_Y) ||
+       (startx>endx) || (starty>endy) )
+    {
+      message_error("Map coordinates out of bounds");
+      return false;
+    }
+    int tile_x,tile_y;
+    for (tile_x=startx; tile_x<=endx; tile_x++)
+      for (tile_y=starty; tile_y<=endy; tile_y++)
+      {
+          set_tile_owner(lvl,tile_x,tile_y,nown);
+          inc_info_usr_slbchng_count(lvl);
+      }
+    if (get_obj_auto_update(lvl))
+      update_obj_for_square(lvl, startx-1, endx+1, starty-1, endy+1);
+    if (get_datclm_auto_update(lvl))
+      update_datclm_for_square(lvl, startx-1, endx+1, starty-1, endy+1);
+    if (get_obj_auto_update(lvl))
+      update_obj_subpos_and_height_for_square(lvl, startx-1, endx+1, starty-1, endy+1);
+    return true;
+}
+
+/**
+ * Puts a rectangle of new slabs on map. Updates level graphics, things and statistics.
+ * @param lvl Pointer to the LEVEL structure.
+ * @param startx,starty Top left of the changed rectangle.
+ * @param endx,endy Bottom right of the changed rectangle.
+ * @param nslab New value for the slab to put in rectangle.
+ * @param nown New value for the rectangle owner.
+ * @return Returns true on success, false on error.
+ */
+short user_set_slabown_rect(struct LEVEL *lvl, unsigned int startx, unsigned int endx,
+    unsigned int starty, unsigned int endy, unsigned short nslab,unsigned short nown)
+{
+    // Sanity check
+    if ((endx>MAP_MAXINDEX_X) || (endy>MAP_MAXINDEX_Y) ||
+       (startx>endx) || (starty>endy) )
+    {
+      message_error("Map coordinates out of bounds");
+      return false;
+    }
+    int tile_x,tile_y;
+    for (tile_x=startx; tile_x<=endx; tile_x++)
+      for (tile_y=starty; tile_y<=endy; tile_y++)
+      {
+          set_tile_slab(lvl,tile_x,tile_y,nslab);
+          set_tile_owner(lvl,tile_x,tile_y,nown);
+          inc_info_usr_slbchng_count(lvl);
+      }
+    if (get_obj_auto_update(lvl))
+      update_obj_for_square(lvl, startx-1, endx+1, starty-1, endy+1);
+    if (get_datclm_auto_update(lvl))
+      update_datclm_for_square(lvl, startx-1, endx+1, starty-1, endy+1);
+    if (get_obj_auto_update(lvl))
+      update_obj_subpos_and_height_for_square(lvl, startx-1, endx+1, starty-1, endy+1);
+    return true;
 }

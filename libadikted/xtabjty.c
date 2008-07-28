@@ -296,7 +296,7 @@ short read_jtytabfile_data(struct JTYTABFILE *jtabf,const char *srcfname)
     {
             struct JTYTAB_ITEM *curitm=&(jtabf->items[entrynum]);
             unsigned long readed=fread (tabitm, 1, JTYTAB_ENTRY_SIZE, tabfp);
-            curitm->offset=read_long_le_buf(tabitm);
+            curitm->offset=read_int32_le_buf(tabitm);
             curitm->width=tabitm[4];
             curitm->height=tabitm[5];
             memcpy(curitm->attrib.unkn,tabitm+6,10);
@@ -316,7 +316,7 @@ short write_jtytabfile_data(const struct JTYTABFILE *jtabf,const char *dstfname)
     for (entrynum=0;entrynum<jtabf->count;entrynum++)
     {
             struct JTYTAB_ITEM *curitm=&(jtabf->items[entrynum]);
-            write_long_le_file(tabfp,curitm->offset);
+            write_int32_le_file(tabfp,curitm->offset);
             fputc(curitm->width,tabfp);
             fputc(curitm->height,tabfp);
             fwrite (curitm->attrib.unkn, 10, 1, tabfp);

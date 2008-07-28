@@ -29,6 +29,7 @@ enum borderStyle {bsSingle,bsDouble,bsSolid};
 #define PRINT_COLOR_YELLOW_ON_BLACK   4
 #define PRINT_COLOR_WHITE_ON_BLACK    5
 #define PRINT_COLOR_LMAGENT_ON_BLACK  7
+#define PRINT_COLOR_YELLOW_ON_RED     8
 #define PRINT_COLOR_LBLUE_ON_BLACK    31
 #define PRINT_COLOR_LGREEN_ON_BLACK   32
 #define PRINT_COLOR_LCYAN_ON_BLACK    34
@@ -102,6 +103,7 @@ void screen_printf_toeol(char *format, ...);
 void screen_draw_hline(int posy,int posx,int length,short border_style);
 void screen_draw_vline(int posy,int posx,int length,short border_style);
 void screen_draw_window(int posy,int posx,int sizey,int sizex,int border_size,short border_style);
+void screen_clear(void);
 void screen_refresh(void);
 void screen_init(void);
 void screen_reinit_and_update(void);

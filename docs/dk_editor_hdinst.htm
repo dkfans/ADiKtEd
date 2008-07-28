@@ -8,7 +8,7 @@
 
 <body lang="EN">
 
-<p class="main_title">Dungeon Keeper Mapmakers Installation Instructions&nbsp;v1.0</p>
+<p class="main_title">Dungeon Keeper Mapmakers Installation Instructions&nbsp;v1.2</p>
 
 <p class="main_subtitle">Created by fans</p>
 
@@ -24,8 +24,17 @@
 <p class="toc2"><a href="#mminst_bfedit">2.1 Official Bullfrog Editor</a></p>
 <p class="toc2"><a href="#mminst_adikted">2.2 Adikted</a></p>
 <p class="toc2"><a href="#mminst_unded">2.3 Unded</a></p>
-<p class="toc1"><a href="#mminst_changelog">3.0 Changes log</a></p>
-<p class="toc1"><a href="#mminst_refs">4.0 References</a></p>
+<p class="toc1"><a href="#manual_playmap">3.0 Playing Your Maps</a></p>
+<p class="toc2"><a href="#manual_playmap_betados">3.1 Dungeon Keeper Beta for DOS</a></p>
+<p class="toc2"><a href="#manual_playmap_betawin">3.2 Dungeon Keeper Beta for Windows</a></p>
+<p class="toc2"><a href="#manual_playmap_retail">3.3 Dungeon Keeper Retail for Windows</a></p>
+<p class="toc2"><a href="#manual_playmap_saveedit">3.4 Editing the Savegame</a></p>
+<p class="toc2"><a href="#manual_playmap_ddung">3.5 Deeper Dungeons</a></p>
+<p class="toc2"><a href="#manual_playmap_keepfx">3.6 KeeperFX</a></p>
+<p class="toc2"><a href="#manual_playmap_multi">3.7 Playing a Multiplayer Level</a></p>
+<p class="toc2"><a href="#manual_playmap_rename">3.8 Renaming Your Map</a></p>
+<p class="toc1"><a href="#mminst_changelog">4.0 Changes log</a></p>
+<p class="toc1"><a href="#mminst_refs">5.0 References</a></p>
 
 <br clear="all"/><br/>
 
@@ -124,8 +133,116 @@ placed in &quot;docs&quot; subdirectory.</p>
 <p class="std">Unzip the program into any directory; it doesn't really matter.</p>
 <br/>
 
-<p class="std">To jump to a level that you have edited, you will need a program called
-&quot;ch-dkc12.zip&quot;. You should find it inside the zip file you downloaded.<br/>
+<br clear="all"/><br/>
+
+<h1><a name="manual_playmap">3.0 Playing Your Maps</a></h1>
+
+<br/>
+<p class="std">Once you have designed your map and written your script,
+you will want to play the level. There&nbsp;are many ways to do this;
+some can be used only on specific versions of the game, other work on
+all versions. You will have to select a way which you prefer:</p>
+
+<br clear="all"/><br/>
+
+<h2><a name="manual_playmap_betados">3.1 Dungeon Keeper Beta for DOS</a></h2>
+
+<br/>
+<p class="std">Beta&nbsp;version of the game was the first version released.
+It&nbsp;had some functions created to test the game, which were removed later.
+One of such functions is a cheat menu under Numpad Enter key, another is
+a command line parameter which allows playing any of the levels.</p>
+<br/>
+
+<p class="std">Note&nbsp;that while it is true that Beta version of the game
+has functions which were removed later, it also have some errors.
+These&nbsp;include code bugs, graphics errors and AI problems.
+The&nbsp;computer player was significantly improved in retail version,
+and even more improvements were made when releasing Deeper Dungeons,
+and Dungeon Keeper Gold.</p>
+<br/>
+
+<p class="std">If you are playing the MS-Dos version of Dungeon Keeper Beta,
+go to the Dungeon Keeper directory, e.g. <b>c:\keeper</b>.
+Then type the following:</p>
+<br/>
+
+<p class="snip">keeper -level [n]</p>
+<br/>
+
+<p class="std">[n] - the number of the level you want to play.</p>
+<br/>
+
+<p class="std">Example:</p>
+<br/>
+<p class="snip">keeper -level 200</p>
+<br/>
+<p class="std">This will take you straight into level 200.
+If&nbsp;the parameter isn't working, then you don't have Beta version of the game.</p>
+
+<br clear="all"/><br/>
+
+<h2><a name="manual_playmap_betawin">3.2 Dungeon Keeper Beta for Windows</a></h2>
+<br/>
+
+<p class="std">Beta&nbsp;version of the game contains an easy option to play
+any map you want. See&nbsp;<a href="#manual_playmap_betados">DK Beta for DOS</a>
+chapter to learn what the beta version is</p>
+<br/>
+
+<p class="std">If you are playing the Windows version
+of Dungeon Keeper Beta, click on the Start button on the taskbar
+and select the Run program on the menu.
+A&nbsp;requester will appear.</p>
+<br/>
+
+<p class="std">Type in the name of the keeper directory
+and also add keeper95.exe on the end, e.g.
+<b>&quot;c:\program&nbsp;files\keeper\keeper95.exe&quot;</b>.</p>
+<br/>
+
+<p class="std">Then, on the end of that, add the following text:</p>
+<br/>
+<p class="snip">-level [n]</p>
+<br/>
+<p class="std">[n] - the number of the level you want to play.</p>
+<br/>
+
+<p class="std">For example:</p>
+<br/>
+<pre class="snip">"c:\program files\keeper\keeper95.exe" -level 200</pre>
+<br/>
+<p class="std">This will take you straight into level 200.
+If&nbsp;the parameter isn't working, this means you don't have Beta version of the game.</p>
+
+<br clear="all"/><br/>
+
+<h2><a name="manual_playmap_retail">3.3 Dungeon Keeper Retail for Windows</a></h2>
+<br/>
+
+<p class="std">On&nbsp;Retail and Gold release of Dungeon Keeper, there is no
+command line parameter which would allow to play any map. The&nbsp;easiest way
+to play the map is to save it as MAP00001 which is named &quot;Eversmile&quot;
+(overwriting the original&nbsp;one), then run the game and use the
+"Start&nbsp;new game" button.</p>
+<br/>
+
+<p class="std">You&nbsp;can recover the original MAP00001 later by copying it
+from the Dungeon Keeper CD.</p>
+<br/>
+
+<p class="std">Another way of playing any map you want is to edit a savegame.
+See next chapters for more information.</p>
+
+<br clear="all"/><br/>
+
+<h2><a name="manual_playmap_saveedit">3.4 Editing the Savegame</a></h2>
+<br/>
+
+<p class="std">To jump to a level that you have edited using modified savegame,
+you will need a program called &quot;Dungeon Keeper Savegame Cheat&quot;
+The last released version of this program is usually stored in file &quot;CH-DKC13.ZIP&quot;.
+You should find it inside zip file containing map editor, UnDed; download it.<br/>
 Unzip it into your Dungeon Keeper Directory.
 It&nbsp;is a program which will edit one of your savegame files, and let you jump
 to any level.
@@ -133,11 +250,46 @@ Use&nbsp;it to edit a savegame file and jump to the level that you have edited.<
 <br/>
 
 <p class="std">WARNING: You should back up your savegames first as the program
-overwrites them.  The &quot;ch-dkc12.zip&quot; was created by a bloke called <i>cyberhead</i>.
-Alternativly, if you don't want to use that program, you can edit the multiplayer levels.
-These&nbsp;are all numbered 50 upwards.
-Start&nbsp;Dungeon Keeper with the switch &quot;-1player&quot;, so for example if you have
-the dos version type:</p>
+overwrites them. The &quot;Dungeon Keeper Savegame Cheat&quot; was created
+by a bloke called <i>cyberhead</i>.</p>
+
+<p class="std">Alternativly, if you don't want to use that program, you can edit
+the multiplayer levels. This is discussed in chapters following this one.</p>
+<br/>
+
+<br clear="all"/><br/>
+
+<h2><a name="manual_playmap_ddung">3.5 Deeper Dungeons</a></h2>
+
+<br/>
+<p class="std">If&nbsp;you have the Deeper Dungeons installed on your machine,
+you should run this instead of <b>keeper95.exe</b>.
+In&nbsp;MS-Dos, the name of the Deeper Dungeons program is <b>Deeper.exe</b>
+and in Windows, it is <b>Deeper95.exe</b>.</p>
+
+<br clear="all"/><br/>
+
+<h2><a name="manual_playmap_keepfx">3.6 KeeperFX</a></h2>
+
+<br/>
+<p class="std">KeeperFX is a fan-made modification to Dungeon Keeper.
+It&nbsp;is based on Dungeon Keeper Gold, but it has the &quot;-level&quot; parameter
+adopted from Beta version. You can use this parameter in the same way that
+in Dungeon Keeper Beta for Windows; you only need to remember, that you want
+to run "keeperfx.exe" instead of "keeper95.exe". Usage of the &quot;-level&quot; parameter
+was discussed earlier in this document.</p>
+
+<br clear="all"/><br/>
+
+<h2><a name="manual_playmap_multi">3.7 Playing a Multiplayer Level</a></h2>
+<br/>
+
+<p class="std">Multiplayer maps are all numbered 50 upwards.
+If&nbsp;you will overwrite an extisting multiplayer level, then you can play it easily:</p>
+<br/>
+
+<p class="std">Start&nbsp;Dungeon Keeper with the switch &quot;-1player&quot;,
+so for example if you have the DOS version, type:</p>
 <p class="snip">keeper -1player</p>
 <p class="std">and for the win95 version type:</p>
 <p class="snip">keeper95 -1player</p>
@@ -146,12 +298,144 @@ service menu. Select your level from the map.
 You&nbsp;will be taken to the level you have edited.</p>
 <br/>
 
+<p class="std">To add a new multiplayer level, you must first do a number of things:</p>
+<br/>
+
+<p class="std">First, open the
+level&rsquo;s script (which can be found in the Levels directory).
+At the start of the script should be block of text
+reading:</p>
+<br/>
+
+<pre class="snip">REM ***** Add this following line to       *****
+REM ***** levels.txt (if this a normal     *****
+REM ***** Keeper level) or dd1lev.txt (if  *****
+REM ***** this is a Deeper Dungeons level) *****
+REM ***** which can be found in the Levels *****
+REM ***** directory of your Keeper         *****
+REM ***** directory. Please include this   *****
+REM ***** text will all multiplayer levels *****
+REM ***** you release                      *****
+ 
+REM    Level number (change this if you change the level number)
+REM    :   Number of players
+REM    :   : X coordinate of flag on Levels Map
+REM    :   : :   Y coordinate of flag on Levels Map
+REM    :   : :   :   Name of map
+REM    :   : :   :   :
+ 
+REM    201,4,550,300,Multi Example
+ 
+
+REM    This is a normal Keeper level</pre>
+<br/>
+
+<p class="std">This text provides the all
+information you need to play the multiplayer level. At the bottom,
+it will tell you whether this is a normal Dungeon Keeper level or a
+special Deeper Dungeons level. Next, select the portion of text
+that reads &lsquo;201,4,550,300,Multi Example&rsquo; and press Ctrl
+c to copy it.</p>
+<br/>
+
+<p class="std"><b>Note:</b> if you have had to change the original map
+number, you will also need to change the first number on this piece
+of text to the new map number.</p>
+<br/>
+
+<p class="std">Now, close the script and
+find a file in the Levels directory called levels.txt. If you are
+using Deeper Dungeons, or it is a specific Deeper Dungeons level,
+find a file called dd1lev.txt instead. Open this file and scroll
+down to the bottom of the list of numbers. Now, create a new line
+at the end of the list and press Ctrl v to paste the text in the
+space. Make sure it looks like all the other lines in the list then
+save and close the file.</p>
+<br/>
+
+<p class="std">Now you can run Keeper or
+Deeper Dungeons normally and you can choose the map from the Levels
+Map.</p>
+
 <br clear="all"/><br/>
 
-<h1><a name="mminst_changelog">3.0 Changes log</a></h1>
+<h2><a name="manual_playmap_rename">3.8 Renaming Your Map</a></h2>
+
+<br/>
+<p class="std">Because the Dungeon Keeper
+Editor automatically assigns a level slot for your map, you may
+need to change this number if a conflict occurs. Someone might have
+sent you a map with the same number of you may want to organise
+your maps more efficiently.</p>
+<br/>
+
+<p class="std">To do this, you will need
+to rename ALL the map files to the new number. Remember that these
+files can be found in the Levels directory.</p>
+<br/>
+<p class="std">For example:</p>
+<br/>
+
+<p class="std">(Old Numbers)</p>
+<br/>
+<pre class="snip">Map00235.apt
+Map00235.clm
+Map00235.dat
+Map00235.inf
+Map00235.lgt
+Map00235.lif
+Map00235.own
+Map00235.slb
+Map00235.tng
+Map00235.txt
+Map00235.wib
+Map00235.wlb</pre>
+<br/>
+
+<p class="std">(New numbers)</p>
+<br/>
+<pre class="snip">Map00679.apt
+Map00679.clm
+Map00679.dat
+Map00679.inf
+Map00679.lgt
+Map00679.lif
+Map00679.own
+Map00679.slb
+Map00679.tng
+Map00679.txt
+Map00679.wib
+Map00679.wlb</pre>
+<br/>
+<br/>
+
+<p class="std">You will then need to edit
+the .lif file of the map, e.g. Map00679.lif. Inside this file are
+two pieces of information:</p>
+<br/>
+<p class="snip">235, Fluffy Dell</p>
+<br/>
+<p class="std">One is the map number, the
+other is the map&rsquo;s name. Change the number to the new map
+number:</p>
+<br/>
+<p class="snip">679, Fluffy Dell</p>
+<br/>
+<p class="std">If you want, you can also change the level name.
+This will not affect the game in any way.</p>
+
+<br clear="all"/><br/>
+
+<h1><a name="mminst_changelog">4.0 Changes log</a></h1>
 
 <br/>
 
+<br/>
+<h4>Version 1.2</h4>
+<ul>
+<li class="std">Added &quot;Playing Your Maps&quot; chapter</li>
+<li class="std">Playing custom maps info extended</li>
+</ul>
 <br/>
 <h4>Version 1.1</h4>
 <ul>
@@ -166,7 +450,7 @@ You&nbsp;will be taken to the level you have edited.</p>
 
 <br clear="all"/><br/>
 
-<h1><a name="mminst_refs">3.0 References</a></h1>
+<h1><a name="mminst_refs">5.0 References</a></h1>
 
 <br/>
 <ol>

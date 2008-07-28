@@ -1,20 +1,18 @@
 /******************************************************************************/
-// arr_utils.h - Dungeon Keeper Tools.
-/******************************************************************************/
-// Author:   Tomasz Lis
-// Created:  15 Nov 2007
-
-// Purpose:
-//   Header file. Defines exported routines from arr_utils.c
-
-// Comment:
-//   None.
-
-//Copying and copyrights:
-//   This program is free software; you can redistribute it and/or modify
-//   it under the terms of the GNU General Public License as published by
-//   the Free Software Foundation; either version 2 of the License, or
-//   (at your option) any later version.
+/** @file arr_utils.h
+ * Dungeon Keeper Array Tools.
+ * @par Purpose:
+ *     Header file. Defines exported routines from arr_utils.c
+ * @par Comment:
+ *     None.
+ * @author   Tomasz Lis
+ * @date     15 Nov 2007 - 22 Jul 2008
+ * @par  Copying and copyrights:
+ *     This program is free software; you can redistribute it and/or modify
+ *     it under the terms of the GNU General Public License as published by
+ *     the Free Software Foundation; either version 2 of the License, or
+ *     (at your option) any later version.
+ */
 /******************************************************************************/
 
 #ifndef BULL_ARRUTILS_H
@@ -23,7 +21,10 @@
 #include "globals.h"
 
 DLLIMPORT void strip_crlf(char *string_in);
-DLLIMPORT char *prepare_short_fname(char *fname, unsigned int maxlen);
+DLLIMPORT char *prepare_short_fname(const char *fname, unsigned int maxlen);
+DLLIMPORT char *filename_from_path(char *pathname);
+char *strdup_noquot(char *src);
+char *strdup_trim(char *src);
 
 DLLIMPORT short format_map_fname(char *fname, const char *usrinput,const char *levels_path);
 DLLIMPORT short format_data_fname(char **fullname, const char *data_path, const char *format, ...);

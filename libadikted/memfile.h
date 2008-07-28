@@ -23,7 +23,10 @@
 
 #include "globals.h"
 
-//max. acceptable file size for allreading operations (set to 700MB)
+/**
+ * Maximal acceptable file size for all reading operations.
+ * Value set to 700MB.
+ */
 #define MAX_FILE_SIZE 734003200
 
 //first 16 errors are reserved to RNC support
@@ -32,15 +35,31 @@
 #define MFILE_MALLOC_ERR   -18
 #define MFILE_SIZE_ERR     -19
 #define MFILE_READ_ERR     -20
+#define MFILE_INTERNAL     -21
 
 struct MEMORY_FILE
 {
     unsigned long len;
+    unsigned long alloc_len;
+    unsigned long alloc_delta;
+    unsigned long pos;
     unsigned char *content;
-    int errcode;
+    short errcode;
 };
 
-DLLIMPORT struct MEMORY_FILE read_file(const char *iname);
-DLLIMPORT char *read_file_error(int errcode);
+DLLIMPORT short memfile_new(struct MEMORY_FILE **mfile, unsigned long alloc_len);
+DLLIMPORT short memfile_free(struct MEMORY_FILE **mfile);
+DLLIMPORT unsigned char *memfile_leave_content(struct MEMORY_FILE **mfile);
+DLLIMPORT short memfile_read(struct MEMORY_FILE *mfile,const char *fname,unsigned long max_size);
+DLLIMPORT short memfile_readnew(struct MEMORY_FILE **mfile,const char *fname,unsigned long max_size);
+DLLIMPORT short memfile_add(struct MEMORY_FILE *mfile,
+    const unsigned char *buf,unsigned long buf_len);
+DLLIMPORT short memfile_set(struct MEMORY_FILE *mfile,
+    unsigned char *buf,unsigned long len,unsigned long alloc_len);
+DLLIMPORT short memfile_growalloc(struct MEMORY_FILE *mfile, unsigned long alloc_len);
+DLLIMPORT char *memfile_error(int errcode);
+
+
+//DLLIMPORT struct MEMORY_FILE read_file(const char *iname);
 
 #endif // ADIKT_MEMFILE_H

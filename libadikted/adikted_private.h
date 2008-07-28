@@ -5,11 +5,11 @@
 #define ADIKTED_PRIVATE_H
 
 /* VERSION DEFINITIONS */
-#define VER_STRING	"0.9.1.103"
+#define VER_STRING	"0.9.3.96"
 #define VER_MAJOR	0
 #define VER_MINOR	9
-#define VER_RELEASE	1
-#define VER_BUILD	103
+#define VER_RELEASE	3
+#define VER_BUILD	96
 #define COMPANY_NAME	""
 #define FILE_VERSION	""
 #define FILE_DESCRIPTION	"ADiKtEd Map Maintain Library"

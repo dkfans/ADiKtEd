@@ -1,7 +1,7 @@
 [Project]
 FileName=adikted.dev
 Name=libadikted
-UnitCount=45
+UnitCount=47
 Type=3
 Ver=1
 ObjFiles=
@@ -19,9 +19,9 @@ ExeOutput=
 ObjectOutput=
 OverrideOutput=0
 OverrideOutputName=libadikted.dll
-HostApplication=
+HostApplication=map.exe
 Folders=
-CommandLine=
+CommandLine=MAP00097
 UseCustomMakefile=0
 CustomMakefile=
 IncludeVersionInfo=1
@@ -42,8 +42,8 @@ BuildCmd=
 [VersionInfo]
 Major=0
 Minor=9
-Release=1
-Build=103
+Release=3
+Build=96
 LanguageID=1033
 CharsetID=1252
 CompanyName=
@@ -488,7 +488,7 @@ OverrideBuildCmd=0
 BuildCmd=
 
 [Unit46]
-FileName=arr_utils.c
+FileName=lbfileio.h
 CompileCpp=0
 Folder=libadikted
 Compile=1
@@ -499,6 +499,16 @@ BuildCmd=
 
 [Unit2]
 FileName=bulcommn.h
+CompileCpp=0
+Folder=libadikted
+Compile=1
+Link=1
+Priority=1000
+OverrideBuildCmd=0
+BuildCmd=
+
+[Unit47]
+FileName=lbfileio.c
 CompileCpp=0
 Folder=libadikted
 Compile=1

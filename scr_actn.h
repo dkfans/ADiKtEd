@@ -175,6 +175,7 @@ struct WORKMODE_DATA {
     struct LEVEL *lvl;
     struct MAPMODE_DATA *mapmode;
     struct TXTED_DATA *editor;
+    struct TXTGEN_DATA *txtgen;
     struct MDCUBE_DATA *mdcube;
     struct RWRK_DATA *mdrwrk;
     struct MDTNG_DATA *mdtng;
@@ -258,7 +259,9 @@ int display_mode_keyhelp(struct HELP_DATA *help, int scr_row, int scr_col,
     int max_row,int mode,int itm_idx);
 void draw_mdempty(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata);
 
-void show_cursor(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,char cur);
+void show_cursor(const struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,char cur);
+void show_cursor_at(const struct SCRMODE_DATA *scrmode,int row,int col,char cur);
+void show_no_cursor();
 char *mode_status(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata,int mode);
 short is_simple_mode(int mode);
 

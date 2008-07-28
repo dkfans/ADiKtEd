@@ -44,10 +44,15 @@ const char graffiti_cmdtext[]="GRAFFITI";
 const char leveltimestmp_cmdtext[]="LEVEL_TIMESTAMP";
 const char usrcmnds_count_cmdtext[]="USER_COMMANDS_COUNT";
 const char levversion_cmdtext[]="LEVEL_VERSION";
+const char levname_cmdtext[]="LEVEL_NAME";
+const char levdesc_cmdtext[]="LEVEL_DESCRIPTION";
+const char levauthors_cmdtext[]="LEVEL_AUTHORS";
+
 // CMD_ADIKTED - adikted specific group
 const char *cmd_adikted_arr[]={
         "",custom_column_cmdtext,graffiti_cmdtext,  //0x000,0x001,0x002
         leveltimestmp_cmdtext,usrcmnds_count_cmdtext,levversion_cmdtext,
+        levname_cmdtext, levdesc_cmdtext, levauthors_cmdtext,
         };
 
 // Partys - commands
@@ -315,6 +320,10 @@ const char *cmd_doors_arr[]={
         "", door_wood_cmdtext, door_braced_cmdtext,  //0x000,0x001,0x002
         door_steel_cmdtext,door_magic_cmdtext,
         };
+const char *cmd_doors_fullname[]={
+        "", "Wooden", "Braced",  //0x000,0x001,0x002
+        "Iron", "Magic",
+        };
 
 //Workshop - Traps
 const char trap_boulder_cmdtext[]="BOULDER";
@@ -328,6 +337,11 @@ const char *cmd_traps_arr[]={
         "", trap_boulder_cmdtext, trap_alarm_cmdtext,  //0x000,0x001,0x002
         trap_gas_cmdtext,trap_lightng_cmdtext,trap_wordpwr_cmdtext,
         trap_lava_cmdtext,
+        };
+const char *cmd_traps_fullname[]={
+        "", "Boulder", "Alarm",  //0x000,0x001,0x002
+        "Poison gas", "Lightning", "Word of Power",
+        "Lava",
         };
 
 //Spells
@@ -358,6 +372,15 @@ const char *cmd_spells_arr[]={
         spell_protect_cmdtext,spell_conceal_cmdtext,spell_disease_cmdtext,
         spell_chickn_cmdtext,spell_destrwalls_cmdtext,spell_possess_cmdtext,
         spell_armag_cmdtext,
+        };
+const char *cmd_spells_fullname[]={
+        "", "Hand of Evil", "Create imp",  //0x000,0x001,0x002
+        "Must obey", "Slap", "Evil Sight",
+        "Call to arms", "Cave in", "Heal creature",
+        "Hold audience", "Lightning", "Speed",
+        "Protect", "Conceal", "Disease",
+        "Chicken", "Destroy walls", "Possess",
+        "Armageddon",
         };
 
 //Players
@@ -447,8 +470,8 @@ const char *cmd_rooms_arr[]={
         "", room_entrance_cmdtext, room_treasure_cmdtext,  //0x000,0x001,0x002
         room_library_cmdtext,room_prison_cmdtext,room_torture_cmdtext,
         room_training_cmdtext,room_workshp_cmdtext,room_scavng_cmdtext,
-        room_temple_cmdtext,room_graveyrd_cmdtext,room_barracks_cmdtext,
-        room_hatchery_cmdtext,room_lair_cmdtext,room_brige_cmdtext,
+        room_temple_cmdtext,room_graveyrd_cmdtext,room_hatchery_cmdtext,
+        room_lair_cmdtext,room_barracks_cmdtext,room_brige_cmdtext,
         room_grdpost_cmdtext,
         };
 
@@ -485,8 +508,11 @@ const char *cmd_font_arr[]={
 const char *cmd_orient_shortnames[]={
         "NS","WE","SN","EW","TpNS","TpWE","TpSN","TpEW" };
 
-const char *cmd_font_longnames[]={
+const char *cmd_font_fullnames[]={
         "none","Classic","Size 8" };
+
+const char *object_available_shortnames[]={
+        "None", "Rsch", "Got",};
 
 short script_param_to_int(int *val,const char *param)
 {
@@ -700,6 +726,40 @@ short execute_adikted_command(struct LEVEL *lvl,struct DK_SCRIPT_COMMAND *cmd,ch
        lvl->info.ver_major=vma;
        lvl->info.ver_minor=vmi;
        lvl->info.ver_rel=vre;
+      };return true;
+    case LEVEL_NAME:
+      {
+       if (cmd->param_count<1)
+       {
+         sprintf(err_msg,"%s requires more parameters",adikted_cmd_text(cmd->index));
+         return false;
+       }
+       char *levname=strdup_noquot(cmd->params[0]);
+       if (levname!=NULL)
+           set_lif_name_text(lvl,levname);
+       int pos=0;
+      };return true;
+    case LEVEL_DESC:
+      {
+       if (cmd->param_count<1)
+       {
+         sprintf(err_msg,"%s requires more parameters",adikted_cmd_text(cmd->index));
+         return false;
+       }
+       free(lvl->info.desc_text);
+       lvl->info.desc_text=strdup_noquot(cmd->params[0]);
+      };return true;
+    case LEVEL_AUTHORS:
+      {
+       if (cmd->param_count<2)
+       {
+         sprintf(err_msg,"%s requires more parameters",adikted_cmd_text(cmd->index));
+         return false;
+       }
+       free(lvl->info.author_text);
+       lvl->info.author_text=strdup_noquot(cmd->params[0]);
+       free(lvl->info.editor_text);
+       lvl->info.editor_text=strdup_noquot(cmd->params[1]);
       };return true;
     default:
       {
@@ -2929,11 +2989,12 @@ short execute_script_line(struct LEVEL *lvl,char *line,char *err_msg)
 
 short decompose_script(struct DK_SCRIPT *script,const struct SCRIPT_OPTIONS *optns)
 {
-  message_log("  decompose_script: started");
   if (script==NULL) return false;
+  message_log("  decompose_script: %d lines to analyze",script->lines_count);
   int i;
   for (i=0;i<script->lines_count;i++)
   {
+      //message_log("  decompose_script: line %3d",i);
       struct DK_SCRIPT_COMMAND *cmd=script->list[i];
       script_command_renew(&cmd);
       decompose_script_command(cmd,script->txt[i],optns);
@@ -3041,7 +3102,6 @@ short script_decomposed_to_params_cmd_condit(struct DK_SCRIPT_PARAMETERS *par,
     int cmpvar_idx;
     int opertr_idx;
     int actnpt_num;
-//TODO
     switch (cmd->index)
     {
     case COND_IF:
@@ -3058,6 +3118,8 @@ short script_decomposed_to_params_cmd_condit(struct DK_SCRIPT_PARAMETERS *par,
         cmpvar_type=recognize_script_word_group_and_idx(&cmpvar_idx,cmd->params[3],true);
         if ((conditvar_idx<0)||(cmpvar_idx<0))
             return false;
+//TODO
+// As for now, just add those commands to "rest" list.
         break;
     case IF_AVAILABLE:
         par->end_level++;
@@ -3073,6 +3135,8 @@ short script_decomposed_to_params_cmd_condit(struct DK_SCRIPT_PARAMETERS *par,
         cmpvar_type=recognize_script_word_group_and_idx(&cmpvar_idx,cmd->params[3],true);
         if ((conditvar_idx<0)||(cmpvar_idx<0))
             return false;
+//TODO
+// As for now, just add those commands to "rest" list.
         break;
     case IF_ACTNPT:
         par->end_level++;
@@ -3083,9 +3147,13 @@ short script_decomposed_to_params_cmd_condit(struct DK_SCRIPT_PARAMETERS *par,
         plyr_idx=players_cmd_index(cmd->params[1]);
         if (plyr_idx<0)
             return false;
+//TODO
+// As for now, just add those commands to "rest" list.
         break;
     case COND_ENDIF:
         par->end_level--;
+//TODO
+// As for now, just add those commands to "rest" list.
         break;
     default:
         return false;
@@ -3095,11 +3163,24 @@ short script_decomposed_to_params_cmd_condit(struct DK_SCRIPT_PARAMETERS *par,
 
 /*
  * Analyzes single decomposed script command and adjusts DK_SCRIPT_PARAMETERS;
+ * This one is used for commands inside a conditional loop
+ */
+short script_decomposed_to_params_cmd_blockbody(struct DK_SCRIPT_PARAMETERS *par,
+    struct DK_SCRIPT_COMMAND *cmd,const struct SCRIPT_OPTIONS *optns)
+{
+//TODO!
+// As for now, just add those commands to "rest" list.
+  return true;
+}
+
+/*
+ * Analyzes single decomposed script command and adjusts DK_SCRIPT_PARAMETERS;
  */
 short script_decomposed_to_params_cmd_party(struct DK_SCRIPT_PARAMETERS *par,
     struct DK_SCRIPT_COMMAND *cmd,const struct SCRIPT_OPTIONS *optns)
 {
-//TODO
+//TODO!
+// As for now, just add those commands to "rest" list.
   return true;
 }
 
@@ -3278,6 +3359,7 @@ short script_decomposed_to_params_cmd_custobj(struct DK_SCRIPT_PARAMETERS *par,
     struct DK_SCRIPT_COMMAND *cmd,const struct SCRIPT_OPTIONS *optns)
 {
 //TODO
+// As for now, just add those commands to "rest" list.
   return true;
 }
 /*
@@ -3363,6 +3445,7 @@ short script_decomposed_to_params_cmd_setup(struct DK_SCRIPT_PARAMETERS *par,
         if (cmd->param_count<3)
             return false;
         //TODO
+// As for now, just add those commands to "rest" list.
         return false;
         break;
     case RESEARCH:
@@ -3375,6 +3458,7 @@ short script_decomposed_to_params_cmd_setup(struct DK_SCRIPT_PARAMETERS *par,
         if (type_idx<0)
             return false;
         //TODO
+// As for now, just add those commands to "rest" list.
         return false;
         break;
     case SET_COMPUTER_GLOBALS:
@@ -3384,6 +3468,7 @@ short script_decomposed_to_params_cmd_setup(struct DK_SCRIPT_PARAMETERS *par,
         if ((plyr_idx<0))
             return false;
         //TODO
+// As for now, just add those commands to "rest" list.
         return false;
         break;
     case SET_COMPUTER_CHECKS:
@@ -3393,6 +3478,7 @@ short script_decomposed_to_params_cmd_setup(struct DK_SCRIPT_PARAMETERS *par,
         if ((plyr_idx<0))
             return false;
         //TODO
+// As for now, just add those commands to "rest" list.
         return false;
         break;
     case SET_COMPUTER_EVENT:
@@ -3402,6 +3488,7 @@ short script_decomposed_to_params_cmd_setup(struct DK_SCRIPT_PARAMETERS *par,
         if ((plyr_idx<0))
             return false;
         //TODO
+// As for now, just add those commands to "rest" list.
         return false;
         break;
     case SET_COMPUTER_PROCESS:
@@ -3411,6 +3498,7 @@ short script_decomposed_to_params_cmd_setup(struct DK_SCRIPT_PARAMETERS *par,
         if ((plyr_idx<0))
             return false;
         //TODO
+// As for now, just add those commands to "rest" list.
         return false;
         break;
     case MAX_CREATURES:
@@ -3446,6 +3534,7 @@ short script_decomposed_to_params_cmd_triger(struct DK_SCRIPT_PARAMETERS *par,
     struct DK_SCRIPT_COMMAND *cmd,const struct SCRIPT_OPTIONS *optns)
 {
 //TODO
+// As for now, just add those commands to "rest" list.
   return true;
 }
 /*
@@ -3454,7 +3543,95 @@ short script_decomposed_to_params_cmd_triger(struct DK_SCRIPT_PARAMETERS *par,
 short script_decomposed_to_params_cmd_crtradj(struct DK_SCRIPT_PARAMETERS *par,
     struct DK_SCRIPT_COMMAND *cmd,const struct SCRIPT_OPTIONS *optns)
 {
-//TODO
+    int i;
+    int plyr_idx;
+    int crtr_idx;
+    int crtr2_idx;
+    int logic_val;
+    int amount;
+    switch (cmd->index)
+    {
+    case DEAD_CREATURES_RET_TO_POOL:
+        if (cmd->param_count<1)
+            return false;
+        if (!script_param_to_int(&logic_val,cmd->params[0]))
+            return false;
+        par->dead_return_to_pool=(logic_val!=0);
+        break;
+    case ADD_CREATR_TO_POOL:
+        if (cmd->param_count<2)
+            return false;
+        crtr_idx=creatures_cmd_index(cmd->params[0]);
+        if (crtr_idx<0)
+            return false;
+        if (!script_param_to_int(&amount,cmd->params[1]))
+            return false;
+        par->creature_pool[crtr_idx]=amount;
+        break;
+    case SET_CREATR_MAX_LEVEL:
+        if (cmd->param_count<3)
+            return false;
+        plyr_idx=players_cmd_index(cmd->params[0]);
+        crtr_idx=creatures_cmd_index(cmd->params[1]);
+        if ((plyr_idx<0)||(crtr_idx<0))
+            return false;
+        if (!script_param_to_int(&amount,cmd->params[2]))
+            return false;
+        par->player[plyr_idx].creature_maxlvl[crtr_idx]=amount;
+        //TODO
+        break;
+    case SET_CREATR_STRENGTH:
+        if (cmd->param_count<2)
+            return false;
+        crtr_idx=creatures_cmd_index(cmd->params[0]);
+        if (crtr_idx<0)
+            return false;
+        if (!script_param_to_int(&amount,cmd->params[1]))
+            return false;
+        //TODO
+        break;
+    case SET_CREATR_HEALTH:
+        if (cmd->param_count<2)
+            return false;
+        crtr_idx=creatures_cmd_index(cmd->params[0]);
+        if (crtr_idx<0)
+            return false;
+        if (!script_param_to_int(&amount,cmd->params[1]))
+            return false;
+        //TODO
+        break;
+    case SET_CREATR_ARMOUR:
+        if (cmd->param_count<2)
+            return false;
+        crtr_idx=creatures_cmd_index(cmd->params[0]);
+        if (crtr_idx<0)
+            return false;
+        if (!script_param_to_int(&amount,cmd->params[1]))
+            return false;
+        //TODO
+        break;
+    case SET_CREATR_FEAR:
+        if (cmd->param_count<2)
+            return false;
+        crtr_idx=creatures_cmd_index(cmd->params[0]);
+        if (crtr_idx<0)
+            return false;
+        if (!script_param_to_int(&amount,cmd->params[1]))
+            return false;
+        //TODO
+        break;
+    case CREATR_SWAP:
+        if (cmd->param_count<2)
+            return false;
+        crtr_idx=creatures_cmd_index(cmd->params[0]);
+        crtr2_idx=creatures_cmd_index(cmd->params[1]);
+        if ((crtr_idx<0)||(crtr2_idx<0))
+            return false;
+        //TODO
+        break;
+    default:
+        return false;
+    }
   return true;
 }
 
@@ -3464,6 +3641,8 @@ short script_decomposed_to_params_cmd_crtradj(struct DK_SCRIPT_PARAMETERS *par,
 short script_decomposed_to_params_cmd(struct DK_SCRIPT_PARAMETERS *par,
     struct DK_SCRIPT_COMMAND *cmd,const struct SCRIPT_OPTIONS *optns)
 {
+  if (par->end_level==0)
+  {
     switch (cmd->group)
     {
     case CMD_CONDIT:
@@ -3497,6 +3676,10 @@ short script_decomposed_to_params_cmd(struct DK_SCRIPT_PARAMETERS *par,
             return false;
             break;
         }
+  } else
+  {
+      return script_decomposed_to_params_cmd_blockbody(par,cmd,optns);
+  }
 }
 
 /*
@@ -3522,6 +3705,8 @@ short script_decomposed_to_params(struct DK_SCRIPT *script,const struct SCRIPT_O
 short script_params_to_decomposed(struct DK_SCRIPT *script,const struct SCRIPT_OPTIONS *optns)
 {
 //TODO
+// But before start working on this, I must make all script commands
+// to be decomposed!
 }
 
 short script_strword_pos( char const **ptr, unsigned int *ptr_len, const char *str, const short whole_rest )
@@ -4306,6 +4491,13 @@ const char *spell_cmd_text(int cmdidx)
     return cmd_spells_arr[cmdidx];
 }
 
+const char *spell_cmd_fullname(int cmdidx)
+{
+    int array_count=sizeof(cmd_spells_fullname)/sizeof(char *);
+    if ((cmdidx<0)||(cmdidx>=array_count)) return "BAD";
+    return cmd_spells_fullname[cmdidx];
+}
+
 int trap_cmd_arrsize()
 {
   return sizeof(cmd_traps_arr)/sizeof(char *);
@@ -4332,6 +4524,13 @@ const char *trap_cmd_text(int cmdidx)
     return cmd_traps_arr[cmdidx];
 }
 
+const char *trap_cmd_fullname(int cmdidx)
+{
+    int array_count=sizeof(cmd_traps_fullname)/sizeof(char *);
+    if ((cmdidx<0)||(cmdidx>=array_count)) return "BAD";
+    return cmd_traps_fullname[cmdidx];
+}
+
 int door_cmd_arrsize()
 {
   return sizeof(cmd_doors_arr)/sizeof(char *);
@@ -4356,6 +4555,13 @@ const char *door_cmd_text(int cmdidx)
     int array_count=sizeof(cmd_doors_arr)/sizeof(char *);
     if ((cmdidx<0)||(cmdidx>=array_count)) return "X";
     return cmd_doors_arr[cmdidx];
+}
+
+const char *door_cmd_fullname(int cmdidx)
+{
+    int array_count=sizeof(cmd_doors_fullname)/sizeof(char *);
+    if ((cmdidx<0)||(cmdidx>=array_count)) return "BAD";
+    return cmd_doors_fullname[cmdidx];
 }
 
 int special_cmd_arrsize()
@@ -4738,9 +4944,9 @@ void script_command_free(struct DK_SCRIPT_COMMAND *cmd)
  */
 void script_command_renew(struct DK_SCRIPT_COMMAND **cmd)
 {
-    if (*cmd==NULL)
+    if ((*cmd)==NULL)
     {
-      *cmd=script_command_create();
+      (*cmd)=script_command_create();
       return;
     }
     int i;
@@ -4801,6 +5007,7 @@ short add_stats_to_script(char ***lines,int *lines_count,struct LEVEL *lvl)
     char *line;
     char *tmp;
     char *tmp2;
+    char *tmp3;
     line=(char *)malloc(LINEMSG_SIZE*sizeof(char));
     tmp=(char *)malloc(LINEMSG_SIZE*sizeof(char));
     unsigned long curr_time=time(NULL);
@@ -4823,6 +5030,23 @@ short add_stats_to_script(char ***lines,int *lines_count,struct LEVEL *lvl)
     // User commands count
     sprintf(line,"%s(%lu,%lu,%lu,%lu)",usrcmnds_count_cmdtext,lvl->info.usr_cmds_count,
         lvl->info.usr_mdswtch_count,lvl->info.usr_slbchng_count,lvl->info.usr_creatobj_count);
+    text_file_linecp_add(lines,lines_count,line);
+    // Level name - obsolete due to LIF file support
+/*    tmp2=get_lif_name_text(lvl);
+    if (tmp2==NULL) tmp2="";
+    sprintf(line,"%s(\"%s\")",adikted_cmd_text(LEVEL_NAME),tmp2);
+    text_file_linecp_add(lines,lines_count,line);*/
+    // Level description
+    tmp2=lvl->info.desc_text;
+    if (tmp2==NULL) tmp2="";
+    sprintf(line,"%s(\"%s\")",adikted_cmd_text(LEVEL_DESC),tmp2);
+    text_file_linecp_add(lines,lines_count,line);
+    // Level authors
+    tmp2=lvl->info.author_text;
+    if (tmp2==NULL) tmp2="";
+    tmp3=lvl->info.editor_text;
+    if (tmp3==NULL) tmp3="";
+    sprintf(line,"%s(\"%s\",\"%s\")",adikted_cmd_text(LEVEL_AUTHORS),tmp2,tmp3);
     text_file_linecp_add(lines,lines_count,line);
     free(tmp);
     free(line);
@@ -4905,8 +5129,10 @@ char *get_orientation_shortname(unsigned short orient)
        return "unkn";
 }
 
-/*
- * Returns next orientation constant
+/**
+ * Returns orientation constant after the given one.
+ * @param orient Previous orientation constant.
+ * @return Returns next orientation constant.
  */
 unsigned short get_orientation_next(unsigned short orient)
 {
@@ -4920,14 +5146,16 @@ unsigned short get_orientation_next(unsigned short orient)
     return orient_constants[idx];
 }
 
-/*
- * Returns font name string
+/**
+ * Returns font name string for given font index.
+ * @param font Font index.
+ * @return Returns font name string.
  */
 char *get_font_longname(unsigned short font)
 {
-     int types_count=sizeof(cmd_font_longnames)/sizeof(char *);
+     int types_count=sizeof(cmd_font_fullnames)/sizeof(char *);
      if (font<types_count)
-       return (char *)cmd_font_longnames[font];
+       return (char *)cmd_font_fullnames[font];
      else
        return "unkn";
 }

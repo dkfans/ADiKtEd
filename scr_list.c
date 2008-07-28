@@ -659,35 +659,35 @@ void draw_crcrtr(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata)
       screen_printf(get_owner_type_fullname(workdata->list->val2));
       screen_setcolor(PRINT_COLOR_LGREY_ON_BLACK);
     }
-    set_cursor_pos(get_screen_rows()-1, 17);
+    show_no_cursor();
 }
 
 void draw_critem(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata)
 {
     draw_numbered_list(get_item_subtype_fullname,scrmode,workdata,
         1,ITEM_SUBTYPE_SPELLARMG,18);
-    set_cursor_pos(get_screen_rows()-1, 17);
+    show_no_cursor();
 }
 
 void draw_mdtextr(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata)
 {
     draw_numbered_list(get_texture_fullname,scrmode,workdata,
         0,INF_MAX_INDEX,14);
-    set_cursor_pos(get_screen_rows()-1, 17);
+    show_no_cursor();
 }
 
 void draw_mdcclm(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata)
 {
     draw_numbered_list(get_custom_column_fullname,scrmode,workdata,
         0,CUST_CLM_GEN_MAX_INDEX,20);
-    set_cursor_pos(get_screen_rows()-1, 17);
+    show_no_cursor();
 }
 
 void draw_mdslbl(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata)
 {
     draw_numbered_list(get_slab_fullname,scrmode,workdata,
         0,SLAB_TYPE_GUARDPOST,17);
-    set_cursor_pos(get_screen_rows()-1, 17);
+    show_no_cursor();
 }
 
 void draw_crefct(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata)
@@ -709,7 +709,7 @@ void draw_crefct(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata)
       screen_printf(get_owner_type_fullname(workdata->list->val2));
       screen_setcolor(PRINT_COLOR_LGREY_ON_BLACK);
     }
-    set_cursor_pos(get_screen_rows()-1, 17);
+    show_no_cursor();
 }
 
 void actions_crefct(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata,int key)
@@ -759,7 +759,7 @@ void draw_crtrap(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata)
       screen_printf(get_owner_type_fullname(workdata->list->val2));
       screen_setcolor(PRINT_COLOR_LGREY_ON_BLACK);
     }
-    set_cursor_pos(get_screen_rows()-1, 17);
+    show_no_cursor();
 }
 
 void actions_crtrap(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata,int key)
@@ -795,7 +795,7 @@ void draw_editem(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata)
     draw_thing_list(get_item_subtype_fullname,get_thing_subtypes_arritem_func(workdata->list->val1),
         scrmode,workdata,get_thing_subtypes_count(workdata->list->val1),18);
 //    draw_numbered_list(get_item_subtype_fullname,scrmode,mapmode,1,ITEM_SUBTYPE_SPELLARMG,18);
-    set_cursor_pos(get_screen_rows()-1, 17);
+    show_no_cursor();
 }
 
 void actions_editem(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata,int key)
@@ -956,7 +956,7 @@ void draw_mdsrch(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata)
 {
     draw_numbered_list(get_search_objtype_name,scrmode,workdata,
         0,get_search_objtype_count()-1,18);
-    set_cursor_pos(get_screen_rows()-1, 17);
+    show_no_cursor();
 }
 
 short start_crcrtr(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata)
@@ -1289,7 +1289,7 @@ void actions_mdlmap(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata,
             }
             free_map(workdata->lvl);
             format_lvl_savfname(workdata->lvl,"");
-            load_map(workdata->lvl);
+            user_load_map(workdata->lvl,true);
             clear_highlight(workdata->mapmode);
             change_mode(scrmode,workdata,scrmode->mode);
             message_info("Map \"%s\" loaded", get_lvl_fname(workdata->lvl));
@@ -1304,7 +1304,7 @@ void actions_mdlmap(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata,
       format_lvl_fname(workdata->mapmode->preview,scrmode->usrinput);
       if ((workdata->mapmode->level_preview&LPREV_LOAD) == LPREV_LOAD)
       {
-        if (load_map_preview(workdata->mapmode->preview))
+        if (load_map_preview(workdata->mapmode->preview) == ERR_NONE)
           message_info("Map \"%s\" preview loaded",scrmode->usrinput);
       }
     }
@@ -1388,15 +1388,7 @@ void actions_mdsmap(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata,
               message_error("Map saving cancelled");
               break;
             }
-            struct LEVSTATS *stats=get_lvl_stats(workdata->lvl);
-            if (stats->saves_count==0)
-            {
-              inc_info_ver_major(workdata->lvl);
-            } else
-            {
-              inc_info_ver_minor(workdata->lvl);
-            }
-            save_map(workdata->lvl);
+            user_save_map(workdata->lvl,1);
             message_info("Map \"%s\" saved", get_lvl_savfname(workdata->lvl));
           };break;
         default:
@@ -1409,7 +1401,7 @@ void actions_mdsmap(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata,
       format_lvl_fname(workdata->mapmode->preview,scrmode->usrinput);
       if ((workdata->mapmode->level_preview&LPREV_SAVE) == LPREV_SAVE)
       {
-        if (load_map_preview(workdata->mapmode->preview))
+        if (load_map_preview(workdata->mapmode->preview) == ERR_NONE)
           message_info("Map \"%s\" preview loaded",scrmode->usrinput);
       }
     }

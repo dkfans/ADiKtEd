@@ -110,6 +110,14 @@ void screen_printchr(char dst)
     SLsmg_write_char(dst);
 }
 
+void screen_clear(void)
+{
+    if (!screen_initied) return;
+    SLsmg_gotorc(0,0);
+    SLsmg_erase_eos();
+    //SLsmg_cls();
+}
+
 void screen_refresh(void)
 {
     if (!screen_initied) return;
@@ -139,6 +147,7 @@ void screen_init(void)
     SLtt_set_color(PRINT_COLOR_YELLOW_ON_BLUE , "status", "yellow", "blue");
     SLtt_set_color(PRINT_COLOR_LRED_ON_BLACK  , "escape", "brightred", "black");
     SLtt_set_color(PRINT_COLOR_YELLOW_ON_BLACK, "invalid", "yellow", "black");
+    SLtt_set_color(PRINT_COLOR_YELLOW_ON_RED, "y_on_r", "yellow", "red");
     SLtt_set_color(PRINT_COLOR_WHITE_ON_BLACK , "invalid", "white", "black");
     SLtt_set_color(PRINT_COLOR_LMAGENT_ON_BLACK, "graffiti", "brightmagenta", "black");
     SLtt_set_color(PRINT_COLOR_RED_ON_WHITE   , "cursor", "red", "white");
@@ -327,7 +336,7 @@ void screen_reinit_and_update(void)
 void screen_done(void)
 {
     if (!screen_initied) return;
-    set_cursor_visibility(1);
+    set_cursor_visibility(true);
     SLsmg_reset_smg();
     screen_initied=false;
 }

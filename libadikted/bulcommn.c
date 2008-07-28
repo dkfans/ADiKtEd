@@ -1,297 +1,231 @@
 /******************************************************************************/
-// bulcommn.c - Dungeon Keeper Tools.
-/******************************************************************************/
-// Author:   Tomasz Lis
-// Created:  10 Mar 2005
-
-// Purpose:
-//   Common procedures for Bullfrog game tools. These includes
-//   little-endian and big-endian reading functions,
-//   bitmap writing routines and similar.
-
-// Comment:
-//   None.
-
-//Copying and copyrights:
-//   This program is free software; you can redistribute it and/or modify
-//   it under the terms of the GNU General Public License as published by
-//   the Free Software Foundation; either version 2 of the License, or
-//   (at your option) any later version.
+/** @file bulcommn.c
+ * Various functions used in many tools for Bullfrog games.
+ * @par Purpose:
+ *     Common procedures for Bullfrog game tools. These includes
+ *     bitmaps r/w functions compression detection and similar.
+ * @par Comment:
+ *     None.
+ * @author   Tomasz Lis
+ * @date     10 Mar 2005 - 22 Jul 2008
+ * @par  Copying and copyrights:
+ *     This program is free software; you can redistribute it and/or modify
+ *     it under the terms of the GNU General Public License as published by
+ *     the Free Software Foundation; either version 2 of the License, or
+ *     (at your option) any later version.
+ */
 /******************************************************************************/
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include "lbfileio.h"
 
 #include "bulcommn.h"
 
-// RNC compression magic identifier
+/**
+ * RNC compression magic identifier, as string.
+ */
 char const *RNC_SIGNATURE_STR="RNC\001";
 
-void write_short_le_file (FILE *fp, unsigned short x)
+/**
+ * Writes indexed colour bitmap into file with given name.
+ * @param fname Destination file name.
+ * @param width Bitmap width.
+ * @param height Bitmap height; may be negative to flip the bitmap.
+ * @param pal RGB Palette buffer.
+ * @param data Bitmap data buffer.
+ * @param red Red color position in patette.
+ * @param green Green color position in patette.
+ * @param blue Blue color position in patette.
+ * @param mult Color value multiplier.
+ * @return Returns 0 on success, error code on failure.
+ */
+short write_bmp_fn_idx (const char *fname, int width, int height, 
+        const unsigned char *pal, const char *data,
+        int red, int green, int blue, int mult)
 {
-    fputc ((int) (x&255), fp);
-    fputc ((int) ((x>>8)&255), fp);
+  FILE *out;
+  out = fopen (fname, "wb");
+  if (out==NULL)
+  {
+      printf ("\nCan't open file %s.\n", fname);
+      return 1;
+  }
+
+  short result;
+  result=write_bmp_fp_idx(out,width,height,pal,data,red,green,blue,mult);
+  fclose (out);
+  return result;
 }
 
-void write_short_le_buf (unsigned char *buff, unsigned short x)
+/**
+ * Writes indexed colour bitmap into opened file.
+ * @param out Destination file (already opened for writing).
+ * @param width Bitmap width.
+ * @param height Bitmap height; may be negative to flip the bitmap.
+ * @param pal RGB Palette buffer.
+ * @param data Bitmap data buffer.
+ * @param red Red color position in patette.
+ * @param green Green color position in patette.
+ * @param blue Blue color position in patette.
+ * @param mult Color value multiplier.
+ * @return Returns 0 on success, error code on failure.
+ */
+short write_bmp_fp_idx (FILE *out, int width, int height, 
+        const unsigned char *pal, const char *data,
+        int red, int green, int blue, int mult)
 {
-    buff[0]=(x&255);
-    buff[1]=((x>>8)&255);
-}
-
-void write_long_le_file (FILE *fp, unsigned long x)
-{
-    fputc ((int) (x&255), fp);
-    fputc ((int) ((x>>8)&255), fp);
-    fputc ((int) ((x>>16)&255), fp);
-    fputc ((int) ((x>>24)&255), fp);
-}
-
-void write_long_le_buf (unsigned char *buff, unsigned long x)
-{
-    buff[0]=(x&255);
-    buff[1]=((x>>8)&255);
-    buff[2]=((x>>16)&255);
-    buff[3]=((x>>24)&255);
-}
-
-long read_long_le_file (FILE *fp)
-{
-    long l;
-    l = fgetc (fp);
-    l += fgetc (fp)<<8;
-    l += fgetc (fp)<<16;
-    l += fgetc (fp)<<24;
-    return l;
-}
-
-long read_long_le_buf (unsigned char *buff)
-{
-    long l;
-    l = buff[0];
-    l += buff[1]<<8;
-    l += buff[2]<<16;
-    l += buff[3]<<24;
-    return l;
-}
-
-unsigned short read_short_le_buf (unsigned char *buff)
-{
-    long l;
-    l = buff[0];
-    l += buff[1]<<8;
-    return l;
-}
-
-unsigned short read_short_le_file (FILE *fp)
-{
-    unsigned short l;
-    l = fgetc (fp);
-    l += fgetc (fp)<<8;
-    return l;
-}
-
-long read_long_be_buf (unsigned char *buff)
-{
-    long l;
-    l =  buff[3];
-    l += buff[2]<<8;
-    l += buff[1]<<16;
-    l += buff[0]<<24;
-    return l;
-}
-
-void write_short_be_buf (unsigned char *buff, unsigned short x)
-{
-    buff[1]=(x&255);
-    buff[0]=((x>>8)&255);
-}
-
-void write_long_be_buf (unsigned char *buff, unsigned long x)
-{
-    buff[3]=(x&255);
-    buff[2]=((x>>8)&255);
-    buff[1]=((x>>16)&255);
-    buff[0]=((x>>24)&255);
-}
-
-void write_bmp_idx (char *fname, int width, int height, 
-		unsigned char *pal, char *data,
-		int red, int green, int blue, int mult)
-{
-    long l;
-    int i, j;
-    FILE *out;
+  int pwidth, pheight;
+  long data_len,pal_len;
+  int i, j;
     
-    out = fopen (fname, "wb");
-    if (!out)
+  // Positive width and height
+  if (width>=0)
+    pwidth=width;
+  else
+    pwidth=-width;
+  if (height>=0)
+    pheight=height;
+  else
+    pheight=-height;
+  int padding_size=4-(pwidth&3);
+  // Length of data
+  data_len = (pwidth+padding_size)*pheight;
+  // Length of palette
+  pal_len = 256*4;
+  fputs("BM",out);
+  write_int32_le_file(out, data_len+pal_len+0x36);
+  write_int32_le_file(out, 0);
+  write_int32_le_file(out, pal_len+0x36);
+  write_int32_le_file(out, 40);
+  write_int32_le_file(out, width);
+  write_int32_le_file(out, height);
+  write_int16_le_file(out, 1);
+  write_int16_le_file(out, 8);
+  write_int32_le_file(out, 0);
+  write_int32_le_file(out, 0);
+  write_int32_le_file(out, 0);
+  write_int32_le_file(out, 0);
+  write_int32_le_file(out, 0);
+  write_int32_le_file(out, 0);
+    
+  for (i=0; i < 256; i++)
+  {
+      unsigned int cval;
+      cval=(unsigned int)pal[i*3+blue]*mult;
+      if (cval>255) cval=255;
+      fputc(cval, out);
+      cval=(unsigned int)pal[i*3+green]*mult;
+      if (cval>255) cval=255;
+      fputc(cval, out);
+      cval=(unsigned int)pal[i*3+red]*mult;
+      if (cval>255) cval=255;
+      fputc(cval, out);
+      fputc(0, out);
+  }
+    
+  for (i=1; i <= pheight; i++)
+  {
+    fwrite (data+(pheight-i)*pwidth, pwidth, 1, out);
+    if ((padding_size&3) > 0)
+      for (j=0; j < padding_size; j++)
+        fputc (0, out);
+  }
+    
+  return 0;
+}
+
+/**
+ * Writes indexed colour bitmap into file with given name.
+ * @param fname Destination file name.
+ * @param width Bitmap width.
+ * @param height Bitmap height.
+ * @param data Bitmap data buffer.
+ * @return Returns 0 on success, error code on failure.
+ */
+short write_bmp_fn_24b (const char *fname, int width, int height, const char *data)
+{
+  FILE *out;
+  out = fopen (fname, "wb");
+  if (out==NULL)
+  {
+      printf ("\nCan't open file %s.\n", fname);
+      return 1;
+  }
+
+  short result;
+  result=write_bmp_fp_24b(out,width,height,data);
+  fclose (out);
+  return result;
+}
+
+/**
+ * Writes indexed colour bitmap into opened file.
+ * @param out Destination file (already opened for writing).
+ * @param width Bitmap width.
+ * @param height Bitmap height.
+ * @param data Bitmap data buffer.
+ * @return Returns 0 on success, error code on failure.
+ */
+short write_bmp_fp_24b(FILE *out, int width, int height, const char *data)
+{
+  int pwidth, pheight;
+  long data_len;
+  int i, j;
+    
+  // Positive width and height
+  if (width>=0)
+    pwidth=width;
+  else
+    pwidth=-width;
+  if (height>=0)
+    pheight=height;
+  else
+    pheight=-height;
+    
+  int datawidth=width*3;
+  int padding_size=4-(datawidth&3);
+  // Length of data
+  data_len = (pwidth+padding_size)*pheight;
+  fputs("BM",out);
+  write_int32_le_file (out, 3*data_len+0x36);
+  write_int32_le_file (out, 0);
+  write_int32_le_file (out, 0x36);
+  write_int32_le_file (out, 40);
+  write_int32_le_file (out, width);
+  write_int32_le_file (out, height);
+  write_int16_le_file (out, 1);
+  write_int16_le_file (out, 24);
+  write_int32_le_file (out, 0);
+  write_int32_le_file (out, 0);
+  write_int32_le_file (out, 0);
+  write_int32_le_file (out, 0);
+  write_int32_le_file (out, 0);
+  write_int32_le_file (out, 0);
+    
+    for (i=1; i <= pheight; i++)
     {
-	printf ("\nCan't open file %s. Aborting.\n", fname);
-	exit (1);
-    }
-    
-    l = width*height;
-    fprintf (out, "BM");
-    write_long_le_file (out, l+0x436);
-    write_long_le_file (out, 0);
-    write_long_le_file (out, 0x436);
-    write_long_le_file (out, 40);
-    write_long_le_file (out, width);
-    write_long_le_file (out, height);
-    write_short_le_file (out, 1);
-    write_short_le_file (out, 8);
-    write_long_le_file (out, 0);
-    write_long_le_file (out, 0);
-    write_long_le_file (out, 0);
-    write_long_le_file (out, 0);
-    write_long_le_file (out, 0);
-    write_long_le_file (out, 0);
-    
-    for (i=0; i < 256; i++)
-    {
-	fputc (pal[i*3+blue]*mult, out);
-	fputc (pal[i*3+green]*mult, out);
-	fputc (pal[i*3+red]*mult, out);
-	fputc (0, out);
-    }
-    
-    for (i=1; i <= height; i++)
-    {
-	fwrite (data+(height-i)*width, width, 1, out);
-	if (width & 3)
-	    for (j=0; j < 4-(width&3); j++)
-		fputc (0, out);
-    }
-    
-    fclose (out);
-}
-
-void write_bmp_24b (char *fname, int width, int height, char *data)
-{
-    long l;
-    int i, j;
-    FILE *out;
-    
-    out = fopen (fname, "wb");
-    if (!out)
-    {
-	printf ("\nCan't open file %s. Aborting.\n", fname);
-	exit (1);
-    }
-    
-    l = width*height;
-    fprintf (out, "BM");
-    write_long_le_file (out, 3*l+0x036);
-    write_long_le_file (out, 0);
-    write_long_le_file (out, 0x036);
-    write_long_le_file (out, 40);
-    write_long_le_file (out, width);
-    write_long_le_file (out, height);
-    write_short_le_file (out, 1);
-    write_short_le_file (out, 24);
-    write_long_le_file (out, 0);
-    write_long_le_file (out, 0);
-    write_long_le_file (out, 0);
-    write_long_le_file (out, 0);
-    write_long_le_file (out, 0);
-    write_long_le_file (out, 0);
-    
-    int datawidth=width*3;
-    for (i=1; i <= height; i++)
-    {
-        fwrite (data+(height-i)*datawidth, datawidth, 1, out);
-        int padding_size=4-(datawidth&3);
+        fwrite (data+(pheight-i)*datawidth, datawidth, 1, out);
         if ((padding_size&3) > 0)
         {
             int cntr;
             for (cntr=0;cntr<padding_size;cntr++)
-    	        fputc (0, out);
+                fputc (0, out);
         }
     }
     
     fclose (out);
+    return 0;
 }
 
 
-long file_length (char *path)
-{
-    FILE *fp;
-    long ret;
-    
-    fp = fopen (path, "rb");
-    if (!fp)
-	return -1;
-    fseek (fp, 0, SEEK_END);
-    ret = ftell (fp);
-    fclose (fp);
-    return ret;
-}
-
-long file_length_opened (FILE *fp)
-{
-    long length;
-    long lastpos;
-    
-    if (!fp)
-	return -1;
-    lastpos = ftell (fp);
-    fseek (fp, 0, SEEK_END);
-    length = ftell (fp);
-    fseek (fp, lastpos, SEEK_SET);
-    return length;
-}
-
-char *filename_from_path(char *pathname)
-{
-    char *fname = NULL;
-    if (pathname)
-    {
-        fname = strrchr (pathname, '/') + 1;
-        if (!fname)
-            fname = strrchr (pathname, '\\') + 1;
-    }
-    if (!fname)
-        fname=pathname;
-return fname;
-}
-
-int nth_bit( unsigned char c, int n ) {
-    // returns the nth bit of c
-    // either 1 or 0
-    // ...hooray for cse271...
-    
-    unsigned char one = 1;
-    
-    if( n < 0 || n > 7 )
-        return 0;
-    
-    c = c>>n;
-    return (int)(c & one);
-    
-}
-
-int nth_bit_fourbytes( unsigned char c[4], int n ) {
-    // returns the nth bit of c
-    // either 1 or 0
-    // goes like this:
-    // [31 30 29 28 27 26 25 24][...][...][7 6 5 4 3 2 1 0]
-    
-    if( n < 0 || n > 32 )
-        return 0;
-    
-    if( n < 8 )    // bits 0 - 7
-        return nth_bit( c[3], n );
-    else if( n < 16 )
-        return nth_bit( c[2], n%8 );
-    else if( n < 24 )
-        return nth_bit( c[1], n%8 );
-    else
-        return nth_bit( c[0], n%8 );
-    
-}
-
-int read_palette_rgb(unsigned char *palette, char *fname, unsigned int nColors)
+/**
+ * Reads RGB palette file into preallocated buffer.
+ * The input file can't be compressed and must have 768 bytes.
+ * @return Returns 0 on success, error code on failure.
+ */
+int read_palette_rgb(unsigned char *palette, const char *fname, unsigned int nColors)
 {
     FILE *palfp;
     palfp = fopen (fname, "rb");
@@ -303,16 +237,21 @@ int read_palette_rgb(unsigned char *palette, char *fname, unsigned int nColors)
     return 0;
 }
 
+/**
+ * Returns a random number within given range.
+ */
 unsigned int rnd(const unsigned int range)
 {
     return (rand()%(range));
 }
 
-
-/*
-// Returns 0 if buff seems not to be RNC compressed,
-// or RNC version (positive number) if buff is compressed.
-// Requies buff to be at least 4 bytes long.
+/**
+ * Gives version of the RNC file.
+ * Requies buff to be at least 4 bytes long.
+ * @param buff The source buffer.
+ * @return Returns 0 if buff seems not to be RNC compressed,
+ *     or RNC version (positive number) if buff is compressed.
+ */
 int rnc_compressed_buf (unsigned char *buff)
 {
     if (strncmp(buff,RNC_SIGNATURE_STR,3)!=0)
@@ -322,13 +261,21 @@ int rnc_compressed_buf (unsigned char *buff)
     return rncver;
 }
 
+/**
+ * Gives version of the RNC file.
+ * Reads 4 starting bytes of given FILE, and compares three of them with
+ * RNC signature. Then returns fourth one.
+ * @param fp The opened file.
+ * @return Returns 0 if file seems not to be RNC compressed,
+ *     or RNC version (positive number) if file is compressed.
+ */
 int rnc_compressed_file (FILE *fp)
 {
     unsigned char buff[5];
     long lastpos = ftell (fp);
+    fseek (fp, 0, SEEK_SET);
     int readed=fread (buff, 1, 4, fp);
     fseek (fp, lastpos, SEEK_SET);
     if (readed<4) return 0;
     return rnc_compressed_buf(buff);
 }
-*/

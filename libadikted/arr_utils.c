@@ -1,20 +1,18 @@
 /******************************************************************************/
-// arr_utils.c - Dungeon Keeper Tools.
-/******************************************************************************/
-// Author:   Tomasz Lis
-// Created:  15 Nov 2007
-
-// Purpose:
-//   Utility functions for working with arrays and strings.
-
-// Comment:
-//   None.
-
-//Copying and copyrights:
-//   This program is free software; you can redistribute it and/or modify
-//   it under the terms of the GNU General Public License as published by
-//   the Free Software Foundation; either version 2 of the License, or
-//   (at your option) any later version.
+/** @file arr_utils.c
+ * Dungeon Keeper Array Tools.
+ * @par Purpose:
+ *     Utility functions for working with arrays and strings.
+ * @par Comment:
+ *     None.
+ * @author   Tomasz Lis
+ * @date     15 Nov 2007 - 22 Jul 2008
+ * @par  Copying and copyrights:
+ *     This program is free software; you can redistribute it and/or modify
+ *     it under the terms of the GNU General Public License as published by
+ *     the Free Software Foundation; either version 2 of the License, or
+ *     (at your option) any later version.
+ */
 /******************************************************************************/
 
 #include "arr_utils.h"
@@ -22,8 +20,10 @@
 #include "globals.h"
 #include <stdarg.h>
 
-/*
- * Strips control characters from end of the string
+/**
+ * Strips control characters from end of a string.
+ * @see trim_right
+ * @param string_in the string which is stripped.
  */
 void strip_crlf(char *string_in)
 {
@@ -39,10 +39,13 @@ void strip_crlf(char *string_in)
     }
 }
 
-/*
- * Trimms white & control character from string end
+/**
+ * Trimms white & control character from string end.
+ * @see strip_crlf
+ * @param string_in The string which is trimmed.
+ * @return Returns string_in, which is the trimmed string.
  */
-void trim_right(char *string_in)
+char *trim_right(char *string_in)
 {
     int i;
     unsigned char *string = (unsigned char *) string_in;
@@ -50,21 +53,131 @@ void trim_right(char *string_in)
     for(i=strlen((char *)string)-1;i>=0;i--)
     {
         if(string[i]<=32)
-            string[i]=0;
+            string[i]='\0';
         else
             break;
     }
+    return (char *)string;
 }
 
-/*
+/**
+ * Trimms white & control character from string start.
+ * @see trim_right
+ * @param string_in The string which is trimmed.
+ * @return Returns string_in+n, where n is amount of characters trimmed.
+ */
+char *trim_left(char *string_in)
+{
+    int i;
+    unsigned char *string = (unsigned char *) string_in;
+    
+    while (string[0]!='\0')
+    {
+        if(string[0]<=32)
+            string++;
+        else
+            break;
+    }
+    return (char *)string;
+}
+
+/**
+ * Duplicates a string without quotes. Allocates memory
+ * and copies null-terminated string, skipping any quotes
+ * at start/end of the source.
+ * Any white/control character outside of quotes are skipped.
+ * All white/control characters inside quotes are preserved.
+ * @param src The string which is duplicated.
+ * @return The duplicate, or NULL on error.
+ */
+char *strdup_noquot(char *src)
+{
+     char *trimsrc;
+     trimsrc=src;
+     while ((trimsrc[0]>0)&&(trimsrc[0]<=32)) trimsrc++;
+     if ((trimsrc[0]=='\"')||(trimsrc[0]=='\''))
+         trimsrc++;
+     else
+         trimsrc=src;
+     int len=strlen(trimsrc);
+     int trimlen;
+     trimlen=len;
+     while (((unsigned char)(trimsrc[trimlen-1])<=32)) trimlen--;
+     if ((trimsrc[trimlen-1]=='\"')||(trimsrc[trimlen-1]=='\''))
+         trimlen--;
+     else
+         trimlen=len;
+     char *dest=malloc(trimlen+1);
+     if (dest==NULL) return NULL;
+     strncpy(dest,trimsrc,trimlen);
+     dest[trimlen]='\0';
+     return dest;
+}
+
+/**
+ * Duplicates a string with trimming. Allocates memory
+ * and copies null-terminated string, skipping any
+ * white/control characters at start/end of the source.
+ * @param src The string which is duplicated.
+ * @return The duplicate, or NULL on error.
+ */
+char *strdup_trim(char *src)
+{
+     char *trimsrc;
+     trimsrc=src;
+     while ((trimsrc[0]>0)&&(trimsrc[0]<=32)) trimsrc++;
+     int len=strlen(trimsrc);
+     int trimlen;
+     trimlen=len;
+     while ((((unsigned char)(trimsrc[trimlen-1]))<=32)) trimlen--;
+     char *dest=malloc(trimlen+1);
+     if (dest==NULL) return NULL;
+     strncpy(dest,trimsrc,trimlen);
+     dest[trimlen]='\0';
+     return dest;
+}
+
+/**
+ * Returns file name only from given filename with path.
+ * @see prepare_short_fname
+ * @param pathname The source filename, possibly with path.
+ * @return Pointer to the name in pathname string, with path skipped.
+ */
+char *filename_from_path(char *pathname)
+{
+    char *fname = NULL;
+    if (pathname)
+    {
+        fname = strrchr (pathname, '/') + 1;
+        if (!fname)
+            fname = strrchr (pathname, '\\') + 1;
+    }
+    if (!fname)
+        fname=pathname;
+return fname;
+}
+
+/**
  * Creates map filename from given string.
- * Returns true on success.
+ * @see format_data_fname
+ * @param fname The output filename.
+ * @param usrinput The input string used to create filename.
+ * @param levels_path Directory path to the folder containing levels.
+ * @return Returns true on success.
  */
 short format_map_fname(char *fname, const char *usrinput,const char *levels_path)
 {
     // if the file does not have a path
-    if (strstr(usrinput,SEPARATOR)==NULL)
+    short has_path=(strchr(usrinput,'\\')!=NULL);
+    if (!has_path)
+        has_path=(strchr(usrinput,'/')!=NULL);
+    if (!has_path)
     {
+          const char *usedpath;
+          if ((levels_path==NULL)||(levels_path[0]=='\0'))
+              usedpath=".";
+          else
+              usedpath=levels_path;
           //Then it shouldn't have any dots (no extension)
           char *dotpos=strrchr(usrinput,'.');
           if (dotpos!=NULL)
@@ -76,9 +189,9 @@ short format_map_fname(char *fname, const char *usrinput,const char *levels_path
           // If there are no dots or separators, maybe it's a number of map, not filename
           {
           if (atoi(usrinput))
-              sprintf (fname, "%s"SEPARATOR"map%.5d", levels_path, atoi(usrinput));
+              sprintf (fname, "%s"SEPARATOR"map%.5d", usedpath, atoi(usrinput));
           else
-              sprintf(fname, "%s"SEPARATOR"%s", levels_path, usrinput);
+              sprintf(fname, "%s"SEPARATOR"%s", usedpath, usrinput);
           }
     } else
         // File is with path
@@ -89,14 +202,18 @@ short format_map_fname(char *fname, const char *usrinput,const char *levels_path
     return false;
 }
 
-/*
- * Prepares short version of the given filename; result can't be longer
- * than maxlen. Allocates memory for the returned string - you should
- * free() it after use. Returns NULL on error.
+/**
+ * Prepares short version of the given filename. Resulting string is
+ * never longer than maxlen.
+ * Allocates memory for the returned string - you should
+ * free() it after use.
+ * @param fname The input (possibly long) file name.
+ * @param maxlen Maximal size of the returned output string.
+ * @return Returns the short file name, or NULL on error.
  */
-char *prepare_short_fname(char *fname, unsigned int maxlen)
+char *prepare_short_fname(const char *fname, unsigned int maxlen)
 {
-    char *start;
+    const char *start;
     start=strrchr(fname,SEPARATOR[0]);
     if (start==NULL)
         start=fname;
@@ -122,8 +239,14 @@ char *prepare_short_fname(char *fname, unsigned int maxlen)
     return retname;
 }
 
-/*
- * Formats data file name. Returns true on success.
+/**
+ * Formats data file name. Allocates memory and prints formatted
+ * file name into it.
+ * fullname Pointer to the returned file name.
+ * data_path Path to the data directory, inserted before filename.
+ * format The string format used to create file name.
+ * @see format_map_fname
+ * @return Returns true on success.
  */
 short format_data_fname(char **fullname, const char *data_path, const char *format, ...)
 {
@@ -147,8 +270,12 @@ short format_data_fname(char **fullname, const char *data_path, const char *form
     return false;
 }
 
-/*
- * Searches for position of an item in array of unsigned short
+/**
+ * Searches for position of an item in array of unsigned short.
+ * @param arr Pointer to the source array.
+ * @param arr_item The searched item.
+ * @param array_count Size of the array (number of elements in it).
+ * @return Returns the position, or -1 if cannot find.
  */
 int arr_ushort_pos(const unsigned short *arr,unsigned short arr_item,int array_count)
 {

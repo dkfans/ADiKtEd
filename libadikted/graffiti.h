@@ -1,21 +1,18 @@
 /******************************************************************************/
-// graffiti.h - Another Dungeon Keeper Map Editor.
-/******************************************************************************/
-// Author:   Jon Skeet
-// Created:  14 Oct 1997
-// Modified: Tomasz Lis
-
-// Purpose:
-//   Header file. Defines exported routines from graffiti.c
-
-// Comment:
-//   None.
-
-//Copying and copyrights:
-//   This program is free software; you can redistribute it and/or modify
-//   it under the terms of the GNU General Public License as published by
-//   the Free Software Foundation; either version 2 of the License, or
-//   (at your option) any later version.
+/** @file graffiti.h
+ * Wall graffiti support for levels.
+ * @par Purpose:
+ *     Header file. Defines exported routines from graffiti.c
+ * @par Comment:
+ *     None.
+ * @author   Jon Skeet, Tomasz Lis
+ * @date     14 Oct 1997 - 22 Jul 2008
+ * @par  Copying and copyrights:
+ *     This program is free software; you can redistribute it and/or modify
+ *     it under the terms of the GNU General Public License as published by
+ *     the Free Software Foundation; either version 2 of the License, or
+ *     (at your option) any later version.
+ */
 /******************************************************************************/
 
 #ifndef ADIKT_GRAFFITI_H

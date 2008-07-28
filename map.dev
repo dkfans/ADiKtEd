@@ -1,7 +1,7 @@
 [Project]
 FileName=map.dev
-Name=adikted
-UnitCount=25
+Name=adimap
+UnitCount=29
 Type=1
 Ver=1
 ObjFiles=
@@ -21,19 +21,19 @@ OverrideOutput=0
 OverrideOutputName=map.exe
 HostApplication=
 Folders=
-CommandLine=Levels\MAP00088
+CommandLine=Levels\MAP00097
 UseCustomMakefile=0
 CustomMakefile=
 IncludeVersionInfo=1
 SupportXPThemes=0
 CompilerSet=0
-CompilerSettings=00000000000000000000e1
+CompilerSettings=00000000000000000000a0
 
 [VersionInfo]
 Major=0
 Minor=9
 Release=2
-Build=3
+Build=135
 LanguageID=1033
 CharsetID=1252
 CompanyName=
@@ -218,7 +218,7 @@ OverrideBuildCmd=0
 BuildCmd=
 
 [Unit26]
-FileName=obj_slabs.h
+FileName=textmenu.h
 CompileCpp=0
 Folder=adikted
 Compile=1
@@ -228,7 +228,7 @@ OverrideBuildCmd=0
 BuildCmd=
 
 [Unit27]
-FileName=obj_things.c
+FileName=scr_txtgen.c
 CompileCpp=0
 Folder=adikted
 Compile=1
@@ -238,7 +238,7 @@ OverrideBuildCmd=0
 BuildCmd=
 
 [Unit28]
-FileName=obj_column.h
+FileName=scr_txtgen.h
 CompileCpp=0
 Folder=adikted
 Compile=1
@@ -248,7 +248,7 @@ OverrideBuildCmd=0
 BuildCmd=
 
 [Unit29]
-FileName=obj_column.c
+FileName=textmenu.c
 CompileCpp=0
 Folder=adikted
 Compile=1

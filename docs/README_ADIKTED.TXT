@@ -1,15 +1,16 @@
 Adikted Dungeon Keeper Map Editor
 ------------------------------
 
-Note - there is now a tutorial available for Adikted, at
-http://www.yoda.arachsys.com/dk/tutorial.html.
-A version of this is also within this distribution,
+Note - there is now a manual available for ADiKtEd.
+It even includes a basic tutorial to quickly learn the program.
+A version of it is included within this distribution,
 called dk_adikted_manual.htm. You may wish to print this out.
 
 Here's the Win32 version executable. Just put all the
 files in the same directory, edit map.ini as appropriate (you should
 change paths to your DK files; you can also change other parameters
 if you want), and run it.
+
 Usage: map [mapfile] [-m <logfile>] [-v] [-r] [-n] [-s [mapfile]] [-q]
 where:
   mapfile  Specifies filename (eg newmap), or just map number
@@ -44,25 +45,30 @@ where:
           all comands given in parameters. For users it works just
           like -q option, but it won't even init keyboard input.
 
-When Adikted saves a map, it will ask you what you wish
-to call it. I suggest you don't save directly over the Dungeon
-Keeper original levels, but keep it in the current directory until
-you're finished. When you're ready to test it, use a command like
-the following to copy the files to a "real" location:
-
-copy mymap.* c:\games\keeper\levels\map00001.*
+When ADiKtEd saves a map, it will ask you what you wish to call it
+(unless you're not using quick save). I suggest you don't save
+directly over the Dungeon Keeper original levels, but keep it
+in the current directory until you're finished.
+Then, at end, save it on map00001 to access it easily in the game.
 
 You'll need a level script for your newly created level. You may be
 able to get by with the script which comes with the original level 1
-- ie just don't change anything - but if not, study the level
-scripts for predefined levels and edit map00001.txt (or create a new
-file newmap.txt, which will get picked up in the copy command above).
+- ie just copy it and paste into TXT file of your new map - but
+if not, study the level scripts reference from dk_scripting_ref.htm.
+You can also try looking at the original DK and DD levels for examples.
 
 Press F1 for help.
 
 TODO before final:
  Fixations in room things parameters (height,other)
  Fixations in room corner graphics
+Version: 0.93b
+ Work on Script Generator started (ctrl+t in script mode)
+ Work on doxygen documentation of libAdikted started
+ Renewed file access functions in RNC decompression module
+ Rewritten MEMFILE module
+ LIF files (containing level name) are now supported
+ Created two examples on how to use ADiKtEd library
 Version: 0.92b
  Minor changes to INI commands and defaults
  Disabled changing range of objects which don't have it

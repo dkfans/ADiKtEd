@@ -271,28 +271,7 @@ void slb_place_room(struct WORKMODE_DATA *workdata,unsigned char room)
       markl=markr;
       markt=markb;
     }
-    // Sanity check, almost certainly unneeded
-    if ((markr>MAP_MAXINDEX_X) || (markb>MAP_MAXINDEX_Y) ||
-       (markl<0) || (markt<0))
-    {
-      message_error("Map coordinates out of bounds");
-      return;
-    }
-    int tile_x,tile_y;
-    for (tile_x=markl; tile_x<=markr; tile_x++)
-      for (tile_y=markt; tile_y<=markb; tile_y++)
-      {
-//          unsigned char oldslb;
-//          oldslb = get_tile_slab(lvl,tile_x,tile_y);
-          set_tile_slab(workdata->lvl,tile_x,tile_y,room);
-          inc_info_usr_slbchng_count(workdata->lvl);
-      }
-    if (get_obj_auto_update(workdata->lvl))
-      update_obj_for_square(workdata->lvl, markl-1, markr+1, markt-1, markb+1);
-    if (get_datclm_auto_update(workdata->lvl))
-      update_datclm_for_square(workdata->lvl, markl-1, markr+1, markt-1, markb+1);
-    if (get_obj_auto_update(workdata->lvl))
-      update_obj_subpos_and_height_for_square(workdata->lvl, markl-1, markr+1, markt-1, markb+1);
+    user_set_slab_rect(workdata->lvl, markl, markr, markt, markb, room);
     set_marking_disab(workdata->mapmode);
 }
 

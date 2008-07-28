@@ -1,0 +1,4236 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=us-ascii">
+  <title>Dungeon Keeper Script Commands Reference</title>
+  <link rel="stylesheet" type="text/css" href="dk_docs_style.css" />
+</head>
+
+<body lang="EN">
+
+<p class="main_title">Dungeon Keeper Script&nbsp;Commands Reference v1.3</p>
+
+<p class="main_subtitle">Modified by fans</p>
+
+<br clear="all"/>
+
+<h1><a name="manual_toc">Contents</a></h1>
+
+<br/>
+
+<p class="toc1">Contents</p>
+<p class="toc1"><a href="#scrpt_group_introduction">1.0 Introduction to level scripts</a></p>
+<p class="toc2"><a href="#scrpt_finding">1.1 Finding the level script</a></p>
+<p class="toc2"><a href="#scrpt_layout">1.2 Script Layout</a></p>
+<p class="toc2"><a href="#scrpt_examplemap">1.3 Example Maps</a></p>
+
+<p class="toc1"><a href="#scrpt_group_parameters">2.0 Script Parameters and Variables</a></p>
+<p class="toc2"><a href="#scrpt_gametrn">2.1 Game Turns</a></p>
+<p class="toc2"><a href="#scrpt_players">2.2 Players</a></p>
+<p class="toc2"><a href="#scrpt_variables">2.3 Variables</a></p>
+<p class="toc2"><a href="#scrpt_comparisons">2.4 Comparisons</a></p>
+<p class="toc2"><a href="#scrpt_actionpoints">2.5 Action Points</a></p>
+<p class="toc2"><a href="#scrpt_creaturenames">2.6 Creature Names</a></p>
+<p class="toc2"><a href="#scrpt_roomnames">2.7 Room Names</a></p>
+<p class="toc2"><a href="#scrpt_trapnames">2.8 Door and Trap Names</a></p>
+<p class="toc2"><a href="#scrpt_spellnames">2.9 Spell Names</a></p>
+
+<p class="toc1"><a href="#scrpt_group_misc">3.0 Miscellaneous Commands</a></p>
+<p class="toc5"><a href="#scrpt_cmd_rem">3.1 REM</a></p>
+<p class="toc5"><a href="#scrpt_cmd_win_game">3.2 WIN_GAME</a></p>
+<p class="toc5"><a href="#scrpt_cmd_lose_game">3.3 LOSE_GAME</a></p>
+<p class="toc5"><a href="#scrpt_cmd_set_flag">3.4 SET_FLAG(&#8203;[player],&#8203;[flag],&#8203;[a])</a></p>
+<p class="toc5"><a href="#scrpt_cmd_set_timer">3.5 SET_TIMER(&#8203;[player],&#8203;[timer])</a></p>
+<p class="toc5"><a href="#scrpt_cmd_if">3.6 IF(&#8203;[player],&#8203;[variable][comparison][a])</a></p>
+<p class="toc5"><a href="#scrpt_cmd_if_action_point">3.7 IF_ACTION_POINT(&#8203;[action&nbsp;point],&#8203;[player])</a></p>
+<p class="toc5"><a href="#scrpt_cmd_if_available">3.8 IF_AVAILABLE(&#8203;[player],&#8203;[name]&#8203;[comparison]&#8203;[a])</a></p>
+<p class="toc5"><a href="#scrpt_cmd_endif">3.9 ENDIF</a></p>
+<p class="toc5"><a href="#scrpt_cmd_reset_action_point">3.10 RESET_ACTION_POINT(&#8203;[action&nbsp;point])</a></p>
+<p class="toc5"><a href="#scrpt_cmd_next_command_reusable">3.11 NEXT_COMMAND_REUSABLE</a></p>
+
+<p class="toc1"><a href="#scrpt_group_setup">4.0 Setup Commands</a></p>
+<p class="toc5"><a href="#scrpt_cmd_set_generate_speed">4.1 SET_GENERATE_SPEED(&#8203;[a])</a></p>
+<p class="toc5"><a href="#scrpt_cmd_computer_player">4.2 COMPUTER_PLAYER(&#8203;[player],&#8203;[a])</a></p>
+<p class="toc5"><a href="#scrpt_cmd_start_money">4.3 START_MONEY(&#8203;[player],&#8203;[gold])</a></p>
+<p class="toc5"><a href="#scrpt_cmd_max_creatures">4.4 MAX_CREATURES(&#8203;[player],&#8203;[a])</a></p>
+<p class="toc5"><a href="#scrpt_cmd_ally_players">4.5 ALLY_PLAYERS(&#8203;[player],&#8203;[player])</a></p>
+
+<p class="toc1"><a href="#scrpt_group_crtrtngs">5.0 Creatures, Spells, Traps and Doors</a></p>
+<p class="toc5"><a href="#scrpt_cmd_add_creature_to_pool">5.1 ADD_CREATURE_TO_POOL(&#8203;[creature],&#8203;[a])</a></p>
+<p class="toc5"><a href="#scrpt_cmd_creature_available">5.2 CREATURE_AVAILABLE(&#8203;[player],&#8203;[creature],&#8203;[can&nbsp;be&nbsp;available],&#8203;[is&nbsp;available])</a></p>
+<p class="toc5"><a href="#scrpt_cmd_room_available">5.3 ROOM_AVAILABLE(&#8203;[player],&#8203;[room],&#8203;[can&nbsp;be&nbsp;available],&#8203;[is&nbsp;available])</a></p>
+<p class="toc5"><a href="#scrpt_cmd_door_available">5.4 DOOR_AVAILABLE(&#8203;[player],&#8203;[door],&#8203;[can&nbsp;be&nbsp;available],&#8203;[number&nbsp;available])</a></p>
+<p class="toc5"><a href="#scrpt_cmd_trap_available">5.5 TRAP_AVAILABLE(&#8203;[player],&#8203;[trap],&#8203;[can&nbsp;be&nbsp;available],&#8203;[number&nbsp;available])</a></p>
+<p class="toc5"><a href="#scrpt_cmd_magic_available">5.6 MAGIC_AVAILABLE(&#8203;[player],&#8203;[spell],&#8203;[can&nbsp;be&nbsp;available],&#8203;[is&nbsp;available])</a></p>
+<p class="toc5"><a href="#scrpt_cmd_dead_creatures_return_to_pool">5.7 DEAD_CREATURES_RETURN_TO_POOL(&#8203;[a])</a></p>
+
+<p class="toc1"><a href="#scrpt_group_creatures">6.0 Manipulating Creatures</a></p>
+<p class="toc5"><a href="#scrpt_cmd_set_creature_max_level">6.1 SET_CREATURE_MAX_LEVEL(&#8203;[player],&#8203;[creature],&#8203;[max&nbsp;experience])</a></p>
+<p class="toc5"><a href="#scrpt_cmd_set_creature_strength">6.2 SET_CREATURE_STRENGTH(&#8203;[creature],&#8203;[a])</a></p>
+<p class="toc5"><a href="#scrpt_cmd_set_creature_health">6.3 SET_CREATURE_HEALTH(&#8203;[creature],&#8203;[a])</a></p>
+<p class="toc5"><a href="#scrpt_cmd_set_creature_armour">6.4 SET_CREATURE_ARMOUR(&#8203;[creature],&#8203;[a])</a></p>
+<p class="toc5"><a href="#scrpt_cmd_set_creature_fear">6.5 SET_CREATURE_FEAR(&#8203;[creature],&#8203;[a])</a></p>
+
+<p class="toc1"><a href="#scrpt_group_research">7.0 Manipulating Research</a></p>
+<p class="toc2"><a href="#scrpt_cmd_resrchdefs">7.1 Default Research Values</a></p>
+<p class="toc5"><a href="#scrpt_cmd_research">7.2 RESEARCH(&#8203;[player],&#8203;[research&nbsp;type],&#8203;[room&nbsp;or&nbsp;spell],&#8203;[a])</a></p>
+
+<p class="toc1"><a href="#scrpt_group_crtradd">8.0 Adding New Creatures and Parties to the Level</a></p>
+<p class="toc5"><a href="#scrpt_cmd_add_creature_to_level">8.1 ADD_CREATURE_TO_LEVEL(&#8203;[player],&#8203;[creature],&#8203;[action&nbsp;point],&#8203;[a],&#8203;[experience],&#8203;[gold])</a></p>
+<p class="toc5"><a href="#scrpt_cmd_add_tunneller_to_level">8.2 ADD_TUNNELLER_TO_LEVEL(&#8203;[player],&#8203;[action&nbsp;point],&#8203;[head for],&#8203;[action&nbsp;point/target&nbsp;player],&#8203;[experience],&#8203;[gold])</a></p>
+<p class="toc5"><a href="#scrpt_cmd_create_party">8.3 CREATE_PARTY(&#8203;[party&nbsp;name])</a></p>
+<p class="toc5"><a href="#scrpt_cmd_add_to_party">8.4 ADD_TO_PARTY(&#8203;[party&nbsp;name],&#8203;[creature],&#8203;[experience],&#8203;[gold],&#8203;[objective],&#8203;[countdown])
+<p class="toc5"><a href="#scrpt_cmd_add_tunneller_party_to_level">8.5 ADD_TUNNELLER_PARTY_TO_LEVEL(&#8203;[player],&#8203;[party&nbsp;name],&#8203;[action&nbsp;point],&#8203;[head for],&#8203;[action&nbsp;point/target&nbsp;player],&#8203;[experience],&#8203;[gold])</a></p>
+<p class="toc5"><a href="#scrpt_cmd_add_party_to_level">8.6 ADD_PARTY_TO_LEVEL(&#8203;[player],&#8203;[name],&#8203;[action&nbsp;point],&#8203;[a])</a></p>
+
+<p class="toc1"><a href="#scrpt_group_infobjctv">9.0 Displaying information and affecting interface</a></p>
+<p class="toc5"><a href="#scrpt_cmd_display_objective">9.1 DISPLAY_OBJECTIVE(&#8203;[a],&#8203;[player])</a></p>
+<p class="toc5"><a href="#scrpt_cmd_display_objective_with_pos">9.2 DISPLAY_OBJECTIVE_WITH_POS(&#8203;[a],&#8203;[x],&#8203;[y])</a></p>
+<p class="toc5"><a href="#scrpt_cmd_display_information">9.3 DISPLAY_INFORMATION(&#8203;[a])</a></p>
+<p class="toc5"><a href="#scrpt_cmd_display_information_with_pos">9.4 DISPLAY_INFORMATION_WITH_POS(&#8203;[a],&#8203;[x],&#8203;[y])</a></p>
+<p class="toc5"><a href="#scrpt_cmd_quick_objective">9.5 QUICK_OBJECTIVE(&#8203;[a],&#8203;[&quot;objective&quot;],&#8203;[player])</a></p>
+<p class="toc5"><a href="#scrpt_cmd_quick_information">9.6 QUICK_INFORMATION(&#8203;[a],&#8203;[&quot;information&quot;])</a></p>
+<p class="toc5"><a href="#scrpt_cmd_tutorial_flash_button">9.7 TUTORIAL_FLASH_BUTTON(&#8203;[button],&#8203;[player])</a></p>
+<p class="toc5"><a href="#scrpt_cmd_bonus_level_time">9.8 BONUS_LEVEL_TIME(&#8203;[a])</a></p>
+<p class="toc5"><a href="#scrpt_cmd_set_music">9.9 SET_MUSIC(&#8203;[a])</a></p>
+
+<p class="toc1"><a href="#scrpt_group_compluter">10.0 Tweaking computer players</a></p>
+<p class="toc2"><a href="#scrpt_cmd_compctrlparam">10.1 Computer Player Control Parameters</a></p>
+<p class="toc5"><a href="#scrpt_cmd_set_computer_process">10.2 SET_COMPUTER_PROCESS(&#8203;[player],&#8203;["process&nbsp;name"],&#8203;[priority],&#8203;[data1],&#8203;[data2],&#8203;[data3],&#8203;[data4])</a></p>
+<p class="toc5"><a href="#scrpt_cmd_set_computer_checks">10.3 SET_COMPUTER_CHECKS(&#8203;[player],&#8203;["checks&nbsp;name"],&#8203;[check&nbsp;every],&#8203;[data1],&#8203;[data2],&#8203;[data3],&#8203;[data4])</a></p>
+<p class="toc5"><a href="#scrpt_cmd_set_computer_event">10.4 SET_COMPUTER_EVENT(&#8203;[player],&#8203;["event&nbsp;name"],&#8203;[data1],&#8203;[data2])</a></p>
+<p class="toc5"><a href="#scrpt_cmd_set_computer_globals">10.5 SET_COMPUTER_GLOBALS(&#8203;[player],&#8203;[a],&#8203;[a],&#8203;[a],&#8203;[a],&#8203;[a],&#8203;[a])</a></p>
+
+<p class="toc1"><a href="#scrpt_cmdindex">11.0 Script commands index</a></p>
+<p class="toc1"><a href="#scrpt_credits">12.0 Credits</a></p>
+<p class="toc1"><a href="#scrpt_changelog">13.0 Changes log</a></p>
+<p class="toc1"><a href="#scrpt_refs">14.0 References</a></p>
+
+<br clear="all"/><br/>
+
+<h1><a name="scrpt_group_introduction">1.0 Introduction to level scripts</a></h1>
+
+<br/>
+<p class="std">To get your map to work in Dungeon Keeper,
+you will need to script it first.
+If you do not, the map will not load properly and you will not be able
+to play it. The script will tell Dungeon Keeper what spells are available
+on the level, what creatures appear and other settings that are unique
+to the level.</p>
+
+<br clear="all"/><br/>
+
+<h2><a name="scrpt_finding">1.1 Finding the level script</a></h2>
+
+<p class="std">When you first save your level, a number of files
+are created in the Levels directory.
+For example, for level 200 (the example map), the following files
+are&nbsp;created:</p>
+<br/>
+<pre class="snip">Map00200.apt
+Map00200.clm
+Map00200.dat
+Map00200.inf
+Map00200.lgt
+Map00200.lif
+Map00200.own
+Map00200.slb
+Map00200.tng
+Map00200.txt
+Map00200.wib
+Map00200.wlb</pre>
+<br/>
+
+<p class="std">You will notice that there is a .txt file included
+in the list. This&nbsp;is the script file which you will edit.</p>
+<br/>
+
+<p class="std">If you open it, you will see that it contains
+many commands which the game uses to create the level.
+When you have looked at the example script,
+open the script file of your own level.</p>
+<br/>
+
+<h2><a name="scrpt_layout">1.2 Script Layout</a></h2>
+
+<p class="std">You can enter commands into the script in any order.
+The script does not run like a proper program or an HTML script.
+Instead, Dungeon Keeper stores it all in memory.
+This&nbsp;means that IF commands will be triggered immediately when their
+conditions are met. Bear this in mind when you are writing your scripts.</p>
+<br/>
+
+<p class="std">The example scripts are laid out in the following way:</p>
+<br/>
+<div class="embed">
+<p class="std"><b>Setup Commands</b></p>
+<br/>
+
+<p class="std">Set up Generation Speed</p>
+<p class="std">Set up Computer Players (is applicable)</p>
+<p class="std">Set up Starting Gold</p>
+<p class="std">Set up Maximum Creatures</p>
+<br/>
+
+<p class="std">Set up Creature Pool</p>
+<p class="std">Set up available Creatures</p>
+<p class="std">Set up available Rooms</p>
+<p class="std">Set up available Doors</p>
+<p class="std">Set up available Traps</p>
+<p class="std">Set up available Spells</p>
+<br/>
+
+<p class="std">Adjust any creature statistics</p>
+<p class="std">Adjust any research values</p>
+<br/>
+
+<p class="std">Set up Flags</p>
+<p class="std">Set up Timers</p>
+<br/>
+
+<p class="std">Setup Parties</p>
+<p class="std">Add all creatures to Parties</p>
+<br/>
+
+<p class="std"><b>Main Script</b></p>
+<br/>
+
+<p class="std">IF commands</p>
+<br/>
+
+<p class="std">IF commands for Objectives</p>
+<p class="std">IF commands for Information Icons</p>
+<br/>
+
+<p class="std">IF command resulting in a lost level (if necessary)</p>
+<p class="std">IF command resulting in a won level (if necessary)</p>
+</div>
+
+<br/>
+<br/>
+
+<p class="std">This&nbsp;is done to keep the script readable
+and easy to look at when searching for errors.
+Although not necessary, it is good practice to keep to this format
+so others can look at your script without finding it incomprehensible.</p>
+<br/>
+
+<p class="std">Each subsection of this manual has a different theme
+and you should try and go through each subsection and place the commands
+into your script in the same order.
+This&nbsp;is to keep the scripts similar so that other people can reference them easily.</p>
+<br/>
+
+<p class="std"><b>Note:</b> All action commands in the script (such as
+ADD_PARTY_TO_LEVEL) will only be triggered once. IF commands will
+keep triggering every time their conditions are met but the
+commands inside them will only trigger the one time. You will need
+to use the NEXT_COMMAND_REUSABLE command if you want them to keep
+triggering.</p>
+
+<br clear="all"/><br/>
+
+<h2><a name="scrpt_examplemap">1.3 Example Maps</a></h2>
+
+<br/>
+<p class="std">Included with the Dungeon Keeper Editor
+are two example maps that you can use to study and cut and paste from.
+The single player example map is level 200 and the multiplayer
+example map is level 201. They are playable levels with as many features
+included as possible. The script files have been heavily commented
+using the REM command to explain the script at every step.</p>
+
+<br clear="all"/><br/>
+
+<h1><a name="scrpt_group_parameters">2.0 Script Parameters and Variables</a></h1>
+
+<br/>
+<p class="std">This&nbsp;section will describe parameters to
+script commands available to use in Dungeon Keeper.</p>
+<br/>
+
+<p class="std">Below are a few common references explained:</p>
+
+<br clear="all"/><br/>
+
+<h2><a name="scrpt_gametrn">2.1 Game Turns</a></h2>
+
+<br/>
+<p class="std">A game turn is a counter that counts how many times
+Dungeon Keeper has run through it&rsquo;s main loop.
+The main loop is a series of commands which tells the game
+to update and then draw everything on the screen.
+Each time it runs through these instructions, the game turn counter
+increases by one and the loop is run again.</p>
+<br/>
+
+<p class="std">On slower PCs, the game turns will increase slowly,
+while on fast machines the game turns will increase faster.
+To stop the game becoming too fast, there is a limit of&nbsp;20 game turns
+a&nbsp;second. Bear these things in mind when you write your script
+so that timers are balanced on all machines.</p>
+<br/>
+
+<p class="std">If&nbsp;a script command requires number of game turns
+as a&nbsp;parameter (for example delay before some action), then
+it must be in range from 0 to 2147483647. The maximum value is
+equivalent to delay of approx. 3&nbsp;years, so it&nbsp;should be enough
+for all cases. To make one minute delay, you should use 1200&nbsp;game turns.</p>
+
+<p class="std"><b>Note:</b> The limit is 20&nbsp;turns, not 12&nbsp;turns
+how other sources claim.</p>
+
+<br clear="all"/><br/>
+
+<h2><a name="scrpt_players">2.2 Players</a></h2>
+
+<br/>
+<p class="std">There are six players in the editor. Each has a number and colour.</p>
+<br/>
+
+<table class="tbparam">
+<tr>
+<td class="tbparhd"><p class="tbparht">Player</p></td>
+<td class="tbparhd"><p class="tbparht">Player Command</p></td>
+<td class="tbparhd"><p class="tbparht">Colour</p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">Player&nbsp;1 (single&nbsp;player)</p></td>
+<td class="tbparct"><p class="std">PLAYER0</p></td>
+<td class="tbparct"><p class="std">red</p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">Player&nbsp;2 (enemy)</p></td>
+<td class="tbparct"><p class="std">PLAYER1</p></td>
+<td class="tbparct"><p class="std">blue</p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">Player&nbsp;3 (enemy)</p></td>
+<td class="tbparct"><p class="std">PLAYER2</p></td>
+<td class="tbparct"><p class="std">green</p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">Player&nbsp;4 (enemy)</p></td>
+<td class="tbparct"><p class="std">PLAYER3</p></td>
+<td class="tbparct"><p class="std">yellow</p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">Hero Dungeon</p></td>
+<td class="tbparct"><p class="std">PLAYER_GOOD</p></td>
+<td class="tbparct"><p class="std">white</p></td>
+</tr>
+<tr>
+<td class="tbparct"></td>
+<td class="tbparct"></td>
+<td class="tbparct"></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">Neutral</p></td>
+<td class="tbparct"><br/></td>
+<td class="tbparct"><p class="std">no&nbsp;colour/&#8203;multicoloured</p></td>
+</tr>
+<tr>
+<td class="tbparct"></td>
+<td class="tbparct"></td>
+<td class="tbparct"></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">All Players</p></td>
+<td class="tbparct"><p class="std">ALL_PLAYERS</p></td>
+<td class="tbparct"><br/></td>
+</tr>
+</table>
+<br/>
+
+<p class="std">Neutral is used for creatures and rooms
+that have not been claimed by any players, e.g.
+unclaimed Portals and bonus creatures hidden on the level.</p>
+<br/>
+
+<p class="std"><b>Note:</b> The player numbers start at 0 and not 1.
+The main (red) player is player 0 and the one you will always use
+for single player games.</p>
+<br/>
+
+<br clear="all"/><br/>
+
+<h2><a name="scrpt_variables">2.3 Variables</a></h2>
+
+<br/>
+<p class="std">Variables are names that have a number
+associated with them, e.g. the MONEY variable contains
+the amount of gold that player has.
+Most variables in Dungeon Keeper are individual to each player
+and are constantly updated with the correct information.
+Some, such as the FLAGS (see <a href="#scrpt_cmd_set_flag">SET_FLAG command</a> for more information)
+need to be created and updated by the script.</p>
+<br/>
+
+<p class="std">The following variables are used by Dungeon Keeper:</p>
+<br/>
+
+<table class="tbparam" style="width:80%">
+<tr>
+<td class="tbparhd"><p class="tbparht">Command</p></td>
+<td class="tbparhd"><p class="tbparht">Description</p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">MONEY</p></td>
+<td class="tbparct"><p class="std">The amount of money the player has</p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">GAME_TURN</p></td>
+<td class="tbparct"><p class="std">The current game turn (player independent)</p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">TOTAL_IMPS</p></td>
+<td class="tbparct"><p class="std">The number of Imps that player has got</p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">TOTAL_CREATURES</p></td>
+<td class="tbparct"><p class="std">The number of creatures that player has got</p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">TOTAL_RESEARCH</p></td>
+<td class="tbparct"><p class="std">The amount of research points that player has got
+ (see <a href="#scrpt_group_research">manipulating research section</a> for more information)</p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">TOTAL_DOORS</p></td>
+<td class="tbparct"><p class="std">The amount of doors that player has got</p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">TOTAL_AREA</p></td>
+<td class="tbparct"><p class="std">The amount of tiles that player owns</p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">TOTAL_CREATURES_LEFT</p></td>
+<td class="tbparct"><p class="std">The amount of creatures that have left that player&rsquo;s dungeon because they were annoyed</p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">CREATURES_ANNOYED</p></td>
+<td class="tbparct"><p class="std">The number of creatures annoyed in that player&rsquo;s dungeon</p>
+</td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">BATTLES_WON</p></td>
+<td class="tbparct"><p class="std">The number of battles won by that player</p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">BATTLES_LOST</p></td>
+<td class="tbparct"><p class="std">The number of battles lost by that player</p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">ROOMS_DESTROYED</p></td>
+<td class="tbparct"><p class="std">The&nbsp;number of rooms belonging to the player which were sold or destroyed</p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">SPELLS_STOLEN</p></td>
+<td class="tbparct"><p class="std">The number of spells stolen from that player</p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">TIMES_BROKEN_INTO</p></td>
+<td class="tbparct"><p class="std">The number of times that players walls have been breached</p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">DUNGEON_DESTROYED</p></td>
+<td class="tbparct"><p class="std">Whether that players Dungeon Heart has been destroyed (0 if still active, 1 if destroyed)</p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">CREATURES_SCAVENGED_LOST</p></td>
+<td class="tbparct"><p class="std">Number of creatures lost by that player due to scavenging</p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">CREATURES_SCAVENGED_GAINED</p></td>
+<td class="tbparct"><p class="std">Number of creatures gained by that player through scavenging</p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">ALL_DUNGEONS_DESTROYED</p></td>
+<td class="tbparct"><p class="std">Whether all the players Dungeon Hearts has been destroyed (0&nbsp;if&nbsp;still active, 1&nbsp;if&nbsp;destroyed) (player&nbsp;independent)</p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">DOORS_DESTROYED</p></td>
+<td class="tbparct"><p class="std">The&nbsp;number of doors belonging to the player which were sold or destroyed</p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">TOTAL_GOLD_MINED</p></td>
+<td class="tbparct"><p class="std">Total&nbsp;amount of gold mined by the player</p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">GOLD_POTS_STOLEN</p></td>
+<td class="tbparct"><p class="std">Number of gold pots that were stolen from the player</p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">BREAK_IN</p></td>
+<td class="tbparct"><p class="std"></p></td>
+</tr>
+<tr>
+<td class="tbparct"></td>
+<td class="tbparct"></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">FLAGn</p></td>
+<td class="tbparct"><p class="std">FLAG number: n is a number between 0 and 7</p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">TIMERn</p></td>
+<td class="tbparct"><p class="std">TIMER number: n is a number between 0 and 7</p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">RANDOM</p></td>
+<td class="tbparct"><p class="std">A&nbsp;random number in range from&nbsp;1 to&nbsp;12</p></td>
+</tr>
+</table>
+<br/>
+
+<p class="std"><b>Note:</b> Room&nbsp;names, door names, trap names and creature names
+can also be used as variables for <a href="#scrpt_cmd_if">IF statement</a>.
+Those&nbsp;will return:</p>
+<br/>
+
+<table class="tbparam" style="width:80%">
+<tr>
+<td class="tbparhd"><p class="tbparht">Variable type</p></td>
+<td class="tbparhd"><p class="tbparht">Return value</p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">Room name</p></td>
+<td class="tbparct"><p class="std">Number of tiles of this room a player has</p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">Door name</p></td>
+<td class="tbparct"><p class="std">Number of doors of this type a player has</p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">Trap name</p></td>
+<td class="tbparct"><p class="std">Number of traps of this type a player has</p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">Creature name</p></td>
+<td class="tbparct"><p class="std">Number of creatures of this type a player has</p></td>
+</tr>
+</table>
+
+<br clear="all"/><br/>
+
+<h2><a name="scrpt_comparisons">2.4 Comparisons</a></h2>
+
+<br/>
+<p class="std">The Comparisons are symbols which you can use to compare
+two values. These will be mainly used by the IF commands.</p>
+<br/>
+
+<table class="tbparam">
+<tr>
+<td class="tbparhd"><p class="tbparht">Command</p></td>
+<td class="tbparhd"><p class="tbparht">Description</p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">==</p></td>
+<td class="tbparct"><p class="std">Equal to</p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">!=</p></td>
+<td class="tbparct"><p class="std">Not equal to</p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">&lt;</p></td>
+<td class="tbparct"><p class="std">Less than</p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">&gt;</p></td>
+<td class="tbparct"><p class="std">Greater than</p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">&lt;=</p></td>
+<td class="tbparct"><p class="std">Less than or equal to</p></td>
+</tr>
+<td class="tbparct"><p class="std">&gt;=</p></td>
+<td class="tbparct"><p class="std">Greater than or equal to</p></td>
+</tr>
+</table>
+<br/>
+<br/>
+
+<p class="std"><b>Note:</b> If possible, use &lsquo;Less than or equal
+to&rsquo; or &lsquo;Greater than or equal to&rsquo; instead of the
+&lsquo;Equal to&rsquo; command because the IF command isn&rsquo;t
+checked every game turn. This&nbsp;may cause the game to miss things and
+therefore cause errors.<br/>
+For example, instead of asking whether the player has 30 creatures,
+ask if the player has 30 creatures or more.</p>
+
+<br clear="all"/><br/>
+
+<h2><a name="scrpt_actionpoints">2.5 Action Points</a></h2>
+
+<br/>
+<p class="std">Action points are areas of the map
+that are triggered if a creature steps into it.
+The Action Point can only be triggered once (unless you use the
+RESET_ACTION_POINT command) and is player independent so you can
+only detect which player triggered it.</p>
+<br/>
+
+<p class="std">Each Action Point has a number which you will have
+to remember. You will use this number in the script.</p>
+
+<p class="std">Hero&nbsp;Gates are special Action Points that act as Portals
+for Heroes. They do not have trigger areas so you cannot use them as traps,
+only as entry points for parties or new creatures. Like the Action Points,
+each Hero Gate has a number and you will need to use this number
+in the script.</p>
+<br/>
+
+<br clear="all"/><br/>
+
+<h2><a name="scrpt_creaturenames">2.6 Creature Names</a></h2>
+
+<br/>
+<p class="std">All the creatures in the Dungeon Keeper have special names
+which you have to use when referring to them in the script.
+The following list shows you their proper name and the script name you should use.</p>
+<br/>
+
+<table class="tbparam">
+<tr>
+<td class="tbparhd"><p class="tbparht">Heroes</p></td>
+<td class="tbparhd"><p class="tbparht">Command</p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">Wizard</p></td>
+<td class="tbparct"><p class="std">WIZARD</p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">Barbarian</p></td>
+<td class="tbparct"><p class="std">BARBARIAN</p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">Archer</p></td>
+<td class="tbparct"><p class="std">ARCHER</p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">Monk</p></td>
+<td class="tbparct"><p class="std">MONK</p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">Dwarf</p></td>
+<td class="tbparct"><p class="std">DWARFA</p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">Knight</p></td>
+<td class="tbparct"><p class="std">KNIGHT</p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">Avatar</p></td>
+<td class="tbparct"><p class="std">AVATAR</p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">Tunneller Dwarf</p></td>
+<td class="tbparct"><p class="std">TUNNELLER</p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">Witch</p></td>
+<td class="tbparct"><p class="std">WITCH</p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">Giant</p></td>
+<td class="tbparct"><p class="std">GIANT</p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">Fairy</p></td>
+<td class="tbparct"><p class="std">FAIRY</p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">Thief</p></td>
+<td class="tbparct"><p class="std">THIEF</p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">Samurai</p></td>
+<td class="tbparct"><p class="std">SAMURAI</p></td>
+</tr>
+</table>
+<br/>
+
+<table class="tbparam">
+<tr>
+<td class="tbparhd"><p class="tbparht">Creatures</p></td>
+<td class="tbparhd"><p class="tbparht">Command</p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">Imp</p></td>
+<td class="tbparct"><p class="std">IMP</p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">Horned Reaper</p></td>
+<td class="tbparct"><p class="std">HORNY</p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">Skeleton</p></td>
+<td class="tbparct"><p class="std">SKELETON</p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">Troll</p></td>
+<td class="tbparct"><p class="std">TROLL</p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">Dragon</p></td>
+<td class="tbparct"><p class="std">DRAGON</p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">Demonspawn</p></td>
+<td class="tbparct"><p class="std">DEMONSPAWN</p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">Fly</p></td>
+<td class="tbparct"><p class="std">FLY</p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">Dark Mistress</p></td>
+<td class="tbparct"><p class="std">DARK_MISTRESS</p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">Warlock</p></td>
+<td class="tbparct"><p class="std">SORCEROR</p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">Bile Demon</p></td>
+<td class="tbparct"><p class="std">BILE_DEMON</p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">Beetle</p></td>
+<td class="tbparct"><p class="std">BUG</p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">Vampire</p></td>
+<td class="tbparct"><p class="std">VAMPIRE</p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">Spider</p></td>
+<td class="tbparct"><p class="std">SPIDER</p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">Hellhound</p></td>
+<td class="tbparct"><p class="std">HELL_HOUND</p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">Ghost</p></td>
+<td class="tbparct"><p class="std">GHOST</p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">Tentacle</p></td>
+<td class="tbparct"><p class="std">TENTACLE</p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">Orc</p></td>
+<td class="tbparct"><p class="std">ORC</p></td>
+</tr>
+<tr>
+<td class="tbparct"></td>
+<td class="tbparct"></td>
+</tr>
+</table>
+<br/>
+
+
+<table class="tbparam">
+<tr>
+<td class="tbparhd"><p class="tbparht">Helpers</p></td>
+<td class="tbparhd"><p class="tbparht">Command</p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">Floating spirit</p></td>
+<td class="tbparct"><p class="std">FLOATING_SPIRIT</p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">Buffer 1 for creature swaping</p></td>
+<td class="tbparct"><p class="std">NEW_CREATURE_A</p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">Buffer 2 for creature swaping</p></td>
+<td class="tbparct"><p class="std">NEW_CREATURE_B</p></td>
+</tr>
+</table>
+<br/>
+
+
+<p class="std">How you design your level is up to you
+but when Dungeon Keeper was being developed, it was
+decided that some creatures should not come through the Portals
+(although they can be placed on the map for the player to find).
+The reasons for this are: Ghosts are created when a creature dies
+on a torture table and Skeletons are created when a creature dies
+in a Prison. Horned Reapers are only available through a sacrifice
+in the Temple and Vampires only rise from the Graveyard. Tentacles
+like water and are only bonuses on those levels with water. Bear
+this in mind when you are scripting your level.</p>
+<br/>
+
+<p class="std"><b>Note:</b> The three last creacures are not real
+game creatures, but only helpers. They should not be used.
+Floating&nbsp;Spirits are mainly used when your dungeon heart is destroyed
+(when you click on the Possess icon), or at the very beginning
+of any levels (when you "enter" into the Dungeon Heart).</p>
+<br/>
+
+<p class="std"><b>Fanfact:</b> Floating Spirits can be added into
+creature pool, but when they come out the portal they are completely
+useless - have no attack, and seem to crash the game if you slap them
+or a Boulder Trap hits them.</p>
+<br/>
+
+<br clear="all"/><br/>
+
+<h2><a name="scrpt_roomnames">2.7 Room Names</a></h2>
+
+<br/>
+
+<p class="std">Like the creatures, the rooms in Dungeon Keeper
+have special script names.</p>
+<br/>
+
+<table class="tbparam">
+<tr>
+<td class="tbparhd"><p class="tbparht">Room</p></td>
+<td class="tbparhd"><p class="tbparht">Command</p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">Portal</p></td>
+<td class="tbparct"><p class="std">ENTRANCE</p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">Treasure Room</p></td>
+<td class="tbparct"><p class="std">TREASURE</p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">Dark Library</p></td>
+<td class="tbparct"><p class="std">RESEARCH</p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">Prison</p></td>
+<td class="tbparct"><p class="std">PRISON</p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">Torture Chamber</p></td>
+<td class="tbparct"><p class="std">TORTURE</p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">Training Room</p></td>
+<td class="tbparct"><p class="std">TRAINING</p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">Workshop</p></td>
+<td class="tbparct"><p class="std">WORKSHOP</p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">Scavenger Room</p></td>
+<td class="tbparct"><p class="std">SCAVENGER</p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">Temple</p></td>
+<td class="tbparct"><p class="std">TEMPLE</p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">Graveyard</p></td>
+<td class="tbparct"><p class="std">GRAVEYARD</p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">Barracks</p></td>
+<td class="tbparct"><p class="std">BARRACKS</p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">Hatchery</p></td>
+<td class="tbparct"><p class="std">GARDEN</p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">Lair</p></td>
+<td class="tbparct"><p class="std">LAIR</p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">Bridge</p></td>
+<td class="tbparct"><p class="std">BRIDGE</p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">Guard Post</p></td>
+<td class="tbparct"><p class="std">GUARD_POST</p></td>
+</tr>
+</table>
+
+<br clear="all"/><br/>
+
+<h2><a name="scrpt_trapnames">2.8 Door and Trap Names</a></h2>
+
+<br/>
+<p class="std">Doors and Traps have script names which must be used
+when referring to them.</p>
+<br/>
+
+<table class="tbparam">
+<tr>
+<td class="tbparhd"><p class="tbparht">Door or Trap</p></td>
+<td class="tbparhd"><p class="tbparht">Command</p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">Wooden Door</p></td>
+<td class="tbparct"><p class="std">WOOD</p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">Braced Door</p></td>
+<td class="tbparct"><p class="std">BRACED</p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">Steel Door</p></td>
+<td class="tbparct"><p class="std">STEEL</p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">Magic Door</p></td>
+<td class="tbparct"><p class="std">MAGIC</p></td>
+</tr>
+<tr>
+<td class="tbparct"></td>
+<td class="tbparct"></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">Boulder Trap</p></td>
+<td class="tbparct"><p class="std">BOULDER</p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">Alarm Trap</p></td>
+<td class="tbparct"><p class="std">ALARM</p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">Poison Gas Trap</p></td>
+<td class="tbparct"><p class="std">POISON_GAS</p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">Lightning Trap</p></td>
+<td class="tbparct"><p class="std">LIGHTNING</p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">Word of Power Trap</p></td>
+<td class="tbparct"><p class="std">WORD_OF_POWER</p>
+</td>
+</tr>
+<td class="tbparct"><p class="std">Lava Trap</p></td>
+<td class="tbparct"><p class="std">LAVA</p></td>
+</tr>
+</table>
+<br/>
+
+<br clear="all"/><br/>
+
+<h2><a name="scrpt_spellnames">2.9 Spell Names</a></h2>
+
+<br/>
+<p class="std">Spells have script names which must be used when referring to them.</p>
+<br/>
+
+
+<table class="tbparam">
+<tr>
+<td class="tbparhd"><p class="tbparht">Spell</p></td>
+<td class="tbparhd"><p class="tbparht">Command</p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">Create Imp</p></td>
+<td class="tbparct"><p class="std">POWER_IMP</p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">Obey</p></td>
+<td class="tbparct"><p class="std">POWER_OBEY</p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">Sight of Evil</p></td>
+<td class="tbparct"><p class="std">POWER_SIGHT</p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">Call to Arms</p></td>
+<td class="tbparct"><p class="std">POWER_CALL_TO_ARMS</p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">Cave-in</p></td>
+<td class="tbparct"><p class="std">POWER_CAVE_IN</p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">Heal Creature</p></td>
+<td class="tbparct"><p class="std">POWER_HEAL_CREATURE</p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">Hold Audience</p></td>
+<td class="tbparct"><p class="std">POWER_HOLD_AUDIENCE</p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">Lightning Strike</p></td>
+<td class="tbparct"><p class="std">POWER_LIGHTNING</p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">Speed Creature</p></td>
+<td class="tbparct"><p class="std">POWER_SPEED</p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">Protect Creature</p></td>
+<td class="tbparct"><p class="std">POWER_PROTECT</p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">Conceal Creature</p></td>
+<td class="tbparct"><p class="std">POWER_CONCEAL</p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">Disease</p></td>
+<td class="tbparct"><p class="std">POWER_DISEASE</p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">Chicken</p></td>
+<td class="tbparct"><p class="std">POWER_CHICKEN</p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">Destroy Walls</p></td>
+<td class="tbparct"><p class="std">POWER_DESTROY_WALLS</p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">Armageddon</p></td>
+<td class="tbparct"><p class="std">POWER_ARMAGEDDON</p></td>
+</tr>
+<tr>
+<td class="tbparct"></td>
+<td class="tbparct"></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">Possess creature</p></td>
+<td class="tbparct"><p class="std">POWER_POSSESS</p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">Ability to slap creatures</p></td>
+<td class="tbparct"><p class="std">POWER_SLAP</p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">Power to pick creatures</p></td>
+<td class="tbparct"><p class="std">POWER_HAND</p></td>
+</tr>
+</table>
+<br/>
+
+<p class="std"><b>Note:</b> The three last powers are given to you at
+start of the level, and you don't need library to store them.
+Other spells need to be enabled in you want to allow the player
+to research them or have them at start.</p>
+<br/>
+
+<br clear="all"/><br/>
+
+<h1><a name="scrpt_group_misc">3.0 Miscellaneous Commands</a></h1>
+
+<br/>
+<p class="std">These commands can be placed anywhere in your script
+and do not directly affect the level.</p>
+<br/>
+
+<p class="tlsnip"><a name="scrpt_cmd_rem">3.1 REM</a></p>
+
+<br/>
+<p class="std">This&nbsp;can be placed at the start of a line
+to tell the game to ignore any text after it.</p>
+<br/>
+
+<p class="std">Example:</p>
+<pre class="snip">REM ***** Setup Level Section              *****</pre>
+<br/>
+
+<p class="tlsnip"><a name="scrpt_cmd_win_game">3.2 WIN_GAME</a></p>
+
+<br/>
+<p class="std">Tells the game that you have won the level.</p>
+<br/>
+
+<p class="std">This&nbsp;command must be included in single player games
+to tell the player he has won. In multiplayer levels, it is not necessary.
+You should always use them with IF commands to make sure something happens
+to cause the game to end.</p>
+<br/>
+
+<p class="std">Example:</p>
+<pre class="snip">REM ***** Win the level if Player 1's      *****
+REM ***** dungeon is destroyed             *****
+
+IF(PLAYER1,DUNGEON_DESTROYED==1)
+
+       WIN_GAME
+
+ENDIF</pre>
+<br/>
+
+<p class="tlsnip"><a name="scrpt_cmd_lose_game">3.3 LOSE_GAME</a></p>
+
+<br/>
+<p class="std">Tells the game you have lost the level.</p>
+<br/>
+
+<p class="std">This&nbsp;command does not always need to be included
+as you will automatically lose the level if you Dungeon Heart is destroyed.
+You should include it if there is a strict goal the player needs to attain.</p>
+<br/>
+
+<p class="std">Example:</p>
+<pre class="snip">REM ***** Lose the level if Player 0's     *****
+REM ***** total battles lost is 30         *****
+
+IF(PLAYER0,BATTLES_LOST>=30)
+
+       LOSE_GAME
+
+ENDIF</pre>
+<br/>
+
+<p class="tlsnip"><a name="scrpt_cmd_set_flag">3.4
+SET_FLAG(&#8203;[player],&#8203;[flag],&#8203;[a])</a></p>
+<br/>
+
+<p class="std">Sets up a flag that is assigned a number.</p>
+<br/>
+
+<div class="embed">
+<p class="std">[player] - The player&rsquo;s name, e.g. PLAYER1.
+See&nbsp;<a href=#scrpt_players>players section</a> for more information.</p>
+<br/>
+
+<p class="std">[flag] - The flag&rsquo;s name. There are eight flag names
+which can be used for multiple players:</p>
+<br/>
+
+<div class="embed">
+<p class="std">FLAG0<br/>FLAG1<br/>
+FLAG2<br/>FLAG3<br/>FLAG4<br/>
+FLAG5<br/>FLAG6<br/>FLAG7</p>
+</div>
+<br/>
+
+<p class="std">[a] - The number assigned to the flag. This&nbsp;can be between 0 and 255.</p>
+</div>
+<br/>
+
+<p class="std">Example:</p>
+<pre class="snip">REM ***** Setup FLAG0                      *****
+
+SET_FLAG(PLAYER0,FLAG0,0)
+
+..
+
+REM ***** If Player 0's total creatures    *****
+REM ***** is larger than 40 then set the   *****
+REM ***** flag to 1                        *****
+
+IF(PLAYER0,TOTAL_CREATURES>40)
+
+       SET_FLAG(PLAYER0,FLAG0,1)
+
+ENDIF
+
+..
+
+REM ***** If FLAG0 is equal to 1 then win  *****
+REM ***** the game                         *****
+
+IF(PLAYER0,FLAG0==1)
+
+       WIN_GAME
+
+ENDIF</pre>
+<br/>
+
+<p class="tlsnip"><a name="scrpt_cmd_set_timer">3.5 SET_TIMER(&#8203;[player],&#8203;[timer])</a></p>
+<br/>
+
+<p class="std">Sets up a timer that increases by 1 every game turn
+from when it was triggered.</p>
+<br/>
+
+<div class="embed">
+<p class="std">[player] - The player&rsquo;s name, e.g. PLAYER1.
+See&nbsp;<a href=#scrpt_players>players section</a> for more information.</p>
+<br/>
+
+<p class="std">[timer] - The timer&rsquo;s name. Each player has their own set
+of eight timers you can trigger.</p>
+<br/>
+
+<div class="embed">
+<p class="std">TIMER0<br/>TIMER1<br/>
+TIMER2<br/>TIMER3<br/>TIMER4<br/>
+TIMER5<br/>TIMER6<br/>TIMER7</p>
+</div>
+
+</div>
+<br/>
+
+<p class="std">Example:</p>
+<pre class="snip">REM ***** Setup Player 0's TIMER0          *****
+
+SET_TIMER(PLAYER0,TIMER0)
+
+..
+
+REM ***** When TIMER0 reaches 1000, win    *****
+REM ***** the game                         *****
+
+IF(PLAYER0,TIMER0>=1000)
+
+       WIN_GAME
+
+ENDIF</pre>
+
+<br/>
+
+<p class="tlsnip"><a name="scrpt_cmd_if">3.6 IF(&#8203;[player],&#8203;[variable][comparison][a])</a></p>
+<br/>
+
+<p class="std">This&nbsp;is used to test the differences
+between two values ([variable] and [a]).
+If those two values agree with the comparison, the script will continue.
+If the two values do not agree with the comparison, the script will find
+the next ENDIF and continue from there.</p>
+<br/>
+
+<div class="embed">
+<p class="std">[player] - The player&rsquo;s name, e.g. PLAYER1.
+See&nbsp;<a href=#scrpt_players>players section</a> for more information.</p>
+<br/>
+
+<p class="std">[variable] - The name of a variable used by Dungeon Keeper.
+See <a href="#scrpt_variables">variables section</a> for more information.</p>
+<br/>
+
+<p class="std">[comparison] - A comparison, e.g. == (equal to).
+See <a href="#scrpt_comparisons">comparisons section</a> for more information.</p>
+<br/>
+
+<p class="std">[a] - A number to compare the variable to.</p>
+</div>
+<br/>
+
+<p class="std"><b>Note:</b> You&nbsp;can only have a&nbsp;maximum of 48&nbsp;IF&nbsp;conditions
+(all&nbsp;types) in&nbsp;your script.</p>
+<br/>
+
+<p class="std">Example</p>
+<pre class="snip">REM ***** Detect whether Player 0's total  *****
+REM ***** number of creatures is larger    *****
+REM ***** than 40. If so, win the game, if *****
+REM ***** not, continue                    *****
+
+IF(PLAYER0,TOTAL_CREATURES>=40)
+
+      WIN_GAME
+
+ENDIF
+
+..
+
+REM ***** If Player 0's Dungeon Heart is   *****
+REM ***** destroyed then lose the game     *****
+
+IF(PLAYER0,DUNGEON_DESTROYED==1)
+
+       LOSE_GAME
+
+ENDIF</pre>
+<br/>
+
+<p class="tlsnip"><a name="scrpt_cmd_if_action_poit">3.7
+IF_ACTION_POINT(&#8203;[action&nbsp;point],&#8203;[player])</a></p>
+
+<br/>
+<p class="std">Detects whether an Action Point has been trigger
+by one of that players creatures.
+The Action point is only triggered once (unless you use
+the RESET_ACTION_POINT command) and you can only detect
+which player triggered it.</p>
+<br/>
+
+<div class="embed">
+<p class="std">[action&nbsp;point] - Action Point number.
+See <a href="#scrpt_actionpoints">action points section</a> for more information.</p>
+<br/>
+
+<p class="std">[player] - The player&rsquo;s name, e.g. PLAYER1.
+See&nbsp;<a href=#scrpt_players>players section</a> for more information.</p>
+</div>
+<br/>
+
+<p class="std"><b>Note:</b> You can only have a&nbsp;maximum
+of 48&nbsp;IF conditions (all types) in your script.</p>
+<br/>
+
+<p class="std">Example:</p>
+<pre class="snip">REM ***** If Action Point 2 has been       *****
+REM ***** triggered by one of Player 1's   *****
+REM ***** creatures then perform the       *****
+REM ***** following tasks                  *****
+
+IF_ACTION_POINT(2,PLAYER1)
+
+       ..
+
+ENDIF</pre>
+<br/>
+
+<p class="tlsnip"><a name="scrpt_cmd_if_available">3.8 IF_AVAILABLE(&#8203;[player],&#8203;[name]&#8203;[comparison]&#8203;[a])</a></p>
+
+<br/>
+
+<p class="std">Allows you to ask whether something is available
+to that player. If it is not, then the answer will be 0.
+If it is then the answer will be 1.</p>
+<br/>
+
+<div class="embed">
+<p class="std">[player] - The player&rsquo;s name, e.g. PLAYER1.
+See&nbsp;<a href=#scrpt_players>players section</a> for more information.</p>
+<br/>
+
+<p class="std">[name] - The name of a creature, spell, trap or door.
+See sections <a href=#scrpt_creaturenames>creature names section</a>
+and three sections following it for more information.</p>
+<br/>
+
+<p class="std">[comparison] - A comparison, e.g == (equal to).
+See&nbsp;<a href="#scrpt_comparisons">comparisons section</a> for more information.</p>
+<br/>
+
+<p class="std">[a] - A number to compare the variable to</p>
+</div>
+<br/>
+
+<p class="std"><b>Note:</b>You can only have a maximum of 48 IF conditions
+(all types) in your script.</p>
+<br/>
+
+<p class="std">Example:</p>
+<pre class="snip">REM ***** If Player 2 has a Temple then    *****
+REM ***** perform the following tasks      *****
+
+IF_AVAILABLE(PLAYER2,ROOM_TEMPLE>=1)
+
+       ..
+
+ENDIF</pre>
+<br/>
+
+<p class="tlsnip"><a name="scrpt_cmd_endif">3.9 ENDIF</a></p>
+
+<br/>
+
+<p class="std">This&nbsp;command must be placed at the end of all IF statements.
+This&nbsp;tells the IF command where to jump to when the comparisons
+in the statement are not met.</p>
+<br/>
+
+<p class="std">See IF commands for examples.</p>
+<br/>
+
+<p class="tlsnip"><a name="scrpt_cmd_reset_action_point">3.10 RESET_ACTION_POINT(&#8203;[action&nbsp;point])</a></p>
+
+<br/>
+<p class="std">Once an Action Point has been triggered,
+it cannot be triggered again unless it has been reset by this command.</p>
+<br/>
+
+<div class="embed">
+<p class="std">[action&nbsp;point] - Action Point number.
+See&nbsp;<a href="#scrpt_actionpoints">action points section</a> for more information.</p>
+</div>
+<br/>
+
+<p class="std">Example:</p>
+<p class="snip">RESET_ACTION_POINT(3)</p>
+<br/>
+
+<p class="tlsnip"><a name="scrpt_cmd_next_command_reusable">3.11 NEXT_COMMAND_REUSABLE</a></p>
+
+<br/>
+<p class="std">Once any action command, such as ADD_CREATURE_TO_LEVEL
+or SET_TIMER, has been triggered once, it cannot be triggered again.
+This&nbsp;means that you cannot create loops or generators that add heroes
+to the level each time one of your creatures steps foot in a room.
+To get around this, the Dungeon Keeper script has a special command
+called NEXT_COMMAND_REUSABLE. You will need to place this in front
+of every command in the loop to make it work (it does not need
+to&nbsp;be placed in&nbsp;front&nbsp;of IF&nbsp;commands)</p>
+<br/>
+
+<p class="std">Example:</p>
+<pre class="snip">REM ***** This loop adds a new hero to the *****
+REM ***** level at Action Point 5 while a  *****
+REM ***** creature belonging to Player 0   *****
+REM ***** is within the boundaries of      *****
+REM ***** Action Point 5. It will only     *****
+REM ***** stop when the Hero Dungeon Heart *****
+REM ***** has been destroyed               *****
+
+IF_ACTION_POINT(5,PLAYER0)
+
+       IF(PLAYER_GOOD,DUNGEON_DESTROYED==0)
+
+              NEXT_COMMAND_REUSABLE
+              ADD_CREATURE_TO_LEVEL(PLAYER_GOOD,ARCHER,5,1,3,300)
+
+       ENDIF
+
+ENDIF
+
+..
+
+REM ***** This loop adds a new hero to the *****
+REM ***** level at Hero Gate 3 every 1000  *****
+REM ***** game turns. This is done by      *****
+REM ***** starting a timer, adding the     *****
+REM ***** hero when it reaches 1000 and    *****
+REM ***** then resetting it again          *****
+
+SET_TIMER(PLAYER0,TIMER0)
+
+IF(PLAYER0,TIMER0>=1000)
+
+       NEXT_COMMAND_REUSABLE
+       ADD_CREATURE_TO_LEVEL(PLAYER_GOOD,WITCH,-3,1,6,600)
+
+       NEXT_COMMAND_REUSABLE
+       SET_TIMER(PLAYER0,TIMER0)
+
+ENDIF</pre>
+
+<br clear="all"/><br/>
+
+<h1><a name="scrpt_group_setup">4.0 Setup Commands</a></h1>
+
+<br/>
+<p class="std">These commands set up your level
+and initialise your computer players (if you have any).</p>
+<br/>
+
+<p class="tlsnip"><a name="scrpt_cmd_set_generate_speed">4.1
+SET_GENERATE_SPEED(&#8203;[a])</a></p>
+
+<br/>
+<p class="std">This&nbsp;command tells the game how long to wait
+before generating a new creature for each player.
+The type of creatures that appear cannot be scripted and will
+depend on the rooms the player has built.
+This&nbsp;is a global setting and will apply to all Portals.</p>
+<br/>
+
+<div class="embed">
+<p class="std">[a] - The number of game turns between each creature.</p>
+</div>
+<br/>
+
+<p class="std">Example:</p>
+<pre class="snip">REM ***** Create a new creature for each   *****
+REM ***** player every 500 game turns      *****
+
+SET_GENERATE_SPEED(500)</pre>
+<br/>
+
+<p class="tlsnip"><a name="scrpt_cmd_computer_player">4.2
+COMPUTER_PLAYER(&#8203;[player],&#8203;[a])</a></p>
+
+<br/>
+<p class="std">If you have placed down an enemy dungeon heart
+(not&nbsp;a hero dungeon heart), this command tells Dungeon Keeper
+that a computer player needs to be assigned.</p>
+<br/>
+
+<div class="embed">
+<p class="std">[player] - The player&rsquo;s name, e.g. PLAYER1.
+See&nbsp;<a href=#scrpt_players>players section</a> for more information.</p>
+<br/>
+
+<p class="std">[a] - A single number telling the game what attitude
+the computer player has:</p>
+<br/>
+
+<table class="tbparam">
+<tr>
+<td class="tbparhd"><p class="tbparht">Player</p></td>
+<td class="tbparhd"><p class="tbparht">Description</p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">0</p></td>
+<td class="tbparct"><p class="std">A general computer player with everything turned on.
+Builds&nbsp;rooms quickly and is aggressive.</p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">1</p></td>
+<td class="tbparct"><p class="std">Medium aggressive computer player. Builds&nbsp;rooms slowly.</p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">2</p></td>
+<td class="tbparct"><p class="std">Medium defensive computer player.</p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">3</p></td>
+<td class="tbparct"><p class="std">A&nbsp;defensive computer player that only builds rooms 3x3 tiles in size.</p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">4</p></td>
+<td class="tbparct"><p class="std">A&nbsp;defensive computer player that only builds rooms 4x4 tiles in size.</p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">5</p></td>
+<td class="tbparct"><p class="std">An&nbsp;aggressive computer player that only builds rooms 4x4 tiles in size.</p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">6</p></td>
+<td class="tbparct"><p class="std">General aggressive computer player.</p></td>
+</tr>
+
+<tr>
+<td class="tbparct"><p class="std">7</p></td>
+<td class="tbparct"><p class="std">General defensive computer player.</p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">8</p></td>
+<td class="tbparct"><p class="std">Constructive defensive player that builds 5x5 rooms. Doesn't dig for gold, doesn't move creatures.</p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">9</p></td>
+<td class="tbparct"><p class="std">A computer player which only moves creatures.</p></td>
+</tr>
+
+<tr>
+<td class="tbparct"><p class="std">10</p></td>
+<td class="tbparct"><p class="std">A medium computer player.</p></td>
+</tr>
+</table>
+</div>
+<br/>
+
+<p class="std"><b>Note:</b> The official manual claims that numbers for computer players other
+than&nbsp;0,&nbsp;1,&nbsp;3,&nbsp;4,&nbsp;5, or&nbsp;10 will not make the game work properly.</p>
+<br/>
+
+<p class="std">Example:</p>
+<pre class="snip">REM ***** Set up and aggressive computer   *****
+REM ***** that uses Player 2's dungeon     *****
+
+COMPUTER_PLAYER(PLAYER2,1)</pre>
+<br/>
+
+<p class="tlsnip"><a name="scrpt_cmd_start_money">4.3
+START_MONEY(&#8203;[player],&#8203;[gold])</a></p>
+
+<br/>
+<p class="std">How much gold each player has at the start of the level.</p>
+<br/>
+
+<div class="embed">
+<p class="std">[player] - The player&rsquo;s name, e.g. PLAYER1.
+See&nbsp;<a href=#scrpt_players>players section</a> for more information.</p>
+<br/>
+
+<p class="std">[gold] - The amount of gold for that player.</p>
+</div>
+<br/>
+
+<p class="std">Example:</p>
+<pre class="snip">REM ***** Give all players 40000 in gold   *****
+REM ***** at the start of the level        *****
+
+START_MONEY(ALL_PLAYERS,40000)</pre>
+<br/>
+
+<p class="tlsnip"><a name="scrpt_cmd_max_creatures">4.4 MAX_CREATURES(&#8203;[player],&#8203;[a])</a></p>
+<br/>
+
+<p class="std">The maximum number of creatures a player can have.
+The player can still gain creatures through Scavenging and Torturing
+but no more will come through the portal until the number of creatures
+drops below the maximum again.</p>
+<br/>
+
+<div class="embed">
+<p class="std">[player] - The player name, e.g. PLAYER1.
+See&nbsp;<a href=#scrpt_players>players section</a> for more information.</p>
+<br/>
+
+<p class="std">[a] - The maximum number of creatures. This&nbsp;must be a number below&nbsp;255.</p>
+</div>
+<br/>
+
+<p class="std">Example:</p>
+<pre class="snip">REM ***** Player 1 will not gain any more  *****
+REM ***** creatures through his Portal     *****
+REM ***** once he has 40 creatures in his  *****
+REM ***** dungeon                          *****
+
+MAX_CREATURES(PLAYER1,40)</pre>
+<br/>
+
+<p class="tlsnip"><a name="scrpt_cmd_ally_players">4.5 ALLY_PLAYERS(&#8203;[player],&#8203;[player])</a></p>
+
+<br/>
+<p class="std">This&nbsp;command sets two players as allies at the start of the game.</p>
+<br/>
+
+<div class="embed">
+<p class="std">[player] - The player&rsquo;s name, e.g. PLAYER1.
+See&nbsp;<a href=#scrpt_players>players section</a> for more information.</p>
+</div>
+<br/>
+
+<p class="std">Example:</p>
+<pre class="snip">ALLY_PLAYERS(PLAYER1,PLAYER2)</pre>
+<br/>
+
+<br clear="all"/><br/>
+
+<h1><a name="scrpt_group_crtrtngs">5.0 Creatures, Spells, Traps and Doors</a></h1>
+
+<br/>
+<p class="std">These commands set what creatures, spells, traps and doors
+appear on the level and whether they need to be researched or not.
+You do not need to use these commands for Heroes and their traps and doors.</p>
+<br/>
+
+<p class="tlsnip"><a name="scrpt_cmd_add_creature_to_pool">5.1
+ADD_CREATURE_TO_POOL(&#8203;[creature],&#8203;[a])</a></p>
+
+<br/>
+<p class="std">The creature pool is a set number of creatures
+that can be attracted by all the players.
+Imagine a large group of creatures waiting outside the Dungeon Area
+(all Portals share this group). A&nbsp;player puts down a room,
+e.g. a&nbsp;Torture Chamber, and a creature (Dark Mistress)
+is attracted. The Mistress is taken from this group.
+If&nbsp;there are no&nbsp;more Mistresses in the group then the player
+will not be able to gain any more unless he uses other means,
+e.g. scavenging.
+This&nbsp;is a first come, first serve system so players will need to hurry
+if they want to gain the rarest creatures.
+If&nbsp;a&nbsp;creature becomes angry, it&nbsp;will exit via an Portal
+and return to the pool.
+Dead creatures do not return to the pool so be careful
+the players do not run out.</p>
+<br/>
+
+<p class="std">This&nbsp;command sets the number of creatures
+that are placed in this pool. If you leave any creatures off the list
+then they will not appear in the pool.</p>
+<br/>
+
+<div class="embed">
+<p class="std">[creature] - The creature&rsquo;s name, e.g. BILE_DEMON.
+See <a href="#scrpt_creaturenames">creature names section</a> for more information.</p>
+<br/>
+
+<p class="std">[a] - The number of creature&rsquo;s of that type in the pool.</p>
+</div>
+<br/>
+
+<p class="std">Example:</p>
+<p class="snip">ADD_CREATURE_TO_POOL(BILE_DEMON,20)</p>
+<br/>
+
+<p class="tlsnip"><a name="scrpt_cmd_creature_available">5.2
+CREATURE_AVAILABLE(&#8203;[player],&#8203;[creature],&#8203;[can&nbsp;be&nbsp;available],&#8203;[is&nbsp;available])</a></p>
+
+<br/>
+<p class="std">This&nbsp;command tells the game that a specific creature
+can come through that player&rsquo;s Portal.</p>
+<br/>
+
+<div class="embed">
+<p class="std">[player] - The player&rsquo;s name, e.g. PLAYER1.
+See&nbsp;<a href=#scrpt_players>players section</a> for more information.</p>
+<br/>
+
+<p class="std">[creature] - The creature&rsquo;s name, e.g. SORCEROR.
+See <a href="#scrpt_creaturenames">creature names section</a> for more information.</p>
+<br/>
+
+<p class="std">[can&nbsp;be&nbsp;available] - This&nbsp;value should always be set to 1.
+Creatures, unlike spells and rooms, do not have to be pre-enabled.</p>
+<br/>
+
+<p class="std">[is&nbsp;available] - This&nbsp;value should either be 0 or 1.
+Set it to 1 to enable the creature to appear from the Portal.</p>
+</div>
+<br/>
+
+<p class="std">Since the default value for [can&nbsp;be&nbsp;available] is 0,
+you can just include in the script file only those creatures
+you want the player to be able to attract.
+This&nbsp;will cut down your script file considerably.</p>
+<br/>
+
+<p class="std">Remember, you can use the ALL_PLAYERS option for [player] to cover
+all the players with one command.</p>
+<br/>
+
+<p class="std">Example:</p>
+<pre class="snip">REM ***** A Warlock can now appear at the  *****
+REM ***** Portal if owned by player 2      *****
+
+CREATURE_AVAILABLE(PLAYER2,SORCEROR,1,1)</pre>
+<br/>
+
+<p class="tlsnip"><a name="scrpt_cmd_room_available">5.3
+ROOM_AVAILABLE(&#8203;[player],&#8203;[room],&#8203;[can&nbsp;be&nbsp;available],&#8203;[is&nbsp;available])</a></p>
+
+<br/>
+<p class="std">This&nbsp;command tells the game that a specific room
+is available for the player to place down.</p>
+<br/>
+
+<div class="embed">
+<p class="std">[player] - The player&rsquo;s name, e.g. PLAYER1.
+See&nbsp;<a href=#scrpt_players>players section</a> for more information.</p>
+<br/>
+
+<p class="std">[room] - The room&rsquo;s name, e.g. TEMPLE.
+See <a href="#scrpt_roomnames">room names section</a> for more information.</p>
+<br/>
+
+<p class="std">[can&nbsp;be&nbsp;available] - This&nbsp;value can be set to 0 or 1.
+If it is 1 then you are telling the game that the room may be researched at some point.</p>
+<br/>
+
+<p class="std">[is&nbsp;available] - This&nbsp;value should either be 0 or 1.
+If it is 1 then the room is available straight away.
+If it is 0 then the room cannot become available until it&nbsp;is set to&nbsp;1 or it&nbsp;is&nbsp;researched.</p>
+</div>
+<br/>
+
+<p class="std">Since the default value for [can&nbsp;be&nbsp;available] is 0,
+you can just include in the script file only those rooms you want the player
+to be able to research. This&nbsp;will cut down your script file considerably.</p>
+<br/>
+
+<p class="std">Remember, you can use the ALL_PLAYERS option for [player]
+to cover all the players with one command.</p>
+<br/>
+
+<p class="std"><b>Note:</b> The Treasure Room, Lair, Hatchery,
+Training Room and Research Room should all be available
+at the start of each level.</p>
+<br/>
+
+<p class="std">Example:</p>
+<pre class="snip">REM ***** This Treasure Room has been set  *****
+REM ***** so that it is available from     *****
+REM ***** the start of the level.          *****
+
+ROOM_AVAILABLE(ALL_PLAYERS,TREASURE,1,1)
+
+REM ***** This Torture Chamber has been    *****
+REM ***** set do that it needs to be       *****
+REM ***** researched before it becomes     *****
+REM ***** available.                       *****
+
+ROOM_AVAILABLE(ALL_PLAYERS,TORTURE,1,0)</pre>
+<br/>
+
+<p class="tlsnip"><a name="scrpt_cmd_door_available">5.4 DOOR_AVAILABLE(&#8203;[player],&#8203;[door],&#8203;[can&nbsp;be&nbsp;available],&#8203;[number&nbsp;available])</a></p>
+
+<br/>
+<p class="std">This&nbsp;command tells the game that a specific door is available
+for the player to construct.</p>
+<br/>
+
+<div class="embed">
+<p class="std">[player] - The player&rsquo;s name, e.g. PLAYER1.
+See&nbsp;<a href=#scrpt_players>players section</a> for more information.</p>
+<br/>
+
+<p class="std">[door] - The door&rsquo;s name, e.g. BRACED.
+See <a href="#scrpt_trapnames">doors/traps names section</a> for more information.</p>
+<br/>
+
+<p class="std">[can&nbsp;be&nbsp;available] - This&nbsp;value can be set to 0 or 1.
+If it is 1 then you are telling the game that the door can be constructed.</p>
+<br/>
+
+<p class="std">[number&nbsp;available] - The number of doors available
+to the player at the start of the level or when they become available.</p>
+</div>
+<br/>
+
+<p class="std">Since the default value for [can&nbsp;be&nbsp;available] is 0,
+you can just include in the script file only those doors you want the player to construct.
+This&nbsp;will cut down your script file considerably.</p>
+<br/>
+
+<p class="std">Remember, you can use the ALL_PLAYERS option for [player]
+to cover all the players with one command.</p>
+<br/>
+
+<p class="std">Example:</p>
+<pre class="snip">REM ***** The Wooden Door is now available *****
+REM ***** to the player to manufacture     *****
+REM ***** and none have been given to him  *****
+REM ***** at the start                     *****
+
+DOOR_AVAILABLE(PLAYER1,WOOD,1,0)</pre>
+<br/>
+
+<p class="tlsnip"><a name="scrpt_cmd_trap_available">5.5 TRAP_AVAILABLE(&#8203;[player],&#8203;[trap],&#8203;[can&nbsp;be&nbsp;available],&#8203;[number&nbsp;available])</a></p>
+
+<br/>
+<p class="std">This&nbsp;command tells the game that a specific trap
+is available for the player to construct.</p>
+<br/>
+
+<div class="embed">
+<p class="std">[player] - The player&rsquo;s name, e.g. PLAYER1.
+See&nbsp;<a href=#scrpt_players>players section</a> for more information.</p>
+<br/>
+
+<p class="std">[trap] - The trap&rsquo;s name, e.g. LAVA.
+See <a href="#scrpt_trapnames">doors/traps names section</a> for more information.</p>
+<br/>
+
+<p class="std">[can&nbsp;be&nbsp;available] - This&nbsp;value can be set to 0 or 1.
+If it is 1 then you are telling the game that the trap may be constructed
+at some point.</p>
+<br/>
+
+<p class="std">[number&nbsp;available] - The number of doors available to the player
+at the start of the level or when they become available.
+Bear in mind that without a Workshop, the traps cannot be armed.
+This&nbsp;may cause problems in the game. It&nbsp;is&nbsp;best to leave this at&nbsp;0
+when you write your scripts.</p>
+</div>
+<br/>
+
+<p class="std">Since the default value for [can&nbsp;be&nbsp;available] is&nbsp;0,
+you can just include in the script file only those traps you want the player
+to&nbsp;construct. This&nbsp;will cut down your script file considerably.</p>
+<br/>
+
+<p class="std">Remember, you can use the ALL_PLAYERS option for&nbsp;[player]
+to&nbsp;cover all the players with one command.</p>
+<br/>
+
+<p class="std">The&nbsp;computer player may sometimes build too much traps,
+expanding the workshop or placing traps in wrong places.
+In&nbsp;original DK campaign, computer type&nbsp;0 puts all its traps on a single tile.
+This&nbsp;is corrected in DD, but the computer player there places traps all over,
+which may also lead to problems.
+To&nbsp;make sure the computer won't build too much traps, it&nbsp;is wise to
+set a limit, e.g. disable trap after three have been built,
+and disable the workshop building after it has&nbsp;16 or&nbsp;25 files.</p>
+
+<p class="std">Example:</p>
+<pre class="snip">REM ***** The Word of Power Trap is now    *****
+REM ***** available to the player to       *****
+REM ***** manufacture and none have been   *****
+REM ***** given to him at the start        *****
+
+TRAP_AVAILABLE(PLAYER1,WORD_OF_POWER,1,0)</pre>
+<br/>
+
+<p class="tlsnip"><a name="scrpt_cmd_magic_available">5.6
+MAGIC_AVAILABLE(&#8203;[player],&#8203;[spell],&#8203;[can&nbsp;be&nbsp;available],&#8203;[is&nbsp;available])</a></p>
+
+<br/>
+<p class="std">This&nbsp;command tells the game that a specific spell
+is&nbsp;available for the player to&nbsp;cast.</p>
+<br/>
+
+<div class="embed">
+<p class="std">[player] - The player&rsquo;s name, e.g. PLAYER1.
+See&nbsp;<a href=#scrpt_players>players section</a> for more information.</p>
+<br/>
+
+<p class="std">[spell] - The spell&rsquo;s name, e.g. POWER_LIGHTNING.
+See <a href="#scrpt_spellnames">spell names section</a> for more information.</p>
+<br/>
+
+<p class="std">[can&nbsp;be&nbsp;available] - This&nbsp;value can be set to 0 or 1.
+If&nbsp;it&nbsp;is&nbsp;1 then you are telling the game that the spell may&nbsp;be
+researched at some point.</p>
+<br/>
+
+<p class="std">[is&nbsp;available] - This&nbsp;value should either be&nbsp;0&nbsp;or&nbsp;1.
+If&nbsp;it&nbsp;is&nbsp;1 then the spell is available straight away.
+If it is 0 then the spell cannot become available until it is set to 1 or researched.</p>
+</div>
+<br/>
+
+<p class="std">Since the default value for [can&nbsp;be&nbsp;available] is&nbsp;0,
+you can just include in the script file only those spells you want the player to research.
+This&nbsp;will cut down your script file considerably.</p>
+<br/>
+
+<p class="std">Remember, you can use the ALL_PLAYERS option for [player]
+to&nbsp;cover all the players with one command.</p>
+<br/>
+
+<p class="std">Example:</p>
+<pre class="snip">REM ***** This Speed Creature spell has    *****
+REM ***** been set so that it is available *****
+REM ***** from the start of the level.     *****
+
+MAGIC_AVAILABLE(ALL_PLAYERS,POWER_SPEED,1,1)
+
+REM ***** This Conceal Creature spell has  *****
+REM ***** been set do that it needs to be  *****
+REM ***** researched before it becomes     *****
+REM ***** available.                       *****
+
+MAGIC_AVAILABLE(ALL_PLAYERS,POWER_CONCEAL,1,0)</pre>
+<br/>
+
+<p class="tlsnip"><a name="scrpt_cmd_dead_creatures_return_to_pool">5.7
+DEAD_CREATURES_RETURN_TO_POOL(&#8203;[a])</a></p>
+<br/>
+
+<p class="std">Normally, when a&nbsp;creature dies, and its body vanishes,
+it&nbsp;is&nbsp;added to the&nbsp;creature pool again.
+This&nbsp;command allows you to ensure that all dead creatures are&nbsp;dead forever.</p>
+
+<br/>
+
+<div class="embed">
+<p class="std">[a] - Logic value to control the creatures returning after death.
+The default value is&nbsp;1, allowing dead creatures to come through portal again.
+Setting it to&nbsp;0 will prevent dead creatures from returning.</p>
+</div>
+<br/>
+
+<p class="std"><b>Note:</b> This&nbsp;function should be used only in&nbsp;special maps,
+where there are sources of new creatures other than portals.</p>
+
+<p class="std">Example:</p>
+<pre class="snip">REM ***** Dead creatures will not return   *****
+REM ***** to pool on this map.             *****
+
+DEAD_CREATURES_RETURN_TO_POOL(0)</pre>
+
+<br clear="all"/><br/>
+
+<h1><a name="scrpt_group_creatures">6.0 Manipulating Creatures</a></h1>
+
+<br/>
+<p class="std">With the following commands, you can manipulate
+the creature statistic directly and alter them specifically for your level.
+This&nbsp;will not affect the statistics in the creature.txt file and can be set
+for a specific player.</p>
+<br/>
+
+<p class="tlsnip"><a name="scrpt_cmd_set_creature_max_level">6.1 SET_CREATURE_MAX_LEVEL(&#8203;[player],&#8203;[creature],&#8203;[max&nbsp;experience])</a></p>
+
+<br/>
+<p class="std">This&nbsp;command sets the maximum experience level the creature can train to.
+You can use this to stop certain creatures from becoming too powerful.</p>
+<br/>
+
+<div class="embed">
+<p class="std">[player] - The player&rsquo;s name, e.g. PLAYER1.
+See&nbsp;<a href=#scrpt_players>players section</a> for more information.</p>
+<br/>
+
+<p class="std">[creature] - The creature&rsquo;s name, e.g. SKELETON.
+See <a href="#scrpt_creaturenames">creature names section</a> for more information.</p>
+<br/>
+
+<p class="std">[max&nbsp;experience] - The maximum experience level for that creature.
+The highest and default maximum experience level of any creature is 10,
+but setting it to 10 with this command has influence on the game - it prevents
+creatures from transforming when they reach level 10 and are still training.</p>
+</div>
+<br/>
+
+<p class="std">Example:</p>
+<pre class="snip">REM ***** Do not allow human player Hell   *****
+REM ***** Hounds to go higher than level 5 *****
+
+SET_CREATURE_MAX_LEVEL(PLAYER0,HELL_HOUND,5)</pre>
+<br/>
+
+<p class="tlsnip"><a name="scrpt_cmd_set_creature_strength">6.2
+SET_CREATURE_STRENGTH(&#8203;[creature],&#8203;[a])</a></p>
+
+<br/>
+<p class="std">This&nbsp;command sets the strength of all the creatures
+of that type on the level.
+Each creature has a default strength which can&nbsp;be found in&nbsp;the
+creature.txt file, e.g. the BILE_DEMON has a&nbsp;strength level of&nbsp;80.</p>
+<br/>
+
+<div class="embed">
+<p class="std">[creature] - The&nbsp;creature&rsquo;s name, e.g. HORNY.
+See <a href="#scrpt_creaturenames">creature names section</a> for more information.</p>
+<br/>
+
+<p class="std">[a] - The new strength of that creature.
+The strength must be between&nbsp;0 and&nbsp;255.</p>
+</div>
+<br/>
+
+<p class="std">Example:</p>
+<p class="snip">SET_CREATURE_STRENGTH(DEMON_SPAWN,190)</p>
+<br/>
+
+<p class="tlsnip"><a name="scrpt_cmd_set_creature_health">6.3 SET_CREATURE_HEALTH(&#8203;[creature],&#8203;[a])</a></p>
+
+<br/>
+<p class="std">This&nbsp;command sets the health of all the creatures
+of that type on the level.
+Each creature has a default full health level which can be found
+in&nbsp;the creature.txt file, e.g. the DRAGON has a&nbsp;full health level of&nbsp;900.</p>
+<br/>
+
+<div class="embed">
+<p class="std">[creature] - The creature&rsquo;s name, e.g. ORC.
+See <a href="#scrpt_creaturenames">creature names section</a> for more information.</p>
+<br/>
+
+<p class="std">[a] - The new health level of that creature.
+The&nbsp;health level must be between&nbsp;0 and&nbsp;1024.</p>
+</div>
+<br/>
+
+<p class="std">Example:</p>
+<br/>
+<p class="snip">SET_CREATURE_HEALTH(ORC,1000)</p>
+<br/>
+
+<p class="tlsnip"><a name="scrpt_cmd_set_creature_armour">6.4 SET_CREATURE_ARMOUR(&#8203;[creature],&#8203;[a])</a></p>
+
+<br/>
+<p class="std">This&nbsp;command sets the armour of all the creatures of that type on the level.
+Each creature has a default armour level which can be found
+in the creature.txt file, e.g. the Dark Mistress has a armour level of&nbsp;50.</p>
+<br/>
+
+<div class="embed">
+<p class="std">[creature] - The&nbsp;creature&rsquo;s name, e.g. HORNY.
+See <a href="#scrpt_creaturenames">creature names section</a> for more information.</p>
+<br/>
+
+<p class="std">[a] - The&nbsp;new armour level of that creature.
+The armour level must be between 0 and 255.</p>
+</div>
+<br/>
+
+<p class="std">Example:</p>
+<p class="snip">SET_CREATURE_ARMOUR(DEMON_SPAWN,60)</p>
+<br/>
+
+<p class="tlsnip"><a name="scrpt_cmd_set_creature_fear">6.5
+SET_CREATURE_FEAR(&#8203;[creature],&#8203;[a])</a></p>
+
+<br/>
+<p class="std">This&nbsp;command sets the fear of all the creatures
+of that type on the level.
+Each creature has a default fear which can be found
+in the creature.txt file, e.g. the FLY has a fear level of&nbsp;30.</p>
+<br/>
+
+<div class="embed">
+<p class="std">[creature] - The creature&rsquo;s name, e.g. BUG.
+See <a href="#scrpt_creaturenames">creature names section</a> for more information.</p>
+<br/>
+
+<p class="std">[a] - The new fear level of that creature.
+The fear level must be between 0 and 255.</p>
+</div>
+<br/>
+
+<p class="std">Example:</p>
+<p class="snip">SET_CREATURE_FEAR(SPIDER,190)</p>
+
+<br clear="all"/><br/>
+
+<h1><a name="scrpt_group_research">7.0 Manipulating Research</a></h1>
+
+<br/>
+<p class="std">When you put creatures into the Library
+and they start to research, a research counter will start to increase.
+The rate at which it increases depends on the number of creatures
+in the Library and their individual abilities and experience levels.
+Each spell and room has a research number assigned to it.
+When this number is reached by the research counter,
+the room or spell is deemed to be researched.
+All the rooms and spells have default research values (see below)
+but you can adjust these for individual levels if you want to.</p>
+
+<br/>
+
+<h2><a name="scrpt_cmd_resrchdefs">7.1
+Default Research Values</a></h2>
+<br/>
+
+<p class="std">These are the default research values for the rooms.</p>
+<br/>
+
+<table class="tbparam">
+<tr>
+<td class="tbparhd"><p class="tbparht">Room</b></p></td>
+<td class="tbparhd"><p class="tbparht">Command</b></p></td>
+<td class="tbparhd"><p class="tbparht">Research Value</b></p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">Treasure Room</p></td>
+<td class="tbparct"><p class="std">TREASURE</p></td>
+<td class="tbparct"><p class="std">1000</p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">Hatchery</p></td>
+<td class="tbparct"><p class="std">GARDEN</p></td>
+<td class="tbparct"><p class="std">1000</p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">Lair</p></td>
+<td class="tbparct"><p class="std">LAIR</p></td>
+<td class="tbparct"><p class="std">1000</p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">Library</p></td>
+<td class="tbparct"><p class="std">RESEARCH</p></td>
+<td class="tbparct"><p class="std">1000</p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">Training Room</p></td>
+<td class="tbparct"><p class="std">TRAINING</p></td>
+<td class="tbparct"><p class="std">1000</p></td>
+</tr>
+<tr>
+<td class="tbparct"></td>
+<td class="tbparct"></td>
+<td class="tbparct"></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">Bridge</p></td>
+<td class="tbparct"><p class="std">BRIDGE</p></td>
+<td class="tbparct"><p class="std">4600</p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">Guard Post</p></td>
+<td class="tbparct"><p class="std">GUARD_POST</p></td>
+<td class="tbparct"><p class="std">6700</p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">Workshop</p></td>
+<td class="tbparct"><p class="std">WORKSHOP</p></td>
+<td class="tbparct"><p class="std">9000</p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">Barracks</p></td>
+<td class="tbparct"><p class="std">BARRACKS</p></td>
+<td class="tbparct"><p class="std">12000</p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">Prison</p></td>
+<td class="tbparct"><p class="std">PRISON</p></td>
+<td class="tbparct"><p class="std">20000</p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">Torture</p></td>
+<td class="tbparct"><p class="std">TORTURE</p></td>
+<td class="tbparct"><p class="std">20000</p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">Temple</p></td>
+<td class="tbparct"><p class="std">TEMPLE</p></td>
+<td class="tbparct"><p class="std">25000</p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">Graveyard</p></td>
+<td class="tbparct"><p class="std">GRAVEYARD</p></td>
+<td class="tbparct"><p class="std">25000</p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">Scavenger</p></td>
+<td class="tbparct"><p class="std">SCAVENGER</p></td>
+<td class="tbparct"><p class="std">27500</p></td>
+</tr>
+</table>
+
+<br/>
+<p class="std">These are the default research values for spells.</p>
+<br/>
+
+<table class="tbparam">
+<tr>
+<td class="tbparhd"><p class="tbparht">Spell</b></p></td>
+<td class="tbparhd"><p class="tbparht">Command</b></p></td>
+<td class="tbparhd"><p class="tbparht">Research Value</b></p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">Create Imp</p></td>
+<td class="tbparct"><p class="std">POWER_IMP</p></td>
+<td class="tbparct"><p class="std">1000</p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">Sight of Evil</p></td>
+<td class="tbparct"><p class="std">POWER_SIGHT</p></td>
+<td class="tbparct"><p class="std">3800</p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">Speed Creature</p></td>
+<td class="tbparct"><p class="std">POWER_SPEED</p></td>
+<td class="tbparct"><p class="std">5700</p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">Obey</p></td>
+<td class="tbparct"><p class="std">POWER_OBEY</p></td>
+<td class="tbparct"><p class="std">6000</p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">Call to Arms</p></td>
+<td class="tbparct"><p class="std">POWER_CALL_TO_ARMS</p></td>
+<td class="tbparct"><p class="std">7400</p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">Conceal Creature</p></td>
+<td class="tbparct"><p class="std">POWER_CONCEAL</p></td>
+<td class="tbparct"><p class="std">9400</p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">Hold Audience</p></td>
+<td class="tbparct"><p class="std">POWER_HOLD_AUDIENCE</p></td>
+<td class="tbparct"><p class="std">11000</p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">Cave-in</p></td>
+<td class="tbparct"><p class="std">POWER_CAVE_IN</p></td>
+<td class="tbparct"><p class="std">25000</p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">Heal Creature</p></td>
+<td class="tbparct"><p class="std">POWER_HEAL_CREATURE</p></td>
+<td class="tbparct"><p class="std">14000</p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">Lightning Strike</p></td>
+<td class="tbparct"><p class="std">POWER_LIGHTNING</p></td>
+<td class="tbparct"><p class="std">15000</p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">Protect Creature</p></td>
+<td class="tbparct"><p class="std">POWER_PROTECT</p></td>
+<td class="tbparct"><p class="std">15000</p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">Chicken</p></td>
+<td class="tbparct"><p class="std">POWER_CHICKEN</p></td>
+<td class="tbparct"><p class="std">20000</p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">Disease</p></td>
+<td class="tbparct"><p class="std">POWER_DISEASE</p></td>
+<td class="tbparct"><p class="std">20000</p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">Armageddon</p></td>
+<td class="tbparct"><p class="std">POWER_ARMAGEDDON</p></td>
+<td class="tbparct"><p class="std">100000</p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">Destroy Walls</p></td>
+<td class="tbparct"><p class="std">POWER_DESTROY_WALLS</p></td>
+<td class="tbparct"><p class="std">750000</p></td>
+</tr>
+</table>
+<br/>
+<br/>
+
+<p class="tlsnip"><a name="scrpt_cmd_research">7.2 RESEARCH(&#8203;[player],&#8203;[research&nbsp;type],&#8203;[room&nbsp;or&nbsp;spell],&#8203;[a])</a></p>
+
+<br/>
+<p class="std">This&nbsp;command allows you to adjust the research value
+for individual rooms or spells and even for a specific player.</p>
+<br/>
+
+<div class="embed">
+<p class="std">[player] - The player&rsquo;s name, e.g. PLAYER1.
+See&nbsp;<a href=#scrpt_players>players section</a> for more information.</p>
+<br/>
+
+<p class="std">[research&nbsp;type] - Whether it is a room or spell you are researching.
+Use one of the following commands:</p>
+<br/>
+
+<table class="tbparam">
+<tr>
+<td class="tbparhd"><p class="tbparht">Research Type</p></td>
+<td class="tbparhd"><p class="tbparht">Command</p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">Rooms</p></td>
+<td class="tbparct"><p class="std">ROOM</p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">Spells</p></td>
+<td class="tbparct"><p class="std">MAGIC</p></td>
+</tr>
+</table>
+<br/>
+
+<p class="std">[room&nbsp;or&nbsp;spell] - The name of the room or spell
+you want to adjust, e.g. TEMPLE or MAGIC_LIGHTNING.
+See <a href="#scrpt_roomnames">room names section</a> and <a href="#scrpt_spellnames">spell names section</a> for more information.</p>
+<br/>
+
+<p class="std">[a] - The new research value.
+This&nbsp;must be a number below 16777216.</p>
+</div>
+<br/>
+
+<p class="std">Example:</p>
+<pre class="snip">REM ***** Change the research value of the *****
+REM ***** Scavenger Room from 27500 to     *****
+REM ***** 50000                            *****
+
+RESEARCH(PLAYER1,ROOM,SCAVENGER,50000)</pre>
+<br/>
+
+<p class="std"><b>Fanfact:</b> The game engine also recognizes CREATURE
+as a value of [research&nbsp;type] parameter. It is unknown if a command with
+this value has any influence on the game.</p>
+
+<br clear="all"/><br/>
+
+<h1><a name="scrpt_group_crtradd">8.0 Adding New Creatures and Parties to the Level</a></h1>
+
+<br/>
+<p class="std">As well as set the attributes for your level,
+the Dungeon Keeper script allows you to add new creatures
+to the level at specified points and times.
+ In conjunction with Action Points, you can trigger parties of Heroes
+to appear when a players&rsquo; creatures enter a certain part of the level.</p>
+<br/>
+
+<p class="tlsnip"><a name="scrpt_cmd_add_creature_to_level">8.1
+ADD_CREATURE_TO_LEVEL(&#8203;[player],&#8203;[creature],&#8203;[action&nbsp;point],&#8203;[a],&#8203;[experience],&#8203;[gold])</a></p>
+
+<br/>
+<p class="std">This&nbsp;command will add a number of new creatures
+to the level at the co-ordinates of a specifies Action Point.
+You cannot set where the creatures head for so you may need to use
+a party instead.</p>
+<br/>
+
+<div class="embed">
+<p class="std">[player] - The name of the player, e.g. PLAYER1,
+that the creatures belong to.
+See&nbsp;<a href=#scrpt_players>players section</a> for more information.</p>
+<br/>
+
+<p class="std">[creature] - The creature&rsquo;s name, e.g. DRAGON.
+See <a href="#scrpt_creaturenames">creature names section</a> for more information.</p>
+<br/>
+
+<p class="std">[action&nbsp;point] - The number of the Action Point
+where the creatures will appear. Positive integer value.
+See <a href="#scrpt_actionpoints">action points section</a> for more information.<br/>
+If you want a creature to appear at a Hero Gate, you will need to
+enter the Hero Gate&rsquo;s number here.
+The number must have a minus sign in front of it to distinguish it
+from the normal Action Points.
+For example, if you want the creature to appear at Hero Gate&nbsp;4,
+the [action&nbsp;point] number will be&nbsp;-4.<br/>
+If you want a creature to appear at player's Dungeon&nbsp;Heart, you need
+to enter the player's name instead of the number
+(see&nbsp;<a href=#scrpt_players>players section</a>).</p>
+<br/>
+
+<p class="std">[a] - The number of creatures that will appear
+at the Action Point. This&nbsp;can be any number but remember
+that you can only have up to 255 creatures on the map at any one time
+so this number should not be too high.</p>
+<br/>
+
+<p class="std">[experience] - The experience level of the creatures.</p>
+<br/>
+
+<p class="std">[gold] - The amount of gold carried by the creatures.</p>
+</div>
+<br/>
+
+<p class="std"><b>Note:</b> You can only have a maximum of&nbsp;48
+ADD_CREATURE_TO_LEVEL commands.</p>
+<br/>
+
+<p class="std">Example:</p>
+<pre class="snip">REM ***** Add 7 level 4 Hero Wizards who   *****
+REM ***** are carrying 400 gold at Action  *****
+REM ***** Point 3                          *****
+
+ADD_CREATURE_TO_LEVEL(PLAYER_GOOD,WIZARD,3,7,4,400)</pre>
+<br/>
+
+<p class="tlsnip"><a name="scrpt_cmd_add_tunneller_to_level">8.2
+ADD_TUNNELLER_TO_LEVEL(&#8203;[player],&#8203;[action&nbsp;point],&#8203;[head&nbsp;for],&#8203;[action&nbsp;point/target player],&#8203;[experience],&#8203;[gold])</a></p>
+
+<br/>
+<p class="std">This&nbsp;commands adds a number of Tunneller Dwarves to the level.
+They will immediately start digging towards their target.
+Tunneller Dwarves are the only creatures that can tunnel towards a target.</p>
+<br/>
+
+<div class="embed">
+<p class="std">[player] - The name of the player, e.g. PLAYER_GOOD,
+that the creatures belong to. See&nbsp;<a href=#scrpt_players>players section</a> for more information.</p>
+<br/>
+
+<p class="std">[action&nbsp;point] - The number of the Action Point
+where the Tunneller will appear. Positive integer value.
+See <a href="#scrpt_actionpoints">action points section</a> for more information.<br/>
+If you want the Tunneller to appear at a Hero Gate, you will need to
+enter the Hero Gate&rsquo;s number here.
+The number must have a minus sign in front of it to distinguish it
+from the normal Action Points. For example, if you want the Tunneller
+to appear at Hero Gate&nbsp;4, the [action&nbsp;point] number will be&nbsp;-4.<br/>
+If you want the Tunneller to appear at player's Dungeon&nbsp;Heart, you need
+to enter the player's name instead of the number
+(see&nbsp;<a href=#scrpt_players>players section</a>).</p>
+<br/>
+
+<p class="std">[head&nbsp;for] - This&nbsp;command tells the Tunneller
+what it is tunnelling to. You will specify the exact Action Point
+or Player number in the next command. There are a number of commands you can use:</p>
+<br/>
+
+<table class="tbparam">
+<tr>
+<td class="tbparhd"><p class="tbparht">Description</p></td>
+<td class="tbparhd"><p class="tbparht">Command</p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">An Action Point</p></td>
+<td class="tbparct"><p class="std">ACTION_POINT</p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">A Player&rsquo;s dungeon</p></td>
+<td class="tbparct"><p class="std">DUNGEON</p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">A Player&rsquo;s Dungeon Heart</p></td>
+<td class="tbparct"><p class="std">DUNGEON_HEART</p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">The dungeon of the player with the highest score</p></td>
+<td class="tbparct"><p class="std">APPROPIATE_DUNGEON</p></td>
+</tr>
+</table>
+<br/>
+
+<p class="std">[action&nbsp;point/&#8203;target&nbsp;player] - This&nbsp;command will tell
+the Tunneller which Action Point (if the [head&nbsp;for] command was ACTION_POINT)
+or Player (if the [head&nbsp;for] command was DUNGEON or DUNGEON_HEART) to go to.
+If&nbsp;the command was APPROPIATE_DUNGEON then this will just be&nbsp;0
+as the APPROPIATE_DUNGEON command sends the Tunneller to the dungeon
+of the player with the highest score.<br/>
+If&nbsp;you wish to put player here, you must type player number, like&nbsp;1,
+not player name. If you will type PLAYER1, the game won't be able
+to recognize the number and will treat&nbsp;it as&nbsp;0.</p>
+<br/>
+
+<p class="std">[experience] - The&nbsp;experience level of the Tunneller.</p>
+<br/>
+
+<p class="std">[gold] - The&nbsp;amount of gold carried by the Tunneller.</p>
+</div>
+<br/>
+
+<p class="std"><b>Note:</b> You can only have a maximum
+of&nbsp;16 ADD_TUNNELLER_TO_LEVEL commands.</p>
+<br/>
+
+<p class="std">Example:</p>
+<pre class="snip">REM ***** Add a level 6 Hero Tunneller at  *****
+REM ***** Action Point 7. He will tunnel   *****
+REM ***** towards Action Point 5           *****
+
+ADD_TUNNELLER_TO_LEVEL(PLAYER_GOOD,7,ACTION_POINT,5,6,400)
+
+..
+
+REM ***** Add a level 4 Hero Tunneller at  *****
+REM ***** Action Point 3. He will tunnel   *****
+REM ***** towards Player 2's Dungeon Heart *****
+
+ADD_TUNNELLER_TO_LEVEL(PLAYER_GOOD,3,DUNGEON_HEART,2,4,400)
+
+..
+
+REM ***** Add a level 9 Hero Tunneller at  *****
+REM ***** Action Point 5. He will tunnel   *****
+REM ***** towards the dungeon of the       *****
+REM ***** player with the highest score    *****
+
+ADD_TUNNELLER_TO_LEVEL(PLAYER_GOOD,5,APPROPIATE_DUNGEON,0,9,400)</pre>
+<br/>
+
+<p class="tlsnip"><a name="scrpt_cmd_create_party">8.3 CREATE_PARTY(&#8203;[party&nbsp;name])</a></p>
+
+<br/>
+
+<p class="std">This&nbsp;command tells the game to expect a party with a specific name.</p>
+<br/>
+
+<div class="embed">
+<p class="std">[party&nbsp;name] - The name of the party.
+You can use any name you want but it must be in capitals.</p>
+</div>
+<br/>
+
+<p class="std"><b>Note:</b> You can only have a maximum of&nbsp;16 parties.</p>
+<br/>
+
+<p class="std">Example:</p>
+<p class="snip">CREATE_PARTY(FIRST_STRIKE)</p>
+<br/>
+
+<p class="tlsnip"><a name="scrpt_cmd_add_to_party">8.4 ADD_TO_PARTY(&#8203;[party&nbsp;name],&#8203;[creature],&#8203;[experience],&#8203;[gold],&#8203;[objective],&#8203;[countdown])</a></p>
+
+<br/>
+<p class="std">This&nbsp;command adds a number of creatures to a party (maximum seven).</p>
+<br/>
+
+<div class="embed">
+<p class="std">[party&nbsp;name] - The name of the party.
+This&nbsp;must have been declared with the CREATE_PARTY command.</p>
+<br/>
+
+<p class="std">[creature] - The creature&rsquo;s name, e.g. HORNY.
+See&nbsp;<a href=#scrpt_creaturenames>creature names section</a> for more information.</p>
+<br/>
+
+<p class="std">[experience] - The creature&rsquo;s experience level.</p>
+<br/>
+
+<p class="std">[gold] - The amount of gold the creatures are carrying.</p>
+<br/>
+
+<p class="std">[objective] - The target of the creatures and where
+they will make for when they enter the level.
+You will not need to specify the target player yet.
+This&nbsp;will be done when you place the party on the map.</p>
+<br/>
+
+<table class="tbparam" style="width:90%;">
+<tr>
+<td class="tbparhd"><p class="tbparht">Description</p></td>
+<td class="tbparhd"><p class="tbparht">Command</p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">Steal gold from the Treasure Room.
+Party&nbsp;leader will go to Treasure Room and steal gold until he carries&nbsp;1000,
+then he will attack Dungeon Heart. The&nbsp;gold carried at start must
+be less than&nbsp;1000 for this to work.</p></td>
+<td class="tbparct"><p class="std">STEAL_GOLD</p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">Go&nbsp;to Library and steal spells.
+It&nbsp;seems that this objective doesn't work, or works only in some specific situation.
+Usually&nbsp;if this objective is used, the leader is heading to attack Dungeon Heart.</p></td>
+<td class="tbparct"><p class="std">STEAL_SPELLS</p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">Attack any enemies</p></td>
+<td class="tbparct"><p class="std">ATTACK_ENEMIES</p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">Attack the nearest Dungeon Heart</p></td>
+<td class="tbparct"><p class="std">ATTACK_DUNGEON_HEART</p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">Attack the nearest rooms</p></td>
+<td class="tbparct"><p class="std">ATTACK_ROOMS</p></td>
+</tr>
+<td class="tbparct"><p class="std">Defend the other creatures in the party</p></td>
+<td class="tbparct"><p class="std">DEFEND_PARTY</p></td>
+</tr>
+</table>
+<br/>
+<p class="std">Only&nbsp;a party leader fulfils his objective.
+Other&nbsp;members are protecting him.</p>
+
+<p class="std">[countdown] - Number&nbsp;of game turns before the&nbsp;leader
+of the party start moving to the objective. Even&nbsp;if this is set to zero,
+there usually is a little delay (approx.&nbsp;200 game turns) before the leader
+starts moving.</p>
+</div>
+<br/>
+
+<p class="std"><b>Note:</b> You can only have a maximum of&nbsp;7
+in a&nbsp;party. The&nbsp;leader is selected based on the creature types
+and their experience level (best&nbsp;and most experienced).
+Because&nbsp;only the leader will react on [objective] and [countdown] parameters,
+and&nbsp;you may be not certain which member will become a leader, it&nbsp;is wise
+to set these parameter to same values for all members of the party.</p>
+<br/>
+
+<p class="std">Example:</p>
+<pre class="snip">REM ***** Create a party called MY_PARTY.  *****
+
+CREATE_PARTY(MY_PARTY)
+
+..
+
+REM ***** Add to MY_PARTY a level 5 Fairy  *****
+REM ***** with 600 in gold who will attack *****
+REM ***** the rooms of the target player   *****
+
+ADD_TO_PARTY(MY_PARTY,FAIRY,5,600,ATTACK_ROOMS,0)</pre>
+<br/>
+
+<p class="tlsnip"><a name="scrpt_cmd_add_tunneller_party_to_level">8.5
+ADD_TUNNELLER_PARTY_TO_LEVEL(&#8203;[player],&#8203;[party&nbsp;name],&#8203;[action&nbsp;point],&#8203;[head&nbsp;for],&#8203;[action&nbsp;point/&#8203;target&nbsp;player],&#8203;[experience],&#8203;[gold])</a></p>
+
+<br/>
+<p class="std">This&nbsp;adds a specified party of creatures to the level
+with a Tunneller Dwarf as it&rsquo;s leader.
+The Tunneller will immediately dig to it&rsquo;s target
+and the other creatures will follow.</p>
+<br/>
+
+<div class="embed">
+<p class="std">[player] - The name of the player, e.g. PLAYER_GOOD,
+that the creatures belong to. See&nbsp;<a href=#scrpt_players>players section</a> for more information.</p>
+<br/>
+
+<p class="std">[party&nbsp;name] - The name of the party.
+This&nbsp;must have been declared with the CREATE_PARTY command.</p>
+<br/>
+
+<p class="std">[action&nbsp;point] - The number of the Action Point
+where the party will appear. Positive integer value.
+See <a href="#scrpt_actionpoints">action points section</a> for more information.<br/>
+If you want the party to appear at a Hero Gate, you will need to enter
+the Hero Gate&rsquo;s number here.
+The number must have a minus sign in front of it to distinguish it
+from the normal Action Points. For example, if you want the party
+to appear at Hero Gate&nbsp;4, the [action&nbsp;point] number will be&nbsp;-4.<br/>
+If you want the party to appear at player's Dungeon&nbsp;Heart, you need
+to enter the player's name instead of the number
+(see&nbsp;<a href=#scrpt_players>players section</a>).</p>
+<br/>
+
+<p class="std">[head&nbsp;for] - This&nbsp;command tells the Tunneller
+what it is tunnelling to. You will specify the exact Action Point
+or Player number in the next command.
+There are a number of commands you can use:</p>
+<br/>
+
+<table class="tbparam">
+<tr>
+<td class="tbparhd"><p class="tbparht">Description</p></td>
+<td class="tbparhd"><p class="tbparht">Command</p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">An Action Point</p></td>
+<td class="tbparct"><p class="std">ACTION_POINT</p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">A Player&rsquo;s dungeon</p></td>
+<td class="tbparct"><p class="std">DUNGEON</p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">A Player&rsquo;s Dungeon Heart</p></td>
+<td class="tbparct"><p class="std">DUNGEON_HEART</p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">The dungeon of the player with the highest score</p></td>
+<td class="tbparct"><p class="std">APPROPIATE_DUNGEON</p></td>
+</tr>
+</table>
+<br/>
+
+<p class="std">[action&nbsp;point/&#8203;target&nbsp;player] - This&nbsp;command will tell
+the Tunneller which Action Point (if the [head&nbsp;for] command was ACTION_POINT)
+or Player (if the [head&nbsp;for] command was DUNGEON or DUNGEON_HEART) to go to.
+If the command was APPROPIATE_DUNGEON then this will just be 0
+as the APPROPIATE_DUNGEON command sends the Tunneller to the dungeon of
+the player with the highest score.<br/>
+If&nbsp;you wish to put player here, you must type player number, like&nbsp;1,
+not player name. If you will type PLAYER1, the game won't be able
+to recognize the number and will treat&nbsp;it as&nbsp;0.</p>
+
+<br/>
+
+<p class="std">[experience] - The experience level of the Tunneller.</p>
+<br/>
+
+<p class="std">[gold] - The amount of gold the Tunneller is carrying.</p>
+</div>
+<br/>
+
+<p class="std"><b>Note:</b> The ADD_TUNNELLER_PARTY_TO_LEVEL command counts
+as one&nbsp;ADD_TUNNELLER_TO_LEVEL command. Therefore, there can only&nbsp;be
+a&nbsp;total of&nbsp;16 of&nbsp;these commands in&nbsp;your script.</p>
+<br/>
+
+<p class="std">Example:</p>
+<pre class="snip">REM ***** Add MY_PARTY to the level at     *****
+REM ***** Action Point 4 with a level 5    *****
+REM ***** Tunneller as it's leader. The    *****
+REM ***** party will head for Action       *****
+REM ***** Point 1                          *****
+
+ADD_TUNNELLER_PARTY_TO_LEVEL(PLAYER_GOOD,MY_PARTY,4,ACTION_POINT,1,5,600)
+
+REM ***** Add MY_PARTY to the level at     *****
+REM ***** Action Point 10 with a level 4   *****
+REM ***** Tunneller as it's leader. The    *****
+REM ***** party will head for the dungeon  *****
+REM ***** of Player 1                      *****
+
+ADD_TUNNELLER_PARTY_TO_LEVEL(PLAYER_GOOD,MY_PARTY,10,DUNGEON,1,4,600)</pre>
+<br/>
+
+
+<p class="tlsnip"><a name="scrpt_cmd_add_party_to_level">8.6
+ADD_PARTY_TO_LEVEL(&#8203;[player],&#8203;[name],&#8203;[action&nbsp;point],&#8203;[a])</a></p>
+<br/>
+
+<p class="std">Very similar to the ADD_TUNNELLER_PARTY_TO_LEVEL command,
+this adds a party to the level but does not include a Tunneller Dwarf.
+This&nbsp;means the party will not be able to tunnel to their target.</p>
+<br/>
+
+<div class="embed">
+<p class="std">[player] - The name of the player, e.g. PLAYER1,
+that the creatures belong to. See&nbsp;<a href=#scrpt_players>players section</a> for more information.</p>
+<br/>
+
+<p class="std">[name] - The name of the party. This&nbsp;must have been declared
+with the CREATE_PARTY command.</p>
+<br/>
+
+<p class="std">[action&nbsp;point] - The number of the Action Point
+where the party will appear. Positive integer value.
+See <a href="#scrpt_actionpoints">action points section</a> for more information.<br/>
+If you want the party to appear at a Hero Gate, you will need to enter
+the Hero Gate&rsquo;s number here. The number must have a minus sign
+in front of it to distinguish it from the normal Action Points.
+For example, if you want the party to appear at Hero Gate&nbsp;4,
+the [action&nbsp;point] number will be&nbsp;-4.<br/>
+If you want the party to appear at player's Dungeon&nbsp;Heart, you need
+to enter the player's name instead of the number
+(see&nbsp;<a href=#scrpt_players>players section</a>).</p>
+<br/>
+
+<p class="std">[a] - The number of copies of the party to be placed down
+at the Action Point.</p>
+</div>
+<br/>
+
+<p class="std"><b>Note:</b> The ADD_PARTY_TO_LEVEL command counts as one
+ADD_CREATURE_TO_LEVEL command. Therefore, there can only be a total
+of 48 of these commands in your script.
+The [a] (number of copies) variable in the ADD_PARTY_TO_LEVEL command
+does not affect this number and you will only use up one command
+however many copies you make.</p>
+<br/>
+
+<p class="std">Example:</p>
+<pre class="snip">REM ***** Add 2 copies of MY_PARTY to the  *****
+REM ***** level at Action Point 5. They    *****
+REM ***** belong to Player 3               *****
+
+ADD_PARTY_TO_LEVEL(PLAYER3,MY_PARTY,5,2)</pre>
+
+<br clear="all"/><br/>
+
+<h1><a name="scrpt_group_infobjctv">9.0
+Displaying information and affecting interface</a></h1>
+<br/>
+
+<p class="std">You can include the following commands in your script
+to display objectives for the player to follow, or information about
+level background story or some of the level mechanisms. There&nbsp;are also
+some commands to influence other elements of the game interface.</p>
+<br/>
+
+<p class="std">Please note that there is no CREATE_TEXT nor PRINT command.
+Commands&nbsp;with these names can be often found in scripts of the original maps.
+There&nbsp;were such commands in early version of&nbsp;the game, but&nbsp;were removed later.
+CREATE_TEXT&nbsp;has&nbsp;been replaced by DISPLAY_OBJECTIVE command
+to allow easier translation to languages other than english,
+PRINT was removed to prevent the game from using printer connected to&nbsp;PC.</p>
+<br/>
+
+<p class="tlsnip"><a name="scrpt_cmd_display_objective">9.1
+DISPLAY_OBJECTIVE(&#8203;[a],&#8203;[player])</a></p>
+<br/>
+
+<p class="std">Displays one of the text messages stored in TEXT.DAT file
+(if&nbsp;used in Dungeon Keeper) or DD1TEXT.DAT (if&nbsp;used in Deeper Dungeons)
+in an Objective Box.
+This file comes in various language version, so messages from it are always
+in the language selected during installation of Dungeon Keeper.</p>
+<br/>
+
+<div class="embed">
+<p class="std">[a] - The number of the message, 0 to 839.
+Text of every message is stored in TEXT.DAT. This parameter is a message index
+in the TEXT.DAT file.</p>
+<br/>
+
+<p class="std">Some of the message numbers are:</p>
+<br/>
+<table class="tbparam" style="width:90%;">
+<tr>
+<td class="tbparhd"><p class="tbparht">Number</p></td>
+<td class="tbparhd"><p class="tbparht">Message text</p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">18</p></td>
+<td class="tbparct"><p class="std">Savour your first victory while you can. You have attracted the wrath of the Lord of this realm. His party will soon be here.</p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">19</p></td>
+<td class="tbparct"><p class="std">The Lord of the Land has arrived. I can smell his fear. Defeat him and the realm is yours.</p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">31</p></td>
+<td class="tbparct"><p class="std">Harder the heroes may have been but they were obviously no match for your forces.</p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">33</p></td>
+<td class="tbparct"><p class="std">Congratulations. You have conquered the enemy hordes.</p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">40</p></td>
+<td class="tbparct"><p class="std">You meet with success yet again, Keeper. All those corpses will keep your Hatchery's topsoil fertile. They also serve as warnings to other foolhardy adventurers, of course.</p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">41</p></td>
+<td class="tbparct"><p class="std">All is quiet again. Use this time to ready yourself for the next attacks. The enemy is only regrouping. It is not yet defeated.</p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">64</p></td>
+<td class="tbparct"><p class="std">It's time to mete out the ultimate punishment to a keeper who dares to challenge you for this corner of your subterranean empire. The price of failure shall be oblivion.</p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">103</p></td>
+<td class="tbparct"><p class="std">The enemy are upon us. I'm just telling you in case you were having a doze.</p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">114</p></td>
+<td class="tbparct"><p class="std">Can you see how vulnerable one of your opponents has become? Then kill him.</p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">115</p></td>
+<td class="tbparct"><p class="std">I spy a keeper with hardly any creatures left under his control. I spy a Keeper who's about to die.</p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">126</p></td>
+<td class="tbparct"><p class="std">This ancient realm is rich in magical artifacts. Go forth and plunder.</p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">171</p></td>
+<td class="tbparct"><p class="std">What is this? The Avatar lives!</p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">361</p></td>
+<td class="tbparct"><p class="std">This is a tale of valour and honour and how tasty heroes are....</p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">803</p></td>
+<td class="tbparct"><p class="std">When night does not give way to day, And children are too scared to play, Abandon hope, embrace despair, You're destined for my Dragon's lair</p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">805</p></td>
+<td class="tbparct"><p class="std">Through my dungeon you may tread, But rest assured, you'll end up dead.</p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">812</p></td>
+<td class="tbparct"><p class="std">The denizens of your domain, Just cannot wait to kill again.</p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">825</p></td>
+<td class="tbparct"><p class="std">Torture is the crowning glory, Of your Dungeon Keeper story.</p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">827</p></td>
+<td class="tbparct"><p class="std">When your troops are hunger-stricken, Your Hatchery has yummy chicken.</p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">836</p></td>
+<td class="tbparct"><p class="std">Keep your Imps digging. There are always surprises to be found deep in the earth.</p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">839</p></td>
+<td class="tbparct"><p class="std">Foolish is the Keeper who sells all his rooms and refuses to pay his creatures.</p></td>
+</tr>
+</table>
+<br/>
+
+<p class="std">[player] - If the player clicks on the zoom to icon
+on the Objective Panel, this option will specify which player&rsquo;s Dungeon Heart
+the Dungeon View will zoom to. This&nbsp;should always be set to PLAYER0
+in single player levels unless the text requires it to go to a different
+Dungeon Heart. You cannot use ALL_PLAYERS.</p>
+</div>
+<br/>
+
+<p class="std">Example:</p>
+<pre class="snip">REM ***** Display objective box which says:*****
+REM ***** "Your plan proceeds smoothly,    *****
+REM ***** keeper. Allow your Imps time to  *****
+REM ***** fortify the walls of your        *****
+REM ***** dungeon. This increases the      *****
+REM ***** efficiency of rooms and repels   *****
+REM ***** would-be invaders."              *****
+
+DISPLAY_OBJECTIVE(26,PLAYER0)</pre>
+
+<br/>
+
+<p class="tlsnip"><a name="scrpt_cmd_display_objective_with_pos">9.2
+DISPLAY_OBJECTIVE_WITH_POS(&#8203;[a],[x],[y])</a></p>
+<br/>
+
+<p class="std">Displays one of the text messages stored in TEXT.DAT file
+(if&nbsp;used in Dungeon Keeper) or DD1TEXT.DAT (if&nbsp;used in Deeper Dungeons)
+in an Objective Box. Allows to enter map coordinates of an area which
+is shown when the eye icon is clicked on the message.</p>
+<br/>
+
+<div class="embed">
+<p class="std">[a] - The number of the message, 0 to 839.
+Text of every message is stored in TEXT.DAT. This parameter is a message index
+in the TEXT.DAT file.</p>
+<br/>
+<p class="std">[x] - X coordinate of the map area to view when eye icon is clicked.
+The coordinate range is from&nbsp;0 (most&nbsp;west) to&nbsp;84 (most&nbsp;east).</p>
+<br/>
+<p class="std">[y] - Y coordinate of the map area to view when eye icon is clicked.
+The coordinate range is from&nbsp;0 (most&nbsp;north) to&nbsp;84 (most&nbsp;south).</p>
+</div>
+<br/>
+
+<p class="std">Example:</p>
+<pre class="snip">REM ***** Display objective box which says:*****
+REM ***** "Enemy reinforcements have       *****
+REM ***** arrived. So what? Let's hear it  *****
+REM ***** for more killing."               *****
+REM ***** Allows to view map coords (19,21)*****
+
+DISPLAY_OBJECTIVE_WITH_POS(130,19,21)</pre>
+
+<br/>
+
+<p class="tlsnip"><a name="scrpt_cmd_display_information">9.3
+DISPLAY_INFORMATION(&#8203;[a])</a></p>
+<br/>
+<p class="std">Creates a text box with Information Pop-up Icon.
+Works identical (except of the icon) as
+<a href="#scrpt_cmd_display_objective">DISPLAY_OBJECTIVE</a>.</p>
+<br/>
+
+<div class="embed">
+<p class="std">[a] - The number of the message, 0 to 839.
+Text of every message is stored in TEXT.DAT. This parameter is a message index
+in the TEXT.DAT file.</p>
+<br/>
+
+<p class="std">Some of the message numbers are explained in
+<a href="#scrpt_cmd_display_objective">DISPLAY_OBJECTIVE</a> help.</p>
+</div>
+<br/>
+
+<p class="std">Example:</p>
+<pre class="snip">REM ***** Display information which says:  *****
+REM ***** "How time flies... hurry!"       *****
+
+DISPLAY_INFORMATION(166)</pre>
+
+<br/>
+
+<p class="tlsnip"><a name="scrpt_cmd_display_information_with_pos">9.4
+DISPLAY_INFORMATION_WITH_POS(&#8203;[a],[x],[y])</a></p>
+<br/>
+
+<p class="std">Creates a text box with Information Pop-up Icon.
+Works identical (except of the icon) as
+<a href="#scrpt_cmd_display_objective_with_pos">DISPLAY_OBJECTIVE_WITH_POS</a>.</p>
+<br/>
+  
+<div class="embed">
+<p class="std">[a] - The number of the message, 0 to 839.
+Text of every message is stored in TEXT.DAT. This parameter is a message index
+in the TEXT.DAT file.</p>
+<br/>
+<p class="std">[x] - X&nbsp;coordinate of the map area to view when eye icon is clicked.</p>
+<br/>
+<p class="std">[y] - Y&nbsp;coordinate of the map area to view when eye icon is clicked.</p>
+</div>
+<br/>
+
+<p class="std"><b>Note:</b> The unpatched version of the game do not recognizes
+this command correctly. Therefore, this command is very unsafe and shouldn't
+be used - it will work properly only with unofficial patch installed.</p>
+<br/>
+
+<pre class="snip">REM ***** Display information which says:  *****
+REM ***** "If thou art bold and pure of    *****
+REM ***** heart, Come down here, be torn   *****
+REM ***** apart."                          *****
+REM ***** Allows to view map coords (66,77)*****
+
+DISPLAY_INFORMATION_WITH_POS(804,66,77)</pre>
+<br/>
+
+<p class="std"><b>Fanfact:</b> This command has wrong internal command number
+in the game engine, and therefore is interpreted as DISPLAY_INFORMATION
+by&nbsp;the unpatched game. This is clearly a typing mistake of the programmer.</p>
+<br/>
+
+<p class="tlsnip"><a name="scrpt_cmd_quick_objective">9.5
+QUICK_OBJECTIVE(&#8203;[a],&#8203;[&quot;objective&quot;],&#8203;[player])</a></p>
+<br/>
+
+<p class="std">This&nbsp;command brings up the Objective Box at the bottom
+of the game screen and displays the specified text.
+The command will be triggered as soon as the game reaches it in the script
+so you will probably need to trigger it with an IF command.</p>
+<br/>
+
+<div class="embed">
+<p class="std">[a] - The number of the objective.
+Each objective must have a different number and you can only have a maximum of&nbsp;49.</p>
+<p class="std">The message identified by '0' will not flash; all other numbers
+will make the information flash when displayed.</p>
+<p class="std">If you will use one identification number more than once in the script,
+the text displayed will be that of the last definition, regardless if it is
+inside IF/ENDIF statement or not.</p>
+<br/>
+
+<p class="std">[objective] - The objective text,
+e.g. &quot;Your dungeon is doomed, Keeper.&quot;.</p>
+<br/>
+
+<p class="std">[player] - If the player clicks on the zoom to icon
+on the Objective Panel, this option will specify which player&rsquo;s Dungeon Heart
+the Dungeon View will zoom to. This&nbsp;should always be set to PLAYER0
+in single player levels unless the text requires it to go to a different
+Dungeon Heart. You cannot use ALL_PLAYERS.</p>
+</div>
+<br/>
+
+<p class="std"><b>Note:</b> This command will work only if you have
+the&nbsp;Deeper Dungeons expansion pack, or Dungeon Keeper Gold
+installed on&nbsp;your&nbsp;PC. Remember, if&nbsp;you give this level
+to another person, they must also have the&nbsp;Deeper Dungeons
+expansion pack (or&nbsp;DK&nbsp;Gold) installed on&nbsp;their machine.</p>
+<p class="std">Even&nbsp;if used in Deeper Dungeons, the command may not work properly
+in user will use the load/save game functions.</p>
+<br/>
+
+<p class="std">Example:</p>
+<p class="snip">QUICK_OBJECTIVE(1,&quot;Your dungeon is doomed, Keeper&quot;,PLAYER1)</p>
+<br/>
+
+<p class="tlsnip"><a name="scrpt_cmd_quick_information">9.6
+QUICK_INFORMATION(&#8203;[a],&#8203;[&quot;information&quot;])</a></p>
+<br/>
+
+<p class="std">This&nbsp;command is similar to the QUICK_OBJECTIVE command
+except&nbsp;that instead&nbsp;of an Objective Window, the text is written
+on&nbsp;an Information Pop-up Icon.
+Again, this command will be triggered as soon as the game reaches&nbsp;it
+in&nbsp;the script so you will probably need to trigger&nbsp;it
+with an IF&nbsp;command.</p>
+<br/>
+
+<div class="embed">
+<p class="std">[a] - The number of the information.
+Each bit of information must have a different number
+and&nbsp;you can only have a maximum of&nbsp;49.<br/>
+Objective text will overwrite Information text of the same identifying number
+when the information is defined before the objective, and vice-versa.
+Define information and objectives with different numbers.</p>
+<br/>
+
+<p class="std">[information] - The information text,
+e.g. &quot;Well done. You have researched the Temple.&quot;</p>
+</div>
+<br/>
+
+<p class="std"><b>Note:</b> This command will work only if you have
+the&nbsp;Deeper Dungeons expansion pack, or Dungeon Keeper Gold
+installed on&nbsp;your&nbsp;PC. Remember, if&nbsp;you give this level
+to another person, they must also have the&nbsp;Deeper Dungeons
+expansion pack (or&nbsp;DK&nbsp;Gold) installed on&nbsp;their machine.</p>
+<br/>
+
+<p class="std"><b>Note:</b> There is no player defined on this command
+as there is for the objective. The&nbsp;information will <b>not</b> be displayed
+at all if you have stated the player name.</p>
+<br/>
+
+<p class="std">Example:</p>
+<p class="snip">QUICK_INFORMATION(1,&quot;Well done. You have researched the Temple.&quot;)</p>
+<br/>
+
+<p class="tlsnip"><a name="scrpt_cmd_tutorial_flash_button">9.7
+TUTORIAL_FLASH_BUTTON(&#8203;[button],&#8203;[player])</a></p>
+<br/>
+
+<p class="std">Flashes a button on the toolar until the player selects it.</p>
+<br/>
+
+<div class="embed">
+<p class="std">[button] - The number of the button.
+Each button of the interface has corresponding unique number.</p>
+<br/>
+
+<p class="std">Some of the button numbers are:</p>
+<br/>
+<table class="tbparam">
+<tr>
+<td class="tbparhd"><p class="tbparht">Number</p></td>
+<td class="tbparhd"><p class="tbparht">Interface element</p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">0</p></td>
+<td class="tbparct"><p class="std">Clear any flashing elements</p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">1</p></td>
+<td class="tbparct"><p class="std">Information panel</p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">2</p></td>
+<td class="tbparct"><p class="std">Rooms panel</p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">3</p></td>
+<td class="tbparct"><p class="std">Spells panel</p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">4</p></td>
+<td class="tbparct"><p class="std">Workshop panel</p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">5</p></td>
+<td class="tbparct"><p class="std">Creatures panel</p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">6</p></td>
+<td class="tbparct"><p class="std">Treasure room</p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">7</p></td>
+<td class="tbparct"><p class="std">Hatchery</p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">8</p></td>
+<td class="tbparct"><p class="std">Lair</p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">9</p></td>
+<td class="tbparct"><p class="std">Library</p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">10</p></td>
+<td class="tbparct"><p class="std">Training room</p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">11</p></td>
+<td class="tbparct"><p class="std">Prison</p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">12</p></td>
+<td class="tbparct"><p class="std">Temple</p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">13</p></td>
+<td class="tbparct"><p class="std">Workshop</p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">15</p></td>
+<td class="tbparct"><p class="std">Graveyard</p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">16</p></td>
+<td class="tbparct"><p class="std">Barracks</p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">17</p></td>
+<td class="tbparct"><p class="std">Torture chamber</p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">18</p></td>
+<td class="tbparct"><p class="std">Bridge</p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">19</p></td>
+<td class="tbparct"><p class="std">Guard post</p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">20</p></td>
+<td class="tbparct"><p class="std">Sell button</p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">21</p></td>
+<td class="tbparct"><p class="std">Create imp</p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">22</p></td>
+<td class="tbparct"><p class="std">Sight of Evil</p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">24</p></td>
+<td class="tbparct"><p class="std">Cave in</p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">25</p></td>
+<td class="tbparct"><p class="std">Lightning spell</p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">26</p></td>
+<td class="tbparct"><p class="std">Heal spell</p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">27</p></td>
+<td class="tbparct"><p class="std">Speed monster spell</p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">28</p></td>
+<td class="tbparct"><p class="std">Protect spell</p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">29</p></td>
+<td class="tbparct"><p class="std">Invisibility spell</p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">31</p></td>
+<td class="tbparct"><p class="std">Disease spell</p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">32</p></td>
+<td class="tbparct"><p class="std">Destroy walls</p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">33</p></td>
+<td class="tbparct"><p class="std">Armageddon spell</p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">35</p></td>
+<td class="tbparct"><p class="std">Must obey spell</p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">36</p></td>
+<td class="tbparct"><p class="std">Possess creature</p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">37</p></td>
+<td class="tbparct"><p class="std">View map</p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">38</p></td>
+<td class="tbparct"><p class="std">Map zoom in</p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">39</p></td>
+<td class="tbparct"><p class="std">Map zoom out</p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">40</p></td>
+<td class="tbparct"><p class="std">Information area 1</p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">41</p></td>
+<td class="tbparct"><p class="std">Information area 2</p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">42</p></td>
+<td class="tbparct"><p class="std">Information area 3</p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">43</p></td>
+<td class="tbparct"><p class="std">Information area 4</p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">44</p></td>
+<td class="tbparct"><p class="std">Information area 5</p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">45</p></td>
+<td class="tbparct"><p class="std">Information area 6</p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">46</p></td>
+<td class="tbparct"><p class="std">Information area 7</p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">47</p></td>
+<td class="tbparct"><p class="std">Information area 8</p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">48</p></td>
+<td class="tbparct"><p class="std">Information area 9</p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">49</p></td>
+<td class="tbparct"><p class="std">Information area 10</p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">50</p></td>
+<td class="tbparct"><p class="std">Information area 11</p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">51</p></td>
+<td class="tbparct"><p class="std">Information area 12</p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">52</p></td>
+<td class="tbparct"><p class="std">Information area 13</p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">53</p></td>
+<td class="tbparct"><p class="std">Boulder trap</p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">54</p></td>
+<td class="tbparct"><p class="std">Alarm trap</p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">55</p></td>
+<td class="tbparct"><p class="std">Poison Gas trap</p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">56</p></td>
+<td class="tbparct"><p class="std">Lightning trap</p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">57</p></td>
+<td class="tbparct"><p class="std">Word of Power trap</p></td>
+</tr>
+
+<tr>
+<td class="tbparct"><p class="std">58</p></td>
+<td class="tbparct"><p class="std">Wooden door</p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">59</p></td>
+<td class="tbparct"><p class="std">Braced door</p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">60</p></td>
+<td class="tbparct"><p class="std">Iron door</p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">61</p></td>
+<td class="tbparct"><p class="std">Magic door</p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">63</p></td>
+<td class="tbparct"><p class="std">Focus on area</p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">64</p></td>
+<td class="tbparct"><p class="std">Close window</p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">65</p></td>
+<td class="tbparct"><p class="std">Scroll up</p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">66</p></td>
+<td class="tbparct"><p class="std">Scroll down</p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">67</p></td>
+<td class="tbparct"><p class="std">Lava trap</p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">69</p></td>
+<td class="tbparct"><p class="std">Imprisonment</p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">70</p></td>
+<td class="tbparct"><p class="std">Avoid combat</p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">72</p></td>
+<td class="tbparct"><p class="std">Creature idle</p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">73</p></td>
+<td class="tbparct"><p class="std">Creature work</p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">74</p></td>
+<td class="tbparct"><p class="std">Creature combat</p></td>
+</tr>
+</table>
+<br/>
+
+<p class="std">[player] - Player on which the command should work; usually&nbsp;PLAYER0.
+Setting&nbsp;this to&nbsp;0 will clear the flashing effect from the button.
+Setting it to positive number controls how long the button is flashing.
+Setting it to -1 will flash the button until clicked, with no time limit.</p>
+</div>
+<br/>
+
+<p class="std">Example:</p>
+<pre class="snip">ROOM_AVAILABLE(PLAYER0,WORKSHOP,1,1)
+QUICK_INFORMATION(1,"Build a 3x3 workshop which is now available to you.")
+TUTORIAL_FLASH_BUTTON(13,PLAYER0)</pre>
+<br/>
+
+<p class="tlsnip"><a name="scrpt_cmd_bonus_level_time">9.8
+BONUS_LEVEL_TIME(&#8203;[a])</a></p>
+<br/>
+
+<p class="std">Sets&nbsp;the time a player has to complete an objective.
+A&nbsp;timer appears in the top right corner of&nbsp;the&nbsp;screen.
+Only&nbsp;works on levels&nbsp;100 to&nbsp;105, marked as the bonus levels.
+The&nbsp;value shown on timer is amount of game turns left divided by&nbsp;2.</p>
+<br/>
+
+<div class="embed">
+<p class="std">[a] - The starting amount of game turns.
+Timer starts decrementing just after the command is executed.</p>
+</div>
+<br/>
+
+<p class="std"><b>Note:</b> This&nbsp;command does not create the counter,
+it&nbsp;only sets the bonus level time shown on it.
+You can't have the timer in custom maps or other original campaign maps.
+If&nbsp;you don't specify a BONUS_LEVEL_TIME in a bonus level, the counter
+will still be there, but will be set to 00000.</p>
+<br/>
+
+<p class="std">Example:</p>
+<pre class="snip">REM ***** Set the level time to 10 minutes *****
+
+SET_TIMER(PLAYER0,TIMER1)
+BONUS_LEVEL_TIME(12000)
+
+IF(PLAYER0,TIMER1 >= 12000)
+	LOSE_GAME
+ENDIF</pre>
+<br/>
+
+<p class="tlsnip"><a name="scrpt_cmd_set_music">9.9
+SET_MUSIC(&#8203;[a])</a></p>
+<br/>
+
+<p class="std">This command was designed to choose the music track to play.</p>
+<br/>
+
+<p class="std">It is unknown if this command works, and how it works.</p>
+<br/>
+
+<div class="embed">
+<p class="std">[a] - Probably the music track number.</p>
+</div>
+<br/>
+
+<p class="std">Example:</p>
+<pre class="snip">SET_MUSIC(1)</pre>
+
+<br clear="all"/><br/>
+
+<h1><a name="scrpt_group_compluter">10.0
+Tweaking computer players</a></h1>
+<br/>
+
+<p class="std">Computer player commands allows you to change the common behaviour
+of the computer player, or force it to conduct a specific action. None&nbsp;of&nbsp;these
+commands was originally documented - this section is completely work of&nbsp;fans.</p>
+<br/>
+
+<h2><a name="scrpt_cmd_compctrlparam">10.1
+Computer Player Control Parameters</a></h2>
+<br/>
+
+<p class="std">These are the values of variables used in AI control commands.</p>
+<br/>
+
+<table class="tbparam" style="width:90%;">
+<tr>
+<td class="tbparhd"><p class="tbparht">Process names</p></td>
+<td class="tbparhd"><p class="tbparht">Descriptions</p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">DIG&nbsp;TO&nbsp;CLOSE&nbsp;GOLD</p></td>
+<td class="tbparct"><p class="std">Cautiously dig for gold. This&nbsp;process
+is used when the computer still has some gold supplies, or is undeveloped yet,
+and it is more crucial not to dig too far than to really get the gold.</p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">DIG&nbsp;TO&nbsp;GOLD</p></td>
+<td class="tbparct"><p class="std">Standard dig for gold. This&nbsp;process
+is used next after DIG&nbsp;TO&nbsp;CLOSE&nbsp;GOLD, when the gold supplies
+begin to be really short, or the computer is more developed.</p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">DIG&nbsp;TO&nbsp;GREEDY&nbsp;GOLD</p></td>
+<td class="tbparct"><p class="std">Greedly dig for gold. Computer&nbsp;uses
+this process when it ran out of gold, or is ready to attack. The search range
+can be far longer here.</p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">DIG&nbsp;TO&nbsp;GREEDY&nbsp;GOLD2</p></td>
+<td class="tbparct"><p class="std">Very greedly dig for gold. This&nbsp;is used
+when the computer becomes very aggresive.</p></td>
+</tr>
+<tr>
+<td class="tbparct"></td>
+<td class="tbparct"></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">BUILD&nbsp;A&nbsp;TREASURE&nbsp;ROOM</p></td>
+<td class="tbparct"><p class="std">Build Treasure Room of given size. This&nbsp;is
+one of first processes conducted at start of the game.</p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">BUILD&nbsp;A&nbsp;LAIR&nbsp;ROOM</p></td>
+<td class="tbparct"><p class="std">Build a Lair of given size. This&nbsp;is
+usually third of processes conducted at start of the game.</p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">BUILD&nbsp;A&nbsp;LAIR&nbsp;ROOM&nbsp;4x4</p></td>
+<td class="tbparct"><p class="std">Build a Lair of 4x4 pattern. This&nbsp;version
+of Lair building process is used for lairs smaller than 5x5.</p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">BUILD&nbsp;A&nbsp;HATCHERY</p></td>
+<td class="tbparct"><p class="std">Build Hatchery of given size.</p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">BUILD&nbsp;A&nbsp;TRAINING&nbsp;ROOM</p></td>
+<td class="tbparct"><p class="std">Build Training Room of given size.</p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">BUILD&nbsp;A&nbsp;RESEARCH&nbsp;ROOM</p></td>
+<td class="tbparct"><p class="std">Build Library of given size.</p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">BUILD&nbsp;A&nbsp;WORKSHOP&nbsp;ROOM</p></td>
+<td class="tbparct"><p class="std">Build Workshop of given size.</p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">BUILD&nbsp;A&nbsp;BARRACK&nbsp;ROOM</p></td>
+<td class="tbparct"><p class="std">Build Barracks of given size.</p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">BUILD&nbsp;A&nbsp;GRAVEYARD&nbsp;ROOM</p></td>
+<td class="tbparct"><p class="std">Build Graveyard of given size.</p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">BUILD&nbsp;A&nbsp;TEMPLE&nbsp;ROOM</p></td>
+<td class="tbparct"><p class="std">Build Temple of given size.</p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">BUILD&nbsp;A&nbsp;SCAVENGER&nbsp;ROOM</p></td>
+<td class="tbparct"><p class="std">Build Scavenger Room of given size.</p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">BUILD&nbsp;A&nbsp;TORTURE&nbsp;ROOM</p></td>
+<td class="tbparct"><p class="std">Build Torture Chamber of given size.</p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">BUILD&nbsp;A&nbsp;PRISON&nbsp;ROOM</p></td>
+<td class="tbparct"><p class="std">Build Prison of given size.</p></td>
+</tr>
+<tr>
+<td class="tbparct"></td>
+<td class="tbparct"></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">BUILD&nbsp;ALL&nbsp;ROOM&nbsp;4x4</p></td>
+<td class="tbparct"><p class="std"></p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">BUILD&nbsp;ALL&nbsp;ROOM&nbsp;3x3</p></td>
+<td class="tbparct"><p class="std"></p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">MOVE&nbsp;CREATURE&nbsp;TO&nbsp;TRAINING</p></td>
+<td class="tbparct"><p class="std"></p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">MOVE&nbsp;CREATURE&nbsp;TO&nbsp;BEST&nbsp;ROOM</p></td>
+<td class="tbparct"><p class="std"></p></td>
+</tr>
+<tr>
+<td class="tbparct"></td>
+<td class="tbparct"></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">COMPUTER&nbsp;CHECK&nbsp;HATES</p></td>
+<td class="tbparct"><p class="std"></p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">BUILD&nbsp;AND&nbsp;DEFEND&nbsp;COMPUTER</p></td>
+<td class="tbparct"><p class="std"></p></td>
+</tr>
+<tr>
+<td class="tbparct"></td>
+<td class="tbparct"></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">ATTACK&nbsp;SAFE&nbsp;ATTACK</p></td>
+<td class="tbparct"><p class="std"></p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">ATTACK&nbsp;PLAN&nbsp;1</p></td>
+<td class="tbparct"><p class="std"></p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">SIGHT&nbsp;OF&nbsp;EVIL&nbsp;SCARE</p></td>
+<td class="tbparct"><p class="std"></p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">SIGHT&nbsp;OF&nbsp;EVIL</p></td>
+<td class="tbparct"><p class="std"></p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">DIG&nbsp;TO&nbsp;AN&nbsp;ENTRANCE</p></td>
+<td class="tbparct"><p class="std"></p></td>
+</tr>
+</table>
+<br/>
+
+<table class="tbparam" style="width:90%;">
+<tr>
+<td class="tbparhd"><p class="tbparht">Event names</p></td>
+<td class="tbparhd"><p class="tbparht">Descriptions</p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">EVENT&nbsp;PAY&nbsp;DAY</p></td>
+<td class="tbparct"><p class="std"></p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">EVENT&nbsp;SAVE&nbsp;IMPS</p></td>
+<td class="tbparct"><p class="std"></p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">EVENT&nbsp;CHECK&nbsp;ROOMS&nbsp;FULL</p></td>
+<td class="tbparct"><p class="std"></p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">EVENT&nbsp;MAGIC&nbsp;FOE</p></td>
+<td class="tbparct"><p class="std"></p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">EVENT&nbsp;CHECK&nbsp;FIGHTERS</p></td>
+<td class="tbparct"><p class="std"></p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">EVENT&nbsp;FIGHT&nbsp;TEST</p></td>
+<td class="tbparct"><p class="std"></p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">EVENT&nbsp;FIGHT</p></td>
+<td class="tbparct"><p class="std"></p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">EVENT&nbsp;LIVING&nbsp;SPACE&nbsp;FULL</p></td>
+<td class="tbparct"><p class="std"></p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">EVENT&nbsp;TREASURE&nbsp;ROOM&nbsp;FULL</p></td>
+<td class="tbparct"><p class="std"></p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">EVENT&nbsp;HEART&nbsp;UNDER&nbsp;ATTACK</p></td>
+<td class="tbparct"><p class="std"></p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">EVENT&nbsp;ROOM&nbsp;ATTACK</p></td>
+<td class="tbparct"><p class="std"></p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">EVENT&nbsp;DUNGEON&nbsp;BREACH</p></td>
+<td class="tbparct"><p class="std"></p></td>
+</tr>
+</table>
+<br/>
+
+<table class="tbparam" style="width:90%;">
+<tr>
+<td class="tbparhd"><p class="tbparht">Globals names</p></td>
+<td class="tbparhd"><p class="tbparht">Descriptions</p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">COMPUTER_ATTACK_MAGIC</p></td>
+<td class="tbparct"><p class="std"></p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">COMPUTER_WAIT_FOR_BRIDGE</p></td>
+<td class="tbparct"><p class="std"></p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">COMPUTER_MAGIC_SPEED_UP</p></td>
+<td class="tbparct"><p class="std"></p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">COMPUTER_DIG_TO_NEUTRAL</p></td>
+<td class="tbparct"><p class="std"></p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">COMPUTER_SLAP_IMPS</p></td>
+<td class="tbparct"><p class="std"></p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">COMPUTER_MOVE_CREATURES_TO_DEFEND</p></td>
+<td class="tbparct"><p class="std"></p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">COMPUTER_MOVE_CREATURE_TO_POS</p></td>
+<td class="tbparct"><p class="std"></p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">COMPUTER_MOVE_CREATURE_TO_ROOM</p></td>
+<td class="tbparct"><p class="std"></p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">COMPUTER_PICKUP_FOR_ATTACK</p></td>
+<td class="tbparct"><p class="std"></p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">COMPUTER_MAGIC_CALL_TO_ARMS</p></td>
+<td class="tbparct"><p class="std"></p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">COMPUTER_DIG_TO_ATTACK</p></td>
+<td class="tbparct"><p class="std"></p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">COMPUTER_DIG_TO_GOLD</p></td>
+<td class="tbparct"><p class="std"></p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">COMPUTER_DIG_TO_ENTRANCE</p></td>
+<td class="tbparct"><p class="std"></p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">COMPUTER_PLACE_ROOM</p></td>
+<td class="tbparct"><p class="std"></p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">COMPUTER_CHECK_ROOM_DUG</p></td>
+<td class="tbparct"><p class="std"></p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">COMPUTER_DIG_ROOM</p></td>
+<td class="tbparct"><p class="std"></p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">COMPUTER_DIG_ROOM_PASSAGE</p></td>
+<td class="tbparct"><p class="std"></p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">COMPUTER_SELL_TRAPS_AND_DOORS</p></td>
+<td class="tbparct"><p class="std">Command available in Deeper Dungeons only.</p></td>
+</tr>
+</table>
+<br/>
+
+<table class="tbparam" style="width:90%;">
+<tr>
+<td class="tbparhd"><p class="tbparht">Check names</p></td>
+<td class="tbparhd"><p class="tbparht">Descriptions</p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">CHECK&nbsp;MONEY</p></td>
+<td class="tbparct"><p class="std"></p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">CHECK&nbsp;EXPAND&nbsp;ROOM</p></td>
+<td class="tbparct"><p class="std"></p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">CHECK&nbsp;AVAILIABLE&nbsp;TRAP</p></td>
+<td class="tbparct"><p class="std"></p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">CHECK&nbsp;FOR&nbsp;NEUTRAL&nbsp;PLACES</p></td>
+<td class="tbparct"><p class="std"></p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">CHECK&nbsp;AVAILIABLE&nbsp;DOOR</p></td>
+<td class="tbparct"><p class="std"></p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">CHECK&nbsp;FOR&nbsp;ENEMY&nbsp;ENTRANCES</p></td>
+<td class="tbparct"><p class="std"></p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">CHECK&nbsp;FOR&nbsp;SLAP&nbsp;IMP</p></td>
+<td class="tbparct"><p class="std"></p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">CHECK&nbsp;FOR&nbsp;SPEED&nbsp;UP</p></td>
+<td class="tbparct"><p class="std"></p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">CHECK&nbsp;FOR&nbsp;QUICK&nbsp;ATTACK</p></td>
+<td class="tbparct"><p class="std"></p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">CHECK&nbsp;TO&nbsp;PRETTY</p></td>
+<td class="tbparct"><p class="std"></p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">CHECK&nbsp;FOR&nbsp;ENOUGH&nbsp;IMPS</p></td>
+<td class="tbparct"><p class="std"></p></td>
+</tr>
+</table>
+<br/>
+
+<p class="tlsnip"><a name="scrpt_cmd_set_computer_process">10.2
+SET_COMPUTER_PROCESS(&#8203;[player],&#8203;["process&nbsp;name"],&#8203;[priority],&#8203;[data1],&#8203;[data2],&#8203;[data3],&#8203;[data4])</a></p>
+<br/>
+
+<p class="std">Changes conditions and&nbsp;parameters for&nbsp;one of&nbsp;the
+computer processes. A&nbsp;process is started if the computer player realizes
+that any action is&nbsp;needed. Some&nbsp;of the processes have more than one version,
+and&nbsp;specific one is selected by checking variables inside the processes.</p>
+<br/>
+
+<div class="embed">
+<p class="std">[player] - The computer player&rsquo;s name, e.g. PLAYER1.
+See&nbsp;<a href=#scrpt_players>players section</a> for more information.</p>
+<br/>
+
+<p class="std">["process&nbsp;name"] - Text name of the process which is being changed.
+See&nbsp;<a href=#scrpt_cmd_compctrlparam>player control parameters</a>
+for more information.</p>
+<br/>
+
+<p class="std">[priority] - Priority of the process. This&nbsp;parameter
+controls which process to&nbsp;choose if more&nbsp;than one process has met the conditions
+to&nbsp;be conducted.</p>
+<br/>
+
+<p class="std">[data1],&#8203;[data2],&#8203;[data3],&#8203;[data4] - These&nbsp;parameters
+can have different meaning for different values of&nbsp;["process&nbsp;name"].</p>
+</div>
+<br/>
+
+<p class="std">Note that some processes are only used for some of the
+computer player types. To&nbsp;make sure your commands won't be inactive,
+you&nbsp;should set up the computer player type&nbsp;0
+(see&nbsp;<a href="#scrpt_cmd_computer_player">COMPUTER_PLAYER command</a>), e.g.</p>
+<br/>
+<pre class="snip">REM ***** Set up standard computer player  *****
+REM ***** to be sure no processes will be  *****
+REM ***** skipped when AI takes action.    *****
+
+COMPUTER_PLAYER(PLAYER1,0)</pre>
+<br/>
+
+<h4><a name="scrpt_cmd_set_computer_process_diggold">10.2.1
+Digging to gold processes</a></h4>
+<br/>
+<p class="std">In this case, the function definition is:</p>
+<br/>
+<p class="stlsnip">SET_COMPUTER_PROCESS(&#8203;[player],&#8203;["process&nbsp;name"],&#8203;[priority],&#8203;[money&nbsp;minimum],&#8203;[turn&nbsp;scale],&#8203;[gold&nbsp;dug&nbsp;at&nbsp;once],&#8203;[max&nbsp;distance])</p>
+<br/>
+<div class="embed">
+<p class="std">["process&nbsp;name"] - Can be one of the following:</p>
+<br/>
+<div class="embed">
+<p class="std">DIG&nbsp;TO&nbsp;CLOSE&nbsp;GOLD</p>
+<p class="std">DIG&nbsp;TO&nbsp;GOLD</p>
+<p class="std">DIG&nbsp;TO&nbsp;GREEDY&nbsp;GOLD</p>
+<p class="std">DIG&nbsp;TO&nbsp;GREEDY&nbsp;GOLD2</p>
+</div>
+<br/>
+<p class="std">[money&nbsp;minimum] - Minimal amount of money to use the specific process.
+If&nbsp;a computer player has less gold than [money&nbsp;minimum], it&nbsp;will not use
+the process, but will check the more "greedy" one. If minimal amount of money is not reached
+for any process, computer will use its "fail&nbsp;safe" gold digging process.</p>
+<br/>
+<p class="std">[turn&nbsp;scale] - Number of game turns to wait before thinking&nbsp;of
+digging to&nbsp;next vein. The&nbsp;computer will always wait these turns before creating next
+process for digging gold. Setting&nbsp;small value (like&nbsp;10) here will allow computer
+to&nbsp;dig many veins at once.</p>
+<br/>
+<p class="std">[gold&nbsp;dug&nbsp;at&nbsp;once] - Number of the gold tiles
+selected at one time.</p>
+<br/>
+<p class="std">[max&nbsp;distance] - Maximum distance from the gold vein
+to&nbsp;the nearest of computer player&rsquo;s rooms.
+The&nbsp;proper values are from&nbsp;1 to&nbsp;84.</p>
+</div>
+<br/>
+
+<p class="std"><b>Note:</b> If&nbsp;you will use all the gold process commands with
+very small range, the computer player will still dig for far gold when he'll run completely
+out of&nbsp;it. This is due to a&nbsp;"fail&nbsp;safe" process which exist after these four.
+To&nbsp;disable digging for&nbsp;gold, you will have to place a&nbsp;first vein just next to the player,
+and use very large value of&nbsp;[turn&nbsp;scale], e.g. 144000 will make the computer
+not to dig for gold in 2&nbsp;hours after digging the first vein.</p>
+<br/>
+
+<p class="std">Example:</p>
+<pre class="snip">REM ***** Dig safely for gold if more than *****
+REM ***** 1250 is in treasury; search for  *****
+REM ***** vein in 20 squares, wait 30 secs *****
+REM ***** before the next digging          *****
+
+SET_COMPUTER_PROCESS(PLAYER1,"DIG TO CLOSE GOLD",0,1250,600,5,20)
+
+REM ***** Don't dig for gold in two hours  *****
+REM ***** after first time digging greedly *****
+REM ***** for gold.                        *****
+
+SET_COMPUTER_PROCESS(PLAYER1,"DIG TO GREEDY GOLD", 0,  100,76666,5,50)
+SET_COMPUTER_PROCESS(PLAYER1,"DIG TO GREEDY GOLD2",0,    0,76666,5,60)</pre>
+<br/>
+
+<h4><a name="scrpt_cmd_set_computer_process_buildroom">10.2.2
+Build a specific room processes</a></h4>
+<br/>
+
+<p class="std">In this case, the function definition is:</p>
+<br/>
+<p class="stlsnip">SET_COMPUTER_PROCESS(&#8203;[player],&#8203;["process&nbsp;name"],&#8203;[priority],&#8203;[room&nbsp;width],&#8203;[room&nbsp;height],&#8203;[room&nbsp;index],&#8203;[required&nbsp;index])</p>
+<br/>
+<div class="embed">
+<p class="std">["process&nbsp;name"] - Can be one of the following:</p>
+<br/>
+<div class="embed">
+<p class="std">BUILD&nbsp;A&nbsp;TREASURE&nbsp;ROOM</p>
+<p class="std">BUILD&nbsp;A&nbsp;LAIR&nbsp;ROOM</p>
+<p class="std">BUILD&nbsp;A&nbsp;LAIR&nbsp;ROOM&nbsp;4x4</p>
+<p class="std">BUILD&nbsp;A&nbsp;HATCHERY</p>
+<p class="std">BUILD&nbsp;A&nbsp;TRAINING&nbsp;ROOM</p>
+<p class="std">BUILD&nbsp;A&nbsp;RESEARCH&nbsp;ROOM</p>
+<p class="std">BUILD&nbsp;A&nbsp;WORKSHOP&nbsp;ROOM</p>
+<p class="std">BUILD&nbsp;A&nbsp;BARRACK&nbsp;ROOM</p>
+<p class="std">BUILD&nbsp;A&nbsp;GRAVEYARD&nbsp;ROOM</p>
+<p class="std">BUILD&nbsp;A&nbsp;TEMPLE&nbsp;ROOM</p>
+<p class="std">BUILD&nbsp;A&nbsp;SCAVENGER&nbsp;ROOM</p>
+<p class="std">BUILD&nbsp;A&nbsp;TORTURE&nbsp;ROOM</p>
+<p class="std">BUILD&nbsp;A&nbsp;PRISON&nbsp;ROOM</p>
+</div>
+<br/>
+<p class="std">[room&nbsp;width] - Number of tiles width the room should have. Minimum is&nbsp;2.</p>
+<br/>
+<p class="std">[room&nbsp;height] - Number of tiles height the room should have.
+Minimum is&nbsp;2. This&nbsp;value shouldn't differ from room width by more than&nbsp;1.
+If&nbsp;it will, then a room with non rectangular shape will result.</p>
+<br/>
+<p class="std">[room&nbsp;index] - Index of the room. should always correspond to the room
+in a ["process&nbsp;name"].</p>
+<br/>
+<table class="tbparam" style="width:90%;">
+<tr>
+<td class="tbparhd"><p class="tbparht">Process names</p></td>
+<td class="tbparhd"><p class="tbparht">Room<br/>indices</p></td>
+<td class="tbparhd"><p class="tbparht">Descriptions</p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">n/a</p></td>
+<td class="tbparct"><p class="std">0</p></td>
+<td class="tbparct"><p class="std">None (can&nbsp;be used as [required&nbsp;index])</p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">BUILD&nbsp;A&nbsp;TREASURE&nbsp;ROOM</p></td>
+<td class="tbparct"><p class="std">2</p></td>
+<td class="tbparct"><p class="std">Treasure Room</p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">BUILD&nbsp;A&nbsp;RESEARCH&nbsp;ROOM</p></td>
+<td class="tbparct"><p class="std">3</p></td>
+<td class="tbparct"><p class="std">Library</p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">BUILD&nbsp;A&nbsp;PRISON&nbsp;ROOM</p></td>
+<td class="tbparct"><p class="std">4</p></td>
+<td class="tbparct"><p class="std">Prison</p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">BUILD&nbsp;A&nbsp;TORTURE&nbsp;ROOM</p></td>
+<td class="tbparct"><p class="std">5</p></td>
+<td class="tbparct"><p class="std">Torture Chamber</p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">BUILD&nbsp;A&nbsp;TRAINING&nbsp;ROOM</p></td>
+<td class="tbparct"><p class="std">6</p></td>
+<td class="tbparct"><p class="std">Training Room</p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">BUILD&nbsp;A&nbsp;WORKSHOP&nbsp;ROOM</p></td>
+<td class="tbparct"><p class="std">8</p></td>
+<td class="tbparct"><p class="std">Workshop</p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">BUILD&nbsp;A&nbsp;SCAVENGER&nbsp;ROOM</p></td>
+<td class="tbparct"><p class="std">9</p></td>
+<td class="tbparct"><p class="std">Scavenger Room</p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">BUILD&nbsp;A&nbsp;TEMPLE&nbsp;ROOM</p></td>
+<td class="tbparct"><p class="std">10</p></td>
+<td class="tbparct"><p class="std">Temple</p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">BUILD&nbsp;A&nbsp;GRAVEYARD&nbsp;ROOM</p></td>
+<td class="tbparct"><p class="std">11</p></td>
+<td class="tbparct"><p class="std">Graveyard</p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">BUILD&nbsp;A&nbsp;BARRACK&nbsp;ROOM</p></td>
+<td class="tbparct"><p class="std">12</p></td>
+<td class="tbparct"><p class="std">Barracks</p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">BUILD&nbsp;A&nbsp;HATCHERY</p></td>
+<td class="tbparct"><p class="std">13</p></td>
+<td class="tbparct"><p class="std">Hatchery</p></td>
+</tr>
+<tr>
+<td class="tbparct"><p class="std">BUILD&nbsp;A&nbsp;LAIR&nbsp;ROOM<br/>
+BUILD&nbsp;A&nbsp;LAIR&nbsp;ROOM&nbsp;4x4</p></td>
+<td class="tbparct"><p class="std">14</p></td>
+<td class="tbparct"><p class="std">Lair (you&nbsp;can only enlarge the&nbsp;lair,
+making it smaller usually won't work)</p></td>
+</tr>
+</table>
+<br/>
+
+<p class="std">[required&nbsp;index] - Index of the room that should exist when
+building the new room.</p>
+</div>
+<br/>
+
+<p class="std">Maximum size of a room is restricted only by amount of tiles
+which a player can mark for digging. Rooms&nbsp;of size up to 23x23 are usually
+created properly.</p>
+<br/>
+
+<p class="std"><b>Note:</b> You&nbsp;can't build rooms where width and height differ
+by more than one. If&nbsp;e.g. you will set width to&nbsp;4, you can only use
+height values of&nbsp;3,&nbsp;4 or&nbsp;5.</p>
+
+<p class="std">The&nbsp;importand rooms: Treasure Room, Lair, Hatchery,
+Library and Training Room, should have priority around&nbsp;0. Other&nbsp;rooms
+should have priority around -10. This&nbsp;will make sure AI will conduct
+other processes when neccessery.</p>
+
+<p class="std">Example:</p>
+<pre class="snip">REM ***** Build 4x3 treasure room at start *****
+SET_COMPUTER_PROCESS(PLAYER1,"BUILD A TREASURE ROOM",     0,4,3, 2,0)
+
+REM ***** Build only 2x3 hatchery          *****
+
+REM SET_COMPUTER_PROCESS(PLAYER1,"BUILD A HATCHERY",      0,2,3,13,0)
+
+REM ***** Build 3x3 scavenger room, only   *****
+REM ***** after the Prison has been built  *****
+
+SET_COMPUTER_PROCESS(PLAYER1,"BUILD A SCAVENGER ROOM",-10,3,3,9,8)</pre>
+<br/>
+
+<p class="tlsnip"><a name="scrpt_cmd_set_computer_checks">10.3
+SET_COMPUTER_CHECKS(&#8203;[player],&#8203;["checks&nbsp;name"],&#8203;[check&nbsp;every],&#8203;[data1],&#8203;[data2],&#8203;[data3],&#8203;[data4])</a></p>
+<br/>
+
+<p class="std">If&nbsp;no importand event is occuring, the computer player searches
+for things that need to be done using checks. Checks&nbsp;are similar to IF commands
+which allows computer player to undertake a process under some circumstances determined
+by values of variables.</p>
+<br/>
+
+<div class="embed">
+<p class="std">[player] - The computer player&rsquo;s name, e.g. PLAYER1.
+See&nbsp;<a href=#scrpt_players>players section</a> for more information.</p>
+<br/>
+
+<p class="std">["checks&nbsp;name"] - Text name of the check which is being altered.
+See&nbsp;<a href=#scrpt_cmd_compctrlparam>player control parameters</a>
+for more information.</p>
+<br/>
+
+<p class="std">[check&nbsp;every] - Number&nbsp;of turns before repeating the test.</p>
+<br/>
+
+<p class="std">[data1],&#8203;[data2],&#8203;[data3],&#8203;[data4] - These&nbsp;parameters
+can have different meaning for different values of&nbsp;["checks&nbsp;name"].</p>
+</div>
+<br/>
+
+<h4><a name="scrpt_cmd_set_computer_process_checkattack">10.3.1
+Check for attack</a></h4>
+<br/>
+
+<p class="std">In this case, the function definition is:</p>
+<br/>
+<p class="stlsnip">SET_COMPUTER_CHECKS(&#8203;[player],&#8203;["checks&nbsp;name"],&#8203;[check&nbsp;every],&#8203;[attack&nbsp;percent],&#8203;[CTA&nbsp;duration],&#8203;[min&nbsp;for&nbsp;attack],&#8203;[last&nbsp;check])</p>
+<br/>
+
+<p class="std">This command is not fully documented yet. Sorry.</p>
+<br/>
+
+<p class="tlsnip"><a name="scrpt_cmd_set_computer_event">10.4
+SET_COMPUTER_EVENT(&#8203;[player],&#8203;["event&nbsp;name"],&#8203;[data1],&#8203;[data2])</a></p>
+<br/>
+
+<p class="std">Event&nbsp;is a sudden situation that needs a process to be undertaken.
+Unlike&nbsp;checks, events are triggered by often complicated logic conditions.
+Both&nbsp;checks and events are used to test if a process should be started.</p>
+<br/>
+
+<div class="embed">
+<p class="std">[player] - The computer player&rsquo;s name, e.g. PLAYER1.
+See&nbsp;<a href=#scrpt_players>players section</a> for more information.</p>
+<br/>
+
+<p class="std">["event&nbsp;name"] - Text name of the event which is being altered.
+See&nbsp;<a href=#scrpt_cmd_compctrlparam>player control parameters</a>
+for more information.</p>
+<br/>
+
+<p class="std">[data1],&#8203;[data2] - These&nbsp;parameters
+can have different meaning for different values of&nbsp;["event&nbsp;name"].</p>
+</div>
+<br/>
+
+<p class="std">This command is not fully documented yet. Sorry.</p>
+<br/>
+
+<p class="tlsnip"><a name="scrpt_cmd_set_computer_globals">10.5
+SET_COMPUTER_GLOBALS(&#8203;[player],&#8203;[a],&#8203;[a],&#8203;[a],&#8203;[a],&#8203;[a],&#8203;[a])</a></p>
+<br/>
+
+<p class="std">This command is not fully documented yet. Sorry.</p>
+<br/>
+
+
+<br clear="all"/><br/>
+
+<h1><a name="scrpt_cmdindex">11.0 Script commands index</a></h1>
+
+<p class="cidx"><a href="#scrpt_cmd_add_creature_to_pool">ADD_CREATURE_TO_POOL(&#8203;[creature],&#8203;[a])</a></p>
+<p class="cidx"><a href="#scrpt_cmd_add_creature_to_level">ADD_CREATURE_TO_LEVEL(&#8203;[player],&#8203;[creature],&#8203;[action&nbsp;point],&#8203;[a],&#8203;[experience],&#8203;[gold])</a></p>
+<p class="cidx"><a href="#scrpt_cmd_add_party_to_level">ADD_PARTY_TO_LEVEL(&#8203;[player],&#8203;[name],&#8203;[action&nbsp;point],&#8203;[a])</a></p>
+<p class="cidx"><a href="#scrpt_cmd_add_to_party">ADD_TO_PARTY(&#8203;[party&nbsp;name],&#8203;[creature],&#8203;[experience],&#8203;[gold],&#8203;[objective],&#8203;[countdown])
+<p class="cidx"><a href="#scrpt_cmd_add_tunneller_party_to_level">ADD_TUNNELLER_PARTY_TO_LEVEL(&#8203;[player],&#8203;[party&nbsp;name],&#8203;[action&nbsp;point],&#8203;[head for],&#8203;[action&nbsp;point/target&nbsp;player],&#8203;[experience],&#8203;[gold])</a></p>
+<p class="cidx"><a href="#scrpt_cmd_add_tunneller_to_level">ADD_TUNNELLER_TO_LEVEL(&#8203;[player],&#8203;[action&nbsp;point],&#8203;[head for],&#8203;[action&nbsp;point/target&nbsp;player],&#8203;[experience],&#8203;[gold])</a></p>
+<p class="cidx"><a href="#scrpt_cmd_ally_players">ALLY_PLAYERS(&#8203;[player],&#8203;[player])</a></p>
+<p class="cidx"><a href="#scrpt_cmd_bonus_level_time">BONUS_LEVEL_TIME(&#8203;[a])</a></p>
+<p class="cidx"><a href="#scrpt_cmd_computer_player">COMPUTER_PLAYER(&#8203;[player],&#8203;[a])</a></p>
+<p class="cidx"><a href="#scrpt_cmd_create_party">CREATE_PARTY(&#8203;[party&nbsp;name])</a></p>
+<p class="cidx"><a href="#scrpt_cmd_creature_available">CREATURE_AVAILABLE(&#8203;[player],&#8203;[creature],&#8203;[can&nbsp;be&nbsp;available],&#8203;[is&nbsp;available])</a></p>
+<p class="cidx"><a href="#scrpt_cmd_dead_creatures_return_to_pool">DEAD_CREATURES_RETURN_TO_POOL(&#8203;[a])</a></p>
+<p class="cidx"><a href="#scrpt_cmd_display_information">DISPLAY_INFORMATION(&#8203;[a])</a></p>
+<p class="cidx"><a href="#scrpt_cmd_display_information_with_pos">DISPLAY_INFORMATION_WITH_POS(&#8203;[a],&#8203;[x],&#8203;[y])</a></p>
+<p class="cidx"><a href="#scrpt_cmd_display_objective">DISPLAY_OBJECTIVE(&#8203;[a],&#8203;[player])</a></p>
+<p class="cidx"><a href="#scrpt_cmd_display_objective_with_pos">DISPLAY_OBJECTIVE_WITH_POS(&#8203;[a],&#8203;[x],&#8203;[y])</a></p>
+<p class="cidx"><a href="#scrpt_cmd_door_available">DOOR_AVAILABLE(&#8203;[player],&#8203;[door],&#8203;[can&nbsp;be&nbsp;available],&#8203;[number&nbsp;available])</a></p>
+<p class="cidx"><a href="#scrpt_cmd_endif">ENDIF</a></p>
+<p class="cidx"><a href="#scrpt_cmd_if">IF(&#8203;[player],&#8203;[variable][comparison][a])</a></p>
+<p class="cidx"><a href="#scrpt_cmd_if_action_point">IF_ACTION_POINT(&#8203;[action&nbsp;point],&#8203;[player])</a></p>
+<p class="cidx"><a href="#scrpt_cmd_if_available">IF_AVAILABLE(&#8203;[player],&#8203;[name]&#8203;[comparison]&#8203;[a])</a></p>
+<p class="cidx"><a href="#scrpt_cmd_lose_game">LOSE_GAME</a></p>
+<p class="cidx"><a href="#scrpt_cmd_magic_available">MAGIC_AVAILABLE(&#8203;[player],&#8203;[spell],&#8203;[can&nbsp;be&nbsp;available],&#8203;[is&nbsp;available])</a></p>
+<p class="cidx"><a href="#scrpt_cmd_max_creatures">MAX_CREATURES(&#8203;[player],&#8203;[a])</a></p>
+<p class="cidx"><a href="#scrpt_cmd_next_command_reusable">NEXT_COMMAND_REUSABLE</a></p>
+<p class="cidx"><a href="#scrpt_cmd_quick_information">QUICK_INFORMATION(&#8203;[a],&#8203;[&quot;information&quot;])</a></p>
+<p class="cidx"><a href="#scrpt_cmd_quick_objective">QUICK_OBJECTIVE(&#8203;[a],&#8203;[&quot;objective&quot;],&#8203;[player])</a></p>
+<p class="cidx"><a href="#scrpt_cmd_rem">REM</a></p>
+<p class="cidx"><a href="#scrpt_cmd_research">RESEARCH(&#8203;[player],&#8203;[research&nbsp;type],&#8203;[room&nbsp;or&nbsp;spell],&#8203;[a])</a></p>
+<p class="cidx"><a href="#scrpt_cmd_reset_action_point">RESET_ACTION_POINT(&#8203;[action&nbsp;point])</a></p>
+<p class="cidx"><a href="#scrpt_cmd_room_available">ROOM_AVAILABLE(&#8203;[player],&#8203;[room],&#8203;[can&nbsp;be&nbsp;available],&#8203;[is&nbsp;available])</a></p>
+<p class="cidx"><a href="#scrpt_cmd_set_computer_checks">SET_COMPUTER_CHECKS(&#8203;[player],&#8203;["checks&nbsp;name"],&#8203;[check&nbsp;every],&#8203;[data1],&#8203;[data2],&#8203;[data3],&#8203;[data4])</a></p>
+<p class="cidx"><a href="#scrpt_cmd_set_computer_event">SET_COMPUTER_EVENT(&#8203;[player],&#8203;["event&nbsp;name"],&#8203;[data1],&#8203;[data2])</a></p>
+<p class="cidx"><a href="#scrpt_cmd_set_computer_globals">SET_COMPUTER_GLOBALS(&#8203;[player],&#8203;[a],&#8203;[a],&#8203;[a],&#8203;[a],&#8203;[a],&#8203;[a])</a></p>
+<p class="cidx"><a href="#scrpt_cmd_set_computer_process">SET_COMPUTER_PROCESS(&#8203;[player],&#8203;["process&nbsp;name"],&#8203;[priority],&#8203;[data1],&#8203;[data2],&#8203;[data3],&#8203;[data4])</a></p>
+<p class="cidx"><a href="#scrpt_cmd_set_creature_armour">SET_CREATURE_ARMOUR(&#8203;[creature],&#8203;[a])</a></p>
+<p class="cidx"><a href="#scrpt_cmd_set_creature_fear">SET_CREATURE_FEAR(&#8203;[creature],&#8203;[a])</a></p>
+<p class="cidx"><a href="#scrpt_cmd_set_creature_health">SET_CREATURE_HEALTH(&#8203;[creature],&#8203;[a])</a></p>
+<p class="cidx"><a href="#scrpt_cmd_set_creature_max_level">SET_CREATURE_MAX_LEVEL(&#8203;[player],&#8203;[creature],&#8203;[max&nbsp;experience])</a></p>
+<p class="cidx"><a href="#scrpt_cmd_set_creature_strength">SET_CREATURE_STRENGTH(&#8203;[creature],&#8203;[a])</a></p>
+<p class="cidx"><a href="#scrpt_cmd_set_flag">SET_FLAG(&#8203;[player],&#8203;[flag],&#8203;[a])</a></p>
+<p class="cidx"><a href="#scrpt_cmd_set_generate_speed">SET_GENERATE_SPEED(&#8203;[a])</a></p>
+<p class="cidx"><a href="#scrpt_cmd_set_music">SET_MUSIC(&#8203;[a])</a></p>
+<p class="cidx"><a href="#scrpt_cmd_set_timer">SET_TIMER(&#8203;[player],&#8203;[timer])</a></p>
+<p class="cidx"><a href="#scrpt_cmd_start_money">START_MONEY(&#8203;[player],&#8203;[gold])</a></p>
+<p class="cidx"><a href="#scrpt_cmd_trap_available">TRAP_AVAILABLE(&#8203;[player],&#8203;[trap],&#8203;[can&nbsp;be&nbsp;available],&#8203;[number&nbsp;available])</a></p>
+<p class="cidx"><a href="#scrpt_cmd_tutorial_flash_button">TUTORIAL_FLASH_BUTTON(&#8203;[button],&#8203;[player])</a></p>
+<p class="cidx"><a href="#scrpt_cmd_win_game">WIN_GAME</a></p>
+
+<h3><a name="scrpt_undindex">10.1 Undocumented script commands</a></h3>
+
+<p class="cidx"><a href="#scrpt_cmd_set_hate">SET_HATE([a],[a],[a]) NNN</a></p>
+DD/gold only:
+<p class="cidx"><a href="#scrpt_cmd_swap_creature">SWAP_CREATURE([?],[?]) AA</a></p>
+
+<br clear="all"/><br/>
+
+<h1><a name="scrpt_credits">12.0 Credits</a></h1>
+
+<br/>
+<p class="std"><b>Producer:</b> Sean Cooper</p>
+<br/>
+<p class="std"><b>Project Leader:</b> Alex Peters</p>
+<br/>
+<p class="std"><b>Lead Programmer:</b> Mark Stacey</p>
+<br/>
+<p class="std"><b>Additional Artwork:</b> Peter Amachree</p>
+<br/>
+<p class="std"><b>Manual and Documentation:</b> Jon Rennie</p>
+<br/>
+<p class="std"><b>Manual Verification:</b> Shintaro Kanaoya, Nathan Smethurst, Barrie Parker</p>
+<br/>
+<p class="std"><b>Testing Manager:</b> Andy Robson</p>
+<br/>
+<p class="std"><b>Testing:</b> Nathan Smethurst, Steve Lawrie, Tristan Paramor, Jeff Brutus</p>
+<br/>
+<p class="std"><b>Documentation Modifications:</b> Tomasz Lis</p>
+<br/>
+<p class="std"><b>Used information provided by:</b> DzjeeAr, DragonsLover, Danrhan</p>
+
+<br clear="all"/><br/>
+
+<h1><a name="scrpt_changelog">13.0 Changes log</a></h1>
+
+<br/>
+
+<h4>Version 1.3</h4>
+<ul>
+<li class="std">Many modifications, suggested by DragonsLover</li>
+<li class="std">Better creature parties explanation</li>
+</ul>
+<br/>
+<h4>Version 1.2</h4>
+<ul>
+<li class="std">Fixations to small mistakes</li>
+<li class="std">Extended game turns explanation</li>
+<li class="std">Added information and interface commands</li>
+<li class="std">Added computer player commands</li>
+</ul>
+<br/>
+<h4>Version 1.1</h4>
+<ul>
+<li class="std">File format changed to HTML</li>
+<li class="std">Divided into two parts: Official Editor Manual and Script Reference</li>
+<li class="std">Fixations of text formattiong</li>
+</ul>
+<br/>
+<h4>Version 1.0</h4>
+<ul>
+<li class="std">Original version of the reference, released by Bullfrog with the
+Official Map Editor for Dungeon Keeper</li>
+</ul>
+
+<br clear="all"/><br/>
+
+<h1><a name="scrpt_refs">14.0 References</a></h1>
+
+<br/>
+<ol>
+<li class="std"><a href="index.htm">Dungeon Keeper Mapmaker's Documentation</a></li>
+<li class="std"><a href="dk_editor_manual.htm">Dungeon Keeper Official Editor Manual</a></li>
+</ol>
+
+<br clear="all"/><br/>
+
+</body>
+</html>

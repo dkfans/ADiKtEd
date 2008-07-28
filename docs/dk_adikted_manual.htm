@@ -28,7 +28,7 @@ div.clearleft { clear: left; line-height: 0; height: 0; }
 
 <body>
 
-<p class="main_title">Another Dungeon Keeper map Editor Manual&nbsp;v1.0</p>
+<p class="main_title">Another Dungeon Keeper map Editor Manual&nbsp;v1.1</p>
 
 <p class="main_subtitle">Created by ADiKtEd authors</p>
 
@@ -63,10 +63,14 @@ div.clearleft { clear: left; line-height: 0; height: 0; }
 <p class="toc2"><a href="#adiman_mapfix_datclm">4.7 Problems in column or DAT file</a></p>
 <p class="toc2"><a href="#adiman_mapfix_other">4.8 Other problems</a></p>
 
-<p class="toc1"><a href="#adiman_keys">5.0 Keys</a></p>
-<p class="toc1"><a href="#adiman_credits">6.0 Credits</a></p>
-<p class="toc1"><a href="#adiman_changelog">7.0 Changes log</a></p>
-<p class="toc1"><a href="#adiman_refs">8.0 References</a></p>
+<p class="toc1"><a href="#adiman_inifile">5.0 ADiKtEd Configuration file</a></p>
+<p class="toc2"><a href="#adiman_inifile_othrcomp">5.1 UnDed and Official Editor compatibility</a></p>
+<p class="toc2"><a href="#adiman_inifile_reincrnr">5.2 FILL_REINFORCED_CORNER option</a></p>
+
+<p class="toc1"><a href="#adiman_keys">6.0 Keys</a></p>
+<p class="toc1"><a href="#adiman_credits">7.0 Credits</a></p>
+<p class="toc1"><a href="#adiman_changelog">8.0 Changes log</a></p>
+<p class="toc1"><a href="#adiman_refs">9.0 References</a></p>
 
 <br clear="all"/><br/>
 
@@ -730,7 +734,65 @@ any of the topics, and you can't understand it, please contact ADiKtEd developer
 
 <br clear="all"/><br/>
 
-<h1><a name="adiman_keys">5.0 Keys</a></h1>
+<h1><a name="adiman_inifile">5.0 ADiKtEd Configuration file</a></h1>
+<br/>
+
+<p class="std">The&nbsp;configuration file for ADiKtEd is called <b>map.ini</b>.
+It&nbsp;is a text file with very simple layout, and it's easy to change it
+with any text editor, ie. notepad. Commands in the file are well commented
+inside it, and additional information is provided here.</p>
+<br/>
+
+<h2><a name="adiman_inifile_othrcomp">5.1 UnDed and Official Editor compatibility</a></h2>
+<br/>
+
+<p class="std">UnDed&nbsp;has some specific behavior which differs from ADiKtEd.
+Still, you may force ADiKtEd to emulate some of the UnDed characteristics.</p>
+<br/>
+
+<p class="std">The main difference is that UnDed creates maps where every tile
+is completely filled with its content. For&nbsp;example if you will place
+earth next to path, UnDed will fill all&nbsp;9 subtiles of the earth with
+tall columns. ADiKtEd and Official Editor may in some cases leave one corner
+subtile short inside the earth slab. To make ADiKtEd compatible with UnDed,
+you should set these options in INI file to shown values:</p>
+<br/>
+
+<pre class="snip">UNAFFECTED_GEMS=1
+UNAFFECTED_ROCK=1
+FILL_REINFORCED_CORNER=1
+FRAIL_COLUMNS=0
+LOAD_REDUNDANT_OBJECTS=0</pre>
+<br/>
+
+<p class="std">ADiKtEd replaces corners of slabs more often than Official Editor.
+To make it more compatible with Official Editor, you should set these options in INI file:</p>
+<br/>
+
+<pre class="snip">UNAFFECTED_GEMS=1
+UNAFFECTED_ROCK=0
+FILL_REINFORCED_CORNER=1
+FRAIL_COLUMNS=1</pre>
+
+<br clear="all"/><br/>
+
+<h2><a name="adiman_inifile_reincrnr">5.2 FILL_REINFORCED_CORNER option</a></h2>
+<br/>
+
+<div class="rightfloatbox"><img src="dk_adikted_tutorial_reinforced_corner_0.png"/>
+<img src="dk_adikted_tutorial_reinforced_corner_1.png"/></div>
+
+<p class="std">This option allows you choose what to place at reinforced wall corners.
+The value 0 means there will be earth at corners, 1&nbsp;will place cobblestones there,
+2&nbsp;will also place cobblestones, but with some markings on. You&nbsp;can see the
+difference between value 0 and 1 on the image. The default is:</p>
+<br/>
+
+<pre class="snip">FILL_REINFORCED_CORNER=1</pre>
+
+<br clear="all"/><br/>
+
+<h1><a name="adiman_keys">6.0 Keys</a></h1>
 <br/>
 
 <p class="std">The following keys are shortcut keys for all work modes:</p>
@@ -764,7 +826,7 @@ found by reading the help screen under <b>F1</b> key.</p>
 
 <br clear="all"/><br/>
 
-<h1><a name="adiman_credits">6.0 Credits</a></h1>
+<h1><a name="adiman_credits">7.0 Credits</a></h1>
 <br/>
 
 <p class="std"><b>Original author:</b> Jon Skeet,
@@ -777,13 +839,14 @@ found by reading the help screen under <b>F1</b> key.</p>
 
 <br clear="all"/><br/>
 
-<h1><a name="adiman_changelog">7.0 Changes log</a></h1>
+<h1><a name="adiman_changelog">8.0 Changes log</a></h1>
 
 <br/>
 
 <h4>Version 1.1</h4>
 <ul>
 <li class="std">Added explanation of some verification warnings</li>
+<li class="std">Some configuration file information</li>
 </ul>
 
 <h4>Version 1.0</h4>
@@ -793,7 +856,7 @@ found by reading the help screen under <b>F1</b> key.</p>
 
 <br clear="all"/><br/>
 
-<h1><a name="adiman_refs">8.0 References</a></h1>
+<h1><a name="adiman_refs">9.0 References</a></h1>
 
 <br/>
 <ol>

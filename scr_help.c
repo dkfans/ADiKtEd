@@ -550,7 +550,7 @@ void draw_help(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata)
           help_line=workdata->help->text[y+i];
       draw_help_line(i,0,help_line,DHFLAG_USE_COLORS);
     }
-    set_cursor_pos(get_screen_rows()-1, get_screen_cols()-1);
+    show_no_cursor();
 }
 
 void draw_help_line(int posy,int posx,char *text,short flags)

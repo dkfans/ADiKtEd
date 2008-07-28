@@ -1,20 +1,18 @@
 /******************************************************************************/
-// draw_map.h - Graphics draw of Dungeon Keeper map.
-/******************************************************************************/
-// Author:   Tomasz Lis
-// Created:  12 Jan 2008
-
-// Purpose:
-//   Header file. Defines exported routines from draw_map.c
-
-// Comment:
-//   None.
-
-//Copying and copyrights:
-//   This program is free software; you can redistribute it and/or modify
-//   it under the terms of the GNU General Public License as published by
-//   the Free Software Foundation; either version 2 of the License, or
-//   (at your option) any later version.
+/** @file draw_map.h
+ * Graphics draw of Dungeon Keeper map.
+ * @par Purpose:
+ *     Header file. Defines exported routines from draw_map.c
+ * @par Comment:
+ *     None.
+ * @author   Tomasz Lis
+ * @date     12 Jan 2008 - 22 Jul 2008
+ * @par  Copying and copyrights:
+ *     This program is free software; you can redistribute it and/or modify
+ *     it under the terms of the GNU General Public License as published by
+ *     the Free Software Foundation; either version 2 of the License, or
+ *     (at your option) any later version.
+ */
 /******************************************************************************/
 
 #ifndef ADIKT_DRAWMAP_H
@@ -47,8 +45,22 @@ struct MAPDRAW_DATA {
     short rescale;
 };
 
+// Disk bitmap drawing
+
 DLLIMPORT short generate_map_bitmap(const char *bmpfname,const struct LEVEL *lvl,
     const struct MAPDRAW_OPTIONS *opts);
 DLLIMPORT short generate_map_bitmap_mapfname(struct LEVEL *lvl);
+
+// Memory buffer drawing
+
+DLLIMPORT short load_draw_data(struct MAPDRAW_DATA **draw_data,const struct MAPDRAW_OPTIONS *opts,
+    const struct IPOINT_2D bmp_size,int textr_idx);
+DLLIMPORT short free_draw_data(struct MAPDRAW_DATA *draw_data);
+DLLIMPORT short draw_map_on_buffer(char *dest,const struct LEVEL *lvl,
+    const struct MAPDRAW_DATA *draw_data);
+DLLIMPORT short set_draw_data_rect(struct MAPDRAW_DATA *draw_data,
+    const int startx,const int starty,const int endx,const int endy,const short rescale);
+DLLIMPORT short set_draw_data_rect_ip(struct MAPDRAW_DATA *draw_data,
+    const struct IPOINT_2D start,const struct IPOINT_2D end,const short rescale);
 
 #endif // ADIKT_DRAWMAP_H

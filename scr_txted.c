@@ -24,6 +24,7 @@
 #include "output_scr.h"
 #include "input_kb.h"
 #include "scr_actn.h"
+#include "scr_txtgen.h"
 #include "libadikted/lev_data.h"
 #include "libadikted/lev_script.h"
 
@@ -76,9 +77,21 @@ void free_scrpt(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata)
  */
 void actions_scrpt(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata,int key)
 {
+    message_release();
+    if ((workdata->editor->gen_flags&SGF_ENABLED)==SGF_ENABLED)
+    {
+        if (action_menukey(workdata,workdata->txtgen->currmnu,key))
+            return;
+        switch (key)
+        {
+        case KEY_ESCAPE:
+            end_scrptgen(scrmode,workdata);
+            break;
+        }
+        return;
+    }
     int lines_count;
     int line_y=workdata->editor->y;
-    message_release();
     lines_count=workdata->editor->script->lines_count;
     switch (key)
     {
@@ -174,6 +187,7 @@ short recompute_editor_lines(struct TXTED_DATA *editor,const struct DK_SCRIPT *s
     const unsigned int scr_width)
 {
     free(editor->line_rows);
+//    message_log("recompute_editor_lines: starting");
     editor->line_rows=(int *)malloc((script->lines_count+1)*sizeof(unsigned int));
     if (editor->line_rows==NULL) return false;
     editor->scr_width=scr_width;
@@ -196,6 +210,8 @@ short recompute_editor_lines(struct TXTED_DATA *editor,const struct DK_SCRIPT *s
         editor->line_rows[line_num]=ln_rows;
         total_rows+=ln_rows;
     }
+    message_log("recompute_editor_lines: got %d screen lines from %d script lines",
+        total_rows,all_lines);
     editor->line_rows[all_lines]=0;
     editor->total_rows_count=total_rows;
     return true;
@@ -309,7 +325,8 @@ void draw_scrpt(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata)
             txt_line=workdata->editor->script->txt[line_num];
         else
             txt_line="";
-        if (line_num==workdata->editor->y)
+        if (((workdata->editor->gen_flags&SGF_ENABLED)!=SGF_ENABLED) &&
+           (line_num==workdata->editor->y))
             ccolor=&script_hl_colors;
         else
             ccolor=&script_std_colors;
@@ -429,7 +446,15 @@ void draw_scrpt(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata)
         new_line=true;
       }
     }
-    set_cursor_pos(get_screen_rows()-1, get_screen_cols()-1);
+    if ((workdata->editor->gen_flags&SGF_ENABLED)==SGF_ENABLED)
+    {
+      draw_menuscr(workdata->txtgen->currmnu,scrmode->rows,scrmode->cols);
+      // Place cursor appropriately
+      draw_menu_cursor(workdata->txtgen->currmnu,scrmode->rows,scrmode->cols);
+    } else
+    {
+      show_no_cursor();
+    }
 }
 
 void script_verify_with_highlight(const struct LEVEL *lvl,struct TXTED_DATA *editor)

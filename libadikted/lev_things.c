@@ -89,9 +89,10 @@ short things_verify(struct LEVEL *lvl, char *err_msg,struct IPOINT_2D *errpt)
             return result;
           }
           unsigned char type_idx=get_thing_type(thing);
-          // Checking sensitile again (one check is in thing_verify())
+          // Checking level-dependent thing parameters
           if (type_idx==THING_TYPE_ITEM)
           {
+            // Checking sensitile again (one check is in thing_verify())
             int sen_tl;
             sen_tl=get_thing_sensitile(thing);
             unsigned short stype_idx=get_thing_subtype(thing);
@@ -106,30 +107,51 @@ short things_verify(struct LEVEL *lvl, char *err_msg,struct IPOINT_2D *errpt)
               get_item_subtype_fullname(stype_idx),errpt->x,errpt->y);
               return VERIF_WARN;
             }
+            // Gold hoards only in treasure room
             if (((stype_idx==ITEM_SUBTYPE_GLDHOARD1)||(stype_idx==ITEM_SUBTYPE_GLDHOARD2)||
                 (stype_idx==ITEM_SUBTYPE_GLDHOARD3)||(stype_idx==ITEM_SUBTYPE_GLDHOARD4)||
                 (stype_idx==ITEM_SUBTYPE_GLDHOARD5))&&(slab!=SLAB_TYPE_TREASURE))
             {
               errpt->x=i/MAP_SUBNUM_X;
               errpt->y=j/MAP_SUBNUM_Y;
-              sprintf(err_msg,"Gold hoarde put outside of treasure room on slab %d,%d.",
-                  errpt->x,errpt->y);
+              sprintf(err_msg,"%s put outside of %s on slab %d,%d.",
+                  get_item_subtype_fullname(stype_idx),
+                  get_slab_fullname(SLAB_TYPE_TREASURE), errpt->x, errpt->y);
               return VERIF_WARN;
             }
+            // Multiple things overlaid
             if ((get_thing_subtypes_arridx(thing)==categr)&&(get_thing_subtpos_x(thing)==subtp_x)&&
                 (get_thing_subtpos_y(thing)==subtp_y)&&(get_thing_subtpos_h(thing)==subtp_h)&&
                 (!is_gold(thing))&&(!is_food(thing)))
             {
               errpt->x=i/MAP_SUBNUM_X;
               errpt->y=j/MAP_SUBNUM_Y;
-              sprintf(err_msg,"Multiple %s with exactly same position on slab %d,%d.",
-                  get_thing_category_fullname(categr),errpt->x,errpt->y);
+              sprintf(err_msg,"Multiple %s with %s on slab %d,%d.",
+                  get_thing_category_fullname(categr),"exactly same position",
+                  errpt->x,errpt->y);
               return VERIF_WARN;
             }
             categr=get_thing_subtypes_arridx(thing);
             subtp_x=get_thing_subtpos_x(thing);
             subtp_y=get_thing_subtpos_y(thing);
             subtp_h=get_thing_subtpos_h(thing);
+          }
+          if (type_idx==THING_TYPE_DOOR)
+          {
+            unsigned short stype_idx=get_thing_subtype(thing);
+            // Doors must be on door slab
+            if (((stype_idx==DOOR_SUBTYPE_WOOD)&&(slab!=SLAB_TYPE_DOORWOOD1)&&(slab!=SLAB_TYPE_DOORWOOD2)) ||
+                ((stype_idx==DOOR_SUBTYPE_BRACED)&&(slab!=SLAB_TYPE_DOORBRACE1)&&(slab!=SLAB_TYPE_DOORBRACE2)) ||
+                ((stype_idx==DOOR_SUBTYPE_IRON)&&(slab!=SLAB_TYPE_DOORIRON1)&&(slab!=SLAB_TYPE_DOORIRON2)) ||
+                ((stype_idx==DOOR_SUBTYPE_MAGIC)&&(slab!=SLAB_TYPE_DOORMAGIC1)&&(slab!=SLAB_TYPE_DOORMAGIC2)))
+            {
+              errpt->x=i/MAP_SUBNUM_X;
+              errpt->y=j/MAP_SUBNUM_Y;
+              sprintf(err_msg,"%s %s thing put on %s slab at %d,%d.",
+                  get_door_subtype_fullname(stype_idx),get_thing_type_fullname(type_idx),
+                  get_slab_fullname(slab), errpt->x, errpt->y);
+              return VERIF_WARN;
+            }
           }
           if (is_creature(thing))  creatures_on_subtl++;
           if (is_trap(thing))  traps_on_subtl++;
@@ -140,23 +162,25 @@ short things_verify(struct LEVEL *lvl, char *err_msg,struct IPOINT_2D *errpt)
               ||is_doorbox(thing)) booksboxes_on_subtl++;
         }
         char *err_objcount=NULL;
+        char *err_objtype=NULL;
         if (creatures_on_subtl>5)
-            err_objcount="five creature";
+        { err_objcount="five"; err_objtype=get_thing_type_fullname(THING_TYPE_CREATURE); }
         if (traps_on_subtl>3)
-            err_objcount="three traps";
+        { err_objcount="three"; err_objtype=get_thing_type_fullname(THING_TYPE_TRAP); }
         if (effectgenrts_on_subtl>3)
-            err_objcount="three effect genertrs";
+        { err_objcount="three"; err_objtype=get_thing_type_fullname(THING_TYPE_EFFECTGEN); }
         if (lit_things_on_subtl>2)
-            err_objcount="two lit things";
+        { err_objcount="two"; err_objtype="lit"; }
         if (doors_on_subtl>1)
-            err_objcount="one door thing";
+        { err_objcount="one"; err_objtype=get_thing_type_fullname(THING_TYPE_DOOR); }
         if (booksboxes_on_subtl>1)
-            err_objcount="one book/workshop box/special";
+        { err_objcount="one"; err_objtype="book/box"; }
         if (err_objcount!=NULL)
         {
             errpt->x=i/MAP_SUBNUM_X;
             errpt->y=j/MAP_SUBNUM_Y;
-            sprintf(err_msg,"More than %s at one subtile on slab %d,%d.",err_objcount,errpt->x,errpt->y);
+            sprintf(err_msg,"More than %s %s thing at one subtile on slab %d,%d.",
+                err_objcount,err_objtype,errpt->x,errpt->y);
             return VERIF_WARN;
         }
       }

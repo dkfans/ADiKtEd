@@ -113,5 +113,5 @@ void draw_mdcube(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata)
     // which are too long for the list (without shortcuts)
     draw_numbered_list(get_cube_fullname,scrmode,workdata,
         0,CUBE_MAX_INDEX,20);
-    set_cursor_pos(get_screen_rows()-1, 17);
+    show_no_cursor();
 }

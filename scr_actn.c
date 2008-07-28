@@ -37,6 +37,8 @@
 #include "scr_txted.h"
 #include "scr_rwrk.h"
 #include "scr_cube.h"
+#include "textmenu.h"
+#include "scr_txtgen.h"
 #include "libadikted/obj_slabs.h"
 #include "libadikted/obj_things.h"
 #include "libadikted/obj_column.h"
@@ -191,6 +193,8 @@ void init_levscr_modes(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workda
     init_mdslab(scrmode,workdata);
     // Init rework mode
     init_mdrwrk(scrmode,workdata);
+    // Init script generator in script mode
+    init_scrptgen(scrmode,workdata);
     // Copy options into level preview structure
     level_set_options(workdata->mapmode->preview,workdata->optns);
     // Note: the modes which are not initied here, are initied earlier
@@ -632,7 +636,6 @@ void draw_levscr(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata)
     drawdata.workdata=workdata;
     if (is_marking_enab(workdata->mapmode))
       mark_check(scrmode,workdata->mapmode);
-    set_cursor_visibility(0);
     int all_rows=get_screen_rows();
     int all_cols=get_screen_cols();
     scrmode->rows = all_rows-2;
@@ -645,8 +648,12 @@ void draw_levscr(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata)
     set_cursor_pos(scrmode->rows, 0);
     screen_setcolor(PRINT_COLOR_YELLOW_ON_BLUE);
     // Hope there's enough room for it :)
+    char *divline_str;
+    divline_str=get_lif_name_text(workdata->lvl);
+    if ((divline_str==NULL)||(divline_str[0]=='\0'))
+        divline_str="Dungeon Keeper Map Editor";
     if (all_cols>70)
-      screen_printf_toeol("Dungeon Keeper Map Editor    %5.5s mode  %s", 
+      screen_printf_toeol("%25s    %5.5s mode  %s", divline_str,
                  modenames[scrmode->mode], mode_status(scrmode,workdata,scrmode->mode));
 
     int tx=workdata->mapmode->screen.x+workdata->mapmode->map.x;
@@ -664,7 +671,6 @@ void draw_levscr(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata)
     screen_setcolor(PRINT_COLOR_LGREY_ON_BLACK);
     message_log(" draw_levscr: executing screen-specific subfunction");
     mddraw[scrmode->mode%MODES_COUNT](scrmode,workdata);
-    set_cursor_pos(all_rows-1, all_cols-1);
     screen_refresh();
     message_log(" draw_levscr: finished");
 }
@@ -795,7 +801,10 @@ char *mode_status(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata,in
       strcpy (buffer, "    (unknown mode)");
       break;
     case MD_SCRP:
-      sprintf (buffer, "   Text Line: %4d", workdata->editor->y+1);
+      if ((workdata->editor->gen_flags&SGF_ENABLED)==SGF_ENABLED)
+        sprintf (buffer, "   (Script generator)");
+      else
+        sprintf (buffer, "   Text Line: %4d", workdata->editor->y+1);
       break;
     }
     return buffer;
@@ -1094,11 +1103,35 @@ void draw_map_cursor(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,s
  * Shows map cursor at position from mapmode; the cursor is a character
  * same as in the current map background written in different colors.
  */
-void show_cursor(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,char cur)
+void show_cursor(const struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,char cur)
 {
     set_cursor_pos(mapmode->screen.y, mapmode->screen.x);
     screen_setcolor(PRINT_COLOR_RED_ON_WHITE);
     screen_printchr(cur);
+    set_cursor_visibility(false);
+    set_cursor_pos(get_screen_rows()-1, get_screen_cols()-1);
+}
+
+/*
+ * Shows map cursor at given position; the cursor is a character
+ * from the parameter written in highlighted colors.
+ */
+void show_cursor_at(const struct SCRMODE_DATA *scrmode,int row,int col,char cur)
+{
+    set_cursor_pos(row,col);
+    screen_setcolor(PRINT_COLOR_RED_ON_WHITE);
+    screen_printchr(cur);
+    set_cursor_visibility(false);
+    set_cursor_pos(get_screen_rows()-1, get_screen_cols()-1);
+}
+
+/*
+ * Used when the screen should be drawn without any cursor
+ * (ie. if a whole string, like button, is selected)
+ */
+void show_no_cursor()
+{
+    set_cursor_visibility(false);
     set_cursor_pos(get_screen_rows()-1, get_screen_cols()-1);
 }
 
@@ -1119,9 +1152,10 @@ void draw_rpanel_usrinput(const struct SCRMODE_DATA *scrmode,const char *inp_mes
     {
       char chr=scrmode->usrinput[scrmode->usrinput_pos];
       if ((chr<32)||(chr>126)) chr=' ';
-      set_cursor_pos(scr_row, scr_col+scrmode->usrinput_pos);
-      screen_setcolor(PRINT_COLOR_RED_ON_WHITE);
-      screen_printchr(chr);
+      show_cursor_at(scrmode, scr_row, scr_col+scrmode->usrinput_pos, chr);
+    } else
+    {
+      show_no_cursor();
     }
 }
 
@@ -1158,6 +1192,7 @@ void display_rpanel_bottom(const struct SCRMODE_DATA *scrmode,const struct WORKM
         }
         display_tng_subtiles(scrmode,workdata,workdata->lvl,scr_row,scr_col,compressed,ty,tx);
       }
+      show_no_cursor();
     } else
     {
       draw_rpanel_usrinput(scrmode,string_input_msg[scrmode->usrinput_type]);
@@ -1190,8 +1225,12 @@ int display_mode_keyhelp(struct HELP_DATA *help, int scr_row, int scr_col,
  */
 int change_mode(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata,int new_mode)
 {
-  mdend[scrmode->mode%MODES_COUNT](scrmode,workdata);
-  mdstart[new_mode%MODES_COUNT](scrmode,workdata);
+  short prevmode=scrmode->mode;
+  mdend[prevmode%MODES_COUNT](scrmode,workdata);
+  short result=mdstart[new_mode%MODES_COUNT](scrmode,workdata);
+  if (!result)
+      mdstart[prevmode%MODES_COUNT](scrmode,workdata);
+  return result;
 }
 
 /*
@@ -1646,7 +1685,7 @@ void action_load_map_quick(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *wo
           popup_show("Reloading map","Reading map files. Please wait...");
           free_map(workdata->lvl);
           set_lvl_savfname(workdata->lvl,"");
-          load_map(workdata->lvl);
+          user_load_map(workdata->lvl,true);
           clear_highlight(workdata->mapmode);
           workdata->mdtng->obj_ranges_changed=true;
           change_mode(scrmode,workdata,scrmode->mode);
@@ -1675,8 +1714,7 @@ void action_save_map_quick(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *wo
     if (strlen(get_lvl_savfname(workdata->lvl))>0)
     {
         popup_show("Saving map","Writing map files. Please wait...");
-        inc_info_ver_rel(workdata->lvl);
-        save_map(workdata->lvl);
+        user_save_map(workdata->lvl,0);
         message_info("Map \"%s\" saved", get_lvl_savfname(workdata->lvl));
     } else
     {
@@ -1745,6 +1783,11 @@ void action_enter_script_mode(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA 
     if (is_simple_mode(scrmode->mode))
     {
         message_info("You can't view script from here.");
+    } else
+    if (scrmode->mode==MD_SCRP)
+    {
+        message_info("Entering script generator.");
+        start_scrptgen(scrmode,workdata);
     } else
     {
         change_mode(scrmode,workdata,MD_SCRP);

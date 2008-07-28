@@ -1,21 +1,19 @@
 /******************************************************************************/
-// globals.h - Another Dungeon Keeper Map Editor.
-/******************************************************************************/
-// Author:   Jon Skeet
-// Created:  08 sep 1998
-// Modified: Tomasz Lis
-
-// Purpose:
-//   Header file for global definitions.
-
-// Comment:
-//   Defines basic includes and definitions, used in whole program.
-
-//Copying and copyrights:
-//   This program is free software; you can redistribute it and/or modify
-//   it under the terms of the GNU General Public License as published by
-//   the Free Software Foundation; either version 2 of the License, or
-//   (at your option) any later version.
+/** @file globals.h
+ * Global configuration file.
+ * @par Purpose:
+ *     Header file with global definitions for Another Dungeon
+ *     Keeper Map Editor.
+ * @par Comment:
+ *     Defines basic includes and definitions, used in whole program.
+ * @author   Jon Skeet, Tomasz Lis
+ * @date     08 sep 1998 - 22 Jul 2008
+ * @par  Copying and copyrights:
+ *     This program is free software; you can redistribute it and/or modify
+ *     it under the terms of the GNU General Public License as published by
+ *     the Free Software Foundation; either version 2 of the License, or
+ *     (at your option) any later version.
+ */
 /******************************************************************************/
 
 #ifndef ADIKT_GLOBALS_H
@@ -43,6 +41,8 @@
 
 #if defined(BUILD_DLL)
 # define DLLIMPORT __declspec (dllexport)
+#elif defined(BUILD_SINGLE)
+# define DLLIMPORT 
 #else // Not defined BUILD_DLL
 # define DLLIMPORT __declspec (dllimport)
 #endif

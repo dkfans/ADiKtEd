@@ -1,20 +1,18 @@
 /******************************************************************************/
-// lev_column.h - Dungeon Keeper Tools.
-/******************************************************************************/
-// Author:   Tomasz Lis
-// Created:  21 Jan 2008
-
-// Purpose:
-//   Header file. Defines exported routines from lev_column.c
-
-// Comment:
-//   None.
-
-//Copying and copyrights:
-//   This program is free software; you can redistribute it and/or modify
-//   it under the terms of the GNU General Public License as published by
-//   the Free Software Foundation; either version 2 of the License, or
-//   (at your option) any later version.
+/** @file lev_column.h
+ * Level graphics (DAT/CLM) handling module.
+ * @par Purpose:
+ *     Header file. Defines exported routines from lev_column.c
+ * @par Comment:
+ *     None.
+ * @author   Tomasz Lis
+ * @date     21 Jan 2008 - 22 Jul 2008
+ * @par  Copying and copyrights:
+ *     This program is free software; you can redistribute it and/or modify
+ *     it under the terms of the GNU General Public License as published by
+ *     the Free Software Foundation; either version 2 of the License, or
+ *     (at your option) any later version.
+ */
 /******************************************************************************/
 
 #ifndef ADIKT_LEVCOLMN_H
@@ -56,7 +54,7 @@ DLLIMPORT void set_new_datclm_values(struct LEVEL *lvl, int tx, int ty, struct C
 DLLIMPORT void set_new_datclm_entry(struct LEVEL *lvl, int sx, int sy, struct COLUMN_REC *clm_rec);
 DLLIMPORT void update_clm_utilize_counters(struct LEVEL *lvl);
 DLLIMPORT void get_slab_surround(unsigned char *surr_slb,unsigned char *surr_own,
-    unsigned char **surr_tng,const struct LEVEL *lvl,int x, int y);
+    unsigned char **surr_tng,const struct LEVEL *lvl,int tx, int ty);
 DLLIMPORT void clm_utilize_dec(struct LEVEL *lvl, int clmidx);
 DLLIMPORT void clm_utilize_inc(struct LEVEL *lvl, int clmidx);
 DLLIMPORT short clm_entry_is_used(const struct LEVEL *lvl,unsigned int clmidx);

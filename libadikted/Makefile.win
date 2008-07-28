@@ -5,8 +5,8 @@ CPP  = g++.exe
 CC   = gcc.exe
 WINDRES = windres.exe
 RES  = adikted_private.res
-OBJ  = libadi_main.o bulcommn.o dernc.o draw_map.o graffiti.o graffiti_font.o lev_column.o lev_data.o lev_files.o lev_script.o lev_things.o memfile.o obj_actnpts.o obj_column.o obj_column_def.o obj_column_per.o obj_slabs.o obj_things.o xcubtxtr.o xtabdat8.o xtabjty.o msg_log.o arr_utils.o $(RES)
-LINKOBJ  = libadi_main.o bulcommn.o dernc.o draw_map.o graffiti.o graffiti_font.o lev_column.o lev_data.o lev_files.o lev_script.o lev_things.o memfile.o obj_actnpts.o obj_column.o obj_column_def.o obj_column_per.o obj_slabs.o obj_things.o xcubtxtr.o xtabdat8.o xtabjty.o msg_log.o arr_utils.o $(RES)
+OBJ  = libadi_main.o bulcommn.o dernc.o draw_map.o graffiti.o graffiti_font.o lev_column.o lev_data.o lev_files.o lev_script.o lev_things.o memfile.o obj_actnpts.o obj_column.o obj_column_def.o obj_column_per.o obj_slabs.o obj_things.o xcubtxtr.o xtabdat8.o xtabjty.o msg_log.o arr_utils.o lbfileio.o $(RES)
+LINKOBJ  = libadi_main.o bulcommn.o dernc.o draw_map.o graffiti.o graffiti_font.o lev_column.o lev_data.o lev_files.o lev_script.o lev_things.o memfile.o obj_actnpts.o obj_column.o obj_column_def.o obj_column_per.o obj_slabs.o obj_things.o xcubtxtr.o xtabdat8.o xtabjty.o msg_log.o arr_utils.o lbfileio.o $(RES)
 LIBS =  -L"D:/ProgsNT/Dev-Cpp/lib" --no-export-all-symbols --add-stdcall-alias  -march=i486 
 INCS =  -I"D:/ProgsNT/Dev-Cpp/include" 
 CXXINCS =  -I"D:/ProgsNT/Dev-Cpp/lib/gcc/mingw32/3.4.2/include"  -I"D:/ProgsNT/Dev-Cpp/include/c++/3.4.2/backward"  -I"D:/ProgsNT/Dev-Cpp/include/c++/3.4.2/mingw32"  -I"D:/ProgsNT/Dev-Cpp/include/c++/3.4.2"  -I"D:/ProgsNT/Dev-Cpp/include" 
@@ -98,6 +98,9 @@ msg_log.o: msg_log.c
 
 arr_utils.o: arr_utils.c
 	$(CC) -c arr_utils.c -o arr_utils.o $(CFLAGS)
+
+lbfileio.o: lbfileio.c
+	$(CC) -c lbfileio.c -o lbfileio.o $(CFLAGS)
 
 adikted_private.res: adikted_private.rc 
 	$(WINDRES) -i adikted_private.rc --input-format=rc -o adikted_private.res -O coff 

@@ -316,6 +316,9 @@ enum cmnds_adikted {
     LEVEL_TIMESTAMP    = 0x003,
     USER_CMNDS_COUNT   = 0x004,
     LEVEL_VERSION      = 0x005,
+    LEVEL_NAME         = 0x006,
+    LEVEL_DESC         = 0x007,
+    LEVEL_AUTHORS      = 0x008,
 };
 
 enum object_available {
@@ -439,12 +442,15 @@ DLLIMPORT const char *room_cmd_text(int cmdidx);
 int spell_cmd_arrsize();
 int spell_cmd_index(const char *cmdtext);
 DLLIMPORT const char *spell_cmd_text(int cmdidx);
+DLLIMPORT const char *spell_cmd_fullname(int cmdidx);
 int trap_cmd_arrsize();
 int trap_cmd_index(const char *cmdtext);
 DLLIMPORT const char *trap_cmd_text(int cmdidx);
+DLLIMPORT const char *trap_cmd_fullname(int cmdidx);
 int door_cmd_arrsize();
 int door_cmd_index(const char *cmdtext);
 DLLIMPORT const char *door_cmd_text(int cmdidx);
+DLLIMPORT const char *door_cmd_fullname(int cmdidx);
 int objtype_cmd_arrsize();
 int objtype_cmd_index(const char *cmdtext);
 DLLIMPORT const char *objtype_cmd_text(int cmdidx);

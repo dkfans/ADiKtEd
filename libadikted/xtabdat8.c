@@ -189,7 +189,7 @@ int read_tabfile_data(struct TABFILE *tabf,const char *srcfname)
         {
             struct TABFILE_ITEM *curitm=&(tabf->items[entrynum]);
             unsigned long readed=fread (tabitm, 1, 6, tabfp);
-            curitm->offset=read_long_le_buf(tabitm);
+            curitm->offset=read_int32_le_buf(tabitm);
             curitm->width=tabitm[4];
             curitm->height=tabitm[5];
             if (readed < 6) return 3;
@@ -227,7 +227,7 @@ short read_datfile_data(struct DATFILE *datf,const char *srcfname)
     FILE *datfp;
     datfp = fopen (srcfname, "rb");
     if (datfp==NULL) return XTABDAT8_CANT_OPEN;
-    datf->count=read_short_le_file(datfp)-1;
+    datf->count=read_int16_le_file(datfp)-1;
     datf->filelength=file_length_opened(datfp);
     datf->data=malloc(datf->filelength);
     if (datf->data==NULL) { fclose(datfp);return XTABDAT8_MALLOC_ERR; }
