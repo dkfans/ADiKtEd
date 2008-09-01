@@ -21,7 +21,7 @@
 #ifndef ADIKT_SCRACTN_H
 #define ADIKT_SCRACTN_H
 
-#include "libadikted/globals.h"
+#include "../libadikted/globals.h"
 
 struct LEVEL;
 
@@ -133,6 +133,8 @@ struct INFOPANEL_DATA {
 };
 
 struct MAPMODE_DATA {
+    // Level size, in tiles
+    struct UPOINT_2D tlsize;
     //Marking variables
     short mark;
     struct IPOINT_2D markp;

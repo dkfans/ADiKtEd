@@ -22,16 +22,11 @@
 #include "scr_thing.h"
 
 #include <math.h>
-#include "libadikted/globals.h"
+#include "../libadikted/adikted.h"
 #include "scr_help.h"
 #include "output_scr.h"
 #include "input_kb.h"
 #include "scr_actn.h"
-#include "libadikted/lev_data.h"
-#include "libadikted/lev_things.h"
-#include "libadikted/obj_things.h"
-#include "libadikted/obj_actnpts.h"
-#include "libadikted/obj_slabs.h"
 
 /*
  * Initializes variables for the tng screen.
@@ -462,7 +457,7 @@ void draw_mdtng_panel(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdat
       display_static_light(obj, scr_col1, 1, scrmode->rows, workdata->ipanel->display_float_pos);
       break;
     case OBJECT_TYPE_THING:
-      display_thing(workdata->help, obj, scr_col1, 1, scrmode->rows, workdata->ipanel->display_float_pos);
+      display_thing(workdata->help, obj, &(workdata->lvl->tlsize), scr_col1, 1, scrmode->rows, workdata->ipanel->display_float_pos);
       break;
     default:
       k=display_mode_keyhelp(workdata->help,k,scr_col1,scrmode->rows-TNGDAT_ROWS,scrmode->mode,0);
@@ -632,8 +627,8 @@ int display_object_posxy(const short display_float_pos,int scr_col, int scr_row,
     return scr_row;
 }
 
-int display_thing(struct HELP_DATA *help,unsigned char *thing, int scr_col, int scr_row,
-        int max_row, short display_float_pos)
+int display_thing(struct HELP_DATA *help,const unsigned char *thing, const struct UPOINT_2D *tlsize,
+        int scr_col, int scr_row, const int max_row, const short display_float_pos)
 {
     int m, i;
 
@@ -681,8 +676,8 @@ int display_thing(struct HELP_DATA *help,unsigned char *thing, int scr_col, int 
         } else
         {
             int sen_tlx,sen_tly;
-            sen_tlx=sen_tl%MAP_SIZE_X;
-            sen_tly=sen_tl/MAP_SIZE_X;
+            sen_tlx=sen_tl%tlsize->x;
+            sen_tly=sen_tl/tlsize->x;
             screen_printf(" %3d, %3d", sen_tlx, sen_tly);
         }
     }
@@ -1145,7 +1140,7 @@ void tng_change_height(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workda
     case OBJECT_TYPE_ACTNPT:
       height=get_actnpt_range_subtile(obj);
       subheight=get_actnpt_range_subtpos(obj)+delta_height;
-      tile_limit=MAP_SIZE_X/2;
+      tile_limit=workdata->lvl->tlsize.x/2;
       break;
     case OBJECT_TYPE_THING:
       height=get_thing_subtile_h(obj);
@@ -1215,12 +1210,12 @@ void tng_change_range(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdat
     case OBJECT_TYPE_STLIGHT:
       rng=get_stlight_range_subtile(obj);
       subrng=get_stlight_range_subtpos(obj)+delta_range;
-      tile_limit=MAP_SIZE_X/2;
+      tile_limit=workdata->lvl->tlsize.x/2;
       break;
     case OBJECT_TYPE_ACTNPT:
       rng=get_actnpt_range_subtile(obj);
       subrng=get_actnpt_range_subtpos(obj)+delta_range;
-      tile_limit=MAP_SIZE_X/2;
+      tile_limit=workdata->lvl->tlsize.x/2;
       break;
     case OBJECT_TYPE_THING:
       {
@@ -1229,7 +1224,7 @@ void tng_change_range(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdat
         case THING_TYPE_EFFECTGEN:
           rng=get_thing_range_subtile(obj);
           subrng=get_thing_range_subtpos(obj)+delta_range;
-          tile_limit=MAP_SIZE_X/2;
+          tile_limit=workdata->lvl->tlsize.x/2;
           break;
         case THING_TYPE_ITEM:
         case THING_TYPE_CREATURE:

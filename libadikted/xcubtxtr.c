@@ -154,14 +154,14 @@ short load_textureanim(struct CUBES_DATA *cubes,const char *fname)
     //Loading the entries
     cubes->anitx=malloc(cubes->anitxcount*sizeof(struct CUBE_TXTRANIM));
     int i,k;
-    for (i=0; i<cubes->anitxcount; i++)
+    for (k=0; k<cubes->anitxcount; k++)
     {
-      unsigned char *addr=mem->content + (k<<1);
-      for (k=0; k<8; k++)
+      unsigned char *addr=mem->content + (k<<4);
+      for (i=0; i<8; i++)
       {
         unsigned int val;
-        val=read_int16_le_buf(addr+(i<<4));
-        cubes->anitx[i].data[k]=val;
+        val=read_int16_le_buf(addr+(i<<1));
+        cubes->anitx[k].data[i]=val;
       }
     }
     memfile_free(&mem);

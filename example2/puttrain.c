@@ -41,7 +41,7 @@ int main(int argc, char *argv[])
   printf("%s\n",message_get());
 
   // create object for storing map
-  level_init(&lvl);
+  level_init(&lvl,MFV_DKGOLD,NULL);
 
   // Set paths to levels - this will allow us to
   // skip the path when formatting level name

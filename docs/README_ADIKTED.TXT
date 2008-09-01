@@ -62,6 +62,13 @@ Press F1 for help.
 TODO before final:
  Fixations in room things parameters (height,other)
  Fixations in room corner graphics
+Version: 0.95b
+ Prepared two more libAdikted examples
+ Added some graphics API functions
+ Started making support of various map sizes
+ Added support for VSN files
+ Fixed verification of QUICK_* in script - length up to 511
+ Added warning if there are unclosed IF loops
 Version: 0.93b
  Work on Script Generator started (ctrl+t in script mode)
  Work on doxygen documentation of libAdikted started

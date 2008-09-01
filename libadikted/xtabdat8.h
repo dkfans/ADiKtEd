@@ -20,6 +20,12 @@
 #ifndef BULL_XTABDAT8_H
 #define BULL_XTABDAT8_H
 
+#if (defined(MAIN_XTABDAT8)||defined(MAIN_XTABJTY))
+ #define msgprintf printf
+#else
+ #define msgprintf message_log
+#endif
+
 // Error returns
 
 #define XTABDAT8_COLOUR_LEAK 2
@@ -30,12 +36,22 @@
 #define XTABDAT8_MALLOC_ERR 11
 #define XTABDAT8_INTERNAL   12
 
+// Values
+
+#define TABFILE_ENTRY_SIZE  6
+#define TABFILE_HEADER_SIZE 6
+
 // Data types
+
+struct IMGTAB_ATTRIB {
+    unsigned char unkn[10];
+       };
 
 struct TABFILE_ITEM {
     unsigned long offset;
     unsigned int width;
     unsigned int height;
+//    struct IMGTAB_ATTRIB attrib;
        };
 
 struct TABFILE {
@@ -49,6 +65,23 @@ struct DATFILE {
     unsigned long filelength;
     unsigned char *data;
        };
+
+//Compressed (rle) images
+
+struct ENCIMAGEITEM {
+    unsigned int width;
+    unsigned int height;
+    struct IMGTAB_ATTRIB attrib;
+    unsigned char *data;
+    unsigned int datsize;
+       };
+
+struct ENCIMAGELIST {
+    unsigned long count;
+    struct ENCIMAGEITEM *items;
+       };
+
+//Decompressed (bitmap) images
 
 struct IMAGEITEM {
     unsigned int width;
@@ -65,7 +98,8 @@ struct IMAGELIST {
 // Routines
 
 DLLIMPORT int read_tabfile_data(struct TABFILE *tabf,const char *srcfname);
-DLLIMPORT int free_tabfile_data(struct TABFILE *tabf);
+DLLIMPORT short write_tabfile_data(const struct TABFILE *tabf,const char *dstfname);
+DLLIMPORT short free_tabfile_data(struct TABFILE *tabf);
 
 DLLIMPORT short read_datfile_data(struct DATFILE *datf,const char *srcfname);
 DLLIMPORT short write_datfile_data(const struct DATFILE *datf,const char *dstfname);
@@ -78,6 +112,17 @@ DLLIMPORT int read_dat_image_idx(struct IMAGEITEM *image,unsigned long *readedsi
     const struct DATFILE *datf,const unsigned long off,
     const unsigned int width,const unsigned int height);
 
-DLLIMPORT int create_images_dattab_idx(struct IMAGELIST *images,const char *datfname,const char *tabfname,const int verbose);
+DLLIMPORT int read_dattab_encimages(struct ENCIMAGELIST *images,unsigned long *readcount,
+    const struct TABFILE *tabf,const struct DATFILE *datf,const int verbose);
+DLLIMPORT int write_encimages_dattab(const struct ENCIMAGELIST *images,unsigned long *writecount,
+    struct TABFILE *tabf,struct DATFILE *datf);
+
+DLLIMPORT short create_images_dattab_enc(struct ENCIMAGELIST *images,const char *datfname,
+    const char *tabfname,const int verbose);
+DLLIMPORT short write_dattab_images_enc(const struct ENCIMAGELIST *images,const char *datfname,
+    const char *tabfname,const int verbose);
+
+DLLIMPORT int create_images_dattab_idx(struct IMAGELIST *images,const char *datfname,
+    const char *tabfname,const int verbose);
 
 #endif

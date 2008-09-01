@@ -367,7 +367,13 @@ short set_thing_subtile_h(unsigned char *thing,unsigned char pos_h)
 unsigned char get_thing_subtpos_x(const unsigned char *thing)
 {
     if (thing==NULL) return 128;
-    return (char)thing[0];
+    return (unsigned char)thing[0];
+}
+
+unsigned short get_thing_pos_x_adv(const unsigned char *thing)
+{
+    if (thing==NULL) return 0;
+    return (((unsigned short)thing[1])<<8) + thing[0];
 }
 
 short set_thing_subtpos_x(unsigned char *thing,unsigned char pos_x)
@@ -381,6 +387,12 @@ unsigned char get_thing_subtpos_y(const unsigned char *thing)
 {
     if (thing==NULL) return 0x80;
     return (char)thing[2];
+}
+
+unsigned short get_thing_pos_y_adv(const unsigned char *thing)
+{
+    if (thing==NULL) return 0;
+    return (((unsigned short)thing[3])<<8) + thing[2];
 }
 
 short set_thing_subtpos_y(unsigned char *thing,unsigned char pos_y)
@@ -438,7 +450,7 @@ short set_thing_range_subtile(unsigned char *thing,unsigned char rng)
 }
 
 /*
- * Returns range for any thing, as subtiles*256+within_subtile
+ * Returns range for any thing, as subtiles*256+within_subtile.
  */
 unsigned int get_thing_range_adv(const unsigned char *thing)
 {
@@ -457,6 +469,36 @@ unsigned int get_thing_range_adv(const unsigned char *thing)
     default:
       return 0;
   }
+}
+
+/*
+ * Returns squared distance between given thing ang another map point.
+ * It is very easy to exceed integer range with this function,
+ * so it should be used only for short distances!
+ * @param thing The thing which position defines first point.
+ * @param ssx,ssy Coordinates of the second point ("_adv" form).
+ * @return Returns squared distane in "_adv" form.
+ */
+unsigned long get_thing_distance_sqr_adv(const unsigned char *thing,const int ssx,const int ssy)
+{
+    int dx=get_thing_pos_x_adv(thing)-ssx;
+    int dy=get_thing_pos_y_adv(thing)-ssy;
+    return (dx*dx)+(dy*dy);
+}
+
+/*
+ * Returns distance between given thing ang another map point.
+ * Slower than get_thing_distance_sqr_adv, but it should fit integer range.
+ * @param thing The thing which position defines first point.
+ * @param ssx,ssy Coordinates of the second point ("_adv" form).
+ * @return Returns squared distane in "_adv" form.
+ */
+unsigned long get_thing_distance_adv(const unsigned char *thing,const int ssx,const int ssy)
+{
+    int dx=get_thing_pos_x_adv(thing)-ssx;
+    int dy=get_thing_pos_y_adv(thing)-ssy;
+    float dist_sqr=((float)dx*dx)+((float)dy*dy);
+    return sqrt(dist_sqr);
 }
 
 /*
@@ -633,6 +675,33 @@ char *get_thing_type_shortname(const unsigned short type_idx)
        return "unkn!";
 }
 
+char *get_thing_subtype_fullname(const unsigned short type_idx,const unsigned short stype_idx)
+{
+  static char buffer[LINEMSG_SIZE];
+  switch (type_idx)
+  {
+  case THING_TYPE_ITEM:
+      sprintf(buffer,"%s",get_item_subtype_fullname(stype_idx));
+      break;
+  case THING_TYPE_CREATURE:
+      sprintf(buffer,"%s",get_creature_subtype_fullname(stype_idx));
+      break;
+  case THING_TYPE_EFFECTGEN:
+      sprintf(buffer,"%s effect",get_effectgen_subtype_fullname(stype_idx));
+      break;
+  case THING_TYPE_TRAP:
+      sprintf(buffer,"%s trap",get_trap_subtype_fullname(stype_idx));
+      break;
+  case THING_TYPE_DOOR:
+      sprintf(buffer,"%s door",get_door_subtype_fullname(stype_idx));
+      break;
+  default:
+      sprintf(buffer,"%s",get_thing_type_fullname(type_idx));
+      break;
+  }
+  return buffer;
+}
+
 /*
  * Returns SLB entry on which the thing is usually placed.
  * Note that if SLAB_TYPE_CLAIMED is returned, this means
@@ -774,12 +843,6 @@ unsigned char *create_thing_empty(void)
  */
 unsigned char *create_thing(unsigned int sx, unsigned int sy)
 {
-    //Preparing array bounds
-    int arr_entries_x=MAP_SIZE_X*MAP_SUBNUM_X;
-    int arr_entries_y=MAP_SIZE_Y*MAP_SUBNUM_Y;
-    sx%=arr_entries_x;
-    sy%=arr_entries_y;
-
     unsigned char *thing;
     thing = create_thing_empty();
     int i;
@@ -800,8 +863,8 @@ unsigned char *create_thing(unsigned int sx, unsigned int sy)
 unsigned char *create_thing_copy(const struct LEVEL *lvl,unsigned int sx, unsigned int sy,unsigned char *src)
 {
     //Preparing array bounds
-    int arr_entries_x=MAP_SIZE_X*MAP_SUBNUM_X;
-    int arr_entries_y=MAP_SIZE_Y*MAP_SUBNUM_Y;
+    const int arr_entries_x=lvl->tlsize.x*MAP_SUBNUM_X;
+    const int arr_entries_y=lvl->tlsize.y*MAP_SUBNUM_Y;
     sx%=arr_entries_x;
     sy%=arr_entries_y;
 
@@ -3085,7 +3148,7 @@ char *get_effectgen_subtype_fullname(const unsigned short stype_idx)
        return "unknown(?!)";
 }
 
-short item_verify(unsigned char *thing, char *err_msg)
+short item_verify(unsigned char *thing, struct VERIFY_OPTIONS *verif_opt)
 {
   unsigned char stype_idx=get_thing_subtype(thing);
   switch (get_item_category(stype_idx))
@@ -3112,11 +3175,11 @@ short item_verify(unsigned char *thing, char *err_msg)
     case THING_CATEGR_DNCRUCIAL:
       break;
     case THING_CATEGR_NULL:
-      sprintf(err_msg,"Null item subtype (%d)",(int)stype_idx);
+      sprintf(verif_opt->err_msg,"Null item subtype (%d)",(int)stype_idx);
       return VERIF_WARN;
     case THING_CATEGR_UNKNOWN:
     default:
-      sprintf(err_msg,"Unknown item subtype (%d)",(int)stype_idx);
+      sprintf(verif_opt->err_msg,"Unknown item subtype (%d)",(int)stype_idx);
       return VERIF_WARN;
   }
   int sen_tl;
@@ -3132,36 +3195,36 @@ short item_verify(unsigned char *thing, char *err_msg)
       // Generate warning if sensitile coordinates are wrong.
       // Ignore such error for items which usually have it wrongly set.
       int sen_tlx,sen_tly;
-      sen_tlx=sen_tl%MAP_SIZE_X;
-      sen_tly=sen_tl/MAP_SIZE_Y;
+      sen_tlx=sen_tl%verif_opt->tlsize.x;
+      sen_tly=sen_tl/verif_opt->tlsize.x;
       if (((tx<sen_tlx-1)||(tx>sen_tlx+1)||
            (ty<sen_tly-1)||(ty>sen_tly+1)) &&
            (stype_idx!=ITEM_SUBTYPE_SPINNKEY))
       {
-          sprintf(err_msg,"Item has wrong sensitive tile number");
+          sprintf(verif_opt->err_msg,"Item has wrong sensitive tile number");
           return VERIF_WARN;
       }
   }
   return VERIF_OK;
 }
 
-short creature_verify(unsigned char *thing, char *err_msg)
+short creature_verify(unsigned char *thing, struct VERIFY_OPTIONS *verif_opt)
 {
   unsigned char stype_idx=get_thing_subtype(thing);
   if ((stype_idx>CREATR_SUBTP_FLOAT)||(stype_idx<CREATR_SUBTP_WIZRD))
   {
-      sprintf(err_msg,"Unknown creature subtype (%d)",(int)stype_idx);
+      sprintf(verif_opt->err_msg,"Unknown creature subtype (%d)",(int)stype_idx);
       return VERIF_WARN;
   }
   return VERIF_OK;
 }
 
-short effectgen_verify(unsigned char *thing, char *err_msg)
+short effectgen_verify(unsigned char *thing, struct VERIFY_OPTIONS *verif_opt)
 {
   unsigned char stype_idx=get_thing_subtype(thing);
   if ((stype_idx>EFCTGEN_SUBTP_DRYICE)||(stype_idx<EFCTGEN_SUBTP_LAVA))
   {
-      sprintf(err_msg,"Unknown effect generator subtype (%d)",(int)stype_idx);
+      sprintf(verif_opt->err_msg,"Unknown effect generator subtype (%d)",(int)stype_idx);
       return VERIF_WARN;
   }
   int sen_tl;
@@ -3177,66 +3240,74 @@ short effectgen_verify(unsigned char *thing, char *err_msg)
       // Generate warning if sensitile coordinates are wrong.
       // Ignore such error for effects which usually have it wrongly set.
       int sen_tlx,sen_tly;
-      sen_tlx=sen_tl%MAP_SIZE_X;
-      sen_tly=sen_tl/MAP_SIZE_X;
+      sen_tlx=sen_tl%verif_opt->tlsize.x;
+      sen_tly=sen_tl/verif_opt->tlsize.x;
       if (((tx<sen_tlx-1)||(tx>sen_tlx+1)||
            (ty<sen_tly-1)||(ty>sen_tly+1)) &&
            (stype_idx!=EFCTGEN_SUBTP_ENTRICE))
       {
-          sprintf(err_msg,"Effect generator has wrong sensitive tile number");
+          sprintf(verif_opt->err_msg,"Effect generator has wrong sensitive tile number");
           return VERIF_WARN;
       }
+  }
+  int range_stl;
+  range_stl=get_thing_range_subtile(thing);
+  if (range_stl>MAP_SIZE_DKSTD_X)
+  {
+      sprintf(verif_opt->err_msg,"Effect generator range exceeds %d subtiles",MAP_SIZE_DKSTD_X);
+      return VERIF_WARN;
   }
   return VERIF_OK;
 }
 
-short door_verify(unsigned char *thing, char *err_msg)
+short door_verify(unsigned char *thing, struct VERIFY_OPTIONS *verif_opt)
 {
   unsigned char stype_idx=get_thing_subtype(thing);
   if ((stype_idx>DOOR_SUBTYPE_MAGIC)||(stype_idx<DOOR_SUBTYPE_WOOD))
   {
-      sprintf(err_msg,"Unknown door subtype (%d)",(int)stype_idx);
+      sprintf(verif_opt->err_msg,"Unknown door subtype (%d)",(int)stype_idx);
       return VERIF_WARN;
   }
   return VERIF_OK;
 }
 
-short trap_verify(unsigned char *thing, char *err_msg)
+short trap_verify(unsigned char *thing, struct VERIFY_OPTIONS *verif_opt)
 {
   unsigned char stype_idx=get_thing_subtype(thing);
   if ((stype_idx>TRAP_SUBTYPE_LAVA)||(stype_idx<TRAP_SUBTYPE_BOULDER))
   {
-      sprintf(err_msg,"Unknown trap subtype (%d)",(int)stype_idx);
+      sprintf(verif_opt->err_msg,"Unknown trap subtype (%d)",(int)stype_idx);
       return VERIF_WARN;
   }
   return VERIF_OK;
 }
 
-short thing_verify(unsigned char *thing, char *err_msg)
+short thing_verify(unsigned char *thing, struct VERIFY_OPTIONS *verif_opt)
 {
   short result;
   int pos_h=get_thing_subtile_h(thing);
   int pos_x=get_thing_subtile_x(thing);
   int pos_y=get_thing_subtile_y(thing);
-  if ((pos_h>=MAP_SUBNUM_H)||(pos_x>=MAP_SUBTOTAL_X)||(pos_y>=MAP_SUBTOTAL_Y))
+  if ((pos_h>=MAP_SUBNUM_H) || (pos_x>=verif_opt->tlsize.x*MAP_SUBNUM_X) ||
+      (pos_y>=verif_opt->tlsize.y*MAP_SUBNUM_Y))
   {
-    sprintf(err_msg,"Thing position (%d,%d,%d) invalid",pos_x,pos_y,pos_h);
+    sprintf(verif_opt->err_msg,"Thing position (%d,%d,%d) invalid",pos_x,pos_y,pos_h);
     return VERIF_WARN;
   }
   switch(get_thing_type(thing))
   {
     case THING_TYPE_ITEM:
-      return item_verify(thing, err_msg);
+      return item_verify(thing, verif_opt);
     case THING_TYPE_CREATURE:
-      return creature_verify(thing, err_msg);
+      return creature_verify(thing, verif_opt);
     case THING_TYPE_EFFECTGEN:
-      return effectgen_verify(thing, err_msg);
+      return effectgen_verify(thing, verif_opt);
     case THING_TYPE_TRAP:
-      return trap_verify(thing, err_msg);
+      return trap_verify(thing, verif_opt);
     case THING_TYPE_DOOR:
-      return door_verify(thing, err_msg);
+      return door_verify(thing, verif_opt);
     default:
-      sprintf(err_msg,"Unknown thing type (%d)",(int)get_thing_type(thing));
+      sprintf(verif_opt->err_msg,"Unknown thing type (%d)",(int)get_thing_type(thing));
       return VERIF_WARN;
   }
 }

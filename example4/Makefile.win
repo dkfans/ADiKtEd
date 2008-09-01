@@ -1,0 +1,33 @@
+# Project: putemple
+# Makefile created by Dev-C++ 4.9.9.2
+
+CPP  = g++.exe -D__DEBUG__
+CC   = gcc.exe -D__DEBUG__
+WINDRES = windres.exe
+RES  = putemple_private.res
+OBJ  = putemple.o $(RES)
+LINKOBJ  = putemple.o $(RES)
+LIBS =  -L"D:/ProgsNT/Dev-Cpp/lib" -mwindows -lmingw32 -lSDLmain -lSDL ../libadikted/libadikted.a  -g3 -march=i386 
+INCS =  -I"D:/ProgsNT/Dev-Cpp/include" 
+CXXINCS =  -I"D:/ProgsNT/Dev-Cpp/lib/gcc/mingw32/3.4.2/include"  -I"D:/ProgsNT/Dev-Cpp/include/c++/3.4.2/backward"  -I"D:/ProgsNT/Dev-Cpp/include/c++/3.4.2/mingw32"  -I"D:/ProgsNT/Dev-Cpp/include/c++/3.4.2"  -I"D:/ProgsNT/Dev-Cpp/include" 
+BIN  = putemple.exe
+CXXFLAGS = $(CXXINCS)   -g3 -march=i386
+CFLAGS = $(INCS) -Dmain=SDL_main   -g3 -march=i386
+RM = rm -f
+
+.PHONY: all all-before all-after clean clean-custom
+
+all: all-before putemple.exe all-after
+
+
+clean: clean-custom
+	${RM} $(OBJ) $(BIN)
+
+$(BIN): $(OBJ)
+	$(CC) $(LINKOBJ) -o "putemple.exe" $(LIBS)
+
+putemple.o: putemple.c
+	$(CC) -c putemple.c -o putemple.o $(CFLAGS)
+
+putemple_private.res: putemple_private.rc 
+	$(WINDRES) -i putemple_private.rc --input-format=rc -o putemple_private.res -O coff 

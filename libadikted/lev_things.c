@@ -22,6 +22,7 @@
 #include "lev_things.h"
 
 #include "globals.h"
+#include <limits.h>
 #include "lev_data.h"
 #include "obj_slabs.h"
 #include "obj_things.h"
@@ -56,11 +57,16 @@ const char *search_tngtype_names[]={
  */
 short things_verify(struct LEVEL *lvl, char *err_msg,struct IPOINT_2D *errpt)
 {
-    char child_err_msg[LINEMSG_SIZE];
-    strcpy(child_err_msg,"Unknown error");
+    struct VERIFY_OPTIONS child_verif_opt;
+    
+    child_verif_opt.tlsize.x=lvl->tlsize.x;
+    child_verif_opt.tlsize.y=lvl->tlsize.y;
+    child_verif_opt.subsize.x=lvl->subsize.x;
+    child_verif_opt.subsize.y=lvl->subsize.y;
+    strcpy(child_verif_opt.err_msg,"Unknown error");
     //Preparing array bounds
-    const int arr_entries_x=MAP_SIZE_X*MAP_SUBNUM_X;
-    const int arr_entries_y=MAP_SIZE_Y*MAP_SUBNUM_Y;
+    const int arr_entries_x=lvl->tlsize.x*MAP_SUBNUM_X;
+    const int arr_entries_y=lvl->tlsize.y*MAP_SUBNUM_Y;
     //Sweeping through things
     int i, j, k;
     for (i=0; i < arr_entries_y; i++)
@@ -80,12 +86,12 @@ short things_verify(struct LEVEL *lvl, char *err_msg,struct IPOINT_2D *errpt)
         for (k=0; k <things_count ; k++)
         {
           unsigned char *thing = get_thing(lvl,i,j,k);
-          short result=thing_verify(thing,child_err_msg);
+          short result=thing_verify(thing,&child_verif_opt);
           if (result!=VERIF_OK)
           {
             errpt->x=i/MAP_SUBNUM_X;
             errpt->y=j/MAP_SUBNUM_Y;
-            sprintf(err_msg,"%s at slab %d,%d.",child_err_msg,errpt->x,errpt->y);
+            sprintf(err_msg,"%s at slab %d,%d.",child_verif_opt.err_msg,errpt->x,errpt->y);
             return result;
           }
           unsigned char type_idx=get_thing_type(thing);
@@ -237,6 +243,7 @@ unsigned char *find_next_object_on_map(struct LEVEL *lvl, int *tx, int *ty, unsi
     case 2: return find_next_stlight_on_map(lvl,tx,ty);
     case 0:
     default:
+        message_log(" find_next_object_on_map: search index %d too small",srch_idx);
         return NULL;
     }
 }
@@ -286,7 +293,7 @@ short set_door_lock(struct LEVEL *lvl, unsigned char *thing, unsigned char nlock
 /*
  * Returns lock state for the given door.
  */
-unsigned char get_door_lock(unsigned char *thing)
+unsigned char get_door_lock(const unsigned char *thing)
 {
   return get_thing_level(thing);
 }
@@ -375,8 +382,8 @@ unsigned short get_free_herogate_number_prev(const struct LEVEL *lvl,const unsig
 short create_herogate_number_used_arr(const struct LEVEL *lvl,unsigned char **used,unsigned int *used_size)
 {
     //Preparing array bounds
-    int arr_entries_x=MAP_SIZE_X*MAP_SUBNUM_X;
-    int arr_entries_y=MAP_SIZE_Y*MAP_SUBNUM_Y;
+    const int arr_entries_x=lvl->tlsize.x*MAP_SUBNUM_X;
+    const int arr_entries_y=lvl->tlsize.y*MAP_SUBNUM_Y;
     int k;
     *used_size=max(lvl->stats.hero_gates_count+16,*used_size);
     *used=malloc((*used_size)*sizeof(unsigned char));
@@ -415,8 +422,8 @@ short owned_things_count(int *count,struct LEVEL *lvl,
     unsigned char type_idx,unsigned char stype_idx)
 {
     //Preparing array bounds
-    const int arr_entries_x=MAP_SIZE_X*MAP_SUBNUM_X;
-    const int arr_entries_y=MAP_SIZE_Y*MAP_SUBNUM_Y;
+    const int arr_entries_x=lvl->tlsize.x*MAP_SUBNUM_X;
+    const int arr_entries_y=lvl->tlsize.y*MAP_SUBNUM_Y;
     int i,j,k;
     for (i=0; i < arr_entries_y; i++)
       for (j=0; j < arr_entries_x; j++)
@@ -450,7 +457,7 @@ unsigned char *find_lit_thing_on_square_radius1(struct LEVEL *lvl, int tx, int t
     for (k=ty-1;k<=ty+1;k++)
       for (i=tx-1;i<=tx+1;i++)
       {
-        if ((i>=0) && (k>=0) && (i<MAP_SIZE_X) && (k<MAP_SIZE_Y))
+        if ((i>=0) && (k>=0) && (i<lvl->tlsize.x) && (k<lvl->tlsize.y))
         {
           unsigned char *thing;
           thing=find_thing_on_tile(lvl,i,k,is_lit_thing);
@@ -491,35 +498,37 @@ unsigned char *find_thing_on_tile(struct LEVEL *lvl, int tx, int ty, is_thing_su
  */
 unsigned char *find_next_thing_on_map(struct LEVEL *lvl, int *tx, int *ty, is_thing_subtype check_func)
 {
+  message_log(" find_next_thing_on_map: starting");
   if (check_func==NULL) return NULL;
   if ((*ty)<0) {(*tx)=-1;(*ty)=0;};
   if ((*tx)<0) (*tx)=-1;
   do {
       //Switching coords to next map tile
       (*tx)++;
-      while (*tx>=MAP_SIZE_X)
+      while (*tx>=lvl->tlsize.x)
       {
-        (*tx)-=MAP_SIZE_X;
+        (*tx)-=lvl->tlsize.x;
         (*ty)++;
       }
       //Searching in that tile
       unsigned char *thing;
       thing=find_thing_on_tile(lvl,*tx,*ty,check_func);
       if (thing!=NULL) return thing;
-  } while ((*ty)<MAP_SIZE_Y);
+  } while ((*ty)<lvl->tlsize.y);
   return NULL;
 }
 
 unsigned char *find_next_actnpt_on_map(struct LEVEL *lvl, int *tx, int *ty)
 {
+  message_log(" find_next_actnpt_on_map: starting");
   if ((*ty)<0) {(*tx)=-1;(*ty)=0;};
   if ((*tx)<0) (*tx)=-1;
   do {
       //Switching coords to next map tile
       (*tx)++;
-      while ((*tx)>=MAP_SIZE_X)
+      while ((*tx)>=lvl->tlsize.x)
       {
-        (*tx)-=MAP_SIZE_X;
+        (*tx)-=lvl->tlsize.x;
         (*ty)++;
       }
       //Searching in that tile
@@ -531,20 +540,21 @@ unsigned char *find_next_actnpt_on_map(struct LEVEL *lvl, int *tx, int *ty)
           actnpt=get_actnpt(lvl,sx,sy,0);
           if (actnpt!=NULL) return actnpt;
         }
-  } while ((*ty)<MAP_SIZE_Y);
+  } while ((*ty)<lvl->tlsize.y);
   return NULL;
 }
 
 unsigned char *find_next_stlight_on_map(struct LEVEL *lvl, int *tx, int *ty)
 {
+  message_log(" find_next_stlight_on_map: starting");
   if ((*ty)<0) {(*tx)=-1;(*ty)=0;};
   if ((*tx)<0) (*tx)=-1;
   do {
       //Switching coords to next map tile
       (*tx)++;
-      while ((*tx)>=MAP_SIZE_X)
+      while ((*tx)>=lvl->tlsize.x)
       {
-        (*tx)-=MAP_SIZE_X;
+        (*tx)-=lvl->tlsize.x;
         (*ty)++;
       }
       //Searching in that tile
@@ -556,7 +566,7 @@ unsigned char *find_next_stlight_on_map(struct LEVEL *lvl, int *tx, int *ty)
           stlight=get_stlight(lvl,sx,sy,0);
           if (stlight!=NULL) return stlight;
         }
-  } while ((*ty)<MAP_SIZE_Y);
+  } while ((*ty)<lvl->tlsize.y);
   return NULL;
 }
 
@@ -572,38 +582,38 @@ unsigned short compute_torch_sensitile(const struct LEVEL *lvl, unsigned char *t
     int ntx=tx+(int)(sx%MAP_SUBNUM_X)-1;
     int nty=ty+(int)(sy%MAP_SUBNUM_Y)-1;
     if (ntx<0) ntx=0;
-    if (ntx>=MAP_SIZE_X) ntx=MAP_MAXINDEX_X;
+    if (ntx>=lvl->tlsize.x) ntx=lvl->tlsize.x-1;
     if (nty<0) nty=0;
-    if (nty>=MAP_SIZE_X) nty=MAP_MAXINDEX_X;
+    if (nty>=lvl->tlsize.x) nty=lvl->tlsize.x-1;
     if ((ntx==tx)&&(nty==ty))
-        return ty*MAP_SIZE_X+tx;
+        return ty*lvl->tlsize.x+tx;
     unsigned short slab;
     // Trying fo find torch wall around
     // First - try to put it in X axis
     slab=get_tile_slab(lvl,ntx,ty);
     if (slab_needs_adjacent_torch(slab))
-        return ty*MAP_SIZE_X+ntx;
+        return ty*lvl->tlsize.x+ntx;
     //Now in Y axis
     slab=get_tile_slab(lvl,tx,nty);
     if (slab_needs_adjacent_torch(slab))
-        return nty*MAP_SIZE_X+tx;
+        return nty*lvl->tlsize.x+tx;
     //Now in XY corner
     slab=get_tile_slab(lvl,ntx,nty);
     if (slab_needs_adjacent_torch(slab))
-        return nty*MAP_SIZE_X+ntx;
+        return nty*lvl->tlsize.x+ntx;
     // No torch wall - searching for any tall slab
     // First - try to put it in X axis
     slab=get_tile_slab(lvl,ntx,ty);
     if (slab_is_tall(slab))
-        return ty*MAP_SIZE_X+ntx;
+        return ty*lvl->tlsize.x+ntx;
     //Now in Y axis
     slab=get_tile_slab(lvl,tx,nty);
     if (slab_is_tall(slab))
-        return nty*MAP_SIZE_X+tx;
+        return nty*lvl->tlsize.x+tx;
     //Now in XY corner
     slab=get_tile_slab(lvl,ntx,nty);
     if (slab_is_tall(slab))
-        return nty*MAP_SIZE_X+ntx;
+        return nty*lvl->tlsize.x+ntx;
     return THING_SENSITILE_NONE;
 }
 
@@ -616,7 +626,7 @@ unsigned short compute_effectgen_sensitile(const struct LEVEL *lvl, unsigned cha
     unsigned short sy=get_thing_subtile_y(thing);
     int tx=sx/MAP_SUBNUM_X;
     int ty=sy/MAP_SUBNUM_Y;
-    return ty*MAP_SIZE_X+tx;
+    return ty*lvl->tlsize.x+tx;
 }
 
 /*
@@ -643,7 +653,7 @@ unsigned short compute_item_sensitile(const struct LEVEL *lvl, unsigned char *th
     case THING_CATEGR_POLEBAR:
     case THING_CATEGR_FURNITURE:
       if (slab_is_room(slab_type))
-        return ty*MAP_SIZE_X+tx;
+        return ty*lvl->tlsize.x+tx;
       else
         return THING_SENSITILE_NONE;
     case THING_CATEGR_TORCHCNDL:
@@ -651,23 +661,23 @@ unsigned short compute_item_sensitile(const struct LEVEL *lvl, unsigned char *th
         return compute_torch_sensitile(lvl,thing);
       else
       if (slab_is_room(slab_type))
-        return ty*MAP_SIZE_X+tx;
+        return ty*lvl->tlsize.x+tx;
       else
         return THING_SENSITILE_NONE;
     case THING_CATEGR_ITEMEFFCT://not sure about this one
       if ((stype_idx==ITEM_SUBTYPE_TEMPLESPN)&&(slab_is_room(slab_type)))
-        return ty*MAP_SIZE_X+tx;
+        return ty*lvl->tlsize.x+tx;
       else
         return THING_SENSITILE_NONE;
     case THING_CATEGR_DNCRUCIAL:
       if (stype_idx==ITEM_SUBTYPE_HEROGATE)
         return THING_SENSITILE_NONE;
       else
-        return ty*MAP_SIZE_X+tx;
+        return ty*lvl->tlsize.x+tx;
     case THING_CATEGR_SPINNTNG:
     case THING_CATEGR_CREATLAIR://not sure about this one
     case THING_CATEGR_FOOD://not sure about this one
-        return ty*MAP_SIZE_X+tx;
+        return ty*lvl->tlsize.x+tx;
     case THING_CATEGR_GOLD:
 // from level 19 - all gold things have sensitile=none
 //      if ((stype_idx==ITEM_SUBTYPE_GOLDCHEST)||(stype_idx==ITEM_SUBTYPE_GOLD)||
@@ -816,8 +826,8 @@ unsigned char *create_trap(const struct LEVEL *lvl,unsigned int sx, unsigned int
 unsigned short get_free_indexedthing_number(const struct LEVEL *lvl)
 {
     //Preparing array bounds
-    int arr_entries_x=MAP_SIZE_X*MAP_SUBNUM_X;
-    int arr_entries_y=MAP_SIZE_Y*MAP_SUBNUM_Y;
+    const int arr_entries_x=lvl->tlsize.x*MAP_SUBNUM_X;
+    const int arr_entries_y=lvl->tlsize.y*MAP_SUBNUM_Y;
     int k;
     int used_size=lvl->stats.doors_count+lvl->stats.traps_count+lvl->stats.creatures_count+16;
     unsigned char *used=malloc(used_size*sizeof(unsigned char));
@@ -909,8 +919,8 @@ unsigned char *create_item_adv(const struct LEVEL *lvl, unsigned int sx, unsigne
 void remove_automade_obj_for_whole_map(struct LEVEL *lvl)
 {
     int i,k;
-    for (k=0;k<MAP_SIZE_Y;k++)
-      for (i=0;i<MAP_SIZE_X;i++)
+    for (k=0;k<lvl->tlsize.y;k++)
+      for (i=0;i<lvl->tlsize.x;i++)
           remove_automade_obj_for_slab(lvl, i, k);
 }
 
@@ -922,8 +932,8 @@ void remove_automade_obj_for_whole_map(struct LEVEL *lvl)
 void update_obj_for_whole_map(struct LEVEL *lvl)
 {
     int i,k;
-    for (k=0;k<MAP_SIZE_Y;k++)
-      for (i=0;i<MAP_SIZE_X;i++)
+    for (k=0;k<lvl->tlsize.y;k++)
+      for (i=0;i<lvl->tlsize.x;i++)
           update_clmaffective_obj_for_slab(lvl, i, k);
 }
 
@@ -937,7 +947,7 @@ void update_obj_for_square_radius1(struct LEVEL *lvl, int tx, int ty)
     for (k=ty-1;k<=ty+1;k++)
       for (i=tx-1;i<=tx+1;i++)
       {
-        if ((i>=0) && (k>=0) && (i<MAP_SIZE_X) && (k<MAP_SIZE_Y))
+        if ((i>=0) && (k>=0) && (i<lvl->tlsize.x) && (k<lvl->tlsize.y))
           update_clmaffective_obj_for_slab(lvl, i, k);
       }
 }
@@ -952,7 +962,7 @@ void update_obj_for_square(struct LEVEL *lvl, int tx_first, int tx_last,
     for (k=ty_first;k<=ty_last;k++)
       for (i=tx_first;i<=tx_last;i++)
       {
-        if ((i>=0) && (k>=0) && (i<MAP_SIZE_X) && (k<MAP_SIZE_Y))
+        if ((i>=0) && (k>=0) && (i<lvl->tlsize.x) && (k<lvl->tlsize.y))
           update_clmaffective_obj_for_slab(lvl, i, k);
       }
 }
@@ -1969,8 +1979,8 @@ void update_things_slb_prison(struct LEVEL *lvl, const int tx, const int ty,
 void update_obj_subpos_and_height_for_whole_map(struct LEVEL *lvl)
 {
     int i,k;
-    for (k=0;k<MAP_SIZE_Y;k++)
-      for (i=0;i<MAP_SIZE_X;i++)
+    for (k=0;k<lvl->tlsize.y;k++)
+      for (i=0;i<lvl->tlsize.x;i++)
           update_things_subpos_and_height_for_slab(lvl, i, k);
 }
 
@@ -1984,7 +1994,7 @@ void update_obj_subpos_and_height_for_square_radius1(struct LEVEL *lvl, int tx, 
     for (k=ty-1;k<=ty+1;k++)
       for (i=tx-1;i<=tx+1;i++)
       {
-        if ((i>=0) && (k>=0) && (i<MAP_SIZE_X) && (k<MAP_SIZE_Y))
+        if ((i>=0) && (k>=0) && (i<lvl->tlsize.x) && (k<lvl->tlsize.y))
           update_things_subpos_and_height_for_slab(lvl, i, k);
       }
 }
@@ -2000,7 +2010,7 @@ void update_obj_subpos_and_height_for_square(struct LEVEL *lvl, int tx_first, in
     for (k=ty_first;k<=ty_last;k++)
       for (i=tx_first;i<=tx_last;i++)
       {
-        if ((i>=0) && (k>=0) && (i<MAP_SIZE_X) && (k<MAP_SIZE_Y))
+        if ((i>=0) && (k>=0) && (i<lvl->tlsize.x) && (k<lvl->tlsize.y))
           update_things_subpos_and_height_for_slab(lvl, i, k);
       }
 }
@@ -2147,8 +2157,8 @@ void remove_noncrucial_room_things(struct LEVEL *lvl,int tx, int ty)
  */
 short subtl_in_effectgen_range(struct LEVEL *lvl,unsigned int sx,unsigned int sy)
 {
-    const int arr_entries_x=MAP_SIZE_X*MAP_SUBNUM_X;
-    const int arr_entries_y=MAP_SIZE_Y*MAP_SUBNUM_Y;
+    const int arr_entries_x=lvl->tlsize.x*MAP_SUBNUM_X;
+    const int arr_entries_y=lvl->tlsize.y*MAP_SUBNUM_Y;
     int curr_sx, curr_sy, i;
     for (curr_sx=0; curr_sx < arr_entries_x; curr_sx++)
       for (curr_sy=0; curr_sy < arr_entries_y; curr_sy++)
@@ -2163,4 +2173,334 @@ short subtl_in_effectgen_range(struct LEVEL *lvl,unsigned int sx,unsigned int sy
           }
       }
     return false;
+}
+
+/*
+ * Returns tile coords and thing number for a thing nearest to given position.
+ * The position is expected to be in "_adv" form, which is subtile<<8 + subtile_pos.
+ * The number returned and (sx,sy) pair can be used to get the thing data
+ * like this: get_thing(lvl,sx,sy,num).
+ * @see get_thing
+ * @param lvl Pointer to the LEVEL structure.
+ * @param ssx,ssy Source position, subtile<<8 + subtile_pos.
+ * @param sx,sy,num Indices containing the nearest thing.
+ * @return Returns nonnegative distance of the thing.
+ *     On success, gives thing number and subtile number in (sx,sy,num).
+ *     If cannot find, returns -1.
+ */
+long get_nearest_thing_idx(struct LEVEL *lvl,
+    const unsigned int ssx,const unsigned int ssy,
+    unsigned int *sx,unsigned int *sy,unsigned int *num)
+{
+//    message_log(" get_nearest_thing_idx: Searching for thing near (%u,%u)",ssx>>8,ssy>>8);
+    if (lvl==NULL) return -1;
+    int range;
+    unsigned int best_sx, best_sy;
+    int best_num;
+    unsigned long best_dist;
+    best_sx=0;best_sy=0;best_num=-1;best_dist=ULONG_MAX;
+    short found_previously=0;
+    int range_limit=max(lvl->subsize.x,lvl->subsize.y);
+    // Searching for objects - first at close distance, then increase range
+    for (range=0; range<range_limit; range++)
+    {
+        int test_sx,test_sy;
+        int test_num;
+        unsigned long test_dist;
+        // Preparing sweep bounds for given range
+        int sx_llimit,sx_hlimit;
+        int sy_llimit,sy_hlimit;
+        sx_llimit=(ssx>>8)-range;
+        sx_hlimit=(ssx>>8)+range;
+        sy_llimit=(ssy>>8)-range;
+        sy_hlimit=(ssy>>8)+range;
+        if (sx_llimit>=(int)lvl->subsize.x) sx_llimit=lvl->subsize.x-1;
+        if (sx_llimit<0) sx_llimit=0;
+        if (sx_hlimit>=(int)lvl->subsize.x) sx_hlimit=lvl->subsize.x-1;
+        if (sx_hlimit<0) sx_hlimit=0;
+        if (sy_llimit>=(int)lvl->subsize.y) sy_llimit=lvl->subsize.y-1;
+        if (sy_llimit<0) sy_llimit=0;
+        if (sy_hlimit>=(int)lvl->subsize.y) sy_hlimit=lvl->subsize.y-1;
+        if (sy_hlimit<0) sy_hlimit=0;
+        // Remember if we have found something previously
+        if (best_num>=0) found_previously=1;
+        // Now we can sweep the borders for things
+        for (test_sy=sy_llimit;test_sy<=sy_hlimit;test_sy++)
+        {
+            int num_limit;
+            //Do two times: for test_sx=sx_llimit and test_sx=sx_hlimit
+            test_sx=sx_llimit;
+//    message_log(" get_nearest_thing_idx: Searching subtile (%u,%u)",test_sx,test_sy);
+            num_limit=get_thing_subnums(lvl,test_sx,test_sy);
+            for (test_num=0;test_num<=num_limit;test_num++)
+            {
+                unsigned char *thing=get_thing(lvl,test_sx,test_sy,test_num);
+                test_dist=get_thing_distance_adv(thing,ssx,ssy);
+                if (test_dist<best_dist)
+                {
+                  best_sx=test_sx;
+                  best_sy=test_sy;
+                  best_num=test_num;
+                  best_dist=test_dist;
+                }
+            }
+            test_sx=sx_hlimit;
+//    message_log(" get_nearest_thing_idx: Searching subtile (%u,%u)",test_sx,test_sy);
+            num_limit=get_thing_subnums(lvl,test_sx,test_sy);
+            for (test_num=0;test_num<=num_limit;test_num++)
+            {
+                unsigned char *thing=get_thing(lvl,test_sx,test_sy,test_num);
+                test_dist=get_thing_distance_adv(thing,ssx,ssy);
+                if (test_dist<best_dist)
+                {
+                  best_sx=test_sx;
+                  best_sy=test_sy;
+                  best_num=test_num;
+                  best_dist=test_dist;
+                }
+            }
+        }
+        for (test_sx=sx_llimit+1;test_sx<sx_hlimit;test_sx++)
+        {
+            int num_limit;
+            // Repeat the previous loop, but for test_sy=sy_llimit and test_sy=sy_hlimit
+            test_sy=sy_llimit;
+//    message_log(" get_nearest_thing_idx: Searching subtile (%u,%u)",test_sx,test_sy);
+            num_limit=get_thing_subnums(lvl,test_sx,test_sy);
+            for (test_num=0;test_num<=num_limit;test_num++)
+            {
+                unsigned char *thing=get_thing(lvl,test_sx,test_sy,test_num);
+                test_dist=get_thing_distance_adv(thing,ssx,ssy);
+                if (test_dist<best_dist)
+                {
+                  best_sx=test_sx;
+                  best_sy=test_sy;
+                  best_num=test_num;
+                  best_dist=test_dist;
+                }
+            }
+            test_sy=sy_hlimit;
+//    message_log(" get_nearest_thing_idx: Searching subtile (%u,%u)",test_sx,test_sy);
+            num_limit=get_thing_subnums(lvl,test_sx,test_sy);
+            for (test_num=0;test_num<=num_limit;test_num++)
+            {
+                unsigned char *thing=get_thing(lvl,test_sx,test_sy,test_num);
+                test_dist=get_thing_distance_adv(thing,ssx,ssy);
+                if (test_dist<best_dist)
+                {
+                  best_sx=test_sx;
+                  best_sy=test_sy;
+                  best_num=test_num;
+                  best_dist=test_dist;
+                }
+            }
+        }
+        // If we found sonething in previous turn, then we won't get anything better
+        if (found_previously) break;
+    }
+    if (best_num<0)
+    {
+        //message_log(" get_nearest_thing_idx: Nothing found");
+        return -1;
+    }
+    //message_log(" get_nearest_thing_idx: Returning thing at distance %u",best_dist);
+    *sx=best_sx;
+    *sy=best_sy;
+    *num=best_num;
+    return best_dist;
+}
+
+/*
+ * Returns tile coords and object number for an object nearest to given position.
+ * The position is expected to be in "_adv" form, which is subtile<<8 + subtile_pos.
+ * The returned indices (sx,sy,z) can be used to get the object data
+ * like this: get_object(lvl,sx,sy,z).
+ * @see get_nearest_thing_idx
+ * @param lvl Pointer to the LEVEL structure.
+ * @param ssx,ssy Source position, subtile<<8 + subtile_pos.
+ * @param sx,sy,z Indices containing the nearest object.
+ * @return Returns nonnegative distance of the object.
+ *     On success, gives object indices in (sx,sy,z).
+ *     If cannot find, returns -1.
+ */
+long get_nearest_object_idx(struct LEVEL *lvl,
+    const unsigned int ssx,const unsigned int ssy,
+    unsigned int *sx,unsigned int *sy,unsigned int *z)
+{
+//    message_log(" get_nearest_object_idx: Searching for object near (%u,%u)",ssx>>8,ssy>>8);
+    if (lvl==NULL) return -1;
+    int range;
+    unsigned int best_sx, best_sy;
+    int best_z;
+    unsigned long best_dist;
+    best_sx=0;best_sy=0;best_z=-1;best_dist=ULONG_MAX;
+    short found_previously=0;
+    int range_limit=max(lvl->subsize.x,lvl->subsize.y);
+    // Searching for objects - first at close distance, then increase range
+    for (range=0; range<range_limit; range++)
+    {
+        int test_sx,test_sy;
+        int test_z;
+        unsigned long test_dist;
+        // Preparing sweep bounds for given range
+        int sx_llimit,sx_hlimit;
+        int sy_llimit,sy_hlimit;
+        sx_llimit=(ssx>>8)-range;
+        sx_hlimit=(ssx>>8)+range;
+        sy_llimit=(ssy>>8)-range;
+        sy_hlimit=(ssy>>8)+range;
+        if (sx_llimit>=(int)lvl->subsize.x) sx_llimit=lvl->subsize.x-1;
+        if (sx_llimit<0) sx_llimit=0;
+        if (sx_hlimit>=(int)lvl->subsize.x) sx_hlimit=lvl->subsize.x-1;
+        if (sx_hlimit<0) sx_hlimit=0;
+        if (sy_llimit>=(int)lvl->subsize.y) sy_llimit=lvl->subsize.y-1;
+        if (sy_llimit<0) sy_llimit=0;
+        if (sy_hlimit>=(int)lvl->subsize.y) sy_hlimit=lvl->subsize.y-1;
+        if (sy_hlimit<0) sy_hlimit=0;
+        // Remember if we have found some objects previously
+        if (best_z>=0) found_previously=1;
+        // Now we can sweep the borders for objects
+        for (test_sy=sy_llimit;test_sy<=sy_hlimit;test_sy++)
+        {
+            int num_limit;
+            //Do two times: for test_sx=sx_llimit and test_sx=sx_hlimit
+            test_sx=sx_llimit;
+//    message_log(" get_nearest_object_idx: Searching subtile (%u,%u)",test_sx,test_sy);
+            num_limit=get_object_subnums(lvl,test_sx,test_sy);
+            for (test_z=0;test_z<=num_limit;test_z++)
+            {
+                unsigned char *obj;
+                obj=get_object(lvl,test_sx,test_sy,test_z);
+                switch (get_object_type(lvl,test_sx,test_sy,test_z))
+                {
+                case OBJECT_TYPE_THING:
+                    test_dist=get_thing_distance_adv(obj,ssx,ssy);
+                    break;
+                case OBJECT_TYPE_ACTNPT:
+                    test_dist=get_actnpt_distance_adv(obj,ssx,ssy);
+                    break;
+                case OBJECT_TYPE_STLIGHT:
+                    test_dist=get_stlight_distance_adv(obj,ssx,ssy);
+                    break;
+                default:
+                    test_dist=ULONG_MAX;
+                    break;
+                }
+                if (test_dist<best_dist)
+                {
+                    best_sx=test_sx;
+                    best_sy=test_sy;
+                    best_z=test_z;
+                    best_dist=test_dist;
+                }
+            }
+            test_sx=sx_hlimit;
+//    message_log(" get_nearest_object_idx: Searching subtile (%u,%u)",test_sx,test_sy);
+            num_limit=get_object_subnums(lvl,test_sx,test_sy);
+            for (test_z=0;test_z<=num_limit;test_z++)
+            {
+                unsigned char *obj;
+                obj=get_object(lvl,test_sx,test_sy,test_z);
+                switch (get_object_type(lvl,test_sx,test_sy,test_z))
+                {
+                case OBJECT_TYPE_THING:
+                    test_dist=get_thing_distance_adv(obj,ssx,ssy);
+                    break;
+                case OBJECT_TYPE_ACTNPT:
+                    test_dist=get_actnpt_distance_adv(obj,ssx,ssy);
+                    break;
+                case OBJECT_TYPE_STLIGHT:
+                    test_dist=get_stlight_distance_adv(obj,ssx,ssy);
+                    break;
+                default:
+                    test_dist=ULONG_MAX;
+                    break;
+                }
+                if (test_dist<best_dist)
+                {
+                    best_sx=test_sx;
+                    best_sy=test_sy;
+                    best_z=test_z;
+                    best_dist=test_dist;
+                }
+            }
+        }
+        for (test_sx=sx_llimit+1;test_sx<sx_hlimit;test_sx++)
+        {
+            int num_limit;
+            // Repeat the previous loop, but for test_sy=sy_llimit and test_sy=sy_hlimit
+            test_sy=sy_llimit;
+//    message_log(" get_nearest_object_idx: Searching subtile (%u,%u)",test_sx,test_sy);
+            num_limit=get_object_subnums(lvl,test_sx,test_sy);
+            for (test_z=0;test_z<=num_limit;test_z++)
+            {
+                unsigned char *obj;
+                obj=get_object(lvl,test_sx,test_sy,test_z);
+                switch (get_object_type(lvl,test_sx,test_sy,test_z))
+                {
+                case OBJECT_TYPE_THING:
+                    test_dist=get_thing_distance_adv(obj,ssx,ssy);
+                    break;
+                case OBJECT_TYPE_ACTNPT:
+                    test_dist=get_actnpt_distance_adv(obj,ssx,ssy);
+                    break;
+                case OBJECT_TYPE_STLIGHT:
+                    test_dist=get_stlight_distance_adv(obj,ssx,ssy);
+                    break;
+                default:
+                    test_dist=ULONG_MAX;
+                    break;
+                }
+                if (test_dist<best_dist)
+                {
+                    best_sx=test_sx;
+                    best_sy=test_sy;
+                    best_z=test_z;
+                    best_dist=test_dist;
+                }
+            }
+            test_sy=sy_hlimit;
+//    message_log(" get_nearest_object_idx: Searching subtile (%u,%u)",test_sx,test_sy);
+            num_limit=get_object_subnums(lvl,test_sx,test_sy);
+            for (test_z=0;test_z<=num_limit;test_z++)
+            {
+                unsigned char *obj;
+                obj=get_object(lvl,test_sx,test_sy,test_z);
+                switch (get_object_type(lvl,test_sx,test_sy,test_z))
+                {
+                case OBJECT_TYPE_THING:
+                    test_dist=get_thing_distance_adv(obj,ssx,ssy);
+                    break;
+                case OBJECT_TYPE_ACTNPT:
+                    test_dist=get_actnpt_distance_adv(obj,ssx,ssy);
+                    break;
+                case OBJECT_TYPE_STLIGHT:
+                    test_dist=get_stlight_distance_adv(obj,ssx,ssy);
+                    break;
+                default:
+                    test_dist=ULONG_MAX;
+                    break;
+                }
+                if (test_dist<best_dist)
+                {
+                    best_sx=test_sx;
+                    best_sy=test_sy;
+                    best_z=test_z;
+                    best_dist=test_dist;
+                }
+            }
+        }
+        // If we found something in previous turn, then we won't get anything better
+        if (found_previously) break;
+    }
+    if (best_z<0)
+    {
+        //message_log(" get_nearest_object_idx: Nothing found");
+        return -1;
+    }
+    //message_log(" get_nearest_object_idx: Returning object at distance %u",best_dist);
+    *sx=best_sx;
+    *sy=best_sy;
+    *z=best_z;
+    return best_dist;
 }

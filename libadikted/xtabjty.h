@@ -35,16 +35,11 @@
 
 // Data types
 
-struct JTYTAB_ATTRIB {
-    unsigned char unkn[10];
-       };
-
-
 struct JTYTAB_ITEM {
     unsigned long offset;
     unsigned int width;
     unsigned int height;
-    struct JTYTAB_ATTRIB attrib;
+    struct IMGTAB_ATTRIB attrib;
        };
 
 struct JTYTABFILE {
@@ -52,20 +47,6 @@ struct JTYTABFILE {
     unsigned long filelength;
     struct JTYTAB_ITEM *items;
        };
-
-struct ENCIMAGEITEM {
-    unsigned int width;
-    unsigned int height;
-    struct JTYTAB_ATTRIB attrib;
-    unsigned char *data;
-    unsigned int datsize;
-       };
-
-struct ENCIMAGELIST {
-    unsigned long count;
-    struct ENCIMAGEITEM *items;
-       };
-
 
 // Routines
 

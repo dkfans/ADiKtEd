@@ -18,7 +18,10 @@
 //   (at your option) any later version.
 /******************************************************************************/
 
-#include <stdio.h>
+#if (defined(MAIN_XTABDAT8)||defined(MAIN_XTABJTY))
+ #include <stdio.h>
+#endif
+
 #include <stdlib.h>
 #include <string.h>
 
@@ -105,7 +108,7 @@ int main (int argc, char **argv)
 short create_images_jtytab_enc(struct ENCIMAGELIST *images,const char *jtyfname,
     const char *tabfname,const int verbose)
 {
-    if (verbose) printf("Reading TAB file ...");
+    if (verbose) msgprintf("Reading TAB file ...");
     //Opening TAB file
     struct JTYTABFILE jtabf;
     {
@@ -114,17 +117,17 @@ short create_images_jtytab_enc(struct ENCIMAGELIST *images,const char *jtyfname,
         {
         case ERR_NONE:
             break;
-        case 1:
-            if (verbose) printf(" Error\nCannot open TAB file \"%s\"\n",tabfname);
+        case JTYTB_CANNOT_OPEN:
+            if (verbose) msgprintf(" Error\nCannot open TAB file \"%s\"\n",tabfname);
             return JTYTB_CANNOT_OPEN;
         default:
-            if (verbose) printf(" Error\nLoading TAB file \"%s\" returned fail code %d\n",tabfname,retcode);
+            if (verbose) msgprintf(" Error\nLoading TAB file \"%s\" returned fail code %d\n",tabfname,retcode);
             return retcode;
         }
     }
-    if (verbose) printf(" Done.\n");
+    if (verbose) msgprintf(" Done.\n");
 
-    if (verbose) printf("Reading JTY file ...");
+    if (verbose) msgprintf("Reading JTY file ...");
     //Opening DAT file
     struct DATFILE jtyf;
     {
@@ -134,28 +137,28 @@ short create_images_jtytab_enc(struct ENCIMAGELIST *images,const char *jtyfname,
         case ERR_NONE:
             break;
         case JTYTB_CANNOT_OPEN:
-             if (verbose) printf(" Error\nCannot open JTY file \"%s\"\n",jtyfname);
+             if (verbose) msgprintf(" Error\nCannot open JTY file \"%s\"\n",jtyfname);
              return JTYTB_CANNOT_OPEN;
         default:
-             if (verbose) printf(" Error\nLoading JTY file \"%s\" returned fail code %d\n",jtyfname,retcode);
+             if (verbose) msgprintf(" Error\nLoading JTY file \"%s\" returned fail code %d\n",jtyfname,retcode);
              return retcode;
         }
     }
-    if (verbose) printf(" Done.\n");
+    if (verbose) msgprintf(" Done.\n");
 
     if (verbose)
     {
-        printf("\n");
-        printf ("The TAB file informs of %lu pictures.\n", jtabf.count);
+        msgprintf("\n");
+        msgprintf ("The TAB file informs of %lu pictures.\n", jtabf.count);
         if (jtabf.filelength!=jtabf.count*JTYTAB_ENTRY_SIZE)
         {
-            printf("Warning - the TAB file contains incomplete entry at end.\n");
-            printf(" The truncated entry will be skipped.\n");
+            msgprintf("Warning - the TAB file contains incomplete entry at end.\n");
+            msgprintf(" The truncated entry will be skipped.\n");
         }
         if (jtyf.count==-1)
         {
-            printf ("The JTY file informs of 4bpp content.\n");
-            printf ("Warning - this is 8bpp extractor!\n");
+            msgprintf ("The JTY file informs of 4bpp content.\n");
+            msgprintf ("Warning - this is 8bpp extractor!\n");
         }
     }
     unsigned long readcount=0;
@@ -163,15 +166,15 @@ short create_images_jtytab_enc(struct ENCIMAGELIST *images,const char *jtyfname,
 
     if (verbose)
     {
-        printf("Processed %lu of %lu bytes of JTY file.\n",readcount,jtyf.filelength);
+        msgprintf("Processed %lu of %lu bytes of JTY file.\n",readcount,jtyf.filelength);
         long unused=jtyf.filelength-readcount;
         if (unused>0)
         {
-            printf("Bytes skipped: %ld\n",unused);
+            msgprintf("Bytes skipped: %ld\n",unused);
         } else  
         if (unused<0)
         {
-            printf("Bytes overlapping: %ld\n",-unused);
+            msgprintf("Bytes overlapping: %ld\n",-unused);
         }
     }
 
@@ -190,20 +193,21 @@ short write_jtytab_images_enc(const struct ENCIMAGELIST *images,const char *jtyf
     struct DATFILE jtyf;
     unsigned long writecount=0;
     write_encimages_jtytab(images,&writecount,&jtabf,&jtyf);
-    if (verbose) printf("Writing TAB file ...");
+    if (verbose) msgprintf("Writing TAB file ...");
     write_jtytabfile_data(&jtabf,tabfname);
-    if (verbose) printf(" Done.\n");
-    if (verbose) printf("Writing DAT file ...");
+    if (verbose) msgprintf(" Done.\n");
+    if (verbose) msgprintf("Writing DAT file ...");
     write_datfile_data(&jtyf,jtyfname);
-    if (verbose) printf(" Done.\n");
+    if (verbose) msgprintf(" Done.\n");
     free_jtytabfile_data(&jtabf);
     free_datfile_data(&jtyf);
     return ERR_NONE;
 }
 
-short create_images_jtytab_idx(struct IMAGELIST *images,const char *jtyfname,const char *tabfname,int verbose)
+short create_images_jtytab_idx(struct IMAGELIST *images,const char *jtyfname,
+    const char *tabfname,int verbose)
 {
-    if (verbose) printf("Reading TAB file ...");
+    if (verbose) msgprintf("Reading TAB file ...");
     //Opening TAB file
     struct JTYTABFILE jtabf;
     {
@@ -213,16 +217,16 @@ short create_images_jtytab_idx(struct IMAGELIST *images,const char *jtyfname,con
         case ERR_NONE:
             break;
         case 1:
-            if (verbose) printf(" Error\nCannot open TAB file \"%s\"\n",tabfname);
+            if (verbose) msgprintf(" Error\nCannot open TAB file \"%s\"\n",tabfname);
             return JTYTB_CANNOT_OPEN;
         default:
-            if (verbose) printf(" Error\nLoading TAB file \"%s\" returned fail code %d\n",tabfname,retcode);
+            if (verbose) msgprintf(" Error\nLoading TAB file \"%s\" returned fail code %d\n",tabfname,retcode);
             return retcode;
         }
     }
-    if (verbose) printf(" Done.\n");
+    if (verbose) msgprintf(" Done.\n");
 
-    if (verbose) printf("Reading JTY file ...");
+    if (verbose) msgprintf("Reading JTY file ...");
     //Opening DAT file
     struct DATFILE jtyf;
     {
@@ -232,45 +236,45 @@ short create_images_jtytab_idx(struct IMAGELIST *images,const char *jtyfname,con
         case ERR_NONE:
             break;
         case JTYTB_CANNOT_OPEN:
-             if (verbose) printf(" Error\nCannot open JTY file \"%s\"\n",jtyfname);
+             if (verbose) msgprintf(" Error\nCannot open JTY file \"%s\"\n",jtyfname);
              return JTYTB_CANNOT_OPEN;
         default:
-             if (verbose) printf(" Error\nLoading JTY file \"%s\" returned fail code %d\n",jtyfname,retcode);
+             if (verbose) msgprintf(" Error\nLoading JTY file \"%s\" returned fail code %d\n",jtyfname,retcode);
              return retcode;
         }
     }
-    if (verbose) printf(" Done.\n");
+    if (verbose) msgprintf(" Done.\n");
 
     if (verbose)
     {
-        printf("\n");
-        printf ("The TAB file informs of %lu pictures.\n", jtabf.count);
+        msgprintf("\n");
+        msgprintf ("The TAB file informs of %lu pictures.\n", jtabf.count);
         if (jtabf.filelength!=(jtabf.count+1)*6)
         {
-            printf("Warning - the TAB file contains incomplete entry at end.\n");
-            printf(" The truncated entry will be skipped.\n");
+            msgprintf("Warning - the TAB file contains incomplete entry at end.\n");
+            msgprintf(" The truncated entry will be skipped.\n");
         }
         if (jtyf.count==-1)
         {
-            printf ("The JTY file informs of 4bpp content.\n");
-            printf ("Warning - this is 8bpp extractor!\n");
+            msgprintf ("The JTY file informs of 4bpp content.\n");
+            msgprintf ("Warning - this is 8bpp extractor!\n");
         }
         else
-            printf ("The JTY file informs of %ld pictures.\n", jtyf.count);
+            msgprintf ("The JTY file informs of %ld pictures.\n", jtyf.count);
     }
-    if (verbose) printf("Decoding images ...");
+    if (verbose) msgprintf("Decoding images ...");
     unsigned long readcount=2;
     read_jtytab_images(images,&readcount,&jtabf,&jtyf,verbose);
-    if (verbose) printf(" Done.\n");
+    if (verbose) msgprintf(" Done.\n");
 
     if (verbose)
     {
-        printf("Processed %lu of %lu bytes of JTY file.\n",readcount,jtyf.filelength);
+        msgprintf("Processed %lu of %lu bytes of JTY file.\n",readcount,jtyf.filelength);
         long unused=jtyf.filelength-readcount;
         if (unused>=0)
-            printf("Bytes skipped: %ld\n",unused);
+            msgprintf("Bytes skipped: %ld\n",unused);
           else  
-            printf("Bytes overlapping: %ld\n",-unused);
+            msgprintf("Bytes overlapping: %ld\n",-unused);
     }
 
     free_jtytabfile_data(&jtabf);
@@ -364,7 +368,7 @@ int read_jtytab_encimages(struct ENCIMAGELIST *images,unsigned long *readcount,
     images->items=malloc(all_items_size);
     if (images->items==NULL)
     {
-        if (verbose) printf(" Error\nReason - cannot allocate %lu bytes of memory.\n",all_items_size);
+        if (verbose) msgprintf(" Error\nReason - cannot allocate %lu bytes of memory.\n",all_items_size);
         return JTYTB_MALLOC_ERR;
     }
     //Looping through images
@@ -379,11 +383,11 @@ int read_jtytab_encimages(struct ENCIMAGELIST *images,unsigned long *readcount,
         item->height=jtabitem->height;
         item->data=NULL;
         item->datsize=0;
-        memcpy(&(item->attrib),&(jtabitem->attrib),sizeof(struct JTYTAB_ATTRIB));
-       	if (verbose) printf("\rPreparing picture%6lu from %06lx, %ux%u...",picnum,jtabitem->offset,jtabitem->width,jtabitem->height);
+        memcpy(&(item->attrib),&(jtabitem->attrib),sizeof(struct IMGTAB_ATTRIB));
+       	if (verbose) msgprintf("\rPreparing picture%6lu from %06lx, %ux%u...",picnum,jtabitem->offset,jtabitem->width,jtabitem->height);
         if (jtabitem->offset > jtyf->filelength)
         {
-            if (verbose) printf(" Skipped\nReason - Picture offset out of JTY filesize.\n");
+            if (verbose) msgprintf(" Skipped\nReason - Picture offset out of JTY filesize.\n");
             skipnum++;
             continue;
         }
@@ -398,7 +402,7 @@ int read_jtytab_encimages(struct ENCIMAGELIST *images,unsigned long *readcount,
             } else
             {
                 if (verbose)
-                  printf(" Truncated\nReason - Entry size exceeds JTY filesize.\n");
+                  msgprintf(" Truncated\nReason - Entry size exceeds JTY filesize.\n");
             }
         }
         item->datsize=endoffs-jtabitem->offset;
@@ -407,14 +411,14 @@ int read_jtytab_encimages(struct ENCIMAGELIST *images,unsigned long *readcount,
             item->data=malloc(item->datsize+1);
             if (item->data==NULL)
             {
-              if (verbose) printf(" Error - cannot allocate %lu bytes of memory.\n",(unsigned long)(item->datsize));
+              if (verbose) msgprintf(" Error - cannot allocate %lu bytes of memory.\n",(unsigned long)(item->datsize));
               return JTYTB_MALLOC_ERR;
             }
             memcpy(item->data,jtyf->data+jtabitem->offset,item->datsize);
         }
         (*readcount)+=(item->datsize);
     }
-    if (verbose) printf("\rImages stored; %lu skipped, %lu errors.             \n",skipnum,errnum);
+    if (verbose) msgprintf("\rImages stored; %lu skipped, %lu errors.             \n",skipnum,errnum);
     return errnum;
 }
 
@@ -446,7 +450,7 @@ int write_encimages_jtytab(const struct ENCIMAGELIST *images,unsigned long *writ
         cjtab->offset=datoffs;
         cjtab->width=img->width;
         cjtab->height=img->height;
-        memcpy(&(cjtab->attrib),&(img->attrib),sizeof(struct JTYTAB_ATTRIB));
+        memcpy(&(cjtab->attrib),&(img->attrib),sizeof(struct IMGTAB_ATTRIB));
         datoffs+=img->datsize;
     }
     (*writecount)=datoffs;
@@ -491,7 +495,7 @@ int read_jtytab_images(struct IMAGELIST *images,unsigned long *readcount,
     images->items=malloc(sizeof(struct IMAGEITEM)*(images->count));
     if (images->items==NULL)
     {
-        if (verbose) printf(" Error - cannot allocate %lu bytes of memory.\n",(unsigned long)(sizeof(struct IMAGEITEM)*images->count));
+        if (verbose) msgprintf(" Error - cannot allocate %lu bytes of memory.\n",(unsigned long)(sizeof(struct IMAGEITEM)*images->count));
         return 1;
     }
     //Looping through images
@@ -506,16 +510,16 @@ int read_jtytab_images(struct IMAGELIST *images,unsigned long *readcount,
         item->height=0;
         item->data=NULL;
         item->alpha=NULL;
-       	if (verbose) printf("\rPreparing picture%6lu from %06lx, %ux%u...",picnum,jtabitem->offset,jtabitem->width,jtabitem->height);
+       	if (verbose) msgprintf("\rPreparing picture%6lu from %06lx, %ux%u...",picnum,jtabitem->offset,jtabitem->width,jtabitem->height);
         if (jtabitem->offset >= jtyf->filelength)
             {
-            if (verbose) printf(" Skipped - Picture offset out of JTY filesize.\n");
+            if (verbose) msgprintf(" Skipped - Picture offset out of JTY filesize.\n");
             skipnum++;
             continue;
             }
         if ((jtabitem->width*jtabitem->height) < 1)
             {
-            if (verbose) printf(" Skipped - Picture dimensions are invalid.\n");
+            if (verbose) msgprintf(" Skipped - Picture dimensions are invalid.\n");
             skipnum++;
             continue;
             }
@@ -525,16 +529,16 @@ int read_jtytab_images(struct IMAGELIST *images,unsigned long *readcount,
         *readcount+=readedsize;
         if ((retcode&XTABDAT8_COLOUR_LEAK))
         {  
-            if (verbose) printf (" Error - colour leak out of picture size.\n");
+            if (verbose) msgprintf (" Error - colour leak out of picture size.\n");
             errnum++;
         }
         else if ((retcode&XTABDAT8_ENDOFBUFFER))
         {  
-            if (verbose) printf (" Error - end of DAT buffer, picture truncated.\n");
+            if (verbose) msgprintf (" Error - end of DAT buffer, picture truncated.\n");
             errnum++;
         }
     }
-    if (verbose) printf("\rImages decoded, %lu skipped, %lu errors.\n",skipnum,errnum);
+    if (verbose) msgprintf("\rImages decoded, %lu skipped, %lu errors.\n",skipnum,errnum);
     return errnum;
 }
 

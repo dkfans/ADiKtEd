@@ -27,7 +27,7 @@ int main(int argc, char *argv[])
   short result;
 
   // create object for storing map
-  level_init(&lvl);
+  level_init(&lvl,MFV_DKGOLD,NULL);
 
   // Initialize the message displaying and storing
   // (we won't use them in this example,

@@ -40,7 +40,7 @@ struct COLUMN_REC {
     // Solidmask - appears to be a bitmask for which of the cubes are non-zero,
     // with the lowest cube being represented by the least significant bit.
     unsigned int solid;
-    // Baseblock - determines the very lowest level (below the lowest cube).
+    // Baseblock - determines texture of the very lowest level (below the lowest cube).
     unsigned int base;
     // Orientation (always 0)
     short orientation;
@@ -87,6 +87,7 @@ DLLIMPORT short get_clm_entry_permanent(const unsigned char *clmentry);
 DLLIMPORT void set_clm_entry_permanent(unsigned char *clmentry,short nperm);
 DLLIMPORT unsigned short get_clm_entry_height(const unsigned char *clmentry);
 DLLIMPORT unsigned short get_clm_entry_solid(const unsigned char *clmentry);
+DLLIMPORT unsigned short get_clm_entry_base(const unsigned char *clmentry);
 DLLIMPORT unsigned short get_clm_entry_topcube(const unsigned char *clmentry);
 
 

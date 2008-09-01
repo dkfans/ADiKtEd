@@ -1,20 +1,19 @@
 /******************************************************************************/
-// msg_log.c - Dungeon Keeper Tools.
-/******************************************************************************/
-// Author:   Tomasz Lis
-// Created:  25 Apr 2008
-
-// Purpose:
-//   Maintaining of message log.
-
-// Comment:
-//   None.
-
-//Copying and copyrights:
-//   This program is free software; you can redistribute it and/or modify
-//   it under the terms of the GNU General Public License as published by
-//   the Free Software Foundation; either version 2 of the License, or
-//   (at your option) any later version.
+/** @file msg_log.c
+ * Maintaining of message log.
+ * @par Purpose:
+ *     Procedures for logging messages into file, and holding them
+ *     to print on screen.
+ * @par Comment:
+ *     None.
+ * @author   Tomasz Lis
+ * @date     25 Apr 2008 - 29 Jul 2008
+ * @par  Copying and copyrights:
+ *     This program is free software; you can redistribute it and/or modify
+ *     it under the terms of the GNU General Public License as published by
+ *     the Free Software Foundation; either version 2 of the License, or
+ *     (at your option) any later version.
+ */
 /******************************************************************************/
 
 #include "msg_log.h"
@@ -27,9 +26,11 @@ short message_hold;
 unsigned int message_getcount;
 char *msgout_fname;
 
-/*
+/**
  * Only logs the message, without showing on screen.
- * the va_list and inline version.
+ * The va_list version - mainly for internal use.
+ * @param format Specifies the string pattern.
+ * @param val List of arguments used in the pattern.
  */
 void message_log_vl(const char *format, va_list val)
 {
@@ -45,9 +46,10 @@ void message_log_vl(const char *format, va_list val)
     }
 }
 
-/*
- * Simplified function for message logging; is inline and
- * allows writing only single string.
+/**
+ * Simplified function for message logging.
+ * Allows writing only single string.
+ * @param str Specifies the exact to log string.
  */
 void message_log_simp(const char *str)
 {
@@ -62,9 +64,11 @@ void message_log_simp(const char *str)
     }
 }
 
-/*
+/**
  * Only logs the message, without showing on screen.
  * Standard version - allows formatted message.
+ * @param format Specifies the string pattern.
+ * @param ... List of arguments used in the pattern.
  */
 void message_log(const char *format, ...)
 {
@@ -75,6 +79,12 @@ void message_log(const char *format, ...)
     va_end(val);
 }
 
+/**
+ * Logs the message and prints it into stderr.
+ * Sets message_hold, so other messages can't overwrite it.
+ * @param format Specifies the string pattern.
+ * @param ... List of arguments used in the pattern.
+ */
 void message_error(const char *format, ...)
 {
     va_list val;
@@ -100,12 +110,22 @@ void message_error(const char *format, ...)
     message_getcount=0;
 }
 
+/**
+ * Returns if the message buffer is empty.
+ * @return Returns true if the message buffer is empty.
+ */
 short message_is_empty(void)
 {
      if ((message!=NULL)&&(message[0]>'\0')) return false;
      return true;
 }
 
+/**
+ * Logs the message and prints it into message buffer.
+ * The message is set into buffer only if message_hold is not set.
+ * @param format Specifies the string pattern.
+ * @param ... List of arguments used in the pattern.
+ */
 void message_info(const char *format, ...)
 {
     va_list val;
@@ -136,9 +156,11 @@ void message_info(const char *format, ...)
     }
 }
 
-/*
+/**
  * Sets the new message even if previous one was marked to be held.
  * The new message is a standard information - hold is disabled.
+ * @param format Specifies the string pattern.
+ * @param ... List of arguments used in the pattern.
  */
 void message_info_force(const char *format, ...)
 {
@@ -165,30 +187,62 @@ void message_info_force(const char *format, ...)
     message_getcount=0;
 }
 
+/**
+ * Returns the value of message_hold.
+ * This value informs if the buffer need to be released before
+ * any further logging.
+ * @return Returns message_hold, which true or false.
+ */
 short message_hold_get(void)
 {
       return message_hold;
 }
 
+/**
+ * Returns the value of message_getcount.
+ * This value informs how many times the message_get() was called
+ * for the current message.
+ * @return Returns message_get call count.
+ */
 unsigned int message_getcount_get(void)
 {
       return message_getcount;
 }
 
+/**
+ * Releases the message buffer, so it can store next message.
+ * Call to this function is reqired after message_error call,
+ * to allow logging further messages.
+ */
 void message_release(void)
 {
       message_hold=false;
 }
 
+/**
+ * Returns pointer to the buffer with the last message.
+ * @return Returns pointer to the last message string.
+ */
 char *message_get(void)
 {
      message_getcount++;
      return message;
 }
 
-/*
+/**
+ * Returns pointer to the buffer with the previous message.
+ * @return Returns pointer to the last message string.
+ */
+char *message_get_prev(void)
+{
+     return message_prv;
+}
+
+/**
  * Sets message log file name. Rewrites it, then writes header and two
  * last messages.
+ * @param fname The file name under which log is written.
+ * @return Returns true if the log was created, otherwise false.
  */
 short set_msglog_fname(char *fname)
 {
@@ -215,7 +269,7 @@ short set_msglog_fname(char *fname)
     return false;
 }
 
-/*
+/**
  * Clears message log variables without freeing memory (drops any pointers).
  */
 void init_messages(void)
@@ -227,6 +281,9 @@ void init_messages(void)
   msgout_fname=NULL;
 }
 
+/**
+ * Frees memory allocated for messages. The pointers are not cleared.
+ */
 void free_messages(void)
 {
     free(message_prv);

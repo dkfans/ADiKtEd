@@ -2,11 +2,7 @@
  * main.c   contains main() and initialization functions
  */
 
-#include "libadikted/globals.h"
-#include "libadikted/arr_utils.h"
-#include "libadikted/draw_map.h"
-#include "libadikted/lev_script.h"
-#include "libadikted/lev_data.h"
+#include "../libadikted/adikted.h"
 #include "scr_actn.h"
 #include "scr_help.h"
 #include "scr_txted.h"
@@ -102,6 +98,11 @@ void read_init(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata)
       {
           workdata->optns->load_redundant_objects=atoi(p);
           message_log(" read_init: load_redundant_objects set to %d",(int)workdata->optns->load_redundant_objects);
+      } else
+      if (!strcmp(buffer, "VERIFY_WARN_FLAGS"))
+      {
+          workdata->optns->verify_warn_flags=atoi(p);
+          message_log(" read_init: verify_warn_flags set to %d",(int)workdata->optns->verify_warn_flags);
       } else
       if (!strcmp(buffer, "UNAFFECTED_ROCK"))
       {
@@ -273,14 +274,18 @@ void get_command_line_options(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA 
  */
 int main(int argc, char **argv)
 {
-    //Allocate and set basic configuration variables
     struct SCRMODE_DATA *scrmode;
     struct WORKMODE_DATA workdata;
-    init_levscr_basics(&scrmode,&workdata);
     // Initialize the message displaying and storing
     init_messages();
+    //set_msglog_fname("aaa.log");
     // create object for storing map
-    level_init(&(workdata.lvl));
+    level_init(&(workdata.lvl),MFV_DKGOLD,NULL);
+    //testing new map capabilities
+    //struct UPOINT_3D mapsize={100,100,1};
+    //level_init(&(workdata.lvl),MFV_DKXPAND,&mapsize);
+    //Allocate and set basic configuration variables
+    init_levscr_basics(&scrmode,&workdata);
     // read configuration file
     read_init(scrmode,&workdata);
     // partial options set - required to propagate paths from config file

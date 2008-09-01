@@ -1336,9 +1336,9 @@ short script_cmd_verify_arg_quotparam(struct SCRIPT_VERIFY_DATA *scverif,char *e
           sprintf(err_msg,"Text parameter should be closed in quote");
         return false;
     }
-    if (strlen(param) > 255)
+    if (strlen(param) > 511)
     {
-        sprintf(err_msg,"Text parameter is longer than 255 chars");
+        sprintf(err_msg,"Text parameter is longer than 511 chars");
         return false;
     }
     return true;
@@ -2370,6 +2370,12 @@ short script_cmd_verify_setup(struct SCRIPT_VERIFY_DATA *scverif,char *err_msg,i
             (*err_param)=0;
             return VERIF_WARN;
         }
+        if (plyr_idx==PLAYER0)
+        {
+          sprintf(err_msg,"%s is set as AI player in script",players_cmd_text(PLAYER0));
+          (*err_param)=0;
+          return VERIF_WARN;
+        }
         if (!script_cmd_verify_arg_limparam(scverif,err_msg,cmd->params[1],
             "Computer player",0,10))
         {
@@ -2669,7 +2675,7 @@ short script_cmd_verify_crtradj(struct SCRIPT_VERIFY_DATA *scverif,char *err_msg
             (*err_param)=0;
             return VERIF_WARN;
         }
-        if (!script_cmd_verify_arg_ncrtrs(scverif,err_msg,cmd->params[1],1,&i))
+        if (!script_cmd_verify_arg_ncrtrs(scverif,err_msg,cmd->params[1],0,&i))
         {
             (*err_param)=1;
             return VERIF_WARN;
@@ -2727,7 +2733,7 @@ short script_cmd_verify_crtradj(struct SCRIPT_VERIFY_DATA *scverif,char *err_msg
             (*err_param)=0;
             return VERIF_WARN;
         }
-        if (!script_cmd_verify_arg_limparam(scverif,err_msg,cmd->params[1],"Health",0,32767))
+        if (!script_cmd_verify_arg_limparam(scverif,err_msg,cmd->params[1],"Health",0,7895))
         {
             (*err_param)=1;
             return VERIF_WARN;
@@ -2931,9 +2937,17 @@ short dkscript_verify(const struct LEVEL *lvl, char *err_msg,int *err_line,int *
         }
     }
     const int max_condit_if=48;
-    if (scverif.total_ifs>max_condit_if)
+    if ((result==VERIF_OK)&&(scverif.total_ifs>max_condit_if))
     {
         sprintf(err_msg,"Script file contains more than %d IF statements.",max_condit_if);
+        result=VERIF_WARN;
+    }
+    if ((result==VERIF_OK)&&(scverif.level!=0))
+    {
+        if (scverif.level>0)
+          sprintf(err_msg,"There are %d unclosed IF statements",scverif.level);
+        else
+          sprintf(err_msg,"Amount of ENDIFs is larger than of IF statements");
         result=VERIF_WARN;
     }
     //Freeing structure and returning
@@ -3577,8 +3591,18 @@ short script_decomposed_to_params_cmd_crtradj(struct DK_SCRIPT_PARAMETERS *par,
             return false;
         if (!script_param_to_int(&amount,cmd->params[2]))
             return false;
-        par->player[plyr_idx].creature_maxlvl[crtr_idx]=amount;
-        //TODO
+        if (plyr_idx<PLAYERS_COUNT)
+        {
+            par->player[plyr_idx].creature_maxlvl[crtr_idx]=amount;
+        } else
+        if (plyr_idx==PLAYER_ALL)
+        {
+            for (i=0;i<PLAYERS_COUNT;i++)
+              par->player[i].creature_maxlvl[crtr_idx]=amount;
+        } else
+        {
+            return false;
+        }
         break;
     case SET_CREATR_STRENGTH:
         if (cmd->param_count<2)
@@ -3647,25 +3671,18 @@ short script_decomposed_to_params_cmd(struct DK_SCRIPT_PARAMETERS *par,
     {
     case CMD_CONDIT:
             return script_decomposed_to_params_cmd_condit(par,cmd,optns);
-            break;
     case CMD_PARTY:
             return script_decomposed_to_params_cmd_party(par,cmd,optns);
-            break;
     case CMD_AVAIL:
             return script_decomposed_to_params_cmd_avail(par,cmd,optns);
-            break;
     case CMD_CUSTOBJ:
             return script_decomposed_to_params_cmd_custobj(par,cmd,optns);
-            break;
     case CMD_SETUP:
             return script_decomposed_to_params_cmd_setup(par,cmd,optns);
-            break;
     case CMD_TRIGER:
             return script_decomposed_to_params_cmd_triger(par,cmd,optns);
-            break;
     case CMD_CRTRADJ:
             return script_decomposed_to_params_cmd_crtradj(par,cmd,optns);
-            break;
     case CMD_COMMNT:
             return true;
     case CMD_OBSOLT:
@@ -3674,8 +3691,7 @@ short script_decomposed_to_params_cmd(struct DK_SCRIPT_PARAMETERS *par,
     case CMD_ADIKTED:
         default:
             return false;
-            break;
-        }
+    }
   } else
   {
       return script_decomposed_to_params_cmd_blockbody(par,cmd,optns);
@@ -5008,8 +5024,14 @@ short add_stats_to_script(char ***lines,int *lines_count,struct LEVEL *lvl)
     char *tmp;
     char *tmp2;
     char *tmp3;
-    line=(char *)malloc(LINEMSG_SIZE*sizeof(char));
-    tmp=(char *)malloc(LINEMSG_SIZE*sizeof(char));
+    long max_len=LINEMSG_SIZE;
+    // Secure against very long descriptions
+    if (lvl->info.desc_text!=NULL)
+        max_len=max(max_len,strlen(lvl->info.desc_text)+(LINEMSG_SIZE>>1));
+    if ((lvl->info.author_text!=NULL)&&(lvl->info.editor_text!=NULL))
+        max_len=max(max_len,strlen(lvl->info.author_text)+strlen(lvl->info.editor_text)+(LINEMSG_SIZE>>1));
+    line=(char *)malloc(max_len*sizeof(char));
+    tmp=(char *)malloc(max_len*sizeof(char));
     unsigned long curr_time=time(NULL);
     // Script header
     tmp2=prepare_short_fname(lvl->savfname,24);
@@ -5087,14 +5109,11 @@ short add_graffiti_to_script(char ***lines,int *lines_count,struct LEVEL *lvl)
 
 short add_custom_clms_to_script(char ***lines,int *lines_count,struct LEVEL *lvl)
 {
-    //Preparing array bounds
-    int dat_entries_x=MAP_SIZE_X*MAP_SUBNUM_X+1;
-    int dat_entries_y=MAP_SIZE_Y*MAP_SUBNUM_Y+1;
     int sx,sy;
     char *line;
     line=(char *)malloc(LINEMSG_SIZE*sizeof(char));
-    for (sy=0; sy < dat_entries_y; sy++)
-      for (sx=0; sx < dat_entries_x; sx++)
+    for (sy=0; sy < lvl->subsize.y; sy++)
+      for (sx=0; sx < lvl->subsize.x; sx++)
       {
         struct DK_CUSTOM_CLM *cclm;
         struct COLUMN_REC *clm_rec;

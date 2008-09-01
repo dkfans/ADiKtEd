@@ -21,15 +21,10 @@
 
 #include "scr_clm.h"
 
-#include "libadikted/globals.h"
-#include "libadikted/obj_column_def.h"
+#include "../libadikted/adikted.h"
 #include "output_scr.h"
 #include "input_kb.h"
 #include "scr_actn.h"
-#include "libadikted/obj_slabs.h"
-#include "libadikted/obj_column.h"
-#include "libadikted/lev_column.h"
-#include "libadikted/lev_data.h"
 
 /*
  * Initializes variables for the column screen.

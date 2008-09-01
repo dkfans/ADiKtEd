@@ -137,8 +137,8 @@ void graffiti_del(struct LEVEL *lvl,unsigned int num)
  */
 struct DK_GRAFFITI *create_graffiti(int tx, int ty, char *text, const struct LEVEL *lvl, int orient)
 {
-    tx%=MAP_SIZE_X;
-    ty%=MAP_SIZE_Y;
+    tx%=lvl->tlsize.x;
+    ty%=lvl->tlsize.y;
     if (text==NULL) return NULL;
     struct DK_GRAFFITI *graf;
     //Filling graffiti structure
@@ -194,8 +194,8 @@ short set_graffiti_orientation(struct DK_GRAFFITI *graf,const struct LEVEL *lvl,
 {
     if ((graf==NULL)||(graf->text==NULL)) return false;
     //Preparing array bounds
-    int arr_entries_x=MAP_SIZE_X*MAP_SUBNUM_X;
-    int arr_entries_y=MAP_SIZE_Y*MAP_SUBNUM_Y;
+    int arr_entries_x=lvl->tlsize.x*MAP_SUBNUM_X;
+    int arr_entries_y=lvl->tlsize.y*MAP_SUBNUM_Y;
     unsigned short font=graf->font;
     int i;
     int l;
@@ -389,10 +389,10 @@ void graffiti_clear_from_columns(struct LEVEL *lvl,int graf_idx)
     if (graf==NULL) return;
     int tx,fin_tx,ty,fin_ty;
     //Setting graffiti coords to off-screen
-    tx=graf->tile.x;graf->tile.x=MAP_SIZE_X;
-    fin_tx=graf->fin_tile.x;graf->fin_tile.x=MAP_SIZE_X;
-    ty=graf->tile.y;graf->tile.y=MAP_SIZE_Y;
-    fin_ty=graf->fin_tile.y;graf->fin_tile.y=MAP_SIZE_Y;
+    tx=graf->tile.x;graf->tile.x=lvl->tlsize.x;
+    fin_tx=graf->fin_tile.x;graf->fin_tile.x=lvl->tlsize.x;
+    ty=graf->tile.y;graf->tile.y=lvl->tlsize.y;
+    fin_ty=graf->fin_tile.y;graf->fin_tile.y=lvl->tlsize.y;
     //Updating
     update_datclm_for_square(lvl,tx,fin_tx,ty,fin_ty);
     //Setting the coords back

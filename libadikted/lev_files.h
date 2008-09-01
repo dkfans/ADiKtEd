@@ -18,7 +18,10 @@
 #ifndef ADIKT_LEVFILES_H
 #define ADIKT_LEVFILES_H
 
-#include "lev_data.h"
+#include "globals.h"
+
+struct LEVEL;
+struct MEMORY_FILE;
 
 // The "No error" constant need to be same as in read_file (MFILE_OK).
 // There should be no more than 32 errors (up to -31).
@@ -56,14 +59,19 @@ enum LEVEL_FILE_FLAGS {
 #define LFF_IGNORE_ALL (LFF_IGNORE_INTERNAL|LFF_IGNORE_CANNOT_LOAD)
 #define LFF_IGNORE_WITHOUT_WARN (LFF_IGNORE_INTERNAL|LFF_IGNORE_CANNOT_LOAD|LFF_DONT_EVEN_WARN)
 
-DLLIMPORT short save_map(struct LEVEL *lvl);
+DLLIMPORT short save_dk1_map(struct LEVEL *lvl);
+DLLIMPORT short save_dke_map(struct LEVEL *lvl);
 DLLIMPORT short user_save_map(struct LEVEL *lvl,short prior_save);
 
-DLLIMPORT short load_map(struct LEVEL *lvl);
+DLLIMPORT short load_dk1_map(struct LEVEL *lvl);
+DLLIMPORT short load_dke_map(struct LEVEL *lvl);
 DLLIMPORT short load_map_preview(struct LEVEL *lvl);
 DLLIMPORT short user_load_map(struct LEVEL *lvl,short new_on_error);
 
-DLLIMPORT short script_load_and_execute(struct LEVEL *lvl,char *fname,char *err_msg);
+DLLIMPORT short script_load_and_execute(struct LEVEL *lvl,
+    struct MEMORY_FILE *mem,char *err_msg);
+DLLIMPORT short script_load_and_execute_file(struct LEVEL *lvl,char *fname,char *err_msg);
+DLLIMPORT short save_nfo_file(struct LEVEL *lvl);
 DLLIMPORT short load_text_file(char ***lines,int *lines_count,char *fname);
 DLLIMPORT short write_text_file(char **lines,int lines_count,char *fname);
 

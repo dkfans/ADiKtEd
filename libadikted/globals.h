@@ -128,7 +128,18 @@ struct SCRIPT_OPTIONS {
 
 struct MAPDRAW_OPTIONS {
     short rescale;
+    short bmfonts;
+    short tngflags;
     char *data_path;
+};
+
+struct VERIFY_OPTIONS {
+    // Level size, in tiles
+    struct UPOINT_2D tlsize;
+    // Level size, in subtiles
+    struct UPOINT_2D subsize;
+    // Verification error message buffer
+    char err_msg[LINEMSG_SIZE];
 };
 
 struct LEVOPTIONS {
@@ -147,6 +158,8 @@ struct LEVOPTIONS {
     // True means that APT/TNG will load all objects if file size of TNG/APT
     // is larger than it should
     short load_redundant_objects;
+    // Flags used for level verification
+    unsigned int verify_warn_flags;
     // Map picture generation options
     struct MAPDRAW_OPTIONS picture;
     // Level script options

@@ -19,7 +19,7 @@
 
 #include "var_utils.h"
 
-#include "libadikted/globals.h"
+#include "../libadikted/globals.h"
 #include <stdarg.h>
 #include "input_kb.h"
 #include "output_scr.h"

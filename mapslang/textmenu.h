@@ -20,7 +20,7 @@
 #ifndef BULL_TEXTMENU_H
 #define BULL_TEXTMENU_H
 
-#include "libadikted/globals.h"
+#include "../libadikted/globals.h"
 
 #define MIT_NUMERIC 0
 #define MIT_BOOLEAN 1

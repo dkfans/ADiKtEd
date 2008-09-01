@@ -22,7 +22,7 @@
 
 #include <slang.h>
 #include "output_scr.h"
-#include "libadikted/globals.h"
+#include "../libadikted/adikted.h"
 
 short input_initied=false;
 short disable_sounds=false;

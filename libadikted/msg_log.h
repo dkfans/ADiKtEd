@@ -1,20 +1,18 @@
 /******************************************************************************/
-// msg_log.c - Dungeon Keeper Tools.
-/******************************************************************************/
-// Author:   Tomasz Lis
-// Created:  25 Apr 2008
-
-// Purpose:
-//   Header file. Defines exported routines from msg_log.c
-
-// Comment:
-//   None.
-
-//Copying and copyrights:
-//   This program is free software; you can redistribute it and/or modify
-//   it under the terms of the GNU General Public License as published by
-//   the Free Software Foundation; either version 2 of the License, or
-//   (at your option) any later version.
+/** @file msg_log.h
+ * Maintaining of message log.
+ * @par Purpose:
+ *     Header file. Defines exported routines from msg_log.c.
+ * @par Comment:
+ *     None.
+ * @author   Tomasz Lis
+ * @date     25 Apr 2008 - 29 Jul 2008
+ * @par  Copying and copyrights:
+ *     This program is free software; you can redistribute it and/or modify
+ *     it under the terms of the GNU General Public License as published by
+ *     the Free Software Foundation; either version 2 of the License, or
+ *     (at your option) any later version.
+ */
 /******************************************************************************/
 
 #ifndef BULL_MSGLOG_H
@@ -34,6 +32,7 @@ DLLIMPORT void message_info_force(const char *format, ...);
 DLLIMPORT short message_is_empty(void);
 DLLIMPORT void message_release(void);
 DLLIMPORT char *message_get(void);
+DLLIMPORT char *message_get_prev(void);
 DLLIMPORT short message_hold_get(void);
 DLLIMPORT unsigned int message_getcount_get(void);
 

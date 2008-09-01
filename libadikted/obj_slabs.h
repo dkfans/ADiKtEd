@@ -142,6 +142,7 @@ DLLIMPORT short place_room_rndpos(struct LEVEL *lvl,const unsigned short rslab,
     const unsigned char rown,const struct IPOINT_2D *rsize);
 
 DLLIMPORT char *get_owner_type_fullname(unsigned char own_idx);
+DLLIMPORT char *get_owner_type_colorname(unsigned char own_idx);
 DLLIMPORT unsigned char get_owner_next(unsigned char plyr_idx);
 DLLIMPORT unsigned char get_owner_prev(unsigned char plyr_idx);
 DLLIMPORT void update_slab_owners(struct LEVEL *lvl);

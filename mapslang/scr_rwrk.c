@@ -20,16 +20,10 @@
 
 #include "scr_rwrk.h"
 
-#include "libadikted/globals.h"
+#include "../libadikted/adikted.h"
 #include "output_scr.h"
 #include "input_kb.h"
 #include "scr_actn.h"
-#include "libadikted/obj_slabs.h"
-#include "libadikted/obj_column.h"
-#include "libadikted/lev_data.h"
-#include "libadikted/lev_files.h"
-#include "libadikted/lev_column.h"
-#include "libadikted/obj_actnpts.h"
 
 /*
  * Initializes variables for the rework screen.
@@ -112,8 +106,8 @@ void actions_mdrwrk(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata,
             generate_slab_bkgnd_default(workdata->lvl,SLAB_TYPE_PATH);
             const int size_x=6;
             const int size_y=5;
-            const int limit_x=(MAP_SIZE_X-1)/size_x;
-            const int limit_y=(MAP_SIZE_Y-1)/size_y;
+            const int limit_x=(workdata->lvl->tlsize.x-1)/size_x;
+            const int limit_y=(workdata->lvl->tlsize.y-1)/size_y;
             for (k=0;k<limit_y;k++)
               for (i=0;i<limit_x;i++)
               {
@@ -176,7 +170,7 @@ void place_cube_test(struct LEVEL *lvl,int tx,int ty,unsigned short cube)
       }
     for (k=0;k<clr_y;k++)
       for (i=0;i<clr_x;i++)
-        remove_noncrucial_room_things(tx+i,ty+k);
+        remove_noncrucial_room_things(lvl,tx+i,ty+k);
     // Single cube
     cclm_rec=create_cust_col();
     clm_rec=cclm_rec->rec;
@@ -244,7 +238,7 @@ void draw_rework_map_area(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapm
       screen_setcolor(PRINT_COLOR_LGREY_ON_BLACK);
       set_cursor_pos(k,0);
       int ty=mapmode->map.y+k;
-      if (ty >= MAP_SIZE_Y)
+      if (ty >= lvl->tlsize.y)
       {
           for (i=0; i<scrmode->cols; i++)
             screen_printchr(' ');
@@ -254,7 +248,7 @@ void draw_rework_map_area(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapm
           for (i=0; i<scrmode->cols; i++)
           {
             int tx=mapmode->map.x+i;
-            if (tx < MAP_SIZE_X)
+            if (tx < lvl->tlsize.x)
             {
               char out_ch;
               int sx, sy;

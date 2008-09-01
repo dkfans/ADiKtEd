@@ -24,7 +24,7 @@
 
 #include "textmenu.h"
 
-#include "libadikted/globals.h"
+#include "../libadikted/globals.h"
 #include "input_kb.h"
 #include "output_scr.h"
 

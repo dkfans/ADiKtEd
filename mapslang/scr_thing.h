@@ -26,6 +26,7 @@ struct SCRMODE_DATA;
 struct MAPMODE_DATA;
 struct WORKMODE_DATA;
 struct HELP_DATA;
+struct UPOINT_2D;
 
 // Variables
 
@@ -55,8 +56,8 @@ void action_dec_object_level(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *
 
 //Functions - lower level
 void change_visited_tile(struct WORKMODE_DATA *workdata);
-int display_thing(struct HELP_DATA *help,unsigned char *thing, int scr_col, int scr_row,
-        int max_row, short display_float_pos);
+int display_thing(struct HELP_DATA *help,const unsigned char *thing, const struct UPOINT_2D *tlsize,
+        int scr_col, int scr_row, const int max_row, const short display_float_pos);
 int display_action_point(unsigned char *actnpt, int x, int scr_row, int max_row,
         short display_float_pos);
 int display_static_light(unsigned char *stlight, int x, int y, int max_row, short display_float_pos);

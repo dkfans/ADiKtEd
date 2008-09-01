@@ -293,8 +293,10 @@ DLLIMPORT unsigned char get_thing_owner(const unsigned char *thing);
 DLLIMPORT short set_thing_owner(unsigned char *thing,unsigned char plyr_idx);
 
 DLLIMPORT unsigned char get_thing_subtile_x(const unsigned char *thing);
+DLLIMPORT unsigned short get_thing_pos_x_adv(const unsigned char *thing);
 DLLIMPORT short set_thing_subtile_x(unsigned char *thing,unsigned char pos_x);
 DLLIMPORT unsigned char get_thing_subtile_y(const unsigned char *thing);
+DLLIMPORT unsigned short get_thing_pos_y_adv(const unsigned char *thing);
 DLLIMPORT short set_thing_subtile_y(unsigned char *thing,unsigned char pos_y);
 DLLIMPORT unsigned char get_thing_subtile_h(const unsigned char *thing);
 DLLIMPORT short set_thing_subtile_h(unsigned char *thing,unsigned char pos_h);
@@ -464,6 +466,8 @@ DLLIMPORT int get_item_category(unsigned char stype_idx);
 DLLIMPORT unsigned char get_usual_item_slab(unsigned char stype_idx);
 DLLIMPORT unsigned char get_usual_thing_slab(unsigned char *thing);
 DLLIMPORT short subtl_in_thing_range(const unsigned char *thing,unsigned int sx,unsigned int sy);
+unsigned long get_thing_distance_sqr_adv(const unsigned char *thing,const int ssx,const int ssy);
+unsigned long get_thing_distance_adv(const unsigned char *thing,const int ssx,const int ssy);
 
 DLLIMPORT char *get_thing_type_fullname(const unsigned short type_idx);
 DLLIMPORT char *get_thing_type_shortname(const unsigned short type_idx);
@@ -476,6 +480,7 @@ DLLIMPORT char *get_door_subtype_fullname(const unsigned short stype_idx);
 DLLIMPORT char *get_thing_category_fullname(const unsigned short arr_idx);
 DLLIMPORT char *get_thing_category_shortname(const unsigned short arr_idx);
 DLLIMPORT char *get_effectgen_subtype_fullname(const unsigned short stype_idx);
+DLLIMPORT char *get_thing_subtype_fullname(const unsigned short type_idx,const unsigned short stype_idx);
 
 DLLIMPORT int get_thing_subtypes_arridx(const unsigned char *thing);
 DLLIMPORT unsigned int get_thing_subtypes_count(const unsigned short arr_idx);
@@ -486,6 +491,6 @@ DLLIMPORT unsigned short get_thing_subtypes_next(const unsigned short arr_idx,co
 DLLIMPORT unsigned short get_thing_subtypes_prev(const unsigned short arr_idx,const unsigned short stype_idx);
 DLLIMPORT short switch_thing_subtype(unsigned char *thing,const short forward);
 
-short thing_verify(unsigned char *thing, char *err_msg);
+short thing_verify(unsigned char *thing, struct VERIFY_OPTIONS *verif_opt);
 
 #endif // ADIKT_OBJTHINGS_H

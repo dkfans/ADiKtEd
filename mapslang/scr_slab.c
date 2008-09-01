@@ -22,16 +22,11 @@
 #include "scr_slab.h"
 
 #include <time.h>
-#include "libadikted/globals.h"
+#include "../libadikted/adikted.h"
 #include "output_scr.h"
 #include "input_kb.h"
 #include "scr_actn.h"
-#include "libadikted/lev_data.h"
 #include "scr_help.h"
-#include "libadikted/obj_things.h"
-#include "libadikted/obj_slabs.h"
-#include "libadikted/graffiti.h"
-#include "libadikted/obj_column_def.h"
 #include "scr_thing.h"
 
 /*
@@ -283,7 +278,7 @@ void change_ownership(struct WORKMODE_DATA *workdata,unsigned char purchaser)
     int tx=workdata->mapmode->screen.x+workdata->mapmode->map.x;
     int ty=workdata->mapmode->screen.y+workdata->mapmode->map.y;
     // Sanity check, almost certainly unneeded
-    if ((tx >= MAP_SIZE_X) || (tx >= MAP_SIZE_Y) ||
+    if ((tx >= workdata->lvl->tlsize.x) || (tx >= workdata->lvl->tlsize.y) ||
         (tx < 0) || (ty < 0))
       return;
     if (!is_marking_enab(workdata->mapmode))
@@ -298,7 +293,7 @@ void change_ownership(struct WORKMODE_DATA *workdata,unsigned char purchaser)
       return;
     }
     // another sanity check - this time for marking mode
-    if ((workdata->mapmode->markr.r > MAP_MAXINDEX_X) || (workdata->mapmode->markr.b > MAP_MAXINDEX_Y) ||
+    if ((workdata->mapmode->markr.r+1 > workdata->lvl->tlsize.x) || (workdata->mapmode->markr.b+1 > workdata->lvl->tlsize.y) ||
       (workdata->mapmode->markr.l < 0) || (workdata->mapmode->markr.t < 0))
       return;
     for (tx=workdata->mapmode->markr.l; tx<=workdata->mapmode->markr.r; tx++)

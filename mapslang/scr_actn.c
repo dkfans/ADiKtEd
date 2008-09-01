@@ -23,10 +23,8 @@
 
 #include <math.h>
 #include <strings.h>
-#include "libadikted/globals.h"
+#include "../libadikted/adikted.h"
 #include "var_utils.h"
-#include "libadikted/graffiti.h"
-#include "libadikted/msg_log.h"
 #include "output_scr.h"
 #include "input_kb.h"
 #include "scr_thing.h"
@@ -39,10 +37,6 @@
 #include "scr_cube.h"
 #include "textmenu.h"
 #include "scr_txtgen.h"
-#include "libadikted/obj_slabs.h"
-#include "libadikted/obj_things.h"
-#include "libadikted/obj_column.h"
-#include "libadikted/lev_data.h"
 
 void (*actions [])(struct SCRMODE_DATA *,struct WORKMODE_DATA *,int)={
      actions_mdslab, actions_mdtng,  actions_crcrtr,  actions_critem,
@@ -111,6 +105,7 @@ short finished;
  */
 void init_levscr_basics(struct SCRMODE_DATA **scrmode,struct WORKMODE_DATA *workdata)
 {
+    message_log(" init_levscr_basics: Started");
     // variable that informs if main program loop should finish
     finished=false;
     // random num gen seed selection
@@ -123,27 +118,31 @@ void init_levscr_basics(struct SCRMODE_DATA **scrmode,struct WORKMODE_DATA *work
     workdata->mapmode=(struct MAPMODE_DATA *)malloc(sizeof(struct MAPMODE_DATA));
     if (workdata->mapmode==NULL)
      die("init_levscr: Cannot allocate memory.");
+    // Copy map size in tiles from level
+    workdata->mapmode->tlsize.x=workdata->lvl->tlsize.x;
+    workdata->mapmode->tlsize.y=workdata->lvl->tlsize.y;
+    message_log(" init_levscr_basics: map size set to %dx%d",workdata->mapmode->tlsize.x,workdata->mapmode->tlsize.y);
     { //allocating mapmode sub-structures
       int i;
-      workdata->mapmode->hilight = (int **)malloc(MAP_SIZE_Y*sizeof(int *));
+      workdata->mapmode->hilight = (int **)malloc(workdata->mapmode->tlsize.y*sizeof(int *));
       if (workdata->mapmode->hilight==NULL)
           die("init_levscr: Out of memory");
-      for (i=0; i < MAP_SIZE_Y; i++)
+      for (i=0; i < workdata->mapmode->tlsize.y; i++)
       {
-        workdata->mapmode->hilight[i] = (int *)malloc(MAP_SIZE_X*sizeof(int));
+        workdata->mapmode->hilight[i] = (int *)malloc(workdata->mapmode->tlsize.x*sizeof(int));
         if (workdata->mapmode->hilight[i]==NULL)
           die("init_levscr: Out of memory");
       }
-      workdata->mapmode->brighten = (int **)malloc(MAP_SIZE_Y*sizeof(int *));
+      workdata->mapmode->brighten = (int **)malloc(workdata->mapmode->tlsize.y*sizeof(int *));
       if (workdata->mapmode->brighten==NULL)
           die("init_levscr: Out of memory");
-      for (i=0; i < MAP_SIZE_Y; i++)
+      for (i=0; i < workdata->mapmode->tlsize.y; i++)
       {
-        workdata->mapmode->brighten[i] = (int *)malloc(MAP_SIZE_X*sizeof(int));
+        workdata->mapmode->brighten[i] = (int *)malloc(workdata->mapmode->tlsize.x*sizeof(int));
         if (workdata->mapmode->brighten[i]==NULL)
           die("init_levscr: Out of memory");
       }
-        if (!level_init(&(workdata->mapmode->preview)))
+        if (!level_init(&(workdata->mapmode->preview),MFV_DKGOLD,NULL))
           die("init_levscr: Error creating preview structure");
     }
     clear_mapmode(workdata->mapmode);
@@ -164,6 +163,7 @@ void init_levscr_basics(struct SCRMODE_DATA **scrmode,struct WORKMODE_DATA *work
     (*scrmode)->automated_commands=malloc(READ_BUFSIZE*sizeof(unsigned int));
     for (i=0; i < READ_BUFSIZE; i++)
       (*scrmode)->automated_commands[i]=0;
+    message_log(" init_levscr_basics: Finished");
 }
 
 /*
@@ -268,7 +268,7 @@ void free_levscr(struct SCRMODE_DATA **scrmode,struct WORKMODE_DATA *workdata)
     if (workdata->mapmode->hilight!=NULL)
     {
       int i;
-      for (i=0; i<MAP_SIZE_Y; i++)
+      for (i=0; i<workdata->mapmode->tlsize.y; i++)
           free(workdata->mapmode->hilight[i]);
       free(workdata->mapmode->hilight);
     }
@@ -291,7 +291,7 @@ int get_tile_highlight(struct MAPMODE_DATA *mapmode, unsigned int tx, unsigned i
 {
     if (mapmode->hilight==NULL) return 0;
     //Bounding position
-    if ((tx>=MAP_SIZE_X)||(ty>=MAP_SIZE_Y)) return 0;
+    if ((tx>=mapmode->tlsize.x)||(ty>=mapmode->tlsize.y)) return 0;
     return mapmode->hilight[tx][ty];
 }
 
@@ -301,7 +301,7 @@ int get_tile_highlight(struct MAPMODE_DATA *mapmode, unsigned int tx, unsigned i
 void set_tile_highlight(struct MAPMODE_DATA *mapmode, unsigned int tx, unsigned int ty, int nval)
 {
     //Bounding position
-    if ((tx>=MAP_SIZE_X)||(ty>=MAP_SIZE_Y)) return;
+    if ((tx>=mapmode->tlsize.x)||(ty>=mapmode->tlsize.y)) return;
     mapmode->hilight[tx][ty]=nval;
 }
 
@@ -312,7 +312,7 @@ short get_tile_brighten(struct MAPMODE_DATA *mapmode, unsigned int tx, unsigned 
 {
     if (mapmode->brighten==NULL) return false;
     //Bounding position
-    if ((tx>=MAP_SIZE_X)||(ty>=MAP_SIZE_Y)) return false;
+    if ((tx>=mapmode->tlsize.x)||(ty>=mapmode->tlsize.y)) return false;
     return mapmode->brighten[tx][ty];
 }
 
@@ -322,23 +322,23 @@ short get_tile_brighten(struct MAPMODE_DATA *mapmode, unsigned int tx, unsigned 
 void set_tile_brighten(struct MAPMODE_DATA *mapmode, unsigned int tx, unsigned int ty, short nval)
 {
     //Bounding position
-    if ((tx>=MAP_SIZE_X)||(ty>=MAP_SIZE_Y)) return;
+    if ((tx>=mapmode->tlsize.x)||(ty>=mapmode->tlsize.y)) return;
     mapmode->brighten[tx][ty]=nval;
 }
 
 void clear_highlight(struct MAPMODE_DATA *mapmode)
 {
     int i,k;
-    for (k=0;k<MAP_SIZE_Y;k++)
-      for (i=0;i<MAP_SIZE_X;i++)
+    for (k=0;k<mapmode->tlsize.y;k++)
+      for (i=0;i<mapmode->tlsize.x;i++)
         mapmode->hilight[i][k]=0;
 }
 
 void clear_brighten(struct MAPMODE_DATA *mapmode)
 {
     int i,k;
-    for (k=0;k<MAP_SIZE_Y;k++)
-      for (i=0;i<MAP_SIZE_X;i++)
+    for (k=0;k<mapmode->tlsize.y;k++)
+      for (i=0;i<mapmode->tlsize.x;i++)
         mapmode->brighten[i][k]=false;
 }
 
@@ -350,8 +350,8 @@ void update_brighten(struct LEVEL *lvl,struct MAPMODE_DATA *mapmode)
     //If this may take more than second, display information
     if (ranged_obj>96)
       popup_show("Updating object ranges for whole map","Sweeping through all objects can take some time. Please wait...");
-    const int arr_entries_x=MAP_SIZE_X*MAP_SUBNUM_X;
-    const int arr_entries_y=MAP_SIZE_Y*MAP_SUBNUM_Y;
+    const int arr_entries_x=mapmode->tlsize.x*MAP_SUBNUM_X;
+    const int arr_entries_y=mapmode->tlsize.x*MAP_SUBNUM_Y;
     clear_brighten(mapmode);
     if (!mapmode->show_obj_range) return;
     int curr_sx, curr_sy, i;
@@ -414,12 +414,12 @@ void set_brighten_for_range(struct MAPMODE_DATA *mapmode,
   tx_start=(pos_x/MAP_SUBNUM_X)-til_rng;
   tx_end=(pos_x/MAP_SUBNUM_X)+til_rng+1;
   if (tx_start<0) tx_start=0;
-  if (tx_end>MAP_SIZE_X) tx_end=MAP_SIZE_X;
+  if (tx_end>mapmode->tlsize.x) tx_end=mapmode->tlsize.x;
   int ty_start,ty_end;
   ty_start=(pos_y/MAP_SUBNUM_Y)-til_rng;
   ty_end=pos_y/MAP_SUBNUM_Y+til_rng+1;
   if (ty_start<0) ty_start=0;
-  if (ty_end>MAP_SIZE_Y) ty_end=MAP_SIZE_Y;
+  if (ty_end>mapmode->tlsize.y) ty_end=mapmode->tlsize.y;
   unsigned int tx,ty;
   for (tx=tx_start;tx<tx_end;tx++)
     for (ty=ty_start;ty<ty_end;ty++)
@@ -817,8 +817,8 @@ char *mode_status(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata,in
 int get_draw_map_tile_color(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,struct LEVEL *lvl,int tx,int ty,short special,short darken_fg,short brighten_bg)
 {
     int g;
-    if ((tx<0)||(tx>=MAP_SIZE_X)) return PRINT_COLOR_GREY_ON_BLACK;
-    if ((ty<0)||(ty>=MAP_SIZE_Y)) return PRINT_COLOR_GREY_ON_BLACK;
+    if ((tx<0)||(tx>=lvl->tlsize.x)) return PRINT_COLOR_GREY_ON_BLACK;
+    if ((ty<0)||(ty>=lvl->tlsize.y)) return PRINT_COLOR_GREY_ON_BLACK;
     //If highlighted - nothing more matters
     int hilight=get_tile_highlight(mapmode,tx,ty);
     if (hilight>0) return hilight;
@@ -1028,7 +1028,7 @@ void draw_map_area(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,str
       screen_setcolor(PRINT_COLOR_LGREY_ON_BLACK);
       set_cursor_pos(k,0);
       int ty=mapmode->map.y+k;
-      if (ty >= MAP_SIZE_Y)
+      if (ty >= mapmode->tlsize.y)
       {
           for (i=0; i<scrmode->cols; i++)
             screen_printchr(' ');
@@ -1038,7 +1038,7 @@ void draw_map_area(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,str
           for (i=0; i<scrmode->cols; i++)
           {
             int tx=mapmode->map.x+i;
-            if (tx < MAP_SIZE_X)
+            if (tx < lvl->tlsize.x)
             {
               char out_ch;
               int g;
@@ -1380,8 +1380,8 @@ short cursor_actions(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata
       message_log(" cursor_actions: KEY_CTRL_HOME");
       break;
     case KEY_CTRL_END: // ctrl+end
-      map->x=MAP_SIZE_X;
-      screen->x=MAP_SIZE_X;
+      map->x=workdata->lvl->tlsize.x;
+      screen->x=workdata->lvl->tlsize.x;
       message_log(" cursor_actions: KEY_CTRL_END");
       break;
     case KEY_CTRL_PGUP: // ctrl+page up
@@ -1390,8 +1390,8 @@ short cursor_actions(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata
       message_log(" cursor_actions: KEY_CTRL_PGUP");
       break;
     case KEY_CTRL_PGDOWN: // ctrl+page down
-      map->y=MAP_SIZE_Y;
-      screen->y=MAP_SIZE_Y;
+      map->y=workdata->lvl->tlsize.y;
+      screen->y=workdata->lvl->tlsize.y;
       message_log(" cursor_actions: KEY_CTRL_PGDOWN");
       break;
     case KEY_UP:
@@ -1605,10 +1605,10 @@ void curposcheck(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode)
       mapmode->map.x+=mapmode->screen.x-(scrmode->cols-1);
       mapmode->screen.x = scrmode->cols-1;
     }
-    if (mapmode->map.x+scrmode->cols > MAP_SIZE_X)
-      mapmode->map.x = MAP_SIZE_X-scrmode->cols;
-    if (mapmode->map.y+scrmode->rows > MAP_SIZE_Y)
-      mapmode->map.y = MAP_SIZE_Y-scrmode->rows;
+    if (mapmode->map.x+scrmode->cols > mapmode->tlsize.x)
+      mapmode->map.x = mapmode->tlsize.x-scrmode->cols;
+    if (mapmode->map.y+scrmode->rows > mapmode->tlsize.y)
+      mapmode->map.y = mapmode->tlsize.y-scrmode->rows;
     if (mapmode->map.x < 0)
       mapmode->map.x=0;
     if (mapmode->map.y < 0)
@@ -1813,6 +1813,7 @@ void action_generate_bitmap(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *w
     } else
     {
         popup_show("Generating bitmap","Creating and writing BMP file. Please wait...");
+        save_nfo_file(workdata->lvl);
         generate_map_bitmap_mapfname(workdata->lvl);
     }
 }

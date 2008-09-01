@@ -22,17 +22,26 @@
 
 // Map size definitions
 
-#define MAP_SIZE_X 85
-#define MAP_SIZE_Y 85
+#define MAP_SIZE_DKSTD_X 85
+#define MAP_SIZE_DKSTD_Y 85
 #define MAP_SIZE_H 1
 #define MAP_SUBNUM_H 8
 #define MAP_SUBNUM_X 3
 #define MAP_SUBNUM_Y 3
-#define MAP_SUBTOTAL_X (MAP_SIZE_X*MAP_SUBNUM_X)
-#define MAP_SUBTOTAL_Y (MAP_SIZE_Y*MAP_SUBNUM_Y)
-#define MAP_MAXINDEX_X MAP_SIZE_X-1
-#define MAP_MAXINDEX_Y MAP_SIZE_Y-1
 #define COLUMN_ENTRIES 2048
+
+/**
+ * Map format type selection.
+ * Do not use values other than MFV_DKSTD and MFV_DKGOLD,
+ * unless you know what you're doing!
+ */
+enum MAP_FORMAT_VERSION {
+    MFV_DKSTD           =  0, // Standard Dungeon Keeper 1 map, for first version of DK
+    MFV_DKGOLD          =  1, // Dungeon Keeper Gold or Deeper Dungeons map
+    MFV_DKXPAND         =  2, // KeeperFX or NBKe map
+    MFV_DK2STD          = 10, // Standard Dungeon Keeper 2 map, for versions up to 1.3
+    MFV_DK2OFC          = 11, // Dungeon Keeper 2 v 1.7 map, same as for Official Editor
+     };
 
 enum OBJECT_TYPE_INDEX {
     OBJECT_TYPE_NONE    =  0,
@@ -42,6 +51,12 @@ enum OBJECT_TYPE_INDEX {
     OBJECT_TYPE_COLUMN  = 16,
     OBJECT_TYPE_SLAB    = 17,
     OBJECT_TYPE_DATLST  = 18,
+     };
+
+enum VERIFY_WARN_FLAGS {
+     VWFLAG_NONE              =  0,
+     VWFLAG_NOWARN_MANYHEART  =  1,
+//     VWFLAG_NOWARN_           =  2,
      };
 
 //Disk files entries
@@ -271,6 +286,12 @@ struct LEVINFO {
  * ADiKted's special functions.
  */
 struct LEVEL {
+    // Map version, from MAP_FORMAT_VERSION enumeration
+    short format_version;
+    // Level size, in tiles
+    struct UPOINT_2D tlsize;
+    // Level size, in subtiles
+    struct UPOINT_2D subsize;
     //map file name (for loading)
     char *fname;
     //map file name (for saving)
@@ -340,10 +361,13 @@ struct LEVEL {
 extern const char default_map_name[];
 
 // creates object for storing map
-DLLIMPORT short level_init(struct LEVEL **lvl_ptr);
+DLLIMPORT short level_init(struct LEVEL **lvl_ptr,short map_version,struct UPOINT_3D *lvl_size);
 // frees object for storing map
 DLLIMPORT short level_deinit(struct LEVEL **lvl_ptr);
 DLLIMPORT short level_set_options(struct LEVEL *lvl,struct LEVOPTIONS *optns);
+DLLIMPORT struct LEVOPTIONS *level_get_options(struct LEVEL *lvl);
+DLLIMPORT short level_set_mapdraw_options(struct LEVEL *lvl,struct MAPDRAW_OPTIONS *mdrwopts);
+DLLIMPORT struct MAPDRAW_OPTIONS *level_get_mapdraw_options(struct LEVEL *lvl);
 
 DLLIMPORT short level_clear(struct LEVEL *lvl);
 short level_clear_tng(struct LEVEL *lvl);
@@ -445,6 +469,8 @@ DLLIMPORT short format_lvl_savfname(struct LEVEL *lvl,char *namefmt);
 DLLIMPORT char *get_lvl_savfname(struct LEVEL *lvl);
 DLLIMPORT short set_levels_path(struct LEVEL *lvl,char *lvpath);
 DLLIMPORT char *get_levels_path(struct LEVEL *lvl);
+DLLIMPORT short set_data_path(struct LEVEL *lvl,char *datpath);
+DLLIMPORT char *get_data_path(struct LEVEL *lvl);
 
 DLLIMPORT char *get_lif_name_text(struct LEVEL *lvl);
 DLLIMPORT short set_lif_name_text(struct LEVEL *lvl,char *name);
@@ -468,5 +494,6 @@ DLLIMPORT short get_level_objstats_textln(struct LEVEL *lvl,char *stat_buf,const
 
 DLLIMPORT unsigned char get_lvl_inf(struct LEVEL *lvl);
 DLLIMPORT short set_lvl_inf(struct LEVEL *lvl,unsigned char ninf);
+DLLIMPORT short get_lvl_format_version(struct LEVEL *lvl);
 
 #endif // ADIKT_LEVDATA_H

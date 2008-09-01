@@ -39,7 +39,7 @@ typedef short (*mapfile_io_func)(struct LEVEL *lvl,char *fname);
 /**
  * Level file load/write function with error message parameter.
  */
-typedef short (*mapfile_iomsg_func)(struct LEVEL *lvl,char *fname,char *err_msg);
+typedef short (*mapfile_iomsg_func)(struct LEVEL *lvl,struct MEMORY_FILE *mem,char *err_msg);
 
 /**
  * Returns load error message for specified error code.
@@ -329,6 +329,33 @@ short load_inf(struct LEVEL *lvl,char *fname)
 }
 
 /**
+ * Reads the VSN file into LEVEL structure.
+ * @param lvl Pointer to the LEVEL structure.
+ * @param fname Source file name.
+ * @return Returns ERR_NONE on success, error code on failure.
+ */
+short load_vsn(struct LEVEL *lvl,char *fname)
+{
+    message_log("  load_vsn: started");
+    struct MEMORY_FILE *mem;
+    short result;
+    result = memfile_readnew(&mem,fname,MAX_FILE_SIZE);
+    if (result != MFILE_OK)
+        return result;
+    //If wrong filesize - pannic
+    if (mem->len != 1)
+    { memfile_free(&mem); return ERR_FILE_BADDATA; }
+    unsigned char vsn;
+    vsn=mem->content[0];
+    memfile_free(&mem);
+    if ((vsn==1)&&((lvl->format_version==MFV_DKSTD)||(lvl->format_version==MFV_DKGOLD)))
+        return ERR_NONE;
+    if ((vsn==2)&&((lvl->format_version==MFV_DKXPAND)))
+        return ERR_NONE;
+    return ERR_FILE_BADDATA;
+}
+
+/**
  * Reads the WIB file into LEVEL structure.
  * @param lvl Pointer to the LEVEL structure.
  * @param fname Source file name.
@@ -337,9 +364,6 @@ short load_inf(struct LEVEL *lvl,char *fname)
 short load_wib(struct LEVEL *lvl,char *fname)
 {
     message_log("  load_wib: started");
-    //Preparing array bounds
-    const int dat_entries_x=MAP_SIZE_X*MAP_SUBNUM_X+1;
-    const int dat_entries_y=MAP_SIZE_Y*MAP_SUBNUM_Y+1;
     //Loading the file
     struct MEMORY_FILE *mem;
     short result;
@@ -347,15 +371,15 @@ short load_wib(struct LEVEL *lvl,char *fname)
     if (result != MFILE_OK)
         return result;
     // Checking file size
-    if ((mem->len!=dat_entries_x*dat_entries_y))
+    if ((mem->len!=lvl->subsize.x*lvl->subsize.y))
     { memfile_free(&mem); return ERR_FILE_BADDATA; }
     //Reading WIB entries
     int sx, sy;
     unsigned long addr;
-    for (sy=0; sy<dat_entries_y; sy++)
+    for (sy=0; sy<lvl->subsize.y; sy++)
     {
-      addr = sy*dat_entries_x;
-      for (sx=0; sx<dat_entries_x; sx++)
+      addr = sy*lvl->subsize.x;
+      for (sx=0; sx<lvl->subsize.x; sx++)
       {
           set_subtl_wib(lvl,sx,sy,mem->content[addr+sx]);
       }
@@ -396,15 +420,15 @@ short load_slb(struct LEVEL *lvl,char *fname)
     if (result != MFILE_OK)
         return result;
     // Checking file size
-    if ((mem->len != 2*MAP_SIZE_X*MAP_SIZE_Y))
+    if ((mem->len != 2*lvl->tlsize.x*lvl->tlsize.y))
     { memfile_free(&mem); return ERR_FILE_BADDATA; }
     //Loading the entries
     int i, k;
     unsigned long addr=0;
-    for (i=0; i<MAP_SIZE_Y; i++)
+    for (i=0; i<lvl->tlsize.y; i++)
     {
-      addr = 2*MAP_SIZE_X*i;
-      for (k=0; k<MAP_SIZE_X; k++)
+      addr = 2*lvl->tlsize.x*i;
+      for (k=0; k<lvl->tlsize.x; k++)
           set_tile_slab(lvl,k,i,read_int16_le_buf(mem->content+addr+k*2));
     }
     memfile_free(&mem);
@@ -423,9 +447,6 @@ short load_slb(struct LEVEL *lvl,char *fname)
 short load_own(struct LEVEL *lvl,char *fname)
 {
     message_log("  load_own: started");
-    //Preparing array bounds
-    int dat_entries_x=MAP_SIZE_X*MAP_SUBNUM_X+1;
-    int dat_entries_y=MAP_SIZE_Y*MAP_SUBNUM_Y+1;
     //Reading file
     struct MEMORY_FILE *mem;
     short result;
@@ -433,15 +454,15 @@ short load_own(struct LEVEL *lvl,char *fname)
     if (result != MFILE_OK)
         return result;
     // Checking file size
-    if ((mem->len!=dat_entries_x*dat_entries_y))
+    if ((mem->len!=lvl->subsize.x*lvl->subsize.y))
     { memfile_free(&mem); return ERR_FILE_BADDATA; }
     //Reading entries
     int sx, sy;
     unsigned long addr;
-    for (sy=0; sy<dat_entries_y; sy++)
+    for (sy=0; sy<lvl->subsize.y; sy++)
     {
-      addr = sy*dat_entries_x;
-      for (sx=0; sx<dat_entries_x; sx++)
+      addr = sy*lvl->subsize.x;
+      for (sx=0; sx<lvl->subsize.x; sx++)
       {
           set_subtl_owner(lvl,sx,sy,mem->content[addr+sx]);
       }
@@ -462,26 +483,23 @@ short load_dat(struct LEVEL *lvl,char *fname)
 {
     message_log("  load_dat: started");
     short result;
-    //Preparing array bounds
-    const int dat_entries_x=MAP_SIZE_X*MAP_SUBNUM_X+1;
-    const int dat_entries_y=MAP_SIZE_Y*MAP_SUBNUM_Y+1;
-    const unsigned int line_len=2*dat_entries_x;
+    const unsigned int line_len=2*lvl->subsize.x;
     //Loading the file
     struct MEMORY_FILE *mem;
     result = memfile_readnew(&mem,fname,MAX_FILE_SIZE);
     if (result != MFILE_OK)
         return result;
     //message_log("  load_dat: after memfile_readnew");
-    if ((mem->len != line_len*dat_entries_y))
+    if ((mem->len != line_len*lvl->subsize.y))
     { memfile_free(&mem); return ERR_FILE_BADDATA; }
     //Reading DAT entries
     //message_log("  load_dat: Reading DAT entries");
     int sx, sy;
     unsigned char *addr;
-    for (sy=0; sy<dat_entries_y; sy++)
+    for (sy=0; sy<lvl->subsize.y; sy++)
     {
       addr = mem->content+sy*line_len;
-      for (sx=0; sx<dat_entries_x; sx++)
+      for (sx=0; sx<lvl->subsize.x; sx++)
       {
           set_dat_val(lvl,sx,sy,read_int16_le_buf(addr+sx*2));
       }
@@ -644,13 +662,13 @@ short load_wlb(struct LEVEL *lvl,char *fname)
     if (result != MFILE_OK)
         return result;
     //If wrong filesize - don't load
-    if (mem->len != MAP_SIZE_X*MAP_SIZE_Y)
+    if (mem->len != lvl->tlsize.x*lvl->tlsize.y)
     { memfile_free(&mem); return ERR_FILE_BADDATA; }
     int i,j;
-    for (i=0;i<MAP_SIZE_Y;i++)
-      for (j=0;j<MAP_SIZE_X;j++)
+    for (i=0;i<lvl->tlsize.y;i++)
+      for (j=0;j<lvl->tlsize.x;j++)
       {
-        int mempos=i*MAP_SIZE_X+j;
+        int mempos=i*lvl->tlsize.x+j;
         lvl->wlb[j][i]=mem->content[mempos];
       }
     memfile_free(&mem);
@@ -667,10 +685,7 @@ short load_wlb(struct LEVEL *lvl,char *fname)
 short load_flg(struct LEVEL *lvl,char *fname)
 {
     message_log("  load_flg: started");
-    //Preparing array bounds
-    const int dat_entries_x=MAP_SIZE_X*MAP_SUBNUM_X+1;
-    const int dat_entries_y=MAP_SIZE_Y*MAP_SUBNUM_Y+1;
-    const unsigned int line_len=2*dat_entries_x;
+    const unsigned int line_len=2*lvl->subsize.x;
     //Loading the file
     struct MEMORY_FILE *mem;
     short result;
@@ -678,15 +693,15 @@ short load_flg(struct LEVEL *lvl,char *fname)
     if (result != MFILE_OK)
         return result;
     // Checking file size
-    if ((mem->len!=line_len*dat_entries_y))
+    if ((mem->len!=line_len*lvl->subsize.y))
     { memfile_free(&mem); return ERR_FILE_BADDATA; }
     //Reading entries
     int sx, sy;
     unsigned long addr;
-    for (sy=0; sy<dat_entries_y; sy++)
+    for (sy=0; sy<lvl->subsize.y; sy++)
     {
       addr = sy*line_len;
-      for (sx=0; sx<dat_entries_x; sx++)
+      for (sx=0; sx<lvl->subsize.x; sx++)
       {
           set_subtl_flg(lvl,sx,sy,read_int16_le_buf(mem->content+addr+sx*2));
       }
@@ -739,36 +754,28 @@ short load_lif(struct LEVEL *lvl,char *fname)
 }
 
 /**
- * Loads ADiKtEd script (.ADI file) and executes all commands.
+ * Loads ADiKtEd script (.ADI file) from MEMORY_FILE executes all commands.
  * @param lvl Pointer to the LEVEL structure.
- * @param fname Source file name.
+ * @param mem Source file data.
  * @param err_msg Error message text.
  * @return Returns ERR_NONE on success, error code on failure.
  */
-short script_load_and_execute(struct LEVEL *lvl,char *fname,char *err_msg)
+short script_load_and_execute(struct LEVEL *lvl,struct MEMORY_FILE *mem,char *err_msg)
 {
     message_log(" script_load_and_execute: started");
     sprintf(err_msg,"No error");
-    //Loading the file
-    struct MEMORY_FILE *mem;
     short result;
-    result = memfile_readnew(&mem,fname,MAX_FILE_SIZE);
-    if (result != MFILE_OK)
-    {
-        strncpy(err_msg,memfile_error(result),LINEMSG_SIZE);
-        return result;
-    }
     // Checking file size
     if (mem->len < 2)
     {
         result=ERR_FILE_TOOSMLL;
         strncpy(err_msg,levfile_error(result),LINEMSG_SIZE);
-        memfile_free(&mem);
         return result;
     }
     unsigned char *content=mem->content;
     unsigned char *ptr=mem->content;
     unsigned char *ptr_end=mem->content+mem->len;
+    // Counting lines
     int lines_count=0;
     while (ptr>=content)
     {
@@ -805,6 +812,29 @@ short script_load_and_execute(struct LEVEL *lvl,char *fname,char *err_msg)
       ptr=nptr+1;
       currline++;
     }
+    return result;
+}
+
+/**
+ * Loads ADiKtEd script (.ADI file) and executes all commands.
+ * @param lvl Pointer to the LEVEL structure.
+ * @param fname Source file name.
+ * @param err_msg Error message text.
+ * @return Returns ERR_NONE on success, error code on failure.
+ */
+short script_load_and_execute_file(struct LEVEL *lvl,char *fname,char *err_msg)
+{
+    message_log(" script_load_and_execute_file: started");
+    //Loading the file
+    struct MEMORY_FILE *mem;
+    short result;
+    result = memfile_readnew(&mem,fname,MAX_FILE_SIZE);
+    if (result != MFILE_OK)
+    {
+        strncpy(err_msg,memfile_error(result),LINEMSG_SIZE);
+        return result;
+    }
+    result=script_load_and_execute(lvl,mem,err_msg);
     memfile_free(&mem);
     return result;
 }
@@ -893,9 +923,9 @@ short write_slb(struct LEVEL *lvl,char *fname)
     fp = fopen (fname, "wb");
     if (fp==NULL)
       return ERR_CANT_OPENWR;
-    for (k=0; k < MAP_SIZE_Y; k++)
+    for (k=0; k < lvl->tlsize.y; k++)
     {
-      for (i=0; i < MAP_SIZE_X; i++)
+      for (i=0; i < lvl->tlsize.x; i++)
       {
           write_int16_le_file(fp,get_tile_slab(lvl,i,k));
       }
@@ -913,9 +943,6 @@ short write_slb(struct LEVEL *lvl,char *fname)
 short write_own(struct LEVEL *lvl,char *fname)
 {
     message_log(" write_own: starting");
-    //Preparing array bounds
-    const int dat_entries_x=MAP_SIZE_X*MAP_SUBNUM_X+1;
-    const int dat_entries_y=MAP_SIZE_Y*MAP_SUBNUM_Y+1;
     //Opening
     FILE *fp;
     fp = fopen (fname, "wb");
@@ -923,9 +950,9 @@ short write_own(struct LEVEL *lvl,char *fname)
       return ERR_CANT_OPENWR;
     //Writing data
     int sx,sy;
-    for (sy=0; sy<dat_entries_y; sy++)
+    for (sy=0; sy<lvl->subsize.y; sy++)
     {
-      for (sx=0; sx<dat_entries_x; sx++)
+      for (sx=0; sx<lvl->subsize.x; sx++)
       {
           fputc (get_subtl_owner(lvl,sx,sy), fp);
       }
@@ -943,10 +970,7 @@ short write_own(struct LEVEL *lvl,char *fname)
 short write_dat(struct LEVEL *lvl,char *fname)
 {
     message_log(" write_dat: starting");
-    //Preparing array bounds
-    const int dat_entries_x=MAP_SIZE_X*MAP_SUBNUM_X+1;
-    const int dat_entries_y=MAP_SIZE_Y*MAP_SUBNUM_Y+1;
-    const unsigned int line_len=2*dat_entries_x;
+    const unsigned int line_len=2*lvl->subsize.x;
 
     FILE *fp;
     fp = fopen (fname, "wb");
@@ -954,9 +978,9 @@ short write_dat(struct LEVEL *lvl,char *fname)
       return ERR_CANT_OPENWR;
     //Writing data
     int sx,sy;
-    for (sy=0; sy<dat_entries_y; sy++)
+    for (sy=0; sy<lvl->subsize.y; sy++)
     {
-      for (sx=0; sx<dat_entries_x; sx++)
+      for (sx=0; sx<lvl->subsize.x; sx++)
       {
           write_int16_le_file(fp,get_dat_val(lvl,sx,sy));
       }
@@ -974,10 +998,7 @@ short write_dat(struct LEVEL *lvl,char *fname)
 short write_flg(struct LEVEL *lvl,char *fname)
 {
     message_log(" write_flg: starting");
-    //Preparing array bounds
-    const int dat_entries_x=MAP_SIZE_X*MAP_SUBNUM_X+1;
-    const int dat_entries_y=MAP_SIZE_Y*MAP_SUBNUM_Y+1;
-    const unsigned int line_len=2*dat_entries_x;
+    const unsigned int line_len=2*lvl->subsize.x;
 
     FILE *fp;
     fp = fopen (fname, "wb");
@@ -985,9 +1006,9 @@ short write_flg(struct LEVEL *lvl,char *fname)
       return ERR_CANT_OPENWR;
     //Writing data
     int sx,sy;
-    for (sy=0; sy<dat_entries_y; sy++)
+    for (sy=0; sy<lvl->subsize.y; sy++)
     {
-      for (sx=0; sx<dat_entries_x; sx++)
+      for (sx=0; sx<lvl->subsize.x; sx++)
       {
           write_int16_le_file(fp,get_subtl_flg(lvl,sx,sy));
       }
@@ -1027,18 +1048,15 @@ short write_clm(struct LEVEL *lvl,char *fname)
 short write_wib(struct LEVEL *lvl,char *fname)
 {
     message_log(" write_wib: starting");
-    //Preparing array bounds
-    int dat_entries_x=MAP_SIZE_X*MAP_SUBNUM_X+1;
-    int dat_entries_y=MAP_SIZE_Y*MAP_SUBNUM_Y+1;
 
     FILE *fp;
     fp = fopen (fname, "wb");
     if (fp==NULL)
       return ERR_CANT_OPENWR;
     int i, j;
-    for (i=0; i < dat_entries_y; i++)
+    for (i=0; i < lvl->subsize.y; i++)
     {
-      for (j=0; j<dat_entries_x; j++)
+      for (j=0; j<lvl->subsize.x; j++)
           fputc (get_subtl_wib(lvl,j,i), fp);
     }
     fclose (fp);
@@ -1055,8 +1073,8 @@ short write_apt(struct LEVEL *lvl,char *fname)
 {
     message_log(" write_apt: starting");
     //Preparing array bounds
-    int arr_entries_x=MAP_SIZE_X*MAP_SUBNUM_X;
-    int arr_entries_y=MAP_SIZE_Y*MAP_SUBNUM_Y;
+    const int arr_entries_x=lvl->tlsize.x*MAP_SUBNUM_X;
+    const int arr_entries_y=lvl->tlsize.y*MAP_SUBNUM_Y;
 
     FILE *fp;
     fp = fopen (fname, "wb");
@@ -1090,8 +1108,8 @@ short write_tng(struct LEVEL *lvl,char *fname)
 {
     message_log(" write_tng: starting");
     //Preparing array bounds
-    int arr_entries_x=MAP_SIZE_X*MAP_SUBNUM_X;
-    int arr_entries_y=MAP_SIZE_Y*MAP_SUBNUM_Y;
+    const int arr_entries_x=lvl->tlsize.x*MAP_SUBNUM_X;
+    const int arr_entries_y=lvl->tlsize.y*MAP_SUBNUM_Y;
 
     FILE *fp;
     int cx, cy, k;
@@ -1130,6 +1148,40 @@ short write_inf(struct LEVEL *lvl,char *fname)
 }
 
 /**
+ * Writes the VSN file from LEVEL structure into disk.
+ * One byte file - the easy one.
+ * @param lvl Pointer to the LEVEL structure.
+ * @param fname Destination file name.
+ * @return Returns ERR_NONE on success, error code on failure.
+ */
+short write_vsn(struct LEVEL *lvl,char *fname)
+{
+    message_log(" write_vsn: starting");
+    FILE *fp;
+    int i, j, k;
+    fp = fopen (fname, "wb");
+    if (fp==NULL)
+      return ERR_CANT_OPENWR;
+    unsigned char vsn;
+    switch (lvl->format_version)
+    {
+    case MFV_DKSTD:
+    case MFV_DKGOLD:
+         vsn=1;
+         break;
+    case MFV_DKXPAND:
+         vsn=2;
+         break;
+    default:
+         vsn=0;
+         break;
+    }
+    fputc (vsn, fp);
+    fclose (fp);
+    return ERR_NONE;
+}
+
+/**
  * Writes the TXT script file from LEVEL structure into disk.
  * @see write_text_file
  * @param lvl Pointer to the LEVEL structure.
@@ -1152,8 +1204,8 @@ short write_lgt(struct LEVEL *lvl,char *fname)
 {
     message_log(" write_lgt: starting");
     //Preparing array bounds
-    int arr_entries_x=MAP_SIZE_X*MAP_SUBNUM_X;
-    int arr_entries_y=MAP_SIZE_Y*MAP_SUBNUM_Y;
+    const int arr_entries_x=lvl->tlsize.x*MAP_SUBNUM_X;
+    const int arr_entries_y=lvl->tlsize.y*MAP_SUBNUM_Y;
 
     FILE *fp;
     fp = fopen (fname, "wb");
@@ -1192,9 +1244,9 @@ short write_wlb(struct LEVEL *lvl,char *fname)
     if (fp==NULL)
       return ERR_CANT_OPENWR;
     int i, j;
-    for (i=0; i < MAP_SIZE_Y; i++)
+    for (i=0; i < lvl->tlsize.y; i++)
     {
-      for (j=0; j < MAP_SIZE_X; j++)
+      for (j=0; j < lvl->tlsize.x; j++)
           fputc(lvl->wlb[j][i], fp);
     }
     fclose(fp);
@@ -1252,6 +1304,113 @@ short write_adi_script(struct LEVEL *lvl,char *fname)
 }
 
 /**
+ * Writes the NFO level information file into disk.
+ * @param lvl Pointer to the LEVEL structure.
+ * @param fname Destination file name.
+ * @return Returns ERR_NONE on success, error code on failure.
+ */
+short write_nfo(struct LEVEL *lvl,char *fname)
+{
+  message_log(" write_nfo: starting");
+  //Creating text lines
+  char **lines=NULL;
+  int lines_count=0;
+    char *line;
+    char *tmp1;
+    int plr_items[PLAYERS_COUNT];
+    int i,k,imax;
+    line=(char *)malloc(LINEMSG_SIZE*sizeof(char));
+
+    sprintf(line,"Name: %s %d.%d.%d",get_lif_name_text(lvl),
+        lvl->info.ver_major,lvl->info.ver_minor,lvl->info.ver_rel);
+    text_file_linecp_add(&lines,&lines_count,line);
+    if ((lvl->info.author_text!=NULL)&&(lvl->info.author_text[0]!='\0'))
+        tmp1=lvl->info.author_text;
+    else
+        tmp1="Anonymous";
+    sprintf(line,"Author: %s",tmp1);
+    if ((lvl->info.editor_text!=NULL)&&(lvl->info.editor_text[0]!='\0'))
+        sprintf(line+strlen(line),", Editor: %s",lvl->info.editor_text);
+    strcat(line,", Created on ");
+    strftime(line+strlen(line),LINEMSG_SIZE/2, "%d %b %Y",
+        gmtime(&lvl->info.creat_date) );
+    text_file_linecp_add(&lines,&lines_count,line);
+    strcpy(line,"Keepers: ");
+    //Clearing array for storing players heart count
+    for (i=0; i < PLAYERS_COUNT; i++)
+      plr_items[i]=0;
+    owned_things_count(plr_items,lvl,THING_TYPE_ITEM,ITEM_SUBTYPE_DNHEART);
+    k=0;
+    for (i=0; i < PLAYERS_COUNT; i++)
+      if (plr_items[i]>0)
+      {
+          if (k) strcat(line,", ");
+          strcat(line,get_owner_type_colorname(i));
+          k=1;
+      }
+    text_file_linecp_add(&lines,&lines_count,line);
+    strcpy(line,"Pool: ");
+    imax=creatures_cmd_arrsize();
+    k=0;
+    for (i=0; i < imax; i++)
+      if (lvl->script.par.creature_pool[i]>0)
+      {
+          if (k) strcat(line,", ");
+          strcat(line,get_creature_subtype_fullname(i));
+          k=1;
+          if (strlen(line)>50)
+          {
+            text_file_linecp_add(&lines,&lines_count,line);
+            strcpy(line,"  ");
+            k=0;
+          }
+      }
+    if (strlen(line)>2)
+      text_file_linecp_add(&lines,&lines_count,line);
+    strcpy(line,"Objects on map:");
+    text_file_linecp_add(&lines,&lines_count,line);
+    sprintf(line,"Creatures: %d, Traps: %d, Doors: %d, Items: %d",
+        lvl->stats.creatures_count,lvl->stats.traps_count,
+        lvl->stats.doors_count,lvl->stats.items_count);
+    text_file_linecp_add(&lines,&lines_count,line);
+    sprintf(line,"Dungeon hearts: %d, Hero gates: %d, Special Boxes: %d",
+        lvl->stats.dn_hearts_count,lvl->stats.hero_gates_count,
+        lvl->stats.things_count[THING_CATEGR_SPECIALBOX]);
+    text_file_linecp_add(&lines,&lines_count,line);
+    strcpy(line,"Description:");
+    text_file_linecp_add(&lines,&lines_count,line);
+    if ((lvl->info.desc_text!=NULL)&&(lvl->info.desc_text[0]!='\0'))
+        tmp1=lvl->info.desc_text;
+    else
+        tmp1="No description.";
+    imax=strlen(tmp1);
+    do {
+      i=50;
+      strcpy(line,"  ");
+      strncpy(line+2,tmp1,i);
+      line[i+2]='\0';
+      k=(strrchr(line,' ')-line);
+      if (k>(i>>1))
+        {i=k;line[i]='\0';}
+         text_file_linecp_add(&lines,&lines_count,line);
+      i--;
+      tmp1+=i;
+      imax-=i;
+    } while (imax>i);
+    if (imax>0)
+    {
+      strcpy(line,"  ");
+      strcpy(line+2,tmp1);
+      text_file_linecp_add(&lines,&lines_count,line);
+    }
+    free(line);
+  short result;
+  result=write_text_file(lines,lines_count,fname);
+  text_file_free(lines,lines_count);
+  return result;
+}
+
+/**
  * Saves any text file.
  * @param lines Pointer to the lines array.
  * @param lines_count Lines count.
@@ -1290,11 +1449,11 @@ short write_text_file(char **lines,int lines_count,char *fname)
  * @param result Result value. Set to error code if error occures, otherwise left unchanged.
  * @return Returns ERR_NONE on success, error code on failure.
  */
-short save_mapfile(struct LEVEL *lvl,char *fext,mapfile_io_func write_file,int *saved_files,short *result)
+short save_mapfile(struct LEVEL *lvl,char *mfname,char *fext,mapfile_io_func write_file,int *saved_files,short *result)
 {
   short file_result;
   char *fname;
-  fname = (char *)malloc(strlen(lvl->savfname)+5);
+  fname = (char *)malloc(strlen(mfname)+5);
   if (fname==NULL)
   {
       message_error("save_mapfile: Out of memory");
@@ -1302,7 +1461,7 @@ short save_mapfile(struct LEVEL *lvl,char *fext,mapfile_io_func write_file,int *
       (*result)=file_result;
       return file_result;
   }
-  sprintf (fname, "%s.%s", lvl->savfname,fext);
+  sprintf (fname, "%s.%s", mfname,fext);
   file_result=write_file(lvl,fname);
   if (file_result==ERR_NONE)
   {
@@ -1336,13 +1495,84 @@ short save_mapfile(struct LEVEL *lvl,char *fext,mapfile_io_func write_file,int *
  * @param lvl Pointer to the LEVEL structure.
  * @return Returns ERR_NONE on success, last error code on failure.
  */
-short save_map(struct LEVEL *lvl)
+short save_dk1_map(struct LEVEL *lvl)
 {
-    message_log(" save_map: started");
+    message_log(" save_dk1_map: started");
 
     short result=ERR_NONE;
     int saved_files=0;
     int total_files=0;
+    save_mapfile(lvl,lvl->savfname,"slb",write_slb,&saved_files,&result);
+    total_files++;
+    save_mapfile(lvl,lvl->savfname,"own",write_own,&saved_files,&result);
+    total_files++;
+    save_mapfile(lvl,lvl->savfname,"dat",write_dat,&saved_files,&result);
+    total_files++;
+    save_mapfile(lvl,lvl->savfname,"clm",write_clm,&saved_files,&result);
+    total_files++;
+    save_mapfile(lvl,lvl->savfname,"tng",write_tng,&saved_files,&result);
+    total_files++;
+    save_mapfile(lvl,lvl->savfname,"apt",write_apt,&saved_files,&result);
+    total_files++;
+    save_mapfile(lvl,lvl->savfname,"wib",write_wib,&saved_files,&result);
+    total_files++;
+    save_mapfile(lvl,lvl->savfname,"inf",write_inf,&saved_files,&result);
+    total_files++;
+    save_mapfile(lvl,lvl->savfname,"txt",write_txt,&saved_files,&result);
+    total_files++;
+    save_mapfile(lvl,lvl->savfname,"lgt",write_lgt,&saved_files,&result);
+    total_files++;
+    save_mapfile(lvl,lvl->savfname,"wlb",write_wlb,&saved_files,&result);
+    total_files++;
+    save_mapfile(lvl,lvl->savfname,"flg",write_flg,&saved_files,&result);
+    total_files++;
+    save_mapfile(lvl,lvl->savfname,"lif",write_lif,&saved_files,&result);
+    total_files++;
+    save_mapfile(lvl,lvl->savfname,"vsn",write_vsn,&saved_files,&result);
+    total_files++;
+    save_mapfile(lvl,lvl->savfname,"adi",write_adi_script,&saved_files,&result);
+    total_files++;
+
+    if ((result==ERR_NONE)||(strlen(lvl->fname)<1))
+    {
+      strncpy(lvl->fname,lvl->savfname,DISKPATH_SIZE);
+      lvl->fname[DISKPATH_SIZE-1]=0;
+    }
+    lvl->stats.saves_count++;
+    message_log(" save_dk1_map: properly saved %d out of %d map files",saved_files,total_files);
+    return result;
+}
+
+short save_nfo_file(struct LEVEL *lvl)
+{
+    message_log(" save_dk1_map: started");
+    int saved_files=0;
+    short result=ERR_NONE;
+    return save_mapfile(lvl,lvl->fname,"nfo",write_nfo,&saved_files,&result);
+}
+
+/**
+ * Saves the whole DK Extended map. Includes all files editable in ADiKtEd.
+ * On failure, tries to save at least some of the files.
+ * DK Extended map files won't load in standard Dungeon Keeper on DD.
+ * Does not perform an update before saving - to do this, use
+ * user_save_map() instead.
+ * @see user_save_map
+ * @see save_dk1_map
+ * @param lvl Pointer to the LEVEL structure.
+ * @return Returns ERR_NONE on success, last error code on failure.
+ */
+short save_dke_map(struct LEVEL *lvl)
+{
+    message_log(" save_dke_map: started");
+
+    short result=ERR_NONE;
+    int saved_files=0;
+    int total_files=0;
+
+      message_error("Error: Save not supported for extender map format");
+      result=ERR_INTERNAL;
+/*
     save_mapfile(lvl,"slb",write_slb,&saved_files,&result);
     total_files++;
     save_mapfile(lvl,"own",write_own,&saved_files,&result);
@@ -1369,7 +1599,10 @@ short save_map(struct LEVEL *lvl)
     total_files++;
     save_mapfile(lvl,"lif",write_lif,&saved_files,&result);
     total_files++;
-    save_mapfile(lvl,"adi",write_adi_script,&saved_files,&result);
+*/
+    save_mapfile(lvl,lvl->savfname,"vsn",write_vsn,&saved_files,&result);
+    total_files++;
+    save_mapfile(lvl,lvl->savfname,"adi",write_adi_script,&saved_files,&result);
     total_files++;
 
     if ((result==ERR_NONE)||(strlen(lvl->fname)<1))
@@ -1378,7 +1611,7 @@ short save_map(struct LEVEL *lvl)
       lvl->fname[DISKPATH_SIZE-1]=0;
     }
     lvl->stats.saves_count++;
-    message_log(" save_map: properly saved %d out of %d map files",saved_files,total_files);
+    message_log(" save_dke_map: properly saved %d out of %d map files",saved_files,total_files);
     return result;
 }
 
@@ -1387,9 +1620,9 @@ short save_map(struct LEVEL *lvl)
  * On failure, tries to save at least some of the files.
  * Makes updates required for saving before it starts.
  * Also, fails if the map verification will return serious error.
- * Should be used instead of save_map(), as it prepares the map
+ * Should be used instead of save_dk1_map(), as it prepares the map
  * before the saving operation is performed.
- * @see save_map
+ * @see save_dk1_map
  * @param lvl Pointer to the LEVEL structure.
  * @param prior_save Informs how to increase level version before saving.
  *     Prior saves get greater version increase than minor saves.
@@ -1419,7 +1652,20 @@ short user_save_map(struct LEVEL *lvl,short prior_save)
       else
         inc_info_ver_rel(lvl);
   }
-  result=save_map(lvl);
+  switch (lvl->format_version)
+  {
+  case MFV_DKSTD:
+  case MFV_DKGOLD:
+      result=save_dk1_map(lvl);
+      break;
+  case MFV_DKXPAND:
+      result=save_dke_map(lvl);
+      break;
+  default:
+      message_error("Error: Save not supported for this map format version");
+      result=ERR_INTERNAL;
+      break;
+  }
   return result;
 }
 
@@ -1510,7 +1756,7 @@ short load_mapfile_msg(struct LEVEL *lvl,char *fext,mapfile_iomsg_func load_file
   short file_result;
   char *fname;
   char *err_msg;
-  message_log("load_mapfile: loading %s file",fext);
+  message_log("load_mapfile_msg: loading %s file",fext);
   fname = (char *)malloc(strlen(lvl->fname)+strlen(fext)+3);
   err_msg=(char *)malloc(LINEMSG_SIZE);
   if ((fname==NULL)||(err_msg==NULL))
@@ -1518,10 +1764,10 @@ short load_mapfile_msg(struct LEVEL *lvl,char *fext,mapfile_iomsg_func load_file
       file_result=ERR_CANT_MALLOC;
       if (flags&LFF_IGNORE_INTERNAL)
       {
-          message_log("load_mapfile: Out of memory");
+          message_log("load_mapfile_msg: Out of memory");
       } else
       {
-          message_error("load_mapfile: Out of memory");
+          message_error("load_mapfile_msg: Out of memory");
           (*result)=file_result;
       }
       free(fname);
@@ -1530,7 +1776,28 @@ short load_mapfile_msg(struct LEVEL *lvl,char *fext,mapfile_iomsg_func load_file
   }
   sprintf(fname, "%s.%s", lvl->fname, fext);
   err_msg[0]='\0';
-  file_result=load_file(lvl,fname,err_msg);
+  //Loading the file
+  struct MEMORY_FILE *mem;
+  file_result = memfile_readnew(&mem,fname,MAX_FILE_SIZE);
+  if (file_result != MFILE_OK)
+  {
+      if (flags&LFF_IGNORE_CANNOT_LOAD)
+      {
+          if (flags&LFF_DONT_EVEN_WARN)
+            message_log(" load_mapfile_msg: %s when reading \"%s\"",memfile_error(file_result), fname);
+          else
+            message_info_force("Warning: %s when reading \"%s\"",memfile_error(file_result), fname);
+      } else
+      {
+          message_error("Error: %s when reading \"%s\"",memfile_error(file_result), fname);
+          (*result)=file_result;
+      }
+      free(fname);
+      free(err_msg);
+      return file_result;
+  }
+  file_result=load_file(lvl,mem,err_msg);
+  memfile_free(&mem);
   //message_log("load_mapfile: Load function execution finished");
   if (file_result==ERR_NONE)
   {
@@ -1587,9 +1854,9 @@ short load_mapfile_msg(struct LEVEL *lvl,char *fext,mapfile_iomsg_func load_file
  * @param lvl Pointer to the LEVEL structure.
  * @return Returns ERR_NONE on success, negative error code on error.
  */
-short load_map(struct LEVEL *lvl)
+short load_dk1_map(struct LEVEL *lvl)
 {
-  message_log(" load_map: started");
+  message_log(" load_dk1_map: started");
   short result=ERR_NONE;
   level_free(lvl);
   level_clear(lvl);
@@ -1633,10 +1900,13 @@ short load_map(struct LEVEL *lvl)
   if (result>=ERR_NONE)
       load_mapfile(lvl,"lif",load_lif,&loaded_files,&result,LFF_IGNORE_WITHOUT_WARN);
   if (result>=ERR_NONE)
+      load_mapfile(lvl,"vsn",load_vsn,&loaded_files,&result,LFF_IGNORE_WITHOUT_WARN);
+  if (result>=ERR_NONE)
       load_mapfile_msg(lvl,"adi",script_load_and_execute,&loaded_files,&result,LFF_IGNORE_WITHOUT_WARN);
+
   if (result<ERR_NONE)
   {
-      message_log(" load_map: failed");
+      message_log(" load_dk1_map: failed");
       return result;
   }
   if ((result>=ERR_NONE)&&(strlen(lvl->savfname)<1))
@@ -1644,7 +1914,84 @@ short load_map(struct LEVEL *lvl)
       strncpy(lvl->savfname,lvl->fname,DISKPATH_SIZE);
       lvl->savfname[DISKPATH_SIZE-1]=0;
   }
-  message_log(" load_map: finished");
+  message_log(" load_dk1_map: finished");
+  return result;
+}
+
+/**
+ * Loads the whole map. Tries to open all files editable in ADiKtEd.
+ * Accepts failure for less importand files. Makes no stats update.
+ * If you want a complete loading function, use user_load_map() instead.
+ * DK Extended map files won't work in standard Dungeon Keeper on DD.
+ * @see user_load_map
+ * @param lvl Pointer to the LEVEL structure.
+ * @return Returns ERR_NONE on success, negative error code on error.
+ */
+short load_dke_map(struct LEVEL *lvl)
+{
+  message_log(" load_dke_map: started");
+  short result=ERR_NONE;
+  level_free(lvl);
+  level_clear(lvl);
+  if ((lvl->fname==NULL)||(strlen(lvl->fname)<1))
+  {
+    result=ERR_FILE_BADNAME;
+    message_error("Error: Can't load - bad map name");
+    return result;
+  }
+  int loaded_files=0;
+  int total_files=0;
+  short file_result;
+
+      message_error("Error: Load not supported for extended map format");
+      result=ERR_INTERNAL;
+/*
+  // Crucial files
+  if (result>=ERR_NONE)
+      load_mapfile(lvl,"slb",load_slb,&loaded_files,&result,LFF_IGNORE_NONE);
+  if (result>=ERR_NONE)
+      load_mapfile(lvl,"own",load_own,&loaded_files,&result,LFF_IGNORE_NONE);
+  if (result>=ERR_NONE)
+      load_mapfile(lvl,"tng",load_tng,&loaded_files,&result,LFF_IGNORE_NONE);
+  // Less importand files
+  if (result>=ERR_NONE)
+      load_mapfile(lvl,"dat",load_dat,&loaded_files,&result,LFF_IGNORE_ALL);
+  if (result>=ERR_NONE)
+      load_mapfile(lvl,"apt",load_apt,&loaded_files,&result,LFF_IGNORE_ALL);
+  if (result>=ERR_NONE)
+      load_mapfile(lvl,"lgt",load_lgt,&loaded_files,&result,LFF_IGNORE_ALL);
+  if (result>=ERR_NONE)
+      load_mapfile(lvl,"clm",load_clm,&loaded_files,&result,LFF_IGNORE_ALL);
+  if (result>=ERR_NONE)
+      load_mapfile(lvl,"wib",load_wib,&loaded_files,&result,LFF_IGNORE_ALL);
+
+  // Least importand files
+  if (result>=ERR_NONE)
+      load_mapfile(lvl,"txt",load_txt,&loaded_files,&result,LFF_IGNORE_ALL);
+  if (result>=ERR_NONE)
+      load_mapfile(lvl,"inf",load_inf,&loaded_files,&result,LFF_IGNORE_ALL);
+  if (result>=ERR_NONE)
+      load_mapfile(lvl,"wlb",load_wlb,&loaded_files,&result,LFF_IGNORE_WITHOUT_WARN);
+  if (result>=ERR_NONE)
+      load_mapfile(lvl,"flg",load_flg,&loaded_files,&result,LFF_IGNORE_WITHOUT_WARN);
+  if (result>=ERR_NONE)
+      load_mapfile(lvl,"lif",load_lif,&loaded_files,&result,LFF_IGNORE_WITHOUT_WARN);
+*/
+  if (result>=ERR_NONE)
+      load_mapfile(lvl,"vsn",load_vsn,&loaded_files,&result,LFF_IGNORE_WITHOUT_WARN);
+  if (result>=ERR_NONE)
+      load_mapfile_msg(lvl,"adi",script_load_and_execute,&loaded_files,&result,LFF_IGNORE_WITHOUT_WARN);
+  if (result<ERR_NONE)
+  {
+      message_log(" load_dke_map: failed");
+      return result;
+  }
+  if ((result>=ERR_NONE)&&(strlen(lvl->savfname)<1))
+  {
+      strncpy(lvl->savfname,lvl->fname,DISKPATH_SIZE);
+      lvl->savfname[DISKPATH_SIZE-1]=0;
+  }
+  message_log(" load_dke_map: finished");
   return result;
 }
 
@@ -1658,8 +2005,21 @@ short load_map(struct LEVEL *lvl)
 short user_load_map(struct LEVEL *lvl,short new_on_error)
 {
   short result;
-  result=load_map(lvl);
-  if ((result!=ERR_NONE)&&(new_on_error))
+  switch (lvl->format_version)
+  {
+  case MFV_DKSTD:
+  case MFV_DKGOLD:
+      result=load_dk1_map(lvl);
+      break;
+  case MFV_DKXPAND:
+      result=load_dke_map(lvl);
+      break;
+  default:
+      message_error("Error: Load not supported for this map format version");
+      result=ERR_INTERNAL;
+      break;
+  }
+  if ((result<ERR_NONE)&&(new_on_error))
   {
     free_map(lvl);
     start_new_map(lvl);
@@ -1722,8 +2082,8 @@ short write_def_clm_source(struct LEVEL *lvl,char *fname)
     }
 
     //Preparing array bounds
-    int arr_entries_x=MAP_SIZE_X*MAP_SUBNUM_X;
-    int arr_entries_y=MAP_SIZE_Y*MAP_SUBNUM_Y;
+    const int arr_entries_x=lvl->tlsize.x*MAP_SUBNUM_X;
+    const int arr_entries_y=lvl->tlsize.y*MAP_SUBNUM_Y;
 
     unsigned char *clmentry;
     struct COLUMN_REC *clm_rec;
@@ -1809,8 +2169,8 @@ short write_def_tng_source(struct LEVEL *lvl,char *fname)
     }
 
     //Preparing array bounds
-    int arr_entries_x=MAP_SIZE_X*MAP_SUBNUM_X;
-    int arr_entries_y=MAP_SIZE_Y*MAP_SUBNUM_Y;
+    const int arr_entries_x=lvl->tlsize.x*MAP_SUBNUM_X;
+    const int arr_entries_y=lvl->tlsize.y*MAP_SUBNUM_Y;
     int cx,cy;
     for (cy=0; cy < arr_entries_y; cy++)
       for (cx=0; cx < arr_entries_x; cx++)
@@ -1822,15 +2182,15 @@ short write_def_tng_source(struct LEVEL *lvl,char *fname)
             int sen_tl=get_thing_sensitile(thing);
             unsigned short tngtype=get_thing_type(thing);
 //            if (tngtype!=THING_TYPE_ITEM) continue;
-            if ( (sen_tl!=((spos_x/MAP_SUBNUM_Y-1)+(spos_y/MAP_SUBNUM_Y-1)*MAP_SIZE_X)) &&
-                 (sen_tl!=((spos_x/MAP_SUBNUM_Y-1)+(spos_y/MAP_SUBNUM_Y+0)*MAP_SIZE_X)) &&
-                 (sen_tl!=((spos_x/MAP_SUBNUM_Y-1)+(spos_y/MAP_SUBNUM_Y+1)*MAP_SIZE_X)) &&
-                 (sen_tl!=((spos_x/MAP_SUBNUM_Y+0)+(spos_y/MAP_SUBNUM_Y-1)*MAP_SIZE_X)) &&
-                 (sen_tl!=((spos_x/MAP_SUBNUM_Y+0)+(spos_y/MAP_SUBNUM_Y+0)*MAP_SIZE_X)) &&
-                 (sen_tl!=((spos_x/MAP_SUBNUM_Y+0)+(spos_y/MAP_SUBNUM_Y+1)*MAP_SIZE_X)) &&
-                 (sen_tl!=((spos_x/MAP_SUBNUM_Y+1)+(spos_y/MAP_SUBNUM_Y-1)*MAP_SIZE_X)) &&
-                 (sen_tl!=((spos_x/MAP_SUBNUM_Y+1)+(spos_y/MAP_SUBNUM_Y+0)*MAP_SIZE_X)) &&
-                 (sen_tl!=((spos_x/MAP_SUBNUM_Y+1)+(spos_y/MAP_SUBNUM_Y+1)*MAP_SIZE_X)) )
+            if ( (sen_tl!=((spos_x/MAP_SUBNUM_Y-1)+(spos_y/MAP_SUBNUM_Y-1)*lvl->tlsize.x)) &&
+                 (sen_tl!=((spos_x/MAP_SUBNUM_Y-1)+(spos_y/MAP_SUBNUM_Y+0)*lvl->tlsize.x)) &&
+                 (sen_tl!=((spos_x/MAP_SUBNUM_Y-1)+(spos_y/MAP_SUBNUM_Y+1)*lvl->tlsize.x)) &&
+                 (sen_tl!=((spos_x/MAP_SUBNUM_Y+0)+(spos_y/MAP_SUBNUM_Y-1)*lvl->tlsize.x)) &&
+                 (sen_tl!=((spos_x/MAP_SUBNUM_Y+0)+(spos_y/MAP_SUBNUM_Y+0)*lvl->tlsize.x)) &&
+                 (sen_tl!=((spos_x/MAP_SUBNUM_Y+0)+(spos_y/MAP_SUBNUM_Y+1)*lvl->tlsize.x)) &&
+                 (sen_tl!=((spos_x/MAP_SUBNUM_Y+1)+(spos_y/MAP_SUBNUM_Y-1)*lvl->tlsize.x)) &&
+                 (sen_tl!=((spos_x/MAP_SUBNUM_Y+1)+(spos_y/MAP_SUBNUM_Y+0)*lvl->tlsize.x)) &&
+                 (sen_tl!=((spos_x/MAP_SUBNUM_Y+1)+(spos_y/MAP_SUBNUM_Y+1)*lvl->tlsize.x)) )
             {
               int tl_x=spos_x/MAP_SUBNUM_X;
               int tl_y=spos_y/MAP_SUBNUM_Y;

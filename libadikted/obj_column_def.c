@@ -503,11 +503,17 @@ unsigned short get_clm_entry_height(const unsigned char *clmentry)
 
 unsigned short get_clm_entry_solid(const unsigned char *clmentry)
 {
-    return (unsigned short)clmentry[3]+(clmentry[4]<<8);
+    return read_int16_le_buf(clmentry+3);
+}
+
+unsigned short get_clm_entry_base(const unsigned char *clmentry)
+{
+    return read_int16_le_buf(clmentry+5);
 }
 
 /*
  * Returns most top nonzero cube entry.
+ * If there are no nonzero cubes, returns 0.
  */
 unsigned short get_clm_entry_topcube(const unsigned char *clmentry)
 {
@@ -515,11 +521,9 @@ unsigned short get_clm_entry_topcube(const unsigned char *clmentry)
     int i=7;
     while ((cube==0)&&(i>=0))
     {
-          cube = clmentry[2*i+8]+(clmentry[2*i+9]<<8);
+          cube = read_int16_le_buf(clmentry+(i<<1)+8);
           i--;
     }
-    if (cube==0)
-        cube = clmentry[5]+(clmentry[6]<<8);
     return cube;
 }
 

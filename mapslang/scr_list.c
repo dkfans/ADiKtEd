@@ -21,18 +21,12 @@
 
 #include "scr_list.h"
 
-#include "libadikted/globals.h"
+#include "../libadikted/adikted.h"
 #include "output_scr.h"
 #include "input_kb.h"
-#include "libadikted/lev_data.h"
 #include "scr_actn.h"
 #include "scr_help.h"
 #include "scr_thing.h"
-#include "libadikted/obj_things.h"
-#include "libadikted/obj_column.h"
-#include "libadikted/obj_slabs.h"
-#include "libadikted/lev_things.h"
-#include "libadikted/lev_column.h"
 
 /*
  * Initializes variables for the list screen.
@@ -586,7 +580,7 @@ void actions_mdsrch(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata,
           int ty=-1;
           int num_found=0;
           unsigned char *obj;
-          while (ty<MAP_SIZE_Y)
+          while (ty<(long)workdata->lvl->tlsize.y)
           {
             obj=find_next_object_on_map(workdata->lvl,&tx,&ty,workdata->list->pos);
             if (obj!=NULL)

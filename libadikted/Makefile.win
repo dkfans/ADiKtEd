@@ -7,12 +7,12 @@ WINDRES = windres.exe
 RES  = adikted_private.res
 OBJ  = libadi_main.o bulcommn.o dernc.o draw_map.o graffiti.o graffiti_font.o lev_column.o lev_data.o lev_files.o lev_script.o lev_things.o memfile.o obj_actnpts.o obj_column.o obj_column_def.o obj_column_per.o obj_slabs.o obj_things.o xcubtxtr.o xtabdat8.o xtabjty.o msg_log.o arr_utils.o lbfileio.o $(RES)
 LINKOBJ  = libadi_main.o bulcommn.o dernc.o draw_map.o graffiti.o graffiti_font.o lev_column.o lev_data.o lev_files.o lev_script.o lev_things.o memfile.o obj_actnpts.o obj_column.o obj_column_def.o obj_column_per.o obj_slabs.o obj_things.o xcubtxtr.o xtabdat8.o xtabjty.o msg_log.o arr_utils.o lbfileio.o $(RES)
-LIBS =  -L"D:/ProgsNT/Dev-Cpp/lib" --no-export-all-symbols --add-stdcall-alias  -march=i486 
+LIBS =  -L"D:/ProgsNT/Dev-Cpp/lib" --no-export-all-symbols --add-stdcall-alias  -march=pentium-mmx -mmmx 
 INCS =  -I"D:/ProgsNT/Dev-Cpp/include" 
 CXXINCS =  -I"D:/ProgsNT/Dev-Cpp/lib/gcc/mingw32/3.4.2/include"  -I"D:/ProgsNT/Dev-Cpp/include/c++/3.4.2/backward"  -I"D:/ProgsNT/Dev-Cpp/include/c++/3.4.2/mingw32"  -I"D:/ProgsNT/Dev-Cpp/include/c++/3.4.2"  -I"D:/ProgsNT/Dev-Cpp/include" 
 BIN  = adikted.dll
-CXXFLAGS = $(CXXINCS) -DBUILD_DLL   -march=i486
-CFLAGS = $(INCS) -DBUILD_DLL   -march=i486
+CXXFLAGS = $(CXXINCS) -DBUILD_DLL   -fexpensive-optimizations -O3 -march=pentium-mmx -mmmx
+CFLAGS = $(INCS) -DBUILD_DLL   -fexpensive-optimizations -O3 -march=pentium-mmx -mmmx
 RM = rm -f
 
 .PHONY: all all-before all-after clean clean-custom

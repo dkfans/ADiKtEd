@@ -32,9 +32,11 @@ DLLIMPORT unsigned char get_actnpt_range_subtile(unsigned char *actnpt);
 DLLIMPORT short set_actnpt_range_subtile(unsigned char *actnpt,unsigned char rng_tl);
 DLLIMPORT short set_actnpt_subtile(unsigned char *actnpt,unsigned char pos_x,unsigned char pos_y);
 DLLIMPORT unsigned char get_actnpt_subtpos_x(unsigned char *actnpt);
+DLLIMPORT unsigned short get_actnpt_pos_x_adv(const unsigned char *actnpt);
 DLLIMPORT short set_actnpt_subtpos_x(unsigned char *actnpt,unsigned char pos_x);
 DLLIMPORT unsigned char get_actnpt_subtpos_y(unsigned char *actnpt);
 DLLIMPORT short set_actnpt_subtpos_y(unsigned char *actnpt,unsigned char pos_y);
+DLLIMPORT unsigned short get_actnpt_pos_y_adv(const unsigned char *actnpt);
 DLLIMPORT unsigned char get_actnpt_range_subtpos(unsigned char *actnpt);
 DLLIMPORT short set_actnpt_range_subtpos(unsigned char *actnpt,unsigned char rng_st);
 DLLIMPORT unsigned int get_actnpt_range_adv(unsigned char *actnpt);
@@ -48,6 +50,7 @@ DLLIMPORT unsigned short get_free_actnpt_number(const struct LEVEL *lvl);
 DLLIMPORT unsigned short get_free_actnpt_number_next(const struct LEVEL *lvl,const unsigned short start);
 DLLIMPORT unsigned short get_free_actnpt_number_prev(const struct LEVEL *lvl,const unsigned short start);
 DLLIMPORT short create_actnpt_number_used_arr(const struct LEVEL *lvl,unsigned char **used,unsigned int *used_size);
+DLLIMPORT unsigned long get_actnpt_distance_adv(const unsigned char *actnpt,const int ssx,const int ssy);
 
 DLLIMPORT unsigned char get_stlight_subtile_x(unsigned char *stlight);
 DLLIMPORT short set_stlight_subtile_x(unsigned char *stlight,unsigned char pos_x);
@@ -57,8 +60,10 @@ DLLIMPORT short set_stlight_subtile(unsigned char *stlight,unsigned char pos_x,u
 DLLIMPORT unsigned char get_stlight_subtile_h(unsigned char *stlight);
 DLLIMPORT short set_stlight_subtile_h(unsigned char *stlight,unsigned char pos_h);
 DLLIMPORT unsigned char get_stlight_subtpos_x(unsigned char *stlight);
+DLLIMPORT unsigned short get_stlight_pos_x_adv(const unsigned char *stlight);
 DLLIMPORT short set_stlight_subtpos_x(unsigned char *stlight,unsigned char pos_x);
 DLLIMPORT unsigned char get_stlight_subtpos_y(unsigned char *stlight);
+DLLIMPORT unsigned short get_stlight_pos_y_adv(const unsigned char *stlight);
 DLLIMPORT short set_stlight_subtpos_y(unsigned char *stlight,unsigned char pos_y);
 DLLIMPORT short set_stlight_subtpos(unsigned char *stlight,unsigned char pos_x,unsigned char pos_y);
 DLLIMPORT unsigned char get_stlight_subtpos_h(unsigned char *stlight);
@@ -73,5 +78,6 @@ DLLIMPORT short set_stlight_intensivity(unsigned char *stlight,unsigned char int
 
 DLLIMPORT unsigned char *create_stlight(unsigned int sx, unsigned int sy);
 DLLIMPORT unsigned char *create_stlight_copy(unsigned int sx, unsigned int sy,unsigned char *src);
+DLLIMPORT unsigned long get_stlight_distance_adv(const unsigned char *stlight,const int ssx,const int ssy);
 
 #endif // ADIKT_OBJACTNPTS_H

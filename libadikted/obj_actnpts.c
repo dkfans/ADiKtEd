@@ -82,6 +82,12 @@ unsigned char get_actnpt_subtpos_x(unsigned char *actnpt)
     return actnpt[0];
 }
 
+unsigned short get_actnpt_pos_x_adv(const unsigned char *actnpt)
+{
+    if (actnpt==NULL) return 0;
+    return (((unsigned short)actnpt[1])<<8) + actnpt[0];
+}
+
 short set_actnpt_subtpos_x(unsigned char *actnpt,unsigned char pos_x)
 {
     if (actnpt==NULL) return 0;
@@ -92,6 +98,12 @@ unsigned char get_actnpt_subtpos_y(unsigned char *actnpt)
 {
     if (actnpt==NULL) return 0;
     return actnpt[2];
+}
+
+unsigned short get_actnpt_pos_y_adv(const unsigned char *actnpt)
+{
+    if (actnpt==NULL) return 0;
+    return (((unsigned short)actnpt[3])<<8) + actnpt[2];
 }
 
 short set_actnpt_subtpos_y(unsigned char *actnpt,unsigned char pos_y)
@@ -140,8 +152,8 @@ short set_actnpt_number(unsigned char *actnpt,unsigned short apt_num)
 unsigned char *create_actnpt(struct LEVEL *lvl, unsigned int sx, unsigned int sy)
 {
     //Preparing array bounds
-    int arr_entries_x=MAP_SIZE_X*MAP_SUBNUM_X;
-    int arr_entries_y=MAP_SIZE_Y*MAP_SUBNUM_Y;
+    const int arr_entries_x=lvl->tlsize.x*MAP_SUBNUM_X;
+    const int arr_entries_y=lvl->tlsize.y*MAP_SUBNUM_Y;
     sx%=arr_entries_x;
     sy%=arr_entries_y;
 
@@ -169,12 +181,6 @@ unsigned char *create_actnpt(struct LEVEL *lvl, unsigned int sx, unsigned int sy
  */
 unsigned char *create_actnpt_copy(unsigned int sx, unsigned int sy,unsigned char *src)
 {
-    //Preparing array bounds
-    int arr_entries_x=MAP_SIZE_X*MAP_SUBNUM_X;
-    int arr_entries_y=MAP_SIZE_Y*MAP_SUBNUM_Y;
-    sx%=arr_entries_x;
-    sy%=arr_entries_y;
-
     unsigned char *actnpt;
     actnpt = (unsigned char *)malloc(SIZEOF_DK_APT_REC);
     if (actnpt==NULL)
@@ -245,8 +251,8 @@ unsigned short get_free_actnpt_number_prev(const struct LEVEL *lvl,const unsigne
 short create_actnpt_number_used_arr(const struct LEVEL *lvl,unsigned char **used,unsigned int *used_size)
 {
     //Preparing array bounds
-    int arr_entries_x=MAP_SIZE_X*MAP_SUBNUM_X;
-    int arr_entries_y=MAP_SIZE_Y*MAP_SUBNUM_Y;
+    const int arr_entries_x=lvl->tlsize.x*MAP_SUBNUM_X;
+    const int arr_entries_y=lvl->tlsize.y*MAP_SUBNUM_Y;
     int k;
     *used_size=max(lvl->apt_total_count+16,*used_size);
     *used=malloc((*used_size)*sizeof(unsigned char));
@@ -322,6 +328,12 @@ unsigned char get_stlight_subtpos_x(unsigned char *stlight)
     return stlight[10];
 }
 
+unsigned short get_stlight_pos_x_adv(const unsigned char *stlight)
+{
+    if (stlight==NULL) return 0;
+    return (((unsigned short)stlight[11])<<8) + stlight[10];
+}
+
 short set_stlight_subtpos_x(unsigned char *stlight,unsigned char pos_x)
 {
     if (stlight==NULL) return 0;
@@ -332,6 +344,12 @@ unsigned char get_stlight_subtpos_y(unsigned char *stlight)
 {
     if (stlight==NULL) return 0;
     return stlight[12];
+}
+
+unsigned short get_stlight_pos_y_adv(const unsigned char *stlight)
+{
+    if (stlight==NULL) return 0;
+    return (((unsigned short)stlight[13])<<8) + stlight[12];
 }
 
 short set_stlight_subtpos_y(unsigned char *stlight,unsigned char pos_y)
@@ -411,12 +429,6 @@ short set_stlight_intensivity(unsigned char *stlight,unsigned char intens)
  */
 unsigned char *create_stlight(unsigned int sx, unsigned int sy)
 {
-    //Preparing array bounds
-    int arr_entries_x=MAP_SIZE_X*MAP_SUBNUM_X;
-    int arr_entries_y=MAP_SIZE_Y*MAP_SUBNUM_Y;
-    sx%=arr_entries_x;
-    sy%=arr_entries_y;
-
     unsigned char *stlight;
     stlight = (unsigned char *)malloc(SIZEOF_DK_LGT_REC);
     if (stlight==NULL)
@@ -446,12 +458,6 @@ unsigned char *create_stlight(unsigned int sx, unsigned int sy)
  */
 unsigned char *create_stlight_copy(unsigned int sx, unsigned int sy,unsigned char *src)
 {
-    //Preparing array bounds
-    int arr_entries_x=MAP_SIZE_X*MAP_SUBNUM_X;
-    int arr_entries_y=MAP_SIZE_Y*MAP_SUBNUM_Y;
-    sx%=arr_entries_x;
-    sy%=arr_entries_y;
-
     unsigned char *stlight;
     stlight = (unsigned char *)malloc(SIZEOF_DK_LGT_REC);
     if (stlight==NULL)
@@ -465,3 +471,32 @@ unsigned char *create_stlight_copy(unsigned int sx, unsigned int sy,unsigned cha
     set_stlight_subtile(stlight,(unsigned char)sx,(unsigned char)sy);
     return stlight;
 }
+
+/**
+ * Returns distance between given action point and another map point.
+ * @param actnpt The action point which position defines first point.
+ * @param ssx,ssy Coordinates of the second point ("_adv" form).
+ * @return Returns distance in "_adv" form.
+ */
+unsigned long get_actnpt_distance_adv(const unsigned char *actnpt,const int ssx,const int ssy)
+{
+    int dx=get_actnpt_pos_x_adv(actnpt)-ssx;
+    int dy=get_actnpt_pos_y_adv(actnpt)-ssy;
+    float dist_sqr=((float)dx*dx)+((float)dy*dy);
+    return sqrt(dist_sqr);
+}
+
+/**
+ * Returns distance between given static light and another map point.
+ * @param stlight The light which position defines first point.
+ * @param ssx,ssy Coordinates of the second point ("_adv" form).
+ * @return Returns distance in "_adv" form.
+ */
+unsigned long get_stlight_distance_adv(const unsigned char *stlight,const int ssx,const int ssy)
+{
+    int dx=get_stlight_pos_x_adv(stlight)-ssx;
+    int dy=get_stlight_pos_y_adv(stlight)-ssy;
+    float dist_sqr=((float)dx*dx)+((float)dy*dy);
+    return sqrt(dist_sqr);
+}
+

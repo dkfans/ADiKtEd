@@ -27,6 +27,7 @@
 #include "obj_things.h"
 #include "obj_column.h"
 #include "lev_script.h"
+#include "draw_map.h"
 
 const int idir_subtl_x[]={
     0, 1, 2,
@@ -44,9 +45,12 @@ const char default_map_name[]="Unnamed %Y.%m.%d map";
  * Creates object for storing one level. Allocates memory and inits
  * the values to zero; drops any previous pointers without deallocating.
  * @param lvl_ptr Double pointer to the new level structure.
+ * @param map_version Map version constant, from MAP_FORMAT_VERSION enumeration.
+ * @param lvl_size Level size struct.This can be NULL if map_version 
+ *     does not support multiple sizes of maps.
  * @return Returns false on error, true on success.
  */
-short level_init(struct LEVEL **lvl_ptr)
+short level_init(struct LEVEL **lvl_ptr,short map_version,struct UPOINT_3D *lvl_size)
 {
      message_log(" level_init: started");
     (*lvl_ptr)=(struct LEVEL *)malloc(sizeof(struct LEVEL));
@@ -57,16 +61,29 @@ short level_init(struct LEVEL **lvl_ptr)
         message_error("level_init: Cannot alloc memory for level");
         return false;
     }
+    lvl->format_version=map_version;
     // map file name
     lvl->fname=(char *)malloc(DISKPATH_SIZE*sizeof(char));
     memset(lvl->fname,0,DISKPATH_SIZE*sizeof(char));
     lvl->savfname=(char *)malloc(DISKPATH_SIZE*sizeof(char));
     memset(lvl->savfname,0,DISKPATH_SIZE*sizeof(char));
+
+
+
+    if ((lvl->format_version!=MFV_DKSTD)&&(lvl->format_version!=MFV_DKGOLD)&&(lvl_size!=NULL))
+    {
+        lvl->tlsize.x=lvl_size->x;
+        lvl->tlsize.y=lvl_size->y;
+    } else
+    {
+        lvl->tlsize.x=MAP_SIZE_DKSTD_X;
+        lvl->tlsize.y=MAP_SIZE_DKSTD_Y;
+    }
+    lvl->subsize.x=lvl->tlsize.x*MAP_SUBNUM_X+1;
+    lvl->subsize.y=lvl->tlsize.y*MAP_SUBNUM_Y+1;
     //Preparing array bounds
-    const int arr_entries_x=MAP_SIZE_X*MAP_SUBNUM_X;
-    const int arr_entries_y=MAP_SIZE_Y*MAP_SUBNUM_Y;
-    const int dat_entries_x=MAP_SIZE_X*MAP_SUBNUM_X+1;
-    const int dat_entries_y=MAP_SIZE_Y*MAP_SUBNUM_Y+1;
+    const int arr_entries_x=lvl->tlsize.x*MAP_SUBNUM_X;
+    const int arr_entries_y=lvl->tlsize.y*MAP_SUBNUM_Y;
 
   { //allocating CLM structures
     lvl->clm = (unsigned char **)malloc(COLUMN_ENTRIES*sizeof(char *));
@@ -90,15 +107,15 @@ short level_init(struct LEVEL **lvl_ptr)
   }
   { //allocating SLB structures
     int i;
-    lvl->slb = (unsigned short **)malloc(MAP_SIZE_Y*sizeof(unsigned short *));
+    lvl->slb = (unsigned short **)malloc(lvl->tlsize.y*sizeof(unsigned short *));
     if (lvl->slb==NULL)
     {
         message_error("level_init: Cannot alloc slb memory");
         return false;
     }
-    for (i=0; i < MAP_SIZE_Y; i++)
+    for (i=0; i < lvl->tlsize.y; i++)
     {
-      lvl->slb[i] = (unsigned short *)malloc(MAP_SIZE_X*sizeof(unsigned short));
+      lvl->slb[i] = (unsigned short *)malloc(lvl->tlsize.x*sizeof(unsigned short));
       if (lvl->slb[i]==NULL)
       {
         message_error("level_init: Cannot alloc slb entries");
@@ -108,15 +125,15 @@ short level_init(struct LEVEL **lvl_ptr)
   }
   { //allocating OWN structures
     int i;
-    lvl->own = (unsigned char **)malloc(dat_entries_y*sizeof(char *));
+    lvl->own = (unsigned char **)malloc(lvl->subsize.y*sizeof(char *));
     if (lvl->own==NULL)
     {
         message_error("level_init: Cannot alloc own memory");
         return false;
     }
-    for (i=0; i < dat_entries_y; i++)
+    for (i=0; i < lvl->subsize.y; i++)
     {
-      lvl->own[i] = (unsigned char *)malloc(dat_entries_x*sizeof(char));
+      lvl->own[i] = (unsigned char *)malloc(lvl->subsize.x*sizeof(char));
       if (lvl->own[i]==NULL)
       {
         message_error("level_init: Cannot alloc own entries");
@@ -125,16 +142,16 @@ short level_init(struct LEVEL **lvl_ptr)
     }
   }
   { //allocating DAT structures
-    lvl->dat= (unsigned short **)malloc(dat_entries_y*sizeof(short *));
+    lvl->dat= (unsigned short **)malloc(lvl->subsize.y*sizeof(short *));
     if (lvl->dat==NULL)
     {
         message_error("level_init: Cannot alloc dat memory");
         return false;
     }
     int i;
-    for (i=0; i < dat_entries_y; i++)
+    for (i=0; i < lvl->subsize.y; i++)
     {
-      lvl->dat[i]= (unsigned short *)malloc(dat_entries_x*sizeof(unsigned short));
+      lvl->dat[i]= (unsigned short *)malloc(lvl->subsize.x*sizeof(unsigned short));
       if (lvl->dat[i]==NULL)
       {
         message_error("level_init: Cannot alloc dat entries");
@@ -143,16 +160,16 @@ short level_init(struct LEVEL **lvl_ptr)
     }
   }
   { //allocating WIB structures
-    lvl->wib= (unsigned char **)malloc(dat_entries_y*sizeof(char *));
+    lvl->wib= (unsigned char **)malloc(lvl->subsize.y*sizeof(char *));
     if (lvl->wib==NULL)
     {
         message_error("level_init: Cannot alloc wib memory");
         return false;
     }
     int i;
-    for (i=0; i < dat_entries_y; i++)
+    for (i=0; i < lvl->subsize.y; i++)
     {
-      lvl->wib[i]= (unsigned char *)malloc(dat_entries_x*sizeof(char));
+      lvl->wib[i]= (unsigned char *)malloc(lvl->subsize.x*sizeof(char));
       if (lvl->wib[i]==NULL)
       {
         message_error("level_init: Cannot alloc wib entries");
@@ -161,16 +178,16 @@ short level_init(struct LEVEL **lvl_ptr)
     }
   }
   { //allocating FLG structures
-    lvl->flg= (unsigned short **)malloc(dat_entries_y*sizeof(short *));
+    lvl->flg= (unsigned short **)malloc(lvl->subsize.y*sizeof(short *));
     if (lvl->flg==NULL)
     {
         message_error("level_init: Cannot alloc flg memory");
         return false;
     }
     int i;
-    for (i=0; i < dat_entries_y; i++)
+    for (i=0; i < lvl->subsize.y; i++)
     {
-      lvl->flg[i]= (unsigned short *)malloc(dat_entries_x*sizeof(unsigned short));
+      lvl->flg[i]= (unsigned short *)malloc(lvl->subsize.x*sizeof(unsigned short));
       if (lvl->flg[i]==NULL)
       {
         message_error("level_init: Cannot alloc flg entries");
@@ -180,15 +197,15 @@ short level_init(struct LEVEL **lvl_ptr)
   }
   {
     int i;
-    lvl->tng_apt_lgt_nums = (unsigned short **)malloc(MAP_SIZE_Y*sizeof(unsigned short *));
+    lvl->tng_apt_lgt_nums = (unsigned short **)malloc(lvl->tlsize.y*sizeof(unsigned short *));
     if (lvl->tng_apt_lgt_nums==NULL)
     {
         message_error("level_init: Cannot alloc apt memory");
         return false;
     }
-    for (i=0; i<MAP_SIZE_Y; i++)
+    for (i=0; i<lvl->tlsize.y; i++)
     {
-      lvl->tng_apt_lgt_nums[i]= (unsigned short *)malloc(MAP_SIZE_X*sizeof(unsigned short));
+      lvl->tng_apt_lgt_nums[i]= (unsigned short *)malloc(lvl->tlsize.x*sizeof(unsigned short));
       if (lvl->tng_apt_lgt_nums[i]==NULL)
       {
         message_error("level_init: Cannot alloc apt entries");
@@ -257,16 +274,16 @@ short level_init(struct LEVEL **lvl_ptr)
     }
   }
   { //Allocating WLB structure
-    lvl->wlb = (unsigned char **)malloc(MAP_SIZE_Y*sizeof(unsigned char *));
+    lvl->wlb = (unsigned char **)malloc(lvl->tlsize.y*sizeof(unsigned char *));
     if (lvl->wlb==NULL)
     {
         message_error("level_init: Cannot alloc wlb memory");
         return false;
     }
     int i;
-    for (i=0; i<MAP_SIZE_Y; i++)
+    for (i=0; i<lvl->tlsize.y; i++)
     {
-      lvl->wlb[i]=(unsigned char *)malloc(MAP_SIZE_X*sizeof(unsigned char));
+      lvl->wlb[i]=(unsigned char *)malloc(lvl->tlsize.x*sizeof(unsigned char));
       if (lvl->wlb[i]==NULL)
       {
         message_error("level_init: Cannot alloc wlb entries");
@@ -307,16 +324,16 @@ short level_init(struct LEVEL **lvl_ptr)
     }
   }
   { //allocating cust.columns structures
-    lvl->cust_clm_lookup= (struct DK_CUSTOM_CLM ***)malloc(dat_entries_y*sizeof(struct DK_CUSTOM_CLM **));
+    lvl->cust_clm_lookup= (struct DK_CUSTOM_CLM ***)malloc(lvl->subsize.y*sizeof(struct DK_CUSTOM_CLM **));
     if (lvl->cust_clm_lookup==NULL)
     {
         message_error("level_init: Cannot alloc clm memory");
         return false;
     }
     int i;
-    for (i=0; i < dat_entries_y; i++)
+    for (i=0; i < lvl->subsize.y; i++)
     {
-      lvl->cust_clm_lookup[i]= (struct DK_CUSTOM_CLM **)malloc(dat_entries_x*sizeof(struct DK_CUSTOM_CLM *));
+      lvl->cust_clm_lookup[i]= (struct DK_CUSTOM_CLM **)malloc(lvl->subsize.x*sizeof(struct DK_CUSTOM_CLM *));
       if (lvl->cust_clm_lookup[i]==NULL)
       {
         message_error("level_init: Cannot alloc clm lookup");
@@ -327,6 +344,31 @@ short level_init(struct LEVEL **lvl_ptr)
   message_log(" level_init: finished, now clearing");
   level_clear_options(&(lvl->optns));
   return level_clear(lvl);
+}
+
+/**
+ * Resizes arrays in object for storing level. Allocates memory and inits
+ * the values to zero; deallocates previous pointers.
+ * @param lvl Pointer to the level structure.
+ * @param lvl_size Level size struct.
+ * @return Returns ERR_NONE on success, error code on failure.
+ * @todo Finish, based on level_init.
+ */
+short level_set_size(struct LEVEL *lvl,struct UPOINT_3D *lvl_size)
+{
+    message_log(" level_set_size: started");
+    if (lvl==NULL)
+    {
+        message_error("level_set_size: Level structure doesn't exist");
+        return false;
+    }
+    lvl->tlsize.x=lvl_size->x;
+    lvl->tlsize.y=lvl_size->y;
+    lvl->subsize.x=lvl->tlsize.x*MAP_SUBNUM_X+1;
+    lvl->subsize.y=lvl->tlsize.y*MAP_SUBNUM_Y+1;
+    //TODO: Allocate the structures of given size
+    message_log(" level_set_size: finished");
+    return true;
 }
 
 /**
@@ -346,8 +388,11 @@ short level_clear_options(struct LEVOPTIONS *optns)
     optns->levels_path=NULL;
     optns->data_path=NULL;
     optns->load_redundant_objects=true;
+    optns->verify_warn_flags=VWFLAG_NONE;
     optns->picture.rescale=4;
     optns->picture.data_path=NULL;
+    optns->picture.bmfonts=BMFONT_DONT_LOAD;
+    optns->picture.tngflags=TNGFLG_NONE;
     optns->script.level_spaces=4;
     return ERR_NONE;
 }
@@ -362,7 +407,45 @@ short level_clear_options(struct LEVOPTIONS *optns)
 short level_set_options(struct LEVEL *lvl,struct LEVOPTIONS *optns)
 {
     memcpy(&(lvl->optns),optns,sizeof(struct LEVOPTIONS));
+    lvl->optns.picture.data_path=lvl->optns.data_path;
     return ERR_NONE;
+}
+
+/**
+ * Gets all options for the LEVEL structure.
+ * Returns direct pointer to the structure.
+ * @param lvl Pointer to the LEVEL structure.
+ * @return Returns LEVOPTIONS structure.
+ */
+struct LEVOPTIONS *level_get_options(struct LEVEL *lvl)
+{
+    return &(lvl->optns);
+}
+
+/**
+ * Sets the map drawing options for the LEVEL structure from another MAPDRAW_OPTIONS.
+ * Copies the whole MAPDRAW_OPTIONS structure into the one in LEVEL.
+ * Keeps only previous value of data_path.
+ * @param lvl Pointer to the LEVEL structure.
+ * @param mdrwopts The MAPDRAW_OPTIONS structure to copy from.
+ * @return Returns ERR_NONE on success, error code on failure.
+ */
+short level_set_mapdraw_options(struct LEVEL *lvl,struct MAPDRAW_OPTIONS *mdrwopts)
+{
+    memcpy(&(lvl->optns.picture),mdrwopts,sizeof(struct MAPDRAW_OPTIONS));
+    lvl->optns.picture.data_path=lvl->optns.data_path;
+    return ERR_NONE;
+}
+
+/**
+ * Gets the map drawing options for the LEVEL structure.
+ * Returns direct pointer to the structure.
+ * @param lvl Pointer to the LEVEL structure.
+ * @return Returns MAPDRAW_OPTIONS structure from the level.
+ */
+struct MAPDRAW_OPTIONS *level_get_mapdraw_options(struct LEVEL *lvl)
+{
+    return &(lvl->optns.picture);
 }
 
 /**
@@ -374,8 +457,8 @@ short level_set_options(struct LEVEL *lvl,struct LEVOPTIONS *optns)
 short level_clear_tng(struct LEVEL *lvl)
 {
   //Preparing array bounds
-  int arr_entries_x=MAP_SIZE_X*MAP_SUBNUM_X;
-  int arr_entries_y=MAP_SIZE_Y*MAP_SUBNUM_Y;
+  int arr_entries_x=lvl->tlsize.x*MAP_SUBNUM_X;
+  int arr_entries_y=lvl->tlsize.y*MAP_SUBNUM_Y;
   //Clearing single variables
   lvl->tng_total_count=0;
   //Clearing pointer arrays
@@ -386,8 +469,8 @@ short level_clear_tng(struct LEVEL *lvl)
           lvl->tng_lookup[i][j]=NULL;
           lvl->tng_subnums[i][j]=0;
       }
-  for (i=0; i<MAP_SIZE_Y; i++)
-      for (j=0; j<MAP_SIZE_X; j++)
+  for (i=0; i<lvl->tlsize.y; i++)
+      for (j=0; j<lvl->tlsize.x; j++)
           lvl->tng_apt_lgt_nums[i][j]=0;
 
   //Clearing related stats variables
@@ -404,8 +487,8 @@ short level_clear_tng(struct LEVEL *lvl)
 short level_clear_apt(struct LEVEL *lvl)
 {
     //Preparing array bounds
-    int arr_entries_x=MAP_SIZE_X*MAP_SUBNUM_X;
-    int arr_entries_y=MAP_SIZE_Y*MAP_SUBNUM_Y;
+    int arr_entries_x=lvl->tlsize.x*MAP_SUBNUM_X;
+    int arr_entries_y=lvl->tlsize.y*MAP_SUBNUM_Y;
     //Clearing single variables
     lvl->apt_total_count=0;
     //Clearing pointer arrays
@@ -428,8 +511,8 @@ short level_clear_apt(struct LEVEL *lvl)
 short level_clear_lgt(struct LEVEL *lvl)
 {
     //Preparing array bounds
-    int arr_entries_x=MAP_SIZE_X*MAP_SUBNUM_X;
-    int arr_entries_y=MAP_SIZE_Y*MAP_SUBNUM_Y;
+    int arr_entries_x=lvl->tlsize.x*MAP_SUBNUM_X;
+    int arr_entries_y=lvl->tlsize.y*MAP_SUBNUM_Y;
     //Clearing single variables
     lvl->lgt_total_count=0;
     //Clearing pointer arrays
@@ -452,10 +535,8 @@ short level_clear_lgt(struct LEVEL *lvl)
 short level_clear_datclm(struct LEVEL *lvl)
 {
     //Preparing array bounds
-    const int arr_entries_x=MAP_SIZE_X*MAP_SUBNUM_X;
-    const int arr_entries_y=MAP_SIZE_Y*MAP_SUBNUM_Y;
-    const int dat_entries_x=MAP_SIZE_X*MAP_SUBNUM_X+1;
-    const int dat_entries_y=MAP_SIZE_Y*MAP_SUBNUM_Y+1;
+    const int arr_entries_x=lvl->tlsize.x*MAP_SUBNUM_X;
+    const int arr_entries_y=lvl->tlsize.y*MAP_SUBNUM_Y;
 
     // zero-filling CLM memory
     int i,k;
@@ -469,8 +550,8 @@ short level_clear_datclm(struct LEVEL *lvl)
     write_int32_le_buf(lvl->clm_hdr+0,COLUMN_ENTRIES);
     // Setting all DAT entries to one, first column
     // (it is unused in all maps)
-    for (k=0; k<dat_entries_y; k++)
-      for (i=0; i<dat_entries_x; i++)
+    for (k=0; k<lvl->subsize.y; k++)
+      for (i=0; i<lvl->subsize.x; i++)
       {
           set_dat_subtile(lvl, i, k, 0);
           lvl->clm_utilize[0]++;
@@ -642,45 +723,43 @@ short level_clear_script_param(struct DK_SCRIPT_PARAMETERS *par)
 short level_clear_other(struct LEVEL *lvl)
 {
     //Preparing array bounds
-    const int arr_entries_x=MAP_SIZE_X*MAP_SUBNUM_X;
-    const int arr_entries_y=MAP_SIZE_Y*MAP_SUBNUM_Y;
-    const int dat_entries_x=MAP_SIZE_X*MAP_SUBNUM_X+1;
-    const int dat_entries_y=MAP_SIZE_Y*MAP_SUBNUM_Y+1;
+    const int arr_entries_x=lvl->tlsize.x*MAP_SUBNUM_X;
+    const int arr_entries_y=lvl->tlsize.y*MAP_SUBNUM_Y;
 
     int i;
-    for (i=0; i < MAP_SIZE_Y; i++)
+    for (i=0; i < lvl->tlsize.y; i++)
     {
       if (lvl->slb[i]!=NULL)
-        memset(lvl->slb[i],0,MAP_SIZE_X*sizeof(unsigned short));
+        memset(lvl->slb[i],0,lvl->tlsize.x*sizeof(unsigned short));
     }
-    for (i=0; i < dat_entries_y; i++)
+    for (i=0; i < lvl->subsize.y; i++)
     {
       if (lvl->own[i]!=NULL)
-        memset(lvl->own[i],PLAYER_UNSET,dat_entries_x*sizeof(char));
+        memset(lvl->own[i],PLAYER_UNSET,lvl->subsize.x*sizeof(char));
     }
 
-    for (i=0; i < dat_entries_y; i++)
+    for (i=0; i < lvl->subsize.y; i++)
     {
       if (lvl->dat[i]!=NULL)
-        memset(lvl->dat[i],0,dat_entries_x*sizeof(unsigned short));
+        memset(lvl->dat[i],0,lvl->subsize.x*sizeof(unsigned short));
     }
 
-    for (i=0; i < dat_entries_y; i++)
+    for (i=0; i < lvl->subsize.y; i++)
     {
       if (lvl->wib[i]!=NULL)
-        memset(lvl->wib[i],COLUMN_WIB_SKEW,dat_entries_x*sizeof(char));
+        memset(lvl->wib[i],COLUMN_WIB_SKEW,lvl->subsize.x*sizeof(char));
     }
 
-    for (i=0; i < dat_entries_y; i++)
+    for (i=0; i < lvl->subsize.y; i++)
     {
       if (lvl->flg[i]!=NULL)
-        memset(lvl->flg[i],0,dat_entries_x*sizeof(unsigned short));
+        memset(lvl->flg[i],0,lvl->subsize.x*sizeof(unsigned short));
     }
 
-    for (i=0; i < MAP_SIZE_Y; i++)
+    for (i=0; i < lvl->tlsize.y; i++)
     {
       if (lvl->wlb[i]!=NULL)
-        memset(lvl->wlb[i],0,MAP_SIZE_X*sizeof(char));
+        memset(lvl->wlb[i],0,lvl->tlsize.x*sizeof(char));
     }
     
     // INF file is easy
@@ -689,10 +768,10 @@ short level_clear_other(struct LEVEL *lvl)
     // The Adikted-custom elements
     if (lvl->cust_clm_lookup!=NULL)
     {
-      for (i=0; i < dat_entries_y; i++)
+      for (i=0; i < lvl->subsize.y; i++)
       {
         if (lvl->cust_clm_lookup[i]!=NULL)
-          memset(lvl->cust_clm_lookup[i],0,dat_entries_x*sizeof(struct DK_CUSTOM_CLM  *));
+          memset(lvl->cust_clm_lookup[i],0,lvl->subsize.x*sizeof(struct DK_CUSTOM_CLM  *));
       }
     }
     lvl->cust_clm_count=0;
@@ -768,16 +847,14 @@ short level_deinit(struct LEVEL **lvl_ptr)
     struct LEVEL *lvl;
     lvl=(*lvl_ptr);
     //Preparing array bounds
-    const int arr_entries_x=MAP_SIZE_X*MAP_SUBNUM_X;
-    const int arr_entries_y=MAP_SIZE_Y*MAP_SUBNUM_Y;
-    const int dat_entries_x=MAP_SIZE_X*MAP_SUBNUM_X+1;
-    const int dat_entries_y=MAP_SIZE_Y*MAP_SUBNUM_Y+1;
+    const int arr_entries_x=lvl->tlsize.x*MAP_SUBNUM_X;
+    const int arr_entries_y=lvl->tlsize.y*MAP_SUBNUM_Y;
 
 //    message_log(" level_deinit: Freeing SLB structure");
     if (lvl->slb!=NULL)
     {
       int i;
-      for (i=0; i<MAP_SIZE_Y; i++)
+      for (i=0; i<lvl->tlsize.y; i++)
           free(lvl->slb[i]);
       free(lvl->slb);
     }
@@ -786,7 +863,7 @@ short level_deinit(struct LEVEL **lvl_ptr)
     if (lvl->own!=NULL)
     {
       int i;
-      for (i=0; i<dat_entries_y; i++)
+      for (i=0; i<lvl->subsize.y; i++)
           free(lvl->own[i]);
       free(lvl->own);
     }
@@ -795,7 +872,7 @@ short level_deinit(struct LEVEL **lvl_ptr)
     if (lvl->dat!=NULL)
     {
       int i;
-      for (i=0; i<dat_entries_y; i++)
+      for (i=0; i<lvl->subsize.y; i++)
           free(lvl->dat[i]);
       free (lvl->dat);
     }
@@ -804,7 +881,7 @@ short level_deinit(struct LEVEL **lvl_ptr)
     if (lvl->wib!=NULL)
     {
       int i;
-      for (i=0; i<dat_entries_y; i++)
+      for (i=0; i<lvl->subsize.y; i++)
           free(lvl->wib[i]);
       free (lvl->wib);
     }
@@ -813,7 +890,7 @@ short level_deinit(struct LEVEL **lvl_ptr)
     if (lvl->flg!=NULL)
     {
       int i;
-      for (i=0; i<dat_entries_y; i++)
+      for (i=0; i<lvl->subsize.y; i++)
           free(lvl->flg[i]);
       free (lvl->flg);
     }
@@ -822,7 +899,7 @@ short level_deinit(struct LEVEL **lvl_ptr)
     if (lvl->tng_apt_lgt_nums!=NULL)
     {
       int i;
-      for (i=0; i<MAP_SIZE_Y; i++)
+      for (i=0; i<lvl->tlsize.y; i++)
         free(lvl->tng_apt_lgt_nums[i]);
       free(lvl->tng_apt_lgt_nums);
     }
@@ -888,7 +965,7 @@ short level_deinit(struct LEVEL **lvl_ptr)
     if (lvl->wlb!=NULL)
     {
       int i;
-      for (i=0; i<MAP_SIZE_Y; i++)
+      for (i=0; i<lvl->tlsize.y; i++)
           free(lvl->wlb[i]);
       free(lvl->wlb);
     }
@@ -899,7 +976,7 @@ short level_deinit(struct LEVEL **lvl_ptr)
     if (lvl->cust_clm_lookup!=NULL)
     {
       int i;
-      for (i=0; i<dat_entries_y; i++)
+      for (i=0; i<lvl->subsize.y; i++)
           free(lvl->cust_clm_lookup[i]);
       free (lvl->cust_clm_lookup);
     }
@@ -931,8 +1008,8 @@ short level_deinit(struct LEVEL **lvl_ptr)
 short level_free_tng(struct LEVEL *lvl)
 {
     //Preparing array bounds
-    int arr_entries_x=MAP_SIZE_X*MAP_SUBNUM_X;
-    int arr_entries_y=MAP_SIZE_Y*MAP_SUBNUM_Y;
+    int arr_entries_x=lvl->tlsize.x*MAP_SUBNUM_X;
+    int arr_entries_y=lvl->tlsize.y*MAP_SUBNUM_Y;
     //Freeing object arrays
     if ((lvl->tng_subnums!=NULL) && (lvl->tng_lookup!=NULL))
     {
@@ -960,8 +1037,8 @@ short level_free_tng(struct LEVEL *lvl)
 short level_free_apt(struct LEVEL *lvl)
 {
     //Preparing array bounds
-    int arr_entries_x=MAP_SIZE_X*MAP_SUBNUM_X;
-    int arr_entries_y=MAP_SIZE_Y*MAP_SUBNUM_Y;
+    int arr_entries_x=lvl->tlsize.x*MAP_SUBNUM_X;
+    int arr_entries_y=lvl->tlsize.y*MAP_SUBNUM_Y;
     //Freeing object arrays
     if ((lvl->apt_subnums!=NULL) && (lvl->apt_lookup!=NULL))
     {
@@ -1032,8 +1109,8 @@ short free_text_file(char ***lines,int *lines_count)
 short level_free_lgt(struct LEVEL *lvl)
 {
     //Preparing array bounds
-    int arr_entries_x=MAP_SIZE_X*MAP_SUBNUM_X;
-    int arr_entries_y=MAP_SIZE_Y*MAP_SUBNUM_Y;
+    int arr_entries_x=lvl->tlsize.x*MAP_SUBNUM_X;
+    int arr_entries_y=lvl->tlsize.y*MAP_SUBNUM_Y;
     //Freeing object arrays
     if ((lvl->lgt_subnums!=NULL) && (lvl->lgt_lookup!=NULL))
     {
@@ -1170,8 +1247,8 @@ short level_verify(struct LEVEL *lvl, char *actn_name,struct IPOINT_2D *errpt)
 short level_verify_struct(struct LEVEL *lvl, char *err_msg,struct IPOINT_2D *errpt)
 {
     //Preparing array bounds
-    int arr_entries_x=MAP_SIZE_X*MAP_SUBNUM_X;
-    int arr_entries_y=MAP_SIZE_Y*MAP_SUBNUM_Y;
+    int arr_entries_x=lvl->tlsize.x*MAP_SUBNUM_X;
+    int arr_entries_y=lvl->tlsize.y*MAP_SUBNUM_Y;
     //Checking base pointers
     if (lvl->tng_subnums==NULL)
     {
@@ -1272,8 +1349,8 @@ short level_verify_struct(struct LEVEL *lvl, char *err_msg,struct IPOINT_2D *err
 short actnpts_verify(struct LEVEL *lvl, char *err_msg,struct IPOINT_2D *errpt)
 {
     //Preparing array bounds
-    int arr_entries_x=MAP_SIZE_X*MAP_SUBNUM_X;
-    int arr_entries_y=MAP_SIZE_Y*MAP_SUBNUM_Y;
+    int arr_entries_x=lvl->tlsize.x*MAP_SUBNUM_X;
+    int arr_entries_y=lvl->tlsize.y*MAP_SUBNUM_Y;
     int i, j, k;
     for (i=0; i < arr_entries_y; i++)
       for (j=0; j < arr_entries_x; j++)
@@ -1325,8 +1402,8 @@ short actnpts_verify(struct LEVEL *lvl, char *err_msg,struct IPOINT_2D *errpt)
 short level_verify_logic(struct LEVEL *lvl, char *err_msg,struct IPOINT_2D *errpt)
 {
     //Preparing array bounds
-    int arr_entries_x=MAP_SIZE_X*MAP_SUBNUM_X;
-    int arr_entries_y=MAP_SIZE_Y*MAP_SUBNUM_Y;
+    int arr_entries_x=lvl->tlsize.x*MAP_SUBNUM_X;
+    int arr_entries_y=lvl->tlsize.y*MAP_SUBNUM_Y;
     int i, j, k;
     for (i=0; i < arr_entries_y; i++)
     {
@@ -1386,7 +1463,7 @@ short level_verify_logic(struct LEVEL *lvl, char *err_msg,struct IPOINT_2D *errp
     }
     for (i=0; i < PLAYERS_COUNT; i++)
     {
-      if (hearts[i]>1)
+      if ((hearts[i]>1)&&((lvl->optns.verify_warn_flags&VWFLAG_NOWARN_MANYHEART)==0))
       {
         errpt->x=-1;errpt->y=-1;
         sprintf(err_msg,"Player %d owns %d dungeon heart things.",i, hearts[i]);
@@ -1411,38 +1488,37 @@ short level_verify_logic(struct LEVEL *lvl, char *err_msg,struct IPOINT_2D *errp
  */
 void generate_slab_bkgnd_default(struct LEVEL *lvl,unsigned short def_slab)
 {
+    const struct UPOINT_2D tl_maxindex={lvl->tlsize.x-1,lvl->tlsize.y-1};
     // Filling the map with def_slab
     int i,j;
-    for (i=1; i < MAP_MAXINDEX_Y; i++)
-      for (j=1; j < MAP_MAXINDEX_X; j++)
+    for (i=1; i < tl_maxindex.y; i++)
+      for (j=1; j < tl_maxindex.x; j++)
       {
           set_tile_slab(lvl,i,j,def_slab);
           set_tile_owner(lvl,i,j,PLAYER_UNSET); //=5, simply ;)
       }
     // Impenetrable rock
-    for (i=0; i < MAP_SIZE_X; i++)
+    for (i=0; i < lvl->tlsize.x; i++)
     {
       set_tile_slab(lvl,i,0,SLAB_TYPE_ROCK);
-      set_tile_slab(lvl,i,MAP_MAXINDEX_Y,SLAB_TYPE_ROCK);
+      set_tile_slab(lvl,i,tl_maxindex.y,SLAB_TYPE_ROCK);
       set_tile_owner(lvl,i,0,PLAYER_UNSET);
-      set_tile_owner(lvl,i,MAP_MAXINDEX_Y,PLAYER_UNSET);
+      set_tile_owner(lvl,i,tl_maxindex.y,PLAYER_UNSET);
     }
-    for (i=0; i < MAP_SIZE_Y; i++)
+    for (i=0; i < lvl->tlsize.y; i++)
     {
       set_tile_slab(lvl,0,i,SLAB_TYPE_ROCK);
-      set_tile_slab(lvl,MAP_MAXINDEX_X,i,SLAB_TYPE_ROCK);
+      set_tile_slab(lvl,tl_maxindex.x,i,SLAB_TYPE_ROCK);
       set_tile_owner(lvl,0,i,PLAYER_UNSET);
-      set_tile_owner(lvl,MAP_MAXINDEX_Y,i,PLAYER_UNSET);
+      set_tile_owner(lvl,tl_maxindex.x,i,PLAYER_UNSET);
     }
     //Resetting the last column
-    const int dat_entries_x=MAP_SIZE_X*MAP_SUBNUM_X+1;
-    const int dat_entries_y=MAP_SIZE_Y*MAP_SUBNUM_Y+1;
     int sx, sy;
-    sx=dat_entries_x-1;
-    for (sy=0; sy<dat_entries_y; sy++)
+    sx=lvl->subsize.x-1;
+    for (sy=0; sy<lvl->subsize.y; sy++)
       set_subtl_owner(lvl,sx,sy,PLAYER_UNSET);
-    sy=dat_entries_y-1;
-    for (sx=0; sx<dat_entries_x; sx++)
+    sy=lvl->subsize.y-1;
+    for (sx=0; sx<lvl->subsize.x; sx++)
       set_subtl_owner(lvl,sx,sy,PLAYER_UNSET);
 }
 
@@ -1457,7 +1533,7 @@ void generate_slab_bkgnd_random(struct LEVEL *lvl)
 // TODO: check if there are not closed regions of earth, link them with
 // earth corridors
 //HOW:
-//1. Create array MAP_SIZE_X x MAP_SIZE_Y of unsigned short, maybe call it "slab_group"?
+//1. Create array lvl->tlsize.x x lvl->tlsize.y of unsigned short, maybe call it "slab_group"?
 //2. Find an earth slab, start at map center, check at larger radius (rectangle) until found
 //3. Mark the found slab as group 1
 //4. From the marked slab, extend the radius and mark slabs which have
@@ -1470,7 +1546,7 @@ void generate_slab_bkgnd_random(struct LEVEL *lvl)
 //   mark it with last_group+1 (=2 at first sweep)
 //8. Repeat 5. and 6.
 //9. Repeat 7 and 8 until no unmarked earth slab found
-//10. Create array of unsigned int with size=last_group+1. Fill it with MAP_SIZE_X's
+//10. Create array of unsigned int with size=last_group+1. Fill it with lvl->tlsize.x's
 //11. Sweep through all slabs, and for every which has index>1 find the shortest way
 //    to slab from group with smaller index (use one of four basic directions only).
 //    Write it in array.
@@ -1478,37 +1554,36 @@ void generate_slab_bkgnd_random(struct LEVEL *lvl)
 //13. Free the two allocaded arrays
     int i,j,k,l;
     // Filling the map with SLAB_TYPE_EARTH
-    for (i=1; i < MAP_MAXINDEX_Y; i++)
-      for (j=1; j < MAP_MAXINDEX_X; j++)
+    const struct UPOINT_2D tl_maxindex={lvl->tlsize.x-1,lvl->tlsize.y-1};
+    for (i=1; i < tl_maxindex.y; i++)
+      for (j=1; j < tl_maxindex.x; j++)
           set_tile_slab(lvl,i,j,SLAB_TYPE_EARTH); // Digable dirt
     // Impenetrable rock
-    for (i=0; i < MAP_SIZE_X; i++)
+    for (i=0; i < lvl->tlsize.x; i++)
     {
       set_tile_slab(lvl,i,0,SLAB_TYPE_ROCK);
-      set_tile_slab(lvl,i,MAP_MAXINDEX_Y,SLAB_TYPE_ROCK);
+      set_tile_slab(lvl,i,tl_maxindex.y,SLAB_TYPE_ROCK);
     }
-    for (i=0; i < MAP_SIZE_Y; i++)
+    for (i=0; i < lvl->tlsize.y; i++)
     {
       set_tile_slab(lvl,0,i,SLAB_TYPE_ROCK);
-      set_tile_slab(lvl,MAP_MAXINDEX_X,i,SLAB_TYPE_ROCK);
+      set_tile_slab(lvl,tl_maxindex.x,i,SLAB_TYPE_ROCK);
     }
 
     //Resetting the last column
-    const int dat_entries_x=MAP_SIZE_X*MAP_SUBNUM_X+1;
-    const int dat_entries_y=MAP_SIZE_Y*MAP_SUBNUM_Y+1;
     int sx, sy;
-    sx=dat_entries_x-1;
-    for (sy=0; sy<dat_entries_y; sy++)
+    sx=lvl->subsize.x-1;
+    for (sy=0; sy<lvl->subsize.y; sy++)
       set_subtl_owner(lvl,sx,sy,PLAYER_UNSET);
-    sy=dat_entries_y-1;
-    for (sx=0; sx<dat_entries_x; sx++)
+    sy=lvl->subsize.y-1;
+    for (sx=0; sx<lvl->subsize.x; sx++)
       set_subtl_owner(lvl,sx,sy,PLAYER_UNSET);
 
     // Impenetrable rock at borders
-    for (i=1; i < (MAP_MAXINDEX_Y>>1); i++)
-      for (j=0; j < MAP_MAXINDEX_X-1; j++)
+    for (i=1; i < (tl_maxindex.y>>1); i++)
+      for (j=0; j < tl_maxindex.x-1; j++)
       {
-        int ir=MAP_MAXINDEX_Y-i;
+        int ir=tl_maxindex.y-i;
         int rnd_bound=RAND_MAX/((i/2)+1);
         if (rand()<rnd_bound)
         {
@@ -1516,7 +1591,7 @@ void generate_slab_bkgnd_random(struct LEVEL *lvl)
         }
         if (rand()<rnd_bound)
         {
-          set_tile_slab(lvl,j,MAP_MAXINDEX_X-i,SLAB_TYPE_ROCK);
+          set_tile_slab(lvl,j,tl_maxindex.y-i,SLAB_TYPE_ROCK);
         }
         if (rand()<rnd_bound)
         {
@@ -1524,7 +1599,7 @@ void generate_slab_bkgnd_random(struct LEVEL *lvl)
         }
         if (rand()<rnd_bound)
         {
-          set_tile_slab(lvl,MAP_MAXINDEX_X-i,j,SLAB_TYPE_ROCK);
+          set_tile_slab(lvl,tl_maxindex.x-i,j,SLAB_TYPE_ROCK);
         }
       }
     int num_smears=(rand()%20);
@@ -1534,11 +1609,11 @@ void generate_slab_bkgnd_random(struct LEVEL *lvl)
       for (l=0;l<num_smears;l++)
       {
         int val=rand();
-        int smr_startx=val%MAP_SIZE_X;
-        int smr_starty=(val>>8)%MAP_SIZE_Y;
+        int smr_startx = val%lvl->tlsize.x;
+        int smr_starty=(val>>8)%lvl->tlsize.y;
         val=rand();
-        int smr_endx=(val)%MAP_SIZE_X;
-        int smr_endy=(val>>8)%MAP_SIZE_Y;
+        int smr_endx = (val)%lvl->tlsize.x;
+        int smr_endy=(val>>8)%lvl->tlsize.y;
         val=rand();
         int startr=(val)%4+2;
         int endr=(val>>8)%3+1;
@@ -1551,12 +1626,12 @@ void generate_slab_bkgnd_random(struct LEVEL *lvl)
     //Deleting small rocks and enlarging big rocks
     const int slabgrow_bound_val=4;
     int cx,cy;
-    for (i=1; i < (MAP_SIZE_X>>1); i++)
-      for (j=1; j < (MAP_SIZE_Y>>1); j++)
+    for (i=1; i < (lvl->tlsize.x>>1); i++)
+      for (j=1; j < (lvl->tlsize.y>>1); j++)
         for (k=0; k < 4; k++)
         {
-            if ((k%2)==0) cx=i; else cx=MAP_MAXINDEX_X-i;
-            if ((k>>1)==0) cy=j; else cy=MAP_MAXINDEX_Y-j;
+            if ((k%2)==0) cx=i; else cx=tl_maxindex.x-i;
+            if ((k>>1)==0) cy=j; else cy=tl_maxindex.y-j;
             int nsibln=slab_siblings_oftype(lvl,cx,cy,SLAB_TYPE_ROCK);
             if (nsibln>slabgrow_bound_val)
             {
@@ -1566,8 +1641,8 @@ void generate_slab_bkgnd_random(struct LEVEL *lvl)
               set_tile_slab(lvl,cx,cy,SLAB_TYPE_EARTH);
             }
         }
-    for (i=1; i < MAP_MAXINDEX_X-1; i++)
-      for (j=1; j < MAP_MAXINDEX_Y-1; j++)
+    for (i=1; i < tl_maxindex.x-1; i++)
+      for (j=1; j < tl_maxindex.y-1; j++)
       {
           int nsibln=slab_siblings_oftype(lvl,i,j,SLAB_TYPE_ROCK);
           if (nsibln<2)
@@ -1580,8 +1655,8 @@ void generate_slab_bkgnd_random(struct LEVEL *lvl)
           }
       }
     //Everything generated here should be unclaimed
-    for (i=0; i < MAP_SIZE_X; i++)
-      for (j=0; j < MAP_SIZE_Y; j++)
+    for (i=0; i < lvl->tlsize.x; i++)
+      for (j=0; j < lvl->tlsize.y; j++)
           set_tile_owner(lvl, i, j, PLAYER_UNSET);
 }
 
@@ -1595,8 +1670,8 @@ void start_new_map(struct LEVEL *lvl)
     message_log(" start_new_map: starting");
     level_clear(lvl);
     //Preparing array bounds
-    int arr_entries_x=MAP_SIZE_X*MAP_SUBNUM_X;
-    int arr_entries_y=MAP_SIZE_Y*MAP_SUBNUM_Y;
+    int arr_entries_x=lvl->tlsize.x*MAP_SUBNUM_X;
+    int arr_entries_y=lvl->tlsize.y*MAP_SUBNUM_Y;
 
     message_log(" start_new_map: generating background");
     generate_slab_bkgnd_default(lvl,SLAB_TYPE_EARTH);
@@ -1624,8 +1699,8 @@ void generate_random_map(struct LEVEL *lvl)
 {
     level_clear(lvl);
     //Preparing array bounds
-    int arr_entries_x=MAP_SIZE_X*MAP_SUBNUM_X;
-    int arr_entries_y=MAP_SIZE_Y*MAP_SUBNUM_Y;
+    int arr_entries_x=lvl->tlsize.x*MAP_SUBNUM_X;
+    int arr_entries_y=lvl->tlsize.y*MAP_SUBNUM_Y;
 
     generate_slab_bkgnd_random(lvl);
 
@@ -1686,8 +1761,8 @@ short level_generate_random_extension(struct LEVEL *lvl,char *ret_msg)
 char *get_thing(const struct LEVEL *lvl,unsigned int sx,unsigned int sy,unsigned int num)
 {
     //Preparing array bounds
-    unsigned int arr_entries_x=MAP_SIZE_X*MAP_SUBNUM_X;
-    unsigned int arr_entries_y=MAP_SIZE_Y*MAP_SUBNUM_Y;
+    unsigned int arr_entries_x=lvl->tlsize.x*MAP_SUBNUM_X;
+    unsigned int arr_entries_y=lvl->tlsize.y*MAP_SUBNUM_Y;
     //Bounding position
     sx %= arr_entries_x;
     sy %= arr_entries_y;
@@ -1707,8 +1782,8 @@ char *get_thing(const struct LEVEL *lvl,unsigned int sx,unsigned int sy,unsigned
 int thing_add(struct LEVEL *lvl,unsigned char *thing)
 {
     //Preparing array bounds
-    int arr_entries_x=MAP_SIZE_X*MAP_SUBNUM_X;
-    int arr_entries_y=MAP_SIZE_Y*MAP_SUBNUM_Y;
+    int arr_entries_x=lvl->tlsize.x*MAP_SUBNUM_X;
+    int arr_entries_y=lvl->tlsize.y*MAP_SUBNUM_Y;
     unsigned int x, y;
     x = get_thing_subtile_x(thing)%arr_entries_x;
     y = get_thing_subtile_y(thing)%arr_entries_y;
@@ -1742,8 +1817,8 @@ int thing_add(struct LEVEL *lvl,unsigned char *thing)
 void thing_del(struct LEVEL *lvl,unsigned int sx, unsigned int sy, unsigned int num)
 {
     //Preparing array bounds
-    unsigned int arr_entries_x=MAP_SIZE_X*MAP_SUBNUM_X;
-    unsigned int arr_entries_y=MAP_SIZE_Y*MAP_SUBNUM_Y;
+    unsigned int arr_entries_x=lvl->tlsize.x*MAP_SUBNUM_X;
+    unsigned int arr_entries_y=lvl->tlsize.y*MAP_SUBNUM_Y;
     //Bounding position
     if ((sx>=arr_entries_x)||(sy>=arr_entries_y)) return;
     unsigned char *thing;
@@ -1763,8 +1838,8 @@ void thing_del(struct LEVEL *lvl,unsigned int sx, unsigned int sy, unsigned int 
 void thing_drop(struct LEVEL *lvl,unsigned int sx, unsigned int sy, unsigned int num)
 {
     //Preparing array bounds
-    unsigned int arr_entries_x=MAP_SIZE_X*MAP_SUBNUM_X;
-    unsigned int arr_entries_y=MAP_SIZE_Y*MAP_SUBNUM_Y;
+    unsigned int arr_entries_x=lvl->tlsize.x*MAP_SUBNUM_X;
+    unsigned int arr_entries_y=lvl->tlsize.y*MAP_SUBNUM_Y;
     //Bounding position
     if ((sx>=arr_entries_x)||(sy>=arr_entries_y)) return;
     int i;
@@ -1791,8 +1866,8 @@ void thing_drop(struct LEVEL *lvl,unsigned int sx, unsigned int sy, unsigned int
 unsigned int get_thing_subnums(const struct LEVEL *lvl,unsigned int sx,unsigned int sy)
 {
     //Preparing array bounds
-    unsigned int arr_entries_x=MAP_SIZE_X*MAP_SUBNUM_X;
-    unsigned int arr_entries_y=MAP_SIZE_Y*MAP_SUBNUM_Y;
+    unsigned int arr_entries_x=lvl->tlsize.x*MAP_SUBNUM_X;
+    unsigned int arr_entries_y=lvl->tlsize.y*MAP_SUBNUM_Y;
     //Bounding position
     if ((sx>=arr_entries_x)||(sy>=arr_entries_y)) return 0;
     return lvl->tng_subnums[sx][sy];
@@ -1808,8 +1883,8 @@ unsigned int get_thing_subnums(const struct LEVEL *lvl,unsigned int sx,unsigned 
 char *get_actnpt(const struct LEVEL *lvl,unsigned int sx,unsigned int sy,unsigned int num)
 {
     //Preparing array bounds
-    unsigned int arr_entries_x=MAP_SIZE_X*MAP_SUBNUM_X;
-    unsigned int arr_entries_y=MAP_SIZE_Y*MAP_SUBNUM_Y;
+    unsigned int arr_entries_x=lvl->tlsize.x*MAP_SUBNUM_X;
+    unsigned int arr_entries_y=lvl->tlsize.y*MAP_SUBNUM_Y;
     //Bounding position
     sx %= arr_entries_x;
     sy %= arr_entries_y;
@@ -1829,8 +1904,8 @@ char *get_actnpt(const struct LEVEL *lvl,unsigned int sx,unsigned int sy,unsigne
 int actnpt_add(struct LEVEL *lvl,unsigned char *actnpt)
 {
     //Preparing array bounds
-    int arr_entries_x=MAP_SIZE_X*MAP_SUBNUM_X;
-    int arr_entries_y=MAP_SIZE_Y*MAP_SUBNUM_Y;
+    int arr_entries_x=lvl->tlsize.x*MAP_SUBNUM_X;
+    int arr_entries_y=lvl->tlsize.y*MAP_SUBNUM_Y;
     unsigned int x, y;
     x = get_actnpt_subtile_x(actnpt)%arr_entries_x;
     y = get_actnpt_subtile_y(actnpt)%arr_entries_y;
@@ -1865,8 +1940,8 @@ int actnpt_add(struct LEVEL *lvl,unsigned char *actnpt)
 void actnpt_del(struct LEVEL *lvl,unsigned int sx, unsigned int sy, unsigned int num)
 {
     //Preparing array bounds
-    int arr_entries_x=MAP_SIZE_X*MAP_SUBNUM_X;
-    int arr_entries_y=MAP_SIZE_Y*MAP_SUBNUM_Y;
+    int arr_entries_x=lvl->tlsize.x*MAP_SUBNUM_X;
+    int arr_entries_y=lvl->tlsize.y*MAP_SUBNUM_Y;
     sx%=arr_entries_x;
     sy%=arr_entries_y;
     unsigned int apt_snum=get_actnpt_subnums(lvl,sx,sy);
@@ -1895,8 +1970,8 @@ void actnpt_del(struct LEVEL *lvl,unsigned int sx, unsigned int sy, unsigned int
 unsigned int get_actnpt_subnums(const struct LEVEL *lvl,unsigned int sx,unsigned int sy)
 {
     //Preparing array bounds
-    unsigned int arr_entries_x=MAP_SIZE_X*MAP_SUBNUM_X;
-    unsigned int arr_entries_y=MAP_SIZE_Y*MAP_SUBNUM_Y;
+    unsigned int arr_entries_x=lvl->tlsize.x*MAP_SUBNUM_X;
+    unsigned int arr_entries_y=lvl->tlsize.y*MAP_SUBNUM_Y;
     //Bounding position
     sx %= arr_entries_x;
     sy %= arr_entries_y;
@@ -1913,8 +1988,8 @@ unsigned int get_actnpt_subnums(const struct LEVEL *lvl,unsigned int sx,unsigned
 char *get_stlight(const struct LEVEL *lvl,unsigned int sx,unsigned int sy,unsigned int num)
 {
     //Preparing array bounds
-    unsigned int arr_entries_x=MAP_SIZE_X*MAP_SUBNUM_X;
-    unsigned int arr_entries_y=MAP_SIZE_Y*MAP_SUBNUM_Y;
+    unsigned int arr_entries_x=lvl->tlsize.x*MAP_SUBNUM_X;
+    unsigned int arr_entries_y=lvl->tlsize.y*MAP_SUBNUM_Y;
     //Bounding position
     sx %= arr_entries_x;
     sy %= arr_entries_y;
@@ -1933,8 +2008,8 @@ char *get_stlight(const struct LEVEL *lvl,unsigned int sx,unsigned int sy,unsign
 int stlight_add(struct LEVEL *lvl,unsigned char *stlight)
 {
     //Preparing array bounds
-    int arr_entries_x=MAP_SIZE_X*MAP_SUBNUM_X;
-    int arr_entries_y=MAP_SIZE_Y*MAP_SUBNUM_Y;
+    int arr_entries_x=lvl->tlsize.x*MAP_SUBNUM_X;
+    int arr_entries_y=lvl->tlsize.y*MAP_SUBNUM_Y;
     unsigned int x, y;
     x = get_stlight_subtile_x(stlight)%arr_entries_x;
     y = get_stlight_subtile_y(stlight)%arr_entries_y;
@@ -1969,8 +2044,8 @@ int stlight_add(struct LEVEL *lvl,unsigned char *stlight)
 void stlight_del(struct LEVEL *lvl,unsigned int sx, unsigned int sy, unsigned int num)
 {
     //Preparing array bounds
-    int arr_entries_x=MAP_SIZE_X*MAP_SUBNUM_X;
-    int arr_entries_y=MAP_SIZE_Y*MAP_SUBNUM_Y;
+    int arr_entries_x=lvl->tlsize.x*MAP_SUBNUM_X;
+    int arr_entries_y=lvl->tlsize.y*MAP_SUBNUM_Y;
     sx%=arr_entries_x;
     sy%=arr_entries_y;
     unsigned int lgt_snum=lvl->lgt_subnums[sx][sy];
@@ -1999,8 +2074,8 @@ void stlight_del(struct LEVEL *lvl,unsigned int sx, unsigned int sy, unsigned in
 unsigned int get_stlight_subnums(const struct LEVEL *lvl,unsigned int sx,unsigned int sy)
 {
     //Preparing array bounds
-    unsigned int arr_entries_x=MAP_SIZE_X*MAP_SUBNUM_X;
-    unsigned int arr_entries_y=MAP_SIZE_Y*MAP_SUBNUM_Y;
+    unsigned int arr_entries_x=lvl->tlsize.x*MAP_SUBNUM_X;
+    unsigned int arr_entries_y=lvl->tlsize.y*MAP_SUBNUM_Y;
     //Bounding position
     sx %= arr_entries_x;
     sy %= arr_entries_y;
@@ -2020,8 +2095,8 @@ unsigned int get_stlight_subnums(const struct LEVEL *lvl,unsigned int sx,unsigne
 short get_object_type(const struct LEVEL *lvl, unsigned int sx, unsigned int sy, unsigned int z)
 {
     //Preparing array bounds
-    int arr_entries_x=MAP_SIZE_X*MAP_SUBNUM_X;
-    int arr_entries_y=MAP_SIZE_Y*MAP_SUBNUM_Y;
+    int arr_entries_x=lvl->tlsize.x*MAP_SUBNUM_X;
+    int arr_entries_y=lvl->tlsize.y*MAP_SUBNUM_Y;
     //Bounding indices
     if ((sx>=arr_entries_x)||(sy>=arr_entries_y))
       return OBJECT_TYPE_NONE;
@@ -2047,8 +2122,8 @@ short get_object_type(const struct LEVEL *lvl, unsigned int sx, unsigned int sy,
 unsigned char *get_object(const struct LEVEL *lvl,unsigned int sx,unsigned int sy,unsigned int z)
 {
     //Preparing array bounds
-    int arr_entries_x=MAP_SIZE_X*MAP_SUBNUM_X;
-    int arr_entries_y=MAP_SIZE_Y*MAP_SUBNUM_Y;
+    int arr_entries_x=lvl->tlsize.x*MAP_SUBNUM_X;
+    int arr_entries_y=lvl->tlsize.y*MAP_SUBNUM_Y;
     //Bounding indices
     if ((sx>=arr_entries_x)||(sy>=arr_entries_y))
       return NULL;
@@ -2076,8 +2151,8 @@ unsigned char *get_object(const struct LEVEL *lvl,unsigned int sx,unsigned int s
 void object_del(struct LEVEL *lvl,unsigned int sx,unsigned int sy,unsigned int z)
 {
     //Preparing array bounds
-    int arr_entries_x=MAP_SIZE_X*MAP_SUBNUM_X;
-    int arr_entries_y=MAP_SIZE_Y*MAP_SUBNUM_Y;
+    int arr_entries_x=lvl->tlsize.x*MAP_SUBNUM_X;
+    int arr_entries_y=lvl->tlsize.y*MAP_SUBNUM_Y;
     //Bounding indices
     sx%=arr_entries_x;
     sy%=arr_entries_y;
@@ -2112,8 +2187,8 @@ void object_del(struct LEVEL *lvl,unsigned int sx,unsigned int sy,unsigned int z
 unsigned int get_object_subnums(const struct LEVEL *lvl,unsigned int sx,unsigned int sy)
 {
     //Preparing array bounds
-    unsigned int arr_entries_x=MAP_SIZE_X*MAP_SUBNUM_X;
-    unsigned int arr_entries_y=MAP_SIZE_Y*MAP_SUBNUM_Y;
+    unsigned int arr_entries_x=lvl->tlsize.x*MAP_SUBNUM_X;
+    unsigned int arr_entries_y=lvl->tlsize.y*MAP_SUBNUM_Y;
     //Bounding position
     if ((sx>=arr_entries_x)||(sy>=arr_entries_y))
       return 0;
@@ -2131,7 +2206,7 @@ unsigned int get_object_subnums(const struct LEVEL *lvl,unsigned int sx,unsigned
 unsigned int get_object_tilnums(const struct LEVEL *lvl,unsigned int tx,unsigned int ty)
 {
     if (lvl->tng_apt_lgt_nums==NULL) return 0;
-    return lvl->tng_apt_lgt_nums[tx%MAP_SIZE_X][ty%MAP_SIZE_Y];
+    return lvl->tng_apt_lgt_nums[tx%lvl->tlsize.x][ty%lvl->tlsize.y];
 }
 
 /**
@@ -2145,8 +2220,8 @@ unsigned int get_object_tilnums(const struct LEVEL *lvl,unsigned int tx,unsigned
 int get_object_subtl_last(const struct LEVEL *lvl,unsigned int sx,unsigned int sy,short obj_type)
 {
     //Preparing array bounds
-    unsigned int arr_entries_x=MAP_SIZE_X*MAP_SUBNUM_X;
-    unsigned int arr_entries_y=MAP_SIZE_Y*MAP_SUBNUM_Y;
+    unsigned int arr_entries_x=lvl->tlsize.x*MAP_SUBNUM_X;
+    unsigned int arr_entries_y=lvl->tlsize.y*MAP_SUBNUM_Y;
     //Bounding position
     if ((sx>=arr_entries_x)||(sy>=arr_entries_y))
       return 0;
@@ -2171,12 +2246,9 @@ int get_object_subtl_last(const struct LEVEL *lvl,unsigned int sx,unsigned int s
  */
 short get_subtl_wib(struct LEVEL *lvl, unsigned int sx, unsigned int sy)
 {
-    //Preparing array bounds
-    const unsigned int dat_entries_x=MAP_SIZE_X*MAP_SUBNUM_X+1;
-    const unsigned int dat_entries_y=MAP_SIZE_Y*MAP_SUBNUM_Y+1;
     //Bounding position
-    sx %= dat_entries_x;
-    sy %= dat_entries_y;
+    sx %= lvl->subsize.x;
+    sy %= lvl->subsize.y;
     return lvl->wib[sx][sy];
 }
 
@@ -2188,11 +2260,8 @@ short get_subtl_wib(struct LEVEL *lvl, unsigned int sx, unsigned int sy)
  */
 void set_subtl_wib(struct LEVEL *lvl, unsigned int sx, unsigned int sy, short nval)
 {
-    //Preparing array bounds
-    const unsigned int dat_entries_x=MAP_SIZE_X*MAP_SUBNUM_X+1;
-    const unsigned int dat_entries_y=MAP_SIZE_Y*MAP_SUBNUM_Y+1;
     //Bounding position
-    if ((sx>=dat_entries_x)||(sy>=dat_entries_y))
+    if ((sx>=lvl->subsize.x)||(sy>=lvl->subsize.y))
         return;
     lvl->wib[sx][sy]=nval;
 }
@@ -2206,8 +2275,8 @@ void set_subtl_wib(struct LEVEL *lvl, unsigned int sx, unsigned int sy, short nv
 short get_tile_wlb(struct LEVEL *lvl, unsigned int tx, unsigned int ty)
 {
     //Bounding position
-    tx %= MAP_SIZE_X;
-    ty %= MAP_SIZE_Y;
+    tx %= lvl->tlsize.x;
+    ty %= lvl->tlsize.y;
     return lvl->wlb[tx][ty];
 }
 
@@ -2220,7 +2289,7 @@ short get_tile_wlb(struct LEVEL *lvl, unsigned int tx, unsigned int ty)
 void set_tile_wlb(struct LEVEL *lvl, unsigned int tx, unsigned int ty, short nval)
 {
     //Bounding position
-    if ((tx>=MAP_SIZE_X)||(ty>=MAP_SIZE_Y)) return;
+    if ((tx>=lvl->tlsize.x)||(ty>=lvl->tlsize.y)) return;
     lvl->wlb[tx][ty]=nval;
 }
 
@@ -2232,12 +2301,9 @@ void set_tile_wlb(struct LEVEL *lvl, unsigned int tx, unsigned int ty, short nva
  */
 unsigned char get_subtl_owner(const struct LEVEL *lvl, unsigned int sx, unsigned int sy)
 {
-    //Preparing array bounds
-    const unsigned int dat_entries_x=MAP_SIZE_X*MAP_SUBNUM_X+1;
-    const unsigned int dat_entries_y=MAP_SIZE_Y*MAP_SUBNUM_Y+1;
     //Bounding position
-    sx %= dat_entries_x;
-    sy %= dat_entries_y;
+    sx %= lvl->subsize.x;
+    sy %= lvl->subsize.y;
     return lvl->own[sx][sy];
 }
 
@@ -2249,11 +2315,8 @@ unsigned char get_subtl_owner(const struct LEVEL *lvl, unsigned int sx, unsigned
  */
 void set_subtl_owner(struct LEVEL *lvl, unsigned int sx, unsigned int sy, unsigned char nval)
 {
-    //Preparing array bounds
-    const unsigned int dat_entries_x=MAP_SIZE_X*MAP_SUBNUM_X+1;
-    const unsigned int dat_entries_y=MAP_SIZE_Y*MAP_SUBNUM_Y+1;
     //Bounding position
-    if ((sx>=dat_entries_x)||(sy>=dat_entries_y)) return;
+    if ((sx>=lvl->subsize.x)||(sy>=lvl->subsize.y)) return;
     lvl->own[sx][sy]=nval;
 }
 
@@ -2293,7 +2356,7 @@ unsigned short get_tile_slab(const struct LEVEL *lvl, unsigned int tx, unsigned 
 {
     if (lvl->slb==NULL) return SLAB_TYPE_ROCK;
     //Bounding position
-    if ((tx>=MAP_SIZE_X)||(ty>=MAP_SIZE_Y)) return SLAB_TYPE_ROCK;
+    if ((tx>=lvl->tlsize.x)||(ty>=lvl->tlsize.y)) return SLAB_TYPE_ROCK;
     return lvl->slb[tx][ty];
 }
 
@@ -2308,7 +2371,7 @@ unsigned short get_tile_slab(const struct LEVEL *lvl, unsigned int tx, unsigned 
 void set_tile_slab(struct LEVEL *lvl, unsigned int tx, unsigned int ty, unsigned short nval)
 {
     //Bounding position
-    if ((tx>=MAP_SIZE_X)||(ty>=MAP_SIZE_Y)) return;
+    if ((tx>=lvl->tlsize.x)||(ty>=lvl->tlsize.y)) return;
     lvl->slb[tx][ty]=nval;
 }
 
@@ -2320,11 +2383,8 @@ void set_tile_slab(struct LEVEL *lvl, unsigned int tx, unsigned int ty, unsigned
  */
 unsigned int get_dat_val(const struct LEVEL *lvl, const unsigned int sx, const unsigned int sy)
 {
-    //Preparing array bounds
-    const int dat_entries_x=MAP_SIZE_X*MAP_SUBNUM_X+1;
-    const int dat_entries_y=MAP_SIZE_Y*MAP_SUBNUM_Y+1;
     if (lvl->dat==NULL) return 0;
-    if ((sx>=dat_entries_x)||(sy>=dat_entries_y)) return 0;
+    if ((sx>=lvl->subsize.x)||(sy>=lvl->subsize.y)) return 0;
     return lvl->dat[sx][sy];
 }
 
@@ -2337,11 +2397,8 @@ unsigned int get_dat_val(const struct LEVEL *lvl, const unsigned int sx, const u
  */
 void set_dat_val(struct LEVEL *lvl, int sx, int sy, unsigned int d)
 {
-    //Preparing array bounds
-    const int dat_entries_x=MAP_SIZE_X*MAP_SUBNUM_X+1;
-    const int dat_entries_y=MAP_SIZE_Y*MAP_SUBNUM_Y+1;
     if (lvl->dat==NULL) return;
-    if ((sx<0)||(sy<0)||(sx>=dat_entries_x)||(sy>=dat_entries_y)) return;
+    if ((sx<0)||(sy<0)||(sx>=lvl->subsize.x)||(sy>=lvl->subsize.y)) return;
     lvl->dat[sx][sy]=d;
 }
 
@@ -2353,11 +2410,8 @@ void set_dat_val(struct LEVEL *lvl, int sx, int sy, unsigned int d)
  */
 unsigned short get_subtl_flg(struct LEVEL *lvl, unsigned int sx, unsigned int sy)
 {
-    //Preparing array bounds
-    const int dat_entries_x=MAP_SIZE_X*MAP_SUBNUM_X+1;
-    const int dat_entries_y=MAP_SIZE_Y*MAP_SUBNUM_Y+1;
     if (lvl->flg==NULL) return 0;
-    if ((sx>=dat_entries_x)||(sy>=dat_entries_y)) return 0;
+    if ((sx>=lvl->subsize.x)||(sy>=lvl->subsize.y)) return 0;
     return lvl->flg[sx][sy];
 }
 
@@ -2369,11 +2423,8 @@ unsigned short get_subtl_flg(struct LEVEL *lvl, unsigned int sx, unsigned int sy
  */
 void set_subtl_flg(struct LEVEL *lvl, unsigned int sx, unsigned int sy,unsigned short nval)
 {
-    //Preparing array bounds
-    const int dat_entries_x=MAP_SIZE_X*MAP_SUBNUM_X+1;
-    const int dat_entries_y=MAP_SIZE_Y*MAP_SUBNUM_Y+1;
     if (lvl->flg==NULL) return;
-    if ((sx<0)||(sy<0)||(sx>=dat_entries_x)||(sy>=dat_entries_y)) return;
+    if ((sx<0)||(sy<0)||(sx>=lvl->subsize.x)||(sy>=lvl->subsize.y)) return;
     lvl->flg[sx][sy]=nval;
 }
 
@@ -2396,8 +2447,8 @@ void update_level_stats(struct LEVEL *lvl)
 void update_things_stats(struct LEVEL *lvl)
 {
     //Preparing array bounds
-    int arr_entries_x=MAP_SIZE_X*MAP_SUBNUM_X;
-    int arr_entries_y=MAP_SIZE_Y*MAP_SUBNUM_Y;
+    int arr_entries_x=lvl->tlsize.x*MAP_SUBNUM_X;
+    int arr_entries_y=lvl->tlsize.y*MAP_SUBNUM_Y;
     //Clearing previous stats
     level_clear_stats(lvl);
     //Sweeping through structures
@@ -2744,6 +2795,42 @@ char *get_levels_path(struct LEVEL *lvl)
 }
 
 /**
+ * Sets path at which data files are. The path should be without ending slash,
+ * and will be used only for graphics related commands.
+ * @param lvl Pointer to the LEVEL structure.
+ * @param datpath The new path for data files folder.
+ * @return Returns true on success, false on error.
+ */
+short set_data_path(struct LEVEL *lvl,char *datpath)
+{
+    if (lvl==NULL) return false;
+    if (datpath == NULL)
+    {
+      free(lvl->optns.data_path);
+      lvl->optns.data_path=NULL;
+      lvl->optns.picture.data_path=lvl->optns.data_path;
+      return true;
+    }
+    free(lvl->optns.data_path);
+    lvl->optns.data_path=strdup(datpath);
+    lvl->optns.picture.data_path=lvl->optns.data_path;
+    if (lvl->optns.data_path==NULL)
+      return false;
+    return true;
+}
+
+/**
+ * Returns path to folder with data files.
+ * @param lvl Pointer to the LEVEL structure.
+ * @return Returns path text, or NULL on error.
+ */
+char *get_data_path(struct LEVEL *lvl)
+{
+    if (lvl==NULL) return NULL;
+    return lvl->optns.data_path;
+}
+
+/**
  * Returns pointer to the level script structure.
  * @param lvl Pointer to the LEVEL structure.
  * @return Returns pointer to DK_SCRIPT, or NULL on error.
@@ -2865,6 +2952,18 @@ unsigned char get_lvl_inf(struct LEVEL *lvl)
 {
     if (lvl==NULL) return 0;
     return lvl->inf;
+}
+
+/**
+ * Returns level format version. The format version was used
+ * when creating the LEVEL structure with level_init().
+ * @param lvl Pointer to the LEVEL structure.
+ * @return Returns format version for the level.
+ */
+short get_lvl_format_version(struct LEVEL *lvl)
+{
+    if (lvl==NULL) return MFV_DKSTD;
+    return lvl->format_version;
 }
 
 /**
@@ -3063,7 +3162,7 @@ short user_set_slab_rect(struct LEVEL *lvl, unsigned int startx, unsigned int en
     unsigned int starty, unsigned int endy, unsigned short nslab)
 {
     // Sanity check
-    if ((endx>MAP_MAXINDEX_X) || (endy>MAP_MAXINDEX_Y) ||
+    if ((endx>=lvl->tlsize.x) || (endy>=lvl->tlsize.y) ||
        (startx>endx) || (starty>endy) )
     {
       message_error("Map coordinates out of bounds");
@@ -3099,7 +3198,7 @@ short user_set_owner_rect(struct LEVEL *lvl, unsigned int startx, unsigned int e
     unsigned int starty, unsigned int endy, unsigned short nown)
 {
     // Sanity check
-    if ((endx>MAP_MAXINDEX_X) || (endy>MAP_MAXINDEX_Y) ||
+    if ((endx>=lvl->tlsize.x) || (endy>=lvl->tlsize.y) ||
        (startx>endx) || (starty>endy) )
     {
       message_error("Map coordinates out of bounds");
@@ -3134,7 +3233,7 @@ short user_set_slabown_rect(struct LEVEL *lvl, unsigned int startx, unsigned int
     unsigned int starty, unsigned int endy, unsigned short nslab,unsigned short nown)
 {
     // Sanity check
-    if ((endx>MAP_MAXINDEX_X) || (endy>MAP_MAXINDEX_Y) ||
+    if ((endx>=lvl->tlsize.x) || (endy>=lvl->tlsize.y) ||
        (startx>endx) || (starty>endy) )
     {
       message_error("Map coordinates out of bounds");

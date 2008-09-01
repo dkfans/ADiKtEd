@@ -20,7 +20,7 @@
 
 #include "output_scr.h"
 
-#include "libadikted/globals.h"
+#include "../libadikted/adikted.h"
 #include <slang.h>
 
 short screen_initied=false;

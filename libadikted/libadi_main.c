@@ -26,9 +26,18 @@
  * the ADiKtEd executable sources.
  *
  * \example putgems.c
- *     This example puts gems on center of gold vein in map 1.
+ *     Example 1 puts gems on center of gold vein in map 1.
  * \example puttrain.c
- *     This example puts 3x5 training room in bottom right part of map 1.
+ *     Example 2  puts 3x5 training room in bottom right part of map 1.
+ * \example viewmap.c
+ *     Example 3 shows how to view maps graphically using libAdikted.
+ *     Move with mouse, zoom with numpad +/-.
+ *     You can maximize the window for better effect.
+ * \example putemple.c
+ *     Example 4 demonstrates fast drawing routines and putting slabs with mouse.
+ *     Also, shows how to draw ADiKtEd messages using DK font.
+ *     Use left/right arrows to switch levels, numpad +/- to zoom,
+ *     LMB to move, RMB to put temple tiles.
  */
 
 BOOL APIENTRY DllMain (HINSTANCE hInst,    // Library instance handle.

@@ -7,7 +7,7 @@ WINDRES = windres.exe
 RES  = map_private.res
 OBJ  = main.o input_kb.o scr_help.o output_scr.o scr_thing.o scr_list.o scr_slab.o scr_clm.o scr_actn.o scr_txted.o scr_rwrk.o scr_cube.o var_utils.o scr_txtgen.o textmenu.o $(RES)
 LINKOBJ  = main.o input_kb.o scr_help.o output_scr.o scr_thing.o scr_list.o scr_slab.o scr_clm.o scr_actn.o scr_txted.o scr_rwrk.o scr_cube.o var_utils.o scr_txtgen.o textmenu.o $(RES)
-LIBS =  -L"D:/ProgsNT/Dev-Cpp/lib" ../../../ProgsNT/Dev-Cpp/lib/libslang.a libadikted/libadikted.a  -march=i486 
+LIBS =  -L"D:/ProgsNT/Dev-Cpp/lib" /lib/libslang.a ../libadikted/libadikted.a  -march=i486 
 INCS =  -I"D:/ProgsNT/Dev-Cpp/include" 
 CXXINCS =  -I"D:/ProgsNT/Dev-Cpp/lib/gcc/mingw32/3.4.2/include"  -I"D:/ProgsNT/Dev-Cpp/include/c++/3.4.2/backward"  -I"D:/ProgsNT/Dev-Cpp/include/c++/3.4.2/mingw32"  -I"D:/ProgsNT/Dev-Cpp/include/c++/3.4.2"  -I"D:/ProgsNT/Dev-Cpp/include" 
 BIN  = map.exe

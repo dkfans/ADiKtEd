@@ -26,6 +26,7 @@
 #include "lev_things.h"
 #include "obj_actnpts.h"
 #include "obj_column.h"
+#include "obj_column_def.h"
 #include "obj_cube.h"
 #include "obj_slabs.h"
 #include "obj_things.h"

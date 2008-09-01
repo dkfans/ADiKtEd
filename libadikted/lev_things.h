@@ -38,6 +38,13 @@ DLLIMPORT unsigned short get_search_objtype_count(void);
 DLLIMPORT unsigned char *find_next_object_on_map(struct LEVEL *lvl, int *tx, int *ty, unsigned short srch_idx);
 DLLIMPORT short subtl_in_effectgen_range(struct LEVEL *lvl,unsigned int sx,unsigned int sy);
 
+DLLIMPORT long get_nearest_thing_idx(struct LEVEL *lvl,
+    const unsigned int ssx,const unsigned int ssy,
+    unsigned int *sx,unsigned int *sy,unsigned int *num);
+DLLIMPORT long get_nearest_object_idx(struct LEVEL *lvl,
+    const unsigned int ssx,const unsigned int ssy,
+    unsigned int *sx,unsigned int *sy,unsigned int *z);
+
 DLLIMPORT unsigned char *create_door(struct LEVEL *lvl, unsigned int sx, unsigned int sy, unsigned char stype_idx);
 DLLIMPORT unsigned char *create_effectgen(const struct LEVEL *lvl,unsigned int sx, unsigned int sy, unsigned char stype_idx);
 DLLIMPORT unsigned char *create_creature(const struct LEVEL *lvl,unsigned int sx, unsigned int sy, unsigned char stype_idx);
@@ -49,7 +56,7 @@ DLLIMPORT unsigned char *create_torch(const struct LEVEL *lvl, unsigned int sx, 
 DLLIMPORT unsigned char *create_doorkey(const struct LEVEL *lvl, unsigned int sx, unsigned int sy,  unsigned char stype_idx);
 
 DLLIMPORT short set_door_lock(struct LEVEL *lvl, unsigned char *thing, unsigned char nlock);
-DLLIMPORT unsigned char get_door_lock(unsigned char *thing);
+DLLIMPORT unsigned char get_door_lock(const unsigned char *thing);
 DLLIMPORT unsigned char compute_door_orientation(const struct LEVEL *lvl, unsigned char *thing);
 DLLIMPORT unsigned short compute_torch_sensitile(const struct LEVEL *lvl, unsigned char *thing);
 DLLIMPORT unsigned short compute_effectgen_sensitile(const struct LEVEL *lvl, unsigned char *thing);

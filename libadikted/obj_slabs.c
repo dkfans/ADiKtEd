@@ -61,8 +61,10 @@ char const SLB_BRIDGE_LTEXT[]="Bridge";
 char const SLB_GEMS_LTEXT[]="Gems";
 char const SLB_GUARDPOST_LTEXT[]="Guard post";
 
-const char *owner_names[]={"Keeper 0 (Human)", "Keeper 1 (blue)", "Keeper 2 (green)",
+const char *owner_fullnames[]={"Keeper 0 (Human)", "Keeper 1 (blue)", "Keeper 2 (green)",
     "Keeper 3 (yellow)", "Heroes (Player4)", "Unclaimed/Unowned"};
+const char *owner_colornames[]={"Red", "Blue", "Green",
+    "Yellow", "White", "Unowned"};
 
 const unsigned char owners_list[]={
     PLAYER0, PLAYER1, PLAYER2, PLAYER3,
@@ -158,17 +160,14 @@ unsigned char get_owner_prev(unsigned char plyr_idx)
 }
 
 /*
- * Sets slabs which can't be claimed as unowned (PLAYER_UNSET)
+ * Sets slabs which can't be claimed as unowned (PLAYER_UNSET).
  */
 void update_slab_owners(struct LEVEL *lvl)
 {
-    //Preparing array bounds
-    int dat_entries_x=MAP_SIZE_X*MAP_SUBNUM_X+1;
-    int dat_entries_y=MAP_SIZE_Y*MAP_SUBNUM_Y+1;
     //Resetting owners on tiles
     int tx, ty;    
-    for (ty=0; ty<MAP_SIZE_Y; ty++)
-      for (tx=0; tx<MAP_SIZE_X; tx++)
+    for (ty=0; ty<lvl->tlsize.y; ty++)
+      for (tx=0; tx<lvl->tlsize.x; tx++)
       {
         unsigned short slb=get_tile_slab(lvl, tx, ty);
         if (!slab_is_clmabl(slb))
@@ -176,11 +175,11 @@ void update_slab_owners(struct LEVEL *lvl)
       }
     //Resetting the last column
     int sx, sy;
-    sx=dat_entries_x-1;
-    for (sy=0; sy<dat_entries_y; sy++)
+    sx=lvl->subsize.x-1;
+    for (sy=0; sy<lvl->subsize.y; sy++)
       set_subtl_owner(lvl,sx,sy,PLAYER_UNSET);
-    sy=dat_entries_y-1;
-    for (sx=0; sx<dat_entries_x; sx++)
+    sy=lvl->subsize.y-1;
+    for (sx=0; sx<lvl->subsize.x; sx++)
       set_subtl_owner(lvl,sx,sy,PLAYER_UNSET);
 }
 
@@ -199,8 +198,8 @@ short place_room_rndpos(struct LEVEL *lvl,const unsigned short rslab,
       int lottery_count;
       for (lottery_count=0;lottery_count<16;lottery_count++)
       {
-        rpos.x=(surrnd_size>>1)+1+rnd(MAP_SIZE_X-surrnd_size);
-        rpos.y=(surrnd_size>>1)+1+rnd(MAP_SIZE_Y-surrnd_size);
+        rpos.x=(surrnd_size>>1)+1+rnd(lvl->tlsize.x-surrnd_size);
+        rpos.y=(surrnd_size>>1)+1+rnd(lvl->tlsize.y-surrnd_size);
 //TODO!!!!!!!!!!!
 /*
 4 Check if there's no enemy/short slab/rock in range of surrnd_size
@@ -218,13 +217,25 @@ short place_room_rndpos(struct LEVEL *lvl,const unsigned short rslab,
 }
 
 /*
- * Returns square owner name string
+ * Returns tile owner name string
  */
 char *get_owner_type_fullname(unsigned char own_idx)
 {
-     int types_count=sizeof(owner_names)/sizeof(char *);
+     int types_count=sizeof(owner_fullnames)/sizeof(char *);
      if (own_idx<types_count)
-       return (char *)owner_names[own_idx];
+       return (char *)owner_fullnames[own_idx];
+     else
+       return "unknown(?!)";
+}
+
+/*
+ * Returns tile owner name string
+ */
+char *get_owner_type_colorname(unsigned char own_idx)
+{
+     int types_count=sizeof(owner_colornames)/sizeof(char *);
+     if (own_idx<types_count)
+       return (char *)owner_colornames[own_idx];
      else
        return "unknown(?!)";
 }
@@ -235,7 +246,7 @@ char *get_owner_type_fullname(unsigned char own_idx)
 short slab_is_central(struct LEVEL *lvl,int tx,int ty)
 {
     // Can't be central if it is on map edge
-    if ((tx<=0) || (ty<=0) || (tx>=MAP_MAXINDEX_X) || (ty>=MAP_MAXINDEX_Y))
+    if ((tx<=0) || (ty<=0) || (tx+1>=lvl->tlsize.x) || (ty+1>=lvl->tlsize.y))
       return false;
     //Preparing variables
     int i, j;
@@ -255,10 +266,13 @@ short slab_is_central(struct LEVEL *lvl,int tx,int ty)
  */
 short slabs_verify(struct LEVEL *lvl, char *err_msg,struct IPOINT_2D *errpt)
 {
+  //Preparing array bounds
+  int max_tl_idx_x=lvl->tlsize.x-1;
+  int max_tl_idx_y=lvl->tlsize.y-1;
   short result;
   int i,j;
-  for (i=1; i < MAP_MAXINDEX_Y; i++)
-    for (j=1; j < MAP_MAXINDEX_X; j++)
+  for (i=1; i < max_tl_idx_y; i++)
+    for (j=1; j < max_tl_idx_x; j++)
     {
       result=slab_verify_entry(get_tile_slab(lvl,i,j),err_msg);
       if (result!=VERIF_OK)
@@ -285,7 +299,7 @@ int slab_siblings_oftype(struct LEVEL *lvl,int x,int y,unsigned short slab_type)
     for (i=x-1; i<=x+1; i++)
       for (j=y-1; j<=y+1; j++)
       {
-      if ((i>=0) && (j>=0) && (i<MAP_SIZE_X) && (j<MAP_SIZE_Y))
+      if ((i>=0) && (j>=0) && (i<lvl->tlsize.x) && (j<lvl->tlsize.y))
         if (get_tile_slab(lvl,i,j)==slab_type)
           amount++;
       }
@@ -469,7 +483,7 @@ void slab_draw_circle(struct LEVEL *lvl,int x,int y,int rad,unsigned short slab_
        {
          cx=x+i;
          cy=y+j;
-         if ((cx>=0) && (cy>=0) && (cx<MAP_SIZE_X) && (cy<MAP_SIZE_Y))
+         if ((cx>=0) && (cy>=0) && (cx<lvl->tlsize.x) && (cy<lvl->tlsize.y))
          {
            int crad=floor(sqrt(i*i+j*j)+0.5);
            if (crad<rad)

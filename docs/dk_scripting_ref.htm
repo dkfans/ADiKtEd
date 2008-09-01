@@ -1963,7 +1963,8 @@ See <a href="#scrpt_creaturenames">creature names section</a> for more informati
 <br/>
 
 <p class="std">[a] - The new strength of that creature.
-The strength must be between&nbsp;0 and&nbsp;255.</p>
+The strength must be between&nbsp;0 and&nbsp;255. Putting higher values
+will still make a final value smaller than 256, ie. 257 will set it to&nbsp;1.</p>
 </div>
 <br/>
 
@@ -1986,7 +1987,9 @@ See <a href="#scrpt_creaturenames">creature names section</a> for more informati
 <br/>
 
 <p class="std">[a] - The new health level of that creature.
-The&nbsp;health level must be between&nbsp;0 and&nbsp;1024.</p>
+The&nbsp;health level must be between&nbsp;0 and&nbsp;7895.
+If&nbsp;the value is greater, some creatures may instantly die when reaching
+certain level of experience.</p>
 </div>
 <br/>
 
@@ -2009,7 +2012,8 @@ See <a href="#scrpt_creaturenames">creature names section</a> for more informati
 <br/>
 
 <p class="std">[a] - The&nbsp;new armour level of that creature.
-The armour level must be between 0 and 255.</p>
+The armour level must be between 0 and 255. Putting higher values
+will still make a final value smaller than 256.</p>
 </div>
 <br/>
 
@@ -2033,7 +2037,8 @@ See <a href="#scrpt_creaturenames">creature names section</a> for more informati
 <br/>
 
 <p class="std">[a] - The new fear level of that creature.
-The fear level must be between 0 and 255.</p>
+The fear level must be between 0 and 255. Putting higher values
+will still make a final value smaller than 256.</p>
 </div>
 <br/>
 
@@ -3003,7 +3008,8 @@ inside IF/ENDIF statement or not.</p>
 <br/>
 
 <p class="std">[objective] - The objective text,
-e.g. &quot;Your dungeon is doomed, Keeper.&quot;.</p>
+e.g. &quot;Your&nbsp;dungeon is doomed, Keeper.&quot;. Length of this text cannot
+exceed 511&nbsp;characters, otherwise the message will not be displayed.</p>
 <br/>
 
 <p class="std">[player] - If the player clicks on the zoom to icon

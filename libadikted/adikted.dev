@@ -27,7 +27,7 @@ CustomMakefile=
 IncludeVersionInfo=1
 SupportXPThemes=0
 CompilerSet=0
-CompilerSettings=00000000000000000000a0
+CompilerSettings=00000000010010000000e1
 
 [Unit1]
 FileName=libadi_main.c
@@ -42,8 +42,8 @@ BuildCmd=
 [VersionInfo]
 Major=0
 Minor=9
-Release=3
-Build=96
+Release=5
+Build=7
 LanguageID=1033
 CharsetID=1252
 CompanyName=

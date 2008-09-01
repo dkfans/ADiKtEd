@@ -20,13 +20,11 @@
 
 #include "scr_txted.h"
 
-#include "libadikted/globals.h"
+#include "../libadikted/adikted.h"
 #include "output_scr.h"
 #include "input_kb.h"
 #include "scr_actn.h"
 #include "scr_txtgen.h"
-#include "libadikted/lev_data.h"
-#include "libadikted/lev_script.h"
 
 // Constants
 

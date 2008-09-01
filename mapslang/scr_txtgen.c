@@ -24,11 +24,7 @@
 
 #include "scr_txtgen.h"
 
-#include "libadikted/globals.h"
-#include "libadikted/lev_data.h"
-#include "libadikted/lev_script.h"
-#include "libadikted/obj_slabs.h"
-#include "libadikted/obj_things.h"
+#include "../libadikted/adikted.h"
 #include "var_utils.h"
 #include "input_kb.h"
 #include "output_scr.h"
