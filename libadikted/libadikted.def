@@ -1,4 +1,4 @@
-; D:\ProgsNT\Dev-Cpp\Bin\dlltool --base-file C:/DOCUME~1/Tomasz/USTAWI~1/Temp/cca07336.base --output-exp adikted.exp --dllname adikted.dll --output-def libadikted.def --no-export-all-symbols --add-stdcall-alias --exclude-symbol=DllMainCRTStartup@12 --def C:/DOCUME~1/Tomasz/USTAWI~1/Temp/cca07336.def --output-lib libadikted.a
+; C:\msys64\mingw32\bin\dlltool --base-file C:\msys64\tmp\cca11284.base --output-exp adikted.exp --dllname adikted.dll --output-def libadikted.def --no-export-all-symbols --add-stdcall-alias --exclude-symbol=DllMainCRTStartup@12 --def C:\msys64\tmp\cca11284.def --output-lib libadikted.a
 EXPORTS
 	actnpt_add @ 1
 	actnpt_del @ 2
