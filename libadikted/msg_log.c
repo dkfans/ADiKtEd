@@ -39,7 +39,7 @@ void message_log_vl(const char *format, va_list val)
     msgout_fp=fopen(msgout_fname,"ab");
     if (msgout_fp!=NULL)
     {
-      // Write to log file if it is opened
+      /* Write to log file if it is opened */
       vfprintf(msgout_fp, format, val);
       fprintf(msgout_fp,"\r\n");
       fclose(msgout_fp);
@@ -56,7 +56,7 @@ void message_log_simp(const char *str)
     if (msgout_fname==NULL) return;
     FILE *msgout_fp;
     msgout_fp=fopen(msgout_fname,"ab");
-    // Write to log file if it is opened
+    /* Write to log file if it is opened */
     if (msgout_fp!=NULL)
     {
       fprintf(msgout_fp, "%s\r\n",str);
@@ -101,9 +101,9 @@ void message_error(const char *format, ...)
     }
     vsprintf(msg, format, val);
     va_end(val);
-    // Write to log file if it is prepared
+    /* Write to log file if it is prepared */
     message_log_simp(msg);
-    // Store the message
+    /* Store the message */
     message_prv=message;
     message=msg;
     message_hold=true;
@@ -142,7 +142,7 @@ void message_info(const char *format, ...)
     }
     vsprintf(msg, format, val);
     va_end(val);
-    // Write to log file if it is prepared
+    /* Write to log file if it is prepared */
     message_log_simp(msg);
     if ((!message_is_empty())&&(message_hold))
     {
@@ -178,9 +178,9 @@ void message_info_force(const char *format, ...)
     }
     vsprintf(msg, format, val);
     va_end(val);
-    // Write to log file if it is prepared
+    /* Write to log file if it is prepared */
     message_log_simp(msg);
-    // Update message variables
+    /* Update message variables */
     message_prv=message;
     message=msg;
     message_hold=false;

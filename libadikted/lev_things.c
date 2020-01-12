@@ -1,22 +1,19 @@
 /******************************************************************************/
-// lev_things.c - Dungeon Keeper Tools.
-/******************************************************************************/
-// Author:   Jon Skeet
-// Created:  14 Oct 1997
-// Modified: Tomasz Lis
-
-// Purpose:
-//   Defines routines for maintaining list of TNG entries,
-//   provides higher level TNG control than obj_things
-
-// Comment:
-//   None.
-
-//Copying and copyrights:
-//   This program is free software; you can redistribute it and/or modify
-//   it under the terms of the GNU General Public License as published by
-//   the Free Software Foundation; either version 2 of the License, or
-//   (at your option) any later version.
+/** @file lev_things.c
+ * Dungeon Keeper Tools.
+ * @par Purpose:
+ *     Defines routines for maintaining list of TNG entries,
+ *     provides higher level TNG control than obj_things
+ * @par Comment:
+ *     None.
+ * @author   Jon Skeet, Tomasz Lis
+ * @date     14 Oct 1997
+ * @par  Copying and copyrights:
+ *     This program is free software; you can redistribute it and/or modify
+ *     it under the terms of the GNU General Public License as published by
+ *     the Free Software Foundation; either version 2 of the License, or
+ *     (at your option) any later version.
+ */
 /******************************************************************************/
 
 #include "lev_things.h"
@@ -64,10 +61,10 @@ short things_verify(struct LEVEL *lvl, char *err_msg,struct IPOINT_2D *errpt)
     child_verif_opt.subsize.x=lvl->subsize.x;
     child_verif_opt.subsize.y=lvl->subsize.y;
     strcpy(child_verif_opt.err_msg,"Unknown error");
-    //Preparing array bounds
+    /*Preparing array bounds */
     const int arr_entries_x=lvl->tlsize.x*MAP_SUBNUM_X;
     const int arr_entries_y=lvl->tlsize.y*MAP_SUBNUM_Y;
-    //Sweeping through things
+    /*Sweeping through things */
     int i, j, k;
     for (i=0; i < arr_entries_y; i++)
     {
@@ -95,10 +92,10 @@ short things_verify(struct LEVEL *lvl, char *err_msg,struct IPOINT_2D *errpt)
             return result;
           }
           unsigned char type_idx=get_thing_type(thing);
-          // Checking level-dependent thing parameters
+          /* Checking level-dependent thing parameters */
           if (type_idx==THING_TYPE_ITEM)
           {
-            // Checking sensitile again (one check is in thing_verify())
+            /* Checking sensitile again (one check is in thing_verify()) */
             int sen_tl;
             sen_tl=get_thing_sensitile(thing);
             unsigned short stype_idx=get_thing_subtype(thing);
@@ -113,7 +110,7 @@ short things_verify(struct LEVEL *lvl, char *err_msg,struct IPOINT_2D *errpt)
               get_item_subtype_fullname(stype_idx),errpt->x,errpt->y);
               return VERIF_WARN;
             }
-            // Gold hoards only in treasure room
+            /* Gold hoards only in treasure room */
             if (((stype_idx==ITEM_SUBTYPE_GLDHOARD1)||(stype_idx==ITEM_SUBTYPE_GLDHOARD2)||
                 (stype_idx==ITEM_SUBTYPE_GLDHOARD3)||(stype_idx==ITEM_SUBTYPE_GLDHOARD4)||
                 (stype_idx==ITEM_SUBTYPE_GLDHOARD5))&&(slab!=SLAB_TYPE_TREASURE))
@@ -125,7 +122,7 @@ short things_verify(struct LEVEL *lvl, char *err_msg,struct IPOINT_2D *errpt)
                   get_slab_fullname(SLAB_TYPE_TREASURE), errpt->x, errpt->y);
               return VERIF_WARN;
             }
-            // Multiple things overlaid
+            /* Multiple things overlaid */
             if ((get_thing_subtypes_arridx(thing)==categr)&&(get_thing_subtpos_x(thing)==subtp_x)&&
                 (get_thing_subtpos_y(thing)==subtp_y)&&(get_thing_subtpos_h(thing)==subtp_h)&&
                 (!is_gold(thing))&&(!is_food(thing)))
@@ -145,7 +142,7 @@ short things_verify(struct LEVEL *lvl, char *err_msg,struct IPOINT_2D *errpt)
           if (type_idx==THING_TYPE_DOOR)
           {
             unsigned short stype_idx=get_thing_subtype(thing);
-            // Doors must be on door slab
+            /* Doors must be on door slab */
             if (((stype_idx==DOOR_SUBTYPE_WOOD)&&(slab!=SLAB_TYPE_DOORWOOD1)&&(slab!=SLAB_TYPE_DOORWOOD2)) ||
                 ((stype_idx==DOOR_SUBTYPE_BRACED)&&(slab!=SLAB_TYPE_DOORBRACE1)&&(slab!=SLAB_TYPE_DOORBRACE2)) ||
                 ((stype_idx==DOOR_SUBTYPE_IRON)&&(slab!=SLAB_TYPE_DOORIRON1)&&(slab!=SLAB_TYPE_DOORIRON2)) ||
@@ -305,7 +302,7 @@ unsigned char compute_door_orientation(const struct LEVEL *lvl, unsigned char *t
 {
     unsigned short tx=get_thing_subtile_x(thing)/MAP_SUBNUM_X;
     unsigned short ty=get_thing_subtile_y(thing)/MAP_SUBNUM_Y;
-    // Check the previous orientation - if it matches, then it is preferred
+    /* Check the previous orientation - if it matches, then it is preferred */
     if (get_door_orientation(thing)==DOOR_ORIENT_NSPASS)
     {
       unsigned short slab_e=get_tile_slab(lvl, tx+1, ty);
@@ -381,7 +378,7 @@ unsigned short get_free_herogate_number_prev(const struct LEVEL *lvl,const unsig
  */
 short create_herogate_number_used_arr(const struct LEVEL *lvl,unsigned char **used,unsigned int *used_size)
 {
-    //Preparing array bounds
+    /*Preparing array bounds */
     const int arr_entries_x=lvl->tlsize.x*MAP_SUBNUM_X;
     const int arr_entries_y=lvl->tlsize.y*MAP_SUBNUM_Y;
     int k;
@@ -421,7 +418,7 @@ short create_herogate_number_used_arr(const struct LEVEL *lvl,unsigned char **us
 short owned_things_count(int *count,struct LEVEL *lvl,
     unsigned char type_idx,unsigned char stype_idx)
 {
-    //Preparing array bounds
+    /*Preparing array bounds */
     const int arr_entries_x=lvl->tlsize.x*MAP_SUBNUM_X;
     const int arr_entries_y=lvl->tlsize.y*MAP_SUBNUM_Y;
     int i,j,k;
@@ -503,14 +500,14 @@ unsigned char *find_next_thing_on_map(struct LEVEL *lvl, int *tx, int *ty, is_th
   if ((*ty)<0) {(*tx)=-1;(*ty)=0;};
   if ((*tx)<0) (*tx)=-1;
   do {
-      //Switching coords to next map tile
+      /*Switching coords to next map tile */
       (*tx)++;
       while (*tx>=lvl->tlsize.x)
       {
         (*tx)-=lvl->tlsize.x;
         (*ty)++;
       }
-      //Searching in that tile
+      /*Searching in that tile */
       unsigned char *thing;
       thing=find_thing_on_tile(lvl,*tx,*ty,check_func);
       if (thing!=NULL) return thing;
@@ -524,14 +521,14 @@ unsigned char *find_next_actnpt_on_map(struct LEVEL *lvl, int *tx, int *ty)
   if ((*ty)<0) {(*tx)=-1;(*ty)=0;};
   if ((*tx)<0) (*tx)=-1;
   do {
-      //Switching coords to next map tile
+      /*Switching coords to next map tile */
       (*tx)++;
       while ((*tx)>=lvl->tlsize.x)
       {
         (*tx)-=lvl->tlsize.x;
         (*ty)++;
       }
-      //Searching in that tile
+      /*Searching in that tile */
       unsigned char *actnpt;
       int sx,sy;
       for (sx=(*tx)*3;sx<(*tx)*3+3;sx++)
@@ -550,14 +547,14 @@ unsigned char *find_next_stlight_on_map(struct LEVEL *lvl, int *tx, int *ty)
   if ((*ty)<0) {(*tx)=-1;(*ty)=0;};
   if ((*tx)<0) (*tx)=-1;
   do {
-      //Switching coords to next map tile
+      /*Switching coords to next map tile */
       (*tx)++;
       while ((*tx)>=lvl->tlsize.x)
       {
         (*tx)-=lvl->tlsize.x;
         (*ty)++;
       }
-      //Searching in that tile
+      /*Searching in that tile */
       unsigned char *stlight;
       int sx,sy;
       for (sx=(*tx)*3;sx<(*tx)*3+3;sx++)
@@ -588,29 +585,29 @@ unsigned short compute_torch_sensitile(const struct LEVEL *lvl, unsigned char *t
     if ((ntx==tx)&&(nty==ty))
         return ty*lvl->tlsize.x+tx;
     unsigned short slab;
-    // Trying fo find torch wall around
-    // First - try to put it in X axis
+    /* Trying fo find torch wall around */
+    /* First - try to put it in X axis */
     slab=get_tile_slab(lvl,ntx,ty);
     if (slab_needs_adjacent_torch(slab))
         return ty*lvl->tlsize.x+ntx;
-    //Now in Y axis
+    /*Now in Y axis */
     slab=get_tile_slab(lvl,tx,nty);
     if (slab_needs_adjacent_torch(slab))
         return nty*lvl->tlsize.x+tx;
-    //Now in XY corner
+    /*Now in XY corner */
     slab=get_tile_slab(lvl,ntx,nty);
     if (slab_needs_adjacent_torch(slab))
         return nty*lvl->tlsize.x+ntx;
-    // No torch wall - searching for any tall slab
-    // First - try to put it in X axis
+    /* No torch wall - searching for any tall slab */
+    /* First - try to put it in X axis */
     slab=get_tile_slab(lvl,ntx,ty);
     if (slab_is_tall(slab))
         return ty*lvl->tlsize.x+ntx;
-    //Now in Y axis
+    /*Now in Y axis */
     slab=get_tile_slab(lvl,tx,nty);
     if (slab_is_tall(slab))
         return nty*lvl->tlsize.x+tx;
-    //Now in XY corner
+    /*Now in XY corner */
     slab=get_tile_slab(lvl,ntx,nty);
     if (slab_is_tall(slab))
         return nty*lvl->tlsize.x+ntx;
@@ -664,7 +661,7 @@ unsigned short compute_item_sensitile(const struct LEVEL *lvl, unsigned char *th
         return ty*lvl->tlsize.x+tx;
       else
         return THING_SENSITILE_NONE;
-    case THING_CATEGR_ITEMEFFCT://not sure about this one
+    case THING_CATEGR_ITEMEFFCT:/*not sure about this one */
       if ((stype_idx==ITEM_SUBTYPE_TEMPLESPN)&&(slab_is_room(slab_type)))
         return ty*lvl->tlsize.x+tx;
       else
@@ -675,13 +672,13 @@ unsigned short compute_item_sensitile(const struct LEVEL *lvl, unsigned char *th
       else
         return ty*lvl->tlsize.x+tx;
     case THING_CATEGR_SPINNTNG:
-    case THING_CATEGR_CREATLAIR://not sure about this one
-    case THING_CATEGR_FOOD://not sure about this one
+    case THING_CATEGR_CREATLAIR:/*not sure about this one */
+    case THING_CATEGR_FOOD:/*not sure about this one */
         return ty*lvl->tlsize.x+tx;
     case THING_CATEGR_GOLD:
-// from level 19 - all gold things have sensitile=none
-//      if ((stype_idx==ITEM_SUBTYPE_GOLDCHEST)||(stype_idx==ITEM_SUBTYPE_GOLD)||
-//          (stype_idx==ITEM_SUBTYPE_GOLDL))
+/* from level 19 - all gold things have sensitile=none */
+/*      if ((stype_idx==ITEM_SUBTYPE_GOLDCHEST)||(stype_idx==ITEM_SUBTYPE_GOLD)|| */
+/*          (stype_idx==ITEM_SUBTYPE_GOLDL)) */
         return THING_SENSITILE_NONE;
     case THING_CATEGR_NULL:
     case THING_CATEGR_SPECIALBOX:
@@ -691,7 +688,7 @@ unsigned short compute_item_sensitile(const struct LEVEL *lvl, unsigned char *th
     case THING_CATEGR_PWHAND:
     default:
         return THING_SENSITILE_NONE;
-    // These have sensitile used for other data
+    /* These have sensitile used for other data */
     case THING_CATEGR_TRAP:
     case THING_CATEGR_DOOR:
     case THING_CATEGR_CREATR:
@@ -709,12 +706,12 @@ unsigned char *create_door(struct LEVEL *lvl, unsigned int sx, unsigned int sy, 
     set_thing_type(thing,THING_TYPE_DOOR);
     set_thing_subtype(thing,stype_idx);
     set_thing_owner(thing,get_tile_owner(lvl,sx/MAP_SUBNUM_X,sy/MAP_SUBNUM_Y));
-    //This will be updated in update_tile_things_subpos_and_height
+    /*This will be updated in update_tile_things_subpos_and_height */
     set_thing_subtpos(thing,128,128);
     set_thing_subtile_h(thing,5);
     set_door_orientation(thing,compute_door_orientation(lvl,thing));
     set_thing_sensitile(thing,get_free_indexedthing_number(lvl));
-    //Set default lock state
+    /*Set default lock state */
     set_thing_level(thing,DOOR_PASS_UNLOCKED);
     return thing;
 }
@@ -726,7 +723,7 @@ unsigned char *create_torch(const struct LEVEL *lvl, unsigned int sx, unsigned i
     set_thing_type(thing,THING_TYPE_ITEM);
     set_thing_subtype(thing,stype_idx);
     set_thing_owner(thing,get_tile_owner(lvl,sx/MAP_SUBNUM_X,sy/MAP_SUBNUM_Y));
-    //This will be updated in update_tile_things_subpos_and_height
+    /*This will be updated in update_tile_things_subpos_and_height */
     unsigned char sub_x=0x080;
     unsigned char sub_y=0x080;
     unsigned char subtl_h=2;
@@ -750,7 +747,7 @@ unsigned char *create_torch(const struct LEVEL *lvl, unsigned int sx, unsigned i
     set_thing_subtpos(thing,sub_x,sub_y);
     set_thing_subtile_h(thing,subtl_h);
     set_thing_subtpos_h(thing,subpos_h);
-    //Sensitive tile
+    /*Sensitive tile */
     unsigned short sensitile=compute_torch_sensitile(lvl,thing);
     set_thing_sensitile(thing,sensitile);
     return thing;
@@ -765,11 +762,11 @@ unsigned char *create_doorkey(const struct LEVEL *lvl, unsigned int sx, unsigned
     set_thing_type(thing,THING_TYPE_ITEM);
     set_thing_subtype(thing,stype_idx);
     set_thing_owner(thing,get_tile_owner(lvl,tx,ty));
-    //This will be updated in update_tile_things_subpos_and_height
+    /*This will be updated in update_tile_things_subpos_and_height */
     set_thing_subtile_h(thing,4);
     set_thing_subtpos_h(thing,0x000);
     set_thing_subtpos(thing,0x080,0x080);
-    //Note: in most DK maps, sensitile of key is set to 0, but I believe it is an error
+    /*Note: in most DK maps, sensitile of key is set to 0, but I believe it is an error */
     unsigned short sensitile=compute_item_sensitile(lvl,thing);
     set_thing_sensitile(thing,sensitile);
     return thing;
@@ -825,7 +822,7 @@ unsigned char *create_trap(const struct LEVEL *lvl,unsigned int sx, unsigned int
  */
 unsigned short get_free_indexedthing_number(const struct LEVEL *lvl)
 {
-    //Preparing array bounds
+    /*Preparing array bounds */
     const int arr_entries_x=lvl->tlsize.x*MAP_SUBNUM_X;
     const int arr_entries_y=lvl->tlsize.y*MAP_SUBNUM_Y;
     int k;
@@ -850,7 +847,7 @@ unsigned short get_free_indexedthing_number(const struct LEVEL *lvl)
           }
       }
     }
-    // Note: numbering starts at 1, not 0
+    /* Note: numbering starts at 1, not 0 */
     int new_num=1;
     while (used[new_num]>0) new_num++;
     free(used);
@@ -874,7 +871,7 @@ unsigned char *create_item_adv(const struct LEVEL *lvl, unsigned int sx, unsigne
     {
         thing=create_item(lvl,sx,sy,stype_idx);
         set_thing_owner(thing,PLAYER_GOOD);
-        //Hero gate must be numbered
+        /*Hero gate must be numbered */
         set_thing_level(thing,get_free_herogate_number(lvl));
         unsigned short sensitile=compute_item_sensitile(lvl,thing);
         set_thing_sensitile(thing,sensitile);
@@ -882,14 +879,14 @@ unsigned char *create_item_adv(const struct LEVEL *lvl, unsigned int sx, unsigne
     if (stype_idx==ITEM_SUBTYPE_DNHEART)
     {
         thing=create_item(lvl,sx,sy,stype_idx);
-        set_thing_subtile_h(thing,3); // Raise it up a bit
+        set_thing_subtile_h(thing,3); /* Raise it up a bit */
         unsigned short sensitile=compute_item_sensitile(lvl,thing);
         set_thing_sensitile(thing,sensitile);
     } else
     if (is_heartflame_stype(stype_idx))
     {
         thing=create_item(lvl,sx,sy,stype_idx);
-        set_thing_subtile_h(thing,2); // That is where heart flames should be
+        set_thing_subtile_h(thing,2); /* That is where heart flames should be */
         unsigned short sensitile=compute_item_sensitile(lvl,thing);
         set_thing_sensitile(thing,sensitile);
     } else
@@ -985,7 +982,7 @@ void remove_automade_obj_for_slab(struct LEVEL *lvl, int tx, int ty)
             int categr=get_thing_subtypes_arridx(thing);
             switch (categr)
             {
-            // Categories to leave
+            /* Categories to leave */
             case THING_CATEGR_CREATR:
             case THING_CATEGR_SPECIALBOX:
             case THING_CATEGR_SPELLBOOK:
@@ -993,20 +990,20 @@ void remove_automade_obj_for_slab(struct LEVEL *lvl, int tx, int ty)
             case THING_CATEGR_TRAP:
             case THING_CATEGR_GOLD:
                 break;
-            // Not-so-easy categories
+            /* Not-so-easy categories */
             case THING_CATEGR_STATUE:
             case THING_CATEGR_FURNITURE:
                 if (is_room_inventory(thing) && slab_is_room(slab))
                   should_delete=true;
                 break;
-            // Do not touch hero gates!
+            /* Do not touch hero gates! */
             case THING_CATEGR_DNCRUCIAL:
               {
                 unsigned short stype_idx=get_thing_subtype(thing);
                 if (stype_idx!=ITEM_SUBTYPE_HEROGATE)
                   should_delete=true;
               };break;
-            // Categories to delete
+            /* Categories to delete */
             case THING_CATEGR_NULL:
             case THING_CATEGR_EFFCTGEN:
             case THING_CATEGR_ITEMEFFCT:
@@ -1024,12 +1021,12 @@ void remove_automade_obj_for_slab(struct LEVEL *lvl, int tx, int ty)
                 should_delete=true;
                 break;
             }
-            // If the thing is placed on incorrect place - delete anyway
+            /* If the thing is placed on incorrect place - delete anyway */
             unsigned char expect_slb=get_usual_thing_slab(thing);
             if ((expect_slb!=slab)&&
                ((expect_slb!=SLAB_TYPE_CLAIMED)||(slab_is_tall(slab))))
                should_delete=true;
-            // And the final act...
+            /* And the final act... */
             if (should_delete)
                 thing_del(lvl,sx, sy, i);
           }
@@ -1191,7 +1188,7 @@ void update_door_things_on_slab(struct LEVEL *lvl, int tx, int ty)
       door_subtype=DOOR_SUBTYPE_WOOD;
       break;
     }
-    //Search for door things on all subtiles, delete if there is more than one
+    /*Search for door things on all subtiles, delete if there is more than one */
     unsigned char *thing=NULL;
     unsigned char *sec_thing;
     int sx, sy, i;
@@ -1202,24 +1199,24 @@ void update_door_things_on_slab(struct LEVEL *lvl, int tx, int ty)
             sec_thing=get_thing(lvl,sx,sy,i);
             if (is_door(sec_thing))
             {
-              // delete if we already have proper thing
+              /* delete if we already have proper thing */
               if (thing!=NULL)
                 thing_del(lvl,sx, sy, i);
               else
               {
-                //If that's firs one - keep it, but remove from level structure
-                // (we will add it later to make sure it is in central subtile)
+                /*If that's firs one - keep it, but remove from level structure */
+                /* (we will add it later to make sure it is in central subtile) */
                 thing=sec_thing;
                 thing_drop(lvl,sx, sy, i);
               }
             }
           }
-    // If we didn't find door thing, create the new one
+    /* If we didn't find door thing, create the new one */
     if (thing==NULL)
     {
       thing=create_door(lvl, tx*MAP_SUBNUM_X+1, ty*MAP_SUBNUM_Y+1, door_subtype);
     } else
-    // and if we found one, modify its parameters
+    /* and if we found one, modify its parameters */
     {
       set_thing_subtype(thing,door_subtype);
       set_thing_subtile(thing,tx*MAP_SUBNUM_X+1,ty*MAP_SUBNUM_Y+1);
@@ -1242,7 +1239,7 @@ void update_torch_things_near_slab(struct LEVEL *lvl, int tx, int ty)
   const unsigned short dir_b[]={IDIR_EAST, IDIR_SOUTH, IDIR_WEST, IDIR_NORTH};
   int i;
   short allow_torch[9];
-  //Filling matrix
+  /*Filling matrix */
   for (i=0;i<9;i++)
   {
     int cur_tx,cur_ty;
@@ -1252,14 +1249,14 @@ void update_torch_things_near_slab(struct LEVEL *lvl, int tx, int ty)
     slab=get_tile_slab(lvl,cur_tx,cur_ty);
     allow_torch[i]=slab_allows_torch(slab);
   }
-  // Well, let's just make torch where it can be made
+  /* Well, let's just make torch where it can be made */
   for (i=0;i<4;i++)
     if (allow_torch[dir_a[i]])
     {
       int cur_tx,cur_ty;
       cur_tx=tx+idir_subtl_x[dir_a[i]]-1;
       cur_ty=ty+idir_subtl_y[dir_a[i]]-1;
-      //Check if there already is a light source on the destination slab
+      /*Check if there already is a light source on the destination slab */
       if (find_lit_thing_on_square_radius1(lvl,cur_tx,cur_ty)==NULL)
       {
         int sx,sy;
@@ -1289,7 +1286,7 @@ void create_things_slb_room(cr_tng_func cr_floor,cr_tng_func cr_edge,
   unsigned short slab=surr_slb[IDIR_CENTR];
   unsigned char ownr=surr_own[IDIR_CENTR];
   struct UPOINT_2D corner_pos={1,1};
-  //Checking if completely surrounded
+  /*Checking if completely surrounded */
   if ((surr_slb[IDIR_NORTH]==slab)&&(surr_own[IDIR_NORTH]==ownr) &&
       (surr_slb[IDIR_EAST]==slab)&&(surr_own[IDIR_EAST]==ownr) &&
       (surr_slb[IDIR_SOUTH]==slab)&&(surr_own[IDIR_SOUTH]==ownr) &&
@@ -1304,7 +1301,7 @@ void create_things_slb_room(cr_tng_func cr_floor,cr_tng_func cr_edge,
             corner_pos.y=dir_y[i];
         }
       }
-      // Doing the work
+      /* Doing the work */
       if  ((corner_pos.x==1)||(corner_pos.y==1))
       {
           corner_pos.x=dir_x[0];
@@ -1312,13 +1309,13 @@ void create_things_slb_room(cr_tng_func cr_floor,cr_tng_func cr_edge,
           cr_inside(lvl,tx,ty,surr_slb,surr_own,corner_pos);
       } else
       {
-          //The 'near inside' columns are usually same that floor,
-          //but may differ for rooms with specific corners
+          /*The 'near inside' columns are usually same that floor, */
+          /*but may differ for rooms with specific corners */
           cr_nearinsd(lvl,tx,ty,surr_slb,surr_own,corner_pos);
       }
       return;
   }
-  //If not completely, maybe we're surrounded from 3 sides (5 with corners)?
+  /*If not completely, maybe we're surrounded from 3 sides (5 with corners)? */
   if (((surr_slb[IDIR_NORTH]==slab)&&(surr_own[IDIR_NORTH]==ownr) &&
        (surr_slb[IDIR_NE]==slab)&&(surr_own[IDIR_NE]==ownr) &&
        (surr_slb[IDIR_EAST]==slab)&&(surr_own[IDIR_EAST]==ownr) &&
@@ -1360,8 +1357,8 @@ void create_things_slb_room(cr_tng_func cr_floor,cr_tng_func cr_edge,
       cr_edge(lvl,tx,ty,surr_slb,surr_own,corner_pos);
       return;
   }
-  //If still nothing, maybe we have same surround from two sides and 1 corner,
-  // and another two are surely something else
+  /*If still nothing, maybe we have same surround from two sides and 1 corner, */
+  /* and another two are surely something else */
   if (((surr_slb[IDIR_NORTH]==slab)&&(surr_own[IDIR_NORTH]==ownr) &&
        (surr_slb[IDIR_EAST]==slab)&&(surr_own[IDIR_EAST]==ownr) &&
       ((surr_slb[IDIR_SOUTH]!=slab)||(surr_own[IDIR_SOUTH]!=ownr)) &&
@@ -1402,7 +1399,7 @@ void create_things_slb_room(cr_tng_func cr_floor,cr_tng_func cr_edge,
   }
   corner_pos.x=dir_x[0];
   corner_pos.y=dir_y[0];
-  //If nothing found - update as floor of this room
+  /*If nothing found - update as floor of this room */
   cr_floor(lvl,tx,ty,surr_slb,surr_own,corner_pos);
 }
 
@@ -1418,7 +1415,7 @@ void create_things_slb_room_simple(cr_tng_func cr_any,
   struct UPOINT_2D corner_pos={0,0};
   unsigned short slab=surr_slb[IDIR_CENTR];
   unsigned char ownr=surr_own[IDIR_CENTR];
-  //Very simple...
+  /*Very simple... */
   cr_any(lvl,tx,ty,surr_slb,surr_own,corner_pos);
 }
 
@@ -1443,12 +1440,12 @@ void delete_room_things_subtl(struct LEVEL *lvl, int sx, int sy)
       unsigned char *thing=get_thing(lvl,sx,sy,i);
       if (is_room_inventory(thing))
       {
-          //checking surrounding slabs to be sure
-          // if we should delete torches
+          /*checking surrounding slabs to be sure */
+          /* if we should delete torches */
           if (is_torch(thing))
             if (subtl_is_near_tall_slab(lvl,sx,sy))
               continue;
-          // Now deleting, without mercy
+          /* Now deleting, without mercy */
           thing_del(lvl,sx, sy, i);
       }
     }
@@ -1474,7 +1471,7 @@ void update_things_slb_portal_inside(struct LEVEL *lvl, const int tx, const int 
                 if (is_effectgen(thing)&&(stype_idx==EFCTGEN_SUBTP_ENTRICE)&&(thing_eff==NULL))
                   thing_eff=thing;
                 else
-                //Let's leave two entrance ice effects - we sometimes use two of them
+                /*Let's leave two entrance ice effects - we sometimes use two of them */
                 if (is_effectgen(thing)&&(stype_idx==EFCTGEN_SUBTP_ENTRICE)&&(thing_eff2==NULL))
                   thing_eff2=thing;
                 else
@@ -1490,13 +1487,13 @@ void update_things_slb_portal_inside(struct LEVEL *lvl, const int tx, const int 
       thing_add(lvl,thing_eff);
     } else
     {
-      //Position is not crucial, so leaving it as it was
+      /*Position is not crucial, so leaving it as it was */
       set_thing_owner(thing_eff,get_tile_owner(lvl,tx,ty));
     }
-    //Second effect is not auto-created - user must make it
+    /*Second effect is not auto-created - user must make it */
     if (thing_eff2!=NULL)
     {
-      //Position is not crucial, so leaving it as it was
+      /*Position is not crucial, so leaving it as it was */
       set_thing_owner(thing_eff2,get_tile_owner(lvl,tx,ty));
     }
 }
@@ -1522,7 +1519,7 @@ unsigned char *update_thing_slb_room_one_central_item(struct LEVEL *lvl, int tx,
                 {
                   thing_dst=thing;
                 } else
-                // If we found torch, and we're searching for something else - leave the torch.
+                /* If we found torch, and we're searching for something else - leave the torch. */
                 if ((type_idx==THING_TYPE_ITEM)&&(is_torch_stype(stype_idx))&&(!is_torch_stype(itm_stype_idx)))
                 {
                   if ((sx==tx*MAP_SUBNUM_X+1)&&(sy==ty*MAP_SUBNUM_Y+1))
@@ -1549,7 +1546,7 @@ unsigned char *update_thing_slb_room_one_central_item(struct LEVEL *lvl, int tx,
       }
     } else
     {
-      //Position is not crucial, so leaving it as it was
+      /*Position is not crucial, so leaving it as it was */
       set_thing_owner(thing_dst,get_tile_owner(lvl,tx,ty));
     }
     return thing_dst;
@@ -1573,7 +1570,7 @@ unsigned char *update_thing_slb_room_one_item_subtl(struct LEVEL *lvl, int sx, i
             {
                 thing_dst=thing;
             } else
-            // If we found torch, and we're searching for something else - leave the torch.
+            /* If we found torch, and we're searching for something else - leave the torch. */
             if ((type_idx==THING_TYPE_ITEM)&&(is_torch_stype(stype_idx))&&(!is_torch_stype(itm_stype_idx)))
             {
                 other_thing_there=true;
@@ -1596,7 +1593,7 @@ unsigned char *update_thing_slb_room_one_item_subtl(struct LEVEL *lvl, int sx, i
       }
     } else
     {
-      //Position is not crucial, so leaving it as it was
+      /*Position is not crucial, so leaving it as it was */
       set_thing_owner(thing_dst,get_tile_owner(lvl,sx/MAP_SUBNUM_X,sy/MAP_SUBNUM_Y));
     }
     return thing_dst;
@@ -1678,7 +1675,7 @@ void update_things_slb_temple_corner(struct LEVEL *lvl, const int tx, const int 
 {
     unsigned char *thing;
     thing=update_thing_slb_room_one_central_item(lvl,tx,ty,ITEM_SUBTYPE_TEMPLESTA,true);
-    set_thing_subtile_h(thing,2); // Temple floor is higher than ground
+    set_thing_subtile_h(thing,2); /* Temple floor is higher than ground */
 }
 
 void update_things_slb_workshop_corner(struct LEVEL *lvl, const int tx, const int ty,
@@ -1710,7 +1707,7 @@ void update_things_slb_barracks_corner(struct LEVEL *lvl, const int tx, const in
             {
                 unsigned char type_idx=get_thing_type(thing);
                 unsigned char stype_idx=get_thing_subtype(thing);
-                // If we found torch, and that's the first one, and we are allowed to have it - then keep the torch.
+                /* If we found torch, and that's the first one, and we are allowed to have it - then keep the torch. */
                 if ((type_idx==THING_TYPE_ITEM)&&(is_torch_stype(stype_idx))&&(allow_torch>0)&&(thing_trch==NULL))
                 {
                   thing_trch=thing;
@@ -1742,7 +1739,7 @@ void update_things_slb_barracks_corner(struct LEVEL *lvl, const int tx, const in
         set_thing_owner(thing_trch,get_tile_owner(lvl,tx,ty));
         if (allow_torch<3)
           set_thing_subtile(thing_trch,sx,sy);
-        //Sensitive tile
+        /*Sensitive tile */
         unsigned short sensitile=compute_torch_sensitile(lvl,thing_trch);
         set_thing_sensitile(thing_trch,sensitile);
       }
@@ -1793,7 +1790,7 @@ void update_things_slb_dungheart_inside(struct LEVEL *lvl, const int tx, const i
       delete_room_things(lvl,tx,ty,surr_slb,surr_own,corner_pos);
       return;
     }
-    //Array for storing players heart count
+    /*Array for storing players heart count */
     int hearts[PLAYERS_COUNT];
     int i;
     for (i=0; i < PLAYERS_COUNT; i++)
@@ -1834,7 +1831,7 @@ void update_things_slb_graveyard_corner(struct LEVEL *lvl, const int tx, const i
                 if ((type_idx==THING_TYPE_EFFECTGEN)&&(stype_idx==eff_stype_idx)&&(thing_eff==NULL))
                   thing_eff=thing;
                 else
-                // If we found torch, and that's the first one, and we are allowed to have it - then keep the torch.
+                /* If we found torch, and that's the first one, and we are allowed to have it - then keep the torch. */
                 if ((type_idx==THING_TYPE_ITEM)&&(is_torch_stype(stype_idx))&&(allow_torch>0)&&(thing_trch==NULL))
                 {
                   thing_trch=thing;
@@ -1876,7 +1873,7 @@ void update_things_slb_graveyard_corner(struct LEVEL *lvl, const int tx, const i
         set_thing_owner(thing_trch,get_tile_owner(lvl,tx,ty));
         if (allow_torch<3)
           set_thing_subtile(thing_trch,sx,sy);
-        //Sensitive tile
+        /*Sensitive tile */
         unsigned short sensitile=compute_torch_sensitile(lvl,thing_trch);
         set_thing_sensitile(thing_trch,sensitile);
       }
@@ -1889,7 +1886,7 @@ void update_things_slb_graveyard_corner(struct LEVEL *lvl, const int tx, const i
       thing_add(lvl,thing_eff);
     } else
     {
-      //Position is not crucial, so leaving it as it was
+      /*Position is not crucial, so leaving it as it was */
       set_thing_owner(thing_eff,get_tile_owner(lvl,tx,ty));
     }
 }
@@ -1933,7 +1930,7 @@ void update_things_slb_prison(struct LEVEL *lvl, const int tx, const int ty,
   int i;
   for (i=0;i<9;i++)
     pris_bars[i]=false;
-  // Base directions
+  /* Base directions */
   if (((surr_slb[IDIR_NORTH]!=slab)||(surr_own[IDIR_NORTH]!=ownr)) &&
       !slab_is_tall(surr_slb[IDIR_NORTH]))
     pris_bars[IDIR_NORTH]=true;
@@ -1946,7 +1943,7 @@ void update_things_slb_prison(struct LEVEL *lvl, const int tx, const int ty,
   if (((surr_slb[IDIR_WEST]!=slab)||(surr_own[IDIR_WEST]!=ownr)) &&
       !slab_is_tall(surr_slb[IDIR_WEST]))
     pris_bars[IDIR_WEST]=true;
-  //Edges
+  /*Edges */
   if ((pris_bars[IDIR_NORTH]==true)||(pris_bars[IDIR_EAST]==true))
     pris_bars[IDIR_NE]=true;
   if ((pris_bars[IDIR_NORTH]==true)||(pris_bars[IDIR_WEST]==true))
@@ -1955,18 +1952,18 @@ void update_things_slb_prison(struct LEVEL *lvl, const int tx, const int ty,
     pris_bars[IDIR_SW]=true;
   if ((pris_bars[IDIR_SOUTH]==true)||(pris_bars[IDIR_EAST]==true))
     pris_bars[IDIR_SE]=true;
-  //Creating the bars where needed
+  /*Creating the bars where needed */
   for (i=0;i<9;i++)
   {
     int sx=tx*3+idir_subtl_x[i];
     int sy=ty*3+idir_subtl_y[i];
     if (pris_bars[i])
     {
-      //Create/update prison bar
+      /*Create/update prison bar */
       update_thing_slb_room_one_item_subtl(lvl,sx,sy,ITEM_SUBTYPE_PRISONBAR,true);
     } else
     {
-      //Delete unwanted things
+      /*Delete unwanted things */
       delete_room_things_subtl(lvl,sx,sy);
     }
   }
@@ -2027,7 +2024,7 @@ short update_things_subpos_and_height_for_slab(struct LEVEL *lvl, int tx, int ty
     for (sx=tx*3; sx < tx*3+3; sx++)
       for (sy=ty*3; sy < ty*3+3; sy++)
       {
-          //Getting height of the adjacent columns
+          /*Getting height of the adjacent columns */
           for (i=0;i<9;i++)
           {
             int cur_sx,cur_sy;
@@ -2058,7 +2055,7 @@ short update_thing_subpos_and_height(unsigned short *clm_height,unsigned char *t
     int sx, sy, i;
     sx=get_thing_subtile_x(thing);
     sy=get_thing_subtile_y(thing);
-    //Setting things parameters
+    /*Setting things parameters */
     if (is_door(thing))
     {
         unsigned char sub_x=0x080;
@@ -2107,16 +2104,16 @@ short update_thing_subpos_and_height(unsigned short *clm_height,unsigned char *t
       unsigned char sub_y=0x080;
       unsigned char subtl_h=clm_height[IDIR_CENTR]+1;
       unsigned char subpos_h=224;
-      //Set the subtile position tall column
+      /*Set the subtile position tall column */
       for (i=0;i<8;i++)
         if (clm_height[dir_a[i]]>subtl_h)
         {
           sub_x=dir_a_subx[i];
           sub_y=dir_a_suby[i];
-          // If found a position - stop searching
+          /* If found a position - stop searching */
           break;
         }
-      // If it is at center - rise it a little higher
+      /* If it is at center - rise it a little higher */
       if (((sx%MAP_SUBNUM_X)==1)&&((sy%MAP_SUBNUM_Y)==1))
       {
         subtl_h=clm_height[IDIR_CENTR]+2;
@@ -2192,7 +2189,7 @@ long get_nearest_thing_idx(struct LEVEL *lvl,
     const unsigned int ssx,const unsigned int ssy,
     unsigned int *sx,unsigned int *sy,unsigned int *num)
 {
-//    message_log(" get_nearest_thing_idx: Searching for thing near (%u,%u)",ssx>>8,ssy>>8);
+/*    message_log(" get_nearest_thing_idx: Searching for thing near (%u,%u)",ssx>>8,ssy>>8); */
     if (lvl==NULL) return -1;
     int range;
     unsigned int best_sx, best_sy;
@@ -2201,13 +2198,13 @@ long get_nearest_thing_idx(struct LEVEL *lvl,
     best_sx=0;best_sy=0;best_num=-1;best_dist=ULONG_MAX;
     short found_previously=0;
     int range_limit=max(lvl->subsize.x,lvl->subsize.y);
-    // Searching for objects - first at close distance, then increase range
+    /* Searching for objects - first at close distance, then increase range */
     for (range=0; range<range_limit; range++)
     {
         int test_sx,test_sy;
         int test_num;
         unsigned long test_dist;
-        // Preparing sweep bounds for given range
+        /* Preparing sweep bounds for given range */
         int sx_llimit,sx_hlimit;
         int sy_llimit,sy_hlimit;
         sx_llimit=(ssx>>8)-range;
@@ -2222,15 +2219,15 @@ long get_nearest_thing_idx(struct LEVEL *lvl,
         if (sy_llimit<0) sy_llimit=0;
         if (sy_hlimit>=(int)lvl->subsize.y) sy_hlimit=lvl->subsize.y-1;
         if (sy_hlimit<0) sy_hlimit=0;
-        // Remember if we have found something previously
+        /* Remember if we have found something previously */
         if (best_num>=0) found_previously=1;
-        // Now we can sweep the borders for things
+        /* Now we can sweep the borders for things */
         for (test_sy=sy_llimit;test_sy<=sy_hlimit;test_sy++)
         {
             int num_limit;
-            //Do two times: for test_sx=sx_llimit and test_sx=sx_hlimit
+            /*Do two times: for test_sx=sx_llimit and test_sx=sx_hlimit */
             test_sx=sx_llimit;
-//    message_log(" get_nearest_thing_idx: Searching subtile (%u,%u)",test_sx,test_sy);
+/*    message_log(" get_nearest_thing_idx: Searching subtile (%u,%u)",test_sx,test_sy); */
             num_limit=get_thing_subnums(lvl,test_sx,test_sy);
             for (test_num=0;test_num<=num_limit;test_num++)
             {
@@ -2245,7 +2242,7 @@ long get_nearest_thing_idx(struct LEVEL *lvl,
                 }
             }
             test_sx=sx_hlimit;
-//    message_log(" get_nearest_thing_idx: Searching subtile (%u,%u)",test_sx,test_sy);
+/*    message_log(" get_nearest_thing_idx: Searching subtile (%u,%u)",test_sx,test_sy); */
             num_limit=get_thing_subnums(lvl,test_sx,test_sy);
             for (test_num=0;test_num<=num_limit;test_num++)
             {
@@ -2263,9 +2260,9 @@ long get_nearest_thing_idx(struct LEVEL *lvl,
         for (test_sx=sx_llimit+1;test_sx<sx_hlimit;test_sx++)
         {
             int num_limit;
-            // Repeat the previous loop, but for test_sy=sy_llimit and test_sy=sy_hlimit
+            /* Repeat the previous loop, but for test_sy=sy_llimit and test_sy=sy_hlimit */
             test_sy=sy_llimit;
-//    message_log(" get_nearest_thing_idx: Searching subtile (%u,%u)",test_sx,test_sy);
+/*    message_log(" get_nearest_thing_idx: Searching subtile (%u,%u)",test_sx,test_sy); */
             num_limit=get_thing_subnums(lvl,test_sx,test_sy);
             for (test_num=0;test_num<=num_limit;test_num++)
             {
@@ -2280,7 +2277,7 @@ long get_nearest_thing_idx(struct LEVEL *lvl,
                 }
             }
             test_sy=sy_hlimit;
-//    message_log(" get_nearest_thing_idx: Searching subtile (%u,%u)",test_sx,test_sy);
+/*    message_log(" get_nearest_thing_idx: Searching subtile (%u,%u)",test_sx,test_sy); */
             num_limit=get_thing_subnums(lvl,test_sx,test_sy);
             for (test_num=0;test_num<=num_limit;test_num++)
             {
@@ -2295,15 +2292,15 @@ long get_nearest_thing_idx(struct LEVEL *lvl,
                 }
             }
         }
-        // If we found sonething in previous turn, then we won't get anything better
+        /* If we found sonething in previous turn, then we won't get anything better */
         if (found_previously) break;
     }
     if (best_num<0)
     {
-        //message_log(" get_nearest_thing_idx: Nothing found");
+        /*message_log(" get_nearest_thing_idx: Nothing found"); */
         return -1;
     }
-    //message_log(" get_nearest_thing_idx: Returning thing at distance %u",best_dist);
+    /*message_log(" get_nearest_thing_idx: Returning thing at distance %u",best_dist); */
     *sx=best_sx;
     *sy=best_sy;
     *num=best_num;
@@ -2327,7 +2324,7 @@ long get_nearest_object_idx(struct LEVEL *lvl,
     const unsigned int ssx,const unsigned int ssy,
     unsigned int *sx,unsigned int *sy,unsigned int *z)
 {
-//    message_log(" get_nearest_object_idx: Searching for object near (%u,%u)",ssx>>8,ssy>>8);
+/*    message_log(" get_nearest_object_idx: Searching for object near (%u,%u)",ssx>>8,ssy>>8); */
     if (lvl==NULL) return -1;
     int range;
     unsigned int best_sx, best_sy;
@@ -2336,13 +2333,13 @@ long get_nearest_object_idx(struct LEVEL *lvl,
     best_sx=0;best_sy=0;best_z=-1;best_dist=ULONG_MAX;
     short found_previously=0;
     int range_limit=max(lvl->subsize.x,lvl->subsize.y);
-    // Searching for objects - first at close distance, then increase range
+    /* Searching for objects - first at close distance, then increase range */
     for (range=0; range<range_limit; range++)
     {
         int test_sx,test_sy;
         int test_z;
         unsigned long test_dist;
-        // Preparing sweep bounds for given range
+        /* Preparing sweep bounds for given range */
         int sx_llimit,sx_hlimit;
         int sy_llimit,sy_hlimit;
         sx_llimit=(ssx>>8)-range;
@@ -2357,15 +2354,15 @@ long get_nearest_object_idx(struct LEVEL *lvl,
         if (sy_llimit<0) sy_llimit=0;
         if (sy_hlimit>=(int)lvl->subsize.y) sy_hlimit=lvl->subsize.y-1;
         if (sy_hlimit<0) sy_hlimit=0;
-        // Remember if we have found some objects previously
+        /* Remember if we have found some objects previously */
         if (best_z>=0) found_previously=1;
-        // Now we can sweep the borders for objects
+        /* Now we can sweep the borders for objects */
         for (test_sy=sy_llimit;test_sy<=sy_hlimit;test_sy++)
         {
             int num_limit;
-            //Do two times: for test_sx=sx_llimit and test_sx=sx_hlimit
+            /*Do two times: for test_sx=sx_llimit and test_sx=sx_hlimit */
             test_sx=sx_llimit;
-//    message_log(" get_nearest_object_idx: Searching subtile (%u,%u)",test_sx,test_sy);
+/*    message_log(" get_nearest_object_idx: Searching subtile (%u,%u)",test_sx,test_sy); */
             num_limit=get_object_subnums(lvl,test_sx,test_sy);
             for (test_z=0;test_z<=num_limit;test_z++)
             {
@@ -2395,7 +2392,7 @@ long get_nearest_object_idx(struct LEVEL *lvl,
                 }
             }
             test_sx=sx_hlimit;
-//    message_log(" get_nearest_object_idx: Searching subtile (%u,%u)",test_sx,test_sy);
+/*    message_log(" get_nearest_object_idx: Searching subtile (%u,%u)",test_sx,test_sy); */
             num_limit=get_object_subnums(lvl,test_sx,test_sy);
             for (test_z=0;test_z<=num_limit;test_z++)
             {
@@ -2428,9 +2425,9 @@ long get_nearest_object_idx(struct LEVEL *lvl,
         for (test_sx=sx_llimit+1;test_sx<sx_hlimit;test_sx++)
         {
             int num_limit;
-            // Repeat the previous loop, but for test_sy=sy_llimit and test_sy=sy_hlimit
+            /* Repeat the previous loop, but for test_sy=sy_llimit and test_sy=sy_hlimit */
             test_sy=sy_llimit;
-//    message_log(" get_nearest_object_idx: Searching subtile (%u,%u)",test_sx,test_sy);
+/*    message_log(" get_nearest_object_idx: Searching subtile (%u,%u)",test_sx,test_sy); */
             num_limit=get_object_subnums(lvl,test_sx,test_sy);
             for (test_z=0;test_z<=num_limit;test_z++)
             {
@@ -2460,7 +2457,7 @@ long get_nearest_object_idx(struct LEVEL *lvl,
                 }
             }
             test_sy=sy_hlimit;
-//    message_log(" get_nearest_object_idx: Searching subtile (%u,%u)",test_sx,test_sy);
+/*    message_log(" get_nearest_object_idx: Searching subtile (%u,%u)",test_sx,test_sy); */
             num_limit=get_object_subnums(lvl,test_sx,test_sy);
             for (test_z=0;test_z<=num_limit;test_z++)
             {
@@ -2490,15 +2487,15 @@ long get_nearest_object_idx(struct LEVEL *lvl,
                 }
             }
         }
-        // If we found something in previous turn, then we won't get anything better
+        /* If we found something in previous turn, then we won't get anything better */
         if (found_previously) break;
     }
     if (best_z<0)
     {
-        //message_log(" get_nearest_object_idx: Nothing found");
+        /*message_log(" get_nearest_object_idx: Nothing found"); */
         return -1;
     }
-    //message_log(" get_nearest_object_idx: Returning object at distance %u",best_dist);
+    /*message_log(" get_nearest_object_idx: Returning object at distance %u",best_dist); */
     *sx=best_sx;
     *sy=best_sy;
     *z=best_z;

@@ -24,7 +24,7 @@ struct DK_GRAFFITI;
 
 #include "globals.h"
 
-// Imports from graffiti.c
+/* Imports from graffiti.c */
 DLLIMPORT short level_free_graffiti(struct LEVEL *lvl);
 DLLIMPORT int place_graffiti_on_slab(struct COLUMN_REC *clm_recs[9],struct LEVEL *lvl, int tx, int ty);
 
@@ -53,11 +53,11 @@ DLLIMPORT int get_graffiti_cube_height(unsigned short font,char *text);
 DLLIMPORT const unsigned char *get_font_char(unsigned short font,char chr);
 
 
-// Import the font from graffiti_font.c
+/* Import the font from graffiti_font.c */
 extern const unsigned char font_any_chnull[];
 extern const unsigned char *font_adiclssc_chars[];
 extern const int font_adiclssc_height;
 extern const unsigned char *font_adisize8_chars[];
 extern const int font_adisize8_height;
 
-#endif // ADIKT_GRAFFITI_H
+#endif /* ADIKT_GRAFFITI_H */

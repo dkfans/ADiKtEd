@@ -38,23 +38,23 @@
  * where owners should be visible.
  */
 struct PALETTE_ENTRY owned_area_palette_intns[] =
- { {63,24,11,0}, {47,31,63,0}, {54,63,26,0}, {63,59,0,0}, {52,47,42,0}, {0,0,0,0}, };//intensified
+ { {63,24,11,0}, {47,31,63,0}, {54,63,26,0}, {63,59,0,0}, {52,47,42,0}, {0,0,0,0}, }; /* intensified */
 /**
  * Standard player colors array.
  * This array containing color intensity added to bitmap
  * where owners should be visible.
  */
 struct PALETTE_ENTRY owned_area_palette_std[] =
-// { {31,12,5,0}, {20,13,27,0}, {23,27,11,0}, {31,29,0,0}, {22,19,17,0}, {0,0,0,0}, };// for sum
- { {186,72,30,0}, {120,78,162,0}, {138,162,66,0}, {186,154,0,0}, {132,114,102,0}, {0,0,0,0}, };// for mul
+/* { {31,12,5,0}, {20,13,27,0}, {23,27,11,0}, {31,29,0,0}, {22,19,17,0}, {0,0,0,0}, };*/ /* for sum */
+ { {186,72,30,0}, {120,78,162,0}, {138,162,66,0}, {186,154,0,0}, {132,114,102,0}, {0,0,0,0}, }; /* for mul */
 /**
  * Weak player colors array.
  * This array containing color intensity added to bitmap
  * where owners should be visible.
  */
 struct PALETTE_ENTRY owned_area_palette_weak[] =
-// { {19,7,2,0}, {10,6,15,0}, {11,14,5,0}, {15,14,0,0}, {11,9,8,0}, {0,0,0,0}, };// for sum
- { {62,24,10,0}, {40,26,54,0}, {46,54,22,0}, {62,55,0,0}, {44,38,34,0}, {0,0,0,0}, };// for mul
+/* { {19,7,2,0}, {10,6,15,0}, {11,14,5,0}, {15,14,0,0}, {11,9,8,0}, {0,0,0,0}, };*/ /* for sum */
+ { {62,24,10,0}, {40,26,54,0}, {46,54,22,0}, {62,55,0,0}, {44,38,34,0}, {0,0,0,0}, };/* for mul */
 
 /**
  * Intense slab colors array.
@@ -62,16 +62,16 @@ struct PALETTE_ENTRY owned_area_palette_weak[] =
  * where slab colors should be intensified.
  */
 struct PALETTE_ENTRY intense_slab_palette_intns[] =
-// { {31,10,17,0}, {28,28,2,0}, };// for sum
- { {248,80,136,0}, {224,224,16,0}, };// for mul
+/* { {31,10,17,0}, {28,28,2,0}, };*/ /* for sum */
+ { {248,80,136,0}, {224,224,16,0}, }; /* for mul */
 /**
  * Standard slab colors array.
  * This array containing color intensity added to bitmap
  * where slab colors should be intensified.
  */
 struct PALETTE_ENTRY intense_slab_palette_std[] =
-// { {15,5,8,0}, {14,14,1,0}, };// for sum
- { {124,40,68,0}, {112,112,8,0}, };// for mul
+/* { {15,5,8,0}, {14,14,1,0}, };*/ /* for sum */
+ { {124,40,68,0}, {112,112,8,0}, }; /* for mul */
 
 #define THINGCIRCLE_PALETTE_SIZE 14
 
@@ -91,14 +91,14 @@ struct PALETTE_ENTRY minimap_owned_room[] =
  * Minimap slab colors array.
  */
 struct PALETTE_ENTRY minimap_walldoor[] =
- // wall          opened door   locked door
+ /* wall           opened door      locked door     */
  { {112,88,60,0}, {224,236,136,0}, {252,208,152,0}, };
 
 /**
  * Minimap slab colors array.
  */
 struct PALETTE_ENTRY minimap_pathliquid[] =
- // path              water         lava
+ /* path          water            lava          */
  { {96,72,28,0}, {140,112,104,0}, {100,60,16,0}, };
 
 /**
@@ -120,37 +120,37 @@ struct PALETTE_ENTRY minimap_earth[] =
  { {56,48,16,0}, {48,44,16,0}, {60,48,16,0}, {72,50,16,0}, {72,56,16,0}, };
 
 struct PALETTE_ENTRY thingcircle_palette_std[] =
- { {176,176,176,0},   // 0 none
-   {224,224,  0,0},   // 1 item
-   {255,255,255,0},   // 2 shot
-   {  0, 96,255,0},   // 3 effect element
-   { 16,255, 16,0},   // 4 dead creature
-   { 16,255, 16,0},   // 5 creature
-   {176,176,176,0},   // 6 unknown
-   { 48, 96,255,0},   // 7 effect generator
-   {255, 32, 32,0},   // 8 trap
-   {255,  0,255,0},   // 9 door
-   {176,176,176,0},   // 10 unknown
-   {176,176,176,0},   // 11 unknown
-   {  0, 96,255,0},   // 12 ambient sound
-   {  0, 96,255,0},   // 13 cave in
+ { {176,176,176,0},   /* 0 none */
+   {224,224,  0,0},   /* 1 item */
+   {255,255,255,0},   /* 2 shot */
+   {  0, 96,255,0},   /* 3 effect element */
+   { 16,255, 16,0},   /* 4 dead creature */
+   { 16,255, 16,0},   /* 5 creature */
+   {176,176,176,0},   /* 6 unknown */
+   { 48, 96,255,0},   /* 7 effect generator */
+   {255, 32, 32,0},   /* 8 trap */
+   {255,  0,255,0},   /* 9 door */
+   {176,176,176,0},   /* 10 unknown */
+   {176,176,176,0},   /* 11 unknown */
+   {  0, 96,255,0},   /* 12 ambient sound */
+   {  0, 96,255,0},   /* 13 cave in */
    };
 
 struct PALETTE_ENTRY thingcircle_palette_weak[] =
- { { 88, 88, 88,0},   // 0 none
-   { 48, 48,  8,0},   // 1 item
-   {128,128,128,0},   // 2 shot
-   {  0, 48,128,0},   // 3 effect element
-   {  8,128,  8,0},   // 4 dead creature
-   {  8,128,  8,0},   // 5 creature
-   { 88, 88, 88,0},   // 6 unknown
-   {  8,  8,128,0},   // 7 effect generator
-   {128, 16, 16,0},   // 8 trap
-   {128,  0,128,0},   // 9 door
-   { 88, 88, 88,0},   // 10 unknown
-   { 88, 88, 88,0},   // 11 unknown
-   {  0, 48,128,0},   // 12 ambient sound
-   {  0, 48,128,0},   // 13 cave in
+ { { 88, 88, 88,0},   /* 0 none */
+   { 48, 48,  8,0},   /* 1 item */
+   {128,128,128,0},   /* 2 shot */
+   {  0, 48,128,0},   /* 3 effect element */
+   {  8,128,  8,0},   /* 4 dead creature */
+   {  8,128,  8,0},   /* 5 creature */
+   { 88, 88, 88,0},   /* 6 unknown */
+   {  8,  8,128,0},   /* 7 effect generator */
+   {128, 16, 16,0},   /* 8 trap */
+   {128,  0,128,0},   /* 9 door */
+   { 88, 88, 88,0},   /* 10 unknown */
+   { 88, 88, 88,0},   /* 11 unknown */
+   {  0, 48,128,0},   /* 12 ambient sound */
+   {  0, 48,128,0},   /* 13 cave in */
    };
 
 /**
@@ -159,8 +159,8 @@ struct PALETTE_ENTRY thingcircle_palette_weak[] =
  * where slab colors should be intensified.
  */
 struct PALETTE_ENTRY intense_slab_palette_weak[] =
-// { {8,3,4,0}, {7,7,0,0}, };// for sum
- { {62,20,34,0}, {56,56,4,0}, };// for mul
+/* { {8,3,4,0}, {7,7,0,0}, }; */ /* for sum */
+ { {62,20,34,0}, {56,56,4,0}, }; /* for mul */
 
 const char *palette_fname="palette.dat";
 const char *cube_fname="cube.dat";
@@ -234,19 +234,19 @@ void mdrand_g8_waste(const unsigned int num)
 short load_palette(struct PALETTE_ENTRY *pal,char *fname)
 {
     message_log(" load_palette: Starting");
-    //Reading file
+    /* Reading file */
     struct MEMORY_FILE *mem;
     short result;
     result = memfile_readnew(&mem,fname,MAX_FILE_SIZE);
     if (result != MFILE_OK)
         return result;
-    // Checking file size
+    /* Checking file size */
     if ((mem->len!=256*3))
     {
       memfile_free(&mem);
       return ERR_FILE_BADDATA;
     }
-    //Loading the entries
+    /* Loading the entries */
     int i;
     for (i=0; i<256; i++)
     {
@@ -344,7 +344,7 @@ void draw_circle_fill(unsigned char *dest,const struct IPOINT_2D dest_pos,
   {
       dxoffset = dest_scanln*dx;
       dyoffset = dest_scanln*dy;
-      // draw border
+      /* draw border */
       i=dy;
       {
         int pos;
@@ -352,41 +352,41 @@ void draw_circle_fill(unsigned char *dest,const struct IPOINT_2D dest_pos,
         {
           pos=dest_pos.x+i ;
           if ((pos>=0)&&(pos<dest_size.x))
-            draw_pixel_exact_offs(dest,offset+3*pos-dxoffset,bcolor);  // octant 0
+            draw_pixel_exact_offs(dest,offset+3*pos-dxoffset,bcolor);  /* octant 0 */
           pos=dest_pos.x-i ;
           if ((pos>=0)&&(pos<dest_size.x))
-            draw_pixel_exact_offs(dest,offset+3*pos-dxoffset,bcolor);  // octant 3
+            draw_pixel_exact_offs(dest,offset+3*pos-dxoffset,bcolor);  /* octant 3 */
         }
         if ((dest_pos.y-i>=0)&&(dest_pos.y-i<dest_size.y))
         {
           pos=dest_pos.x+dx;
           if ((pos>=0)&&(pos<dest_size.x))
-            draw_pixel_exact_offs(dest,offset+3*pos-dyoffset,bcolor);  // octant 1
+            draw_pixel_exact_offs(dest,offset+3*pos-dyoffset,bcolor);  /* octant 1 */
           pos=dest_pos.x-dx;
           if ((pos>=0)&&(pos<dest_size.x))
-            draw_pixel_exact_offs(dest,offset+3*pos-dyoffset,bcolor);  // octant 2
+            draw_pixel_exact_offs(dest,offset+3*pos-dyoffset,bcolor);  /* octant 2 */
         }
         if ((dest_pos.y+dx>=0)&&(dest_pos.y+dx<dest_size.y))
         {
           pos=dest_pos.x-i ;
           if ((pos>=0)&&(pos<dest_size.x))
-            draw_pixel_exact_offs(dest,offset+3*pos+dxoffset,bcolor);  // octant 4
+            draw_pixel_exact_offs(dest,offset+3*pos+dxoffset,bcolor);  /* octant 4 */
           pos=dest_pos.x+i ;
           if ((pos>=0)&&(pos<dest_size.x))
-            draw_pixel_exact_offs(dest,offset+3*pos+dxoffset,bcolor);  // octant 7
+            draw_pixel_exact_offs(dest,offset+3*pos+dxoffset,bcolor);  /* octant 7 */
         }
         if ((dest_pos.y+i>=0)&&(dest_pos.y+i<dest_size.y))
         {
           pos=dest_pos.x-dx;
           if ((pos>=0)&&(pos<dest_size.x))
-            draw_pixel_exact_offs(dest,offset+3*pos+dyoffset,bcolor);  // octant 5
+            draw_pixel_exact_offs(dest,offset+3*pos+dyoffset,bcolor);  /* octant 5 */
           pos=dest_pos.x+dx;
           if ((pos>=0)&&(pos<dest_size.x))
-            draw_pixel_exact_offs(dest,offset+3*pos+dyoffset,bcolor);  // octant 6
+            draw_pixel_exact_offs(dest,offset+3*pos+dyoffset,bcolor);  /* octant 6 */
         }
       }
       i--;dyoffset-=dest_scanln;
-      // draw inside
+      /* draw inside */
       for(;i>=dx;i--,dyoffset-=dest_scanln)
       {
         int pos;
@@ -394,37 +394,37 @@ void draw_circle_fill(unsigned char *dest,const struct IPOINT_2D dest_pos,
         {
           pos=dest_pos.x+i ;
           if ((pos>=0)&&(pos<dest_size.x))
-            draw_pixel_exact_offs(dest,offset+3*pos-dxoffset,fcolor);  // octant 0
+            draw_pixel_exact_offs(dest,offset+3*pos-dxoffset,fcolor);  /* octant 0 */
           pos=dest_pos.x-i ;
           if ((pos>=0)&&(pos<dest_size.x))
-            draw_pixel_exact_offs(dest,offset+3*pos-dxoffset,fcolor);  // octant 3
+            draw_pixel_exact_offs(dest,offset+3*pos-dxoffset,fcolor);  /* octant 3 */
         }
         if ((dest_pos.y-i>=0)&&(dest_pos.y-i<dest_size.y))
         {
           pos=dest_pos.x+dx;
           if ((pos>=0)&&(pos<dest_size.x))
-            draw_pixel_exact_offs(dest,offset+3*pos-dyoffset,fcolor);  // octant 1
+            draw_pixel_exact_offs(dest,offset+3*pos-dyoffset,fcolor);  /* octant 1 */
           pos=dest_pos.x-dx;
           if ((pos>=0)&&(pos<dest_size.x))
-            draw_pixel_exact_offs(dest,offset+3*pos-dyoffset,fcolor);  // octant 2
+            draw_pixel_exact_offs(dest,offset+3*pos-dyoffset,fcolor);  /* octant 2 */
         }
         if ((dest_pos.y+dx>=0)&&(dest_pos.y+dx<dest_size.y))
         {
           pos=dest_pos.x-i ;
           if ((pos>=0)&&(pos<dest_size.x))
-            draw_pixel_exact_offs(dest,offset+3*pos+dxoffset,fcolor);  // octant 4
+            draw_pixel_exact_offs(dest,offset+3*pos+dxoffset,fcolor);  /* octant 4 */
           pos=dest_pos.x+i ;
           if ((pos>=0)&&(pos<dest_size.x))
-            draw_pixel_exact_offs(dest,offset+3*pos+dxoffset,fcolor);  // octant 7
+            draw_pixel_exact_offs(dest,offset+3*pos+dxoffset,fcolor);  /* octant 7 */
         }
         if ((dest_pos.y+i>=0)&&(dest_pos.y+i<dest_size.y))
         {
           pos=dest_pos.x-dx;
           if ((pos>=0)&&(pos<dest_size.x))
-            draw_pixel_exact_offs(dest,offset+3*pos+dyoffset,fcolor);  // octant 5
+            draw_pixel_exact_offs(dest,offset+3*pos+dyoffset,fcolor);  /* octant 5 */
           pos=dest_pos.x+dx;
           if ((pos>=0)&&(pos<dest_size.x))
-            draw_pixel_exact_offs(dest,offset+3*pos+dyoffset,fcolor);  // octant 6
+            draw_pixel_exact_offs(dest,offset+3*pos+dyoffset,fcolor);  /* octant 6 */
         }
       }
       {
@@ -463,7 +463,7 @@ void draw_circle_mul(unsigned char *dest,const struct IPOINT_2D dest_pos,
   {
       dxoffset = dest_scanln*dx;
       dyoffset = dest_scanln*dy;
-      // draw border
+      /* draw border */
       i=dy;
       {
         int pos;
@@ -471,41 +471,41 @@ void draw_circle_mul(unsigned char *dest,const struct IPOINT_2D dest_pos,
         {
           pos=dest_pos.x+i ;
           if ((pos>=0)&&(pos<dest_size.x))
-            draw_pixel_mul_offs(dest,offset+3*pos-dxoffset,bcolor);  // octant 0
+            draw_pixel_mul_offs(dest,offset+3*pos-dxoffset,bcolor);  /* octant 0 */
           pos=dest_pos.x-i ;
           if ((pos>=0)&&(pos<dest_size.x))
-            draw_pixel_mul_offs(dest,offset+3*pos-dxoffset,bcolor);  // octant 3
+            draw_pixel_mul_offs(dest,offset+3*pos-dxoffset,bcolor);  /* octant 3 */
         }
         if ((dest_pos.y-i>=0)&&(dest_pos.y-i<dest_size.y))
         {
           pos=dest_pos.x+dx;
           if ((pos>=0)&&(pos<dest_size.x))
-            draw_pixel_mul_offs(dest,offset+3*pos-dyoffset,bcolor);  // octant 1
+            draw_pixel_mul_offs(dest,offset+3*pos-dyoffset,bcolor);  /* octant 1 */
           pos=dest_pos.x-dx;
           if ((pos>=0)&&(pos<dest_size.x))
-            draw_pixel_mul_offs(dest,offset+3*pos-dyoffset,bcolor);  // octant 2
+            draw_pixel_mul_offs(dest,offset+3*pos-dyoffset,bcolor);  /* octant 2 */
         }
         if ((dest_pos.y+dx>=0)&&(dest_pos.y+dx<dest_size.y))
         {
           pos=dest_pos.x-i ;
           if ((pos>=0)&&(pos<dest_size.x))
-            draw_pixel_mul_offs(dest,offset+3*pos+dxoffset,bcolor);  // octant 4
+            draw_pixel_mul_offs(dest,offset+3*pos+dxoffset,bcolor);  /* octant 4 */
           pos=dest_pos.x+i ;
           if ((pos>=0)&&(pos<dest_size.x))
-            draw_pixel_mul_offs(dest,offset+3*pos+dxoffset,bcolor);  // octant 7
+            draw_pixel_mul_offs(dest,offset+3*pos+dxoffset,bcolor);  /* octant 7 */
         }
         if ((dest_pos.y+i>=0)&&(dest_pos.y+i<dest_size.y))
         {
           pos=dest_pos.x-dx;
           if ((pos>=0)&&(pos<dest_size.x))
-            draw_pixel_mul_offs(dest,offset+3*pos+dyoffset,bcolor);  // octant 5
+            draw_pixel_mul_offs(dest,offset+3*pos+dyoffset,bcolor);  /* octant 5 */
           pos=dest_pos.x+dx;
           if ((pos>=0)&&(pos<dest_size.x))
-            draw_pixel_mul_offs(dest,offset+3*pos+dyoffset,bcolor);  // octant 6
+            draw_pixel_mul_offs(dest,offset+3*pos+dyoffset,bcolor);  /* octant 6 */
         }
       }
       i--;dyoffset-=dest_scanln;
-      // draw inside
+      /* draw inside */
       for(;i>=dx;i--,dyoffset-=dest_scanln)
       {
         int pos;
@@ -513,37 +513,37 @@ void draw_circle_mul(unsigned char *dest,const struct IPOINT_2D dest_pos,
         {
           pos=dest_pos.x+i ;
           if ((pos>=0)&&(pos<dest_size.x))
-            draw_pixel_mul_offs(dest,offset+3*pos-dxoffset,fcolor);  // octant 0
+            draw_pixel_mul_offs(dest,offset+3*pos-dxoffset,fcolor);  /* octant 0 */
           pos=dest_pos.x-i ;
           if ((pos>=0)&&(pos<dest_size.x))
-            draw_pixel_mul_offs(dest,offset+3*pos-dxoffset,fcolor);  // octant 3
+            draw_pixel_mul_offs(dest,offset+3*pos-dxoffset,fcolor);  /* octant 3 */
         }
         if ((dest_pos.y-i>=0)&&(dest_pos.y-i<dest_size.y))
         {
           pos=dest_pos.x+dx;
           if ((pos>=0)&&(pos<dest_size.x))
-            draw_pixel_mul_offs(dest,offset+3*pos-dyoffset,fcolor);  // octant 1
+            draw_pixel_mul_offs(dest,offset+3*pos-dyoffset,fcolor);  /* octant 1 */
           pos=dest_pos.x-dx;
           if ((pos>=0)&&(pos<dest_size.x))
-            draw_pixel_mul_offs(dest,offset+3*pos-dyoffset,fcolor);  // octant 2
+            draw_pixel_mul_offs(dest,offset+3*pos-dyoffset,fcolor);  /* octant 2 */
         }
         if ((dest_pos.y+dx>=0)&&(dest_pos.y+dx<dest_size.y))
         {
           pos=dest_pos.x-i ;
           if ((pos>=0)&&(pos<dest_size.x))
-            draw_pixel_mul_offs(dest,offset+3*pos+dxoffset,fcolor);  // octant 4
+            draw_pixel_mul_offs(dest,offset+3*pos+dxoffset,fcolor);  /* octant 4 */
           pos=dest_pos.x+i ;
           if ((pos>=0)&&(pos<dest_size.x))
-            draw_pixel_mul_offs(dest,offset+3*pos+dxoffset,fcolor);  // octant 7
+            draw_pixel_mul_offs(dest,offset+3*pos+dxoffset,fcolor);  /* octant 7 */
         }
         if ((dest_pos.y+i>=0)&&(dest_pos.y+i<dest_size.y))
         {
           pos=dest_pos.x-dx;
           if ((pos>=0)&&(pos<dest_size.x))
-            draw_pixel_mul_offs(dest,offset+3*pos+dyoffset,fcolor);  // octant 5
+            draw_pixel_mul_offs(dest,offset+3*pos+dyoffset,fcolor);  /* octant 5 */
           pos=dest_pos.x+dx;
           if ((pos>=0)&&(pos<dest_size.x))
-            draw_pixel_mul_offs(dest,offset+3*pos+dyoffset,fcolor);  // octant 6
+            draw_pixel_mul_offs(dest,offset+3*pos+dyoffset,fcolor);  /* octant 6 */
         }
       }
       {
@@ -594,7 +594,7 @@ short place_sprite_cntr_on_buf_rgb(unsigned char *dest,const struct IPOINT_2D de
       for (;w<spr->width;w++)
       {
           if (dest_sidx>dest_maxidx) continue;
-          //Using multiplication to place colour on the pixel
+          /* Using multiplication to place colour on the pixel */
           draw_pixel_x4walpha_offs(dest,dest_idx+dest_sidx,
               spr->alpha[src_idx+w],&pal[spr->data[src_idx+w]]);
           dest_sidx+=3;
@@ -628,9 +628,9 @@ short draw_rect_mul_on_buffer(unsigned char *dest,const struct IPOINT_2D dest_po
     unsigned long dest_maxidx=(dest_size.x-1)*3;
     if (dest_maxidx>=dest_scanln) dest_maxidx=dest_scanln-1;
     struct IPOINT_2D dest_rect_size={rect_size.x/scale.x,rect_size.y/scale.y};
-//    struct IPOINT_2D dest_rect_size=
-//        {rect_size.x/scale.x+((rect_size.x%scale.x)>0),
-//         rect_size.y/scale.y+((rect_size.y%scale.y)>0)};
+/*    struct IPOINT_2D dest_rect_size=
+        {rect_size.x/scale.x+((rect_size.x%scale.x)>0),
+         rect_size.y/scale.y+((rect_size.y%scale.y)>0)};*/
     int i,j;
     for (j=0;j<dest_rect_size.y;j++)
     {
@@ -639,7 +639,7 @@ short draw_rect_mul_on_buffer(unsigned char *dest,const struct IPOINT_2D dest_po
       for (i=0;i<dest_rect_size.x;i++)
       {
           if (dest_sidx>dest_maxidx) continue;
-          //Using multiplication to place colour on the pixel
+          /* Using multiplication to place colour on the pixel */
           draw_pixel_mul_offs(dest,dest_idx+dest_sidx,pxdata);
           dest_sidx+=3;
       }
@@ -677,7 +677,7 @@ short draw_rect_sum_on_buffer(unsigned char *dest,const struct IPOINT_2D dest_po
           if ((i%scale.x)!=0) continue;
           unsigned long dest_sidx=dest_pos.x+(i/scale.x);
           if (dest_sidx>=dest_size.x) continue;
-          //Using sum place colour on the pixel
+          /* Using sum place colour on the pixel */
           unsigned char nval;
           dest_sidx*=3;
           nval=(dest[dest_idx+dest_sidx+0]);
@@ -750,7 +750,7 @@ short draw_texture_on_buffer_avg4(unsigned char *dest,const struct IPOINT_2D des
       if (dest_idx>=dest_fullsize) break;
       if (src_idx>=src_fullsize) break;
       unsigned short ridy=mdrand_g8(scale.x);
-      // Determine if we won't be out of source bounds for max value of src_add
+      /* Determine if we won't be out of source bounds for max value of src_add */
       if (src_idx+(scale.y-1)*src_size.x>=src_fullsize) break;
       unsigned long dest_sidx=dest_startx;
       for (i=0;i<rect_size.x;i++)
@@ -759,13 +759,13 @@ short draw_texture_on_buffer_avg4(unsigned char *dest,const struct IPOINT_2D des
           int src_xfinal=src_pos.x+i;
           i+=scale.x-ridy-1;
           ridy=mdrand_g8(scale.x);
-          // Select two source lines
+          /* Select two source lines */
           int scaley_half=scale.y>>1;
           int src_add1=(mdrand_g8(scaley_half))*src_size.x;
           int src_add2=(mdrand_g8(scaley_half)+scaley_half)*src_size.x;
           if (dest_sidx>dest_maxidx) continue;
           if (src_xfinal>=src_size.x) continue;
-          // Getting pixels for the average
+          /* Getting pixels for the average */
           struct PALETTE_ENTRY *pxdata1;
           struct PALETTE_ENTRY *pxdata2;
           struct PALETTE_ENTRY *pxdata3;
@@ -827,7 +827,7 @@ short draw_texture_on_buffer_avg4_unsafe(unsigned char *dest,const struct IPOINT
           continue;
       }
       unsigned short ridy=mdrand_g8(scale.x);
-      // Determine if we won't be out of source bounds for max value of src_add
+      /* Determine if we won't be out of source bounds for max value of src_add */
       for (i=0;i<rect_size.x;i++)
       {
           if ((i%scale.x)!=(ridy)) continue;
@@ -835,13 +835,13 @@ short draw_texture_on_buffer_avg4_unsafe(unsigned char *dest,const struct IPOINT
           i+=scale.x-ridy-1;
           unsigned long dest_sidx=dest_pos.x+(i/scale.x);
           ridy=mdrand_g8(scale.x);
-          // Select two source lines
+          /* Select two source lines */
           int scaley_half=scale.y>>1;
           int src_add1=(mdrand_g8(scaley_half))*src_size.x;
           int src_add2=(mdrand_g8(scaley_half)+scaley_half)*src_size.x;
           src_add1+=src_idx+src_xfinal;
           src_add2+=src_idx+src_xfinal;
-          // Getting pixels for the average
+          /* Getting pixels for the average */
           struct PALETTE_ENTRY *pxdata1;
           struct PALETTE_ENTRY *pxdata2;
           struct PALETTE_ENTRY *pxdata3;
@@ -917,7 +917,7 @@ short draw_texture_on_buffer_avg2(unsigned char *dest,const struct IPOINT_2D des
       if (dest_idx>=dest_fullsize) break;
       if (src_idx>=src_fullsize) break;
       unsigned short ridy=mdrand_g8(scale.x);
-      // Determine if we won't be out of source bounds for max value of src_add
+      /* Determine if we won't be out of source bounds for max value of src_add */
       if (src_idx+(scale.y-1)*src_size.x>=src_fullsize) break;
       for (i=0;i<rect_size.x;i++)
       {
@@ -1139,7 +1139,7 @@ short draw_texture_on_buffer_noavg(unsigned char *dest,const struct IPOINT_2D de
             continue;
         }
         unsigned short ridy=mdrand_g8(scale.x);
-        // The bound conditions are rarely true - this is why they are here, not before
+        /* The bound conditions are rarely true - this is why they are here, not before */
         if (dest_idx >= dest_fullsize) break;
         if (src_idx+(scale.y-1)*src_size.x >= src_fullsize) break;
         long dest_sidx=3*dest_pos.x;
@@ -1199,7 +1199,7 @@ short draw_texture_on_buffer_noavg_unsafe(unsigned char *dest,const struct IPOIN
     long dest_idx=(dest_pos.y*dest_scanln);
     long src_idx=(src_pos.y*src_size.x);
     int i,j;
-    // Danger - We asume that both src_idx and dest_idx are not less than zero here!
+    /* Danger - We asume that both src_idx and dest_idx are not less than zero here! */
     for (j=0;j<rect_size.y;j++)
     {
         if ((j%scale.y)>0)
@@ -1209,7 +1209,7 @@ short draw_texture_on_buffer_noavg_unsafe(unsigned char *dest,const struct IPOIN
         }
         unsigned short ridy=mdrand_g8(scale.x);
         long dest_sidx=3*dest_pos.x;
-        // Danger - We asume that dest_sidx is not less than zero here!
+        /* Danger - We asume that dest_sidx is not less than zero here! */
         for (i=0;i<rect_size.x;i++)
         {
             if ((i%scale.x)!=(ridy)) continue;
@@ -1217,8 +1217,8 @@ short draw_texture_on_buffer_noavg_unsafe(unsigned char *dest,const struct IPOIN
             i+=scale.x-ridy-1;
             ridy=mdrand_g8(scale.x);
             src_add+=src_idx+mdrand_g8(scale.y)*src_size.x;
-            //Danger - we assume that dest_sidx is less than scanline length,
-            // and src_pos.x+i is less or equal src_size.x here!
+            /* Danger - we assume that dest_sidx is less than scanline length,
+               and src_pos.x+i is less or equal src_size.x here! */
             struct PALETTE_ENTRY *pxdata=&pal[src[src_add]];
             dest[dest_idx+dest_sidx+0]=(pxdata->b<<2);
             dest[dest_idx+dest_sidx+1]=(pxdata->g<<2);
@@ -1435,7 +1435,7 @@ short texture_index_to_texture_pos(struct IPOINT_2D *texture_pos,
     const struct CUBES_DATA *cubes,unsigned short textr_idx,unsigned int anim_frame)
 {
     short result=ERR_NONE;
-    // Checking if the index is animated
+    /* Checking if the index is animated */
     if (textr_idx>=TEXTURE_COUNT_X*TEXTURE_COUNT_Y)
     {
         textr_idx-=TEXTURE_COUNT_X*TEXTURE_COUNT_Y;
@@ -1478,7 +1478,7 @@ short texture_index_to_texture_pos(struct IPOINT_2D *texture_pos,
 short get_top_texture_pos(struct IPOINT_2D *texture_pos,
     const struct CUBES_DATA *cubes,unsigned short cube_idx,unsigned int anim)
 {
-    // Retrieving texture top index
+    /* Retrieving texture top index */
     unsigned int textr_top;
     short result=ERR_NONE;
     if (cube_idx<cubes->count)
@@ -1505,7 +1505,7 @@ short get_top_texture_pos(struct IPOINT_2D *texture_pos,
 short draw_map_on_buffer(char *dest,const struct LEVEL *lvl,
     struct MAPDRAW_DATA *draw_data,unsigned int anim)
 {
-//    message_log("  draw_map_on_buffer: Starting");
+    /*message_log("  draw_map_on_buffer: Starting");*/
     struct IPOINT_2D texture_size={TEXTURE_SIZE_X*TEXTURE_COUNT_X,TEXTURE_SIZE_Y*TEXTURE_COUNT_Y};
     struct IPOINT_2D single_txtr_size={TEXTURE_SIZE_X,TEXTURE_SIZE_Y};
     struct IPOINT_2D dest_size={draw_data->end.x-draw_data->start.x+1,draw_data->end.y-draw_data->start.y+1};
@@ -1513,7 +1513,7 @@ short draw_map_on_buffer(char *dest,const struct LEVEL *lvl,
     struct IPOINT_2D dest_pos;
     struct IPOINT_2D scale={1<<(draw_data->rescale),1<<(draw_data->rescale)};
     struct IPOINT_2D scaled_txtr_size={TEXTURE_SIZE_X>>(draw_data->rescale),TEXTURE_SIZE_Y>>(draw_data->rescale)};
-    //Finding start/end of the drawing area
+    /* Finding start/end of the drawing area */
     struct IPOINT_2D start;
     start.x = draw_data->start.x/scaled_txtr_size.x;
     start.y = draw_data->start.y/scaled_txtr_size.y;
@@ -1521,7 +1521,7 @@ short draw_map_on_buffer(char *dest,const struct LEVEL *lvl,
     end.x = draw_data->end.x/scaled_txtr_size.x + ((draw_data->end.x%scaled_txtr_size.x)>0);
     end.y = draw_data->end.y/scaled_txtr_size.y + ((draw_data->end.y%scaled_txtr_size.y)>0);
     struct IPOINT_2D stile_count={end.x-start.x-1,end.y-start.y-1};
-    //Drawing subtiles
+    /* Drawing subtiles */
     int i,j;
     j=0;
     {
@@ -1576,7 +1576,7 @@ short draw_map_on_buffer(char *dest,const struct LEVEL *lvl,
           draw_texture_on_buffer_unsafe(dest,dest_pos,dest_size,draw_data->dest_scanln,draw_data->texture,
               texture_pos,texture_size,single_txtr_size,draw_data->palette,scale);
       }
-      { // i=stile_count.x
+      { /* i=stile_count.x */
           mdrand_setpos(draw_data,start.x+i,start.y+j);
           clmentry=get_subtile_column(lvl,start.x+i,start.y+j);
           cube_idx=get_clm_entry_topcube(clmentry);
@@ -1590,7 +1590,7 @@ short draw_map_on_buffer(char *dest,const struct LEVEL *lvl,
               texture_pos,texture_size,single_txtr_size,draw_data->palette,scale);
       }
     }
-    { // j=stile_count.y
+    { /* j=stile_count.y */
       dest_pos.y=j*(scaled_txtr_size.y)-(draw_data->start.y%scaled_txtr_size.y);
       for (i=0; i<=stile_count.x; i++)
       {
@@ -1609,7 +1609,7 @@ short draw_map_on_buffer(char *dest,const struct LEVEL *lvl,
               texture_pos,texture_size,single_txtr_size,draw_data->palette,scale);
       }
     }
-    // Colirizing some slabs
+    /* Colirizing some slabs */
     if (draw_data->ownerpal!=NULL)
       for (j=0; j<end.y-start.y; j++)
       {
@@ -1638,7 +1638,7 @@ short draw_map_on_buffer(char *dest,const struct LEVEL *lvl,
           }
         }
       }
-//    message_log("  draw_map_on_buffer: Finished");
+      /*message_log("  draw_map_on_buffer: Finished");*/
     return ERR_NONE;
 }
 
@@ -1654,7 +1654,7 @@ short draw_map_on_buffer(char *dest,const struct LEVEL *lvl,
 short draw_map_on_buffer_fast(char *dest,const struct LEVEL *lvl,
     struct MAPDRAW_DATA *draw_data,unsigned int anim)
 {
-//    message_log("  draw_map_on_buffer_fast: Starting");
+    /*message_log("  draw_map_on_buffer_fast: Starting");*/
     struct IPOINT_2D texture_size={TEXTURE_SIZE_X*TEXTURE_COUNT_X,TEXTURE_SIZE_Y*TEXTURE_COUNT_Y};
     struct IPOINT_2D single_txtr_size={TEXTURE_SIZE_X,TEXTURE_SIZE_Y};
     struct IPOINT_2D dest_size={draw_data->end.x-draw_data->start.x+1,draw_data->end.y-draw_data->start.y+1};
@@ -1662,7 +1662,7 @@ short draw_map_on_buffer_fast(char *dest,const struct LEVEL *lvl,
     struct IPOINT_2D dest_pos;
     struct IPOINT_2D scale={1<<(draw_data->rescale),1<<(draw_data->rescale)};
     struct IPOINT_2D scaled_txtr_size={TEXTURE_SIZE_X>>(draw_data->rescale),TEXTURE_SIZE_Y>>(draw_data->rescale)};
-    //Finding start/end of the drawing area
+    /* Finding start/end of the drawing area */
     struct IPOINT_2D start;
     start.x = draw_data->start.x/scaled_txtr_size.x;
     start.y = draw_data->start.y/scaled_txtr_size.y;
@@ -1674,7 +1674,7 @@ short draw_map_on_buffer_fast(char *dest,const struct LEVEL *lvl,
     dest_pos.y=-(draw_data->start.y%scaled_txtr_size.y);
 
     j=0;
-    { //j=0 loop - partial slab
+    { /* j=0 loop - partial slab */
       dest_pos.x=-(draw_data->start.x%scaled_txtr_size.x);
       for (i=0; i<=tile_count.x; i++)
       {
@@ -1699,7 +1699,7 @@ short draw_map_on_buffer_fast(char *dest,const struct LEVEL *lvl,
     {
       dest_pos.x=-(draw_data->start.x%scaled_txtr_size.x);
       i=0;
-      { //i=0 loop - partial slab
+      { /* i=0 loop - partial slab */
           unsigned short cube_idx;
           unsigned char *clmentry;
           mdrand_setpos(draw_data,start.x+i,start.y+j);
@@ -1730,7 +1730,7 @@ short draw_map_on_buffer_fast(char *dest,const struct LEVEL *lvl,
               texture_pos,texture_size,single_txtr_size,draw_data->palette,scale);
           dest_pos.x+=scaled_txtr_size.x;
       }
-      { //i=tile_count.x loop - partial slab
+      { /* i=tile_count.x loop - partial slab */
           unsigned short cube_idx;
           unsigned char *clmentry;
           mdrand_setpos(draw_data,start.x+i,start.y+j);
@@ -1747,7 +1747,7 @@ short draw_map_on_buffer_fast(char *dest,const struct LEVEL *lvl,
       }
       dest_pos.y+=scaled_txtr_size.y;
     }
-    { //j=tile_count.y loop - partial slab
+    { /* j=tile_count.y loop - partial slab */
       dest_pos.x=-(draw_data->start.x%scaled_txtr_size.x);
       for (i=0; i<=tile_count.x; i++)
       {
@@ -1767,7 +1767,7 @@ short draw_map_on_buffer_fast(char *dest,const struct LEVEL *lvl,
       }
       dest_pos.y+=scaled_txtr_size.y;
     }
-//    message_log("  draw_map_on_buffer_fast: Finished");
+    /* message_log("  draw_map_on_buffer_fast: Finished"); */
     return ERR_NONE;
 }
 
@@ -1819,9 +1819,9 @@ unsigned int get_objcircle_ranged_radius(const struct IPOINT_2D scaled_txtr_size
  */
 short draw_things_on_buffer(char *dest,const struct LEVEL *lvl,struct MAPDRAW_DATA *draw_data)
 {
-    //message_log("  draw_things_on_buffer: Starting");
+    /*message_log("  draw_things_on_buffer: Starting");*/
     struct IPOINT_2D scaled_txtr_size={TEXTURE_SIZE_X>>(draw_data->rescale),TEXTURE_SIZE_Y>>(draw_data->rescale)};
-    //Finding start/end of the drawing area
+    /* Finding start/end of the drawing area */
     struct IPOINT_2D start;
     start.x = draw_data->start.x/scaled_txtr_size.x;
     start.y = draw_data->start.y/scaled_txtr_size.y;
@@ -1829,10 +1829,10 @@ short draw_things_on_buffer(char *dest,const struct LEVEL *lvl,struct MAPDRAW_DA
     end.x = draw_data->end.x/scaled_txtr_size.x + ((draw_data->end.x%scaled_txtr_size.x)>0);
     end.y = draw_data->end.y/scaled_txtr_size.y + ((draw_data->end.y%scaled_txtr_size.y)>0);
 
-//    struct IPOINT_2D dest_scaled_size={(end.x-start.x)*scaled_txtr_size.x,(end.y-start.y)*scaled_txtr_size.y};
+    /*struct IPOINT_2D dest_scaled_size={(end.x-start.x)*scaled_txtr_size.x,(end.y-start.y)*scaled_txtr_size.y};*/
     struct IPOINT_2D dest_scaled_size={(draw_data->end.x-draw_data->start.x+1),(draw_data->end.y-draw_data->start.y+1)};
     struct IPOINT_2D dest_pos;
-    // Looping through coords and placing things - first pass, the background things
+    /* Looping through coords and placing things - first pass, the background things */
     int i,j,k;
     for (j=0; j<end.y-start.y; j++)
     {
@@ -1846,7 +1846,7 @@ short draw_things_on_buffer(char *dest,const struct LEVEL *lvl,struct MAPDRAW_DA
             int spr_idx=-1;
             if (is_gold(thing))
             {
-              //Show only some of the gold on large scaling
+              /* Show only some of the gold on large scaling */
               if ((draw_data->rescale<4)||(mdrand_g8(7)==0))
                 spr_idx=510;
             } else
@@ -1875,7 +1875,7 @@ short draw_things_on_buffer(char *dest,const struct LEVEL *lvl,struct MAPDRAW_DA
           }
         }
     }
-    //Second pass - foreground things
+    /* Second pass - foreground things */
     for (j=0; j<end.y-start.y; j++)
     {
         for (i=0; i<end.x-start.x; i++)
@@ -1915,7 +1915,7 @@ short draw_things_on_buffer(char *dest,const struct LEVEL *lvl,struct MAPDRAW_DA
         }
     }
 
-    //Third pass - thing circles
+  /* Third pass - thing circles */
   if (draw_data->tngflags&TNGFLG_SHOW_CIRCLES)
   {
     mdrand_setpos(draw_data,0,0);
@@ -1986,7 +1986,7 @@ short draw_things_on_buffer(char *dest,const struct LEVEL *lvl,struct MAPDRAW_DA
         }
     }
   }
-  //message_log("  draw_things_on_buffer: Finished");
+  /*message_log("  draw_things_on_buffer: Finished");*/
   return ERR_NONE;
 }
 
@@ -2023,7 +2023,7 @@ short draw_text_on_buffer(char *dest,const int px,const int py,
               dest_pos.x+=item->width;
         }
     }
-    //message_log("  draw_text_on_buffer: Finished");
+    /*message_log("  draw_text_on_buffer: Finished");*/
     return ERR_NONE;
 }
 
@@ -2162,7 +2162,7 @@ short load_draw_data(struct MAPDRAW_DATA **draw_data,const struct MAPDRAW_OPTION
     (*draw_data)->subsize.y=subtl->y;
     (*draw_data)->tngflags=opts->tngflags;
     unsigned int total_subtiles=(*draw_data)->subsize.x*(*draw_data)->subsize.y;
-    // Initializing draw_data values
+    /* Initializing draw_data values */
     (*draw_data)->cubes=malloc(sizeof(struct CUBES_DATA));
     (*draw_data)->palette=malloc(256*sizeof(struct PALETTE_ENTRY));
     (*draw_data)->images=malloc(sizeof(struct IMAGELIST));
@@ -2194,7 +2194,7 @@ short load_draw_data(struct MAPDRAW_DATA **draw_data,const struct MAPDRAW_OPTION
         (*draw_data)=NULL;
         return 3;
     }
-    // Preparing random pool
+    /* Preparing random pool */
     int i;
     for (i=0;i<total_subtiles;i++)
     {
@@ -2202,9 +2202,9 @@ short load_draw_data(struct MAPDRAW_DATA **draw_data,const struct MAPDRAW_OPTION
         rnd_ints[i]=rand();
     }
     (*draw_data)->rand_count=0;
-    // Setting map drawing rectangle
+    /* Setting map drawing rectangle */
     set_draw_data_rect(*draw_data,0,0,bmp_size.x-1,bmp_size.y-1,bmp_size.x*3,(opts->rescale));
-    // Loading files needed to draw
+    /* Loading files needed to draw */
     char *fnames;
     result=true;
     if (result)
@@ -2243,7 +2243,7 @@ short load_draw_data(struct MAPDRAW_DATA **draw_data,const struct MAPDRAW_OPTION
       message_log(" load_draw_data: Loading texture");
       result = (change_draw_data_texture(*draw_data,opts,textr_idx)==ERR_NONE);
     }
-    //Reading DAT,TAB and extracting images
+    /* Reading DAT,TAB and extracting images */
     if (result)
     {
       message_log(" load_draw_data: Loading gui2-0 icons");
@@ -2259,7 +2259,7 @@ short load_draw_data(struct MAPDRAW_DATA **draw_data,const struct MAPDRAW_OPTION
       free(fnames);
       free(tabfname);
     }
-    //Reading font0 DAT,TAB and extracting images
+    /* Reading font0 DAT,TAB and extracting images */
     if ((result)&&(opts->bmfonts&BMFONT_LOAD_SMALL))
     {
       message_log(" load_draw_data: Loading small font");
@@ -2275,7 +2275,7 @@ short load_draw_data(struct MAPDRAW_DATA **draw_data,const struct MAPDRAW_OPTION
       free(fnames);
       free(tabfname);
     }
-    //Reading font1 DAT,TAB and extracting images
+    /* Reading font1 DAT,TAB and extracting images */
     if ((result)&&(opts->bmfonts&BMFONT_LOAD_LARGE))
     {
       message_log(" load_draw_data: Loading large font");
@@ -2291,11 +2291,11 @@ short load_draw_data(struct MAPDRAW_DATA **draw_data,const struct MAPDRAW_OPTION
       free(fnames);
       free(tabfname);
     }
-    //Preparing constant arrays
+    /* Preparing constant arrays */
     if (result)
     {
       message_log(" load_draw_data: Preparing constant arrays");
-      for(i=0;i<SIN_ACOS_SIZE;i++)                 // create the sin(arccos(x)) table.
+      for(i=0;i<SIN_ACOS_SIZE;i++)                 /* create the sin(arccos(x)) table. */
       {
         (*draw_data)->sin_acos[i]=sin(acos(((float)i)/SIN_ACOS_SIZE))*0x10000L;
       }
@@ -2371,7 +2371,7 @@ short get_draw_tile_rect(struct IPOINT_2D *tstart,
       return ERR_INTERNAL;
   tdim->x = (TEXTURE_SIZE_X>>(draw_data->rescale))*MAP_SUBNUM_X;
   tdim->y = (TEXTURE_SIZE_Y>>(draw_data->rescale))*MAP_SUBNUM_Y;
-  //Finding start of the tile area
+  /* Finding start of the tile area */
   tstart->x = (tdim->x*tx)-draw_data->start.x;
   tstart->y = (tdim->y*ty)-draw_data->start.y;
   return ERR_NONE;
@@ -2395,7 +2395,7 @@ short get_draw_subtile_rect(struct IPOINT_2D *sstart,
       return ERR_INTERNAL;
   sdim->x = (TEXTURE_SIZE_X>>(draw_data->rescale));
   sdim->y = (TEXTURE_SIZE_Y>>(draw_data->rescale));
-  //Finding start of the tile area
+  /* Finding start of the tile area */
   sstart->x = (sdim->x*sx)-draw_data->start.x;
   sstart->y = (sdim->y*sy)-draw_data->start.y;
   return ERR_NONE;
@@ -2514,7 +2514,7 @@ short get_thing_with_circle_at(unsigned int *sx,unsigned int *sy,unsigned int *n
     const struct MAPDRAW_DATA *draw_data,const struct LEVEL *lvl,
     unsigned int px,unsigned int py)
 {
-  //message_log(" get_thing_with_circle_at: Starting with pos (%u,%u)",px,py);
+  /*message_log(" get_thing_with_circle_at: Starting with pos (%u,%u)",px,py);*/
   if (draw_data==NULL)
       return ERR_INTERNAL;
   struct IPOINT_2D scaled_txtr_size=
@@ -2528,8 +2528,8 @@ short get_thing_with_circle_at(unsigned int *sx,unsigned int *sy,unsigned int *n
       message_error("Cannot convert coordinates");
       return result;
   }
-  //message_log(" get_thing_with_circle_at: Searching for thing at (%u,%u)",test_ssx,test_ssy);
-  // Searching for nearest thing
+  /*message_log(" get_thing_with_circle_at: Searching for thing at (%u,%u)",test_ssx,test_ssy);*/
+  /* Searching for nearest thing */
   unsigned int obj_sx,obj_sy,obj_num;
   long dist;
   dist=get_nearest_thing_idx(lvl,test_ssx,test_ssy,&obj_sx,&obj_sy,&obj_num);
@@ -2538,23 +2538,25 @@ short get_thing_with_circle_at(unsigned int *sx,unsigned int *sy,unsigned int *n
       message_info("No thing near subtile (%u,%u)",test_ssx>>8,test_ssy>>8);
       return ERR_INTERNAL;
   }
-  //message_log(" get_thing_with_circle_at: Thing found");
-  // Checking if it is near enough
-  // Note: it is quite simplified and assumes scale is same in X and Y direction!
+  /*message_log(" get_thing_with_circle_at: Thing found");*/
+  /**
+   * Checking if it is near enough
+   * Note: it is quite simplified and assumes scale is same in X and Y direction!
+   */
   long radius;
   radius=get_objcircle_std_radius(scaled_txtr_size);
   if (radius<3) radius=3;
   radius = ((unsigned long)radius<<8)/scaled_txtr_size.x;
-  // Equation of a circle
+  /* Equation of a circle */
   if (dist<=radius)
   {
-      //message_log(" get_thing_with_circle_at: Thing mets condition");
+      /*message_log(" get_thing_with_circle_at: Thing mets condition");*/
       *sx=obj_sx;
       *sy=obj_sy;
       *num=obj_num;
       return ERR_NONE;
   }
-  //message_log(" get_thing_with_circle_at: Thing rejected");
+  /*message_log(" get_thing_with_circle_at: Thing rejected");*/
   return ERR_INTERNAL;
 }
 
@@ -2573,7 +2575,7 @@ short get_object_with_circle_at(unsigned int *sx,unsigned int *sy,unsigned int *
     const struct MAPDRAW_DATA *draw_data,const struct LEVEL *lvl,
     unsigned int px,unsigned int py)
 {
-  //message_log(" get_object_with_circle_at: Starting with pos (%u,%u)",px,py);
+  /*message_log(" get_object_with_circle_at: Starting with pos (%u,%u)",px,py);*/
   if (draw_data==NULL)
       return ERR_INTERNAL;
   struct IPOINT_2D scaled_txtr_size=
@@ -2587,8 +2589,8 @@ short get_object_with_circle_at(unsigned int *sx,unsigned int *sy,unsigned int *
       message_error("Cannot convert coordinates");
       return result;
   }
-  //message_log(" get_object_with_circle_at: Searching for objects at (%u,%u)",test_ssx,test_ssy);
-  // Searching for nearest object
+  /*message_log(" get_object_with_circle_at: Searching for objects at (%u,%u)",test_ssx,test_ssy);*/
+  /* Searching for nearest object */
   unsigned int obj_sx,obj_sy,obj_num;
   long dist;
   dist=get_nearest_object_idx(lvl,test_ssx,test_ssy,&obj_sx,&obj_sy,&obj_num);
@@ -2597,23 +2599,25 @@ short get_object_with_circle_at(unsigned int *sx,unsigned int *sy,unsigned int *
       message_info("No object near subtile (%u,%u)",test_ssx>>8,test_ssy>>8);
       return ERR_INTERNAL;
   }
-  //message_log(" get_object_with_circle_at: Object found");
-  // Checking if it is near enough
-  // Note: it is quite simplified and assumes scale is same in X and Y direction!
+  /*message_log(" get_object_with_circle_at: Object found");*/
+  /**
+   * Checking if it is near enough
+   * Note: it is quite simplified and assumes scale is same in X and Y direction!
+   */
   long radius;
   radius=get_objcircle_std_radius(scaled_txtr_size);
   if (radius<3) radius=3;
   radius = ((unsigned long)radius<<8)/scaled_txtr_size.x;
-  // Equation of a circle
+  /* Equation of a circle */
   if (dist<=radius)
   {
-      //message_log(" get_object_with_circle_at: Object mets condition");
+      /*message_log(" get_object_with_circle_at: Object mets condition");*/
       *sx=obj_sx;
       *sy=obj_sy;
       *z=obj_num;
       return ERR_NONE;
   }
-  //message_log(" get_object_with_circle_at: Object rejected");
+  /*message_log(" get_object_with_circle_at: Object rejected");*/
   return ERR_INTERNAL;
 }
 
@@ -2674,10 +2678,10 @@ short generate_map_bitmap(const char *bmpfname,const struct LEVEL *lvl,
     message_log(" generate_map_bitmap: Starting");
     short result;
     struct MAPDRAW_DATA *draw_data;
-    // Texture and bitmap size
+    /* Texture and bitmap size */
     struct IPOINT_2D textr_size={TEXTURE_SIZE_X>>(opts->rescale),TEXTURE_SIZE_Y>>(opts->rescale)};
     struct IPOINT_2D bmp_size;
-    // Settings to draw whole map
+    /* Settings to draw whole map */
     bmp_size.x=textr_size.x*lvl->subsize.x;
     bmp_size.y=textr_size.y*lvl->subsize.y;
     result=load_draw_data(&draw_data,opts,&(lvl->subsize),bmp_size,(int)(lvl->inf%8));
@@ -2709,7 +2713,7 @@ short generate_map_bitmap(const char *bmpfname,const struct LEVEL *lvl,
     }
     if (result==ERR_NONE)
     {
-      //result = write_bitmap_idx(bmpfname, draw_data->palette, bitmap, bmp_size);
+      /*result = write_bitmap_idx(bmpfname, draw_data->palette, bitmap, bmp_size);*/
       result = write_bitmap_rgb(bmpfname,bitmap,bmp_size);
     }
     free(bitmap);

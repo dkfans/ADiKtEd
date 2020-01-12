@@ -1,20 +1,18 @@
 /******************************************************************************/
-// obj_column.c - Dungeon Keeper Tools.
-/******************************************************************************/
-// Author:   Tomasz Lis
-// Created:  12 Dec 2007
-
-// Purpose:
-//   Functions for maintaining single CLM entries.
-
-// Comment:
-//   None.
-
-//Copying and copyrights:
-//   This program is free software; you can redistribute it and/or modify
-//   it under the terms of the GNU General Public License as published by
-//   the Free Software Foundation; either version 2 of the License, or
-//   (at your option) any later version.
+/** @file obj_column.c
+ * Dungeon Keeper Tools.
+ * @par Purpose:
+ *     Functions for maintaining single CLM entries.
+ * @par Comment:
+ *     None.
+ * @author   Tomasz Lis
+ * @date     12 Dec 2007
+ * @par  Copying and copyrights:
+ *     This program is free software; you can redistribute it and/or modify
+ *     it under the terms of the GNU General Public License as published by
+ *     the Free Software Foundation; either version 2 of the License, or
+ *     (at your option) any later version.
+ */
 /******************************************************************************/
 
 #include "obj_column.h"
@@ -29,24 +27,24 @@
 
 static void (*custom_columns_gen [])(struct COLUMN_REC *clm_recs[9],
         unsigned char *,unsigned char *, unsigned char **)={
-     create_columns_slb_rock,create_columns_slb_gold,              //00
+     create_columns_slb_rock,create_columns_slb_gold,              /*00 */
      create_columns_slb_fulldirt,create_columns_slb_earth,
      create_columns_slb_torchdirt,
      create_columns_slb_walldrape,create_columns_slb_walltorch,
      create_columns_slb_wallwtwins,create_columns_slb_wallwwoman,
      create_columns_slb_wallpairshr,
-     create_columns_slb_path,create_columns_slb_claimed,           //0a
+     create_columns_slb_path,create_columns_slb_claimed,           /*0a */
      create_columns_slb_lava,create_columns_slb_water,
      create_columns_slb_portal,create_columns_slb_treasure,
      create_columns_slb_library,create_columns_slb_prison,
      create_columns_slb_torture,create_columns_slb_training,
-     create_columns_slb_dungheart,create_columns_slb_workshop,     //14
+     create_columns_slb_dungheart,create_columns_slb_workshop,     /*14 */
      create_columns_slb_scavenger,create_columns_slb_temple,
      create_columns_slb_graveyard,create_columns_slb_hatchery,
-     create_columns_slb_lair,create_columns_slb_barracks,          //1a
+     create_columns_slb_lair,create_columns_slb_barracks,          /*1a */
      create_columns_slb_doorwood,create_columns_slb_doorbrace,
      create_columns_slb_dooriron,create_columns_slb_doormagic,
-     create_columns_slb_bridge,create_columns_slb_gems,            //20
+     create_columns_slb_bridge,create_columns_slb_gems,            /*20 */
      create_columns_slb_guardpost,
      create_columns_slb_thingems_path,create_columns_slb_rock_gndlev,
      create_columns_slb_rockcaped_pathcave,create_columns_slb_rockcaped_claimcave,
@@ -55,24 +53,24 @@ static void (*custom_columns_gen [])(struct COLUMN_REC *clm_recs[9],
      };
 
 const char * custom_columns_fullnames[]={
-     "Standard Rock","Standard Gold",              //00
+     "Standard Rock","Standard Gold",              /*00 */
      "Unaffected Earth","Standard Earth",
      SLB_TORCHDIRT_LTEXT,
      SLB_WALLDRAPE_LTEXT,SLB_WALLTORCH_LTEXT,
      SLB_WALLWTWINS_LTEXT,SLB_WALLWWOMAN_LTEXT,
      SLB_WALLPAIRSHR_LTEXT,
-     "Standard Path",SLB_CLAIMED_LTEXT,           //0A
+     "Standard Path",SLB_CLAIMED_LTEXT,           /*0A */
      "Standard Lava","Standard Water",
      SLB_PORTAL_LTEXT,SLB_TREASURE_LTEXT,
      SLB_LIBRARY_LTEXT,SLB_PRISON_LTEXT,
      SLB_TORTURE_LTEXT,SLB_TRAINING_LTEXT,
-     SLB_DUNGHEART_LTEXT,SLB_WORKSHOP_LTEXT,     //14
+     SLB_DUNGHEART_LTEXT,SLB_WORKSHOP_LTEXT,     /*14 */
      SLB_SCAVENGER_LTEXT,SLB_TEMPLE_LTEXT,
      SLB_GRAVEYARD_LTEXT,SLB_HATCHERY_LTEXT,
-     SLB_LAIR_LTEXT,SLB_BARRACKS_LTEXT,          //1A
+     SLB_LAIR_LTEXT,SLB_BARRACKS_LTEXT,          /*1A */
      SLB_DOORWOOD_LTEXT,SLB_DOORBRACE_LTEXT,
      SLB_DOORIRON_LTEXT,SLB_DOORMAGIC_LTEXT,
-     SLB_BRIDGE_LTEXT,"Standard Gems",            //20
+     SLB_BRIDGE_LTEXT,"Standard Gems",            /*20 */
      SLB_GUARDPOST_LTEXT,
      "Thin gems on path","Ground level rock",
      "Rock with cave","Rock w/claimed cave",
@@ -249,7 +247,7 @@ void create_columns_for_slab(struct COLUMN_REC *clm_recs[9],struct LEVOPTIONS *o
     case SLAB_TYPE_GUARDPOST:
       create_columns_slb_guardpost(clm_recs,surr_slb,surr_own,surr_tng);
       break;
-    default: //on error, make path
+    default: /*on error, make path */
       create_columns_slb_path(clm_recs,surr_slb,surr_own,surr_tng);
       break;
     }
@@ -305,7 +303,7 @@ void create_columns_slb_rock(struct COLUMN_REC *clm_recs[9],
         unsigned char *surr_slb,unsigned char *surr_own, unsigned char **surr_tng)
 {
   create_columns_slb_unaffected_rock(clm_recs,surr_slb,surr_own,surr_tng);
-  //Switch (remove) corner columns near lava,water,...
+  /*Switch (remove) corner columns near lava,water,... */
   modify_frail_columns(clm_recs,surr_slb,surr_own,surr_tng);
 }
 
@@ -315,10 +313,10 @@ void create_columns_slb_gold(struct COLUMN_REC *clm_recs[9],
   const unsigned short dir_a[]={IDIR_WEST, IDIR_NORTH, IDIR_EAST, IDIR_SOUTH};
   const unsigned short dir_b[]={IDIR_NORTH, IDIR_EAST, IDIR_SOUTH, IDIR_WEST};
   const unsigned short dir_c[]={IDIR_NW, IDIR_NE, IDIR_SE, IDIR_SW};
-  //Central column
+  /*Central column */
   fill_column_gold(clm_recs[IDIR_CENTR],surr_own[IDIR_CENTR]);
-  //Note: can't use modify_liquid_surrounding() because more than one cube changes near water
-  //corner columns
+  /*Note: can't use modify_liquid_surrounding() because more than one cube changes near water */
+  /*corner columns */
   int i;
   for (i=0;i<4;i++)
   {
@@ -330,7 +328,7 @@ void create_columns_slb_gold(struct COLUMN_REC *clm_recs[9],
     else
       fill_column_gold(clm_recs[dir_c[i]],surr_own[IDIR_CENTR]);
   }
-  // Remaining edge columns
+  /* Remaining edge columns */
   for (i=0;i<4;i++)
   {
     if ((surr_slb[dir_a[i]]==SLAB_TYPE_WATER))
@@ -341,7 +339,7 @@ void create_columns_slb_gold(struct COLUMN_REC *clm_recs[9],
     else
       fill_column_gold(clm_recs[dir_a[i]],surr_own[IDIR_CENTR]);
   }
-  //Switch (remove) corner columns near lava,water,...
+  /*Switch (remove) corner columns near lava,water,... */
   modify_frail_columns(clm_recs,surr_slb,surr_own,surr_tng);
 }
 
@@ -352,15 +350,15 @@ void create_columns_slb_gold(struct COLUMN_REC *clm_recs[9],
 void create_columns_slb_fulldirt(struct COLUMN_REC *clm_recs[9],
         unsigned char *surr_slb,unsigned char *surr_own, unsigned char **surr_tng)
 {
-  //Center is always earth
+  /*Center is always earth */
   fill_column_earth(clm_recs[IDIR_CENTR],surr_own[IDIR_CENTR]);
 
   const unsigned short dir_a[]={IDIR_WEST, IDIR_NORTH, IDIR_EAST, IDIR_SOUTH};
   const unsigned short dir_b[]={IDIR_NORTH, IDIR_EAST, IDIR_SOUTH, IDIR_WEST};
   const unsigned short dir_c[]={IDIR_NW, IDIR_NE, IDIR_SE, IDIR_SW};
   int i;
-  //Note: can't use modify_liquid_surrounding() - two cubes changes
-  //Now corner slabs
+  /*Note: can't use modify_liquid_surrounding() - two cubes changes */
+  /*Now corner slabs */
   for (i=0;i<4;i++)
   {
       if ((surr_slb[dir_a[i]]==SLAB_TYPE_WATER)||(surr_slb[dir_b[i]]==SLAB_TYPE_WATER))
@@ -375,7 +373,7 @@ void create_columns_slb_fulldirt(struct COLUMN_REC *clm_recs[9],
          fill_column_earth(clm_recs[dir_c[i]],surr_own[IDIR_CENTR]);
       }
   }
-  // And the middle ones
+  /* And the middle ones */
   for (i=0;i<4;i++)
   {
       if (surr_slb[dir_a[i]]==SLAB_TYPE_WATER)
@@ -391,9 +389,9 @@ void create_columns_slb_fulldirt(struct COLUMN_REC *clm_recs[9],
 void create_columns_slb_earth(struct COLUMN_REC *clm_recs[9],
         unsigned char *surr_slb,unsigned char *surr_own, unsigned char **surr_tng)
 {
-  //Make the standard, 9x9 columns filled with dirt
+  /*Make the standard, 9x9 columns filled with dirt */
   create_columns_slb_fulldirt(clm_recs,surr_slb,surr_own,surr_tng);
-  //Finally - switch corner columns near lava,water,...
+  /*Finally - switch corner columns near lava,water,... */
   modify_frail_columns(clm_recs,surr_slb,surr_own,surr_tng);
 }
 
@@ -401,19 +399,19 @@ void create_columns_slb_torchdirt(struct COLUMN_REC *clm_recs[9],
         unsigned char *surr_slb,unsigned char *surr_own, unsigned char **surr_tng)
 {
   const unsigned short dir_a[]={IDIR_WEST, IDIR_NORTH, IDIR_EAST, IDIR_SOUTH};
-  //This is identical to standard dirt
+  /*This is identical to standard dirt */
   create_columns_slb_earth(clm_recs,surr_slb,surr_own,surr_tng);
-  //But one of the c[3] entries is replaced with torch-one
+  /*But one of the c[3] entries is replaced with torch-one */
   int i;
   short has_torches=false;
   for (i=0;i<4;i++)
   {
-// old way - without things (pending delete, but first we must have auto-adding things)
-//      if (slab_is_room(surr_slb[dir_a[i]])||slab_is_space(surr_slb[dir_a[i]]))
+/* old way - without things (pending delete, but first we must have auto-adding things) */
+/*      if (slab_is_room(surr_slb[dir_a[i]])||slab_is_space(surr_slb[dir_a[i]])) */
     unsigned char *thing=surr_tng[dir_a[i]];
     if ((thing!=NULL)&&(is_torch(thing)))
     {
-        //Add the torch plate at same height where the torch thing is
+        /*Add the torch plate at same height where the torch thing is */
         unsigned short height=get_thing_subtile_h(thing);
         if (get_thing_subtpos_h(thing)>127) height++;
         clm_recs[dir_a[i]]->c[height%8]=0x018;
@@ -451,23 +449,23 @@ void create_columns_slb_skulls_on_claimed(struct COLUMN_REC *clm_recs[9],
 void create_columns_slb_wallbrick(struct COLUMN_REC *clm_recs[9], short *allow_relief,
         unsigned char *surr_slb,unsigned char *surr_own, unsigned char **surr_tng)
 {
-//TODO: add shadow to central cobblestones near water and lava
+/*TODO: add shadow to central cobblestones near water and lava */
   const unsigned short dir_a[]={IDIR_WEST, IDIR_NORTH, IDIR_EAST, IDIR_SOUTH};
   const unsigned short dir_b[]={IDIR_NORTH, IDIR_EAST, IDIR_SOUTH, IDIR_WEST};
   const unsigned short dir_c[]={IDIR_NW, IDIR_NE, IDIR_SE, IDIR_SW};
   int i;
-  //Filling matrix
+  /*Filling matrix */
   for (i=0;i<9;i++)
     allow_relief[i]=true;
-  //We will use the NW, NE, SW, SE values of the matrix to help making brick
-  // with shadow
-  //Central slab identifies the player
+  /*We will use the NW, NE, SW, SE values of the matrix to help making brick */
+  /* with shadow */
+  /*Central slab identifies the player */
   fill_column_wall_centr(clm_recs[IDIR_CENTR], surr_own[IDIR_CENTR]);
 
-  //Corner slabs - white brick, small red brick or clear earth
+  /*Corner slabs - white brick, small red brick or clear earth */
   for (i=0;i<4;i++)
   {
-    // Place the floor
+    /* Place the floor */
     if ((surr_slb[dir_a[i]]==SLAB_TYPE_WATER) || (surr_slb[dir_b[i]]==SLAB_TYPE_WATER))
       fill_column_wallground_nearwater(clm_recs[dir_c[i]], surr_own[IDIR_CENTR]);
     else
@@ -475,21 +473,21 @@ void create_columns_slb_wallbrick(struct COLUMN_REC *clm_recs[9], short *allow_r
       fill_column_wallground_nearlava(clm_recs[dir_c[i]], surr_own[IDIR_CENTR]);
     else
       fill_column_earthground(clm_recs[dir_c[i]], surr_own[IDIR_CENTR]);
-    // If we're surrounded by our wall, and there is something short also - red brick
+    /* If we're surrounded by our wall, and there is something short also - red brick */
     if (((slab_is_wall(surr_slb[dir_a[i]])&&surrnd_not_enemy(surr_own,dir_a[i]))
        &&((slab_is_short(surr_slb[dir_b[i]]))||(!surrnd_not_enemy(surr_own,dir_b[i]))))
        ||((slab_is_wall(surr_slb[dir_b[i]])&&surrnd_not_enemy(surr_own,dir_b[i]))
        &&((slab_is_short(surr_slb[dir_a[i]]))||(!surrnd_not_enemy(surr_own,dir_a[i])))))
     {
-      //Note: can't use modify_liquid_surrounding() because more than one cube changes near water
-      //corner columns
+      /*Note: can't use modify_liquid_surrounding() because more than one cube changes near water */
+      /*corner columns */
         if ((surr_slb[dir_a[i]]==SLAB_TYPE_WATER) || (surr_slb[dir_b[i]]==SLAB_TYPE_WATER) ||
             (surr_slb[dir_a[i]]==SLAB_TYPE_LAVA) || (surr_slb[dir_b[i]]==SLAB_TYPE_LAVA))
           place_column_wall_redsmbrick(clm_recs[dir_c[i]], surr_own[IDIR_CENTR]);
         else
           place_column_wall_redsmbrick_dkbtm(clm_recs[dir_c[i]], surr_own[IDIR_CENTR]);
     } else
-    // If we're surrounded by our wall, and there are doors in front - red brick, but without relief
+    /* If we're surrounded by our wall, and there are doors in front - red brick, but without relief */
     if (((slab_is_wall(surr_slb[dir_a[i]])&&surrnd_not_enemy(surr_own,dir_a[i]))
        &&((slab_is_door(surr_slb[dir_b[i]]))||(!surrnd_not_enemy(surr_own,dir_b[i]))))
        ||((slab_is_wall(surr_slb[dir_b[i]])&&surrnd_not_enemy(surr_own,dir_b[i]))
@@ -501,7 +499,7 @@ void create_columns_slb_wallbrick(struct COLUMN_REC *clm_recs[9], short *allow_r
         if (slab_is_door(surr_slb[dir_b[i]]))
           allow_relief[dir_b[i]]=false;
     } else
-    // if we're surrouned with unowned tall thing on _both_ sides, fill with dirt
+    /* if we're surrouned with unowned tall thing on _both_ sides, fill with dirt */
     if ((slab_is_tall_unclmabl(surr_slb[dir_a[i]])&&slab_is_tall_unclmabl(surr_slb[dir_b[i]]))
       ||(((slab_is_tall(surr_slb[dir_a[i]])&&surrnd_not_enemy(surr_own,dir_a[i]))
       &&(slab_is_tall(surr_slb[dir_b[i]])&& surrnd_not_enemy(surr_own,dir_b[i])))))
@@ -520,7 +518,7 @@ void create_columns_slb_wallbrick(struct COLUMN_REC *clm_recs[9], short *allow_r
       allow_relief[dir_a[i]]=false;
       allow_relief[dir_b[i]]=false;
     } else
-    // Finally - if there's something short, like ground - use the white brick
+    /* Finally - if there's something short, like ground - use the white brick */
     {
       place_column_wall_cobblestones(clm_recs[dir_c[i]], surr_own[IDIR_CENTR]);
       allow_relief[dir_a[i]]=false;
@@ -528,10 +526,10 @@ void create_columns_slb_wallbrick(struct COLUMN_REC *clm_recs[9], short *allow_r
       allow_relief[dir_c[i]]=false;
     }
   }
-  // And the remaining, middle slabs
+  /* And the remaining, middle slabs */
   for (i=0;i<4;i++)
   {
-    // Place the floor
+    /* Place the floor */
     if (surr_slb[dir_a[i]]==SLAB_TYPE_WATER)
       fill_column_wallground_nearwater(clm_recs[dir_a[i]], surr_own[IDIR_CENTR]);
     else
@@ -540,8 +538,8 @@ void create_columns_slb_wallbrick(struct COLUMN_REC *clm_recs[9], short *allow_r
     else
       fill_column_earthground(clm_recs[dir_a[i]], surr_own[IDIR_CENTR]);
   }
-  //These cannot be taken in simple 'for' loop, because different directions uses
-  // different fill_column_wall_redsmbrick_* functions.
+  /*These cannot be taken in simple 'for' loop, because different directions uses */
+  /* different fill_column_wall_redsmbrick_* functions. */
   if ((slab_is_wall(surr_slb[IDIR_NORTH])&&surrnd_not_enemy(surr_own,IDIR_NORTH))
     ||slab_is_tall_unclmabl(surr_slb[IDIR_NORTH]))
   {
@@ -557,10 +555,10 @@ void create_columns_slb_wallbrick(struct COLUMN_REC *clm_recs[9], short *allow_r
     allow_relief[IDIR_NORTH]=false;
   } else
   if (allow_relief[IDIR_NE])
-  { // just standard red brick
+  { /* just standard red brick */
     place_column_wall_redsmbrick_c(clm_recs[IDIR_NORTH], surr_own[IDIR_CENTR]);
   } else
-  { // the "b" brick has dark edge from this view
+  { /* the "b" brick has dark edge from this view */
     place_column_wall_redsmbrick_b(clm_recs[IDIR_NORTH], surr_own[IDIR_CENTR]);
   }
 
@@ -579,10 +577,10 @@ void create_columns_slb_wallbrick(struct COLUMN_REC *clm_recs[9], short *allow_r
     allow_relief[IDIR_EAST]=false;
   } else
   if (allow_relief[IDIR_SE])
-  {   // just standard red brick
+  {   /* just standard red brick */
       place_column_wall_redsmbrick_c(clm_recs[IDIR_EAST], surr_own[IDIR_CENTR]);
   } else
-  {   // the "b" brick has dark edge from this view
+  {   /* the "b" brick has dark edge from this view */
       place_column_wall_redsmbrick_b(clm_recs[IDIR_EAST], surr_own[IDIR_CENTR]);
   }
 
@@ -601,10 +599,10 @@ void create_columns_slb_wallbrick(struct COLUMN_REC *clm_recs[9], short *allow_r
     allow_relief[IDIR_SOUTH]=false;
   } else
   if (allow_relief[IDIR_SW])
-  {   // just standard red brick
+  {   /* just standard red brick */
       place_column_wall_redsmbrick_b(clm_recs[IDIR_SOUTH], surr_own[IDIR_CENTR]);
   } else
-  {   // the "c" brick has dark edge from this view
+  {   /* the "c" brick has dark edge from this view */
       place_column_wall_redsmbrick_c(clm_recs[IDIR_SOUTH], surr_own[IDIR_CENTR]);
   }
 
@@ -623,13 +621,13 @@ void create_columns_slb_wallbrick(struct COLUMN_REC *clm_recs[9], short *allow_r
     allow_relief[IDIR_WEST]=false;
   } else
   if (allow_relief[IDIR_NW])
-  {   // just standard red brick
+  {   /* just standard red brick */
       place_column_wall_redsmbrick_b(clm_recs[IDIR_WEST], surr_own[IDIR_CENTR]);
   } else
-  {   // the "c" brick has dark edge from this view
+  {   /* the "c" brick has dark edge from this view */
       place_column_wall_redsmbrick_c(clm_recs[IDIR_WEST], surr_own[IDIR_CENTR]);
   }
-  //No frail columns switching on reinforced wall, so we're done.
+  /*No frail columns switching on reinforced wall, so we're done. */
 }
 
 /*
@@ -650,14 +648,14 @@ void fill_columns_slb_roomrelief(struct COLUMN_REC *clm_recs[9], short *allow_re
     unsigned short slab=surr_slb[dir_b[i]];
     if ((allow_relief[dir_b[i]])&&(slab_is_room(slab)))
     {
-      //TODO: check edge and corner if they're set properly
+      /*TODO: check edge and corner if they're set properly */
       short corner=false;
       short edge=false;
-      // 'edge' means that the wall starts/ends/changes direction after current slab
+      /* 'edge' means that the wall starts/ends/changes direction after current slab */
       if (((!slab_is_short(surr_slb[dir_d[i]]))&&(surrnd_not_enemy(surr_own,dir_d[i])))
         ||((!slab_is_short(surr_slb[dir_e[i]]))&&(surrnd_not_enemy(surr_own,dir_e[i]))))
         edge=true;
-      // 'corner' means that the room ends after current slab
+      /* 'corner' means that the room ends after current slab */
       if ((!slab_is_room(surr_slb[dir_a[i]]))||(!slab_is_room(surr_slb[dir_c[i]])))
         corner=true;
       if (fill_side_columns_room_relief(clm_recs[dir_a[i]],clm_recs[dir_b[i]],
@@ -676,8 +674,8 @@ void fill_columns_slb_roomrelief(struct COLUMN_REC *clm_recs[9], short *allow_re
 short fill_side_columns_room_relief(struct COLUMN_REC *clm_reca,struct COLUMN_REC *clm_recb,
     struct COLUMN_REC *clm_recc,unsigned short room_slab,unsigned char owner, short corner, short edge)
 {
-  //Note: we're using fill_column_wall_drapebrick to save CLM space.
-  //TODO: make corner and edge support
+  /*Note: we're using fill_column_wall_drapebrick to save CLM space. */
+  /*TODO: make corner and edge support */
   switch (room_slab)
   {
   case SLAB_TYPE_PORTAL:
@@ -702,7 +700,7 @@ short fill_side_columns_room_relief(struct COLUMN_REC *clm_reca,struct COLUMN_RE
     fill_column_wall_drapebrick_c(clm_recc,owner);
     if (corner)
     {
-      //TODO
+      /*TODO */
     } else
     {
       place_column_wall_library_a(clm_reca,owner);
@@ -716,7 +714,7 @@ short fill_side_columns_room_relief(struct COLUMN_REC *clm_reca,struct COLUMN_RE
       fill_column_wall_drapebrick_a(clm_reca,owner);
       fill_column_wall_drapebrick_b(clm_recb,owner);
       fill_column_wall_drapebrick_c(clm_recc,owner);
-      // TODO
+      /* TODO */
     } else
     {
       place_column_wall_prison_a(clm_reca,owner);
@@ -735,7 +733,7 @@ short fill_side_columns_room_relief(struct COLUMN_REC *clm_reca,struct COLUMN_RE
     fill_column_wall_drapebrick_c(clm_recc,owner);
     if (corner)
     {
-      //TODO
+      /*TODO */
     } else
     {
       place_column_wall_training_a(clm_reca,owner);
@@ -749,7 +747,7 @@ short fill_side_columns_room_relief(struct COLUMN_REC *clm_reca,struct COLUMN_RE
       fill_column_wall_drapebrick_a(clm_reca,owner);
       fill_column_wall_drapebrick_b(clm_recb,owner);
       fill_column_wall_drapebrick_c(clm_recc,owner);
-      // TODO
+      /* TODO */
     } else
     {
       place_column_wall_workshop_a(clm_reca,owner);
@@ -763,7 +761,7 @@ short fill_side_columns_room_relief(struct COLUMN_REC *clm_reca,struct COLUMN_RE
     fill_column_wall_drapebrick_c(clm_recc,owner);
     if (corner)
     {
-      //TODO
+      /*TODO */
     } else
     {
       place_column_wall_scavenger_a(clm_reca,owner);
@@ -777,7 +775,7 @@ short fill_side_columns_room_relief(struct COLUMN_REC *clm_reca,struct COLUMN_RE
       fill_column_wall_drapebrick_a(clm_reca,owner);
       fill_column_wall_drapebrick_b(clm_recb,owner);
       fill_column_wall_drapebrick_c(clm_recc,owner);
-      // TODO
+      /* TODO */
     } else
     {
       place_column_wall_temple_a(clm_reca,owner);
@@ -799,7 +797,7 @@ short fill_side_columns_room_relief(struct COLUMN_REC *clm_reca,struct COLUMN_RE
     fill_column_wall_drapebrick_c(clm_recc,owner);
     if (corner)
     {
-      //TODO
+      /*TODO */
     } else
     {
       place_column_wall_hatchery_a(clm_reca,owner);
@@ -826,7 +824,7 @@ short fill_side_columns_room_relief(struct COLUMN_REC *clm_reca,struct COLUMN_RE
       fill_column_wall_drapebrick_a(clm_reca,owner);
       fill_column_wall_drapebrick_b(clm_recb,owner);
       fill_column_wall_drapebrick_c(clm_recc,owner);
-      // TODO
+      /* TODO */
     } else
     {
       place_column_wall_barracks_a(clm_reca,owner);
@@ -857,7 +855,7 @@ void create_columns_slb_wall_force_relief_splatbody(struct COLUMN_REC *clm_recs[
 {
     const unsigned short dir_a[]={IDIR_NW,   IDIR_NE,   IDIR_SE,   IDIR_SW};
     const unsigned short dir_b[]={IDIR_WEST, IDIR_NORTH,IDIR_EAST, IDIR_SOUTH};
-    // Filling the wall with brick & cobblestones on edges
+    /* Filling the wall with brick & cobblestones on edges */
     int i;
     for (i=0;i<4;i++)
     {
@@ -865,7 +863,7 @@ void create_columns_slb_wall_force_relief_splatbody(struct COLUMN_REC *clm_recs[
       fill_column_wall_redsmbrick_b(clm_recs[dir_b[i]], surr_own[IDIR_CENTR]);
     }
     fill_column_wall_centr(clm_recs[IDIR_CENTR], surr_own[IDIR_CENTR]);
-    // Finding best orientation for the relief
+    /* Finding best orientation for the relief */
     const unsigned short *dir;
     short draw_oposite;
     if (slab_is_short(surr_slb[IDIR_WEST]) && slab_is_short(surr_slb[IDIR_NORTH]))
@@ -893,12 +891,12 @@ void create_columns_slb_wall_force_relief_splatbody(struct COLUMN_REC *clm_recs[
       dir=dir_rot_180;
       draw_oposite=false;
     } else
-    //if (slab_is_short(surr_slb[IDIR_WEST]) || slab_is_short(surr_slb[IDIR_NORTH]))
+    /*if (slab_is_short(surr_slb[IDIR_WEST]) || slab_is_short(surr_slb[IDIR_NORTH])) */
     {
       dir=dir_rot_000;
       draw_oposite=false;
     }
-    // Drawing the reliefs
+    /* Drawing the reliefs */
     if (draw_oposite)
     {
         place_column_wall_torture_a(clm_recs[dir[0]],surr_own[IDIR_CENTR]);
@@ -933,12 +931,12 @@ void create_columns_slb_wall_force_relief_splatbody(struct COLUMN_REC *clm_recs[
 void create_columns_slb_walldrape(struct COLUMN_REC *clm_recs[9],
         unsigned char *surr_slb,unsigned char *surr_own, unsigned char **surr_tng)
 {
-  //This variable will help in placing the bas-relief or drape;
-  //only four of its values will be used
+  /*This variable will help in placing the bas-relief or drape; */
+  /*only four of its values will be used */
   short allow_relief[9];
   create_columns_slb_wallbrick(clm_recs,allow_relief,surr_slb,surr_own,surr_tng);
   fill_columns_slb_roomrelief(clm_recs,allow_relief,surr_slb,surr_own,surr_tng);
-  //If there's enought place for drape - draw it
+  /*If there's enought place for drape - draw it */
   const unsigned short dir_a[]={IDIR_NW,   IDIR_NW,   IDIR_NE,   IDIR_SW};
   const unsigned short dir_b[]={IDIR_WEST, IDIR_NORTH,IDIR_EAST, IDIR_SOUTH};
   const unsigned short dir_c[]={IDIR_SW,   IDIR_NE,   IDIR_SE,   IDIR_SE};
@@ -961,17 +959,17 @@ void create_columns_slb_walltorch(struct COLUMN_REC *clm_recs[9],
         unsigned char *surr_slb,unsigned char *surr_own, unsigned char **surr_tng)
 {
   const unsigned short dir_a[]={IDIR_WEST, IDIR_NORTH, IDIR_EAST, IDIR_SOUTH};
-  //This variable will help in placing the bas-relief or drape;
+  /*This variable will help in placing the bas-relief or drape; */
   short allow_relief[9];
   create_columns_slb_wallbrick(clm_recs,allow_relief,surr_slb,surr_own,surr_tng);
-    // Torch plate
+    /* Torch plate */
   int i;
   for (i=0;i<4;i++)
   {
     unsigned char *thing=surr_tng[dir_a[i]];
     if ((thing!=NULL)&&(is_torch(thing)))
     {
-        //Add the torch plate at same height where the torch thing is
+        /*Add the torch plate at same height where the torch thing is */
         unsigned short height=get_thing_subtile_h(thing);
         if (get_thing_subtpos_h(thing)>127) height++;
         clm_recs[dir_a[i]]->c[height%8]=0x077;
@@ -984,12 +982,12 @@ void create_columns_slb_walltorch(struct COLUMN_REC *clm_recs[9],
 void create_columns_slb_wallwtwins(struct COLUMN_REC *clm_recs[9],
         unsigned char *surr_slb,unsigned char *surr_own, unsigned char **surr_tng)
 {
-  //This variable will help in placing the bas-relief or drape;
-  //only four of its values will be used
+  /*This variable will help in placing the bas-relief or drape; */
+  /*only four of its values will be used */
   short allow_relief[9];
   create_columns_slb_wallbrick(clm_recs,allow_relief,surr_slb,surr_own,surr_tng);
   fill_columns_slb_roomrelief(clm_recs,allow_relief,surr_slb,surr_own,surr_tng);
-  //If there's enought place for drape - draw it
+  /*If there's enought place for drape - draw it */
   if (allow_relief[IDIR_NORTH])
   {
     fill_column_wall_twinsbrick_a(clm_recs[IDIR_NW],    surr_own[IDIR_CENTR]);
@@ -1018,12 +1016,12 @@ void create_columns_slb_wallwtwins(struct COLUMN_REC *clm_recs[9],
 void create_columns_slb_wallwwoman(struct COLUMN_REC *clm_recs[9],
         unsigned char *surr_slb,unsigned char *surr_own, unsigned char **surr_tng)
 {
-  //This variable will help in placing the bas-relief or drape;
-  //only four of its values will be used
+  /*This variable will help in placing the bas-relief or drape; */
+  /*only four of its values will be used */
   short allow_relief[9];
   create_columns_slb_wallbrick(clm_recs,allow_relief,surr_slb,surr_own,surr_tng);
   fill_columns_slb_roomrelief(clm_recs,allow_relief,surr_slb,surr_own,surr_tng);
-  //If there's enought place for drape - draw it
+  /*If there's enought place for drape - draw it */
   if (allow_relief[IDIR_NORTH])
   {
     fill_column_wall_womanbrick_a(clm_recs[IDIR_NW],    surr_own[IDIR_CENTR]);
@@ -1053,12 +1051,12 @@ void create_columns_slb_wallwwoman(struct COLUMN_REC *clm_recs[9],
 void create_columns_slb_wallpairshr(struct COLUMN_REC *clm_recs[9],
         unsigned char *surr_slb,unsigned char *surr_own, unsigned char **surr_tng)
 {
-  //This variable will help in placing the bas-relief or drape;
-  //only four of its values will be used
+  /*This variable will help in placing the bas-relief or drape; */
+  /*only four of its values will be used */
   short allow_relief[9];
   create_columns_slb_wallbrick(clm_recs,allow_relief,surr_slb,surr_own,surr_tng);
   fill_columns_slb_roomrelief(clm_recs,allow_relief,surr_slb,surr_own,surr_tng);
-  //If there's enought place for drape - draw it
+  /*If there's enought place for drape - draw it */
   if (allow_relief[IDIR_NORTH])
   {
     fill_column_wall_pairshrbrick_a(clm_recs[IDIR_NW],    surr_own[IDIR_CENTR]);
@@ -1104,10 +1102,10 @@ void create_columns_slb_claimed(struct COLUMN_REC *clm_recs[9],
   const unsigned short dir_b[]={IDIR_NORTH, IDIR_EAST, IDIR_SOUTH, IDIR_WEST};
   const unsigned short dir_c[]={IDIR_NW, IDIR_NE, IDIR_SE, IDIR_SW};
 
-  //Center
+  /*Center */
   fill_column_claimedgnd_centr(clm_recs[IDIR_CENTR], surr_own[IDIR_CENTR]);
 
-  //Corners
+  /*Corners */
   int i;
   for (i=0;i<4;i++)
   {
@@ -1116,29 +1114,29 @@ void create_columns_slb_claimed(struct COLUMN_REC *clm_recs[9],
 
     if (slab_is_claimedgnd(surr_slb[dir_a[i]])&&surrnd_not_enemy(surr_own,dir_a[i])&&
         slab_is_claimedgnd(surr_slb[dir_b[i]])&&surrnd_not_enemy(surr_own,dir_b[i]))
-    { //Surrounded by our area
+    { /*Surrounded by our area */
        clm_recs[dir_c[i]]->c[0]=0x07e +rnd(3);
     } else
     if (slab_is_claimedgnd(surr_slb[dir_a[i]])&&surrnd_not_enemy(surr_own,dir_a[i]))
-    { //our on side A only
+    { /*our on side A only */
         switch (dir_c[i])
         {
-        case IDIR_NW://West only, not north
+        case IDIR_NW:/*West only, not north */
            clm_recs[dir_c[i]]->c[0]=0x082;
            break;
-        case IDIR_NE://North only, not east
+        case IDIR_NE:/*North only, not east */
            clm_recs[dir_c[i]]->c[0]=0x085;
            break;
-        case IDIR_SW://South only, not west
+        case IDIR_SW:/*South only, not west */
            clm_recs[dir_c[i]]->c[0]=0x084;
            break;
-        case IDIR_SE://East only, not south
+        case IDIR_SE:/*East only, not south */
            clm_recs[dir_c[i]]->c[0]=0x087;
            break;
         }
     } else
     if (slab_is_claimedgnd(surr_slb[dir_b[i]])&&surrnd_not_enemy(surr_own,dir_b[i]))
-    { //our on side B only
+    { /*our on side B only */
         switch (dir_c[i])
         {
         case IDIR_NW:
@@ -1155,7 +1153,7 @@ void create_columns_slb_claimed(struct COLUMN_REC *clm_recs[9],
            break;
         }
     } else
-    { //Surrounded by not our area
+    { /*Surrounded by not our area */
         switch (dir_c[i])
         {
         case IDIR_NW:
@@ -1174,7 +1172,7 @@ void create_columns_slb_claimed(struct COLUMN_REC *clm_recs[9],
     }
   }
 
-  //And the middle columns
+  /*And the middle columns */
   for (i=0;i<4;i++)
   {
     fill_column_rec_sim(clm_recs[dir_a[i]], 0, 0x0ce,
@@ -1202,7 +1200,7 @@ void create_columns_slb_claimed(struct COLUMN_REC *clm_recs[9],
         }
     }
   }
-  // Water and lava can beat all previous conditions
+  /* Water and lava can beat all previous conditions */
   modify_liquid_surrounding(clm_recs, surr_slb, 0, 0x094, 0x093);
 }
 
@@ -1231,7 +1229,7 @@ void create_columns_slb_water(struct COLUMN_REC *clm_recs[9],
 void create_columns_slb_unaffected_gems(struct COLUMN_REC *clm_recs[9],
         unsigned char *surr_slb,unsigned char *surr_own, unsigned char **surr_tng)
 {
-  //These are, in official editor, same for every surrounding, even near water
+  /*These are, in official editor, same for every surrounding, even near water */
   int i,k;
   for (i=0;i<3;i++)
    for (k=0;k<3;k++)
@@ -1244,7 +1242,7 @@ void create_columns_slb_gems(struct COLUMN_REC *clm_recs[9],
         unsigned char *surr_slb,unsigned char *surr_own, unsigned char **surr_tng)
 {
   create_columns_slb_unaffected_gems(clm_recs,surr_slb,surr_own,surr_tng);
-  //Switch corner columns near lava,water,...
+  /*Switch corner columns near lava,water,... */
   modify_frail_columns(clm_recs,surr_slb,surr_own,surr_tng);
 }
 
@@ -1312,8 +1310,8 @@ void create_columns_slb_training(struct COLUMN_REC *clm_recs[9],
 void create_columns_slb_dungheart(struct COLUMN_REC *clm_recs[9],
         unsigned char *surr_slb,unsigned char *surr_own, unsigned char **surr_tng)
 {
-    //Note: the 'floor' function is different in DK, and floor can change if user
-    // force it to update in the game.
+    /*Note: the 'floor' function is different in DK, and floor can change if user */
+    /* force it to update in the game. */
     create_columns_slb_room(create_columns_slb_dungheart_nearinsd,create_columns_slb_dungheart_edge,
         create_columns_slb_dungheart_corner,create_columns_slb_dungheart_inside,create_columns_slb_dungheart_nearinsd,
         clm_recs,surr_slb,surr_own,surr_tng);
@@ -1489,24 +1487,24 @@ void modify_frail_columns(struct COLUMN_REC *clm_recs[9],
     const unsigned short dir_a[]={IDIR_WEST, IDIR_NORTH, IDIR_EAST, IDIR_SOUTH};
     const unsigned short dir_b[]={IDIR_NORTH, IDIR_EAST, IDIR_SOUTH, IDIR_WEST};
     const unsigned short dir_c[]={IDIR_NW, IDIR_NE, IDIR_SE, IDIR_SW};
-    //This gives smaller probability of column change if there are no adjacent tall slabs
+    /*This gives smaller probability of column change if there are no adjacent tall slabs */
     int base_prob=33;
     if (slab_is_tall_unclmabl(surr_slb[IDIR_WEST])||slab_is_tall_unclmabl(surr_slb[IDIR_NORTH])||
        slab_is_tall_unclmabl(surr_slb[IDIR_EAST])||slab_is_tall_unclmabl(surr_slb[IDIR_SOUTH]))
        base_prob=66;
     int i;
-    //Let's take all corners at once, in a loop
+    /*Let's take all corners at once, in a loop */
     for (i=0;i<4;i++)
     {
-      // All the changes near short unclaimable slabs
+      /* All the changes near short unclaimable slabs */
       if (slab_is_short_unclmabl(surr_slb[dir_a[i]]) &&
           slab_is_short_unclmabl(surr_slb[dir_b[i]]) && (frail_columns_near_short))
       {
           if ((surr_slb[dir_a[i]]==SLAB_TYPE_PATH)&&(surr_slb[dir_b[i]]==SLAB_TYPE_PATH)&&
               slab_is_tall(surr_slb[dir_c[i]]))
           {
-            // Path on both sides, and tall diagonal slabs - in this case we shouldn't
-            // modify the columns, as this may cause imps to stuck
+            /* Path on both sides, and tall diagonal slabs - in this case we shouldn't */
+            /* modify the columns, as this may cause imps to stuck */
           } else
           if ((surr_slb[dir_a[i]]==SLAB_TYPE_PATH)||(surr_slb[dir_b[i]]==SLAB_TYPE_PATH))
           {
@@ -1524,12 +1522,12 @@ void modify_frail_columns(struct COLUMN_REC *clm_recs[9],
               fill_column_lava(clm_recs[dir_c[i]], surr_own[IDIR_CENTR]);
           }
       } else
-      // All the changes near tall unclaimable slabs
-      // These are mods by Tomasz Lis - originally tall slabs do not affect others
+      /* All the changes near tall unclaimable slabs */
+      /* These are mods by Tomasz Lis - originally tall slabs do not affect others */
       if (slab_is_tall_unclmabl(surr_slb[dir_a[i]]) &&
           slab_is_tall_unclmabl(surr_slb[dir_b[i]]) && (frail_columns_near_tall))
       {
-          // Replacing part of gold/gems with dirt if it is near
+          /* Replacing part of gold/gems with dirt if it is near */
           if ((surr_slb[IDIR_CENTR]!=SLAB_TYPE_EARTH)&&(surr_slb[IDIR_CENTR]!=SLAB_TYPE_TORCHDIRT)&&
              ((surr_slb[dir_a[i]]==SLAB_TYPE_EARTH)||(surr_slb[dir_a[i]]==SLAB_TYPE_TORCHDIRT))&&
              ((surr_slb[dir_b[i]]==SLAB_TYPE_EARTH)||(surr_slb[dir_b[i]]==SLAB_TYPE_TORCHDIRT)))
@@ -1551,12 +1549,12 @@ short modify_liquid_surrounding(struct COLUMN_REC *clm_recs[9],unsigned char *su
   const unsigned short dir_a[]={IDIR_WEST, IDIR_NORTH, IDIR_EAST, IDIR_SOUTH};
   const unsigned short dir_b[]={IDIR_NORTH, IDIR_EAST, IDIR_SOUTH, IDIR_WEST};
   const unsigned short dir_c[]={IDIR_NW, IDIR_NE, IDIR_SE, IDIR_SW};
-  //initial tests
+  /*initial tests */
   if ((liq_level<0)||(liq_level>7)) return false;
   if (surr_slb==NULL) return false;
   short result=false;
   int i;
-  //corner columns
+  /*corner columns */
   for (i=0;i<4;i++)
   {
     if ((surr_slb[dir_a[i]]==SLAB_TYPE_WATER)||(surr_slb[dir_b[i]]==SLAB_TYPE_WATER))
@@ -1570,7 +1568,7 @@ short modify_liquid_surrounding(struct COLUMN_REC *clm_recs[9],unsigned char *su
        result=true;
     }
   }
-  //And the edge columns
+  /*And the edge columns */
   for (i=0;i<4;i++)
   {
     if ((surr_slb[dir_a[i]]==SLAB_TYPE_WATER))
@@ -1602,12 +1600,12 @@ short modify_liquid_surrounding_advncd(struct COLUMN_REC *clm_recs[9],
   const unsigned short dir_c[]={IDIR_NW, IDIR_NE, IDIR_SE, IDIR_SW};
   unsigned short slab=surr_slb[IDIR_CENTR];
   unsigned char ownr=surr_own[IDIR_CENTR];
-  //initial tests
+  /*initial tests */
   if ((liq_level<0)||(liq_level>7)) return false;
   if (surr_slb==NULL) return false;
   short result=false;
   int i;
-  //corner columns
+  /*corner columns */
   for (i=0;i<4;i++)
   {
     if ((surr_slb[dir_a[i]]==SLAB_TYPE_WATER)||(surr_slb[dir_b[i]]==SLAB_TYPE_WATER))
@@ -1633,7 +1631,7 @@ short modify_liquid_surrounding_advncd(struct COLUMN_REC *clm_recs[9],
        result=true;
     }
   }
-  //And the edge columns
+  /*And the edge columns */
   for (i=0;i<4;i++)
   {
     if ((surr_slb[dir_a[i]]==SLAB_TYPE_WATER))
@@ -1749,7 +1747,7 @@ void create_columns_slb_room(cr_clm_func cr_floor,cr_clm_func cr_edge,
 {
   unsigned short slab=surr_slb[IDIR_CENTR];
   unsigned char ownr=surr_own[IDIR_CENTR];
-  //Checking if completely surrounded
+  /*Checking if completely surrounded */
   if ((surr_slb[IDIR_NORTH]==slab)&&(surr_own[IDIR_NORTH]==ownr) &&
       (surr_slb[IDIR_EAST]==slab)&&(surr_own[IDIR_EAST]==ownr) &&
       (surr_slb[IDIR_SOUTH]==slab)&&(surr_own[IDIR_SOUTH]==ownr) &&
@@ -1763,13 +1761,13 @@ void create_columns_slb_room(cr_clm_func cr_floor,cr_clm_func cr_edge,
           cr_inside(clm_recs,surr_slb,surr_own,surr_tng);
       } else
       {
-          //The 'near inside' columns are usually same that floor,
-          //but may differ for rooms with specific corners
+          /*The 'near inside' columns are usually same that floor, */
+          /*but may differ for rooms with specific corners */
           cr_nearinsd(clm_recs,surr_slb,surr_own,surr_tng);
       }
       return;
   }
-  //If not completely, maybe we're surrounded from 3 sides (5 with corners)?
+  /*If not completely, maybe we're surrounded from 3 sides (5 with corners)? */
   if (((surr_slb[IDIR_NORTH]==slab)&&(surr_own[IDIR_NORTH]==ownr) &&
        (surr_slb[IDIR_NE]==slab)&&(surr_own[IDIR_NE]==ownr) &&
        (surr_slb[IDIR_EAST]==slab)&&(surr_own[IDIR_EAST]==ownr) &&
@@ -1794,28 +1792,28 @@ void create_columns_slb_room(cr_clm_func cr_floor,cr_clm_func cr_edge,
       cr_edge(clm_recs,surr_slb,surr_own,surr_tng);
       return;
   }
-  //If still nothing, maybe we have same surround from two sides and 1 corner,
-  // and another two are surely something else
+  /*If still nothing, maybe we have same surround from two sides and 1 corner, */
+  /* and another two are surely something else */
   if (((surr_slb[IDIR_NORTH]==slab)&&(surr_own[IDIR_NORTH]==ownr) &&
-//       (surr_slb[IDIR_NE]==slab)&&(surr_own[IDIR_NE]==ownr) &&
+/*       (surr_slb[IDIR_NE]==slab)&&(surr_own[IDIR_NE]==ownr) && */
        (surr_slb[IDIR_EAST]==slab)&&(surr_own[IDIR_EAST]==ownr) &&
       ((surr_slb[IDIR_SOUTH]!=slab)||(surr_own[IDIR_SOUTH]!=ownr)) &&
       ((surr_slb[IDIR_WEST]!=slab)||(surr_own[IDIR_WEST]!=ownr))) ||
 
       ((surr_slb[IDIR_EAST]==slab)&&(surr_own[IDIR_EAST]==ownr) &&
-//       (surr_slb[IDIR_SE]==slab)&&(surr_own[IDIR_SE]==ownr) &&
+/*       (surr_slb[IDIR_SE]==slab)&&(surr_own[IDIR_SE]==ownr) && */
        (surr_slb[IDIR_SOUTH]==slab)&&(surr_own[IDIR_SOUTH]==ownr) &&
       ((surr_slb[IDIR_NORTH]!=slab)||(surr_own[IDIR_NORTH]!=ownr)) &&
       ((surr_slb[IDIR_WEST]!=slab)||(surr_own[IDIR_WEST]!=ownr))) ||
 
       ((surr_slb[IDIR_SOUTH]==slab)&&(surr_own[IDIR_SOUTH]==ownr) &&
-//       (surr_slb[IDIR_SW]==slab)&&(surr_own[IDIR_SW]==ownr) &&
+/*       (surr_slb[IDIR_SW]==slab)&&(surr_own[IDIR_SW]==ownr) && */
        (surr_slb[IDIR_WEST]==slab)&&(surr_own[IDIR_WEST]==ownr) &&
       ((surr_slb[IDIR_NORTH]!=slab)||(surr_own[IDIR_NORTH]!=ownr)) &&
       ((surr_slb[IDIR_EAST]!=slab)||(surr_own[IDIR_EAST]!=ownr))) ||
 
       ((surr_slb[IDIR_WEST]==slab)&&(surr_own[IDIR_WEST]==ownr) &&
-//       (surr_slb[IDIR_NW]==slab)&&(surr_own[IDIR_NW]==ownr) &&
+/*       (surr_slb[IDIR_NW]==slab)&&(surr_own[IDIR_NW]==ownr) && */
        (surr_slb[IDIR_NORTH]==slab)&&(surr_own[IDIR_NORTH]==ownr) &&
       ((surr_slb[IDIR_SOUTH]!=slab)||(surr_own[IDIR_SOUTH]!=ownr)) &&
       ((surr_slb[IDIR_EAST]!=slab)||(surr_own[IDIR_EAST]!=ownr))))
@@ -1823,7 +1821,7 @@ void create_columns_slb_room(cr_clm_func cr_floor,cr_clm_func cr_edge,
       cr_corner(clm_recs,surr_slb,surr_own,surr_tng);
       return;
   }
-  //If nothing found - just draw floor of this room
+  /*If nothing found - just draw floor of this room */
   cr_floor(clm_recs,surr_slb,surr_own,surr_tng);
 }
 
@@ -1843,7 +1841,7 @@ void create_columns_slb_library_floor(struct COLUMN_REC *clm_recs[9],
 void create_columns_slb_library_edge(struct COLUMN_REC *clm_recs[9],
         unsigned char *surr_slb,unsigned char *surr_own, unsigned char **surr_tng)
 {
-  //Library egde is just its floor
+  /*Library egde is just its floor */
   create_columns_slb_library_floor(clm_recs,surr_slb,surr_own,surr_tng);
 }
 
@@ -1921,12 +1919,12 @@ void create_columns_slb_dungheart_nearinsd(struct COLUMN_REC *clm_recs[9],
   const unsigned short dir_b[]={IDIR_NORTH, IDIR_EAST, IDIR_SOUTH, IDIR_WEST};
   const unsigned short dir_c[]={IDIR_NW, IDIR_NE, IDIR_SE, IDIR_SW};
   create_columns_slb_dungheart_floor(clm_recs,surr_slb,surr_own,surr_tng);
-  //Raise the center a little bit
+  /*Raise the center a little bit */
   place_column_univ_stair(clm_recs[IDIR_CENTR], surr_own[IDIR_CENTR]);
   int i;
   unsigned short slab=surr_slb[IDIR_CENTR];
   unsigned char ownr=surr_own[IDIR_CENTR];
-  //corner columns
+  /*corner columns */
   for (i=0;i<4;i++)
   {
     if (((surr_slb[dir_a[i]]==slab)&&(surr_own[dir_a[i]]==ownr)) ||
@@ -1940,7 +1938,7 @@ void create_columns_slb_dungheart_nearinsd(struct COLUMN_REC *clm_recs[9],
         fill_column_dungheart_inside(clm_recs[dir_c[i]], surr_own[IDIR_CENTR]);
     }
   }
-  //and the rest of columns
+  /*and the rest of columns */
   for (i=0;i<4;i++)
   {
     if ((surr_slb[dir_a[i]]==slab)&&(surr_own[dir_a[i]]==ownr))
@@ -1962,9 +1960,9 @@ void create_columns_slb_portal_floor(struct COLUMN_REC *clm_recs[9],
   const unsigned short dir_c[]={IDIR_NW, IDIR_NE, IDIR_SE, IDIR_SW};
   unsigned short slab=surr_slb[IDIR_CENTR];
   unsigned char ownr=surr_own[IDIR_CENTR];
-  //Center
+  /*Center */
   fill_column_portal_floor(clm_recs[IDIR_CENTR], surr_own[IDIR_CENTR]);
-  //Corners
+  /*Corners */
   int i;
   for (i=0;i<4;i++)
   {
@@ -1974,7 +1972,7 @@ void create_columns_slb_portal_floor(struct COLUMN_REC *clm_recs[9],
     else
       fill_column_portal_floor(clm_recs[dir_c[i]], surr_own[IDIR_CENTR]);
   }
-  //And the edge columns
+  /*And the edge columns */
   for (i=0;i<4;i++)
   {
     if (((surr_slb[dir_a[i]]!=slab)||(surr_own[dir_a[i]]!=ownr)))
@@ -2035,10 +2033,10 @@ void create_columns_slb_temple_edge(struct COLUMN_REC *clm_recs[9],
   const unsigned short dir_e[]={IDIR_EAST, IDIR_SOUTH, IDIR_WEST, IDIR_NORTH};
   unsigned short slab=surr_slb[IDIR_CENTR];
   unsigned char ownr=surr_own[IDIR_CENTR];
-  //Temple edge is like its floor,
-  //but it is higher by one cube from inside.
+  /*Temple edge is like its floor, */
+  /*but it is higher by one cube from inside. */
   create_columns_slb_temple_floor(clm_recs,surr_slb,surr_own, surr_tng);
-  //Corners
+  /*Corners */
   int i;
   for (i=0;i<4;i++)
   {
@@ -2048,7 +2046,7 @@ void create_columns_slb_temple_edge(struct COLUMN_REC *clm_recs[9],
          (surr_slb[dir_e[i]]==slab)&&(surr_own[dir_e[i]]==ownr)))
       place_column_temple_edge(clm_recs[dir_c[i]], surr_own[IDIR_CENTR]);
   }
-  //And the edge columns
+  /*And the edge columns */
   for (i=0;i<4;i++)
   {
     if (((surr_slb[dir_a[i]]==slab)&&(surr_own[dir_a[i]]==ownr) &&
@@ -2084,9 +2082,9 @@ void create_columns_slb_hatchery_floor(struct COLUMN_REC *clm_recs[9],
   const unsigned short dir_c[]={IDIR_NW, IDIR_NE, IDIR_SE, IDIR_SW};
   unsigned short slab=surr_slb[IDIR_CENTR];
   unsigned char ownr=surr_own[IDIR_CENTR];
-  //Center
+  /*Center */
   fill_column_hatchery_inside(clm_recs[IDIR_CENTR], surr_own[IDIR_CENTR]);
-  //Corners
+  /*Corners */
   int i;
   for (i=0;i<4;i++)
   {
@@ -2096,7 +2094,7 @@ void create_columns_slb_hatchery_floor(struct COLUMN_REC *clm_recs[9],
     else
       fill_column_hatchery_inside(clm_recs[dir_c[i]], surr_own[IDIR_CENTR]);
   }
-  //And the edge columns
+  /*And the edge columns */
   for (i=0;i<4;i++)
   {
     if (((surr_slb[dir_a[i]]!=slab)||(surr_own[dir_a[i]]!=ownr)))
@@ -2104,7 +2102,7 @@ void create_columns_slb_hatchery_floor(struct COLUMN_REC *clm_recs[9],
     else
       fill_column_hatchery_inside(clm_recs[dir_a[i]], surr_own[IDIR_CENTR]);
   }
-  //Liquid surrounding - lava surround is not as trivial as usually
+  /*Liquid surrounding - lava surround is not as trivial as usually */
   unsigned short *water_cube=malloc(9*sizeof(unsigned short));
   unsigned short *lava_cube  =malloc(9*sizeof(unsigned short));
   for (i=0;i<9;i++)
@@ -2152,9 +2150,9 @@ void create_columns_slb_lair_floor(struct COLUMN_REC *clm_recs[9],
   const unsigned short dir_c[]={IDIR_NW, IDIR_NE, IDIR_SE, IDIR_SW};
   unsigned short slab=surr_slb[IDIR_CENTR];
   unsigned char ownr=surr_own[IDIR_CENTR];
-  //Center
+  /*Center */
   fill_column_lair_inside(clm_recs[IDIR_CENTR], surr_own[IDIR_CENTR]);
-  //Corners
+  /*Corners */
   int i;
   for (i=0;i<4;i++)
   {
@@ -2162,29 +2160,29 @@ void create_columns_slb_lair_floor(struct COLUMN_REC *clm_recs[9],
 
     if ((surr_slb[dir_a[i]]==slab)&&(surr_own[dir_a[i]]==ownr)&&
         (surr_slb[dir_b[i]]==slab)&&(surr_own[dir_b[i]]==ownr))
-    { //Surrounded by our area
+    { /*Surrounded by our area */
        clm_recs[dir_c[i]]->c[0]=CUBE_LAIR_INSIDE;
     } else
     if ((surr_slb[dir_a[i]]==slab)&&(surr_own[dir_a[i]]==ownr))
-    { //our on side A only
+    { /*our on side A only */
         switch (dir_c[i])
         {
-        case IDIR_NW://West only, not north
+        case IDIR_NW:/*West only, not north */
            clm_recs[dir_c[i]]->c[0]=0x01f;
            break;
-        case IDIR_NE://North only, not east
+        case IDIR_NE:/*North only, not east */
            clm_recs[dir_c[i]]->c[0]=0x022;
            break;
-        case IDIR_SW://South only, not west
+        case IDIR_SW:/*South only, not west */
            clm_recs[dir_c[i]]->c[0]=0x021;
            break;
-        case IDIR_SE://East only, not south
+        case IDIR_SE:/*East only, not south */
            clm_recs[dir_c[i]]->c[0]=0x024;
            break;
         }
     } else
     if ((surr_slb[dir_b[i]]==slab)&&(surr_own[dir_b[i]]==ownr))
-    { //our on side B only
+    { /*our on side B only */
         switch (dir_c[i])
         {
         case IDIR_NW:
@@ -2201,7 +2199,7 @@ void create_columns_slb_lair_floor(struct COLUMN_REC *clm_recs[9],
            break;
         }
     } else
-    { //Surrounded by not our area
+    { /*Surrounded by not our area */
         switch (dir_c[i])
         {
         case IDIR_NW:
@@ -2219,7 +2217,7 @@ void create_columns_slb_lair_floor(struct COLUMN_REC *clm_recs[9],
         }
     }
   }
-  //And the middle columns
+  /*And the middle columns */
   for (i=0;i<4;i++)
   {
      fill_column_lair_inside(clm_recs[dir_a[i]], surr_own[IDIR_CENTR]);
@@ -2246,8 +2244,8 @@ void create_columns_slb_lair_floor(struct COLUMN_REC *clm_recs[9],
         }
     }
   }
-  // Liquid surrounding is not supported for the lair ground,
-  // so we've done
+  /* Liquid surrounding is not supported for the lair ground, */
+  /* so we've done */
 }
 
 void create_columns_slb_lair_edge(struct COLUMN_REC *clm_recs[9],
@@ -2278,9 +2276,9 @@ void create_columns_slb_graveyard_floor(struct COLUMN_REC *clm_recs[9],
   const unsigned short dir_c[]={IDIR_NW, IDIR_NE, IDIR_SE, IDIR_SW};
   unsigned short slab=surr_slb[IDIR_CENTR];
   unsigned char ownr=surr_own[IDIR_CENTR];
-  //Center
+  /*Center */
   fill_column_graveyard_inside(clm_recs[IDIR_CENTR], surr_own[IDIR_CENTR]);
-  //Corners
+  /*Corners */
   int i;
   for (i=0;i<4;i++)
   {
@@ -2288,46 +2286,46 @@ void create_columns_slb_graveyard_floor(struct COLUMN_REC *clm_recs[9],
 
     if ((surr_slb[dir_a[i]]==slab)&&(surr_own[dir_a[i]]==ownr)&&
         (surr_slb[dir_b[i]]==slab)&&(surr_own[dir_b[i]]==ownr))
-    { //Surrounded by our area
+    { /*Surrounded by our area */
        clm_recs[dir_c[i]]->c[0]=0x142;
     } else
     if ((surr_slb[dir_a[i]]==slab)&&(surr_own[dir_a[i]]==ownr))
-    { //our on side A only
+    { /*our on side A only */
         switch (dir_c[i])
         {
-        case IDIR_NW://West only, not north
+        case IDIR_NW:/*West only, not north */
            clm_recs[dir_c[i]]->c[0]=0x144;
            break;
-        case IDIR_NE://North only, not east
+        case IDIR_NE:/*North only, not east */
            clm_recs[dir_c[i]]->c[0]=0x147;
            break;
-        case IDIR_SW://South only, not west
+        case IDIR_SW:/*South only, not west */
            clm_recs[dir_c[i]]->c[0]=0x146;
            break;
-        case IDIR_SE://East only, not south
+        case IDIR_SE:/*East only, not south */
            clm_recs[dir_c[i]]->c[0]=0x149;
            break;
         }
     } else
     if ((surr_slb[dir_b[i]]==slab)&&(surr_own[dir_b[i]]==ownr))
-    { //our on side B only
+    { /*our on side B only */
         switch (dir_c[i])
         {
-        case IDIR_NW://not west
+        case IDIR_NW:/*not west */
            clm_recs[dir_c[i]]->c[0]=0x146;
            break;
-        case IDIR_SW://not south
+        case IDIR_SW:/*not south */
            clm_recs[dir_c[i]]->c[0]=0x149;
            break;
-        case IDIR_NE://not north
+        case IDIR_NE:/*not north */
            clm_recs[dir_c[i]]->c[0]=0x144;
            break;
-        case IDIR_SE://not east
+        case IDIR_SE:/*not east */
            clm_recs[dir_c[i]]->c[0]=0x147;
            break;
         }
     } else
-    { //Surrounded by not our area
+    { /*Surrounded by not our area */
         switch (dir_c[i])
         {
         case IDIR_NW:
@@ -2345,7 +2343,7 @@ void create_columns_slb_graveyard_floor(struct COLUMN_REC *clm_recs[9],
         }
     }
   }
-  //And the middle columns
+  /*And the middle columns */
   for (i=0;i<4;i++)
   {
      fill_column_graveyard_inside(clm_recs[dir_a[i]], surr_own[IDIR_CENTR]);
@@ -2372,8 +2370,8 @@ void create_columns_slb_graveyard_floor(struct COLUMN_REC *clm_recs[9],
         }
     }
   }
-  // Liquid surrounding is not supported for the graveyard ground,
-  // so we've done
+  /* Liquid surrounding is not supported for the graveyard ground, */
+  /* so we've done */
 }
 
 void create_columns_slb_graveyard_edge(struct COLUMN_REC *clm_recs[9],
@@ -2523,7 +2521,7 @@ void create_columns_slb_workshop_inside(struct COLUMN_REC *clm_recs[9],
         unsigned char *surr_slb,unsigned char *surr_own, unsigned char **surr_tng)
 {
   create_columns_slb_workshop_floor(clm_recs,surr_slb,surr_own,surr_tng);
-  //On central slabs, we can use lava and water cubes too - they have same top.
+  /*On central slabs, we can use lava and water cubes too - they have same top. */
   int i,k;
   for (i=0;i<3;i++)
    for (k=0;k<3;k++)
@@ -2573,9 +2571,9 @@ void create_columns_slb_prison_floor(struct COLUMN_REC *clm_recs[9],
   const unsigned short dir_c[]={IDIR_NW, IDIR_NE, IDIR_SE, IDIR_SW};
   unsigned short slab=surr_slb[IDIR_CENTR];
   unsigned char ownr=surr_own[IDIR_CENTR];
-  //Center
+  /*Center */
   fill_column_prison_inside(clm_recs[IDIR_CENTR], surr_own[IDIR_CENTR]);
-  //Corners
+  /*Corners */
   int i;
   for (i=0;i<4;i++)
   {
@@ -2583,46 +2581,46 @@ void create_columns_slb_prison_floor(struct COLUMN_REC *clm_recs[9],
 
     if ((surr_slb[dir_a[i]]==slab)&&(surr_own[dir_a[i]]==ownr)&&
         (surr_slb[dir_b[i]]==slab)&&(surr_own[dir_b[i]]==ownr))
-    { //Surrounded by our area
+    { /*Surrounded by our area */
        clm_recs[dir_c[i]]->c[0]=0x0c8;
     } else
     if ((surr_slb[dir_a[i]]==slab)&&(surr_own[dir_a[i]]==ownr))
-    { //our on side A only
+    { /*our on side A only */
         switch (dir_c[i])
         {
-        case IDIR_NW://West only, not north
+        case IDIR_NW:/*West only, not north */
            clm_recs[dir_c[i]]->c[0]=0x0ca;
            break;
-        case IDIR_NE://North only, not east
+        case IDIR_NE:/*North only, not east */
            clm_recs[dir_c[i]]->c[0]=0x0cd;
            break;
-        case IDIR_SW://South only, not west
+        case IDIR_SW:/*South only, not west */
            clm_recs[dir_c[i]]->c[0]=0x0cc;
            break;
-        case IDIR_SE://East only, not south
+        case IDIR_SE:/*East only, not south */
            clm_recs[dir_c[i]]->c[0]=0x0cf;
            break;
         }
     } else
     if ((surr_slb[dir_b[i]]==slab)&&(surr_own[dir_b[i]]==ownr))
-    { //our on side B only
+    { /*our on side B only */
         switch (dir_c[i])
         {
-        case IDIR_NW://not west
+        case IDIR_NW:/*not west */
            clm_recs[dir_c[i]]->c[0]=0x0cc;
            break;
-        case IDIR_SW://not south
+        case IDIR_SW:/*not south */
            clm_recs[dir_c[i]]->c[0]=0x0cf;
            break;
-        case IDIR_NE://not north
+        case IDIR_NE:/*not north */
            clm_recs[dir_c[i]]->c[0]=0x0ca;
            break;
-        case IDIR_SE://not east
+        case IDIR_SE:/*not east */
            clm_recs[dir_c[i]]->c[0]=0x0cd;
            break;
         }
     } else
-    { //Surrounded by not our area
+    { /*Surrounded by not our area */
         switch (dir_c[i])
         {
         case IDIR_NW:
@@ -2640,7 +2638,7 @@ void create_columns_slb_prison_floor(struct COLUMN_REC *clm_recs[9],
         }
     }
   }
-  //And the middle columns
+  /*And the middle columns */
   for (i=0;i<4;i++)
   {
      fill_column_prison_inside(clm_recs[dir_a[i]], surr_own[IDIR_CENTR]);
@@ -2667,7 +2665,7 @@ void create_columns_slb_prison_floor(struct COLUMN_REC *clm_recs[9],
         }
     }
   }
-  // Liquid surrounding - quite hard here
+  /* Liquid surrounding - quite hard here */
   unsigned short *water_cube=malloc(9*sizeof(unsigned short));
   unsigned short *lava_cube  =malloc(9*sizeof(unsigned short));
   water_cube[IDIR_NW]=0x0d9;

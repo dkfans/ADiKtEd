@@ -1,21 +1,19 @@
 /******************************************************************************/
-// xtabjty.c - Dungeon Keeper Tools.
-/******************************************************************************/
-// Author:  Tomasz Lis
-// Created: 13 Mar 2007
-
-// Purpose:
-//   Converts picture data from bullfrog's JTY/TAB files into BMPs.
-//   Needs a .jty and a .tab file, and color palette
-
-// Comment:
-//   None.
-
-//Copying and copyrights:
-//   This program is free software; you can redistribute it and/or modify
-//   it under the terms of the GNU General Public License as published by
-//   the Free Software Foundation; either version 2 of the License, or
-//   (at your option) any later version.
+/** @file xtabjty.c
+ * Dungeon Keeper Tools.
+ * @par Purpose:
+ *     Converts picture data from bullfrog's JTY/TAB files into BMPs.
+ *     Needs a .jty and a .tab file, and color palette
+ * @par Comment:
+ *     None.
+ * @author   Tomasz Lis
+ * @date     13 Mar 2007
+ * @par  Copying and copyrights:
+ *     This program is free software; you can redistribute it and/or modify
+ *     it under the terms of the GNU General Public License as published by
+ *     the Free Software Foundation; either version 2 of the License, or
+ *     (at your option) any later version.
+ */
 /******************************************************************************/
 
 #if (defined(MAIN_XTABDAT8)||defined(MAIN_XTABJTY))
@@ -47,7 +45,7 @@ int main (int argc, char **argv)
     }
 
     printf("Loading palette ...");
-    //Reading palette file
+    /*Reading palette file */
     char *palette=malloc(768);
     {
         char fname[255];
@@ -69,7 +67,7 @@ int main (int argc, char **argv)
     }
     printf("Done.\n");
 
-    //Reading JTY,TAB and extracting images
+    /*Reading JTY,TAB and extracting images */
     struct IMAGELIST images;
     {
         char tabfname[255];
@@ -80,12 +78,12 @@ int main (int argc, char **argv)
         if (retcode!=0) return retcode;
     }
 
-    //Looping through images and extracting to files
+    /*Looping through images and extracting to files */
     printf("Extracting images into bitmaps...");
     unsigned long picnum;
     for (picnum=0;picnum<images.count;picnum++)
     {
-        //printf ("\rExtracting: picture number %*d", 4, picnum);
+        /*printf ("\rExtracting: picture number %*d", 4, picnum); */
         char fname[20];
        	sprintf (fname, "pic%0*d.bmp", 4, picnum);
         IMAGEITEM *item=&(images.items[picnum]);
@@ -109,7 +107,7 @@ short create_images_jtytab_enc(struct ENCIMAGELIST *images,const char *jtyfname,
     const char *tabfname,const int verbose)
 {
     if (verbose) msgprintf("Reading TAB file ...");
-    //Opening TAB file
+    /*Opening TAB file */
     struct JTYTABFILE jtabf;
     {
         int retcode=read_jtytabfile_data(&jtabf,tabfname);
@@ -128,7 +126,7 @@ short create_images_jtytab_enc(struct ENCIMAGELIST *images,const char *jtyfname,
     if (verbose) msgprintf(" Done.\n");
 
     if (verbose) msgprintf("Reading JTY file ...");
-    //Opening DAT file
+    /*Opening DAT file */
     struct DATFILE jtyf;
     {
         int retcode=read_datfile_data(&jtyf,jtyfname);
@@ -208,7 +206,7 @@ short create_images_jtytab_idx(struct IMAGELIST *images,const char *jtyfname,
     const char *tabfname,int verbose)
 {
     if (verbose) msgprintf("Reading TAB file ...");
-    //Opening TAB file
+    /*Opening TAB file */
     struct JTYTABFILE jtabf;
     {
         int retcode=read_jtytabfile_data(&jtabf,tabfname);
@@ -227,7 +225,7 @@ short create_images_jtytab_idx(struct IMAGELIST *images,const char *jtyfname,
     if (verbose) msgprintf(" Done.\n");
 
     if (verbose) msgprintf("Reading JTY file ...");
-    //Opening DAT file
+    /*Opening DAT file */
     struct DATFILE jtyf;
     {
         int retcode=read_datfile_data(&jtyf,jtyfname);
@@ -371,7 +369,7 @@ int read_jtytab_encimages(struct ENCIMAGELIST *images,unsigned long *readcount,
         if (verbose) msgprintf(" Error\nReason - cannot allocate %lu bytes of memory.\n",all_items_size);
         return JTYTB_MALLOC_ERR;
     }
-    //Looping through images
+    /*Looping through images */
     unsigned long picnum;
     unsigned long errnum=0;
     unsigned long skipnum=0;
@@ -391,7 +389,7 @@ int read_jtytab_encimages(struct ENCIMAGELIST *images,unsigned long *readcount,
             skipnum++;
             continue;
         }
-        // Determining end of the image
+        /* Determining end of the image */
         unsigned long endoffs=jtyf->filelength;
         if (picnum+1<images->count)
         {
@@ -429,18 +427,18 @@ int write_encimages_jtytab(const struct ENCIMAGELIST *images,unsigned long *writ
     struct JTYTABFILE *jtabf,struct DATFILE *jtyf)
 {
     short retcode;
-    // Preparing TAB structure
+    /* Preparing TAB structure */
     jtabf->filelength=(images->count*JTYTAB_ENTRY_SIZE);
     retcode=alloc_jtytabfile_data(jtabf,images->count);
     if (retcode!=ERR_NONE) return retcode;
-    // Preparing JTY structure
+    /* Preparing JTY structure */
     unsigned long datlength=0;
     int entrynum;
     for (entrynum=0;entrynum<images->count;entrynum++)
         datlength+=(images->items[entrynum].datsize);
     retcode=alloc_datfile_data(jtyf,datlength);
     if (retcode!=ERR_NONE) return retcode;
-    // Filling the structure
+    /* Filling the structure */
     unsigned long datoffs=0;
     for (entrynum=0;entrynum<images->count;entrynum++)
     {
@@ -498,7 +496,7 @@ int read_jtytab_images(struct IMAGELIST *images,unsigned long *readcount,
         if (verbose) msgprintf(" Error - cannot allocate %lu bytes of memory.\n",(unsigned long)(sizeof(struct IMAGEITEM)*images->count));
         return 1;
     }
-    //Looping through images
+    /*Looping through images */
     unsigned long picnum;
     unsigned long errnum=0;
     unsigned long skipnum=0;

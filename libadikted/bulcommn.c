@@ -80,7 +80,7 @@ short write_bmp_fp_idx (FILE *out, int width, int height,
   long data_len,pal_len;
   int i, j;
     
-  // Positive width and height
+  /* Positive width and height */
   if (width>=0)
     pwidth=width;
   else
@@ -90,9 +90,9 @@ short write_bmp_fp_idx (FILE *out, int width, int height,
   else
     pheight=-height;
   int padding_size=4-(pwidth&3);
-  // Length of data
+  /* Length of data */
   data_len = (pwidth+padding_size)*pheight;
-  // Length of palette
+  /* Length of palette */
   pal_len = 256*4;
   fputs("BM",out);
   write_int32_le_file(out, data_len+pal_len+0x36);
@@ -174,7 +174,7 @@ short write_bmp_fp_24b(FILE *out, int width, int height, const char *data)
   long data_len;
   int i, j;
     
-  // Positive width and height
+  /* Positive width and height */
   if (width>=0)
     pwidth=width;
   else
@@ -186,7 +186,7 @@ short write_bmp_fp_24b(FILE *out, int width, int height, const char *data)
     
   int datawidth=width*3;
   int padding_size=4-(datawidth&3);
-  // Length of data
+  /* Length of data */
   data_len = (pwidth+padding_size)*pheight;
   fputs("BM",out);
   write_int32_le_file (out, 3*data_len+0x36);

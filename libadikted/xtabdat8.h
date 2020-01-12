@@ -1,20 +1,18 @@
 /******************************************************************************/
-// xtabdat8.h - Dungeon Keeper Tools.
-/******************************************************************************/
-// Author:  Tomasz Lis
-// Created: 05 Jul 2005
-
-// Purpose:
-//   Header file. Defines exported routines from xtabdat8.c
-
-// Comment:
-//   None.
-
-//Copying and copyrights:
-//   This program is free software; you can redistribute it and/or modify
-//   it under the terms of the GNU General Public License as published by
-//   the Free Software Foundation; either version 2 of the License, or
-//   (at your option) any later version.
+/** @file xtabdat8.h
+ * Dungeon Keeper Tools.
+ * @par Purpose:
+ *     Header file. Defines exported routines from xtabdat8.c
+ * @par Comment:
+ *     None.
+ * @author   Tomasz Lis
+ * @date     05 Jul 2005
+ * @par  Copying and copyrights:
+ *     This program is free software; you can redistribute it and/or modify
+ *     it under the terms of the GNU General Public License as published by
+ *     the Free Software Foundation; either version 2 of the License, or
+ *     (at your option) any later version.
+ */
 /******************************************************************************/
 
 #ifndef BULL_XTABDAT8_H
@@ -26,7 +24,7 @@
  #define msgprintf message_log
 #endif
 
-// Error returns
+/* Error returns */
 
 #define XTABDAT8_COLOUR_LEAK 2
 #define XTABDAT8_ENDOFBUFFER 4
@@ -36,12 +34,12 @@
 #define XTABDAT8_MALLOC_ERR 11
 #define XTABDAT8_INTERNAL   12
 
-// Values
+/* Values */
 
 #define TABFILE_ENTRY_SIZE  6
 #define TABFILE_HEADER_SIZE 6
 
-// Data types
+/* Data types */
 
 struct IMGTAB_ATTRIB {
     unsigned char unkn[10];
@@ -51,7 +49,7 @@ struct TABFILE_ITEM {
     unsigned long offset;
     unsigned int width;
     unsigned int height;
-//    struct IMGTAB_ATTRIB attrib;
+/*    struct IMGTAB_ATTRIB attrib; */
        };
 
 struct TABFILE {
@@ -66,7 +64,7 @@ struct DATFILE {
     unsigned char *data;
        };
 
-//Compressed (rle) images
+/*Compressed (rle) images */
 
 struct ENCIMAGEITEM {
     unsigned int width;
@@ -81,7 +79,7 @@ struct ENCIMAGELIST {
     struct ENCIMAGEITEM *items;
        };
 
-//Decompressed (bitmap) images
+/*Decompressed (bitmap) images */
 
 struct IMAGEITEM {
     unsigned int width;
@@ -95,7 +93,7 @@ struct IMAGELIST {
     struct IMAGEITEM *items;
        };
 
-// Routines
+/* Routines */
 
 DLLIMPORT int read_tabfile_data(struct TABFILE *tabf,const char *srcfname);
 DLLIMPORT short write_tabfile_data(const struct TABFILE *tabf,const char *dstfname);

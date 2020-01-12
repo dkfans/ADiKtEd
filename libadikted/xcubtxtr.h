@@ -1,20 +1,18 @@
 /******************************************************************************/
-// xcubtxtr.h - Dungeon Keeper Tools.
-/******************************************************************************/
-// Author:  Tomasz Lis
-// Created: 19 Apr 2008
-
-// Purpose:
-//   Header file. Defines exported routines from xcubtxtr.h
-
-// Comment:
-//   None.
-
-//Copying and copyrights:
-//   This program is free software; you can redistribute it and/or modify
-//   it under the terms of the GNU General Public License as published by
-//   the Free Software Foundation; either version 2 of the License, or
-//   (at your option) any later version.
+/** @file xcubtxtr.h
+ * Dungeon Keeper Tools.
+ * @par Purpose:
+ *     Header file. Defines exported routines from xcubtxtr.c
+ * @par Comment:
+ *     None.
+ * @author   Tomasz Lis
+ * @date     19 Apr 2008
+ * @par  Copying and copyrights:
+ *     This program is free software; you can redistribute it and/or modify
+ *     it under the terms of the GNU General Public License as published by
+ *     the Free Software Foundation; either version 2 of the License, or
+ *     (at your option) any later version.
+ */
 /******************************************************************************/
 
 #ifndef BULL_XCUBTXTR_H
@@ -22,9 +20,9 @@
 
 #include "globals.h"
 
-// No error condition need to be same as in read_file (MFILE_OK)
-// There should be no more than 32 errors (up to -31)
-// values to 23 are reserved by read_file and RNC library
+/* No error condition need to be same as in read_file (MFILE_OK) */
+/* There should be no more than 32 errors (up to -31) */
+/* values to 23 are reserved by read_file and RNC library */
 #define XCUTX_FILE_BADDATA  1
 #define XCUTX_CANT_OPEN     2
 #define XCUTX_MALLOC_ERR    3
@@ -38,26 +36,26 @@
 #define TEXTURE_COUNT_X 8
 #define TEXTURE_COUNT_Y 68
 
-//Animated texture - indices of textures which are swiching
+/*Animated texture - indices of textures which are swiching */
 struct CUBE_TXTRANIM {
     unsigned int data[8];
 };
 
-//Texture indices for every side of a cube
+/*Texture indices for every side of a cube */
 struct CUBE_TEXTURES {
-       //north
+       /*north */
     unsigned int n;
-       //south
+       /*south */
     unsigned int s;
-       //west
+       /*west */
     unsigned int w;
-       //east
+       /*east */
     unsigned int e;
-       //top
+       /*top */
     unsigned int t;
-       //bottom
+       /*bottom */
     unsigned int b;
-       //unknown (unused?)
+       /*unknown (unused?) */
     unsigned int u[3];
 };
 

@@ -20,7 +20,7 @@
 
 #include "globals.h"
 
-// Routines
+/* Routines */
 
 DLLIMPORT unsigned int rnd(const unsigned int range);
 

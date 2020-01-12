@@ -70,7 +70,7 @@ DLLIMPORT short get_subtile_column_rec(const struct LEVEL *lvl, struct COLUMN_RE
 DLLIMPORT unsigned short get_subtile_column_height(struct LEVEL *lvl, int sx, int sy);
 DLLIMPORT unsigned short get_subtile_column_solid(struct LEVEL *lvl, int sx, int sy);
 
-// Custom columns support; graffiti are also custom columns
+/* Custom columns support; graffiti are also custom columns */
 DLLIMPORT short slab_has_custom_columns(struct LEVEL *lvl, int tx, int ty);
 DLLIMPORT int update_custom_columns_for_slab(struct COLUMN_REC *clm_recs[9],struct LEVEL *lvl, int tx, int ty);
 DLLIMPORT int place_cust_clms_on_slab(struct COLUMN_REC *clm_recs[9],struct LEVEL *lvl, int tx, int ty);
@@ -85,10 +85,10 @@ DLLIMPORT short cust_col_del(struct LEVEL *lvl, int sx, int sy);
 DLLIMPORT int cust_cols_del_for_tile(struct LEVEL *lvl, int tx, int ty);
 DLLIMPORT unsigned int get_cust_clm_count(struct LEVEL *lvl);
 
-//INF file and textures
+/*INF file and textures */
 DLLIMPORT char *get_texture_fullname(unsigned short inf_type);
 
-// This one is special - put in separate file
+/* This one is special - put in separate file */
 DLLIMPORT void add_permanent_columns(struct LEVEL *lvl);
 
-#endif // ADIKT_LEVCOLMN_H
+#endif /* ADIKT_LEVCOLMN_H */

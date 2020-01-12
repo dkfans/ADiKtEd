@@ -1,20 +1,18 @@
 /******************************************************************************/
-// obj_column_def.h - Dungeon Keeper Tools.
-/******************************************************************************/
-// Author:   Tomasz Lis
-// Created:  17 Dec 2007
-
-// Purpose:
-//   Header file. Defines exported routines from obj_column_def.c
-
-// Comment:
-//   None.
-
-//Copying and copyrights:
-//   This program is free software; you can redistribute it and/or modify
-//   it under the terms of the GNU General Public License as published by
-//   the Free Software Foundation; either version 2 of the License, or
-//   (at your option) any later version.
+/** @file obj_column_def.h
+ * Dungeon Keeper Tools.
+ * @par Purpose:
+ *     Header file. Defines exported routines from obj_column_def.c
+ * @par Comment:
+ *     None.
+ * @author   Tomasz Lis
+ * @date     17 Dec 2007
+ * @par  Copying and copyrights:
+ *     This program is free software; you can redistribute it and/or modify
+ *     it under the terms of the GNU General Public License as published by
+ *     the Free Software Foundation; either version 2 of the License, or
+ *     (at your option) any later version.
+ */
 /******************************************************************************/
 
 #ifndef ADIKT_OBJCOLDEF_H
@@ -22,12 +20,12 @@
 
 #include "globals.h"
 
-//WIB entry values
+/*WIB entry values */
 #define COLUMN_WIB_STATIC      0x00
 #define COLUMN_WIB_SKEW        0x01
 #define COLUMN_WIB_ANIMATE     0x02
 
-//WLB entry values
+/*WLB entry values */
 #define TILE_WLB_SOLID       0x00
 #define TILE_WLB_LAVA        0x01
 #define TILE_WLB_WATER       0x02
@@ -37,18 +35,18 @@ struct COLUMN_REC {
     short permanent;
     unsigned short lintel;
     unsigned short height;
-    // Solidmask - appears to be a bitmask for which of the cubes are non-zero,
-    // with the lowest cube being represented by the least significant bit.
+    /* Solidmask - appears to be a bitmask for which of the cubes are non-zero, */
+    /* with the lowest cube being represented by the least significant bit. */
     unsigned int solid;
-    // Baseblock - determines texture of the very lowest level (below the lowest cube).
+    /* Baseblock - determines texture of the very lowest level (below the lowest cube). */
     unsigned int base;
-    // Orientation (always 0)
+    /* Orientation (always 0) */
     short orientation;
-    // c1 is the lowest square, c8 - the top one.
+    /* c1 is the lowest square, c8 - the top one. */
     unsigned int c[8];
   };
 
-// Functions for maintaining COLUMN_REC structure
+/* Functions for maintaining COLUMN_REC structure */
 
 DLLIMPORT struct COLUMN_REC *create_column_rec(void);
 DLLIMPORT struct COLUMN_REC *create_column_recp(void);
@@ -72,12 +70,12 @@ DLLIMPORT unsigned short compute_clm_rec_solid(const struct COLUMN_REC *clm_rec)
 DLLIMPORT short compare_column_recs(struct COLUMN_REC *clm_rec1, struct COLUMN_REC *clm_rec2);
 DLLIMPORT short clm_rec_copy(struct COLUMN_REC *dest_rec,const struct COLUMN_REC *src_rec);
 
-// Converting COLUMN_REC to raw column entry (clmentry) and back
+/* Converting COLUMN_REC to raw column entry (clmentry) and back */
 
 DLLIMPORT void set_clm_entry(unsigned char *clmentry, struct COLUMN_REC *clm_rec);
 DLLIMPORT void get_clm_entry(struct COLUMN_REC *clm_rec, const unsigned char *clmentry);
 
-// Functions for working directly on clmentry, without converting to clm_rec
+/* Functions for working directly on clmentry, without converting to clm_rec */
 
 DLLIMPORT short compare_column_entries(const unsigned char *clmentry1, const unsigned char *clmentry2);
 DLLIMPORT unsigned int get_clm_entry_use(const unsigned char *clmentry);
@@ -98,7 +96,7 @@ unsigned short column_wib_entry(struct COLUMN_REC *clm_rec,
     struct COLUMN_REC *clm_rec_n,struct COLUMN_REC *clm_rec_w,struct COLUMN_REC *clm_rec_nw);
 DLLIMPORT char *get_cube_fullname(unsigned short idx);
 
-// Short columns
+/* Short columns */
 
 void fill_column_path(struct COLUMN_REC *clm_rec, unsigned char owner);
 void fill_column_claimedgnd_centr(struct COLUMN_REC *clm_rec, unsigned char owner);
@@ -113,7 +111,7 @@ void fill_column_rock_gndlev(struct COLUMN_REC *clm_rec, unsigned char owner);
 void fill_column_wallground_nearwater(struct COLUMN_REC *clm_rec, unsigned char owner);
 void fill_column_wallground_nearlava(struct COLUMN_REC *clm_rec, unsigned char owner);
 
-// Placing doors
+/* Placing doors */
 
 void place_column_doorwood_a(struct COLUMN_REC *clm_rec, unsigned char owner);
 void place_column_doorwood_b(struct COLUMN_REC *clm_rec, unsigned char owner);
@@ -128,7 +126,7 @@ void place_column_doormagic_a(struct COLUMN_REC *clm_rec, unsigned char owner);
 void place_column_doormagic_b(struct COLUMN_REC *clm_rec, unsigned char owner);
 void place_column_doormagic_c(struct COLUMN_REC *clm_rec, unsigned char owner);
 
-// Unclaimed tall columns
+/* Unclaimed tall columns */
 
 void fill_column_rock(struct COLUMN_REC *clm_rec, unsigned char owner);
 void place_column_rock(struct COLUMN_REC *clm_rec, unsigned char owner);
@@ -140,7 +138,7 @@ void fill_column_earth_nearwater(struct COLUMN_REC *clm_rec, unsigned char owner
 void fill_column_earth_nearlava(struct COLUMN_REC *clm_rec, unsigned char owner);
 void fill_column_gem(struct COLUMN_REC *clm_rec, unsigned char owner);
 
-// Reinforced Walls
+/* Reinforced Walls */
 
 void fill_column_wall_centr(struct COLUMN_REC *clm_rec, unsigned char owner);
 void fill_column_wall_cobblestones(struct COLUMN_REC *clm_rec, unsigned char owner);
@@ -175,7 +173,7 @@ void place_column_wall_drape_a(struct COLUMN_REC *clm_rec, unsigned char owner);
 void place_column_wall_drape_b(struct COLUMN_REC *clm_rec, unsigned char owner);
 void place_column_wall_drape_c(struct COLUMN_REC *clm_rec, unsigned char owner);
 
-// Room equipment columns
+/* Room equipment columns */
 
 void fill_column_library_pillar(struct COLUMN_REC *clm_rec, unsigned char owner);
 void place_column_library_bookcase_a(struct COLUMN_REC *clm_rec, unsigned char owner);
@@ -218,7 +216,7 @@ void fill_column_guardpost_floor_b(struct COLUMN_REC *clm_rec, unsigned char own
 void fill_column_guardpost_floor_c(struct COLUMN_REC *clm_rec, unsigned char owner);
 void fill_column_bridge_inside(struct COLUMN_REC *clm_rec, unsigned char owner);
 
-// Room-specific walls
+/* Room-specific walls */
 
 void place_column_wall_portal_a(struct COLUMN_REC *clm_rec, unsigned char owner);
 void place_column_wall_portal_b(struct COLUMN_REC *clm_rec, unsigned char owner);
@@ -262,4 +260,4 @@ void place_column_wall_hatchery_a(struct COLUMN_REC *clm_rec, unsigned char owne
 void place_column_wall_hatchery_b(struct COLUMN_REC *clm_rec, unsigned char owner);
 void place_column_wall_hatchery_c(struct COLUMN_REC *clm_rec, unsigned char owner);
 
-#endif // ADIKT_OBJCOLDEF_H
+#endif /* ADIKT_OBJCOLDEF_H */

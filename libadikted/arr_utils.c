@@ -167,7 +167,7 @@ return fname;
  */
 short format_map_fname(char *fname, const char *usrinput,const char *levels_path)
 {
-    // if the file does not have a path
+    /* if the file does not have a path */
     short has_path=(strchr(usrinput,'\\')!=NULL);
     if (!has_path)
         has_path=(strchr(usrinput,'/')!=NULL);
@@ -178,7 +178,7 @@ short format_map_fname(char *fname, const char *usrinput,const char *levels_path
               usedpath=".";
           else
               usedpath=levels_path;
-          //Then it shouldn't have any dots (no extension)
+          /* Then it shouldn't have any dots (no extension) */
           char *dotpos=strrchr(usrinput,'.');
           if (dotpos!=NULL)
           {
@@ -186,7 +186,7 @@ short format_map_fname(char *fname, const char *usrinput,const char *levels_path
               strncpy(fname,usrinput,len);
               fname[len]='\0';
           } else
-          // If there are no dots or separators, maybe it's a number of map, not filename
+          /* If there are no dots or separators, maybe it's a number of map, not filename */
           {
           if (atoi(usrinput))
               sprintf (fname, "%s"SEPARATOR"map%.5d", usedpath, atoi(usrinput));
@@ -194,7 +194,7 @@ short format_map_fname(char *fname, const char *usrinput,const char *levels_path
               sprintf(fname, "%s"SEPARATOR"%s", usedpath, usrinput);
           }
     } else
-        // File is with path
+        /* File is with path */
     {
         sprintf(fname, "%s", usrinput);
     }

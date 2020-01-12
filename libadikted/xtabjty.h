@@ -1,20 +1,18 @@
 /******************************************************************************/
-// xtabjty.h - Dungeon Keeper Tools.
-/******************************************************************************/
-// Author:  Tomasz Lis
-// Created: 13 Mar 2007
-
-// Purpose:
-//   Header file. Defines exported routines from xtabjty.c
-
-// Comment:
-//   None.
-
-//Copying and copyrights:
-//   This program is free software; you can redistribute it and/or modify
-//   it under the terms of the GNU General Public License as published by
-//   the Free Software Foundation; either version 2 of the License, or
-//   (at your option) any later version.
+/** @file xtabjty.h
+ * Dungeon Keeper Tools.
+ * @par Purpose:
+ *     Header file. Defines exported routines from xtabjty.c
+ * @par Comment:
+ *     None.
+ * @author   Tomasz Lis
+ * @date     13 Mar 2007
+ * @par  Copying and copyrights:
+ *     This program is free software; you can redistribute it and/or modify
+ *     it under the terms of the GNU General Public License as published by
+ *     the Free Software Foundation; either version 2 of the License, or
+ *     (at your option) any later version.
+ */
 /******************************************************************************/
 
 #ifndef BULL_XTABJTY_H
@@ -23,7 +21,7 @@
 #include "globals.h"
 #include "xtabdat8.h"
 
-// Error returns
+/* Error returns */
 
 #define JTYTB_FILE_BADDATA  1
 #define JTYTB_CANNOT_OPEN   2
@@ -33,7 +31,7 @@
 
 #define JTYTAB_ENTRY_SIZE 16
 
-// Data types
+/* Data types */
 
 struct JTYTAB_ITEM {
     unsigned long offset;
@@ -48,7 +46,7 @@ struct JTYTABFILE {
     struct JTYTAB_ITEM *items;
        };
 
-// Routines
+/* Routines */
 
 DLLIMPORT short alloc_jtytabfile_data(struct JTYTABFILE *jtabf,long count);
 DLLIMPORT short free_jtytabfile_data(struct JTYTABFILE *jtabf);

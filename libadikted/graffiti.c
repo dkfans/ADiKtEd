@@ -73,7 +73,7 @@ int graffiti_idx_next(struct LEVEL *lvl, int tx, int ty, int prev_idx)
       graf = lvl->graffiti[i];
       if ((tx>=graf->tile.x) && (tx<=graf->fin_tile.x) && (ty>=graf->tile.y) && (ty<=graf->fin_tile.y))
           return i;
-      // This makes empty/wrong graffitis visible
+      /* This makes empty/wrong graffitis visible */
       if ((ty==graf->tile.y) && (tx==graf->tile.x))
           return i;
     }
@@ -118,9 +118,9 @@ void graffiti_del(struct LEVEL *lvl,unsigned int num)
     {
       lvl->graffiti[i]=lvl->graffiti[i+1];
     }
-    //Decrease the graffiti_count by one
+    /*Decrease the graffiti_count by one */
     lvl->graffiti_count=graff_max_idx;
-    //Decrease amount of allocated memory, or free the block
+    /*Decrease amount of allocated memory, or free the block */
     lvl->graffiti = (struct DK_GRAFFITI **)realloc(lvl->graffiti,
              (graff_max_idx)*sizeof(struct DK_GRAFFITI *));
 }
@@ -141,7 +141,7 @@ struct DK_GRAFFITI *create_graffiti(int tx, int ty, char *text, const struct LEV
     ty%=lvl->tlsize.y;
     if (text==NULL) return NULL;
     struct DK_GRAFFITI *graf;
-    //Filling graffiti structure
+    /*Filling graffiti structure */
     graf = (struct DK_GRAFFITI *)malloc(sizeof(struct DK_GRAFFITI));
     if (graf==NULL)
     {
@@ -193,20 +193,20 @@ int graffiti_add_obj(struct LEVEL *lvl,struct DK_GRAFFITI *graf)
 short set_graffiti_orientation(struct DK_GRAFFITI *graf,const struct LEVEL *lvl,unsigned short orient)
 {
     if ((graf==NULL)||(graf->text==NULL)) return false;
-    //Preparing array bounds
+    /*Preparing array bounds */
     int arr_entries_x=lvl->tlsize.x*MAP_SUBNUM_X;
     int arr_entries_y=lvl->tlsize.y*MAP_SUBNUM_Y;
     unsigned short font=graf->font;
     int i;
     int l;
     l = strlen(graf->text);
-    //Computing graffiti length in subtiles
+    /*Computing graffiti length in subtiles */
     int subtl_len=0;
     for (i=0; i<l; i++)
     {
-      //The zero index in every chars[] entry is number of column
-      //needed for this character. The "+1" is required
-      // to make space between letters
+      /*The zero index in every chars[] entry is number of column */
+      /*needed for this character. The "+1" is required */
+      /* to make space between letters */
       subtl_len+=get_font_char(font,graf->text[i])[0]+1;
       int graf_end_subtl_x,graf_end_subtl_y;
       switch (orient)
@@ -236,23 +236,23 @@ short set_graffiti_orientation(struct DK_GRAFFITI *graf,const struct LEVEL *lvl,
           graf_end_subtl_y=graf->tile.y*MAP_SUBNUM_Y;
           break;
       }
-      //If we've exceeded map space - truncate the graffiti displayed
-      //(but keep the text in real length)
+      /*If we've exceeded map space - truncate the graffiti displayed */
+      /*(but keep the text in real length) */
       if ((graf_end_subtl_x > arr_entries_x)||(graf_end_subtl_y > arr_entries_y))
       {
         l=i;
         break;
       }
     }
-    // Remove space after last character
+    /* Remove space after last character */
     subtl_len--;
-    //We will need string length in tiles
+    /*We will need string length in tiles */
     int tiles_len=(subtl_len/MAP_SUBNUM_X) + ((subtl_len%MAP_SUBNUM_X)>0);
     if (tiles_len<1) tiles_len=1;
-    // Getting graffiti height - in subtiles and tiles
+    /* Getting graffiti height - in subtiles and tiles */
     int txt_height=get_graffiti_cube_height(graf->font,graf->text);
     int txt_tile_height=(txt_height/MAP_SUBNUM_X)+((txt_height%MAP_SUBNUM_X)>0);
-    //Now we can set the graffiti size and orientation
+    /*Now we can set the graffiti size and orientation */
     graf->orient=orient;
     int graf_h=6-txt_height;
     if ((graf_h<0)||(graf_h>7))
@@ -388,14 +388,14 @@ void graffiti_clear_from_columns(struct LEVEL *lvl,int graf_idx)
     graf=get_graffiti(lvl, graf_idx);
     if (graf==NULL) return;
     int tx,fin_tx,ty,fin_ty;
-    //Setting graffiti coords to off-screen
+    /*Setting graffiti coords to off-screen */
     tx=graf->tile.x;graf->tile.x=lvl->tlsize.x;
     fin_tx=graf->fin_tile.x;graf->fin_tile.x=lvl->tlsize.x;
     ty=graf->tile.y;graf->tile.y=lvl->tlsize.y;
     fin_ty=graf->fin_tile.y;graf->fin_tile.y=lvl->tlsize.y;
-    //Updating
+    /*Updating */
     update_datclm_for_square(lvl,tx,fin_tx,ty,fin_ty);
-    //Setting the coords back
+    /*Setting the coords back */
     graf->tile.x=tx;
     graf->fin_tile.x=fin_tx;
     graf->tile.y=ty;
@@ -445,17 +445,17 @@ int compute_graffiti_subtl_length(unsigned short font,char *text)
     default:
         return 0;
     }
-    //Counting graffiti length in subtiles
+    /*Counting graffiti length in subtiles */
     int i;
     int subtl_len=0;
     for (i=0; i < l; i++)
     {
-        //The zero index in every chars[] entry is number of column
-        //needed for this character. The "+1" is required
-        // to make space between letters
+        /*The zero index in every chars[] entry is number of column */
+        /*needed for this character. The "+1" is required */
+        /* to make space between letters */
         subtl_len+=get_font_char(font,text[i])[0]+1;
     }
-    // Remove space after last char
+    /* Remove space after last char */
     subtl_len--;
     return subtl_len;
 }
@@ -468,8 +468,8 @@ int compute_graffiti_subtl_length(unsigned short font,char *text)
  */
 int get_graffiti_cube_height(unsigned short font,char *text)
 {
-    //highly simplified - for now...
-    //TODO: compute height of every char in text, then select the largest.
+    /*highly simplified - for now... */
+    /*TODO: compute height of every char in text, then select the largest. */
   switch (font)
   {
   case GRAFF_FONT_ADICLSSC:
@@ -519,16 +519,16 @@ int place_graffiti_on_slab(struct COLUMN_REC *clm_recs[9],struct LEVEL *lvl, int
       struct DK_GRAFFITI *graf;
       graf=get_graffiti(lvl,graf_idx);
       if (graf==NULL) continue;
-      //Setting some local variables
+      /*Setting some local variables */
       int i;
       int base_sx=graf->tile.x*MAP_SUBNUM_X;
       int base_sy=graf->tile.y*MAP_SUBNUM_Y;
-      //Counting graffiti length in subtiles
+      /*Counting graffiti length in subtiles */
       int subtl_len=compute_graffiti_subtl_length(graf->font,graf->text);
-      //Starting part of the graffiti
+      /*Starting part of the graffiti */
       int graf_subtl_start;
-      // Get short access to orientation, and make sure it won't exceed
-      // dx[][]/dy[][] array
+      /* Get short access to orientation, and make sure it won't exceed */
+      /* dx[][]/dy[][] array */
       short orient_top=false;
       switch (graf->orient)
       {
@@ -609,27 +609,27 @@ short place_graffiti_on_clm_top(struct COLUMN_REC *clm_rec,unsigned short font,
     if ((clm_rec==NULL)||(text==NULL)||(strlen(text)<1)) return false;
     int i;
     int l = strlen(text);
-    int text_pos=0; //position of the character to print inside text
-    int clm_pos=0; //index of the current column in the current character
-    i=0;//temporary column counter
+    int text_pos=0; /*position of the character to print inside text */
+    int clm_pos=0; /*index of the current column in the current character */
+    i=0;/*temporary column counter */
     for (text_pos=0; text_pos<l; text_pos++)
     {
-        //The zero index in every chars[] entry is number of column
-        //needed for this character.
+        /*The zero index in every chars[] entry is number of column */
+        /*needed for this character. */
         int chr_clms_count=get_font_char(font,text[text_pos])[0]+1;
         if ((i<=graf_subtl)&&(i+chr_clms_count>graf_subtl))
         {
-            //clm_pos starts with 1, not with 0 (because chars[][0] is
-            // the number of columns in a letter)
+            /*clm_pos starts with 1, not with 0 (because chars[][0] is */
+            /* the number of columns in a letter) */
             clm_pos=graf_subtl-i+1;
             break;
         }
         i+=chr_clms_count;
     }
-    //Check if we've found the right position
+    /*Check if we've found the right position */
     if (text_pos>=l) return false;
     const unsigned char *char_data=get_font_char(font,text[text_pos]);
-    // Check if this is empty column (space between letters)
+    /* Check if this is empty column (space between letters) */
     if ((clm_pos<=0)||(clm_pos>char_data[0])) return false;
     unsigned char clm_mask=char_data[clm_pos];
     if ((clm_mask>>graf_subtl_h)&0x01)
@@ -657,27 +657,27 @@ short place_graffiti_on_column(struct COLUMN_REC *clm_rec,unsigned short font,
     if ((clm_rec==NULL)||(text==NULL)||(strlen(text)<1)) return false;
     int i;
     int l = strlen(text);
-    int text_pos=0; //position of the character to print inside text
-    int clm_pos=0; //index of the current column in the current character
-    i=0;//temporary column counter
+    int text_pos=0; /*position of the character to print inside text */
+    int clm_pos=0; /*index of the current column in the current character */
+    i=0;/*temporary column counter */
     for (text_pos=0; text_pos<l; text_pos++)
     {
-        //The zero index in every chars[] entry is number of column
-        //needed for this character.
+        /*The zero index in every chars[] entry is number of column */
+        /*needed for this character. */
         int chr_clms_count=get_font_char(font,text[text_pos])[0]+1;
         if ((i<=graf_subtl)&&(i+chr_clms_count>graf_subtl))
         {
-            //clm_pos starts with 1, not with 0 (because chars[][0] is
-            // the number of columns in letter)
+            /*clm_pos starts with 1, not with 0 (because chars[][0] is */
+            /* the number of columns in letter) */
             clm_pos=graf_subtl-i+1;
             break;
         }
         i+=chr_clms_count;
     }
-    //Check if we've found the right position
+    /*Check if we've found the right position */
     if (text_pos>=l) return false;
     const unsigned char *char_data=get_font_char(font,text[text_pos]);
-    // Check if this is empty column (space between letters)
+    /* Check if this is empty column (space between letters) */
     if ((clm_pos<=0)||(clm_pos>char_data[0])) return false;
     unsigned char clm_mask=char_data[clm_pos];
     for (i=0;i<8;i++)

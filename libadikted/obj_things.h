@@ -1,21 +1,18 @@
 /******************************************************************************/
-// obj_things.h - Dungeon Keeper Tools.
-/******************************************************************************/
-// Author:   Jon Skeet
-// Created:  14 Oct 1997
-// Modified: Tomasz Lis
-
-// Purpose:
-//   Header file. Defines exported routines from obj_things.c
-
-// Comment:
-//   None.
-
-//Copying and copyrights:
-//   This program is free software; you can redistribute it and/or modify
-//   it under the terms of the GNU General Public License as published by
-//   the Free Software Foundation; either version 2 of the License, or
-//   (at your option) any later version.
+/** @file obj_things.h
+ * Dungeon Keeper Tools.
+ * @par Purpose:
+ *     Header file. Defines exported routines from obj_things.c
+ * @par Comment:
+ *     None.
+ * @author   Jon Skeet, Tomasz Lis
+ * @date     14 Oct 1997
+ * @par  Copying and copyrights:
+ *     This program is free software; you can redistribute it and/or modify
+ *     it under the terms of the GNU General Public License as published by
+ *     the Free Software Foundation; either version 2 of the License, or
+ *     (at your option) any later version.
+ */
 /******************************************************************************/
 
 #ifndef ADIKT_OBJTHINGS_H
@@ -23,26 +20,26 @@
 
 #include "globals.h"
 
-//Things - most of the game objects is stored as thing
+/*Things - most of the game objects is stored as thing */
 #define THING_TYPE_NONE        0x00
-#define THING_TYPE_ITEM        0x01 // called "object" in the game
+#define THING_TYPE_ITEM        0x01 /* called "object" in the game */
 #define THING_TYPE_SHOT        0x02
-#define THING_TYPE_EFFCTELEM   0x03 // "effect element" (?)
-#define THING_TYPE_DEADCRTR    0x04 // dead creature
+#define THING_TYPE_EFFCTELEM   0x03 /* "effect element" (?) */
+#define THING_TYPE_DEADCRTR    0x04 /* dead creature */
 #define THING_TYPE_CREATURE    0x05
-#define THING_TYPE_EFFECTGEN   0x07 // called "effect generator" in the game
+#define THING_TYPE_EFFECTGEN   0x07 /* called "effect generator" in the game */
 #define THING_TYPE_TRAP        0x08
 #define THING_TYPE_DOOR        0x09
-#define THING_TYPE_AMBNITSND   0x0c // ambient sound
+#define THING_TYPE_AMBNITSND   0x0c /* ambient sound */
 #define THING_TYPE_CAVEIN      0x0d
 
-// Count of existing subtypes (max index+1)
+/* Count of existing subtypes (max index+1) */
 #define ITEM_STYPES_COUNT      0x87
 #define CREATR_STYPES_COUNT    0x22
 #define TRAP_STYPES_COUNT      0x0d
 #define DOOR_STYPES_COUNT      0x05
 
-// sub-types for items
+/* sub-types for items */
 #define ITEM_SUBTYPE_NULL      0x00
 #define ITEM_SUBTYPE_BARREL    0x01
 #define ITEM_SUBTYPE_TORCH     0x02
@@ -73,12 +70,12 @@
 
 #define ITEM_SUBTYPE_ANVIL     0x1a
 #define ITEM_SUBTYPE_PRISONBAR 0x1b
-#define ITEM_SUBTYPE_CANDLSTCK 0x1c //candle with candlestick
+#define ITEM_SUBTYPE_CANDLSTCK 0x1c /*candle with candlestick */
 #define ITEM_SUBTYPE_GRAVSTONE 0x1d
 #define ITEM_SUBTYPE_STATUHORN 0x1e
 #define ITEM_SUBTYPE_TRAINPOST 0x1f
 #define ITEM_SUBTYPE_TORTSPIKE 0x20
-#define ITEM_SUBTYPE_TEMPLESPN 0x21 //Temple Spangle
+#define ITEM_SUBTYPE_TEMPLESPN 0x21 /*Temple Spangle */
 
 #define ITEM_SUBTYPE_POTION1   0x22
 #define ITEM_SUBTYPE_POTION2   0x23
@@ -97,14 +94,14 @@
 #define ITEM_SUBTYPE_SPELLTBMB 0x30
 #define ITEM_SUBTYPE_HEROGATE  0x31
 #define ITEM_SUBTYPE_SPINNKEY2 0x32
-        //UNTESTED - indices may differ by one
+        /*UNTESTED - indices may differ by one */
 #define ITEM_SUBTYPE_ARMOUR    0x33
 #define ITEM_SUBTYPE_GLDHOARD1 0x34
 #define ITEM_SUBTYPE_GLDHOARD2 0x35
 #define ITEM_SUBTYPE_GLDHOARD3 0x36
 #define ITEM_SUBTYPE_GLDHOARD4 0x37
 #define ITEM_SUBTYPE_GLDHOARD5 0x38
-        //Creature lairs
+        /*Creature lairs */
 #define ITEM_SUBTYPE_LAIRWIZRD 0x39
 #define ITEM_SUBTYPE_LAIRBARBR 0x3a
 #define ITEM_SUBTYPE_LAIRARCHR 0x3b
@@ -186,14 +183,14 @@
 #define ITEM_SUBTYPE_STATUE6   0x85
 #define ITEM_SUBTYPE_SPELLARMG 0x86
 
-//Effects (all listed)
+/*Effects (all listed) */
 #define EFCTGEN_SUBTP_LAVA     0x01
 #define EFCTGEN_SUBTP_DRIPWTR  0x02
 #define EFCTGEN_SUBTP_ROCKFAL  0x03
 #define EFCTGEN_SUBTP_ENTRICE  0x04
 #define EFCTGEN_SUBTP_DRYICE   0x05
 
-//Creature types (all listed)
+/*Creature types (all listed) */
 #define CREATR_SUBTP_WIZRD     0x01
 #define CREATR_SUBTP_BARBARIN  0x02
 #define CREATR_SUBTP_ARCHER    0x03
@@ -225,7 +222,7 @@
 #define CREATR_SUBTP_TENTCL    0x1D
 #define CREATR_SUBTP_ORC       0x1E
 #define CREATR_SUBTP_FLOAT     0x1F
-// Untested; shouldn't be used
+/* Untested; shouldn't be used */
 #define CREATR_SUBTP_NEWA      0x20
 #define CREATR_SUBTP_NEWB      0x21
 
@@ -234,7 +231,7 @@
 #define DOOR_SUBTYPE_IRON      0x03
 #define DOOR_SUBTYPE_MAGIC     0x04
 
-//Traps (all listed; dummy doesn't really exist)
+/*Traps (all listed; dummy doesn't really exist) */
 #define TRAP_SUBTYPE_BOULDER   0x01
 #define TRAP_SUBTYPE_ALARM     0x02
 #define TRAP_SUBTYPE_GAS       0x03
@@ -253,9 +250,9 @@
 #define DOOR_PASS_UNLOCKED     0x00
 #define DOOR_PASS_LOCKED       0x01
 
-//Thing categories - indices must match the arrays in .c file
-// the UNKNOWN category must be the last one, and THING_CATEGR_COUNT
-// must be set to the count of categories
+/*Thing categories - indices must match the arrays in .c file */
+/* the UNKNOWN category must be the last one, and THING_CATEGR_COUNT */
+/* must be set to the count of categories */
 #define THING_CATEGR_NULL       0x00
 #define THING_CATEGR_EFFCTGEN   0x01
 #define THING_CATEGR_ITEMEFFCT  0x02
@@ -279,7 +276,7 @@
 #define THING_CATEGR_DNCRUCIAL  0x14
 #define THING_CATEGR_UNKNOWN    0x15
 
-//Other defines
+/*Other defines */
 #define THING_SENSITILE_NONE   0x0ffff
 
 struct LEVEL;
@@ -326,7 +323,7 @@ DLLIMPORT unsigned char *create_thing(unsigned int sx, unsigned int sy);
 DLLIMPORT unsigned char *create_thing_copy(const struct LEVEL *lvl,unsigned int sx, unsigned int sy,unsigned char *src);
 DLLIMPORT unsigned char *create_item(const struct LEVEL *lvl,unsigned int sx, unsigned int sy, unsigned char stype_idx);
 
-// Categorization
+/* Categorization */
 DLLIMPORT short is_nulltng(const unsigned char *thing);
 DLLIMPORT short is_nulltng_stype(const unsigned char stype_idx);
 DLLIMPORT int get_nulltng_arridx(const unsigned char stype_idx);
@@ -430,10 +427,10 @@ DLLIMPORT short is_dncrucial_stype(const unsigned char stype_idx);
 DLLIMPORT int get_dncrucial_arridx(const unsigned char stype_idx);
 DLLIMPORT unsigned char get_dncrucial_arritm(const int arr_itm);
 DLLIMPORT unsigned int get_dncrucial_count(void);
-// This one always returns false
+/* This one always returns false */
 DLLIMPORT short is_false_stype(const unsigned char stype_idx);
 
-// Additional functions - not categorization
+/* Additional functions - not categorization */
 DLLIMPORT short is_trapbox(const unsigned char *thing);
 DLLIMPORT short is_trapbox_stype(const unsigned char stype_idx);
 DLLIMPORT int get_trapbox_arridx(const unsigned char stype_idx);
@@ -493,4 +490,4 @@ DLLIMPORT short switch_thing_subtype(unsigned char *thing,const short forward);
 
 short thing_verify(unsigned char *thing, struct VERIFY_OPTIONS *verif_opt);
 
-#endif // ADIKT_OBJTHINGS_H
+#endif /* ADIKT_OBJTHINGS_H */

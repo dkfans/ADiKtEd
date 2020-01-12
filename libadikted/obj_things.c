@@ -1,21 +1,18 @@
 /******************************************************************************/
-// obj_things.c - Dungeon Keeper Tools.
-/******************************************************************************/
-// Author:   Jon Skeet
-// Created:  14 Oct 1997
-// Modified: Tomasz Lis
-
-// Purpose:
-//   Defines routines for maintaining single TNG entry - a thing.
-
-// Comment:
-//   None.
-
-//Copying and copyrights:
-//   This program is free software; you can redistribute it and/or modify
-//   it under the terms of the GNU General Public License as published by
-//   the Free Software Foundation; either version 2 of the License, or
-//   (at your option) any later version.
+/** @file obj_things.c
+ * Dungeon Keeper Tools.
+ * @par Purpose:
+ *     Defines routines for maintaining single TNG entry - a thing.
+ * @par Comment:
+ *     None.
+ * @author   Jon Skeet, Tomasz Lis
+ * @date     14 Oct 1997
+ * @par  Copying and copyrights:
+ *     This program is free software; you can redistribute it and/or modify
+ *     it under the terms of the GNU General Public License as published by
+ *     the Free Software Foundation; either version 2 of the License, or
+ *     (at your option) any later version.
+ */
 /******************************************************************************/
 
 #include "obj_things.h"
@@ -103,7 +100,7 @@ const unsigned char efctgen_types[]={
       EFCTGEN_SUBTP_ENTRICE,EFCTGEN_SUBTP_DRYICE,
       };
 
-// Groups used for defining categories (every item is defined in exactly one group)
+/* Groups used for defining categories (every item is defined in exactly one group) */
 
 const unsigned char items_nullthings[]={
       ITEM_SUBTYPE_NULL, ITEM_SUBTYPE_NULL1, ITEM_SUBTYPE_NULL2, };
@@ -187,8 +184,8 @@ const unsigned char items_pwhand[]={
 const unsigned char items_dncrucial[]={
       ITEM_SUBTYPE_DNHEART, ITEM_SUBTYPE_HEROGATE, };
 
-// Other groups - used for different purposes than defining categories
-// (one item may be defined in multiple groups here, or never be defined)
+/* Other groups - used for different purposes than defining categories */
+/* (one item may be defined in multiple groups here, or never be defined) */
 
 const unsigned char items_litthings[]={
       ITEM_SUBTYPE_TORCH, ITEM_SUBTYPE_CANDLSTCK,};
@@ -727,21 +724,21 @@ unsigned char get_usual_thing_slab(unsigned char *thing)
         case EFCTGEN_SUBTP_LAVA:
             return SLAB_TYPE_LAVA;
         case EFCTGEN_SUBTP_DRIPWTR:
-            //return SLAB_TYPE_WATER;
-            //Changed because this is sometimes placed as "user-made effect"
-            // (usually on lava)
+            /*return SLAB_TYPE_WATER; */
+            /*Changed because this is sometimes placed as "user-made effect" */
+            /* (usually on lava) */
             return SLAB_TYPE_CLAIMED;
         case EFCTGEN_SUBTP_ROCKFAL:
             return SLAB_TYPE_PATH;
         case EFCTGEN_SUBTP_ENTRICE:
-            //return SLAB_TYPE_PORTAL;
-            //Changed because this is sometimes placed as "user-made effect"
-            // (usually on hero gates)
+            /*return SLAB_TYPE_PORTAL; */
+            /*Changed because this is sometimes placed as "user-made effect" */
+            /* (usually on hero gates) */
             return SLAB_TYPE_CLAIMED;
         case EFCTGEN_SUBTP_DRYICE:
-            //return SLAB_TYPE_GRAVEYARD;
-            //Changed because this is sometimes placed as "user-made effect"
-            //(on dyngeon specials and in other places)
+            /*return SLAB_TYPE_GRAVEYARD; */
+            /*Changed because this is sometimes placed as "user-made effect" */
+            /*(on dyngeon specials and in other places) */
             return SLAB_TYPE_CLAIMED;
         }
       };break;
@@ -787,7 +784,7 @@ unsigned char get_usual_item_slab(unsigned char stype_idx)
   case THING_CATEGR_ROOMEQUIP:
   case THING_CATEGR_DNCRUCIAL:
     {
-    //TODO: validate when all rooms will be done
+    /*TODO: validate when all rooms will be done */
         switch (stype_idx)
         {
         case ITEM_SUBTYPE_DNHEART:
@@ -800,7 +797,7 @@ unsigned char get_usual_item_slab(unsigned char stype_idx)
         case ITEM_SUBTYPE_GURDFLAGG:
         case ITEM_SUBTYPE_GURDFLAGY:
           return SLAB_TYPE_GUARDPOST;
-        //TODO: not sure about these
+        /*TODO: not sure about these */
         case ITEM_SUBTYPE_PRISONBAR:
           return SLAB_TYPE_PRISONCASE;
         case ITEM_SUBTYPE_SCAVNGEYE:
@@ -850,8 +847,8 @@ unsigned char *create_thing(unsigned int sx, unsigned int sy)
       thing[i]=0;
     set_thing_subtpos(thing,((sx%MAP_SUBNUM_X)*0x40+0x40),((sy%MAP_SUBNUM_Y)*0x40+0x40));
     set_thing_subtile(thing,(unsigned char)sx,(unsigned char)sy);
-    set_thing_subtile_h(thing,1); // Default height is floor height
-    // Setting the owner
+    set_thing_subtile_h(thing,1); /* Default height is floor height */
+    /* Setting the owner */
     set_thing_owner(thing,PLAYER_UNSET);
     return thing;
 }
@@ -862,7 +859,7 @@ unsigned char *create_thing(unsigned int sx, unsigned int sy)
  */
 unsigned char *create_thing_copy(const struct LEVEL *lvl,unsigned int sx, unsigned int sy,unsigned char *src)
 {
-    //Preparing array bounds
+    /*Preparing array bounds */
     const int arr_entries_x=lvl->tlsize.x*MAP_SUBNUM_X;
     const int arr_entries_y=lvl->tlsize.y*MAP_SUBNUM_Y;
     sx%=arr_entries_x;
@@ -895,7 +892,7 @@ unsigned char *create_item(const struct LEVEL *lvl,unsigned int sx, unsigned int
     set_thing_type(thing,THING_TYPE_ITEM);
     set_thing_subtype(thing,stype_idx);
     set_thing_owner(thing,get_tile_owner(lvl,tx,ty));
-    set_thing_sensitile(thing,THING_SENSITILE_NONE); //Default associated tile is none
+    set_thing_sensitile(thing,THING_SENSITILE_NONE); /*Default associated tile is none */
     return thing;
 }
 
@@ -904,7 +901,7 @@ unsigned char *create_item(const struct LEVEL *lvl,unsigned int sx, unsigned int
  */
 short is_spellbook(const unsigned char *thing)
 {
-    //All spells are items
+    /*All spells are items */
     if (get_thing_type(thing) != THING_TYPE_ITEM)
       return false;
     return is_spellbook_stype(get_thing_subtype(thing));
@@ -923,7 +920,7 @@ int get_spellbook_arridx(const unsigned char stype_idx)
 {
     unsigned char *arr=(unsigned char *)items_spellbooks;
     int array_count=get_spellbook_count();
-    //searching for the subtype in array of this category
+    /*searching for the subtype in array of this category */
     char *pos=memchr(arr,stype_idx,array_count);
     if (pos==NULL) return -1;
     return ((long)pos-(long)arr)/sizeof(unsigned char);
@@ -951,7 +948,7 @@ unsigned int get_spellbook_count(void)
 unsigned char get_spellbook_next(const unsigned char stype_idx)
 {
      int array_count=sizeof(items_spellbooks)/sizeof(unsigned char);
-    //find the spell in items_spellbooks array
+    /*find the spell in items_spellbooks array */
     unsigned char *pos=memchr(items_spellbooks,stype_idx,array_count);
     if (pos!=NULL) pos+=sizeof(unsigned char);
     if ((pos<items_spellbooks)||(pos>=items_spellbooks+sizeof(items_spellbooks)))
@@ -965,7 +962,7 @@ unsigned char get_spellbook_next(const unsigned char stype_idx)
 unsigned char get_spellbook_prev(const unsigned char stype_idx)
 {
      int array_count=sizeof(items_spellbooks)/sizeof(unsigned char);
-    //find the spell in items_spellbooks array
+    /*find the spell in items_spellbooks array */
     unsigned char *pos=memchr(items_spellbooks,stype_idx,array_count);
     if (pos!=NULL) pos-=sizeof(unsigned char);
     if ((pos<items_spellbooks)||(pos>=items_spellbooks+sizeof(items_spellbooks)))
@@ -978,7 +975,7 @@ unsigned char get_spellbook_prev(const unsigned char stype_idx)
  */
 short is_dngspecbox(const unsigned char *thing)
 {
-    //All specials are items
+    /*All specials are items */
     if (get_thing_type(thing) != THING_TYPE_ITEM)
       return false;
     return is_dngspecbox_stype(get_thing_subtype(thing));
@@ -997,7 +994,7 @@ int get_dngspecbox_arridx(const unsigned char stype_idx)
 {
     unsigned char *arr=(unsigned char *)items_specboxes;
     int array_count=get_dngspecbox_count();
-    //searching for the subtype in array of this category
+    /*searching for the subtype in array of this category */
     char *pos=memchr(arr,stype_idx,array_count);
     if (pos==NULL) return -1;
     return ((long)pos-(long)arr)/sizeof(unsigned char);
@@ -1025,7 +1022,7 @@ unsigned int get_dngspecbox_count(void)
 unsigned char get_dngspecbox_next(const unsigned char stype_idx)
 {
      int array_count=sizeof(items_specboxes)/sizeof(unsigned char);
-    //find the special in items_specboxes array
+    /*find the special in items_specboxes array */
     unsigned char *pos=memchr(items_specboxes,stype_idx,array_count);
     if (pos!=NULL) pos+=sizeof(unsigned char);
     if ((pos<items_specboxes)||(pos>=items_specboxes+sizeof(items_specboxes)))
@@ -1039,7 +1036,7 @@ unsigned char get_dngspecbox_next(const unsigned char stype_idx)
 unsigned char get_dngspecbox_prev(const unsigned char stype_idx)
 {
      int array_count=sizeof(items_specboxes)/sizeof(unsigned char);
-    //find the special in items_specboxes array
+    /*find the special in items_specboxes array */
     unsigned char *pos=memchr(items_specboxes,stype_idx,array_count);
     if (pos!=NULL) pos-=sizeof(unsigned char);
     if ((pos<items_specboxes)||(pos>=items_specboxes+sizeof(items_specboxes)))
@@ -1052,7 +1049,7 @@ unsigned char get_dngspecbox_prev(const unsigned char stype_idx)
  */
 short is_crtrlair(const unsigned char *thing)
 {
-    //All lairs are items
+    /*All lairs are items */
     if (get_thing_type(thing) != THING_TYPE_ITEM)
       return false;
     return is_crtrlair_stype(get_thing_subtype(thing));
@@ -1071,7 +1068,7 @@ int get_crtrlair_arridx(const unsigned char stype_idx)
 {
     unsigned char *arr=(unsigned char *)items_crtrlairs;
     int array_count=get_crtrlair_count();
-    //searching for the subtype in array of this category
+    /*searching for the subtype in array of this category */
     char *pos=memchr(arr,stype_idx,array_count);
     if (pos==NULL) return -1;
     return ((long)pos-(long)arr)/sizeof(unsigned char);
@@ -1099,7 +1096,7 @@ unsigned int get_crtrlair_count(void)
 unsigned char get_crtrlair_next(const unsigned char stype_idx)
 {
      int array_count=sizeof(items_crtrlairs)/sizeof(unsigned char);
-    //find the lair in items_crtrlairs array
+    /*find the lair in items_crtrlairs array */
     unsigned char *pos=memchr(items_crtrlairs,stype_idx,array_count);
     if (pos!=NULL) pos+=sizeof(unsigned char);
     if ((pos<items_crtrlairs)||(pos>=items_crtrlairs+sizeof(items_crtrlairs)))
@@ -1113,7 +1110,7 @@ unsigned char get_crtrlair_next(const unsigned char stype_idx)
 unsigned char get_crtrlair_prev(const unsigned char stype_idx)
 {
      int array_count=sizeof(items_crtrlairs)/sizeof(unsigned char);
-    //find the lair in items_crtrlairs array
+    /*find the lair in items_crtrlairs array */
     unsigned char *pos=memchr(items_crtrlairs,stype_idx,array_count);
     if (pos!=NULL) pos-=sizeof(unsigned char);
     if ((pos<items_crtrlairs)||(pos>=items_crtrlairs+sizeof(items_crtrlairs)))
@@ -1126,7 +1123,7 @@ unsigned char get_crtrlair_prev(const unsigned char stype_idx)
  */
 short is_trapbox(const unsigned char *thing)
 {
-    //All traps are items
+    /*All traps are items */
     if (get_thing_type(thing) != THING_TYPE_ITEM)
       return false;
     return is_trapbox_stype(get_thing_subtype(thing));
@@ -1145,7 +1142,7 @@ int get_trapbox_arridx(const unsigned char stype_idx)
 {
     unsigned char *arr=(unsigned char *)items_trapbxs;
     int array_count=get_trapbox_count();
-    //searching for the subtype in array of this category
+    /*searching for the subtype in array of this category */
     char *pos=memchr(arr,stype_idx,array_count);
     if (pos==NULL) return -1;
     return ((long)pos-(long)arr)/sizeof(unsigned char);
@@ -1173,7 +1170,7 @@ unsigned int get_trapbox_count(void)
 unsigned char get_trapbox_next(const unsigned char stype_idx)
 {
      int array_count=sizeof(items_trapbxs)/sizeof(unsigned char);
-    //find the trap box in items_trapbxs array
+    /*find the trap box in items_trapbxs array */
     unsigned char *pos=memchr(items_trapbxs,stype_idx,array_count);
     if (pos!=NULL) pos+=sizeof(unsigned char);
     if ((pos<items_trapbxs)||(pos>=items_trapbxs+sizeof(items_trapbxs)))
@@ -1187,7 +1184,7 @@ unsigned char get_trapbox_next(const unsigned char stype_idx)
 unsigned char get_trapbox_prev(const unsigned char stype_idx)
 {
      int array_count=sizeof(items_trapbxs)/sizeof(unsigned char);
-    //find the trap box in items_trapbxs array
+    /*find the trap box in items_trapbxs array */
     unsigned char *pos=memchr(items_trapbxs,stype_idx,array_count);
     if (pos!=NULL) pos-=sizeof(unsigned char);
     if ((pos<items_trapbxs)||(pos>=items_trapbxs+sizeof(items_trapbxs)))
@@ -1209,7 +1206,7 @@ int get_trap_arridx(const unsigned char stype_idx)
 {
     unsigned char *arr=(unsigned char *)trap_types;
     int array_count=get_trap_count();
-    //searching for the subtype in array of this category
+    /*searching for the subtype in array of this category */
     char *pos=memchr(arr,stype_idx,array_count);
     if (pos==NULL) return -1;
     return ((long)pos-(long)arr)/sizeof(unsigned char);
@@ -1245,7 +1242,7 @@ int get_creature_arridx(const unsigned char stype_idx)
 {
     unsigned char *arr=(unsigned char *)creatr_types;
     int array_count=get_creature_count();
-    //searching for the subtype in array of this category
+    /*searching for the subtype in array of this category */
     char *pos=memchr(arr,stype_idx,array_count);
     if (pos==NULL) return -1;
     return ((long)pos-(long)arr)/sizeof(unsigned char);
@@ -1273,7 +1270,7 @@ unsigned int get_creature_count(void)
 unsigned char get_creature_next(const unsigned char stype_idx)
 {
      int array_count=sizeof(creatr_types)/sizeof(unsigned char);
-    //find the creature in creatr_types array
+    /*find the creature in creatr_types array */
     unsigned char *pos=memchr(creatr_types,stype_idx,array_count);
     if (pos!=NULL) pos+=sizeof(unsigned char);
     if ((pos<creatr_types)||(pos>=creatr_types+sizeof(creatr_types)))
@@ -1287,7 +1284,7 @@ unsigned char get_creature_next(const unsigned char stype_idx)
 unsigned char get_creature_prev(const unsigned char stype_idx)
 {
      int array_count=sizeof(creatr_types)/sizeof(unsigned char);
-    //find the creature in creatr_types array
+    /*find the creature in creatr_types array */
     unsigned char *pos=memchr(creatr_types,stype_idx,array_count);
     if (pos!=NULL) pos-=sizeof(unsigned char);
     if ((pos<creatr_types)||(pos>=creatr_types+sizeof(creatr_types)))
@@ -1300,7 +1297,7 @@ unsigned char get_creature_prev(const unsigned char stype_idx)
  */
 short is_doorbox(const unsigned char *thing)
 {
-    //All traps are items
+    /*All traps are items */
     if (get_thing_type(thing) != THING_TYPE_ITEM)
       return false;
     return is_doorbox_stype(get_thing_subtype(thing));
@@ -1319,7 +1316,7 @@ int get_doorbox_arridx(const unsigned char stype_idx)
 {
     unsigned char *arr=(unsigned char *)items_doorboxes;
     int array_count=get_doorbox_count();
-    //searching for the subtype in array of this category
+    /*searching for the subtype in array of this category */
     char *pos=memchr(arr,stype_idx,array_count);
     if (pos==NULL) return -1;
     return ((long)pos-(long)arr)/sizeof(unsigned char);
@@ -1349,7 +1346,7 @@ unsigned char get_doorbox_next(const unsigned char stype_idx)
     unsigned char *arr=(unsigned char *)items_doorboxes;
     int sizeof_arr=sizeof(items_doorboxes);
     int array_count=sizeof_arr/sizeof(unsigned char);
-    //find the item in array
+    /*find the item in array */
     unsigned char *pos=memchr(arr,stype_idx,array_count);
     if (pos!=NULL) pos++;
     if ((pos<arr)||(pos>=arr+sizeof_arr))
@@ -1365,7 +1362,7 @@ unsigned char get_doorbox_prev(const unsigned char stype_idx)
     unsigned char *arr=(unsigned char *)items_doorboxes;
     int sizeof_arr=sizeof(items_doorboxes);
     int array_count=sizeof_arr/sizeof(unsigned char);
-    //find the item in array
+    /*find the item in array */
     unsigned char *pos=memchr(arr,stype_idx,array_count);
     if (pos!=NULL) pos--;
     if ((pos<arr)||(pos>=arr+sizeof_arr))
@@ -1387,7 +1384,7 @@ int get_door_arridx(const unsigned char stype_idx)
 {
     unsigned char *arr=(unsigned char *)door_types;
     int array_count=get_door_count();
-    //searching for the subtype in array of this category
+    /*searching for the subtype in array of this category */
     char *pos=memchr(arr,stype_idx,array_count);
     if (pos==NULL) return -1;
     return ((long)pos-(long)arr)/sizeof(unsigned char);
@@ -1415,7 +1412,7 @@ unsigned int get_door_count(void)
 unsigned char get_door_next(const unsigned char stype_idx)
 {
      int array_count=sizeof(door_types)/sizeof(unsigned char);
-    //find the door in door_types array
+    /*find the door in door_types array */
     unsigned char *pos=memchr(door_types,stype_idx,array_count);
     if (pos!=NULL) pos+=sizeof(unsigned char);
     if ((pos<door_types)||(pos>=door_types+sizeof(door_types)))
@@ -1429,7 +1426,7 @@ unsigned char get_door_next(const unsigned char stype_idx)
 unsigned char get_door_prev(const unsigned char stype_idx)
 {
      int array_count=sizeof(door_types)/sizeof(unsigned char);
-    //find the door in door_types array
+    /*find the door in door_types array */
     unsigned char *pos=memchr(door_types,stype_idx,array_count);
     if (pos!=NULL) pos-=sizeof(unsigned char);
     if ((pos<door_types)||(pos>=door_types+sizeof(door_types)))
@@ -1451,7 +1448,7 @@ int get_effectgen_arridx(const unsigned char stype_idx)
 {
     unsigned char *arr=(unsigned char *)efctgen_types;
     int array_count=get_effectgen_count();
-    //searching for the subtype in array of this category
+    /*searching for the subtype in array of this category */
     char *pos=memchr(arr,stype_idx,array_count);
     if (pos==NULL) return -1;
     return ((long)pos-(long)arr)/sizeof(unsigned char);
@@ -1479,7 +1476,7 @@ unsigned int get_effectgen_count(void)
 unsigned char get_effectgen_next(const unsigned char stype_idx)
 {
      int array_count=sizeof(efctgen_types)/sizeof(unsigned char);
-    //find the effect in efctgen_types array
+    /*find the effect in efctgen_types array */
     unsigned char *pos=memchr(efctgen_types,stype_idx,array_count);
     if (pos!=NULL) pos+=sizeof(unsigned char);
     if ((pos<efctgen_types)||(pos>=efctgen_types+sizeof(efctgen_types)))
@@ -1493,7 +1490,7 @@ unsigned char get_effectgen_next(const unsigned char stype_idx)
 unsigned char get_effectgen_prev(const unsigned char stype_idx)
 {
      int array_count=sizeof(efctgen_types)/sizeof(unsigned char);
-    //find the effect in efctgen_types array
+    /*find the effect in efctgen_types array */
     unsigned char *pos=memchr(efctgen_types,stype_idx,array_count);
     if (pos!=NULL) pos-=sizeof(unsigned char);
     if ((pos<efctgen_types)||(pos>=efctgen_types+sizeof(efctgen_types)))
@@ -1506,7 +1503,7 @@ unsigned char get_effectgen_prev(const unsigned char stype_idx)
  */
 short is_statue(const unsigned char *thing)
 {
-    //All statues are items
+    /*All statues are items */
     if (get_thing_type(thing) != THING_TYPE_ITEM)
       return false;
     return is_statue_stype(get_thing_subtype(thing));
@@ -1525,7 +1522,7 @@ int get_statue_arridx(const unsigned char stype_idx)
 {
     unsigned char *arr=(unsigned char *)items_statues;
     int array_count=get_statue_count();
-    //searching for the subtype in array of this category
+    /*searching for the subtype in array of this category */
     char *pos=memchr(arr,stype_idx,array_count);
     if (pos==NULL) return -1;
     return ((long)pos-(long)arr)/sizeof(unsigned char);
@@ -1553,7 +1550,7 @@ unsigned int get_statue_count(void)
 unsigned char get_statue_next(const unsigned char stype_idx)
 {
      int array_count=sizeof(items_statues)/sizeof(unsigned char);
-    //find the statue in items_statues array
+    /*find the statue in items_statues array */
     unsigned char *pos=memchr(items_statues,stype_idx,array_count);
     if (pos!=NULL) pos+=sizeof(unsigned char);
     if ((pos<items_statues)||(pos>=items_statues+sizeof(items_statues)))
@@ -1567,7 +1564,7 @@ unsigned char get_statue_next(const unsigned char stype_idx)
 unsigned char get_statue_prev(const unsigned char stype_idx)
 {
      int array_count=sizeof(items_statues)/sizeof(unsigned char);
-    //find the statue in items_statues array
+    /*find the statue in items_statues array */
     unsigned char *pos=memchr(items_statues,stype_idx,array_count);
     if (pos!=NULL) pos-=sizeof(unsigned char);
     if ((pos<items_statues)||(pos>=items_statues+sizeof(items_statues)))
@@ -1580,7 +1577,7 @@ unsigned char get_statue_prev(const unsigned char stype_idx)
  */
 short is_food(const unsigned char *thing)
 {
-    //All food are items
+    /*All food are items */
     if (get_thing_type(thing) != THING_TYPE_ITEM)
       return false;
     return is_food_stype(get_thing_subtype(thing));
@@ -1599,7 +1596,7 @@ int get_food_arridx(const unsigned char stype_idx)
 {
     unsigned char *arr=(unsigned char *)items_food;
     int array_count=get_food_count();
-    //searching for the subtype in array of this category
+    /*searching for the subtype in array of this category */
     char *pos=memchr(arr,stype_idx,array_count);
     if (pos==NULL) return -1;
     return ((long)pos-(long)arr)/sizeof(unsigned char);
@@ -1627,7 +1624,7 @@ unsigned int get_food_count(void)
 unsigned char get_food_next(const unsigned char stype_idx)
 {
      int array_count=sizeof(items_food)/sizeof(unsigned char);
-    //find the food in items_food array
+    /*find the food in items_food array */
     unsigned char *pos=memchr(items_food,stype_idx,array_count);
     if (pos!=NULL) pos+=sizeof(unsigned char);
     if ((pos<items_food)||(pos>=items_food+sizeof(items_food)))
@@ -1641,7 +1638,7 @@ unsigned char get_food_next(const unsigned char stype_idx)
 unsigned char get_food_prev(const unsigned char stype_idx)
 {
      int array_count=sizeof(items_food)/sizeof(unsigned char);
-    //find the food in items_food array
+    /*find the food in items_food array */
     unsigned char *pos=memchr(items_food,stype_idx,array_count);
     if (pos!=NULL) pos-=sizeof(unsigned char);
     if ((pos<items_food)||(pos>=items_food+sizeof(items_food)))
@@ -1651,7 +1648,7 @@ unsigned char get_food_prev(const unsigned char stype_idx)
 
 short is_gold(const unsigned char *thing)
 {
-    //All are items
+    /*All are items */
     if (get_thing_type(thing) != THING_TYPE_ITEM)
       return false;
     return is_gold_stype(get_thing_subtype(thing));
@@ -1667,7 +1664,7 @@ int get_gold_arridx(const unsigned char stype_idx)
 {
     unsigned char *arr=(unsigned char *)items_gold;
     int array_count=get_gold_count();
-    //searching for the subtype in array of this category
+    /*searching for the subtype in array of this category */
     char *pos=memchr(arr,stype_idx,array_count);
     if (pos==NULL) return -1;
     return ((long)pos-(long)arr)/sizeof(unsigned char);
@@ -1695,7 +1692,7 @@ unsigned int get_gold_count(void)
 unsigned char get_gold_next(const unsigned char stype_idx)
 {
      int array_count=sizeof(items_gold)/sizeof(unsigned char);
-    //find the gold in items_gold array
+    /*find the gold in items_gold array */
     unsigned char *pos=memchr(items_gold,stype_idx,array_count);
     if (pos!=NULL) pos+=sizeof(unsigned char);
     if ((pos<items_gold)||(pos>=items_gold+sizeof(items_gold)))
@@ -1709,7 +1706,7 @@ unsigned char get_gold_next(const unsigned char stype_idx)
 unsigned char get_gold_prev(const unsigned char stype_idx)
 {
      int array_count=sizeof(items_gold)/sizeof(unsigned char);
-    //find the gold in items_gold array
+    /*find the gold in items_gold array */
     unsigned char *pos=memchr(items_gold,stype_idx,array_count);
     if (pos!=NULL) pos-=sizeof(unsigned char);
     if ((pos<items_gold)||(pos>=items_gold+sizeof(items_gold)))
@@ -1722,7 +1719,7 @@ unsigned char get_gold_prev(const unsigned char stype_idx)
  */
 short is_torch(const unsigned char *thing)
 {
-    //All torches are items
+    /*All torches are items */
     if (get_thing_type(thing) != THING_TYPE_ITEM)
       return false;
     return is_torch_stype(get_thing_subtype(thing));
@@ -1738,7 +1735,7 @@ int get_torch_arridx(const unsigned char stype_idx)
 {
     unsigned char *arr=(unsigned char *)items_torches;
     int array_count=get_torch_count();
-    //searching for the subtype in array of this category
+    /*searching for the subtype in array of this category */
     char *pos=memchr(arr,stype_idx,array_count);
     if (pos==NULL) return -1;
     return ((long)pos-(long)arr)/sizeof(unsigned char);
@@ -1766,7 +1763,7 @@ unsigned int get_torch_count(void)
 unsigned char get_torch_next(const unsigned char stype_idx)
 {
      int array_count=sizeof(items_torches)/sizeof(unsigned char);
-    //find the torch in items_torches array
+    /*find the torch in items_torches array */
     unsigned char *pos=memchr(items_torches,stype_idx,array_count);
     if (pos!=NULL) pos+=sizeof(unsigned char);
     if ((pos<items_torches)||(pos>=items_torches+sizeof(items_torches)))
@@ -1780,7 +1777,7 @@ unsigned char get_torch_next(const unsigned char stype_idx)
 unsigned char get_torch_prev(const unsigned char stype_idx)
 {
      int array_count=sizeof(items_torches)/sizeof(unsigned char);
-    //find the torch in items_torches array
+    /*find the torch in items_torches array */
     unsigned char *pos=memchr(items_torches,stype_idx,array_count);
     if (pos!=NULL) pos-=sizeof(unsigned char);
     if ((pos<items_torches)||(pos>=items_torches+sizeof(items_torches)))
@@ -1793,7 +1790,7 @@ unsigned char get_torch_prev(const unsigned char stype_idx)
  */
 short is_heartflame(const unsigned char *thing)
 {
-    //All heartflames are items
+    /*All heartflames are items */
     if (get_thing_type(thing) != THING_TYPE_ITEM)
       return false;
     return is_heartflame_stype(get_thing_subtype(thing));
@@ -1809,7 +1806,7 @@ int get_heartflame_arridx(const unsigned char stype_idx)
 {
     unsigned char *arr=(unsigned char *)items_heartflames;
     int array_count=get_heartflame_count();
-    //searching for the subtype in array of this category
+    /*searching for the subtype in array of this category */
     char *pos=memchr(arr,stype_idx,array_count);
     if (pos==NULL) return -1;
     return ((long)pos-(long)arr)/sizeof(unsigned char);
@@ -1840,7 +1837,7 @@ unsigned char get_heartflame_next(const unsigned char stype_idx)
     int sizeof_arr=sizeof(items_heartflames);
     int sizeof_itm=sizeof(unsigned char);
     int array_count=sizeof_arr/sizeof_itm;
-    //find the item in array
+    /*find the item in array */
     unsigned char *pos=memchr(arr,stype_idx,array_count);
     if (pos!=NULL) pos+=sizeof_itm;
     if ((pos<arr)||(pos>=arr+sizeof_arr))
@@ -1856,7 +1853,7 @@ unsigned char get_heartflame_prev(const unsigned char stype_idx)
     unsigned char *arr=(unsigned char *)items_heartflames;
     int sizeof_arr=sizeof(items_heartflames);
     int array_count=sizeof_arr/sizeof(unsigned char);
-    //find the item in array
+    /*find the item in array */
     unsigned char *pos=memchr(arr,stype_idx,array_count);
     if (pos!=NULL) pos--;
     if ((pos<arr)||(pos>=arr+sizeof_arr))
@@ -1869,7 +1866,7 @@ unsigned char get_heartflame_prev(const unsigned char stype_idx)
  */
 short is_polebar(const unsigned char *thing)
 {
-    //All poles are items
+    /*All poles are items */
     if (get_thing_type(thing) != THING_TYPE_ITEM)
       return false;
     return is_polebar_stype(get_thing_subtype(thing));
@@ -1885,7 +1882,7 @@ int get_polebar_arridx(const unsigned char stype_idx)
 {
     unsigned char *arr=(unsigned char *)items_polebars;
     int array_count=get_polebar_count();
-    //searching for the subtype in array of this category
+    /*searching for the subtype in array of this category */
     char *pos=memchr(arr,stype_idx,array_count);
     if (pos==NULL) return -1;
     return ((long)pos-(long)arr)/sizeof(unsigned char);
@@ -1927,7 +1924,7 @@ int get_lit_thing_arridx(const unsigned char stype_idx)
 {
     unsigned char *arr=(unsigned char *)items_litthings;
     int array_count=get_lit_thing_count();
-    //searching for the subtype in array of this category
+    /*searching for the subtype in array of this category */
     char *pos=memchr(arr,stype_idx,array_count);
     if (pos==NULL) return -1;
     return ((long)pos-(long)arr)/sizeof(unsigned char);
@@ -1958,7 +1955,7 @@ unsigned char get_lit_thing_next(const unsigned char stype_idx)
     int sizeof_arr=sizeof(items_litthings);
     int sizeof_itm=sizeof(unsigned char);
     int array_count=sizeof_arr/sizeof_itm;
-    //find the item in array
+    /*find the item in array */
     unsigned char *pos=memchr(arr,stype_idx,array_count);
     if (pos!=NULL) pos+=sizeof_itm;
     if ((pos<arr)||(pos>=arr+sizeof_arr))
@@ -1974,7 +1971,7 @@ unsigned char get_lit_thing_prev(const unsigned char stype_idx)
     unsigned char *arr=(unsigned char *)items_litthings;
     int sizeof_arr=sizeof(items_litthings);
     int array_count=sizeof_arr/sizeof(unsigned char);
-    //find the item in array
+    /*find the item in array */
     unsigned char *pos=memchr(arr,stype_idx,array_count);
     if (pos!=NULL) pos--;
     if ((pos<arr)||(pos>=arr+sizeof_arr))
@@ -2002,7 +1999,7 @@ int get_spinningtng_arridx(const unsigned char stype_idx)
 {
     unsigned char *arr=(unsigned char *)items_spinnthings;
     int array_count=get_spinningtng_count();
-    //searching for the subtype in array of this category
+    /*searching for the subtype in array of this category */
     char *pos=memchr(arr,stype_idx,array_count);
     if (pos==NULL) return -1;
     return ((long)pos-(long)arr)/sizeof(unsigned char);
@@ -2036,7 +2033,7 @@ unsigned char get_spinningtng_next(const unsigned char stype_idx)
     int sizeof_arr=sizeof(items_spinnthings);
     int sizeof_itm=sizeof(unsigned char);
     int array_count=sizeof_arr/sizeof_itm;
-    //find the item in array
+    /*find the item in array */
     unsigned char *pos=memchr(arr,stype_idx,array_count);
     if (pos!=NULL) pos+=sizeof_itm;
     if ((pos<arr)||(pos>=arr+sizeof_arr))
@@ -2053,7 +2050,7 @@ unsigned char get_spinningtng_prev(const unsigned char stype_idx)
     int sizeof_arr=sizeof(items_spinnthings);
     int sizeof_itm=sizeof(unsigned char);
     int array_count=sizeof_arr/sizeof_itm;
-    //find the item in array
+    /*find the item in array */
     unsigned char *pos=memchr(arr,stype_idx,array_count);
     if (pos!=NULL) pos-=sizeof_itm;
     if ((pos<arr)||(pos>=arr+sizeof_arr))
@@ -2081,7 +2078,7 @@ int get_nulltng_arridx(const unsigned char stype_idx)
 {
     unsigned char *arr=(unsigned char *)items_nullthings;
     int array_count=get_nulltng_count();
-    //searching for the subtype in array of this category
+    /*searching for the subtype in array of this category */
     char *pos=memchr(arr,stype_idx,array_count);
     if (pos==NULL) return -1;
     return ((long)pos-(long)arr)/sizeof(unsigned char);
@@ -2131,7 +2128,7 @@ int get_itemeffect_arridx(const unsigned char stype_idx)
 {
     unsigned char *arr=(unsigned char *)items_effcts;
     int array_count=get_itemeffect_count();
-    //searching for the subtype in array of this category
+    /*searching for the subtype in array of this category */
     char *pos=memchr(arr,stype_idx,array_count);
     if (pos==NULL) return -1;
     return ((long)pos-(long)arr)/sizeof(unsigned char);
@@ -2176,7 +2173,7 @@ int get_wrkshopbox_arridx(const unsigned char stype_idx)
 {
     unsigned char *arr=(unsigned char *)items_wrkshpbxs;
     int array_count=get_wrkshopbox_count();
-    //searching for the subtype in array of this category
+    /*searching for the subtype in array of this category */
     char *pos=memchr(arr,stype_idx,array_count);
     if (pos==NULL) return -1;
     return ((long)pos-(long)arr)/sizeof(unsigned char);
@@ -2221,7 +2218,7 @@ int get_torchcndl_arridx(const unsigned char stype_idx)
 {
     unsigned char *arr=(unsigned char *)items_torchcandls;
     int array_count=get_torchcndl_count();
-    //searching for the subtype in array of this category
+    /*searching for the subtype in array of this category */
     char *pos=memchr(arr,stype_idx,array_count);
     if (pos==NULL) return -1;
     return ((long)pos-(long)arr)/sizeof(unsigned char);
@@ -2266,7 +2263,7 @@ int get_roomequip_arridx(const unsigned char stype_idx)
 {
     unsigned char *arr=(unsigned char *)items_roomequip;
     int array_count=get_roomequip_count();
-    //searching for the subtype in array of this category
+    /*searching for the subtype in array of this category */
     char *pos=memchr(arr,stype_idx,array_count);
     if (pos==NULL) return -1;
     return ((long)pos-(long)arr)/sizeof(unsigned char);
@@ -2311,7 +2308,7 @@ int get_pwhand_arridx(const unsigned char stype_idx)
 {
     unsigned char *arr=(unsigned char *)items_pwhand;
     int array_count=get_pwhand_count();
-    //searching for the subtype in array of this category
+    /*searching for the subtype in array of this category */
     char *pos=memchr(arr,stype_idx,array_count);
     if (pos==NULL) return -1;
     return ((long)pos-(long)arr)/sizeof(unsigned char);
@@ -2356,7 +2353,7 @@ int get_dncrucial_arridx(const unsigned char stype_idx)
 {
     unsigned char *arr=(unsigned char *)items_dncrucial;
     int array_count=get_dncrucial_count();
-    //searching for the subtype in array of this category
+    /*searching for the subtype in array of this category */
     char *pos=memchr(arr,stype_idx,array_count);
     if (pos==NULL) return -1;
     return ((long)pos-(long)arr)/sizeof(unsigned char);
@@ -2386,7 +2383,7 @@ unsigned int get_dncrucial_count(void)
  */
 short is_furniture(const unsigned char *thing)
 {
-    //All furniture are items
+    /*All furniture are items */
     if (get_thing_type(thing) != THING_TYPE_ITEM)
       return false;
     return is_furniture_stype(get_thing_subtype(thing));
@@ -2405,7 +2402,7 @@ int get_furniture_arridx(const unsigned char stype_idx)
 {
     unsigned char *arr=(unsigned char *)items_furniture;
     int array_count=get_furniture_count();
-    //searching for the subtype in array of this category
+    /*searching for the subtype in array of this category */
     char *pos=memchr(arr,stype_idx,array_count);
     if (pos==NULL) return -1;
     return ((long)pos-(long)arr)/sizeof(unsigned char);
@@ -2433,7 +2430,7 @@ unsigned int get_furniture_count(void)
 unsigned char get_furniture_next(const unsigned char stype_idx)
 {
      int array_count=sizeof(items_furniture)/sizeof(unsigned char);
-    //find the furniture in items_furniture array
+    /*find the furniture in items_furniture array */
     unsigned char *pos=memchr(items_furniture,stype_idx,array_count);
     if (pos!=NULL) pos+=sizeof(unsigned char);
     if ((pos<items_furniture)||(pos>=items_furniture+sizeof(items_furniture)))
@@ -2447,7 +2444,7 @@ unsigned char get_furniture_next(const unsigned char stype_idx)
 unsigned char get_furniture_prev(const unsigned char stype_idx)
 {
      int array_count=sizeof(items_furniture)/sizeof(unsigned char);
-    //find the furniture in items_furniture array
+    /*find the furniture in items_furniture array */
     unsigned char *pos=memchr(items_furniture,stype_idx,array_count);
     if (pos!=NULL) pos-=sizeof(unsigned char);
     if ((pos<items_furniture)||(pos>=items_furniture+sizeof(items_furniture)))
@@ -2494,24 +2491,24 @@ short is_room_inventory(const unsigned char *thing)
   case THING_TYPE_EFFECTGEN:
       switch (get_thing_subtype(thing))
       {
-      case EFCTGEN_SUBTP_ENTRICE:  // Entrance ice effect generator
-      case EFCTGEN_SUBTP_DRYICE:   //Graveyard dry ice
+      case EFCTGEN_SUBTP_ENTRICE:  /* Entrance ice effect generator */
+      case EFCTGEN_SUBTP_DRYICE:   /*Graveyard dry ice */
         return true;
       }
       return false;
   case THING_TYPE_DOOR:
       return true;
   case THING_TYPE_ITEM:
-    { // Some categories contain only room_things
+    { /* Some categories contain only room_things */
       int cat_idx=get_item_category(get_thing_subtype(thing));
       if ( (cat_idx==THING_CATEGR_ROOMEQUIP)||(cat_idx==THING_CATEGR_POLEBAR)
          ||(cat_idx==THING_CATEGR_TORCHCNDL)||(cat_idx==THING_CATEGR_DNCRUCIAL)
          ||(cat_idx==THING_CATEGR_HEARTFLAME) )
         return true;
-      // Also some other items which are in various categories
+      /* Also some other items which are in various categories */
       switch (get_thing_subtype(thing))
       {
-      case ITEM_SUBTYPE_SPINNKEY:  //Key marking closed doors
+      case ITEM_SUBTYPE_SPINNKEY:  /*Key marking closed doors */
       case ITEM_SUBTYPE_SPINNKEY2:
       case ITEM_SUBTYPE_TEMPLESTA:
       case ITEM_SUBTYPE_ANVIL:
@@ -2534,13 +2531,13 @@ short is_clmaffective_thing(const unsigned char *thing)
   case THING_TYPE_DOOR:
       return true;
   case THING_TYPE_ITEM:
-    { // Some categories contain only clmaffective things
+    { /* Some categories contain only clmaffective things */
       int cat_idx=get_item_category(get_thing_subtype(thing));
       if ( (cat_idx==THING_CATEGR_ROOMEQUIP)
          ||(cat_idx==THING_CATEGR_TORCHCNDL)||(cat_idx==THING_CATEGR_DNCRUCIAL)
          ||(cat_idx==THING_CATEGR_HEARTFLAME) )
         return true;
-      // Also some other items which are in various categories
+      /* Also some other items which are in various categories */
       switch (get_thing_subtype(thing))
       {
       case ITEM_SUBTYPE_TEMPLESTA:
@@ -2582,7 +2579,7 @@ char *get_item_subtype_fullname(const unsigned short stype_idx)
           return "Growing Chicken";
         case ITEM_SUBTYPE_CHICKN:
           return "Chicken";
-        //Spells
+        /*Spells */
         case ITEM_SUBTYPE_SPELLHOE:
           return "Hand of evil spell";
         case ITEM_SUBTYPE_SPELLIMP:
@@ -2654,7 +2651,7 @@ char *get_item_subtype_fullname(const unsigned short stype_idx)
           return "Gold (200)";
         case ITEM_SUBTYPE_SPINNKEY:
           return "Spinning key";
-        //Spells
+        /*Spells */
         case ITEM_SUBTYPE_SPELLDISE:
           return "Disease spell";
         case ITEM_SUBTYPE_SPELLCHKN:
@@ -2682,7 +2679,7 @@ char *get_item_subtype_fullname(const unsigned short stype_idx)
         case ITEM_SUBTYPE_GLDHOARD5: 
           return "Gold Hoarde 5";
 
-        //Creature lairs
+        /*Creature lairs */
         case ITEM_SUBTYPE_LAIRWIZRD: 
           return "Wizard Lair";
         case ITEM_SUBTYPE_LAIRBARBR: 
@@ -2742,7 +2739,7 @@ char *get_item_subtype_fullname(const unsigned short stype_idx)
         case ITEM_SUBTYPE_LAIRTENTC: 
           return "Tentacle Lair";
 
-        //Dungeon Specials
+        /*Dungeon Specials */
         case ITEM_SUBTYPE_SPREVMAP: 
           return "Reveal map";
         case ITEM_SUBTYPE_SPRESURCT:
@@ -2759,7 +2756,7 @@ char *get_item_subtype_fullname(const unsigned short stype_idx)
           return "Make safe";
         case ITEM_SUBTYPE_SPHIDNWRL:
           return "Reveal hiddn world";
-        //Traps
+        /*Traps */
         case ITEM_SUBTYPE_TBBOULDER:
           return "Boulder trap box";
         case ITEM_SUBTYPE_TBALARM:
@@ -2785,7 +2782,7 @@ char *get_item_subtype_fullname(const unsigned short stype_idx)
         case ITEM_SUBTYPE_TBDUMMY7:
           return "Trap Dummy 7";
 
-        //Workshop items
+        /*Workshop items */
         case ITEM_SUBTYPE_DBWOOD:
           return "Door Wood box";
         case ITEM_SUBTYPE_DBBRACE:
@@ -2796,7 +2793,7 @@ char *get_item_subtype_fullname(const unsigned short stype_idx)
           return "Door Magic box";
         case ITEM_SUBTYPE_WBITEM:
           return "Workshop Item";
-        //Room equipment
+        /*Room equipment */
         case ITEM_SUBTYPE_HEARTFLMR:
           return "Heart flame(red)";
         case ITEM_SUBTYPE_DISEASE:
@@ -2822,12 +2819,12 @@ char *get_item_subtype_fullname(const unsigned short stype_idx)
         case ITEM_SUBTYPE_HEARTFLMY:
           return "Heart flame(yellw)";
 
-        //Special effects
+        /*Special effects */
         case ITEM_SUBTYPE_PWSIGHT:
           return "Power Sight";
         case ITEM_SUBTYPE_PWLIGHTNG:
           return "Power Lightning";
-        //Other, mostly untested
+        /*Other, mostly untested */
         case ITEM_SUBTYPE_TORTURER:
           return "Torturer";
         case ITEM_SUBTYPE_LAIRORC:
@@ -2892,7 +2889,7 @@ char *get_item_subtype_shortname(const unsigned short stype_idx)
         case ITEM_SUBTYPE_CHICKNWOB:
         case ITEM_SUBTYPE_CHICKNCRK:
           return "Food";
-        //Spells
+        /*Spells */
         case ITEM_SUBTYPE_SPELLHOE:
         case ITEM_SUBTYPE_SPELLIMP:
         case ITEM_SUBTYPE_SPELLMUST:
@@ -2952,7 +2949,7 @@ char *get_item_subtype_shortname(const unsigned short stype_idx)
         case ITEM_SUBTYPE_GLDHOARD4: 
         case ITEM_SUBTYPE_GLDHOARD5: 
           return "GldHr";
-        //Creature lairs
+        /*Creature lairs */
         case ITEM_SUBTYPE_LAIRWIZRD: 
         case ITEM_SUBTYPE_LAIRBARBR: 
         case ITEM_SUBTYPE_LAIRARCHR: 
@@ -2984,7 +2981,7 @@ char *get_item_subtype_shortname(const unsigned short stype_idx)
         case ITEM_SUBTYPE_LAIRTENTC: 
         case ITEM_SUBTYPE_LAIRORC:
           return "Lair";
-        //Dungeon Specials
+        /*Dungeon Specials */
         case ITEM_SUBTYPE_SPREVMAP: 
         case ITEM_SUBTYPE_SPRESURCT:
         case ITEM_SUBTYPE_SPTRANSFR:
@@ -2994,7 +2991,7 @@ char *get_item_subtype_shortname(const unsigned short stype_idx)
         case ITEM_SUBTYPE_SPMKSAFE:
         case ITEM_SUBTYPE_SPHIDNWRL:
           return "SpcBx";
-        //Traps
+        /*Traps */
         case ITEM_SUBTYPE_TBBOULDER:
         case ITEM_SUBTYPE_TBALARM:
         case ITEM_SUBTYPE_TBPOISONG:
@@ -3008,7 +3005,7 @@ char *get_item_subtype_shortname(const unsigned short stype_idx)
         case ITEM_SUBTYPE_TBDUMMY6:
         case ITEM_SUBTYPE_TBDUMMY7:
           return "TrpBx";
-        //Workshop items
+        /*Workshop items */
         case ITEM_SUBTYPE_DBWOOD:
         case ITEM_SUBTYPE_DBBRACE:
         case ITEM_SUBTYPE_DBSTEEL:
@@ -3016,7 +3013,7 @@ char *get_item_subtype_shortname(const unsigned short stype_idx)
           return "DorBx";
         case ITEM_SUBTYPE_WBITEM:
           return "WshBx";
-        //Room equipment
+        /*Room equipment */
         case ITEM_SUBTYPE_HEARTFLMR:
         case ITEM_SUBTYPE_HEARTFLMB:
         case ITEM_SUBTYPE_HEARTFLMG:
@@ -3192,8 +3189,8 @@ short item_verify(unsigned char *thing, struct VERIFY_OPTIONS *verif_opt)
   ty=sy/MAP_SUBNUM_Y;
   if (sen_tl!=THING_SENSITILE_NONE)
   {
-      // Generate warning if sensitile coordinates are wrong.
-      // Ignore such error for items which usually have it wrongly set.
+      /* Generate warning if sensitile coordinates are wrong. */
+      /* Ignore such error for items which usually have it wrongly set. */
       int sen_tlx,sen_tly;
       sen_tlx=sen_tl%verif_opt->tlsize.x;
       sen_tly=sen_tl/verif_opt->tlsize.x;
@@ -3237,8 +3234,8 @@ short effectgen_verify(unsigned char *thing, struct VERIFY_OPTIONS *verif_opt)
   ty=sy/MAP_SUBNUM_Y;
   if (sen_tl!=THING_SENSITILE_NONE)
   {
-      // Generate warning if sensitile coordinates are wrong.
-      // Ignore such error for effects which usually have it wrongly set.
+      /* Generate warning if sensitile coordinates are wrong. */
+      /* Ignore such error for effects which usually have it wrongly set. */
       int sen_tlx,sen_tly;
       sen_tlx=sen_tl%verif_opt->tlsize.x;
       sen_tly=sen_tl/verif_opt->tlsize.x;

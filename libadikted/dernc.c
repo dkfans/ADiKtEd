@@ -119,11 +119,11 @@ int main_unpack (char *pname, char *iname, char *oname)
         perror(iname);
         return 1;
     }
-    //Checking if the file is RNC
+    /* Checking if the file is RNC */
     fseek (ifp, 0L, SEEK_END);
     plen = ftell (ifp);
     rewind (ifp);
-    if (plen < 4) // Can't be an RNC file
+    if (plen < 4) /* Can't be an RNC file */
     {
         if (strcmp (iname, oname))
             return copy_file (iname, oname);
@@ -138,7 +138,7 @@ int main_unpack (char *pname, char *iname, char *oname)
     return 0;
     }
     rewind (ifp);
-    //Reading compressed data, 8 bytes in buffer are for safety
+    /* Reading compressed data, 8 bytes in buffer are for safety */
     packed = malloc(plen+8);
     if (packed==NULL)
     {
@@ -149,18 +149,18 @@ int main_unpack (char *pname, char *iname, char *oname)
     unsigned long rdlen;
     rdlen=fread (packed, 1, plen, ifp);
     fclose(ifp);
-    //Getting unpacked file size & allocating space
+    /* Getting unpacked file size & allocating space */
     ulen = rnc_ulen (packed);
     if (ulen < 0) 
     {
         free(packed);
-        if (ulen == -1) // File wasn't RNC to start with
+        if (ulen == -1) /* File wasn't RNC to start with */
           return 0;
         printf("Error: %s\n", rnc_error (ulen));
         return 1;
     }
 
-    //Creating output buffer, 8 bytes are for safety
+    /* Creating output buffer, 8 bytes are for safety */
     unpacked = malloc(ulen+8);
     if (unpacked==NULL)
     {
@@ -169,7 +169,7 @@ int main_unpack (char *pname, char *iname, char *oname)
         return 1;
     }
 
-    //Do the decompression
+    /* Do the decompression */
     ulen = rnc_unpack (packed, unpacked, RNC_IGNORE_NONE);
     if (ulen < 0)
     {
@@ -177,7 +177,7 @@ int main_unpack (char *pname, char *iname, char *oname)
     return 1;
     }
 
-    //Write results to a file
+    /* Write results to a file */
     ofp = fopen(oname, "wb");
     if (!ofp)
     {
@@ -229,8 +229,8 @@ int copy_file (char *iname, char *oname)
  * to always point at start of the byte which wasn't read yet.
  */    
 typedef struct {
-    unsigned long bitbuf;       // data bits
-    int bitcount;               // how many bits does bitbuf hold?
+    unsigned long bitbuf;       /* data bits */
+    int bitcount;               /* how many bits does bitbuf hold? */
 } bit_stream;
 
 #define HUFTABLE_ENTRIES 32
@@ -239,7 +239,7 @@ typedef struct {
  * Huffman code table, used for decompression.
  */
 typedef struct {
-    int num;                   // number of nodes in the tree
+    int num;                   /* number of nodes in the tree */
     struct {
     unsigned long code;
     int codelen;
@@ -366,38 +366,40 @@ long rnc_unpack (const void *packed, void *unpacked, const unsigned int flags
 #ifdef COMPRESSOR
     long lee = 0;
 #endif
-    // Reading header
+    /* Reading header */
     if (read_int32_be_buf(input) != RNC_SIGNATURE_INT)
         if (!(flags&RNC_IGNORE_HEADER_VAL_ERROR)) return RNC_HEADER_VAL_ERROR;
     ret_len = read_int32_be_buf(input+4);
     inp_len = read_int32_be_buf(input+8);
     if ((ret_len>(RNC_MAX_FILESIZE))||(inp_len>(RNC_MAX_FILESIZE)))
         return RNC_HEADER_VAL_ERROR;
-    //Setting variables
+    /* Setting variables */
     outputend = output + ret_len;
     inputend = input + SIZEOF_RNC_HEADER + inp_len;
-    input += SIZEOF_RNC_HEADER;               // skip header
+    input += SIZEOF_RNC_HEADER;               /* skip header */
 
-    // Check the packed-data CRC. Also save the unpacked-data CRC
-    // for later.
+    /**
+     * Check the packed-data CRC. Also save the unpacked-data CRC
+     * for later.
+     */
     if (rnc_crc(input, inputend-input) != read_int16_be_buf(input-4))
         if (!(flags&RNC_IGNORE_PACKED_CRC_ERROR)) return RNC_PACKED_CRC_ERROR;
     out_crc = read_int16_be_buf(input-6);
 
     bitread_init(&bs, &input, inputend);
-    bit_advance(&bs, 2, &input, inputend);      // discard first two bits
+    bit_advance(&bs, 2, &input, inputend);      /* discard first two bits */
 
-   // Process chunks.
+   /* Process chunks. */
 
   while (output < outputend)
   {
-//message_log("  while (output < outputend)");
+/*message_log("  while (output < outputend)");*/
 #ifdef COMPRESSOR
       long this_lee;
 #endif
       if (inputend-input<6)
       {
-//printf("\nerr place A!!\n");
+/*printf("\nerr place A!!\n");*/
           if (!(flags&RNC_IGNORE_HUF_EXCEEDS_RANGE)) 
               return RNC_HUF_EXCEEDS_RANGE;
             else
@@ -410,11 +412,11 @@ long rnc_unpack (const void *packed, void *unpacked, const unsigned int flags
 
       while (1)
       {
-//message_log("      while (1)");
+/*message_log("      while (1)");*/
         long length, posn;
 
         length = huf_read(&raw, &bs, &input, inputend);
-//message_log("          length = huf_read(&raw, &bs, &input, inputend)");
+/*message_log("          length = huf_read(&raw, &bs, &input, inputend)");*/
         if (length < 0)
             {
             if (!(flags&RNC_IGNORE_HUF_DECODE_ERROR)) 
@@ -422,16 +424,16 @@ long rnc_unpack (const void *packed, void *unpacked, const unsigned int flags
             else
                 {output=outputend;ch_count=0;break;}
             }
-//message_log("          if (length)");
+/*message_log("          if (length)");*/
         if (length)
         {
-//message_log("          while (length--)");
+/*message_log("          while (length--)");*/
             while (length--)
             {
                 if ((input>=inputend)||(output>=outputend))
                 {
-//printf("\nerr place b!! output-outputend=%d input-inputend=%d length=%d\n",
-//    (void *)output-(void *)outputend,(void *)input-(void *)inputend,length);
+/*printf("\nerr place b!! output-outputend=%d input-inputend=%d length=%d\n",
+    (void *)output-(void *)outputend,(void *)input-(void *)inputend,length);*/
                    if (!(flags&RNC_IGNORE_HUF_EXCEEDS_RANGE)) 
                        return RNC_HUF_EXCEEDS_RANGE;
                    else
@@ -441,13 +443,13 @@ long rnc_unpack (const void *packed, void *unpacked, const unsigned int flags
             }
             bitread_fix (&bs, &input, inputend);
         }
-//message_log("          if (--ch_count <= 0)");
+/*message_log("          if (--ch_count <= 0)");*/
         if (--ch_count <= 0)
             break;
 
-//message_log("          posn = huf_read (&dist, &bs, &input, inputend)");
+/*message_log("          posn = huf_read (&dist, &bs, &input, inputend)");*/
         posn = huf_read (&dist, &bs, &input, inputend);
-//message_log("          if (posn == -1)");
+/*message_log("          if (posn == -1)");*/
         if (posn == -1)
         {
             if (!(flags&RNC_IGNORE_HUF_DECODE_ERROR)) 
@@ -455,7 +457,7 @@ long rnc_unpack (const void *packed, void *unpacked, const unsigned int flags
             else
                 {output=outputend;ch_count=0;break;}
         }
-//message_log("          length = huf_read (&len, &bs, &input, inputend)");
+/*message_log("          length = huf_read (&len, &bs, &input, inputend)");*/
         length = huf_read (&len, &bs, &input, inputend);
         if (length < 0)
         {
@@ -466,14 +468,14 @@ long rnc_unpack (const void *packed, void *unpacked, const unsigned int flags
         }
         posn += 1;
         length += 2;
-//message_log("          while (length--)");
+/*message_log("          while (length--)");*/
         while (length--)
         {
             if ((((void *)output-posn)<unpacked)||((output-posn)>outputend)||
                 (((void *)output)<unpacked)||((output)>outputend))
             {
-//printf("\nerr place c!! output-outputend=%d input-inputend=%d length=%d\n",
-//    (void *)output-(void *)outputend,(void *)input-(void *)inputend,length);
+/*printf("\nerr place c!! output-outputend=%d input-inputend=%d length=%d\n",
+    (void *)output-(void *)outputend,(void *)input-(void *)inputend,length);*/
                    if (!(flags&RNC_IGNORE_HUF_EXCEEDS_RANGE)) 
                        return RNC_HUF_EXCEEDS_RANGE;
                    else
@@ -490,7 +492,7 @@ long rnc_unpack (const void *packed, void *unpacked, const unsigned int flags
       }
   }
 
-//message_log("  rnc_unpack: loop end!!!");
+/*message_log("  rnc_unpack: loop end!!!");*/
 
   if (outputend != output)
   {
@@ -503,31 +505,31 @@ long rnc_unpack (const void *packed, void *unpacked, const unsigned int flags
       *leeway = lee;
 #endif
 
-//message_log("  if (rnc_crc(outputend-ret_len, ret_len) != out_crc)");
+/*message_log("  if (rnc_crc(outputend-ret_len, ret_len) != out_crc)");*/
 
-  // Check the unpacked-data CRC.
+  /* Check the unpacked-data CRC. */
   if (rnc_crc(outputend-ret_len, ret_len) != out_crc)
   {
-//message_log("  rnc_unpack: rnc_crc failed");
+/*message_log("  rnc_unpack: rnc_crc failed");*/
       if (!(flags&RNC_IGNORE_UNPACKED_CRC_ERROR))
           return RNC_UNPACKED_CRC_ERROR;
   }
 
-//message_log("  rnc_unpack: rnc_crc ok");
+/*message_log("  rnc_unpack: rnc_crc ok");*/
   return ret_len;
 }
 
 /**
  * Read a Huffman table out of the bit stream and data stream given.
  */
-//static void read_huftable (huf_table *h, bit_stream *bs,
+/*static void read_huftable (huf_table *h, bit_stream *bs,*/
 void read_huftable (huf_table *h, bit_stream *bs,
                           const unsigned char **p, const unsigned char *pend)
 {
     int i, j, k, num;
     int leaflen[32];
     int leafmax;
-    unsigned long codeb;           // big-endian form of code
+    unsigned long codeb;           /* big-endian form of code */
 
     num = bit_read (bs, 0x1F, 5, p, pend);
     if (!num)
@@ -620,9 +622,9 @@ void bitread_fix (bit_stream *bs, const unsigned char **p, const unsigned char *
 {
     bs->bitcount -= 16;
     if (bs->bitcount<0) bs->bitcount=0;
-    bs->bitbuf &= (1<<bs->bitcount)-1; // remove the top 16 bits
+    bs->bitbuf &= (1<<bs->bitcount)-1; /* remove the top 16 bits */
     int read_val;
-    // replace with what's at *p, or zeroes if nothing more to read
+    /* replace with what's at *p, or zeroes if nothing more to read */
     if (pend-(*p) >= 1)
     {
         bs->bitbuf |= (read_int16_le_buf(*p)<<bs->bitcount);
@@ -719,7 +721,7 @@ long rnc_crc(const void *data, unsigned long len)
     unsigned short val;
     int i, j;
     const unsigned char *p = data;
-    //computing CRC table
+    /* computing CRC table */
     if (!crctab_ready)
     {
       for (i=0; i<256; i++)

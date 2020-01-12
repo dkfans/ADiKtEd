@@ -252,7 +252,7 @@ short nth_bit_fourbytes( unsigned char c[4], short n )
     if( (n<0) || (n>32) )
         return 0;
     
-    if( n < 8 )    // bits 0 - 7
+    if( n < 8 )    /* bits 0 - 7 */
         return nth_bit( c[3], n );
     else if( n < 16 )
         return nth_bit( c[2], n%8 );

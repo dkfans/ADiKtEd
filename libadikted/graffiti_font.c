@@ -121,43 +121,43 @@ f8(126,00,00,20,40,20,40,00,00);
 
 const int font_adisize8_height=8;
 const unsigned char *font_adisize8_chars[] = {
-    font_adisize8_chnotdef,font_adisize8_chnotdef,font_adisize8_chnotdef,font_adisize8_chnotdef,font_adisize8_chnotdef,font_adisize8_chnotdef,font_adisize8_chnotdef, // 00
-    font_adisize8_chnotdef,font_adisize8_chnotdef,font_adisize8_chnotdef,font_adisize8_chnotdef,font_adisize8_chnotdef,font_adisize8_chnotdef,font_adisize8_chnotdef, // 08
-    font_adisize8_chnotdef,font_adisize8_chnotdef,font_adisize8_chnotdef,font_adisize8_chnotdef,font_adisize8_chnotdef,font_adisize8_chnotdef,font_adisize8_chnotdef, // 10
-    font_adisize8_chnotdef,font_adisize8_chnotdef,font_adisize8_chnotdef,font_adisize8_chnotdef,font_adisize8_chnotdef,font_adisize8_chnotdef,font_adisize8_chnotdef, // 18
-    font_adisize8_chnotdef,font_adisize8_chnotdef,font_adisize8_chnotdef,font_adisize8_chnotdef,font_adisize8_ch32    ,font_adisize8_ch33    ,font_adisize8_ch34, // 20
-    font_adisize8_ch35    ,font_adisize8_ch36    ,font_adisize8_ch37    ,font_adisize8_ch38    ,font_adisize8_ch39    ,font_adisize8_ch40    ,font_adisize8_ch41, // 28
-    font_adisize8_ch42    ,font_adisize8_ch43    ,font_adisize8_ch44    ,font_adisize8_ch45    ,font_adisize8_ch46    ,font_adisize8_ch47    ,font_adisize8_ch48, // 30
+    font_adisize8_chnotdef,font_adisize8_chnotdef,font_adisize8_chnotdef,font_adisize8_chnotdef,font_adisize8_chnotdef,font_adisize8_chnotdef,font_adisize8_chnotdef, /* 00*/
+    font_adisize8_chnotdef,font_adisize8_chnotdef,font_adisize8_chnotdef,font_adisize8_chnotdef,font_adisize8_chnotdef,font_adisize8_chnotdef,font_adisize8_chnotdef, /* 08 */
+    font_adisize8_chnotdef,font_adisize8_chnotdef,font_adisize8_chnotdef,font_adisize8_chnotdef,font_adisize8_chnotdef,font_adisize8_chnotdef,font_adisize8_chnotdef, /* 10 */
+    font_adisize8_chnotdef,font_adisize8_chnotdef,font_adisize8_chnotdef,font_adisize8_chnotdef,font_adisize8_chnotdef,font_adisize8_chnotdef,font_adisize8_chnotdef, /* 18 */
+    font_adisize8_chnotdef,font_adisize8_chnotdef,font_adisize8_chnotdef,font_adisize8_chnotdef,font_adisize8_ch32    ,font_adisize8_ch33    ,font_adisize8_ch34, /* 20 */
+    font_adisize8_ch35    ,font_adisize8_ch36    ,font_adisize8_ch37    ,font_adisize8_ch38    ,font_adisize8_ch39    ,font_adisize8_ch40    ,font_adisize8_ch41, /* 28 */
+    font_adisize8_ch42    ,font_adisize8_ch43    ,font_adisize8_ch44    ,font_adisize8_ch45    ,font_adisize8_ch46    ,font_adisize8_ch47    ,font_adisize8_ch48, /* 30 */
     font_adisize8_ch49    ,font_adisize8_ch50    ,font_adisize8_ch51    ,font_adisize8_ch52    ,font_adisize8_ch53    ,font_adisize8_ch54    ,font_adisize8_ch55,
-    font_adisize8_ch56    ,font_adisize8_ch57    ,font_adisize8_ch58    ,font_adisize8_ch59    ,font_adisize8_ch60    ,font_adisize8_ch61    ,font_adisize8_ch62, // 40
+    font_adisize8_ch56    ,font_adisize8_ch57    ,font_adisize8_ch58    ,font_adisize8_ch59    ,font_adisize8_ch60    ,font_adisize8_ch61    ,font_adisize8_ch62, /* 40 */
     font_adisize8_ch63    ,font_adisize8_ch64    ,font_adisize8_ch65    ,font_adisize8_ch66    ,font_adisize8_ch67    ,font_adisize8_ch68    ,font_adisize8_ch69,
-    font_adisize8_ch70    ,font_adisize8_ch71    ,font_adisize8_ch72    ,font_adisize8_ch73    ,font_adisize8_ch74    ,font_adisize8_ch75    ,font_adisize8_ch76, // 50
+    font_adisize8_ch70    ,font_adisize8_ch71    ,font_adisize8_ch72    ,font_adisize8_ch73    ,font_adisize8_ch74    ,font_adisize8_ch75    ,font_adisize8_ch76, /* 50 */
     font_adisize8_ch77    ,font_adisize8_ch78    ,font_adisize8_ch79    ,font_adisize8_ch80    ,font_adisize8_ch81    ,font_adisize8_ch82    ,font_adisize8_ch83,
-    font_adisize8_ch84    ,font_adisize8_ch85    ,font_adisize8_ch86    ,font_adisize8_ch87    ,font_adisize8_ch88    ,font_adisize8_ch89    ,font_adisize8_ch90,     // 60
+    font_adisize8_ch84    ,font_adisize8_ch85    ,font_adisize8_ch86    ,font_adisize8_ch87    ,font_adisize8_ch88    ,font_adisize8_ch89    ,font_adisize8_ch90,     /* 60 */
     font_adisize8_ch91    ,font_adisize8_ch92    ,font_adisize8_ch93    ,font_adisize8_ch94    ,font_adisize8_ch95    ,font_adisize8_ch96    ,font_adisize8_ch97,
-    font_adisize8_ch98    ,font_adisize8_ch99    ,font_adisize8_ch100   ,font_adisize8_ch101   ,font_adisize8_ch102   ,font_adisize8_ch103   ,font_adisize8_ch104,    // 70
+    font_adisize8_ch98    ,font_adisize8_ch99    ,font_adisize8_ch100   ,font_adisize8_ch101   ,font_adisize8_ch102   ,font_adisize8_ch103   ,font_adisize8_ch104,    /* 70 */
     font_adisize8_ch105   ,font_adisize8_ch106   ,font_adisize8_ch107   ,font_adisize8_ch108   ,font_adisize8_ch109   ,font_adisize8_ch110   ,font_adisize8_ch111,
-    font_adisize8_ch112   ,font_adisize8_ch113   ,font_adisize8_ch114   ,font_adisize8_ch115   ,font_adisize8_ch116   ,font_adisize8_ch117   ,font_adisize8_ch118,    // 80
+    font_adisize8_ch112   ,font_adisize8_ch113   ,font_adisize8_ch114   ,font_adisize8_ch115   ,font_adisize8_ch116   ,font_adisize8_ch117   ,font_adisize8_ch118,    /* 80 */
     font_adisize8_ch119   ,font_adisize8_ch120   ,font_adisize8_ch121   ,font_adisize8_ch122   ,font_adisize8_ch123   ,font_adisize8_ch124   ,font_adisize8_ch125,
-    font_adisize8_ch126   ,font_adisize8_chnotdef,font_adisize8_chnotdef,font_adisize8_chnotdef,font_adisize8_chnotdef,font_adisize8_chnotdef,font_adisize8_chnotdef, // 90
+    font_adisize8_ch126   ,font_adisize8_chnotdef,font_adisize8_chnotdef,font_adisize8_chnotdef,font_adisize8_chnotdef,font_adisize8_chnotdef,font_adisize8_chnotdef, /* 90 */
     font_adisize8_chnotdef,font_adisize8_chnotdef,font_adisize8_chnotdef,font_adisize8_chnotdef,font_adisize8_chnotdef,font_adisize8_chnotdef,font_adisize8_chnotdef,
-    font_adisize8_chnotdef,font_adisize8_chnotdef,font_adisize8_chnotdef,font_adisize8_chnotdef,font_adisize8_chnotdef,font_adisize8_chnotdef,font_adisize8_chnotdef, // a0
+    font_adisize8_chnotdef,font_adisize8_chnotdef,font_adisize8_chnotdef,font_adisize8_chnotdef,font_adisize8_chnotdef,font_adisize8_chnotdef,font_adisize8_chnotdef, /* a0 */
     font_adisize8_chnotdef,font_adisize8_chnotdef,font_adisize8_chnotdef,font_adisize8_chnotdef,font_adisize8_chnotdef,font_adisize8_chnotdef,font_adisize8_chnotdef,
-    font_adisize8_chnotdef,font_adisize8_chnotdef,font_adisize8_chnotdef,font_adisize8_chnotdef,font_adisize8_chnotdef,font_adisize8_chnotdef,font_adisize8_chnotdef, // b0
+    font_adisize8_chnotdef,font_adisize8_chnotdef,font_adisize8_chnotdef,font_adisize8_chnotdef,font_adisize8_chnotdef,font_adisize8_chnotdef,font_adisize8_chnotdef, /* b0 */
     font_adisize8_chnotdef,font_adisize8_chnotdef,font_adisize8_chnotdef,font_adisize8_chnotdef,font_adisize8_chnotdef,font_adisize8_chnotdef,font_adisize8_chnotdef,
-    font_adisize8_chnotdef,font_adisize8_chnotdef,font_adisize8_chnotdef,font_adisize8_chnotdef,font_adisize8_chnotdef,font_adisize8_chnotdef,font_adisize8_chnotdef, // c0
+    font_adisize8_chnotdef,font_adisize8_chnotdef,font_adisize8_chnotdef,font_adisize8_chnotdef,font_adisize8_chnotdef,font_adisize8_chnotdef,font_adisize8_chnotdef, /* c0 */
     font_adisize8_chnotdef,font_adisize8_chnotdef,font_adisize8_chnotdef,font_adisize8_chnotdef,font_adisize8_chnotdef,font_adisize8_chnotdef,font_adisize8_chnotdef,
-    font_adisize8_chnotdef,font_adisize8_chnotdef,font_adisize8_chnotdef,font_adisize8_chnotdef,font_adisize8_chnotdef,font_adisize8_chnotdef,font_adisize8_chnotdef, // d0
+    font_adisize8_chnotdef,font_adisize8_chnotdef,font_adisize8_chnotdef,font_adisize8_chnotdef,font_adisize8_chnotdef,font_adisize8_chnotdef,font_adisize8_chnotdef, /* d0 */
     font_adisize8_chnotdef,font_adisize8_chnotdef,font_adisize8_chnotdef,font_adisize8_chnotdef,font_adisize8_chnotdef,font_adisize8_chnotdef,font_adisize8_chnotdef,
-    font_adisize8_chnotdef,font_adisize8_chnotdef,font_adisize8_chnotdef,font_adisize8_chnotdef,font_adisize8_chnotdef,font_adisize8_chnotdef,font_adisize8_chnotdef, // e0
+    font_adisize8_chnotdef,font_adisize8_chnotdef,font_adisize8_chnotdef,font_adisize8_chnotdef,font_adisize8_chnotdef,font_adisize8_chnotdef,font_adisize8_chnotdef, /* e0 */
     font_adisize8_chnotdef,font_adisize8_chnotdef,font_adisize8_chnotdef,font_adisize8_chnotdef,font_adisize8_chnotdef,font_adisize8_chnotdef,font_adisize8_chnotdef,
-    font_adisize8_chnotdef,font_adisize8_chnotdef,font_adisize8_chnotdef,font_adisize8_chnotdef,font_adisize8_chnotdef,font_adisize8_chnotdef,font_adisize8_chnotdef, // f0
+    font_adisize8_chnotdef,font_adisize8_chnotdef,font_adisize8_chnotdef,font_adisize8_chnotdef,font_adisize8_chnotdef,font_adisize8_chnotdef,font_adisize8_chnotdef, /* f0 */
     font_adisize8_chnotdef,font_adisize8_chnotdef,font_adisize8_chnotdef,font_adisize8_chnotdef,font_adisize8_chnotdef,font_adisize8_chnotdef,font_adisize8_chnotdef,
 };
 
 #undef f8
 
-//Defining "Adikted classic" font
+/*Defining "Adikted classic" font */
 
 #define f1(c,a1) const static unsigned char font_adiclssc_ch##c[] = {1,0x##a1}
 #define f2(c,a1,a2) const static unsigned char font_adiclssc_ch##c[] = {2,0x##a1,0x##a2}
@@ -220,41 +220,41 @@ f3(notdef,15,a,15);
 const int font_adiclssc_height=6;
 
 const unsigned char *font_adiclssc_chars[] = {
-    font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,   // 00
-    font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,   // 08
-    font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,   // 10
-    font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,   // 18
-    font_adiclssc_chspace ,font_adiclssc_chexclam,font_adiclssc_chdblqt ,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chcquote,   // 20
-    font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chcomma ,font_adiclssc_chnotdef,font_adiclssc_chperiod,font_adiclssc_chnotdef,   // 28
-    font_adiclssc_ch0     ,font_adiclssc_ch1     ,font_adiclssc_ch2     ,font_adiclssc_ch3     ,font_adiclssc_ch4     ,font_adiclssc_ch5     ,font_adiclssc_ch6     ,font_adiclssc_ch7     ,   // 30
-    font_adiclssc_ch8     ,font_adiclssc_ch9     ,font_adiclssc_chcolon ,font_adiclssc_chsemi  ,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chquery ,   // 38
-    font_adiclssc_chatsign,font_adiclssc_chA     ,font_adiclssc_chB     ,font_adiclssc_chC     ,font_adiclssc_chD     ,font_adiclssc_chE     ,font_adiclssc_chF     ,font_adiclssc_chG     ,   // 40
-    font_adiclssc_chH     ,font_adiclssc_chI     ,font_adiclssc_chJ     ,font_adiclssc_chK     ,font_adiclssc_chL     ,font_adiclssc_chM     ,font_adiclssc_chN     ,font_adiclssc_chO     ,   // 48
-    font_adiclssc_chP     ,font_adiclssc_chQ     ,font_adiclssc_chR     ,font_adiclssc_chS     ,font_adiclssc_chT     ,font_adiclssc_chU     ,font_adiclssc_chV     ,font_adiclssc_chW     ,   // 50
-    font_adiclssc_chX     ,font_adiclssc_chY     ,font_adiclssc_chZ     ,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,   // 58
-    font_adiclssc_choquote,font_adiclssc_chA     ,font_adiclssc_chB     ,font_adiclssc_chC     ,font_adiclssc_chD     ,font_adiclssc_chE     ,font_adiclssc_chF     ,font_adiclssc_chG     ,   // 60
-    font_adiclssc_chH     ,font_adiclssc_chI     ,font_adiclssc_chJ     ,font_adiclssc_chK     ,font_adiclssc_chL     ,font_adiclssc_chM     ,font_adiclssc_chN     ,font_adiclssc_chO     ,   // 68
-    font_adiclssc_chP     ,font_adiclssc_chQ     ,font_adiclssc_chR     ,font_adiclssc_chS     ,font_adiclssc_chT     ,font_adiclssc_chU     ,font_adiclssc_chV     ,font_adiclssc_chW     ,   // 70
-    font_adiclssc_chX     ,font_adiclssc_chY     ,font_adiclssc_chZ     ,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,   // 78
-    font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,   // 80
-    font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,   // 88
-    font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,   // 90
-    font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,   // 98
-    font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,   // A0
-    font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,   // A8
-    font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,   // B0
-    font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,   // B8
-    font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,   // C0
-    font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,   // C8
-    font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,   // D0
-    font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,   // D8
-    font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,   // E0
-    font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,   // E8
-    font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,   // F0
-    font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,   // F8
+    font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,   /* 00 */
+    font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,   /* 08 */
+    font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,   /* 10 */
+    font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,   /* 18 */
+    font_adiclssc_chspace ,font_adiclssc_chexclam,font_adiclssc_chdblqt ,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chcquote,   /* 20 */
+    font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chcomma ,font_adiclssc_chnotdef,font_adiclssc_chperiod,font_adiclssc_chnotdef,   /* 28 */
+    font_adiclssc_ch0     ,font_adiclssc_ch1     ,font_adiclssc_ch2     ,font_adiclssc_ch3     ,font_adiclssc_ch4     ,font_adiclssc_ch5     ,font_adiclssc_ch6     ,font_adiclssc_ch7     ,   /* 30 */
+    font_adiclssc_ch8     ,font_adiclssc_ch9     ,font_adiclssc_chcolon ,font_adiclssc_chsemi  ,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chquery ,   /* 38 */
+    font_adiclssc_chatsign,font_adiclssc_chA     ,font_adiclssc_chB     ,font_adiclssc_chC     ,font_adiclssc_chD     ,font_adiclssc_chE     ,font_adiclssc_chF     ,font_adiclssc_chG     ,   /* 40 */
+    font_adiclssc_chH     ,font_adiclssc_chI     ,font_adiclssc_chJ     ,font_adiclssc_chK     ,font_adiclssc_chL     ,font_adiclssc_chM     ,font_adiclssc_chN     ,font_adiclssc_chO     ,   /* 48 */
+    font_adiclssc_chP     ,font_adiclssc_chQ     ,font_adiclssc_chR     ,font_adiclssc_chS     ,font_adiclssc_chT     ,font_adiclssc_chU     ,font_adiclssc_chV     ,font_adiclssc_chW     ,   /* 50 */
+    font_adiclssc_chX     ,font_adiclssc_chY     ,font_adiclssc_chZ     ,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,   /* 58 */
+    font_adiclssc_choquote,font_adiclssc_chA     ,font_adiclssc_chB     ,font_adiclssc_chC     ,font_adiclssc_chD     ,font_adiclssc_chE     ,font_adiclssc_chF     ,font_adiclssc_chG     ,   /* 60 */
+    font_adiclssc_chH     ,font_adiclssc_chI     ,font_adiclssc_chJ     ,font_adiclssc_chK     ,font_adiclssc_chL     ,font_adiclssc_chM     ,font_adiclssc_chN     ,font_adiclssc_chO     ,   /* 68 */
+    font_adiclssc_chP     ,font_adiclssc_chQ     ,font_adiclssc_chR     ,font_adiclssc_chS     ,font_adiclssc_chT     ,font_adiclssc_chU     ,font_adiclssc_chV     ,font_adiclssc_chW     ,   /* 70 */
+    font_adiclssc_chX     ,font_adiclssc_chY     ,font_adiclssc_chZ     ,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,   /* 78 */
+    font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,   /* 80 */
+    font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,   /* 88 */
+    font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,   /* 90 */
+    font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,   /* 98 */
+    font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,   /* A0 */
+    font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,   /* A8 */
+    font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,   /* B0 */
+    font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,   /* B8 */
+    font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,   /* C0 */
+    font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,   /* C8 */
+    font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,   /* D0 */
+    font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,   /* D8 */
+    font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,   /* E0 */
+    font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,   /* E8 */
+    font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,   /* F0 */
+    font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,font_adiclssc_chnotdef,   /* F8 */
 };
 
-// Cleanup
+/* Cleanup */
 #undef f1
 #undef f2
 #undef f3

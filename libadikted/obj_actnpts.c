@@ -1,21 +1,19 @@
 /******************************************************************************/
-// obj_actnpts.c - Dungeon Keeper Tools.
-/******************************************************************************/
-// Author:   Tomasz Lis
-// Created:  04 Dec 2007
-
-// Purpose:
-//   Functions for maintaining single action points - APT entries,
-//   and single static lights - LGT entries.
-
-// Comment:
-//   None.
-
-//Copying and copyrights:
-//   This program is free software; you can redistribute it and/or modify
-//   it under the terms of the GNU General Public License as published by
-//   the Free Software Foundation; either version 2 of the License, or
-//   (at your option) any later version.
+/** @file obj_actnpts.c
+ * Dungeon Keeper Tools.
+ * @par Purpose:
+ *     Functions for maintaining single action points - APT entries,
+ *     and single static lights - LGT entries.
+ * @par Comment:
+ *     None.
+ * @author   Tomasz Lis
+ * @date     04 Dec 2007
+ * @par  Copying and copyrights:
+ *     This program is free software; you can redistribute it and/or modify
+ *     it under the terms of the GNU General Public License as published by
+ *     the Free Software Foundation; either version 2 of the License, or
+ *     (at your option) any later version.
+ */
 /******************************************************************************/
 
 #include "obj_actnpts.h"
@@ -151,7 +149,7 @@ short set_actnpt_number(unsigned char *actnpt,unsigned short apt_num)
  */
 unsigned char *create_actnpt(struct LEVEL *lvl, unsigned int sx, unsigned int sy)
 {
-    //Preparing array bounds
+    /*Preparing array bounds */
     const int arr_entries_x=lvl->tlsize.x*MAP_SUBNUM_X;
     const int arr_entries_y=lvl->tlsize.y*MAP_SUBNUM_Y;
     sx%=arr_entries_x;
@@ -250,7 +248,7 @@ unsigned short get_free_actnpt_number_prev(const struct LEVEL *lvl,const unsigne
  */
 short create_actnpt_number_used_arr(const struct LEVEL *lvl,unsigned char **used,unsigned int *used_size)
 {
-    //Preparing array bounds
+    /*Preparing array bounds */
     const int arr_entries_x=lvl->tlsize.x*MAP_SUBNUM_X;
     const int arr_entries_y=lvl->tlsize.y*MAP_SUBNUM_Y;
     int k;
@@ -445,7 +443,7 @@ unsigned char *create_stlight(unsigned int sx, unsigned int sy)
     set_stlight_range_subtile(stlight,16);
     set_stlight_range_subtpos(stlight,0);
     set_stlight_intensivity(stlight,32);
-    //Other parameters - no idea what they mean, but seem to be constant
+    /*Other parameters - no idea what they mean, but seem to be constant */
     stlight[18]=0x0ff;
     stlight[19]=0x0ff;
     return stlight;

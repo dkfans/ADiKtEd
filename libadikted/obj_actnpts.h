@@ -1,20 +1,18 @@
 /******************************************************************************/
-// obj_actnpts.h - Dungeon Keeper Tools.
-/******************************************************************************/
-// Author:   Tomasz Lis
-// Created:  04 Dec 2007
-
-// Purpose:
-//   Header file. Defines exported routines from obj_actnpts.c
-
-// Comment:
-//   None.
-
-//Copying and copyrights:
-//   This program is free software; you can redistribute it and/or modify
-//   it under the terms of the GNU General Public License as published by
-//   the Free Software Foundation; either version 2 of the License, or
-//   (at your option) any later version.
+/** @file obj_actnpts.h
+ * Dungeon Keeper Tools.
+ * @par Purpose:
+ *     Header file. Defines exported routines from obj_actnpts.c
+ * @par Comment:
+ *     None.
+ * @author   Tomasz Lis
+ * @date     04 Dec 2007
+ * @par  Copying and copyrights:
+ *     This program is free software; you can redistribute it and/or modify
+ *     it under the terms of the GNU General Public License as published by
+ *     the Free Software Foundation; either version 2 of the License, or
+ *     (at your option) any later version.
+ */
 /******************************************************************************/
 
 #ifndef ADIKT_OBJACTNPTS_H
@@ -80,4 +78,4 @@ DLLIMPORT unsigned char *create_stlight(unsigned int sx, unsigned int sy);
 DLLIMPORT unsigned char *create_stlight_copy(unsigned int sx, unsigned int sy,unsigned char *src);
 DLLIMPORT unsigned long get_stlight_distance_adv(const unsigned char *stlight,const int ssx,const int ssy);
 
-#endif // ADIKT_OBJACTNPTS_H
+#endif /* ADIKT_OBJACTNPTS_H */

@@ -43,11 +43,11 @@
 # define DLLIMPORT __declspec (dllexport)
 #elif defined(BUILD_SINGLE)
 # define DLLIMPORT 
-#else // Not defined BUILD_DLL
+#else /* Not defined BUILD_DLL */
 # define DLLIMPORT __declspec (dllimport)
 #endif
 
-// Basic Definitions
+/* Basic Definitions */
 
 #if defined(unix) && !defined (GO32)
 #define SEPARATOR "/"
@@ -68,7 +68,7 @@
 #define min(a,b) ((a)<(b)?(a):(b))
 #endif
 
-// Buffer sizes
+/* Buffer sizes */
 
 #define DISKPATH_SIZE   256
 #define LINEMSG_SIZE    160
@@ -76,15 +76,17 @@
 
 #define PROGRAM_NAME "ADiKtEd"
 
-// Return values for verification functions
+/* Return values for verification functions */
 #define VERIF_ERROR   0
 #define VERIF_OK      1
 #define VERIF_WARN    2
 
-// Return values for all other functions
+/* Return values for all other functions */
 #define ERR_NONE           0
-// Note: error codes -1..-79 are reserved standard C library errors with sign reverted.
-//    these are defined in errno.h
+/**
+ *  Note: error codes -1..-79 are reserved standard C library errors with sign reverted.
+ * these are defined in errno.h
+ */
 #define ERR_BASE_RNC      -90
 
 
@@ -134,39 +136,41 @@ struct MAPDRAW_OPTIONS {
 };
 
 struct VERIFY_OPTIONS {
-    // Level size, in tiles
+    /* Level size, in tiles */
     struct UPOINT_2D tlsize;
-    // Level size, in subtiles
+    /* Level size, in subtiles */
     struct UPOINT_2D subsize;
-    // Verification error message buffer
+    /* Verification error message buffer */
     char err_msg[LINEMSG_SIZE];
 };
 
 struct LEVOPTIONS {
-    // Level graphic generation options
+    /* Level graphic generation options */
     short unaffected_gems;
     short unaffected_rock;
     short fill_reinforced_corner;
     short frail_columns;
-    // True means DAT/CLM/WIB are updated automatically
+    /* True means DAT/CLM/WIB are updated automatically */
     short datclm_auto_update;
-    // True means TNG/LGT/APTs are updated automatically
+    /* True means TNG/LGT/APTs are updated automatically */
     short obj_auto_update;
-    // File handling variables
+    /* File handling variables */
     char *levels_path;
     char *data_path;
-    // True means that APT/TNG will load all objects if file size of TNG/APT
-    // is larger than it should
+    /**
+     * True means that APT/TNG will load all objects if file size of TNG/APT
+     * is larger than it should
+     */
     short load_redundant_objects;
-    // Flags used for level verification
+    /* Flags used for level verification */
     unsigned int verify_warn_flags;
-    // Map picture generation options
+    /* Map picture generation options */
     struct MAPDRAW_OPTIONS picture;
-    // Level script options
+    /* Level script options */
     struct SCRIPT_OPTIONS script;
   };
 
-// Thing categorization helpers
+/* Thing categorization helpers */
 #define THING_CATEGR_COUNT 0x16
 typedef short (*is_thing_subtype)(const unsigned char *thing);
 typedef short (*is_item_subtype)(const unsigned char stype_idx);
@@ -174,4 +178,4 @@ typedef int (*thing_subtype_arrayindex)(const unsigned char stype_idx);
 typedef unsigned char (*thing_subtype_switch)(const unsigned char stype_idx);
 typedef unsigned char (*thing_subtype_arrayitem)(const int arr_itm);
 
-#endif // ADIKT_GLOBALS_H
+#endif /* ADIKT_GLOBALS_H */

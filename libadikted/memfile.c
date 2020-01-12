@@ -1,21 +1,18 @@
 /******************************************************************************/
-// memfile.c - Another Dungeon Keeper Map Editor.
-/******************************************************************************/
-// Author:   Jon Skeet
-// Created:  05 Oct 1997
-// Modified: Tomasz Lis
-
-// Purpose:
-//   Functions for reading RNC files and storing in memory.
-
-// Comment:
-//   None.
-
-//Copying and copyrights:
-//   This program is free software; you can redistribute it and/or modify
-//   it under the terms of the GNU General Public License as published by
-//   the Free Software Foundation; either version 2 of the License, or
-//   (at your option) any later version.
+/** @file memfile.c
+ * Another Dungeon Keeper Map Editor.
+ * @par Purpose:
+ *     Functions for reading RNC files and storing in memory.
+ * @par Comment:
+ *     None.
+ * @author   Jon Skeet, Tomasz Lis
+ * @date     05 Oct 1997
+ * @par  Copying and copyrights:
+ *     This program is free software; you can redistribute it and/or modify
+ *     it under the terms of the GNU General Public License as published by
+ *     the Free Software Foundation; either version 2 of the License, or
+ *     (at your option) any later version.
+ */
 /******************************************************************************/
 
 #include "memfile.h"
@@ -70,7 +67,7 @@ short memfile_free(struct MEMORY_FILE **mfile)
 {
   if ((*mfile)!=NULL)
   {
-//message_log("  memfile_free: content %X",(*mfile)->content);
+/*message_log("  memfile_free: content %X",(*mfile)->content); */
       free((*mfile)->content);
       free((*mfile));
   }
@@ -112,7 +109,7 @@ short memfile_growalloc(struct MEMORY_FILE *mfile, unsigned long alloc_len)
 short memfile_add(struct MEMORY_FILE *mfile,
     const unsigned char *buf,unsigned long buf_len)
 {
-    // Nothing to add case
+    /* Nothing to add case */
     if (buf_len==0)
     {
       mfile->errcode=MFILE_OK;
@@ -192,7 +189,7 @@ short memfile_read(struct MEMORY_FILE *mfile,const char *fname,unsigned long max
     unsigned long alloc_plen;
     void *packed;
     ifp = fopen(fname, "rb");
-    //If cannot open
+    /*If cannot open */
     if (ifp==NULL)
     {
       mfile->errcode=MFILE_CANNOT_OPEN;
@@ -200,15 +197,15 @@ short memfile_read(struct MEMORY_FILE *mfile,const char *fname,unsigned long max
     }
     fseek(ifp, 0L, SEEK_END);
     plen = ftell(ifp);
-    //message_log("end %d",plen);
+    /*message_log("end %d",plen); */
     if (((long)plen == -1L) || (plen > MAX_FILE_SIZE))
     {
       fclose(ifp);
       mfile->errcode=MFILE_SIZE_ERR;
       return mfile->errcode;
     }
-    // Make sure we have enough bytes allocated to check file type
-    //additional 8 bytes in buffer are for safety
+    /* Make sure we have enough bytes allocated to check file type */
+    /*additional 8 bytes in buffer are for safety */
     if (plen<SIZEOF_RNC_HEADER)
       alloc_plen=SIZEOF_RNC_HEADER+8;
     else
@@ -223,7 +220,7 @@ short memfile_read(struct MEMORY_FILE *mfile,const char *fname,unsigned long max
     }
     unsigned long rdlen;
     rdlen=fread(packed, 1, plen, ifp);
-//message_log("plen %d rdlen %d alloc_plen %d",plen,rdlen,alloc_plen);
+/*message_log("plen %d rdlen %d alloc_plen %d",plen,rdlen,alloc_plen); */
     if (ferror(ifp))
     {
       fclose(ifp);
@@ -232,11 +229,11 @@ short memfile_read(struct MEMORY_FILE *mfile,const char *fname,unsigned long max
       return mfile->errcode;
     }
     fclose(ifp);
-    // Fill the buffer end with zeros
+    /* Fill the buffer end with zeros */
     if (rdlen<alloc_plen)
         memset(packed+rdlen,'\0',alloc_plen-rdlen);
     ulen = rnc_ulen(packed);
-    if ((long)ulen == RNC_FILE_IS_NOT_RNC) // File wasn't RNC to start with
+    if ((long)ulen == RNC_FILE_IS_NOT_RNC) /* File wasn't RNC to start with */
     {
       if (mfile->len > 0)
       {
@@ -252,12 +249,12 @@ short memfile_read(struct MEMORY_FILE *mfile,const char *fname,unsigned long max
       mfile->errcode=MFILE_SIZE_ERR;
       return mfile->errcode;
     }
-    // Check if the input file isn't truncated
+    /* Check if the input file isn't truncated */
     plen = rnc_plen(packed);
     if (((long)plen > 0) && (plen >= alloc_plen) && (plen < MAX_FILE_SIZE))
     {
       unsigned long alloc_new=plen+8;
-//message_log("packed buffer truncated - enlarging to %d",alloc_new);
+/*message_log("packed buffer truncated - enlarging to %d",alloc_new); */
       packed=realloc(packed,alloc_new);
       if (packed==NULL)
       {
@@ -270,7 +267,7 @@ short memfile_read(struct MEMORY_FILE *mfile,const char *fname,unsigned long max
     unsigned long alloc_ulen;
     void *unpacked;
     alloc_ulen=ulen+8;
-//message_log("ulen %d alloc_ulen %d",ulen,alloc_ulen);
+/*message_log("ulen %d alloc_ulen %d",ulen,alloc_ulen); */
     unpacked = malloc(alloc_ulen);
     if (unpacked==NULL)
     {
@@ -280,15 +277,15 @@ short memfile_read(struct MEMORY_FILE *mfile,const char *fname,unsigned long max
     }
 
     ulen = rnc_unpack(packed, unpacked, RNC_IGNORE_NONE);
-//memset(unpacked,0,ulen);
-//message_log("  read_file: packed %X unpacked %X delta %d",packed,unpacked,unpacked-packed);
+/*memset(unpacked,0,ulen); */
+/*message_log("  read_file: packed %X unpacked %X delta %d",packed,unpacked,unpacked-packed); */
     free(packed);
-    // We assume there is less than 32 error messages
+    /* We assume there is less than 32 error messages */
     if ( ((long)ulen < 0) && ((long)ulen > -32) )
     {
       free(unpacked);
       mfile->errcode=(short)ulen;
-//message_log("  read_file: returning unpack error code");
+/*message_log("  read_file: returning unpack error code"); */
       return mfile->errcode;
     }
 
@@ -298,7 +295,7 @@ short memfile_read(struct MEMORY_FILE *mfile,const char *fname,unsigned long max
         free(unpacked);
     } else
         memfile_set(mfile,unpacked,ulen,alloc_ulen);
-//message_log("  read_file: returning");
+/*message_log("  read_file: returning"); */
     return mfile->errcode;
 }
 
@@ -318,7 +315,7 @@ short memfile_readnew(struct MEMORY_FILE **mfile,const char *fname,unsigned long
     errcode = memfile_new(mfile,0);
     if (errcode != MFILE_OK)
         return errcode;
-    //message_log("  load_dat: before read_file");
+    /*message_log("  load_dat: before read_file"); */
     errcode = memfile_read((*mfile),fname,max_size);
     if (errcode != MFILE_OK)
         memfile_free(mfile);
@@ -348,10 +345,12 @@ char *memfile_error(int errcode)
 	return errors[errcode];
 }
 
+#if 0
 /*
  * Read a file, possibly compressed, and decompress it if necessary.
  * @param iname The input file name.
  * @return The MEMORY_FILE structure, containing the file.
+ */
 struct MEMORY_FILE read_file(const char *iname)
 {
     FILE *ifp;
@@ -361,7 +360,7 @@ struct MEMORY_FILE read_file(const char *iname)
     void *unpacked;
     struct MEMORY_FILE ret;
     ifp = fopen(iname, "rb");
-    //If cannot open
+    /*If cannot open */
     if (ifp==NULL)
     {
       ret.errcode=MFILE_CANNOT_OPEN;
@@ -371,7 +370,7 @@ struct MEMORY_FILE read_file(const char *iname)
     }
     fseek(ifp, 0L, SEEK_END);
     plen = ftell(ifp);
-    //message_log("end %d",plen);
+    /*message_log("end %d",plen); */
     if (((long)plen==-1L)||(plen>MAX_FILE_SIZE))
     {
       ret.errcode=MFILE_SIZE_ERR;
@@ -379,8 +378,8 @@ struct MEMORY_FILE read_file(const char *iname)
       ret.len=0;
       return ret;
     }
-    // Make sure we have enough bytes allocated to check file type
-    //additional 8 bytes in buffer are for safety
+    /* Make sure we have enough bytes allocated to check file type */
+    /*additional 8 bytes in buffer are for safety */
     if (plen<12)
       alloc_len=12+8;
     else
@@ -394,7 +393,7 @@ struct MEMORY_FILE read_file(const char *iname)
       ret.len=0;
       return ret;
     }
-    //message_log("allocated %d",alloc_len);
+    /*message_log("allocated %d",alloc_len); */
     unsigned long rdlen;
     rdlen=fread(packed, 1, plen, ifp);
     if (ferror(ifp))
@@ -407,11 +406,11 @@ struct MEMORY_FILE read_file(const char *iname)
       return ret;
     }
     fclose(ifp);
-    // Fill the buffer end with zeros
+    /* Fill the buffer end with zeros */
     if (rdlen<alloc_len)
         memset(packed+rdlen,'\0',alloc_len-rdlen);
     ulen = rnc_ulen(packed);
-    if ((long)ulen == RNC_FILE_IS_NOT_RNC) // File wasn't RNC to start with
+    if ((long)ulen == RNC_FILE_IS_NOT_RNC) /* File wasn't RNC to start with */
     {
       ret.errcode=MFILE_OK;
       ret.content = (unsigned char *)packed;
@@ -426,7 +425,7 @@ struct MEMORY_FILE read_file(const char *iname)
       ret.len=0;
       return ret;
     }
-    // Check if the input file isn't truncated
+    /* Check if the input file isn't truncated */
     plen = rnc_plen(packed);
     if ((plen>0)&&(plen>=alloc_len))
       packed=realloc(packed,plen+8);
@@ -442,20 +441,20 @@ struct MEMORY_FILE read_file(const char *iname)
     }
     ulen = rnc_unpack(packed, unpacked, RNC_IGNORE_NONE);
     free(packed);
-    // We assume there is less than 32 error messages
+    /* We assume there is less than 32 error messages */
     if ( ((long)ulen < 0) && ((long)ulen > -32) )
     {
       free(unpacked);
       ret.errcode=(long)ulen;
       ret.content=NULL;
       ret.len=0;
-//message_log("  read_file: returning unpack error code");
+/*message_log("  read_file: returning unpack error code"); */
       return ret;
     }
     ret.errcode=MFILE_OK;
     ret.content=(unsigned char *)unpacked;
     ret.len=ulen;
-//message_log("  read_file: returning MFILE_OK");
+/*message_log("  read_file: returning MFILE_OK"); */
     return ret;
 }
- */
+#endif

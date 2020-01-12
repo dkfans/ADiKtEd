@@ -1,21 +1,19 @@
 /******************************************************************************/
-// xtabdat8.c - Dungeon Keeper Tools.
-/******************************************************************************/
-// Author:  Tomasz Lis
-// Created: 05 Jul 2005
-
-// Purpose:
-//   Converts picture data from bullfrog's DAT/TAB files into BMPs.
-//   Works with 8bpp files, needs a .dat and a .tab file.
-
-// Comment:
-//   Based on DAT decoding algorithm by Jon Skeet.
-
-//Copying and copyrights:
-//   This program is free software; you can redistribute it and/or modify
-//   it under the terms of the GNU General Public License as published by
-//   the Free Software Foundation; either version 2 of the License, or
-//   (at your option) any later version.
+/** @file xtabdat8.c
+ * Dungeon Keeper Tools.
+ * @par Purpose:
+ *     Converts picture data from bullfrog's DAT/TAB files into BMPs.
+ *     Works with 8bpp files, needs a .dat and a .tab file.
+ * @par Comment:
+ *     None.
+ * @author   Tomasz Lis
+ * @date     05 Jul 2005
+ * @par  Copying and copyrights:
+ *     This program is free software; you can redistribute it and/or modify
+ *     it under the terms of the GNU General Public License as published by
+ *     the Free Software Foundation; either version 2 of the License, or
+ *     (at your option) any later version.
+ */
 /******************************************************************************/
 
 #if (defined(MAIN_XTABDAT8)||defined(MAIN_XTABJTY))
@@ -45,7 +43,7 @@ int main (int argc, char **argv)
     }
 
     printf("Loading palette ...");
-    //Reading palette file
+    /*Reading palette file */
     char *palette=malloc(768);
     {
         char fname[255];
@@ -68,7 +66,7 @@ int main (int argc, char **argv)
     }
     printf("Done.\n");
 
-    //Reading DAT,TAB and extracting images
+    /*Reading DAT,TAB and extracting images */
     IMAGELIST images;
     {
         char tabfname[255];
@@ -79,12 +77,12 @@ int main (int argc, char **argv)
         if (retcode!=0) return retcode;
     }
 
-    //Looping through images and extracting to files
+    /*Looping through images and extracting to files */
     printf("Extracting images into bitmaps...");
     unsigned long picnum;
     for (picnum=0;picnum<images.count;picnum++)
     {
-        //printf ("\rExtracting: picture number %*d", 4, picnum);
+        /*printf ("\rExtracting: picture number %*d", 4, picnum); */
         char fname[20];
        	sprintf (fname, "pic%0*d.bmp", 4, picnum);
         IMAGEITEM *item=&(images.items[picnum]);
@@ -103,7 +101,7 @@ int main (int argc, char **argv)
 int create_images_dattab_idx(struct IMAGELIST *images,const char *datfname,const char *tabfname,const int verbose)
 {
     if (verbose) msgprintf("Reading TAB file ...");
-    //Opening TAB file
+    /*Opening TAB file */
     struct TABFILE tabf;
     {
         int retcode=read_tabfile_data(&tabf,tabfname);
@@ -122,7 +120,7 @@ int create_images_dattab_idx(struct IMAGELIST *images,const char *datfname,const
     if (verbose) msgprintf("Done.\n");
 
     if (verbose) msgprintf("Reading DAT file ...");
-    //Opening DAT file
+    /*Opening DAT file */
     struct DATFILE datf;
     {
         int retcode=read_datfile_data(&datf,datfname);
@@ -191,7 +189,7 @@ int read_tabfile_data(struct TABFILE *tabf,const char *srcfname)
         tabf->items=malloc(tabf->count*sizeof(struct TABFILE_ITEM));
         if (!tabf->items) { fclose(tabfp);return XTABDAT8_CANT_READ; }
         unsigned char tabitm[TABFILE_ENTRY_SIZE];
-        //Skipping first entry (should be empty)
+        /*Skipping first entry (should be empty) */
         fread (tabitm, TABFILE_HEADER_SIZE, 1, tabfp);
         int entrynum;
         for (entrynum=0;entrynum<tabf->count;entrynum++)
@@ -297,7 +295,7 @@ int read_dattab_images(struct IMAGELIST *images,unsigned long *readcount,struct 
         if (verbose) msgprintf(" Error - cannot allocate %lu bytes of memory.\n",(unsigned long)(sizeof(struct IMAGEITEM)*images->count));
         return 1;
     }
-    //Looping through images
+    /*Looping through images */
     unsigned long picnum;
     unsigned long errnum=0;
     unsigned long skipnum=0;
@@ -359,7 +357,7 @@ int read_dat_image_idx(struct IMAGEITEM *image,unsigned long *readedsize,
     const struct DATFILE *datf,const unsigned long off,
     const unsigned int width,const unsigned int height)
 {
-    //Filling image structure
+    /*Filling image structure */
     {
         image->width=width;
         image->height=height;
@@ -371,20 +369,20 @@ int read_dat_image_idx(struct IMAGEITEM *image,unsigned long *readedsize,
         unsigned long i;
         for (i=0;i<imgsize;i++)
         {
-            // Select color index when transparent
+            /* Select color index when transparent */
             image->data[i]=0;
             image->alpha[i]=255;
         }
     }
-    //Code of error, if any occured
+    /*Code of error, if any occured */
     int errorcode=0;
-    //Counter of readed bytes
+    /*Counter of readed bytes */
     long endoff=off;
-    //Position in buffer on height
+    /*Position in buffer on height */
     unsigned int r=0;
-    //position in buffer on width
+    /*position in buffer on width */
 	unsigned int c=0;
-    //Time to decode picture
+    /*Time to decode picture */
     while (r < height)
     {
         char g;
@@ -401,30 +399,30 @@ int read_dat_image_idx(struct IMAGEITEM *image,unsigned long *readedsize,
        	{
             c=0;
            	r++;
-        } else //being here means that g>0
+        } else /*being here means that g>0 */
         {
             int i;
         	for (i=0; i < g; i++)
     		{
     		    if ((r >= height))
                 {
-                    //Colour leak on height - time to finish the work
+                    /*Colour leak on height - time to finish the work */
                     errorcode|=XTABDAT8_COLOUR_LEAK;
                     break;
                 } else
     		    if ((c > width))
                 {
-                    //Colour leak on width - going to next line
+                    /*Colour leak on width - going to next line */
                     r++;c=0;
                     errorcode|=XTABDAT8_COLOUR_LEAK;
                 } else
     		    if ((c >= width))
                 {
-                    //Do nothing - the error is small
+                    /*Do nothing - the error is small */
                     errorcode|=XTABDAT8_COLOUR_LEAK;
                 } else
     		    {
-                    //No leak error
+                    /*No leak error */
                     if (endoff < datf->filelength)
                     {
                         image->data[(width*r)+c]=datf->data[endoff];
@@ -437,7 +435,7 @@ int read_dat_image_idx(struct IMAGEITEM *image,unsigned long *readedsize,
                     endoff++;
                     c++;
                 }
-		    } //for (i=...
+		    } /*for (i=... */
     	}
     }
 	*readedsize=endoff-off;
@@ -456,7 +454,7 @@ int read_dattab_encimages(struct ENCIMAGELIST *images,unsigned long *readcount,
         return XTABDAT8_NOMEMORY;
     }
     if (verbose) msgprintf("Dividing DAT/TAB into list of images...");
-    //Looping through images
+    /*Looping through images */
     unsigned long picnum;
     unsigned long errnum=0;
     unsigned long skipnum=0;
@@ -476,7 +474,7 @@ int read_dattab_encimages(struct ENCIMAGELIST *images,unsigned long *readcount,
             skipnum++;
             continue;
         }
-        // Determining end of the image
+        /* Determining end of the image */
         unsigned long endoffs=datf->filelength;
         if (picnum+1<images->count)
         {
@@ -511,18 +509,18 @@ int write_encimages_dattab(const struct ENCIMAGELIST *images,unsigned long *writ
     struct TABFILE *tabf,struct DATFILE *datf)
 {
     short retcode;
-    // Preparing TAB structure
+    /* Preparing TAB structure */
     tabf->filelength=(images->count*TABFILE_ENTRY_SIZE);
     retcode=alloc_jtytabfile_data(tabf,images->count);
     if (retcode!=ERR_NONE) return retcode;
-    // Preparing DAT structure
+    /* Preparing DAT structure */
     unsigned long datlength=0;
     int entrynum;
     for (entrynum=0;entrynum<images->count;entrynum++)
         datlength+=(images->items[entrynum].datsize);
     retcode=alloc_datfile_data(datf,datlength);
     if (retcode!=ERR_NONE) return retcode;
-    // Filling the structure
+    /* Filling the structure */
     unsigned long datoffs=0;
     for (entrynum=0;entrynum<images->count;entrynum++)
     {
@@ -545,7 +543,7 @@ short create_images_dattab_enc(struct ENCIMAGELIST *images,const char *datfname,
     const char *tabfname,const int verbose)
 {
     if (verbose) msgprintf("Reading TAB file ...");
-    //Opening TAB file
+    /*Opening TAB file */
     struct TABFILE tabf;
     {
         int retcode=read_tabfile_data(&tabf,tabfname);
@@ -564,7 +562,7 @@ short create_images_dattab_enc(struct ENCIMAGELIST *images,const char *datfname,
     if (verbose) msgprintf(" Done.\n");
 
     if (verbose) msgprintf("Reading DAT file ...");
-    //Opening DAT file
+    /*Opening DAT file */
     struct DATFILE datf;
     {
         int retcode=read_datfile_data(&datf,datfname);

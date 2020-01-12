@@ -48,7 +48,7 @@ typedef short (*mapfile_iomsg_func)(struct LEVEL *lvl,struct MEMORY_FILE *mem,ch
  */
 char *levfile_error(int errcode)
 {
-    //static char str[LINEMSG_SIZE];
+    /*static char str[LINEMSG_SIZE]; */
     static char *const errors[] = {
 	"File too small",
 	"Bad data",
@@ -64,7 +64,7 @@ char *levfile_error(int errcode)
 	"Bad items count",
 	"Unknown problem",
     };
-    // Note: remember that errors are negative, warnings positive
+    /* Note: remember that errors are negative, warnings positive */
     if ((errcode>ERR_FILE_TOOSMLL)&&(errcode<WARN_BAD_COUNT))
     {
         return memfile_error(errcode);
@@ -72,8 +72,8 @@ char *levfile_error(int errcode)
     if (errcode<=ERR_FILE_TOOSMLL)
     {
         errcode = ERR_FILE_TOOSMLL-errcode;
-        //sprintf(str,"Error code %d",errcode);
-        //return str;
+        /*sprintf(str,"Error code %d",errcode); */
+        /*return str; */
         const int max_code=(sizeof(errors)/sizeof(*errors) - 1);
         if ((errcode < 0) || (errcode > max_code) )
           errcode = max_code;
@@ -83,8 +83,8 @@ char *levfile_error(int errcode)
     {
         errcode = WARN_BAD_COUNT-errcode;
         const int max_code=(sizeof(warnings)/sizeof(*warnings) - 1);
-        //sprintf(str,"Warning code %d",errcode);
-        //return str;
+        /*sprintf(str,"Warning code %d",errcode); */
+        /*return str; */
         if ((errcode < 0) || (errcode > max_code) )
           errcode = max_code;
         return warnings[errcode];
@@ -123,16 +123,18 @@ short load_subtile(unsigned char **dest,
 }
  */
 
+#if 0
 /*
  * Old way of reading various files; not used anymore.
  * This function reads what Jon Skeet named "subtile format".
  * It allocates memory for loaded data.
+ */
 unsigned char **load_subtile_malloc(char *fname, int length, 
                         int x, int y,
                         int linesize, int nlines, int lineoffset,
                         int mbytes, int byteoffset)
 {
-    // Allocating mem
+    /* Allocating mem */
     unsigned char **dest;
     dest = (unsigned char **)malloc(x*sizeof(char *));
     if (dest==NULL)
@@ -150,19 +152,18 @@ unsigned char **load_subtile_malloc(char *fname, int length,
         return NULL;
       }
     }
-    // Loading
+    /* Loading */
     short result=load_subtile(dest,fname,length,x,y,
         linesize,nlines,lineoffset,mbytes,byteoffset);
     if (result)
       return dest;
-    // Freeing on error
+    /* Freeing on error */
     for (i=0; i < x; i++)
       free(dest[i]);
     free(dest);
     return NULL;
 }
- */
-
+#endif
 
 /**
  * Reads the TNG file into LEVEL structure.
@@ -177,29 +178,29 @@ short load_tng(struct LEVEL *lvl,char *fname)
     int i, j;
     unsigned char *thing;
     if (lvl==NULL) return ERR_INTERNAL;
-    //Reading file
+    /*Reading file */
     struct MEMORY_FILE *mem;
     short result;
     result = memfile_readnew(&mem,fname,MAX_FILE_SIZE);
     if (result != MFILE_OK)
         return result;
-    // Checking file size
+    /* Checking file size */
     if (mem->len<SIZEOF_DK_TNG_HEADER)
     { memfile_free(&mem); return ERR_FILE_TOOSMLL; }
     result=ERR_NONE;
-    //Read the header
+    /*Read the header */
     tng_num = read_int16_le_buf(mem->content);
-    // Check everything's cushty
+    /* Check everything's cushty */
     unsigned long expect_size=tng_num*SIZEOF_DK_TNG_REC+SIZEOF_DK_TNG_HEADER;
     if (mem->len != expect_size)
     {
         message_log("  load_tng: File length %d, expected %lu (%d things)",mem->len,expect_size,tng_num);
-        // Fixing the problem
+        /* Fixing the problem */
         if (((lvl->optns.load_redundant_objects&EXLD_THING)==EXLD_THING)||(mem->len < expect_size))
           tng_num=(mem->len-SIZEOF_DK_TNG_HEADER)/SIZEOF_DK_TNG_REC;
         result=WARN_BAD_COUNT;
     }
-    //Read tng entries
+    /*Read tng entries */
     for (i=0; i < tng_num; i++)
     {
       unsigned char *thing = create_thing_empty();
@@ -227,13 +228,13 @@ short load_clm(struct LEVEL *lvl,char *fname)
     message_log("  load_clm: started");
     int i, j;
     if ((lvl==NULL)||(lvl->clm==NULL)) return ERR_INTERNAL;
-    //Reading file
+    /*Reading file */
     struct MEMORY_FILE *mem;
     short result;
     result = memfile_readnew(&mem,fname,MAX_FILE_SIZE);
     if (result != MFILE_OK)
         return result;
-    // Checking file size
+    /* Checking file size */
     if (mem->len < SIZEOF_DK_CLM_HEADER)
     { memfile_free(&mem); return ERR_FILE_TOOSMLL; }
     memcpy(lvl->clm_hdr, mem->content+0, SIZEOF_DK_CLM_HEADER);
@@ -264,24 +265,24 @@ short load_apt(struct LEVEL *lvl,char *fname)
     int i;
     unsigned char *actnpt;
     if ((lvl==NULL)||(lvl->apt_lookup==NULL)) return ERR_INTERNAL;
-    //Reading file
+    /*Reading file */
     struct MEMORY_FILE *mem;
     short result;
     result = memfile_readnew(&mem,fname,MAX_FILE_SIZE);
     if (result != MFILE_OK)
         return result;
-    // Checking file size
+    /* Checking file size */
     if (mem->len < SIZEOF_DK_APT_HEADER)
     { memfile_free(&mem); return ERR_FILE_TOOSMLL; }
     result=ERR_NONE;
     long apt_num;
     apt_num = read_int32_le_buf(mem->content+0);
-    // Check everything's cushty
+    /* Check everything's cushty */
     unsigned long expect_size=apt_num*SIZEOF_DK_APT_REC+SIZEOF_DK_APT_HEADER;
     if (mem->len != expect_size)
     {
         message_log("  load_apt: File length %d, expected %lu (%d items)",mem->len,expect_size,apt_num);
-        // Fixing the problem
+        /* Fixing the problem */
         if (((lvl->optns.load_redundant_objects&EXLD_ACTNPT)==EXLD_ACTNPT)||(mem->len < expect_size))
           apt_num=(mem->len-SIZEOF_DK_APT_HEADER)/SIZEOF_DK_APT_REC;
         result=WARN_BAD_COUNT;
@@ -320,7 +321,7 @@ short load_inf(struct LEVEL *lvl,char *fname)
     result = memfile_readnew(&mem,fname,MAX_FILE_SIZE);
     if (result != MFILE_OK)
         return result;
-    //If wrong filesize - pannic
+    /*If wrong filesize - pannic */
     if (mem->len != 1)
     { memfile_free(&mem); return ERR_FILE_BADDATA; }
     lvl->inf=mem->content[0];
@@ -342,7 +343,7 @@ short load_vsn(struct LEVEL *lvl,char *fname)
     result = memfile_readnew(&mem,fname,MAX_FILE_SIZE);
     if (result != MFILE_OK)
         return result;
-    //If wrong filesize - pannic
+    /*If wrong filesize - pannic */
     if (mem->len != 1)
     { memfile_free(&mem); return ERR_FILE_BADDATA; }
     unsigned char vsn;
@@ -364,16 +365,16 @@ short load_vsn(struct LEVEL *lvl,char *fname)
 short load_wib(struct LEVEL *lvl,char *fname)
 {
     message_log("  load_wib: started");
-    //Loading the file
+    /*Loading the file */
     struct MEMORY_FILE *mem;
     short result;
     result = memfile_readnew(&mem,fname,MAX_FILE_SIZE);
     if (result != MFILE_OK)
         return result;
-    // Checking file size
+    /* Checking file size */
     if ((mem->len!=lvl->subsize.x*lvl->subsize.y))
     { memfile_free(&mem); return ERR_FILE_BADDATA; }
-    //Reading WIB entries
+    /*Reading WIB entries */
     int sx, sy;
     unsigned long addr;
     for (sy=0; sy<lvl->subsize.y; sy++)
@@ -386,8 +387,8 @@ short load_wib(struct LEVEL *lvl,char *fname)
     }
     memfile_free(&mem);
     return ERR_NONE;
-  // Old way
-  //return load_subtile(lvl->wib, fname, 65536, arr_entries_x, arr_entries_y,256, 1, 0, 1, 0);
+  /* Old way */
+  /*return load_subtile(lvl->wib, fname, 65536, arr_entries_x, arr_entries_y,256, 1, 0, 1, 0); */
 }
 
 /**
@@ -399,11 +400,11 @@ short load_wib(struct LEVEL *lvl,char *fname)
 short load_slb(struct LEVEL *lvl,char *fname)
 {
     message_log("  load_slb: started");
-    // Let's get the modification date, in case ADI script is lost
-    struct stat attrib;    // create a file attribute structure
-    if (stat(fname,&attrib) == 0)  // get the attributes of file
+    /* Let's get the modification date, in case ADI script is lost */
+    struct stat attrib;    /* create a file attribute structure */
+    if (stat(fname,&attrib) == 0)  /* get the attributes of file */
     {
-        lvl->info.creat_date=attrib.st_mtime;    // Get the last modified time
+        lvl->info.creat_date=attrib.st_mtime;    /* Get the last modified time */
         lvl->info.lastsav_date=lvl->info.creat_date;
         int name_len=strlen(default_map_name)+10;
         char *name_text=malloc(name_len);
@@ -413,16 +414,16 @@ short load_slb(struct LEVEL *lvl,char *fname)
             set_lif_name_text(lvl,name_text);
         }
     }
-    //Reading file
+    /*Reading file */
     struct MEMORY_FILE *mem;
     short result;
     result = memfile_readnew(&mem,fname,MAX_FILE_SIZE);
     if (result != MFILE_OK)
         return result;
-    // Checking file size
+    /* Checking file size */
     if ((mem->len != 2*lvl->tlsize.x*lvl->tlsize.y))
     { memfile_free(&mem); return ERR_FILE_BADDATA; }
-    //Loading the entries
+    /*Loading the entries */
     int i, k;
     unsigned long addr=0;
     for (i=0; i<lvl->tlsize.y; i++)
@@ -432,10 +433,10 @@ short load_slb(struct LEVEL *lvl,char *fname)
           set_tile_slab(lvl,k,i,read_int16_le_buf(mem->content+addr+k*2));
     }
     memfile_free(&mem);
-    //message_log("  load_slb: finished");
+    /*message_log("  load_slb: finished"); */
     return ERR_NONE;
-    //The old way - left as an antic
-    //return load_subtile(, fname, 14450, MAP_SIZE_Y, MAP_SIZE_X,170, 1, 0, 2, 0);
+    /*The old way - left as an antic */
+    /*return load_subtile(, fname, 14450, MAP_SIZE_Y, MAP_SIZE_X,170, 1, 0, 2, 0); */
 }
 
 /**
@@ -447,16 +448,16 @@ short load_slb(struct LEVEL *lvl,char *fname)
 short load_own(struct LEVEL *lvl,char *fname)
 {
     message_log("  load_own: started");
-    //Reading file
+    /*Reading file */
     struct MEMORY_FILE *mem;
     short result;
     result = memfile_readnew(&mem,fname,MAX_FILE_SIZE);
     if (result != MFILE_OK)
         return result;
-    // Checking file size
+    /* Checking file size */
     if ((mem->len!=lvl->subsize.x*lvl->subsize.y))
     { memfile_free(&mem); return ERR_FILE_BADDATA; }
-    //Reading entries
+    /*Reading entries */
     int sx, sy;
     unsigned long addr;
     for (sy=0; sy<lvl->subsize.y; sy++)
@@ -469,8 +470,8 @@ short load_own(struct LEVEL *lvl,char *fname)
     }
     memfile_free(&mem);
     return ERR_NONE;
-    //Old way
-    //return load_subtile(lvl->own, fname, 65536, MAP_SIZE_Y, MAP_SIZE_X,256, 3, 0, 3, 0); 
+    /*Old way */
+    /*return load_subtile(lvl->own, fname, 65536, MAP_SIZE_Y, MAP_SIZE_X,256, 3, 0, 3, 0);  */
 }
 
 /**
@@ -484,16 +485,16 @@ short load_dat(struct LEVEL *lvl,char *fname)
     message_log("  load_dat: started");
     short result;
     const unsigned int line_len=2*lvl->subsize.x;
-    //Loading the file
+    /*Loading the file */
     struct MEMORY_FILE *mem;
     result = memfile_readnew(&mem,fname,MAX_FILE_SIZE);
     if (result != MFILE_OK)
         return result;
-    //message_log("  load_dat: after memfile_readnew");
+    /*message_log("  load_dat: after memfile_readnew"); */
     if ((mem->len != line_len*lvl->subsize.y))
     { memfile_free(&mem); return ERR_FILE_BADDATA; }
-    //Reading DAT entries
-    //message_log("  load_dat: Reading DAT entries");
+    /*Reading DAT entries */
+    /*message_log("  load_dat: Reading DAT entries"); */
     int sx, sy;
     unsigned char *addr;
     for (sy=0; sy<lvl->subsize.y; sy++)
@@ -504,9 +505,9 @@ short load_dat(struct LEVEL *lvl,char *fname)
           set_dat_val(lvl,sx,sy,read_int16_le_buf(addr+sx*2));
       }
     }
-    //message_log("  load_dat: Reading entries finished");
+    /*message_log("  load_dat: Reading entries finished"); */
     memfile_free(&mem);
-    //message_log("  load_dat: Loaded file memory freed");
+    /*message_log("  load_dat: Loaded file memory freed"); */
     return ERR_NONE;
 }
 
@@ -520,21 +521,21 @@ short load_txt(struct LEVEL *lvl,char *fname)
 {
     message_log("  load_txt: started");
     lvl->script.lines_count=0;
-    //Loading the file
+    /*Loading the file */
     struct MEMORY_FILE *mem;
     short result;
     result = memfile_readnew(&mem,fname,MAX_FILE_SIZE);
     if (result != MFILE_OK)
         return result;
-//    message_log("  load_txt: file readed");
-    //If filesize too small - pannic
+/*    message_log("  load_txt: file readed"); */
+    /*If filesize too small - pannic */
     if (mem->len < 2)
     { memfile_free(&mem); return ERR_FILE_TOOSMLL; }
     unsigned char *content=mem->content;
     unsigned char *ptr=mem->content;
     unsigned char *ptr_end=mem->content+mem->len;
     int lines_count=0;
-//    message_log("  load_txt: counting lines");
+/*    message_log("  load_txt: counting lines"); */
     while (ptr>=content)
     {
       ptr=memchr(ptr, 0x0a, (char *)ptr_end-(char *)ptr );
@@ -546,28 +547,28 @@ short load_txt(struct LEVEL *lvl,char *fname)
     ptr=mem->content;
     int currline;
     currline=0;
-//    message_log("  load_txt: breaking text into %d lines",lines_count);
+/*    message_log("  load_txt: breaking text into %d lines",lines_count); */
     while (currline<lines_count)
     {
       if (ptr>=ptr_end) ptr=ptr_end-1;
       unsigned char *nptr=memchr(ptr, 0x0a, ptr_end-ptr );
-      //Skip control characters (but leave spaces and TABs)
+      /*Skip control characters (but leave spaces and TABs) */
       while ((ptr<nptr)&&((unsigned char)ptr[0]<0x20)&&((unsigned char)ptr[0]!=0x09)) ptr++;
       if (nptr==NULL)
         nptr=ptr_end;
       int linelen=(char *)nptr-(char *)ptr;
-      //At end, skip control characters and spaces too
+      /*At end, skip control characters and spaces too */
       while ((linelen>0)&&((unsigned char)ptr[linelen-1]<=0x20)) linelen--;
       lvl->script.txt[currline]=(unsigned char *)malloc((linelen+1)*sizeof(unsigned char));
-      lvl->script.list[currline]=NULL; // decompose_script() will allocate memory for it
+      lvl->script.list[currline]=NULL; /* decompose_script() will allocate memory for it */
       memcpy(lvl->script.txt[currline],ptr,linelen);
       lvl->script.txt[currline][linelen]='\0';
       ptr=nptr+1;
       currline++;
     }
-//    message_log("  load_txt: deleting empty lines");
+/*    message_log("  load_txt: deleting empty lines"); */
     int nonempty_lines=lines_count-1;
-    // Delete empty lines at end
+    /* Delete empty lines at end */
     while ((nonempty_lines>=0)&&((lvl->script.txt[nonempty_lines][0])=='\0'))
       nonempty_lines--;
     currline=lines_count-1;
@@ -599,13 +600,13 @@ short load_lgt(struct LEVEL *lvl,char *fname)
     unsigned char *stlight;
     if ((lvl==NULL)||(lvl->lgt_lookup==NULL))
       return ERR_INTERNAL;
-    //Reading file
+    /*Reading file */
     struct MEMORY_FILE *mem;
     short result;
     result = memfile_readnew(&mem,fname,MAX_FILE_SIZE);
     if (result != MFILE_OK)
         return result;
-    // Checking file size
+    /* Checking file size */
     if (mem->len < SIZEOF_DK_LGT_HEADER)
     { memfile_free(&mem); return ERR_FILE_TOOSMLL; }
 
@@ -614,11 +615,11 @@ short load_lgt(struct LEVEL *lvl,char *fname)
     long lgt_num;
     lgt_num = read_int32_le_buf(mem->content+0);
     unsigned long expect_size=lgt_num*SIZEOF_DK_LGT_REC+SIZEOF_DK_LGT_HEADER;
-    // Check everything's cushty
+    /* Check everything's cushty */
     if (mem->len != expect_size)
     {
         message_log("  load_lgt: File length %d, expected %lu (%d items)",mem->len,expect_size,lgt_num);
-        // Fixing the problem
+        /* Fixing the problem */
         if (((lvl->optns.load_redundant_objects&EXLD_STLGHT)==EXLD_STLGHT)||(mem->len < expect_size))
           lgt_num=(mem->len-SIZEOF_DK_LGT_HEADER)/SIZEOF_DK_LGT_REC;
         result=WARN_BAD_COUNT;
@@ -655,13 +656,13 @@ short load_lgt(struct LEVEL *lvl,char *fname)
 short load_wlb(struct LEVEL *lvl,char *fname)
 {
     message_log("  load_wlb: started");
-    //Reading file
+    /*Reading file */
     struct MEMORY_FILE *mem;
     short result;
     result = memfile_readnew(&mem,fname,MAX_FILE_SIZE);
     if (result != MFILE_OK)
         return result;
-    //If wrong filesize - don't load
+    /*If wrong filesize - don't load */
     if (mem->len != lvl->tlsize.x*lvl->tlsize.y)
     { memfile_free(&mem); return ERR_FILE_BADDATA; }
     int i,j;
@@ -686,16 +687,16 @@ short load_flg(struct LEVEL *lvl,char *fname)
 {
     message_log("  load_flg: started");
     const unsigned int line_len=2*lvl->subsize.x;
-    //Loading the file
+    /*Loading the file */
     struct MEMORY_FILE *mem;
     short result;
     result = memfile_readnew(&mem,fname,MAX_FILE_SIZE);
     if (result != MFILE_OK)
         return result;
-    // Checking file size
+    /* Checking file size */
     if ((mem->len!=line_len*lvl->subsize.y))
     { memfile_free(&mem); return ERR_FILE_BADDATA; }
-    //Reading entries
+    /*Reading entries */
     int sx, sy;
     unsigned long addr;
     for (sy=0; sy<lvl->subsize.y; sy++)
@@ -721,7 +722,7 @@ short load_lif(struct LEVEL *lvl,char *fname)
 {
     message_log("  load_lif: started");
     short result;
-    // Load the file lines
+    /* Load the file lines */
     char **lines=NULL;
     int lines_count=0;
     result=load_text_file(&lines,&lines_count,fname);
@@ -729,7 +730,7 @@ short load_lif(struct LEVEL *lvl,char *fname)
     {
       return result;
     }
-    // Search for nonempty line
+    /* Search for nonempty line */
     char *line_data=NULL;
     int currline;
     for (currline=0;currline<lines_count;currline++)
@@ -739,13 +740,13 @@ short load_lif(struct LEVEL *lvl,char *fname)
         if ((line_data!=NULL)&&(line_data[0]!='\0')) break;
     }
     free_text_file(&lines,&lines_count);    
-    // Now we have the line we want in line_data.
+    /* Now we have the line we want in line_data. */
     char *namepos=NULL;
     if ((line_data!=NULL)&&(line_data[0]!='\0'))
         namepos=(char *)strchr(line_data,',');
     if ((namepos==NULL)||(strlen(namepos)<2))
     { free(line_data); return ERR_FILE_BADDATA; }
-    // Getting level name
+    /* Getting level name */
     char *str=strdup_trim(namepos+1);
     if (str!=NULL)
         set_lif_name_text(lvl,str);
@@ -765,7 +766,7 @@ short script_load_and_execute(struct LEVEL *lvl,struct MEMORY_FILE *mem,char *er
     message_log(" script_load_and_execute: started");
     sprintf(err_msg,"No error");
     short result;
-    // Checking file size
+    /* Checking file size */
     if (mem->len < 2)
     {
         result=ERR_FILE_TOOSMLL;
@@ -775,7 +776,7 @@ short script_load_and_execute(struct LEVEL *lvl,struct MEMORY_FILE *mem,char *er
     unsigned char *content=mem->content;
     unsigned char *ptr=mem->content;
     unsigned char *ptr_end=mem->content+mem->len;
-    // Counting lines
+    /* Counting lines */
     int lines_count=0;
     while (ptr>=content)
     {
@@ -791,12 +792,12 @@ short script_load_and_execute(struct LEVEL *lvl,struct MEMORY_FILE *mem,char *er
     {
       if (ptr>=ptr_end) ptr=ptr_end-1;
       unsigned char *nptr=memchr(ptr, 0x0a, ptr_end-ptr );
-      //Skip control characters (but leave spaces and TABs)
+      /*Skip control characters (but leave spaces and TABs) */
       while ((ptr<nptr)&&((unsigned char)ptr[0]<0x20)&&((unsigned char)ptr[0]!=0x09)) ptr++;
       if (nptr==NULL)
         nptr=ptr_end;
       int linelen=(char *)nptr-(char *)ptr;
-      //At end, skip control characters and spaces too
+      /*At end, skip control characters and spaces too */
       while ((linelen>0)&&((unsigned char)ptr[linelen-1]<=0x20)) linelen--;
 
       line=(unsigned char *)malloc((linelen+1)*sizeof(unsigned char *));
@@ -825,7 +826,7 @@ short script_load_and_execute(struct LEVEL *lvl,struct MEMORY_FILE *mem,char *er
 short script_load_and_execute_file(struct LEVEL *lvl,char *fname,char *err_msg)
 {
     message_log(" script_load_and_execute_file: started");
-    //Loading the file
+    /*Loading the file */
     struct MEMORY_FILE *mem;
     short result;
     result = memfile_readnew(&mem,fname,MAX_FILE_SIZE);
@@ -850,20 +851,20 @@ short script_load_and_execute_file(struct LEVEL *lvl,char *fname,char *err_msg)
 short load_text_file(char ***lines,int *lines_count,char *fname)
 {
     message_log(" load_text_file: started");
-    //Loading the file
+    /*Loading the file */
     struct MEMORY_FILE *mem;
     short result;
     result = memfile_readnew(&mem,fname,MAX_FILE_SIZE);
     if (result != MFILE_OK)
     { return result; }
-//    message_log("  load_text_file: file readed");
-    //If filesize too small - pannic
+/*    message_log("  load_text_file: file readed"); */
+    /*If filesize too small - pannic */
     if (mem->len < 2)
     { memfile_free(&mem); return ERR_FILE_TOOSMLL; }
     unsigned char *content=mem->content;
     unsigned char *ptr=mem->content;
     unsigned char *ptr_end=mem->content+mem->len;
-//    message_log("  load_text_file: counting lines");
+/*    message_log("  load_text_file: counting lines"); */
     while (ptr>=content)
     {
       ptr=memchr(ptr, 0x0a, (char *)ptr_end-(char *)ptr );
@@ -874,17 +875,17 @@ short load_text_file(char ***lines,int *lines_count,char *fname)
     ptr=mem->content;
     int currline;
     currline=0;
-//    message_log("  load_text_file: breaking text into %d lines",(*lines_count));
+/*    message_log("  load_text_file: breaking text into %d lines",(*lines_count)); */
     while (currline<(*lines_count))
     {
       if (ptr>=ptr_end) ptr=ptr_end-1;
       unsigned char *nptr=memchr(ptr, 0x0a, ptr_end-ptr );
-      //Skip control characters (but leave spaces and TABs)
+      /*Skip control characters (but leave spaces and TABs) */
       while ((ptr<nptr)&&((unsigned char)ptr[0]<0x20)&&((unsigned char)ptr[0]!=0x09)) ptr++;
       if (nptr==NULL)
         nptr=ptr_end;
       int linelen=(char *)nptr-(char *)ptr;
-      //At end, skip control characters and spaces too
+      /*At end, skip control characters and spaces too */
       while ((linelen>0)&&((unsigned char)ptr[linelen-1]<=0x20)) linelen--;
       (*lines)[currline]=(unsigned char *)malloc((linelen+1)*sizeof(unsigned char));
       memcpy((*lines)[currline],ptr,linelen);
@@ -892,9 +893,9 @@ short load_text_file(char ***lines,int *lines_count,char *fname)
       ptr=nptr+1;
       currline++;
     }
-//    message_log("  load_text_file: deleting empty lines");
+/*    message_log("  load_text_file: deleting empty lines"); */
     int nonempty_lines=(*lines_count)-1;
-    // Delete empty lines at end
+    /* Delete empty lines at end */
     while ((nonempty_lines>=0) && (((*lines)[nonempty_lines][0])=='\0'))
       nonempty_lines--;
     currline=(*lines_count)-1;
@@ -943,12 +944,12 @@ short write_slb(struct LEVEL *lvl,char *fname)
 short write_own(struct LEVEL *lvl,char *fname)
 {
     message_log(" write_own: starting");
-    //Opening
+    /*Opening */
     FILE *fp;
     fp = fopen (fname, "wb");
     if (fp==NULL)
       return ERR_CANT_OPENWR;
-    //Writing data
+    /*Writing data */
     int sx,sy;
     for (sy=0; sy<lvl->subsize.y; sy++)
     {
@@ -976,7 +977,7 @@ short write_dat(struct LEVEL *lvl,char *fname)
     fp = fopen (fname, "wb");
     if (fp==NULL)
       return ERR_CANT_OPENWR;
-    //Writing data
+    /*Writing data */
     int sx,sy;
     for (sy=0; sy<lvl->subsize.y; sy++)
     {
@@ -1004,7 +1005,7 @@ short write_flg(struct LEVEL *lvl,char *fname)
     fp = fopen (fname, "wb");
     if (fp==NULL)
       return ERR_CANT_OPENWR;
-    //Writing data
+    /*Writing data */
     int sx,sy;
     for (sy=0; sy<lvl->subsize.y; sy++)
     {
@@ -1072,7 +1073,7 @@ short write_wib(struct LEVEL *lvl,char *fname)
 short write_apt(struct LEVEL *lvl,char *fname)
 {
     message_log(" write_apt: starting");
-    //Preparing array bounds
+    /*Preparing array bounds */
     const int arr_entries_x=lvl->tlsize.x*MAP_SUBNUM_X;
     const int arr_entries_y=lvl->tlsize.y*MAP_SUBNUM_Y;
 
@@ -1107,7 +1108,7 @@ short write_apt(struct LEVEL *lvl,char *fname)
 short write_tng(struct LEVEL *lvl,char *fname)
 {
     message_log(" write_tng: starting");
-    //Preparing array bounds
+    /*Preparing array bounds */
     const int arr_entries_x=lvl->tlsize.x*MAP_SUBNUM_X;
     const int arr_entries_y=lvl->tlsize.y*MAP_SUBNUM_Y;
 
@@ -1116,9 +1117,9 @@ short write_tng(struct LEVEL *lvl,char *fname)
     fp = fopen (fname, "wb");
     if (fp==NULL)
       return ERR_CANT_OPENWR;
-    //Header
+    /*Header */
     write_int16_le_file(fp, lvl->tng_total_count);
-    //Entries
+    /*Entries */
     for (cy=0; cy < arr_entries_y; cy++)
       for (cx=0; cx < arr_entries_x; cx++)
           for (k=0; k < get_thing_subnums(lvl,cx,cy); k++)
@@ -1203,7 +1204,7 @@ short write_txt(struct LEVEL *lvl,char *fname)
 short write_lgt(struct LEVEL *lvl,char *fname)
 {
     message_log(" write_lgt: starting");
-    //Preparing array bounds
+    /*Preparing array bounds */
     const int arr_entries_x=lvl->tlsize.x*MAP_SUBNUM_X;
     const int arr_entries_y=lvl->tlsize.y*MAP_SUBNUM_Y;
 
@@ -1263,18 +1264,18 @@ short write_wlb(struct LEVEL *lvl,char *fname)
 short write_lif(struct LEVEL *lvl,char *fname)
 {
   message_log(" write_lif: starting");
-  //Acquiring map number
+  /*Acquiring map number */
   long lvl_num;
   char *fname_num=fname;
   while (((*fname_num)!='\0')&&(!isdigit(*fname_num))) fname_num++;
   lvl_num=atol(fname_num);
-  //Creating text lines
+  /*Creating text lines */
   char **lines=(char **)malloc(2*sizeof(char *));
   int lines_count=0;
   lines[lines_count]=malloc(LINEMSG_SIZE+1);
   sprintf(lines[lines_count],"%02d, %s",lvl_num,get_lif_name_text(lvl));
   lines_count++;
-  //Writing data
+  /*Writing data */
   short result;
   result=write_text_file(lines,lines_count,fname);
   text_file_free(lines,lines_count);
@@ -1291,7 +1292,7 @@ short write_lif(struct LEVEL *lvl,char *fname)
 short write_adi_script(struct LEVEL *lvl,char *fname)
 {
   message_log(" write_adi_script: starting");
-  //Creating text lines
+  /*Creating text lines */
   char **lines=NULL;
   int lines_count=0;
   add_stats_to_script(&lines,&lines_count,lvl);
@@ -1312,7 +1313,7 @@ short write_adi_script(struct LEVEL *lvl,char *fname)
 short write_nfo(struct LEVEL *lvl,char *fname)
 {
   message_log(" write_nfo: starting");
-  //Creating text lines
+  /*Creating text lines */
   char **lines=NULL;
   int lines_count=0;
     char *line;
@@ -1336,7 +1337,7 @@ short write_nfo(struct LEVEL *lvl,char *fname)
         gmtime(&lvl->info.creat_date) );
     text_file_linecp_add(&lines,&lines_count,line);
     strcpy(line,"Keepers: ");
-    //Clearing array for storing players heart count
+    /*Clearing array for storing players heart count */
     for (i=0; i < PLAYERS_COUNT; i++)
       plr_items[i]=0;
     owned_things_count(plr_items,lvl,THING_TYPE_ITEM,ITEM_SUBTYPE_DNHEART);
@@ -1635,8 +1636,8 @@ short user_save_map(struct LEVEL *lvl,short prior_save)
   if (level_verify(lvl,"save",&errpt)==VERIF_ERROR)
     return ERR_VERIF;
 
-  //Once there was an CLM/DAT/TNG update function here,
-  // but the new way is to minimize file changes - so it's been removed
+  /*Once there was an CLM/DAT/TNG update function here, */
+  /* but the new way is to minimize file changes - so it's been removed */
   update_slab_owners(lvl);
   struct LEVSTATS *stats=get_lvl_stats(lvl);
   if (stats->saves_count==0)
@@ -1701,7 +1702,7 @@ short load_mapfile(struct LEVEL *lvl,char *fext,mapfile_io_func load_file,
   }
   sprintf(fname, "%s.%s", lvl->fname, fext);
   file_result=load_file(lvl,fname);
-  //message_log("load_mapfile: Load function execution finished");
+  /*message_log("load_mapfile: Load function execution finished"); */
   if (file_result==ERR_NONE)
   {
       (*loaded_files)++;
@@ -1776,7 +1777,7 @@ short load_mapfile_msg(struct LEVEL *lvl,char *fext,mapfile_iomsg_func load_file
   }
   sprintf(fname, "%s.%s", lvl->fname, fext);
   err_msg[0]='\0';
-  //Loading the file
+  /*Loading the file */
   struct MEMORY_FILE *mem;
   file_result = memfile_readnew(&mem,fname,MAX_FILE_SIZE);
   if (file_result != MFILE_OK)
@@ -1798,15 +1799,15 @@ short load_mapfile_msg(struct LEVEL *lvl,char *fext,mapfile_iomsg_func load_file
   }
   file_result=load_file(lvl,mem,err_msg);
   memfile_free(&mem);
-  //message_log("load_mapfile: Load function execution finished");
+  /*message_log("load_mapfile: Load function execution finished"); */
   if (file_result==ERR_NONE)
   {
       (*loaded_files)++;
   } else
   if (file_result<ERR_NONE)
   {
-      // Special condition for ADI file loading.
-      // Ignore ADI load errors other than "bad data" - ADI file don't have to exist
+      /* Special condition for ADI file loading. */
+      /* Ignore ADI load errors other than "bad data" - ADI file don't have to exist */
       if ((load_file==script_load_and_execute)&&(file_result==ERR_FILE_BADDATA))
       {
         char *warn_fname;
@@ -1869,14 +1870,14 @@ short load_dk1_map(struct LEVEL *lvl)
   int loaded_files=0;
   int total_files=0;
   short file_result;
-  // Crucial files
+  /* Crucial files */
   if (result>=ERR_NONE)
       load_mapfile(lvl,"slb",load_slb,&loaded_files,&result,LFF_IGNORE_NONE);
   if (result>=ERR_NONE)
       load_mapfile(lvl,"own",load_own,&loaded_files,&result,LFF_IGNORE_NONE);
   if (result>=ERR_NONE)
       load_mapfile(lvl,"tng",load_tng,&loaded_files,&result,LFF_IGNORE_NONE);
-  // Less importand files
+  /* Less importand files */
   if (result>=ERR_NONE)
       load_mapfile(lvl,"dat",load_dat,&loaded_files,&result,LFF_IGNORE_ALL);
   if (result>=ERR_NONE)
@@ -1888,7 +1889,7 @@ short load_dk1_map(struct LEVEL *lvl)
   if (result>=ERR_NONE)
       load_mapfile(lvl,"wib",load_wib,&loaded_files,&result,LFF_IGNORE_ALL);
 
-  // Least importand files
+  /* Least importand files */
   if (result>=ERR_NONE)
       load_mapfile(lvl,"txt",load_txt,&loaded_files,&result,LFF_IGNORE_ALL);
   if (result>=ERR_NONE)
@@ -1945,15 +1946,15 @@ short load_dke_map(struct LEVEL *lvl)
 
       message_error("Error: Load not supported for extended map format");
       result=ERR_INTERNAL;
-/*
-  // Crucial files
+#if 0
+  /* Crucial files */
   if (result>=ERR_NONE)
       load_mapfile(lvl,"slb",load_slb,&loaded_files,&result,LFF_IGNORE_NONE);
   if (result>=ERR_NONE)
       load_mapfile(lvl,"own",load_own,&loaded_files,&result,LFF_IGNORE_NONE);
   if (result>=ERR_NONE)
       load_mapfile(lvl,"tng",load_tng,&loaded_files,&result,LFF_IGNORE_NONE);
-  // Less importand files
+  /* Less importand files */
   if (result>=ERR_NONE)
       load_mapfile(lvl,"dat",load_dat,&loaded_files,&result,LFF_IGNORE_ALL);
   if (result>=ERR_NONE)
@@ -1965,7 +1966,7 @@ short load_dke_map(struct LEVEL *lvl)
   if (result>=ERR_NONE)
       load_mapfile(lvl,"wib",load_wib,&loaded_files,&result,LFF_IGNORE_ALL);
 
-  // Least importand files
+  /* Least importand files */
   if (result>=ERR_NONE)
       load_mapfile(lvl,"txt",load_txt,&loaded_files,&result,LFF_IGNORE_ALL);
   if (result>=ERR_NONE)
@@ -1976,7 +1977,7 @@ short load_dke_map(struct LEVEL *lvl)
       load_mapfile(lvl,"flg",load_flg,&loaded_files,&result,LFF_IGNORE_WITHOUT_WARN);
   if (result>=ERR_NONE)
       load_mapfile(lvl,"lif",load_lif,&loaded_files,&result,LFF_IGNORE_WITHOUT_WARN);
-*/
+#endif
   if (result>=ERR_NONE)
       load_mapfile(lvl,"vsn",load_vsn,&loaded_files,&result,LFF_IGNORE_WITHOUT_WARN);
   if (result>=ERR_NONE)
@@ -2081,7 +2082,7 @@ short write_def_clm_source(struct LEVEL *lvl,char *fname)
       return false;
     }
 
-    //Preparing array bounds
+    /*Preparing array bounds */
     const int arr_entries_x=lvl->tlsize.x*MAP_SUBNUM_X;
     const int arr_entries_y=lvl->tlsize.y*MAP_SUBNUM_Y;
 
@@ -2096,7 +2097,7 @@ short write_def_clm_source(struct LEVEL *lvl,char *fname)
 /*        clm_rec->c[0]+clm_rec->c[1]+clm_rec->c[2]+clm_rec->c[3]+
             clm_rec->c[4]+clm_rec->c[5]+clm_rec->c[6]+clm_rec->c[7]+
             clm_rec->base;*/
-//        if ((lvl->clm_utilize[i])!=(clm_rec->use))
+/*        if ((lvl->clm_utilize[i])!=(clm_rec->use)) */
         {
 /*          char binstr0[9];
           char binstr1[9];
@@ -2168,7 +2169,7 @@ short write_def_tng_source(struct LEVEL *lvl,char *fname)
       return false;
     }
 
-    //Preparing array bounds
+    /*Preparing array bounds */
     const int arr_entries_x=lvl->tlsize.x*MAP_SUBNUM_X;
     const int arr_entries_y=lvl->tlsize.y*MAP_SUBNUM_Y;
     int cx,cy;
@@ -2181,7 +2182,7 @@ short write_def_tng_source(struct LEVEL *lvl,char *fname)
             int spos_y=get_thing_subtile_y(thing);
             int sen_tl=get_thing_sensitile(thing);
             unsigned short tngtype=get_thing_type(thing);
-//            if (tngtype!=THING_TYPE_ITEM) continue;
+/*            if (tngtype!=THING_TYPE_ITEM) continue; */
             if ( (sen_tl!=((spos_x/MAP_SUBNUM_Y-1)+(spos_y/MAP_SUBNUM_Y-1)*lvl->tlsize.x)) &&
                  (sen_tl!=((spos_x/MAP_SUBNUM_Y-1)+(spos_y/MAP_SUBNUM_Y+0)*lvl->tlsize.x)) &&
                  (sen_tl!=((spos_x/MAP_SUBNUM_Y-1)+(spos_y/MAP_SUBNUM_Y+1)*lvl->tlsize.x)) &&

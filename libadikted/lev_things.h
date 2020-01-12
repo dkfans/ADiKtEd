@@ -1,21 +1,18 @@
 /******************************************************************************/
-// lev_things.h - Dungeon Keeper Tools.
-/******************************************************************************/
-// Author:   Jon Skeet
-// Created:  14 Oct 1997
-// Modified: Tomasz Lis
-
-// Purpose:
-//   Header file. Defines exported routines from lev_things.c
-
-// Comment:
-//   None.
-
-//Copying and copyrights:
-//   This program is free software; you can redistribute it and/or modify
-//   it under the terms of the GNU General Public License as published by
-//   the Free Software Foundation; either version 2 of the License, or
-//   (at your option) any later version.
+/** @file lev_things.h
+ * Dungeon Keeper Tools.
+ * @par Purpose:
+ *     Header file. Defines exported routines from lev_things.c
+ * @par Comment:
+ *     None.
+ * @author   Jon Skeet, Tomasz Lis
+ * @date     14 Oct 1997
+ * @par  Copying and copyrights:
+ *     This program is free software; you can redistribute it and/or modify
+ *     it under the terms of the GNU General Public License as published by
+ *     the Free Software Foundation; either version 2 of the License, or
+ *     (at your option) any later version.
+ */
 /******************************************************************************/
 
 #ifndef ADIKT_LEVTHINGS_H
@@ -51,7 +48,7 @@ DLLIMPORT unsigned char *create_creature(const struct LEVEL *lvl,unsigned int sx
 DLLIMPORT unsigned char *create_trap(const struct LEVEL *lvl,unsigned int sx, unsigned int sy, unsigned char stype_idx);
 DLLIMPORT unsigned char *create_item_adv(const struct LEVEL *lvl, unsigned int sx, unsigned int sy, unsigned char stype_idx);
 
-//Lower level functions, used by create_item_adv
+/*Lower level functions, used by create_item_adv */
 DLLIMPORT unsigned char *create_torch(const struct LEVEL *lvl, unsigned int sx, unsigned int sy,  unsigned char stype_idx);
 DLLIMPORT unsigned char *create_doorkey(const struct LEVEL *lvl, unsigned int sx, unsigned int sy,  unsigned char stype_idx);
 
@@ -75,7 +72,7 @@ DLLIMPORT unsigned short get_free_herogate_number_next(const struct LEVEL *lvl,c
 DLLIMPORT unsigned short get_free_herogate_number_prev(const struct LEVEL *lvl,const unsigned short start);
 DLLIMPORT short create_herogate_number_used_arr(const struct LEVEL *lvl,unsigned char **used,unsigned int *used_size);
 
-// Updating objects functions
+/* Updating objects functions */
 DLLIMPORT void update_obj_for_square(struct LEVEL *lvl, int tx_first, int tx_last,
     int ty_first, int ty_last);
 DLLIMPORT void update_obj_for_square_radius1(struct LEVEL *lvl, int tx, int ty);
@@ -86,7 +83,7 @@ DLLIMPORT void update_room_things_on_slab(struct LEVEL *lvl, int tx, int ty);
 DLLIMPORT void update_door_things_on_slab(struct LEVEL *lvl, int tx, int ty);
 DLLIMPORT void update_torch_things_near_slab(struct LEVEL *lvl, int tx, int ty);
 
-//Functions for updating objects subtile position and height
+/*Functions for updating objects subtile position and height */
 DLLIMPORT void update_obj_subpos_and_height_for_whole_map(struct LEVEL *lvl);
 DLLIMPORT void update_obj_subpos_and_height_for_square_radius1(struct LEVEL *lvl, int tx, int ty);
 DLLIMPORT void update_obj_subpos_and_height_for_square(struct LEVEL *lvl, int tx_first, int tx_last,
@@ -96,7 +93,7 @@ DLLIMPORT short update_thing_subpos_and_height(unsigned short *clm_height,unsign
 DLLIMPORT void remove_automade_obj_for_whole_map(struct LEVEL *lvl);
 DLLIMPORT void remove_automade_obj_for_slab(struct LEVEL *lvl, int tx, int ty);
 
-//Updating room things - lower level function
+/*Updating room things - lower level function */
 DLLIMPORT void create_things_slb_room(cr_tng_func cr_floor,cr_tng_func cr_edge,
         cr_tng_func cr_corner,cr_tng_func cr_inside,cr_tng_func cr_nearinsd,
         struct LEVEL *lvl, int tx, int ty);
@@ -171,4 +168,4 @@ void update_things_slb_prison(struct LEVEL *lvl, const int tx, const int ty,
 DLLIMPORT void remove_noncrucial_room_things(struct LEVEL *lvl, int tx, int ty);
 
 
-#endif // ADIKT_LEVTHINGS_H
+#endif /* ADIKT_LEVTHINGS_H */

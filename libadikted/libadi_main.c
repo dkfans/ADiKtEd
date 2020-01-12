@@ -40,9 +40,9 @@
  *     LMB to move, RMB to put temple tiles.
  */
 
-BOOL APIENTRY DllMain (HINSTANCE hInst,    // Library instance handle.
-                       DWORD reason,       // Reason this function is being called.
-                       LPVOID reserved )   // Not used.
+BOOL APIENTRY DllMain (__attribute__((unused)) HINSTANCE hInst,    /* Library instance handle. */
+                       DWORD reason,                               /* Reason this function is being called. */
+                       __attribute__((unused)) LPVOID reserved )   /* Not used. */
 {
     switch (reason)
     {
@@ -59,6 +59,6 @@ BOOL APIENTRY DllMain (HINSTANCE hInst,    // Library instance handle.
         break;
     }
 
-    // Returns TRUE on success, FALSE on failure
+    /* Returns TRUE on success, FALSE on failure */
     return TRUE;
 }

@@ -106,7 +106,7 @@ int column_find_or_create(struct LEVEL *lvl,struct COLUMN_REC *clm_rec)
   if (clm_rec==NULL) return 0;
   int num=-1;
   unsigned char *clmentry;
-  // Search for column identical to the one we want
+  /* Search for column identical to the one we want */
   struct COLUMN_REC *clm_rec2;
   clm_rec2=create_column_rec();
   for (num=0;num<COLUMN_ENTRIES;num++)
@@ -120,7 +120,7 @@ int column_find_or_create(struct LEVEL *lvl,struct COLUMN_REC *clm_rec)
       }
   }
   free_column_rec(clm_rec2);
-  // If no identical column, then create one
+  /* If no identical column, then create one */
   if ((num<0)||(num>=COLUMN_ENTRIES))
   {
       num=column_get_free_index(lvl);
@@ -130,15 +130,15 @@ int column_find_or_create(struct LEVEL *lvl,struct COLUMN_REC *clm_rec)
          set_clm_entry(clmentry, clm_rec);
       }
   }
-  // Sometimes we may not find the free entry...
-  // If so, return 0 - index of the empty entry
+  /* Sometimes we may not find the free entry... */
+  /* If so, return 0 - index of the empty entry */
   if ((num<0)||(num>=COLUMN_ENTRIES))
      return 0;
-  // But if we have it - the work is nearly done
+  /* But if we have it - the work is nearly done */
   clmentry = (unsigned char *)(lvl->clm[num]);
-  // If the new entry has permanent set, make sure to keep it
+  /* If the new entry has permanent set, make sure to keep it */
   if (clm_rec->permanent) set_clm_entry_permanent(clmentry,1);
-  // Now we may return the CLM index
+  /* Now we may return the CLM index */
   return num;
 }
 
@@ -152,8 +152,8 @@ int column_get_free_index(struct LEVEL *lvl)
 {
   int num;
   unsigned char *clmentry;
-  // Search for free column entry
-  // Skip the first one - it is always zero-filled entry
+  /* Search for free column entry */
+  /* Skip the first one - it is always zero-filled entry */
   for (num=1;num<COLUMN_ENTRIES;num++)
   {
       if (!clm_entry_is_used(lvl,num))
@@ -170,33 +170,33 @@ int column_get_free_index(struct LEVEL *lvl)
  */
 void update_datclm_for_whole_map(struct LEVEL *lvl)
 {
-    //Filling CLM entries with unused, zero-filled ones
-    //message_log(" update_datclm_for_whole_map: Started");
+    /*Filling CLM entries with unused, zero-filled ones */
+    /*message_log(" update_datclm_for_whole_map: Started"); */
     level_clear_datclm(lvl);
     add_permanent_columns(lvl);
-    //setting the values from beginning
-    //message_log(" update_datclm_for_whole_map: Setting CLM entries");
+    /*setting the values from beginning */
+    /*message_log(" update_datclm_for_whole_map: Setting CLM entries"); */
     int i,k;
     for (k=0;k<lvl->tlsize.y;k++)
       for (i=0;i<lvl->tlsize.x;i++)
           update_datclm_for_slab(lvl, i, k);
-    //Setting the 'last column' entries
-    //message_log(" update_datclm_for_whole_map: Updating last column");
+    /*Setting the 'last column' entries */
+    /*message_log(" update_datclm_for_whole_map: Updating last column"); */
     update_dat_last_column(lvl,SLAB_TYPE_ROCK);
-    // updating WIB (animation) entries
-    //message_log(" update_datclm_for_whole_map: Updating WIB");
+    /* updating WIB (animation) entries */
+    /*message_log(" update_datclm_for_whole_map: Updating WIB"); */
     for (k=0;k<lvl->tlsize.y;k++)
       for (i=0;i<lvl->tlsize.x;i++)
           update_tile_wib_entries(lvl,i,k);
-    // updating WLB and FLG entries
-    //message_log(" update_datclm_for_whole_map: Updating WLB/FLG");
+    /* updating WLB and FLG entries */
+    /*message_log(" update_datclm_for_whole_map: Updating WLB/FLG"); */
     for (k=0;k<lvl->tlsize.y;k++)
       for (i=0;i<lvl->tlsize.x;i++)
       {
           update_tile_wlb_entry(lvl,i,k);
           update_tile_flg_entries(lvl,i,k);
       }
-    //message_log(" update_datclm_for_whole_map: Updating Utilize counters");
+    /*message_log(" update_datclm_for_whole_map: Updating Utilize counters"); */
     update_clm_utilize_counters(lvl);
 }
 
@@ -217,14 +217,14 @@ void update_datclm_for_square_radius1(struct LEVEL *lvl, int tx, int ty)
         if ((i>=0) && (k>=0) && (i<lvl->tlsize.x) && (k<lvl->tlsize.y))
           update_datclm_for_slab(lvl, i, k);
       }
-    // updating WIB (animation) entries - wider update is requred
+    /* updating WIB (animation) entries - wider update is requred */
     for (k=ty-2;k<=ty+2;k++)
       for (i=tx-2;i<=tx+2;i++)
       {
         if ((i>=0) && (k>=0) && (i<lvl->tlsize.x) && (k<lvl->tlsize.y))
           update_tile_wib_entries(lvl,i,k);
       }
-    // updating WLB and FLG entries
+    /* updating WLB and FLG entries */
     for (k=ty-2;k<=ty+2;k++)
       for (i=tx-2;i<=tx+2;i++)
       {
@@ -254,14 +254,14 @@ void update_datclm_for_square(struct LEVEL *lvl, int tx_first, int tx_last,
         if ((i>=0) && (k>=0) && (i<lvl->tlsize.x) && (k<lvl->tlsize.y))
           update_datclm_for_slab(lvl, i, k);
       }
-    // updating WIB (animation) entries - wider update is requred
+    /* updating WIB (animation) entries - wider update is requred */
     for (k=ty_first-1;k<=ty_last+1;k++)
       for (i=tx_first-1;i<=tx_last+1;i++)
       {
         if ((i>=0) && (k>=0) && (i<lvl->tlsize.x) && (k<lvl->tlsize.y))
           update_tile_wib_entries(lvl,i,k);
       }
-    // updating WLB and FLG entries
+    /* updating WLB and FLG entries */
     for (k=ty_first-1;k<=ty_last+1;k++)
       for (i=tx_first-1;i<=tx_last+1;i++)
       {
@@ -282,24 +282,24 @@ void update_datclm_for_square(struct LEVEL *lvl, int tx_first, int tx_last,
  */
 void update_datclm_for_slab(struct LEVEL *lvl, int tx, int ty)
 {
-  //Retrieving parameters from LEVEL structure - the slab and its surrounding
+  /*Retrieving parameters from LEVEL structure - the slab and its surrounding */
   unsigned char *surr_slb=(unsigned char *)malloc(9*sizeof(unsigned char));
   unsigned char *surr_own=(unsigned char *)malloc(9*sizeof(unsigned char));
   unsigned char **surr_tng=(unsigned char **)malloc(9*sizeof(unsigned char *));
   get_slab_surround(surr_slb,surr_own,surr_tng,lvl,tx,ty);
   int i;
-  // Creating CoLuMn for each subtile
+  /* Creating CoLuMn for each subtile */
   message_log(" update_datclm_for_slab: Refreshing slab %d tile at %d,%d",(int)surr_slb[IDIR_CENTR],tx,ty);
   struct COLUMN_REC *clm_recs[9];
   for (i=0;i<9;i++)
     clm_recs[i]=create_column_rec();
   create_columns_for_slab(clm_recs,&(lvl->optns),surr_slb,surr_own,surr_tng);
-  //Custom columns, and graffiti
+  /*Custom columns, and graffiti */
   if (slab_has_custom_columns(lvl, tx, ty))
     update_custom_columns_for_slab(clm_recs,lvl,tx,ty);
-  //Use the columns to set DAT/CLM entries in LEVEL
+  /*Use the columns to set DAT/CLM entries in LEVEL */
   set_new_datclm_values(lvl, tx, ty, clm_recs);
-  // Flushing dynamic data
+  /* Flushing dynamic data */
   for (i=0;i<9;i++)
     free_column_rec(clm_recs[i]);
   free(surr_slb);
@@ -319,22 +319,22 @@ void update_datclm_for_slab(struct LEVEL *lvl, int tx, int ty)
 void get_slab_surround(unsigned char *surr_slb,unsigned char *surr_own,
         unsigned char **surr_tng,const struct LEVEL *lvl,int tx, int ty)
 {
-    //Note: the surround[] array indexing must be set in a way
-    // that gives right directions if IDIR_* constants are used.
-    //Preparing array bounds
+    /*Note: the surround[] array indexing must be set in a way */
+    /* that gives right directions if IDIR_* constants are used. */
+    /*Preparing array bounds */
     int arr_entries_x=lvl->tlsize.x*MAP_SUBNUM_X;
     int arr_entries_y=lvl->tlsize.y*MAP_SUBNUM_Y;
-    //Preparing variables
+    /*Preparing variables */
     int i,k;
     int s_idx;
-    //Cleanup of the input variables
+    /*Cleanup of the input variables */
     if (surr_tng!=NULL)
     {
       for (i=0;i<3;i++)
         for (k=0;k<3;k++)
           surr_tng[k*3+i]=NULL;
     }
-    //Sweeping and extracting slab type and owner
+    /*Sweeping and extracting slab type and owner */
     for (i=-1;i<=1;i++)
       for (k=-1;k<=1;k++)
       {
@@ -358,21 +358,21 @@ void get_slab_surround(unsigned char *surr_slb,unsigned char *surr_own,
             }
           }
       }
-    //Sweeping again and extracting things
+    /*Sweeping again and extracting things */
     if (surr_tng!=NULL)
     {
       for (i=-2;i<=2;i++)
         for (k=-2;k<=2;k++)
         {
-          //We're not interested in corners of the 5x5 subtile block
+          /*We're not interested in corners of the 5x5 subtile block */
           if (((i==-2)||(i==2))&&((k==-2)||(k==2))) continue;
-          //Finding the index in target array (3x3)
+          /*Finding the index in target array (3x3) */
           s_idx=0;
           if (i>1) { s_idx+=2; }
           else if (i>-1) s_idx+=i+1;
           if (k>1) s_idx+=2*3;
           else if (k>-1) s_idx+=(k+1)*3;
-          //Now searching for the correct thing to place there
+          /*Now searching for the correct thing to place there */
           int sx=tx*MAP_SUBNUM_X+i+1;
           int sy=ty*MAP_SUBNUM_Y+k+1;
           int tng_num;
@@ -424,15 +424,15 @@ void set_new_datclm_values(struct LEVEL *lvl, int tx, int ty, struct COLUMN_REC 
 void set_new_datclm_entry(struct LEVEL *lvl, int sx, int sy, struct COLUMN_REC *clm_rec)
 {
   unsigned int clmidx;
-  //Updating previously used column
+  /*Updating previously used column */
   clmidx=get_dat_subtile(lvl, sx, sy);
   clm_utilize_dec(lvl,clmidx);
-  // Saving column, retrieving DAT index
-  //and updating 'utilize' counter
+  /* Saving column, retrieving DAT index */
+  /*and updating 'utilize' counter */
   int dat_entry;
   dat_entry=column_find_or_create(lvl,clm_rec);
   clm_utilize_inc(lvl,dat_entry);
-  // Saving DAT index
+  /* Saving DAT index */
   set_dat_subtile(lvl,sx,sy,dat_entry);
 }
 
@@ -452,7 +452,7 @@ void clm_utilize_dec(struct LEVEL *lvl, int clmidx)
   clmentry=lvl->clm[clmidx];
   if (clmentry!=NULL)
     clm_entry_use_dec(clmentry);
-  // If the entry is unused, let's clear it completely, just for sure.
+  /* If the entry is unused, let's clear it completely, just for sure. */
   if ((lvl->clm_utilize[clmidx]<1)&&(get_clm_entry_permanent(clmentry)==0))
   {
     lvl->clm_utilize[clmidx]=0;
@@ -489,7 +489,7 @@ void clm_utilize_inc(struct LEVEL *lvl, int clmidx)
  */
 short columns_verify(struct LEVEL *lvl, char *err_msg,struct IPOINT_2D *errpt)
 {
-    //checking entries
+    /*checking entries */
     short result;
     int i,k;
     for (i=0; i<COLUMN_ENTRIES; i++)
@@ -524,12 +524,12 @@ short columns_verify(struct LEVEL *lvl, char *err_msg,struct IPOINT_2D *errpt)
 void update_clm_utilize_counters(struct LEVEL *lvl)
 {
   int clmidx;
-  //Set all "utilize" values to 0
+  /*Set all "utilize" values to 0 */
   for (clmidx=0; clmidx<COLUMN_ENTRIES; clmidx++)
   {
       lvl->clm_utilize[clmidx]=0;
   }
-  //Now count "utilize" of all columns
+  /*Now count "utilize" of all columns */
   int cx,cy;
   for (cy=0; cy < lvl->subsize.y; cy++)
     for (cx=0; cx < lvl->subsize.x; cx++)
@@ -603,7 +603,7 @@ void update_tile_wlb_entry(struct LEVEL *lvl, int tx, int ty)
     wlb_val=get_tile_wlb(lvl,tx,ty);
     if ((wlb_val!=TILE_WLB_LAVA)&&(wlb_val!=TILE_WLB_WATER))
     {
-      // Value is obviously wrong; try to recognize correct value
+      /* Value is obviously wrong; try to recognize correct value */
       int sib_water=slab_siblings_oftype(lvl,tx,ty,SLAB_TYPE_WATER);
       int sib_lava=slab_siblings_oftype(lvl,tx,ty,SLAB_TYPE_LAVA);
       if (sib_lava>sib_water)
@@ -636,11 +636,11 @@ void update_tile_flg_entries(struct LEVEL *lvl, int tx, int ty)
     {
       int sx=tx*MAP_SUBNUM_X+i;
       int sy=ty*MAP_SUBNUM_Y+k;
-      //Checking if we're on slab type corner
+      /*Checking if we're on slab type corner */
       short corner=true;
       int crnr_x;
       int crnr_y;
-      // the corners is FLG are strange - marked from inside, not outside
+      /* the corners is FLG are strange - marked from inside, not outside */
       if ((k==0)&&(i==0))
       {
         crnr_x=1;crnr_y=1;
@@ -657,7 +657,7 @@ void update_tile_flg_entries(struct LEVEL *lvl, int tx, int ty)
       {
         crnr_x=-1;crnr_y=-1;
       } else
-      { //If no corner - set the value to compare with the same tile
+      { /*If no corner - set the value to compare with the same tile */
         crnr_x=0;crnr_y=0;
       }
       if (((slab==get_tile_slab(lvl,tx+crnr_x,ty))&&(owner==get_tile_owner(lvl,tx+crnr_x,ty))) ||
@@ -737,7 +737,7 @@ short get_subtile_column_rec(const struct LEVEL *lvl, struct COLUMN_REC *clm_rec
   clmentry=get_subtile_column(lvl,sx,sy);
   if (clmentry==NULL)
   {
-    // Rock is the most static column, so use it on error
+    /* Rock is the most static column, so use it on error */
     fill_column_rock(clm_rec, PLAYER_UNSET);
     return false;
   }
@@ -799,7 +799,7 @@ unsigned int get_dat_subtile(const struct LEVEL *lvl, const unsigned int sx, con
 {          
     unsigned int val;
     val=0x10000-get_dat_val(lvl,sx,sy);
-    //The AND will make sure that value "0" from get_dat_val returns as 0.
+    /*The AND will make sure that value "0" from get_dat_val returns as 0. */
     return val&0x0ffff;
 }
 
@@ -877,7 +877,7 @@ short find_dat_entry(const struct LEVEL *lvl, int *sx, int *sy, const unsigned i
  */
 short dat_verify(struct LEVEL *lvl, char *err_msg,struct IPOINT_2D *errpt)
 {
-    //Sweeping through DAT entries
+    /*Sweeping through DAT entries */
     int i, k;
     for (k=0; k<lvl->subsize.y; k++)
       for (i=0; i<lvl->subsize.x; i++)
@@ -922,19 +922,19 @@ short clm_entry_is_used(const struct LEVEL *lvl,unsigned int clmidx)
  */
 short update_dat_last_column(struct LEVEL *lvl, unsigned short slab)
 {
-  //Retrieving parameters from LEVEL structure - the slab and its surrounding
+  /*Retrieving parameters from LEVEL structure - the slab and its surrounding */
   unsigned char *surr_slb=(unsigned char *)malloc(9*sizeof(unsigned char));
   unsigned char *surr_own=(unsigned char *)malloc(9*sizeof(unsigned char));
   unsigned char **surr_tng=(unsigned char **)malloc(9*sizeof(unsigned char *));
   get_slab_surround(surr_slb,surr_own,surr_tng,lvl,lvl->tlsize.x,lvl->tlsize.y);
   surr_slb[IDIR_CENTR]=slab;
   int i;
-  // Creating CoLuMn for each subtile
+  /* Creating CoLuMn for each subtile */
   struct COLUMN_REC *clm_recs[9];
   for (i=0;i<9;i++)
     clm_recs[i]=create_column_rec();
   create_columns_for_slab(clm_recs,&(lvl->optns),surr_slb,surr_own,surr_tng);
-  //Use the columns to set DAT/CLM entries in LEVEL
+  /*Use the columns to set DAT/CLM entries in LEVEL */
   int sx, sy;
   sx=lvl->subsize.x-1;
   for (sy=0; sy<lvl->subsize.y; sy++)
@@ -942,7 +942,7 @@ short update_dat_last_column(struct LEVEL *lvl, unsigned short slab)
   sy=lvl->subsize.y-1;
   for (sx=0; sx<lvl->subsize.x; sx++)
       set_new_datclm_entry(lvl,sx,sy,clm_recs[sx%MAP_SUBNUM_X]);
-  // Flushing dynamic data
+  /* Flushing dynamic data */
   for (i=0;i<9;i++)
     free_column_rec(clm_recs[i]);
   free(surr_slb);
@@ -1031,12 +1031,12 @@ short cust_col_add_or_update(struct LEVEL *lvl,int sx,int sy,struct DK_CUSTOM_CL
     if ((lvl==NULL)||(lvl->cust_clm_lookup==NULL)) return false;
     if ((ccol==NULL)||(ccol->rec==NULL)) return false;
     int idx;
-    //Check if we already have the column at this place
+    /*Check if we already have the column at this place */
     struct DK_CUSTOM_CLM *ccol_old;
     ccol_old=get_cust_col(lvl,sx,sy);
     if (ccol_old!=NULL)
       cust_col_del(lvl,sx,sy);
-    //Old is gone, set the new one
+    /*Old is gone, set the new one */
     set_cust_col(lvl,sx,sy,ccol);
     if (lvl->optns.datclm_auto_update)
     {
@@ -1056,7 +1056,7 @@ short cust_col_add_or_update(struct LEVEL *lvl,int sx,int sy,struct DK_CUSTOM_CL
  */
 int cust_cols_num_on_tile(struct LEVEL *lvl, int tx, int ty)
 {
-    //We can skip tx,ty range checking, as it is made in get_cust_col
+    /*We can skip tx,ty range checking, as it is made in get_cust_col */
     int sx_max=(tx+1)*MAP_SUBNUM_X;
     int sy_max=(ty+1)*MAP_SUBNUM_Y;
     int sx,sy;
@@ -1157,7 +1157,7 @@ unsigned int get_cust_clm_count(struct LEVEL *lvl)
 struct DK_CUSTOM_CLM *create_cust_col(void)
 {
     struct DK_CUSTOM_CLM *ccol;
-    //Filling graffiti structure
+    /*Filling graffiti structure */
     ccol = (struct DK_CUSTOM_CLM *)malloc(sizeof(struct DK_CUSTOM_CLM));
     if (ccol==NULL)
     {
@@ -1187,9 +1187,9 @@ short cust_col_del(struct LEVEL *lvl, int sx, int sy)
     ccol=lvl->cust_clm_lookup[sx][sy];
     lvl->cust_clm_lookup[sx][sy]=NULL;
     if (ccol==NULL) return false;
-    //Decrease the count by one
+    /*Decrease the count by one */
     lvl->cust_clm_count--;
-    //Decrease amount of allocated memory, or free the block
+    /*Decrease amount of allocated memory, or free the block */
     free_column_rec(ccol->rec);
     free(ccol);
     return true;
@@ -1204,7 +1204,7 @@ short cust_col_del(struct LEVEL *lvl, int sx, int sy)
  */
 int cust_cols_del_for_tile(struct LEVEL *lvl, int tx, int ty)
 {
-    //We can skip tx,ty range checking, as it is made in get_cust_col
+    /*We can skip tx,ty range checking, as it is made in get_cust_col */
     int sx_max=(tx+1)*MAP_SUBNUM_X;
     int sy_max=(ty+1)*MAP_SUBNUM_Y;
     int sx,sy;

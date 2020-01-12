@@ -1,20 +1,18 @@
 /******************************************************************************/
-// obj_column.h - Dungeon Keeper Tools.
-/******************************************************************************/
-// Author:   Tomasz Lis
-// Created:  12 Dec 2007
-
-// Purpose:
-//   Header file. Defines exported routines from obj_column.c
-
-// Comment:
-//   None.
-
-//Copying and copyrights:
-//   This program is free software; you can redistribute it and/or modify
-//   it under the terms of the GNU General Public License as published by
-//   the Free Software Foundation; either version 2 of the License, or
-//   (at your option) any later version.
+/** @file obj_column.h
+ * Dungeon Keeper Tools.
+ * @par Purpose:
+ *     Header file. Defines exported routines from obj_column.c
+ * @par Comment:
+ *     None.
+ * @author   Tomasz Lis
+ * @date     12 Dec 2007
+ * @par  Copying and copyrights:
+ *     This program is free software; you can redistribute it and/or modify
+ *     it under the terms of the GNU General Public License as published by
+ *     the Free Software Foundation; either version 2 of the License, or
+ *     (at your option) any later version.
+ */
 /******************************************************************************/
 
 #ifndef ADIKT_OBJCOLMN_H
@@ -270,7 +268,7 @@ void create_columns_slb_barracks_inside(struct COLUMN_REC *clm_recs[9],
 void create_columns_slb_door_floor(struct COLUMN_REC *clm_recs[9],
         unsigned char *surr_slb,unsigned char *surr_own, unsigned char **surr_tng);
 
-//User columns - used only in "manual columns" function, not as standard ones
+/*User columns - used only in "manual columns" function, not as standard ones */
 void create_columns_slb_thingems_path(struct COLUMN_REC *clm_recs[9],
         unsigned char *surr_slb,unsigned char *surr_own, unsigned char **surr_tng);
 void create_columns_slb_rock_gndlev(struct COLUMN_REC *clm_recs[9],
@@ -282,4 +280,4 @@ void create_columns_slb_rockcaped_claimcave(struct COLUMN_REC *clm_recs[9],
 
 short surrnd_not_enemy(unsigned char *surr_own, short direction);
 
-#endif // ADIKT_OBJCOLMN_H
+#endif /* ADIKT_OBJCOLMN_H */

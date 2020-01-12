@@ -42,4 +42,4 @@ DLLIMPORT void message_log_vl(const char *format, va_list val);
 
 DLLIMPORT short set_msglog_fname(char *fname);
 
-#endif // BULL_MSGLOG_H
+#endif /* BULL_MSGLOG_H */

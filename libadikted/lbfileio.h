@@ -20,7 +20,7 @@
 
 # include <stdio.h>
 
-// Routines
+/* Routines */
 
 long file_length (char *path);
 long file_length_opened (FILE *fp);

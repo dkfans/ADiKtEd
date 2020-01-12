@@ -48,27 +48,27 @@ struct PALETTE_ENTRY {
 };
 
 struct MAPDRAW_DATA {
-    // Level size, in subtiles
+    /* Level size, in subtiles */
     struct UPOINT_2D subsize;
-    // Definitions of cubes
+    /* Definitions of cubes */
     struct CUBES_DATA *cubes;
     unsigned char *texture;
     struct PALETTE_ENTRY *palette;
     struct PALETTE_ENTRY *ownerpal;
     struct PALETTE_ENTRY *intnspal;
-    // TNG/LGT/APT flags
+    /* TNG/LGT/APT flags */
     short tngflags;
-    // Things and other objects
+    /* Things and other objects */
     struct IMAGELIST *images;
-    // Fonts for drawing text messages
+    /* Fonts for drawing text messages */
     struct IMAGELIST *font0;
     struct IMAGELIST *font1;
-    // Where to start/end drawing
+    /* Where to start/end drawing */
     struct IPOINT_2D start;
     struct IPOINT_2D end;
     short rescale;
     unsigned int dest_scanln;
-    // Random pool
+    /* Random pool */
     unsigned char *rand_pool;
     struct IPOINT_2D rand_subtl;
     unsigned int rand_count;
@@ -76,13 +76,13 @@ struct MAPDRAW_DATA {
     unsigned long sin_acos[SIN_ACOS_SIZE];
 };
 
-// Disk bitmap drawing
+/* Disk bitmap drawing */
 
 DLLIMPORT short generate_map_bitmap(const char *bmpfname,const struct LEVEL *lvl,
     const struct MAPDRAW_OPTIONS *opts);
 DLLIMPORT short generate_map_bitmap_mapfname(struct LEVEL *lvl);
 
-// Memory buffer drawing
+/* Memory buffer drawing */
 
 DLLIMPORT short load_draw_data(struct MAPDRAW_DATA **draw_data,const struct MAPDRAW_OPTIONS *opts,
     const struct UPOINT_2D *subtl,const struct IPOINT_2D bmp_size,int textr_idx);
@@ -96,7 +96,7 @@ DLLIMPORT short draw_things_on_buffer(char *dest,const struct LEVEL *lvl,
 DLLIMPORT short draw_text_on_buffer(char *dest,const int px,const int py,
     const char *text,struct MAPDRAW_DATA *draw_data,short font);
 
-// Helper functions
+/* Helper functions */
 
 DLLIMPORT short change_draw_data_texture(struct MAPDRAW_DATA *draw_data,
     const struct MAPDRAW_OPTIONS *opts,const int textr_idx);
@@ -137,4 +137,4 @@ DLLIMPORT short get_thing_with_circle_at(unsigned int *sx,unsigned int *sy,unsig
 DLLIMPORT short get_object_with_circle_at(unsigned int *sx,unsigned int *sy,unsigned int *z,
     const struct MAPDRAW_DATA *draw_data,const struct LEVEL *lvl,
     unsigned int px,unsigned int py);
-#endif // ADIKT_DRAWMAP_H
+#endif /* ADIKT_DRAWMAP_H */

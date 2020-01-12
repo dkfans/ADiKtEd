@@ -23,9 +23,9 @@
 struct LEVEL;
 struct MEMORY_FILE;
 
-// The "No error" constant need to be same as in read_file (MFILE_OK).
-// There should be no more than 32 errors (up to -31).
-// values to 23 and -23 are reserved by read_file and MEMORY_FILE support.
+/* The "No error" constant need to be same as in read_file (MFILE_OK). */
+/* There should be no more than 32 errors (up to -31). */
+/* values to 23 and -23 are reserved by read_file and MEMORY_FILE support. */
 #define ERR_NONE           0
 #define ERR_FILE_TOOSMLL -24
 #define ERR_FILE_BADDATA -25
@@ -80,4 +80,4 @@ DLLIMPORT short write_def_tng_source(struct LEVEL *lvl,char *fname);
 
 DLLIMPORT char *levfile_error(int errcode);
 
-#endif // ADIKT_LEVFILES_H
+#endif /* ADIKT_LEVFILES_H */

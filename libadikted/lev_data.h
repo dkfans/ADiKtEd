@@ -20,7 +20,7 @@
 
 #include "globals.h"
 
-// Map size definitions
+/* Map size definitions */
 
 #define MAP_SIZE_DKSTD_X 85
 #define MAP_SIZE_DKSTD_Y 85
@@ -36,11 +36,11 @@
  * unless you know what you're doing!
  */
 enum MAP_FORMAT_VERSION {
-    MFV_DKSTD           =  0, // Standard Dungeon Keeper 1 map, for first version of DK
-    MFV_DKGOLD          =  1, // Dungeon Keeper Gold or Deeper Dungeons map
-    MFV_DKXPAND         =  2, // KeeperFX or NBKe map
-    MFV_DK2STD          = 10, // Standard Dungeon Keeper 2 map, for versions up to 1.3
-    MFV_DK2OFC          = 11, // Dungeon Keeper 2 v 1.7 map, same as for Official Editor
+    MFV_DKSTD           =  0, /* Standard Dungeon Keeper 1 map, for first version of DK */
+    MFV_DKGOLD          =  1, /* Dungeon Keeper Gold or Deeper Dungeons map */
+    MFV_DKXPAND         =  2, /* KeeperFX or NBKe map */
+    MFV_DK2STD          = 10, /* Standard Dungeon Keeper 2 map, for versions up to 1.3 */
+    MFV_DK2OFC          = 11, /* Dungeon Keeper 2 v 1.7 map, same as for Official Editor */
      };
 
 enum OBJECT_TYPE_INDEX {
@@ -56,10 +56,10 @@ enum OBJECT_TYPE_INDEX {
 enum VERIFY_WARN_FLAGS {
      VWFLAG_NONE              =  0,
      VWFLAG_NOWARN_MANYHEART  =  1,
-//     VWFLAG_NOWARN_           =  2,
+/*     VWFLAG_NOWARN_           =  2, */
      };
 
-//Disk files entries
+/*Disk files entries */
 
 #define SIZEOF_DK_TNG_REC 21
 #define SIZEOF_DK_CLM_REC 24
@@ -86,10 +86,10 @@ enum DIRECTION_INDEX {
     IDIR_SW     = 6,
     IDIR_WEST   = 3,
      };
-// Now explaining the constants as elements of an array:
-//       IDIR_NW     IDIR_NORTH    IDIR_NE
-//       IDIR_WEST   IDIR_CENTR    IDIR_EAST
-//       IDIR_SW     IDIR_SOUTH    IDIR_SE
+/* Now explaining the constants as elements of an array: */
+/*       IDIR_NW     IDIR_NORTH    IDIR_NE */
+/*       IDIR_WEST   IDIR_CENTR    IDIR_EAST */
+/*       IDIR_SW     IDIR_SOUTH    IDIR_SE */
 
 /**
  * Orientation - for graffiti.
@@ -150,7 +150,7 @@ struct DK_SCRIPT_PLAYER {
     int computer_player;
     unsigned short *ally;
     unsigned short *creature_avail;
-    int *creature_maxlvl; // Max level; -1 means unlimited
+    int *creature_maxlvl; /* Max level; -1 means unlimited */
     unsigned short *room_avail;
     unsigned short *spell_avail;
     unsigned short *trap_avail;
@@ -187,11 +187,11 @@ struct DK_SCRIPT_PARTY {
  */
 struct DK_SCRIPT_ADDEVENT {
     unsigned short owner;
-    unsigned short type; //CREATURE/PARTY/TUNNELLER/TUNNELLER_PARTY
-    struct DK_SCRIPT_PARTYMEMBER leader; //type<0 means he's not there
-    int actnpt;         //where the creature/party is added
-    char *partyname;    //should be NULL for CREATURE and TUNNELLER
-    unsigned short num; //number of copies of creature/party
+    unsigned short type; /*CREATURE/PARTY/TUNNELLER/TUNNELLER_PARTY */
+    struct DK_SCRIPT_PARTYMEMBER leader; /*type<0 means he's not there */
+    int actnpt;         /*where the creature/party is added */
+    char *partyname;    /*should be NULL for CREATURE and TUNNELLER */
+    unsigned short num; /*number of copies of creature/party */
   };
 
 /**
@@ -200,21 +200,21 @@ struct DK_SCRIPT_ADDEVENT {
  * and can be converted back into script.
  */
 struct DK_SCRIPT_PARAMETERS {
-       // Single values
+       /* Single values */
     unsigned long portal_gen_speed;
     short dead_return_to_pool;
-    int end_level; //This should be 0 if all loops are closed properly
-       // Arrays with indices PLAYER0..PLAYER_UNSET
+    int end_level; /*This should be 0 if all loops are closed properly */
+       /* Arrays with indices PLAYER0..PLAYER_UNSET */
     struct DK_SCRIPT_PLAYER *player;
-       // Other constant-size arrays
+       /* Other constant-size arrays */
     unsigned int *creature_pool;
-       // Dynamic structures
+       /* Dynamic structures */
     struct DK_SCRIPT_ADDEVENT *addevent;
     unsigned int addevent_count;
     struct DK_SCRIPT_PARTY *party;
     unsigned int party_count;
-    //TODO - action points/hero gates code
-    // All others - unrecognized commands
+    /*TODO - action points/hero gates code */
+    /* All others - unrecognized commands */
     struct DK_SCRIPT_COMMAND **rest;
     int rest_count;
   };
@@ -226,7 +226,7 @@ struct DK_SCRIPT_PARAMETERS {
 struct DK_SCRIPT {
     struct DK_SCRIPT_COMMAND **list;
     struct DK_SCRIPT_PARAMETERS par;
-    char **txt;  // The whole script stored as txt
+    char **txt;  /* The whole script stored as txt */
     int lines_count;
 };
 
@@ -235,24 +235,24 @@ struct DK_SCRIPT {
  * Stats are re-computed on every load and other operations.
  */
 struct LEVSTATS {
-    //Things strats
+    /*Things strats */
     int creatures_count;
     int effectgenrts_count;
     int traps_count;
     int doors_count;
     int items_count;
-    //Items stats
+    /*Items stats */
     int hero_gates_count;
     int dn_hearts_count;
     int things_count[THING_CATEGR_COUNT];
-    //Various stats
+    /*Various stats */
     int room_things_count;
-    //Stats on objects adding/removal
+    /*Stats on objects adding/removal */
     int things_removed;
     int things_added;
-    // Number of save operations in this session
+    /* Number of save operations in this session */
     int saves_count;
-    // Number of unsaved changes
+    /* Number of unsaved changes */
     int unsaved_changes;
   };
 
@@ -261,23 +261,23 @@ struct LEVSTATS {
  * Info are not re-computed on load, unless the ADI script or LIF file is missing.
  */
 struct LEVINFO {
-    // Adikted commands executed by user
+    /* Adikted commands executed by user */
     unsigned long usr_cmds_count;
     unsigned long usr_mdswtch_count;
     unsigned long usr_slbchng_count;
     unsigned long usr_creatobj_count;
-    // Map creation date
+    /* Map creation date */
     time_t creat_date;
     time_t lastsav_date;
-    // Map version
+    /* Map version */
     int ver_major;
     int ver_minor;
     int ver_rel;
-    //text name of the level, and other text data
+    /*text name of the level, and other text data */
     char *name_text;
     char *desc_text;
     char *author_text;
-    char *editor_text; // name of the person who last edited the level
+    char *editor_text; /* name of the person who last edited the level */
   };
 
 /**
@@ -286,73 +286,73 @@ struct LEVINFO {
  * ADiKted's special functions.
  */
 struct LEVEL {
-    // Map version, from MAP_FORMAT_VERSION enumeration
+    /* Map version, from MAP_FORMAT_VERSION enumeration */
     short format_version;
-    // Level size, in tiles
+    /* Level size, in tiles */
     struct UPOINT_2D tlsize;
-    // Level size, in subtiles
+    /* Level size, in subtiles */
     struct UPOINT_2D subsize;
-    //map file name (for loading)
+    /*map file name (for loading) */
     char *fname;
-    //map file name (for saving)
+    /*map file name (for saving) */
     char *savfname;
-    //Slab file - tile type definitions, size MAP_SIZE_Y x MAP_SIZE_X
+    /*Slab file - tile type definitions, size MAP_SIZE_Y x MAP_SIZE_X */
     unsigned short **slb;
-    //Owners file - subtile owner index, size arr_entries_y+1 x arr_entries_x+1
+    /*Owners file - subtile owner index, size arr_entries_y+1 x arr_entries_x+1 */
     unsigned char **own;
-    //Vibration file - subtile animation indices, size arr_entries_y+1 x arr_entries_x+1
+    /*Vibration file - subtile animation indices, size arr_entries_y+1 x arr_entries_x+1 */
     unsigned char **wib;
-    //WLB file - some additional info about water and lava tiles,
-    // size MAP_SIZE_Y x MAP_SIZE_X, not always present
+    /*WLB file - some additional info about water and lava tiles, */
+    /* size MAP_SIZE_Y x MAP_SIZE_X, not always present */
     unsigned char **wlb;
-    //Flag file - size arr_entries_y+1 x arr_entries_x+1
+    /*Flag file - size arr_entries_y+1 x arr_entries_x+1 */
     unsigned short **flg;
-    //Column file - constant-size array of entries used for displaying tiles,
-    // size COLUMN_ENTRIES x SIZEOF_DK_CLM_REC
+    /*Column file - constant-size array of entries used for displaying tiles, */
+    /* size COLUMN_ENTRIES x SIZEOF_DK_CLM_REC */
     unsigned char **clm;
-    //How many DAT entries points at every column
+    /*How many DAT entries points at every column */
     unsigned int *clm_utilize;
-    //Column file header
+    /*Column file header */
     unsigned char *clm_hdr;
-    //Texture information file - one byte file, identifies texture pack index
+    /*Texture information file - one byte file, identifies texture pack index */
     unsigned char inf;
-    //Script text - a text file containing level parameters as editable script;
-    // number of lines and file size totally variable
+    /*Script text - a text file containing level parameters as editable script; */
+    /* number of lines and file size totally variable */
     struct DK_SCRIPT script;
 
-    //our objects - apt, tng and lgt
+    /*our objects - apt, tng and lgt */
 
-    unsigned char ****apt_lookup; // Index to action points, by subtile
-    unsigned short **apt_subnums; // Number of action points in a subtile
-    unsigned int apt_total_count; // Total number of action points
+    unsigned char ****apt_lookup; /* Index to action points, by subtile */
+    unsigned short **apt_subnums; /* Number of action points in a subtile */
+    unsigned int apt_total_count; /* Total number of action points */
 
-    unsigned char ****tng_lookup; // Index to things, by subtile
-    unsigned short **tng_subnums; // Number of things in a subtile
-    unsigned int tng_total_count; // Number of things in total
+    unsigned char ****tng_lookup; /* Index to things, by subtile */
+    unsigned short **tng_subnums; /* Number of things in a subtile */
+    unsigned int tng_total_count; /* Number of things in total */
 
-    //Light file - contains static light definitions
-    unsigned char ****lgt_lookup; // Index to static light, by subtile
-    unsigned short **lgt_subnums; // Number of static lights in a subtile
-    unsigned int lgt_total_count; // Total number of static lights
+    /*Light file - contains static light definitions */
+    unsigned char ****lgt_lookup; /* Index to static light, by subtile */
+    unsigned short **lgt_subnums; /* Number of static lights in a subtile */
+    unsigned int lgt_total_count; /* Total number of static lights */
 
-    unsigned short **tng_apt_lgt_nums;    // Number of all objects in a tile
+    unsigned short **tng_apt_lgt_nums;    /* Number of all objects in a tile */
 
-    // DAT file contains indices of columns for each subtile
-    // Its content stores a graphic for whole map
-    // Size arr_entries_y+1 x arr_entries_x+1 (there is single rock column at end)
+    /* DAT file contains indices of columns for each subtile */
+    /* Its content stores a graphic for whole map */
+    /* Size arr_entries_y+1 x arr_entries_x+1 (there is single rock column at end) */
     unsigned short **dat;
 
-    // Elements that are not part of DK levels, but are importand for Adikted
-    // Level statistics
+    /* Elements that are not part of DK levels, but are importand for Adikted */
+    /* Level statistics */
     struct LEVSTATS stats;
-    // Level information
+    /* Level information */
     struct LEVINFO info;
-    // Options, which affects level graphic generation, and other stuff
+    /* Options, which affects level graphic generation, and other stuff */
     struct LEVOPTIONS optns;
-    // Custom columns definition
-    // There can be only one custom column on each subtile.
-    // The lookup array size is arr_entries_y+1 x arr_entries_x+1
-    struct DK_CUSTOM_CLM ***cust_clm_lookup; // Index to cust.columns, by subtile
+    /* Custom columns definition */
+    /* There can be only one custom column on each subtile. */
+    /* The lookup array size is arr_entries_y+1 x arr_entries_x+1 */
+    struct DK_CUSTOM_CLM ***cust_clm_lookup; /* Index to cust.columns, by subtile */
     unsigned int cust_clm_count;
     struct DK_GRAFFITI **graffiti;
     unsigned int graffiti_count;
@@ -360,9 +360,9 @@ struct LEVEL {
 
 extern const char default_map_name[];
 
-// creates object for storing map
+/* creates object for storing map */
 DLLIMPORT short level_init(struct LEVEL **lvl_ptr,short map_version,struct UPOINT_3D *lvl_size);
-// frees object for storing map
+/* frees object for storing map */
 DLLIMPORT short level_deinit(struct LEVEL **lvl_ptr);
 DLLIMPORT short level_set_options(struct LEVEL *lvl,struct LEVOPTIONS *optns);
 DLLIMPORT struct LEVOPTIONS *level_get_options(struct LEVEL *lvl);
@@ -496,4 +496,4 @@ DLLIMPORT unsigned char get_lvl_inf(struct LEVEL *lvl);
 DLLIMPORT short set_lvl_inf(struct LEVEL *lvl,unsigned char ninf);
 DLLIMPORT short get_lvl_format_version(struct LEVEL *lvl);
 
-#endif // ADIKT_LEVDATA_H
+#endif /* ADIKT_LEVDATA_H */

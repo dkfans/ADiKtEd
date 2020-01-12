@@ -31,4 +31,4 @@ DLLIMPORT short format_data_fname(char **fullname, const char *data_path, const 
 
 int arr_ushort_pos(const unsigned short *arr,unsigned short arr_item,int array_count);
 
-#endif // BULL_ARRUTILS_H
+#endif /* BULL_ARRUTILS_H */

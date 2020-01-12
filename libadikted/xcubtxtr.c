@@ -1,20 +1,18 @@
 /******************************************************************************/
-// xcubtxtr.c - Dungeon Keeper Tools.
-/******************************************************************************/
-// Author:  Tomasz Lis
-// Created: 19 Apr 2008
-
-// Purpose:
-//   Loads and writes Dungeon Keeper cube definition and texture files.
-
-// Comment:
-//   None.
-
-//Copying and copyrights:
-//   This program is free software; you can redistribute it and/or modify
-//   it under the terms of the GNU General Public License as published by
-//   the Free Software Foundation; either version 2 of the License, or
-//   (at your option) any later version.
+/** @file xcubtxtr.c
+ * Dungeon Keeper Tools.
+ * @par Purpose:
+ *     Loads and writes Dungeon Keeper cube definition and texture files.
+ * @par Comment:
+ *     None.
+ * @author   Tomasz Lis
+ * @date     19 Apr 2008
+ * @par  Copying and copyrights:
+ *     This program is free software; you can redistribute it and/or modify
+ *     it under the terms of the GNU General Public License as published by
+ *     the Free Software Foundation; either version 2 of the License, or
+ *     (at your option) any later version.
+ */
 /******************************************************************************/
 
 #include <stdio.h>
@@ -47,13 +45,13 @@ short free_cubedata(struct CUBES_DATA *cubes)
 
 short load_cubedata(struct CUBES_DATA *cubes,const char *fname)
 {
-    //Reading file
+    /*Reading file */
     struct MEMORY_FILE *mem;
     short result;
     result = memfile_readnew(&mem,fname,MAX_FILE_SIZE);
     if (result != MFILE_OK)
         return result;
-    // Checking file size
+    /* Checking file size */
     if (mem->len<22)
     {
       memfile_free(&mem);
@@ -65,7 +63,7 @@ short load_cubedata(struct CUBES_DATA *cubes,const char *fname)
       memfile_free(&mem);
       return XCUTX_FILE_BADDATA;
     }
-    //Loading the entries
+    /*Loading the entries */
     if (alloc_cubedata(cubes,count)!=ERR_NONE)
     {
       memfile_free(&mem);
@@ -101,13 +99,13 @@ short load_cubedata(struct CUBES_DATA *cubes,const char *fname)
 
 short write_cubedata(struct CUBES_DATA *cubes,const char *fname)
 {
-    //Opening file
+    /*Opening file */
     FILE *fp;
     int i, k;
     fp = fopen (fname, "wb");
     if (fp==NULL)
       return XCUTX_CANT_OPEN;
-    //Writing header
+    /*Writing header */
     write_int32_le_file(fp,cubes->count);
     for (i=0; i<cubes->count; i++)
     {
@@ -138,20 +136,20 @@ short switch_cubedata_entries(struct CUBES_DATA *cubes,unsigned long idx1,unsign
 
 short load_textureanim(struct CUBES_DATA *cubes,const char *fname)
 {
-    //Reading file
+    /*Reading file */
     struct MEMORY_FILE *mem;
     short result;
     result = memfile_readnew(&mem,fname,MAX_FILE_SIZE);
     if (result != MFILE_OK)
         return result;
-    // Checking file size
+    /* Checking file size */
     cubes->anitxcount=(mem->len>>4);
     if ((mem->len!=(cubes->anitxcount<<4)))
     {
       memfile_free(&mem);
       return XCUTX_FILE_BADDATA;
     }
-    //Loading the entries
+    /*Loading the entries */
     cubes->anitx=malloc(cubes->anitxcount*sizeof(struct CUBE_TXTRANIM));
     int i,k;
     for (k=0; k<cubes->anitxcount; k++)
@@ -171,26 +169,26 @@ short load_textureanim(struct CUBES_DATA *cubes,const char *fname)
 short load_texture(unsigned char **texture,const char *fname)
 {
     unsigned long texture_file_len = (TEXTURE_SIZE_X*TEXTURE_COUNT_X) * (TEXTURE_SIZE_Y*TEXTURE_COUNT_Y);
-    //Reading file
+    /*Reading file */
     struct MEMORY_FILE *mem;
     short result;
     result = memfile_readnew(&mem,fname,MAX_FILE_SIZE);
     if (result != MFILE_OK)
         return result;
-    // Checking file size
+    /* Checking file size */
     if ((mem->len!=texture_file_len))
     {
       memfile_free(&mem);
       return XCUTX_FILE_BADDATA;
     }
-    // Allocating buffer
+    /* Allocating buffer */
     (*texture)=malloc(texture_file_len);
     if ((*texture)==NULL)
     {
       memfile_free(&mem);
       return XCUTX_MALLOC_ERR;
     }
-    //Loading the entries
+    /*Loading the entries */
     int i;
     for (i=0; i<(TEXTURE_SIZE_Y*TEXTURE_COUNT_Y); i++)
     {
