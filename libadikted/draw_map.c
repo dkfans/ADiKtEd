@@ -168,7 +168,7 @@ const char *tmapanim_fname="tmapanim.dat";
 
 struct MAPDRAW_DATA *glb_draw_data;
 
-inline void mdrand_setpos(struct MAPDRAW_DATA *draw_data,int sx,int sy)
+void mdrand_setpos(struct MAPDRAW_DATA *draw_data,int sx,int sy)
 {
     draw_data->rand_subtl.x=sx;
     draw_data->rand_subtl.y=sy;
@@ -176,7 +176,7 @@ inline void mdrand_setpos(struct MAPDRAW_DATA *draw_data,int sx,int sy)
     glb_draw_data=draw_data;
 }
 
-inline unsigned int mdrand_t8(struct MAPDRAW_DATA *draw_data,int tx,int ty,const unsigned int range)
+unsigned int mdrand_t8(struct MAPDRAW_DATA *draw_data,int tx,int ty,const unsigned int range)
 {
     if ((draw_data->rand_subtl.x!=tx*MAP_SUBNUM_X) || (draw_data->rand_subtl.y!=ty*MAP_SUBNUM_Y))
     {
@@ -190,7 +190,7 @@ inline unsigned int mdrand_t8(struct MAPDRAW_DATA *draw_data,int tx,int ty,const
     return (draw_data->rand_pool[idx%draw_data->rand_size]%range);
 }
 
-inline unsigned int mdrand_s8(struct MAPDRAW_DATA *draw_data,int sx,int sy,const unsigned int range)
+unsigned int mdrand_s8(struct MAPDRAW_DATA *draw_data,int sx,int sy,const unsigned int range)
 {
     if ((draw_data->rand_subtl.x!=sx) || (draw_data->rand_subtl.y!=sy))
     {
@@ -204,21 +204,21 @@ inline unsigned int mdrand_s8(struct MAPDRAW_DATA *draw_data,int sx,int sy,const
     return (draw_data->rand_pool[idx%draw_data->rand_size]%range);
 }
 
-inline unsigned int mdrand_nx8(struct MAPDRAW_DATA *draw_data,const unsigned int range)
+unsigned int mdrand_nx8(struct MAPDRAW_DATA *draw_data,const unsigned int range)
 {
     int idx=((draw_data->rand_subtl.y)*draw_data->subsize.x + draw_data->rand_subtl.x)*sizeof(int)+draw_data->rand_count;
     draw_data->rand_count++;
     return (draw_data->rand_pool[idx%draw_data->rand_size]%range);
 }
 
-inline unsigned int mdrand_g8(const unsigned int range)
+unsigned int mdrand_g8(const unsigned int range)
 {
     int idx=((glb_draw_data->rand_subtl.y)*glb_draw_data->subsize.x + glb_draw_data->rand_subtl.x)*sizeof(int)+glb_draw_data->rand_count;
     glb_draw_data->rand_count++;
     return (glb_draw_data->rand_pool[idx%glb_draw_data->rand_size]%range);
 }
 
-inline void mdrand_g8_waste(const unsigned int num)
+void mdrand_g8_waste(const unsigned int num)
 {
     glb_draw_data->rand_count+=num;
 }
@@ -268,7 +268,7 @@ short load_palette(struct PALETTE_ENTRY *pal,char *fname)
  * @param offset Position in destination buffer of the pixel.
  * @param color Pixel color.
  */
-inline void draw_pixel_exact_offs(unsigned char *dest,
+void draw_pixel_exact_offs(unsigned char *dest,
     const unsigned long offset,const struct PALETTE_ENTRY *color)
 {
     dest[offset+0]=color->b;
@@ -283,7 +283,7 @@ inline void draw_pixel_exact_offs(unsigned char *dest,
  * @param offset Position in destination buffer of the pixel.
  * @param color Pixel color.
  */
-inline void draw_pixel_mul_offs(unsigned char *dest,
+void draw_pixel_mul_offs(unsigned char *dest,
     const unsigned long offset,const struct PALETTE_ENTRY *color)
 {
   unsigned short nvalr,nvalg,nvalb;
@@ -304,7 +304,7 @@ inline void draw_pixel_mul_offs(unsigned char *dest,
  * @param alpha Pixel alpha.
  * @param color Pixel color.
  */
-inline void draw_pixel_x4walpha_offs(unsigned char *dest,
+void draw_pixel_x4walpha_offs(unsigned char *dest,
     const unsigned long offset,const unsigned short alpha,
     const struct PALETTE_ENTRY *color)
 {
@@ -327,7 +327,7 @@ inline void draw_pixel_x4walpha_offs(unsigned char *dest,
  * @param fcolor Fill color.
  * @param radius Circle radius.
  */
-inline void draw_circle_fill(unsigned char *dest,const struct IPOINT_2D dest_pos,
+void draw_circle_fill(unsigned char *dest,const struct IPOINT_2D dest_pos,
     const struct IPOINT_2D dest_size,const unsigned int dest_scanln,
     const struct PALETTE_ENTRY *bcolor,const struct PALETTE_ENTRY *fcolor,
     int radius)
@@ -446,7 +446,7 @@ inline void draw_circle_fill(unsigned char *dest,const struct IPOINT_2D dest_pos
  * @param fcolor Fill color factors.
  * @param radius Circle radius.
  */
-inline void draw_circle_mul(unsigned char *dest,const struct IPOINT_2D dest_pos,
+void draw_circle_mul(unsigned char *dest,const struct IPOINT_2D dest_pos,
     const struct IPOINT_2D dest_size,const unsigned int dest_scanln,
     const struct PALETTE_ENTRY *bcolor,const struct PALETTE_ENTRY *fcolor,
     int radius)
@@ -967,7 +967,7 @@ short draw_texture_on_buffer_avg2(unsigned char *dest,const struct IPOINT_2D des
  * @param scale Destination buffer scale.
  * @return Returns ERR_NONE on success, error code on failure.
  */
-inline __fastcall short draw_texture_on_buffer_avg2_fast(unsigned char *dest,const struct IPOINT_2D dest_pos,
+__fastcall short draw_texture_on_buffer_avg2_fast(unsigned char *dest,const struct IPOINT_2D dest_pos,
     const struct IPOINT_2D dest_size, const unsigned int dest_scanln,
     const unsigned char *src,const struct IPOINT_2D src_pos,const struct IPOINT_2D src_size,
     const struct IPOINT_2D rect_size,struct PALETTE_ENTRY *pal,const struct IPOINT_2D scale)
@@ -1046,7 +1046,7 @@ inline __fastcall short draw_texture_on_buffer_avg2_fast(unsigned char *dest,con
  * @param scale Destination buffer scale.
  * @return Returns ERR_NONE on success, error code on failure.
  */
-inline __fastcall short draw_texture_on_buffer_avg2_fast_unsafe(unsigned char *dest,const struct IPOINT_2D dest_pos,
+__fastcall short draw_texture_on_buffer_avg2_fast_unsafe(unsigned char *dest,const struct IPOINT_2D dest_pos,
     const struct IPOINT_2D dest_size, const unsigned int dest_scanln,
     const unsigned char *src,const struct IPOINT_2D src_pos,const struct IPOINT_2D src_size,
     const struct IPOINT_2D rect_size,struct PALETTE_ENTRY *pal,const struct IPOINT_2D scale)
@@ -1298,7 +1298,7 @@ short draw_texture_on_buffer_noscale(unsigned char *dest,const struct IPOINT_2D 
  * @param scale Destination buffer scale.
  * @return Returns ERR_NONE on success, error code on failure.
  */
-inline short draw_texture_on_buffer(unsigned char *dest,const struct IPOINT_2D dest_pos,
+short draw_texture_on_buffer(unsigned char *dest,const struct IPOINT_2D dest_pos,
     const struct IPOINT_2D dest_size, const unsigned int dest_scanln,
     const unsigned char *src,const struct IPOINT_2D src_pos,const struct IPOINT_2D src_size,
     const struct IPOINT_2D rect_size,struct PALETTE_ENTRY *pal,const struct IPOINT_2D scale)
@@ -1336,7 +1336,7 @@ inline short draw_texture_on_buffer(unsigned char *dest,const struct IPOINT_2D d
  * @param scale Destination buffer scale.
  * @return Returns ERR_NONE on success, error code on failure.
  */
-inline short draw_texture_on_buffer_unsafe(unsigned char *dest,const struct IPOINT_2D dest_pos,
+short draw_texture_on_buffer_unsafe(unsigned char *dest,const struct IPOINT_2D dest_pos,
     const struct IPOINT_2D dest_size, const unsigned int dest_scanln,
     const unsigned char *src,const struct IPOINT_2D src_pos,const struct IPOINT_2D src_size,
     const struct IPOINT_2D rect_size,struct PALETTE_ENTRY *pal,const struct IPOINT_2D scale)
@@ -1372,7 +1372,7 @@ inline short draw_texture_on_buffer_unsafe(unsigned char *dest,const struct IPOI
  * @param scale Destination buffer scale.
  * @return Returns ERR_NONE on success, error code on failure.
  */
-inline short draw_texture_on_buffer_fast(unsigned char *dest,const struct IPOINT_2D dest_pos,
+short draw_texture_on_buffer_fast(unsigned char *dest,const struct IPOINT_2D dest_pos,
     const struct IPOINT_2D dest_size, const unsigned int dest_scanln,
     const unsigned char *src,const struct IPOINT_2D src_pos,const struct IPOINT_2D src_size,
     const struct IPOINT_2D rect_size,struct PALETTE_ENTRY *pal,const struct IPOINT_2D scale)
@@ -1406,7 +1406,7 @@ inline short draw_texture_on_buffer_fast(unsigned char *dest,const struct IPOINT
  * @param scale Destination buffer scale.
  * @return Returns ERR_NONE on success, error code on failure.
  */
-inline short draw_texture_on_buffer_fast_unsafe(unsigned char *dest,const struct IPOINT_2D dest_pos,
+short draw_texture_on_buffer_fast_unsafe(unsigned char *dest,const struct IPOINT_2D dest_pos,
     const struct IPOINT_2D dest_size, const unsigned int dest_scanln,
     const unsigned char *src,const struct IPOINT_2D src_pos,const struct IPOINT_2D src_size,
     const struct IPOINT_2D rect_size,struct PALETTE_ENTRY *pal,const struct IPOINT_2D scale)
@@ -1431,7 +1431,7 @@ inline short draw_texture_on_buffer_fast_unsafe(unsigned char *dest,const struct
  * @param anim_frame Number of the animation frame.
  * @return Returns ERR_NONE on success, and texture coords in texture_pos parameter.
  */
-inline short texture_index_to_texture_pos(struct IPOINT_2D *texture_pos,
+short texture_index_to_texture_pos(struct IPOINT_2D *texture_pos,
     const struct CUBES_DATA *cubes,unsigned short textr_idx,unsigned int anim_frame)
 {
     short result=ERR_NONE;
@@ -1776,7 +1776,7 @@ short draw_map_on_buffer_fast(char *dest,const struct LEVEL *lvl,
  * @param scaled_txtr_size Scaled size of one texture (one subtile).
  * @return Returns circle radius as integer value.
  */
-inline unsigned int get_objcircle_std_radius(const struct IPOINT_2D scaled_txtr_size)
+unsigned int get_objcircle_std_radius(const struct IPOINT_2D scaled_txtr_size)
 {
     unsigned int radius;
     radius=min(scaled_txtr_size.x,scaled_txtr_size.y);
@@ -1800,7 +1800,7 @@ inline unsigned int get_objcircle_std_radius(const struct IPOINT_2D scaled_txtr_
  * @param secscale Second scale, for additional scaling.
  * @return Returns circle radius as integer value.
  */
-inline unsigned int get_objcircle_ranged_radius(const struct IPOINT_2D scaled_txtr_size,
+unsigned int get_objcircle_ranged_radius(const struct IPOINT_2D scaled_txtr_size,
     const unsigned int obj_range,const int secscale)
 {
     unsigned int radius;
@@ -2486,7 +2486,7 @@ short get_subtile_from_draw_coords_adv(unsigned int *ssx,unsigned int *ssy,
  * @return Returns ERR_NONE on success, error code on failure.
  *     On success, returns coordinates in (sx,sy).
  */
-inline short get_subtile_from_draw_coords_adv_fast(unsigned int *ssx,unsigned int *ssy,
+short get_subtile_from_draw_coords_adv_fast(unsigned int *ssx,unsigned int *ssy,
     const struct IPOINT_2D scaled_txtr_size,const struct IPOINT_2D start,
     unsigned int px,unsigned int py)
 {

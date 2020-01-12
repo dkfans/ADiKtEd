@@ -103,10 +103,10 @@ DLLIMPORT short change_draw_data_texture(struct MAPDRAW_DATA *draw_data,
 DLLIMPORT short set_draw_data_rect(struct MAPDRAW_DATA *draw_data,
     const int startx,const int starty,const int endx,const int endy,
     const unsigned int scanline,const short rescale);
-inline short set_draw_data_rect_ip(struct MAPDRAW_DATA *draw_data,
+short set_draw_data_rect_ip(struct MAPDRAW_DATA *draw_data,
     const struct IPOINT_2D start,const struct IPOINT_2D end,
     const unsigned int scanline,const short rescale);
-inline short set_draw_data_rect_sl4(struct MAPDRAW_DATA *draw_data,
+short set_draw_data_rect_sl4(struct MAPDRAW_DATA *draw_data,
     const int startx,const int starty,const int endx,const int endy,
     const short dest_sizex,const short rescale);
 
@@ -124,7 +124,7 @@ DLLIMPORT short get_subtile_from_draw_coords_ip(struct IPOINT_2D *subtl,
     unsigned int px,unsigned int py);
 DLLIMPORT short get_subtile_from_draw_coords_adv(unsigned int *ssx,unsigned int *ssy,
     const struct MAPDRAW_DATA *draw_data,unsigned int px,unsigned int py);
-inline short get_subtile_from_draw_coords_adv_fast(unsigned int *ssx,unsigned int *ssy,
+short get_subtile_from_draw_coords_adv_fast(unsigned int *ssx,unsigned int *ssy,
     const struct IPOINT_2D scaled_txtr_size,const struct IPOINT_2D start,
     unsigned int px,unsigned int py);
 DLLIMPORT short get_full_draw_dimensions(struct IPOINT_2D *gdim,

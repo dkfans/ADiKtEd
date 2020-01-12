@@ -24,7 +24,7 @@
 /**
  * Writes 2-byte little-endian number to given FILE.
  */
-inline void write_int16_le_file (FILE *fp, unsigned short x)
+void write_int16_le_file (FILE *fp, unsigned short x)
 {
     fputc ((int) (x&255), fp);
     fputc ((int) ((x>>8)&255), fp);
@@ -33,7 +33,7 @@ inline void write_int16_le_file (FILE *fp, unsigned short x)
 /**
  * Writes 2-byte little-endian number into given buffer.
  */
-inline void write_int16_le_buf (unsigned char *buff, unsigned short x)
+void write_int16_le_buf (unsigned char *buff, unsigned short x)
 {
     buff[0]=(x&255);
     buff[1]=((x>>8)&255);
@@ -42,7 +42,7 @@ inline void write_int16_le_buf (unsigned char *buff, unsigned short x)
 /**
  * Writes 4-byte little-endian number to given FILE.
  */
-inline void write_int32_le_file (FILE *fp, unsigned long x)
+void write_int32_le_file (FILE *fp, unsigned long x)
 {
     fputc ((int) (x&255), fp);
     fputc ((int) ((x>>8)&255), fp);
@@ -53,7 +53,7 @@ inline void write_int32_le_file (FILE *fp, unsigned long x)
 /**
  * Writes 4-byte little-endian number into given buffer.
  */
-inline void write_int32_le_buf (unsigned char *buff, unsigned long x)
+void write_int32_le_buf (unsigned char *buff, unsigned long x)
 {
     buff[0]=(x&255);
     buff[1]=((x>>8)&255);
@@ -64,7 +64,7 @@ inline void write_int32_le_buf (unsigned char *buff, unsigned long x)
 /**
  * Reads 4-byte little-endian number from given FILE.
  */
-inline long read_int32_le_file (FILE *fp)
+long read_int32_le_file (FILE *fp)
 {
     long l;
     l = fgetc(fp);
@@ -77,7 +77,7 @@ inline long read_int32_le_file (FILE *fp)
 /**
  * Reads 4-byte little-endian number from given buffer.
  */
-inline long read_int32_le_buf (const unsigned char *buff)
+long read_int32_le_buf (const unsigned char *buff)
 {
     long l;
     l = buff[0];
@@ -90,7 +90,7 @@ inline long read_int32_le_buf (const unsigned char *buff)
 /**
  * Reads 2-byte little-endian number from given buffer.
  */
-inline unsigned short read_int16_le_buf (const unsigned char *buff)
+unsigned short read_int16_le_buf (const unsigned char *buff)
 {
     long l;
     l = buff[0];
@@ -101,7 +101,7 @@ inline unsigned short read_int16_le_buf (const unsigned char *buff)
 /**
  * Reads 2-byte little-endian number from given FILE.
  */
-inline unsigned short read_int16_le_file (FILE *fp)
+unsigned short read_int16_le_file (FILE *fp)
 {
     unsigned short l;
     l = fgetc(fp);
@@ -112,7 +112,7 @@ inline unsigned short read_int16_le_file (FILE *fp)
 /**
  * Reads 4-byte big-endian number from given FILE.
  */
-inline long read_int32_be_file (FILE *fp)
+long read_int32_be_file (FILE *fp)
 {
     long l;
     l = fgetc(fp)<<24;
@@ -125,7 +125,7 @@ inline long read_int32_be_file (FILE *fp)
 /**
  * Reads 4-byte big-endian number from given buffer.
  */
-inline long read_int32_be_buf (const unsigned char *buff)
+long read_int32_be_buf (const unsigned char *buff)
 {
     long l;
     l =  buff[3];
@@ -138,7 +138,7 @@ inline long read_int32_be_buf (const unsigned char *buff)
 /**
  * Reads 2-byte big-endian number from given buffer.
  */
-inline unsigned short read_int16_be_buf (const unsigned char *buff)
+unsigned short read_int16_be_buf (const unsigned char *buff)
 {
     long l;
     l = buff[1];
@@ -149,7 +149,7 @@ inline unsigned short read_int16_be_buf (const unsigned char *buff)
 /**
  * Reads 2-byte big-endian number from given FILE.
  */
-inline unsigned short read_int16_be_file (FILE *fp)
+unsigned short read_int16_be_file (FILE *fp)
 {
     unsigned short l;
     l = fgetc(fp)<<8;
@@ -160,7 +160,7 @@ inline unsigned short read_int16_be_file (FILE *fp)
 /**
  * Writes 2-byte big-endian number into given buffer.
  */
-inline void write_int16_be_buf (unsigned char *buff, unsigned short x)
+void write_int16_be_buf (unsigned char *buff, unsigned short x)
 {
     buff[1]=(x&255);
     buff[0]=((x>>8)&255);
@@ -169,7 +169,7 @@ inline void write_int16_be_buf (unsigned char *buff, unsigned short x)
 /**
  * Writes 4-byte big-endian number into given buffer.
  */
-inline void write_int32_be_buf (unsigned char *buff, unsigned long x)
+void write_int32_be_buf (unsigned char *buff, unsigned long x)
 {
     buff[3]=(x&255);
     buff[2]=((x>>8)&255);
@@ -181,7 +181,7 @@ inline void write_int32_be_buf (unsigned char *buff, unsigned long x)
  * Returns length of given file.
  * Value -1 means error.
  */
-inline long file_length (char *path)
+long file_length (char *path)
 {
     FILE *fp;
     long length;
@@ -200,7 +200,7 @@ inline long file_length (char *path)
  * Returns length of opened file.
  * Value -1 means error.
  */
-inline long file_length_opened (FILE *fp)
+long file_length_opened (FILE *fp)
 {
     long length;
     long lastpos;
@@ -219,7 +219,7 @@ inline long file_length_opened (FILE *fp)
  * Reads 1-byte number from given buffer.
  * Simple wrapper for use with both little and big endian files.
  */
-inline unsigned char read_int8_buf (const unsigned char *buff)
+unsigned char read_int8_buf (const unsigned char *buff)
 {
     return buff[0];
 }
@@ -230,7 +230,7 @@ inline unsigned char read_int8_buf (const unsigned char *buff)
  * @param n Source bit number.
  * @return The nth bit, either 1 or 0.
  */
-inline short nth_bit( unsigned char c, short n )
+short nth_bit( unsigned char c, short n )
 {
     if( (n<0) || (n>7) )
         return 0;
@@ -247,7 +247,7 @@ inline short nth_bit( unsigned char c, short n )
  * @param n Source bit number.
  * @return The nth bit, either 1 or 0.
  */
-inline short nth_bit_fourbytes( unsigned char c[4], short n )
+short nth_bit_fourbytes( unsigned char c[4], short n )
 {
     if( (n<0) || (n>32) )
         return 0;

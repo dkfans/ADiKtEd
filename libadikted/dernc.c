@@ -254,10 +254,10 @@ static void read_huftable (huf_table *h, bit_stream *bs,
 static unsigned long huf_read (huf_table *h, bit_stream *bs,
                    const unsigned char **p,const unsigned char *pend);
 
-inline void bitread_init (bit_stream *bs, const unsigned char **p, const unsigned char *pend);
-inline void bitread_fix (bit_stream *bs, const unsigned char **p, const unsigned char *pend);
-inline unsigned long bit_peek (bit_stream *bs, unsigned long mask);
-inline void bit_advance (bit_stream *bs, int n,
+void bitread_init (bit_stream *bs, const unsigned char **p, const unsigned char *pend);
+void bitread_fix (bit_stream *bs, const unsigned char **p, const unsigned char *pend);
+unsigned long bit_peek (bit_stream *bs, unsigned long mask);
+void bit_advance (bit_stream *bs, int n,
                    const unsigned char **p, const unsigned char *pend);
 static unsigned long bit_read (bit_stream *bs, unsigned long mask,
                    int n, const unsigned char **p, const unsigned char *pend);
@@ -595,7 +595,7 @@ static unsigned long huf_read (huf_table *h, bit_stream *bs,
  * to the last readable byte in buffer.
  * If buffer is exceeded, fills output (or part of output) with zeros.
  */
-inline void bitread_init (bit_stream *bs, const unsigned char **p, const unsigned char *pend)
+void bitread_init (bit_stream *bs, const unsigned char **p, const unsigned char *pend)
 {
     if (pend-(*p) >= 1)
     {
@@ -616,7 +616,7 @@ inline void bitread_init (bit_stream *bs, const unsigned char **p, const unsigne
  * Checks pend for proper buffer pointers range. The pend should point
  * to the last readable byte in buffer.
  */
-inline void bitread_fix (bit_stream *bs, const unsigned char **p, const unsigned char *pend)
+void bitread_fix (bit_stream *bs, const unsigned char **p, const unsigned char *pend)
 {
     bs->bitcount -= 16;
     if (bs->bitcount<0) bs->bitcount=0;
@@ -638,7 +638,7 @@ inline void bitread_fix (bit_stream *bs, const unsigned char **p, const unsigned
 /**
  * Returns some bits, masked with given bit mask.
  */
-inline unsigned long bit_peek (bit_stream *bs, const unsigned long mask)
+unsigned long bit_peek (bit_stream *bs, const unsigned long mask)
 {
     return bs->bitbuf & mask;
 }
@@ -650,7 +650,7 @@ inline unsigned long bit_peek (bit_stream *bs, const unsigned long mask)
  * Checks pend for proper buffer pointers range. The pend should point
  * to the last readable byte in buffer.
  */
-inline void bit_advance (bit_stream *bs, int n,
+void bit_advance (bit_stream *bs, int n,
     const unsigned char **p, const unsigned char *pend)
 {
     bs->bitbuf >>= n;

@@ -22,31 +22,31 @@
 
 // Routines
 
-inline long file_length (char *path);
-inline long file_length_opened (FILE *fp);
+long file_length (char *path);
+long file_length_opened (FILE *fp);
 
-inline long read_int32_le_file (FILE *fp);
-inline long read_int32_le_buf (const unsigned char *buff);
-inline unsigned short read_int16_le_file (FILE *fp);
-inline unsigned short read_int16_le_buf (const unsigned char *buff);
+long read_int32_le_file (FILE *fp);
+long read_int32_le_buf (const unsigned char *buff);
+unsigned short read_int16_le_file (FILE *fp);
+unsigned short read_int16_le_buf (const unsigned char *buff);
 
-inline void write_int16_le_file (FILE *fp, unsigned short x);
-inline void write_int16_le_buf (unsigned char *buff, unsigned short x);
-inline void write_int32_le_file (FILE *fp, unsigned long x);
-inline void write_int32_le_buf (unsigned char *buff, unsigned long x);
+void write_int16_le_file (FILE *fp, unsigned short x);
+void write_int16_le_buf (unsigned char *buff, unsigned short x);
+void write_int32_le_file (FILE *fp, unsigned long x);
+void write_int32_le_buf (unsigned char *buff, unsigned long x);
 
-inline long read_int32_be_file (FILE *fp);
-inline long read_int32_be_buf (const unsigned char *buff);
-inline unsigned short read_int16_be_file (FILE *fp);
-inline unsigned short read_int16_be_buf (const unsigned char *buff);
+long read_int32_be_file (FILE *fp);
+long read_int32_be_buf (const unsigned char *buff);
+unsigned short read_int16_be_file (FILE *fp);
+unsigned short read_int16_be_buf (const unsigned char *buff);
 
-inline void write_int16_be_file (FILE *fp, unsigned short x);
-inline void write_int16_be_buf (unsigned char *buff, unsigned short x);
-inline void write_int32_be_file (FILE *fp, unsigned long x);
-inline void write_int32_be_buf (unsigned char *buff, unsigned long x);
+void write_int16_be_file (FILE *fp, unsigned short x);
+void write_int16_be_buf (unsigned char *buff, unsigned short x);
+void write_int32_be_file (FILE *fp, unsigned long x);
+void write_int32_be_buf (unsigned char *buff, unsigned long x);
 
-inline unsigned char read_int8_buf (const unsigned char *buff);
-inline short nth_bit( unsigned char c, short n );
-inline short nth_bit_fourbytes( unsigned char c[4], short n );
+unsigned char read_int8_buf (const unsigned char *buff);
+short nth_bit( unsigned char c, short n );
+short nth_bit_fourbytes( unsigned char c[4], short n );
 
 #endif

@@ -1,8 +1,8 @@
 # Project: libadikted
 # Makefile created by Dev-C++ 4.9.9.2
 
-CPP  = g++.exe -std=gnu89
-CC   = gcc.exe -std=gnu89
+CPP  = g++.exe -std=c18
+CC   = gcc.exe -std=c18
 WINDRES = windres.exe
 RES  = adikted_private.res
 OBJ  = libadi_main.o bulcommn.o dernc.o draw_map.o graffiti.o graffiti_font.o lev_column.o lev_data.o lev_files.o lev_script.o lev_things.o memfile.o obj_actnpts.o obj_column.o obj_column_def.o obj_column_per.o obj_slabs.o obj_things.o xcubtxtr.o xtabdat8.o xtabjty.o msg_log.o arr_utils.o lbfileio.o $(RES)
