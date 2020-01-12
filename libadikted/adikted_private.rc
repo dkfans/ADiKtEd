@@ -8,8 +8,8 @@
 // TO CHANGE VERSION INFORMATION, EDIT PROJECT OPTIONS...
 //
 1 VERSIONINFO
-FILEVERSION 0,9,5,7
-PRODUCTVERSION 0,9,5,7
+FILEVERSION 0,9,6,1
+PRODUCTVERSION 0,9,6,1
 FILETYPE VFT_DLL
 {
   BLOCK "StringFileInfo"
@@ -20,10 +20,10 @@ FILETYPE VFT_DLL
 			 VALUE "FileVersion", ""
 			 VALUE "FileDescription", "ADiKtEd Map Maintain Library"
 			 VALUE "InternalName", ""
-			 VALUE "LegalCopyright", "Open source"
+			 VALUE "LegalCopyright", "GNU General Public License v2.0"
 			 VALUE "LegalTrademarks", ""
 			 VALUE "OriginalFilename", ""
-			 VALUE "ProductName", "Unofficial Bullfrog game tools"
+			 VALUE "ProductName", "Another Dungeon Keeper Editor"
 			 VALUE "ProductVersion", ""
 		 }
 	 }
