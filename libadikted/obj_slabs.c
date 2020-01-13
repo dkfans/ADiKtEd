@@ -186,8 +186,8 @@ void update_slab_owners(struct LEVEL *lvl)
  * Tries to select position far from other players.
  * Used mainly for putting Dungeon Hearts.
  */
-short place_room_rndpos(struct LEVEL *lvl,const unsigned short rslab,
-    const unsigned char rown,const struct IPOINT_2D *rsize)
+short place_room_rndpos(struct LEVEL *lvl, __attribute__((unused)) const unsigned short rslab,
+    __attribute__((unused)) const unsigned char rown, __attribute__((unused)) const struct IPOINT_2D *rsize)
 {
     int surrnd_size=20;
     struct IPOINT_2D rpos;

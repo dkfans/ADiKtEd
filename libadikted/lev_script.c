@@ -822,7 +822,7 @@ short string_is_decimal_number(const char *str,const short allow_sign)
   return true;
 }
 
-short script_cmd_verify_arg_actnpt(struct SCRIPT_VERIFY_DATA *scverif,char *err_msg,
+short script_cmd_verify_arg_actnpt(__attribute__((unused)) struct SCRIPT_VERIFY_DATA *scverif,char *err_msg,
         const char *param,const short allow_herogate,const short allow_plyrheart)
 {
     if (allow_plyrheart)
@@ -895,7 +895,7 @@ short script_cmd_verify_arg_actnpt(struct SCRIPT_VERIFY_DATA *scverif,char *err_
     return true;
 }
 
-short script_cmd_verify_arg_gameturn(struct SCRIPT_VERIFY_DATA *scverif,char *err_msg,
+short script_cmd_verify_arg_gameturn(__attribute__((unused)) struct SCRIPT_VERIFY_DATA *scverif,char *err_msg,
         const char *param)
 {
     if (!string_is_decimal_number(param,false))
@@ -939,7 +939,7 @@ short script_cmd_verify_arg_gameturn(struct SCRIPT_VERIFY_DATA *scverif,char *er
     return true;
 }
 
-short script_cmd_verify_arg_goldamnt(struct SCRIPT_VERIFY_DATA *scverif,char *err_msg,
+short script_cmd_verify_arg_goldamnt(__attribute__((unused)) struct SCRIPT_VERIFY_DATA *scverif,char *err_msg,
         const char *param)
 {
     if (!string_is_decimal_number(param,false))
@@ -983,7 +983,7 @@ short script_cmd_verify_arg_goldamnt(struct SCRIPT_VERIFY_DATA *scverif,char *er
     return true;
 }
 
-short script_cmd_verify_arg_experience(struct SCRIPT_VERIFY_DATA *scverif,char *err_msg,
+short script_cmd_verify_arg_experience(__attribute__((unused)) struct SCRIPT_VERIFY_DATA *scverif,char *err_msg,
         const char *param)
 {
     if (!string_is_decimal_number(param,false))
@@ -1024,8 +1024,8 @@ short script_cmd_verify_arg_experience(struct SCRIPT_VERIFY_DATA *scverif,char *
     return true;
 }
 
-short script_cmd_verify_arg_ncrtrs(struct SCRIPT_VERIFY_DATA *scverif,char *err_msg,
-        const char *param,int min_val,int *count)
+short script_cmd_verify_arg_ncrtrs(__attribute__((unused)) struct SCRIPT_VERIFY_DATA *scverif,char *err_msg,
+        const char *param,int min_val,__attribute__((unused)) int *count)
 {
     if (!string_is_decimal_number(param,false))
     {
@@ -1065,7 +1065,7 @@ short script_cmd_verify_arg_ncrtrs(struct SCRIPT_VERIFY_DATA *scverif,char *err_
     return true;
 }
 
-short script_cmd_verify_arg_operator(struct SCRIPT_VERIFY_DATA *scverif,char *err_msg,
+short script_cmd_verify_arg_operator(__attribute__((unused)) struct SCRIPT_VERIFY_DATA *scverif,char *err_msg,
         const char *param,int *opertr_idx)
 {
     int cmd_idx;
@@ -1082,7 +1082,7 @@ short script_cmd_verify_arg_operator(struct SCRIPT_VERIFY_DATA *scverif,char *er
     return true;
 }
 
-short script_cmd_verify_arg_conditvar(struct SCRIPT_VERIFY_DATA *scverif,char *err_msg,
+short script_cmd_verify_arg_conditvar(__attribute__((unused)) struct SCRIPT_VERIFY_DATA *scverif,char *err_msg,
         const char *param,short allow_vars,int *cmd_type,int *var_idx)
 {
     (*cmd_type)=-1;
@@ -1156,7 +1156,7 @@ short script_cmd_verify_arg_conditvar(struct SCRIPT_VERIFY_DATA *scverif,char *e
     return true;
 }
 
-short script_cmd_verify_arg_singlevar(struct SCRIPT_VERIFY_DATA *scverif,char *err_msg,
+short script_cmd_verify_arg_singlevar(__attribute__((unused)) struct SCRIPT_VERIFY_DATA *scverif,char *err_msg,
         const char *param,char *param_name,func_cmd_index f_cmd_index,int *res_idx)
 {
     int cmd_idx;
@@ -1173,7 +1173,7 @@ short script_cmd_verify_arg_singlevar(struct SCRIPT_VERIFY_DATA *scverif,char *e
     return true;
 }
 
-short script_cmd_verify_arg_btnparam(struct SCRIPT_VERIFY_DATA *scverif,char *err_msg,
+short script_cmd_verify_arg_btnparam(__attribute__((unused)) struct SCRIPT_VERIFY_DATA *scverif,char *err_msg,
         const char *param)
 {
     int cmd_idx;
@@ -1223,7 +1223,7 @@ short script_cmd_verify_arg_btnparam(struct SCRIPT_VERIFY_DATA *scverif,char *er
 }
 
 
-short script_cmd_verify_arg_creatr(struct SCRIPT_VERIFY_DATA *scverif,char *err_msg,
+short script_cmd_verify_arg_creatr(__attribute__((unused)) struct SCRIPT_VERIFY_DATA *scverif,char *err_msg,
         const char *param,int *crtr_idx)
 {
     int cmd_idx;
@@ -1240,7 +1240,7 @@ short script_cmd_verify_arg_creatr(struct SCRIPT_VERIFY_DATA *scverif,char *err_
     return true;
 }
 
-short script_cmd_verify_arg_party_objectv(struct SCRIPT_VERIFY_DATA *scverif,char *err_msg,
+short script_cmd_verify_arg_party_objectv(__attribute__((unused)) struct SCRIPT_VERIFY_DATA *scverif,char *err_msg,
         const char *param,const short heading_objctv,int *obj_idx)
 {
     int cmd_idx;
@@ -1271,7 +1271,7 @@ short script_cmd_verify_arg_party_objectv(struct SCRIPT_VERIFY_DATA *scverif,cha
     return true;
 }
 
-short script_cmd_verify_arg_party_name(struct SCRIPT_VERIFY_DATA *scverif,char *err_msg,
+short script_cmd_verify_arg_party_name(__attribute__((unused)) struct SCRIPT_VERIFY_DATA *scverif,char *err_msg,
         const char *param,const short create_new,int *party_idx)
 {
     int i;
@@ -1315,8 +1315,8 @@ short script_cmd_verify_arg_party_name(struct SCRIPT_VERIFY_DATA *scverif,char *
     return true;
 }
 
-short script_cmd_verify_arg_quotparam(struct SCRIPT_VERIFY_DATA *scverif,char *err_msg,
-        const char *param,const char *param_name,unsigned int *par_idx)
+short script_cmd_verify_arg_quotparam(__attribute__((unused)) struct SCRIPT_VERIFY_DATA *scverif, char *err_msg,
+        const char *param, __attribute__((unused)) const char *param_name, __attribute__((unused)) unsigned int *par_idx)
 {
     int parlen=strlen(param);
     if (parlen<3)
@@ -1342,7 +1342,7 @@ short script_cmd_verify_arg_quotparam(struct SCRIPT_VERIFY_DATA *scverif,char *e
     return true;
 }
 
-short script_cmd_verify_arg_limparam(struct SCRIPT_VERIFY_DATA *scverif,char *err_msg,
+short script_cmd_verify_arg_limparam(__attribute__((unused)) struct SCRIPT_VERIFY_DATA *scverif,char *err_msg,
         const char *param,const char *param_name,int min_val,unsigned int max_val)
 {
     if (!string_is_decimal_number(param,false))
@@ -1387,7 +1387,7 @@ short script_cmd_verify_arg_limparam(struct SCRIPT_VERIFY_DATA *scverif,char *er
     return true;
 }
 
-short script_cmd_verify_arg_unsg_int(struct SCRIPT_VERIFY_DATA *scverif,char *err_msg,
+short script_cmd_verify_arg_unsg_int(__attribute__((unused)) struct SCRIPT_VERIFY_DATA *scverif,char *err_msg,
         const char *param,int min_val,unsigned int max_val)
 {
     if (!string_is_decimal_number(param,false))
@@ -1434,7 +1434,7 @@ short script_cmd_verify_arg_unsg_int(struct SCRIPT_VERIFY_DATA *scverif,char *er
     return true;
 }
 
-short script_cmd_verify_arg_logic_int(struct SCRIPT_VERIFY_DATA *scverif,char *err_msg,
+short script_cmd_verify_arg_logic_int(__attribute__((unused)) struct SCRIPT_VERIFY_DATA *scverif,char *err_msg,
         const char *param,short *logic_val)
 {
     if (strlen(param)>1)
@@ -1456,7 +1456,7 @@ short script_cmd_verify_arg_logic_int(struct SCRIPT_VERIFY_DATA *scverif,char *e
     return false;
 }
 
-short script_cmd_verify_arg_specval(struct SCRIPT_VERIFY_DATA *scverif,char *err_msg,
+short script_cmd_verify_arg_specval(__attribute__((unused)) struct SCRIPT_VERIFY_DATA *scverif,char *err_msg,
         const char *param,char def_val)
 {
     if (strlen(param)>1)
@@ -1470,7 +1470,7 @@ short script_cmd_verify_arg_specval(struct SCRIPT_VERIFY_DATA *scverif,char *err
     return false;
 }
 
-short script_cmd_verify_condit(struct SCRIPT_VERIFY_DATA *scverif,
+short script_cmd_verify_condit(__attribute__((unused)) struct SCRIPT_VERIFY_DATA *scverif,
     char *err_msg,int *err_param,const struct DK_SCRIPT_COMMAND *cmd)
 {
     int plyr_idx;
@@ -1715,7 +1715,7 @@ short script_cmd_verify_condit(struct SCRIPT_VERIFY_DATA *scverif,
     return VERIF_OK;
 }
 
-short script_cmd_verify_party(struct SCRIPT_VERIFY_DATA *scverif,char *err_msg,int *err_param,const struct DK_SCRIPT_COMMAND *cmd)
+short script_cmd_verify_party(__attribute__((unused)) struct SCRIPT_VERIFY_DATA *scverif,char *err_msg,int *err_param,const struct DK_SCRIPT_COMMAND *cmd)
 {
     int i;
     int plyr_idx;
@@ -1985,7 +1985,7 @@ short script_cmd_verify_party(struct SCRIPT_VERIFY_DATA *scverif,char *err_msg,i
     return VERIF_OK;
 }
 
-short script_cmd_verify_avail(struct SCRIPT_VERIFY_DATA *scverif,char *err_msg,int *err_param,const struct DK_SCRIPT_COMMAND *cmd)
+short script_cmd_verify_avail(__attribute__((unused)) struct SCRIPT_VERIFY_DATA *scverif,char *err_msg,int *err_param,const struct DK_SCRIPT_COMMAND *cmd)
 {
     int plyr_idx;
     int crtr_idx;
@@ -2146,7 +2146,7 @@ short script_cmd_verify_avail(struct SCRIPT_VERIFY_DATA *scverif,char *err_msg,i
     return VERIF_OK;
 }
 
-short script_cmd_verify_custobj(struct SCRIPT_VERIFY_DATA *scverif,char *err_msg,int *err_param,const struct DK_SCRIPT_COMMAND *cmd)
+short script_cmd_verify_custobj(__attribute__((unused)) struct SCRIPT_VERIFY_DATA *scverif,char *err_msg,int *err_param,const struct DK_SCRIPT_COMMAND *cmd)
 {
     int plyr_idx;
     int i;
@@ -2318,7 +2318,7 @@ short script_cmd_verify_custobj(struct SCRIPT_VERIFY_DATA *scverif,char *err_msg
     return VERIF_OK;
 }
 
-short script_cmd_verify_setup(struct SCRIPT_VERIFY_DATA *scverif,char *err_msg,int *err_param,const struct DK_SCRIPT_COMMAND *cmd)
+short script_cmd_verify_setup(__attribute__((unused)) struct SCRIPT_VERIFY_DATA *scverif,char *err_msg,int *err_param,const struct DK_SCRIPT_COMMAND *cmd)
 {
     int obj_type;
     int i;
@@ -2545,7 +2545,7 @@ short script_cmd_verify_setup(struct SCRIPT_VERIFY_DATA *scverif,char *err_msg,i
     return VERIF_OK;
 }
 
-short script_cmd_verify_triger(struct SCRIPT_VERIFY_DATA *scverif,char *err_msg,int *err_param,const struct DK_SCRIPT_COMMAND *cmd)
+short script_cmd_verify_triger(__attribute__((unused)) struct SCRIPT_VERIFY_DATA *scverif,char *err_msg,int *err_param,const struct DK_SCRIPT_COMMAND *cmd)
 {
     int plyr_idx;
     int i;
@@ -2641,7 +2641,7 @@ short script_cmd_verify_triger(struct SCRIPT_VERIFY_DATA *scverif,char *err_msg,
     return VERIF_OK;
 }
 
-short script_cmd_verify_crtradj(struct SCRIPT_VERIFY_DATA *scverif,char *err_msg,int *err_param,const struct DK_SCRIPT_COMMAND *cmd)
+short script_cmd_verify_crtradj(__attribute__((unused)) struct SCRIPT_VERIFY_DATA *scverif,char *err_msg,int *err_param,const struct DK_SCRIPT_COMMAND *cmd)
 {
     int i;
     int plyr_idx;
@@ -2795,7 +2795,7 @@ short script_cmd_verify_crtradj(struct SCRIPT_VERIFY_DATA *scverif,char *err_msg
     return VERIF_OK;
 }
 
-short script_cmd_verify_commnt(struct SCRIPT_VERIFY_DATA *scverif,char *err_msg,int *err_param,const struct DK_SCRIPT_COMMAND *cmd)
+short script_cmd_verify_commnt(__attribute__((unused)) struct SCRIPT_VERIFY_DATA *scverif, char *err_msg, __attribute__((unused)) int *err_param, const struct DK_SCRIPT_COMMAND *cmd)
 {
     switch (cmd->index)
     {
@@ -2809,7 +2809,7 @@ short script_cmd_verify_commnt(struct SCRIPT_VERIFY_DATA *scverif,char *err_msg,
     return VERIF_OK;
 }
 
-short script_cmd_verify_obsol(struct SCRIPT_VERIFY_DATA *scverif,char *err_msg,int *err_param,const struct DK_SCRIPT_COMMAND *cmd)
+short script_cmd_verify_obsol(__attribute__((unused)) struct SCRIPT_VERIFY_DATA *scverif,char *err_msg,int *err_param,const struct DK_SCRIPT_COMMAND *cmd)
 {
     switch (cmd->index)
     {
@@ -3105,7 +3105,7 @@ int get_script_command_level(const char *text,const struct SCRIPT_OPTIONS *optns
  * Analyzes single decomposed script command and adjusts DK_SCRIPT_PARAMETERS;
  */
 short script_decomposed_to_params_cmd_condit(struct DK_SCRIPT_PARAMETERS *par,
-    struct DK_SCRIPT_COMMAND *cmd,const struct SCRIPT_OPTIONS *optns)
+    struct DK_SCRIPT_COMMAND *cmd, __attribute__((unused)) const struct SCRIPT_OPTIONS *optns)
 {
     int plyr_idx;
     int conditvar_type;
@@ -3177,8 +3177,8 @@ short script_decomposed_to_params_cmd_condit(struct DK_SCRIPT_PARAMETERS *par,
  * Analyzes single decomposed script command and adjusts DK_SCRIPT_PARAMETERS;
  * This one is used for commands inside a conditional loop
  */
-short script_decomposed_to_params_cmd_blockbody(struct DK_SCRIPT_PARAMETERS *par,
-    struct DK_SCRIPT_COMMAND *cmd,const struct SCRIPT_OPTIONS *optns)
+short script_decomposed_to_params_cmd_blockbody(__attribute__((unused)) struct DK_SCRIPT_PARAMETERS *par,
+    __attribute__((unused)) struct DK_SCRIPT_COMMAND *cmd, __attribute__((unused)) const struct SCRIPT_OPTIONS *optns)
 {
 /*TODO! */
 /* As for now, just add those commands to "rest" list. */
@@ -3188,8 +3188,8 @@ short script_decomposed_to_params_cmd_blockbody(struct DK_SCRIPT_PARAMETERS *par
 /*
  * Analyzes single decomposed script command and adjusts DK_SCRIPT_PARAMETERS;
  */
-short script_decomposed_to_params_cmd_party(struct DK_SCRIPT_PARAMETERS *par,
-    struct DK_SCRIPT_COMMAND *cmd,const struct SCRIPT_OPTIONS *optns)
+short script_decomposed_to_params_cmd_party(__attribute__((unused)) struct DK_SCRIPT_PARAMETERS *par,
+    __attribute__((unused)) struct DK_SCRIPT_COMMAND *cmd, __attribute__((unused)) const struct SCRIPT_OPTIONS *optns)
 {
 /*TODO! */
 /* As for now, just add those commands to "rest" list. */
@@ -3200,7 +3200,7 @@ short script_decomposed_to_params_cmd_party(struct DK_SCRIPT_PARAMETERS *par,
  * Analyzes single decomposed script command and adjusts DK_SCRIPT_PARAMETERS;
  */
 short script_decomposed_to_params_cmd_avail(struct DK_SCRIPT_PARAMETERS *par,
-    struct DK_SCRIPT_COMMAND *cmd,const struct SCRIPT_OPTIONS *optns)
+    struct DK_SCRIPT_COMMAND *cmd, __attribute__((unused)) const struct SCRIPT_OPTIONS *optns)
 {
     int plyr_idx;
     int object_idx;
@@ -3367,8 +3367,8 @@ short script_decomposed_to_params_cmd_avail(struct DK_SCRIPT_PARAMETERS *par,
 /*
  * Analyzes single decomposed script command and adjusts DK_SCRIPT_PARAMETERS;
  */
-short script_decomposed_to_params_cmd_custobj(struct DK_SCRIPT_PARAMETERS *par,
-    struct DK_SCRIPT_COMMAND *cmd,const struct SCRIPT_OPTIONS *optns)
+short script_decomposed_to_params_cmd_custobj(__attribute__((unused)) struct DK_SCRIPT_PARAMETERS *par,
+    __attribute__((unused)) struct DK_SCRIPT_COMMAND *cmd, __attribute__((unused)) const struct SCRIPT_OPTIONS *optns)
 {
 /*TODO */
 /* As for now, just add those commands to "rest" list. */
@@ -3378,7 +3378,7 @@ short script_decomposed_to_params_cmd_custobj(struct DK_SCRIPT_PARAMETERS *par,
  * Analyzes single decomposed script command and adjusts DK_SCRIPT_PARAMETERS;
  */
 short script_decomposed_to_params_cmd_setup(struct DK_SCRIPT_PARAMETERS *par,
-    struct DK_SCRIPT_COMMAND *cmd,const struct SCRIPT_OPTIONS *optns)
+    struct DK_SCRIPT_COMMAND *cmd, __attribute__((unused)) const struct SCRIPT_OPTIONS *optns)
 {
     int obj_type;
     int i;
@@ -3542,8 +3542,8 @@ short script_decomposed_to_params_cmd_setup(struct DK_SCRIPT_PARAMETERS *par,
 /*
  * Analyzes single decomposed script command and adjusts DK_SCRIPT_PARAMETERS;
  */
-short script_decomposed_to_params_cmd_triger(struct DK_SCRIPT_PARAMETERS *par,
-    struct DK_SCRIPT_COMMAND *cmd,const struct SCRIPT_OPTIONS *optns)
+short script_decomposed_to_params_cmd_triger(__attribute__((unused)) struct DK_SCRIPT_PARAMETERS *par,
+    __attribute__((unused)) struct DK_SCRIPT_COMMAND *cmd, __attribute__((unused)) const struct SCRIPT_OPTIONS *optns)
 {
 /*TODO */
 /* As for now, just add those commands to "rest" list. */
@@ -3553,7 +3553,7 @@ short script_decomposed_to_params_cmd_triger(struct DK_SCRIPT_PARAMETERS *par,
  * Analyzes single decomposed script command and adjusts DK_SCRIPT_PARAMETERS;
  */
 short script_decomposed_to_params_cmd_crtradj(struct DK_SCRIPT_PARAMETERS *par,
-    struct DK_SCRIPT_COMMAND *cmd,const struct SCRIPT_OPTIONS *optns)
+    struct DK_SCRIPT_COMMAND *cmd, __attribute__((unused)) const struct SCRIPT_OPTIONS *optns)
 {
     int i;
     int plyr_idx;
@@ -3716,7 +3716,7 @@ short script_decomposed_to_params(struct DK_SCRIPT *script,const struct SCRIPT_O
   return result;
 }
 
-short script_params_to_decomposed(struct DK_SCRIPT *script,const struct SCRIPT_OPTIONS *optns)
+short script_params_to_decomposed(__attribute__((unused)) struct DK_SCRIPT *script, __attribute__((unused)) const struct SCRIPT_OPTIONS *optns)
 {
 /*TODO */
 /* But before start working on this, I must make all script commands */
@@ -4139,8 +4139,8 @@ char *recompose_script_command(const struct DK_SCRIPT_COMMAND *cmd,const struct 
  * Renews the script parameter; returns true if it was renewed, false if left
  * without changes.
  */
-short renew_cmd_param(const struct DK_SCRIPT_COMMAND *cmd,const unsigned int param_idx,
-    const struct SCRIPT_OPTIONS *optns)
+short renew_cmd_param(const struct DK_SCRIPT_COMMAND *cmd, const unsigned int param_idx,
+    __attribute__((unused)) const struct SCRIPT_OPTIONS *optns)
 {
   if ((cmd == NULL) || (param_idx >= cmd->param_count))
       return false;

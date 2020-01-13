@@ -289,7 +289,7 @@ unsigned char *surr_tng_find(unsigned char **surr_tng,unsigned char type_idx)
 }
 
 void create_columns_slb_unaffected_rock(struct COLUMN_REC *clm_recs[9],
-        unsigned char *surr_slb,unsigned char *surr_own, unsigned char **surr_tng)
+        __attribute__((unused)) unsigned char *surr_slb, unsigned char *surr_own, __attribute__((unused)) unsigned char **surr_tng)
 {
   int i,k;
   for (i=0;i<3;i++)
@@ -348,7 +348,7 @@ void create_columns_slb_gold(struct COLUMN_REC *clm_recs[9],
  * May be used for making earth and torchdirt columns.
  */
 void create_columns_slb_fulldirt(struct COLUMN_REC *clm_recs[9],
-        unsigned char *surr_slb,unsigned char *surr_own, unsigned char **surr_tng)
+        unsigned char *surr_slb,unsigned char *surr_own, __attribute__((unused)) unsigned char **surr_tng)
 {
   /*Center is always earth */
   fill_column_earth(clm_recs[IDIR_CENTR],surr_own[IDIR_CENTR]);
@@ -447,7 +447,7 @@ void create_columns_slb_skulls_on_claimed(struct COLUMN_REC *clm_recs[9],
  * Creates wall with red brick inside. Returns where are whole brick walls
  */
 void create_columns_slb_wallbrick(struct COLUMN_REC *clm_recs[9], short *allow_relief,
-        unsigned char *surr_slb,unsigned char *surr_own, unsigned char **surr_tng)
+        unsigned char *surr_slb,unsigned char *surr_own, __attribute__((unused)) unsigned char **surr_tng)
 {
 /*TODO: add shadow to central cobblestones near water and lava */
   const unsigned short dir_a[]={IDIR_WEST, IDIR_NORTH, IDIR_EAST, IDIR_SOUTH};
@@ -635,7 +635,7 @@ void create_columns_slb_wallbrick(struct COLUMN_REC *clm_recs[9], short *allow_r
  * Modifies allow_relief setting of the modified columns to false.
  */
 void fill_columns_slb_roomrelief(struct COLUMN_REC *clm_recs[9], short *allow_relief,
-        unsigned char *surr_slb,unsigned char *surr_own, unsigned char **surr_tng)
+        unsigned char *surr_slb,unsigned char *surr_own, __attribute__((unused)) unsigned char **surr_tng)
 {
   const unsigned short dir_a[]={IDIR_NW,   IDIR_NW,   IDIR_NE,   IDIR_SW};
   const unsigned short dir_b[]={IDIR_WEST, IDIR_NORTH,IDIR_EAST, IDIR_SOUTH};
@@ -672,7 +672,7 @@ void fill_columns_slb_roomrelief(struct COLUMN_REC *clm_recs[9], short *allow_re
  * ends after or before these columns.
  */
 short fill_side_columns_room_relief(struct COLUMN_REC *clm_reca,struct COLUMN_REC *clm_recb,
-    struct COLUMN_REC *clm_recc,unsigned short room_slab,unsigned char owner, short corner, short edge)
+    struct COLUMN_REC *clm_recc,unsigned short room_slab,unsigned char owner, short corner, __attribute__((unused)) short edge)
 {
   /*Note: we're using fill_column_wall_drapebrick to save CLM space. */
   /*TODO: make corner and edge support */
@@ -851,7 +851,7 @@ short fill_side_columns_room_relief(struct COLUMN_REC *clm_reca,struct COLUMN_RE
  * Creates wall with splatted dead body (torture chamber specific)
  */
 void create_columns_slb_wall_force_relief_splatbody(struct COLUMN_REC *clm_recs[9],
-        unsigned char *surr_slb,unsigned char *surr_own, unsigned char **surr_tng)
+        unsigned char *surr_slb,unsigned char *surr_own, __attribute__((unused)) unsigned char **surr_tng)
 {
     const unsigned short dir_a[]={IDIR_NW,   IDIR_NE,   IDIR_SE,   IDIR_SW};
     const unsigned short dir_b[]={IDIR_WEST, IDIR_NORTH,IDIR_EAST, IDIR_SOUTH};
@@ -1084,7 +1084,7 @@ void create_columns_slb_wallpairshr(struct COLUMN_REC *clm_recs[9],
 }
 
 void create_columns_slb_path(struct COLUMN_REC *clm_recs[9],
-        unsigned char *surr_slb,unsigned char *surr_own, unsigned char **surr_tng)
+        unsigned char *surr_slb,unsigned char *surr_own, __attribute__((unused)) unsigned char **surr_tng)
 {
   int i,k;
   for (i=0;i<3;i++)
@@ -1096,7 +1096,7 @@ void create_columns_slb_path(struct COLUMN_REC *clm_recs[9],
 }
 
 void create_columns_slb_claimed(struct COLUMN_REC *clm_recs[9],
-        unsigned char *surr_slb,unsigned char *surr_own, unsigned char **surr_tng)
+        unsigned char *surr_slb,unsigned char *surr_own, __attribute__((unused)) unsigned char **surr_tng)
 {
   const unsigned short dir_a[]={IDIR_WEST, IDIR_NORTH, IDIR_EAST, IDIR_SOUTH};
   const unsigned short dir_b[]={IDIR_NORTH, IDIR_EAST, IDIR_SOUTH, IDIR_WEST};
@@ -1205,7 +1205,7 @@ void create_columns_slb_claimed(struct COLUMN_REC *clm_recs[9],
 }
 
 void create_columns_slb_lava(struct COLUMN_REC *clm_recs[9],
-        unsigned char *surr_slb,unsigned char *surr_own, unsigned char **surr_tng)
+        __attribute__((unused)) unsigned char *surr_slb,unsigned char *surr_own, __attribute__((unused)) unsigned char **surr_tng)
 {
   int i,k;
   for (i=0;i<3;i++)
@@ -1216,7 +1216,7 @@ void create_columns_slb_lava(struct COLUMN_REC *clm_recs[9],
 }
 
 void create_columns_slb_water(struct COLUMN_REC *clm_recs[9],
-        unsigned char *surr_slb,unsigned char *surr_own, unsigned char **surr_tng)
+        __attribute__((unused)) unsigned char *surr_slb,unsigned char *surr_own, __attribute__((unused)) unsigned char **surr_tng)
 {
   int i,k;
   for (i=0;i<3;i++)
@@ -1227,7 +1227,7 @@ void create_columns_slb_water(struct COLUMN_REC *clm_recs[9],
 }
 
 void create_columns_slb_unaffected_gems(struct COLUMN_REC *clm_recs[9],
-        unsigned char *surr_slb,unsigned char *surr_own, unsigned char **surr_tng)
+        __attribute__((unused)) unsigned char *surr_slb,unsigned char *surr_own, __attribute__((unused)) unsigned char **surr_tng)
 {
   /*These are, in official editor, same for every surrounding, even near water */
   int i,k;
@@ -1247,7 +1247,7 @@ void create_columns_slb_gems(struct COLUMN_REC *clm_recs[9],
 }
 
 void create_columns_slb_thingems_path(struct COLUMN_REC *clm_recs[9],
-        unsigned char *surr_slb,unsigned char *surr_own, unsigned char **surr_tng)
+        unsigned char *surr_slb,unsigned char *surr_own, __attribute__((unused)) unsigned char **surr_tng)
 {
   int i,k;
   for (i=0;i<3;i++)
@@ -1374,7 +1374,7 @@ void create_columns_slb_barracks(struct COLUMN_REC *clm_recs[9],
 }
 
 void create_columns_slb_door_floor(struct COLUMN_REC *clm_recs[9],
-        unsigned char *surr_slb,unsigned char *surr_own, unsigned char **surr_tng)
+        __attribute__((unused)) unsigned char *surr_slb,__attribute__((unused)) unsigned char *surr_own, __attribute__((unused)) unsigned char **surr_tng)
 {
     fill_column_rec_sim(clm_recs[IDIR_NW],    0, CUBE_PATH_SMOOTH3,
         0x094, 0x0, 0x0, 0x0, 0x0, 0, 0, 0);
@@ -1482,7 +1482,7 @@ void create_columns_slb_doormagic(struct COLUMN_REC *clm_recs[9],
  * column are sometimes changed to the surrounding material.
  */
 void modify_frail_columns(struct COLUMN_REC *clm_recs[9],
-        unsigned char *surr_slb,unsigned char *surr_own, unsigned char **surr_tng)
+        unsigned char *surr_slb,unsigned char *surr_own, __attribute__((unused)) unsigned char **surr_tng)
 {
     const unsigned short dir_a[]={IDIR_WEST, IDIR_NORTH, IDIR_EAST, IDIR_SOUTH};
     const unsigned short dir_b[]={IDIR_NORTH, IDIR_EAST, IDIR_SOUTH, IDIR_WEST};
@@ -1543,7 +1543,7 @@ void modify_frail_columns(struct COLUMN_REC *clm_recs[9],
  * Function modifies non-central columns if there is water or lava near.
  * Returns true if something was modified
  */
-short modify_liquid_surrounding(struct COLUMN_REC *clm_recs[9],unsigned char *surr_slb,
+short modify_liquid_surrounding(struct COLUMN_REC *clm_recs[9], unsigned char *surr_slb,
         short liq_level,unsigned short water_cube,unsigned short lava_cube)
 {
   const unsigned short dir_a[]={IDIR_WEST, IDIR_NORTH, IDIR_EAST, IDIR_SOUTH};
@@ -1826,7 +1826,7 @@ void create_columns_slb_room(cr_clm_func cr_floor,cr_clm_func cr_edge,
 }
 
 void create_columns_slb_library_floor(struct COLUMN_REC *clm_recs[9],
-        unsigned char *surr_slb,unsigned char *surr_own, unsigned char **surr_tng)
+        unsigned char *surr_slb,__attribute__((unused)) unsigned char *surr_own, __attribute__((unused)) unsigned char **surr_tng)
 {
   int i,k;
   for (i=0;i<3;i++)
@@ -1863,7 +1863,7 @@ void create_columns_slb_library_inside(struct COLUMN_REC *clm_recs[9],
 }
 
 void create_columns_slb_dungheart_floor(struct COLUMN_REC *clm_recs[9],
-        unsigned char *surr_slb,unsigned char *surr_own, unsigned char **surr_tng)
+        unsigned char *surr_slb, unsigned char *surr_own, __attribute__((unused)) unsigned char **surr_tng)
 {
   int i,k;
   for (i=0;i<3;i++)
@@ -1902,7 +1902,7 @@ void create_columns_slb_dungheart_corner(struct COLUMN_REC *clm_recs[9],
 }
 
 void create_columns_slb_dungheart_inside(struct COLUMN_REC *clm_recs[9],
-        unsigned char *surr_slb,unsigned char *surr_own, unsigned char **surr_tng)
+        __attribute__((unused)) unsigned char *surr_slb, unsigned char *surr_own, __attribute__((unused)) unsigned char **surr_tng)
 {
   int i,k;
   for (i=0;i<3;i++)
@@ -1953,7 +1953,7 @@ void create_columns_slb_dungheart_nearinsd(struct COLUMN_REC *clm_recs[9],
 }
 
 void create_columns_slb_portal_floor(struct COLUMN_REC *clm_recs[9],
-        unsigned char *surr_slb,unsigned char *surr_own, unsigned char **surr_tng)
+        unsigned char *surr_slb,unsigned char *surr_own, __attribute__((unused)) unsigned char **surr_tng)
 {
   const unsigned short dir_a[]={IDIR_WEST, IDIR_NORTH, IDIR_EAST, IDIR_SOUTH};
   const unsigned short dir_b[]={IDIR_NORTH, IDIR_EAST, IDIR_SOUTH, IDIR_WEST};
@@ -2002,7 +2002,7 @@ void create_columns_slb_portal_corner(struct COLUMN_REC *clm_recs[9],
 }
 
 void create_columns_slb_portal_inside(struct COLUMN_REC *clm_recs[9],
-        unsigned char *surr_slb,unsigned char *surr_own, unsigned char **surr_tng)
+        __attribute__((unused)) unsigned char *surr_slb,unsigned char *surr_own, __attribute__((unused)) unsigned char **surr_tng)
 {
   int i;
   for (i=0;i<9;i++)
@@ -2012,7 +2012,7 @@ void create_columns_slb_portal_inside(struct COLUMN_REC *clm_recs[9],
 }
 
 void create_columns_slb_temple_floor(struct COLUMN_REC *clm_recs[9],
-        unsigned char *surr_slb,unsigned char *surr_own, unsigned char **surr_tng)
+        unsigned char *surr_slb,unsigned char *surr_own, __attribute__((unused)) unsigned char **surr_tng)
 {
   int i,k;
   for (i=0;i<3;i++)
@@ -2066,7 +2066,7 @@ void create_columns_slb_temple_corner(struct COLUMN_REC *clm_recs[9],
 }
 
 void create_columns_slb_temple_inside(struct COLUMN_REC *clm_recs[9],
-        unsigned char *surr_slb,unsigned char *surr_own, unsigned char **surr_tng)
+        __attribute__((unused)) unsigned char *surr_slb, __attribute__((unused)) unsigned char *surr_own, __attribute__((unused)) unsigned char **surr_tng)
 {
     int i;
     for (i=0;i<9;i++)
@@ -2075,7 +2075,7 @@ void create_columns_slb_temple_inside(struct COLUMN_REC *clm_recs[9],
 }
 
 void create_columns_slb_hatchery_floor(struct COLUMN_REC *clm_recs[9],
-        unsigned char *surr_slb,unsigned char *surr_own, unsigned char **surr_tng)
+        unsigned char *surr_slb, unsigned char *surr_own, __attribute__((unused)) unsigned char **surr_tng)
 {
   const unsigned short dir_a[]={IDIR_WEST, IDIR_NORTH, IDIR_EAST, IDIR_SOUTH};
   const unsigned short dir_b[]={IDIR_NORTH, IDIR_EAST, IDIR_SOUTH, IDIR_WEST};
@@ -2135,7 +2135,7 @@ void create_columns_slb_hatchery_corner(struct COLUMN_REC *clm_recs[9],
 }
 
 void create_columns_slb_hatchery_inside(struct COLUMN_REC *clm_recs[9],
-        unsigned char *surr_slb,unsigned char *surr_own, unsigned char **surr_tng)
+        __attribute__((unused)) unsigned char *surr_slb,unsigned char *surr_own, __attribute__((unused)) unsigned char **surr_tng)
 {
     int i;
     for (i=0;i<9;i++)
@@ -2143,7 +2143,7 @@ void create_columns_slb_hatchery_inside(struct COLUMN_REC *clm_recs[9],
 }
 
 void create_columns_slb_lair_floor(struct COLUMN_REC *clm_recs[9],
-        unsigned char *surr_slb,unsigned char *surr_own, unsigned char **surr_tng)
+        unsigned char *surr_slb,unsigned char *surr_own, __attribute__((unused)) unsigned char **surr_tng)
 {
   const unsigned short dir_a[]={IDIR_WEST, IDIR_NORTH, IDIR_EAST, IDIR_SOUTH};
   const unsigned short dir_b[]={IDIR_NORTH, IDIR_EAST, IDIR_SOUTH, IDIR_WEST};
@@ -2261,7 +2261,7 @@ void create_columns_slb_lair_corner(struct COLUMN_REC *clm_recs[9],
 }
 
 void create_columns_slb_lair_inside(struct COLUMN_REC *clm_recs[9],
-        unsigned char *surr_slb,unsigned char *surr_own, unsigned char **surr_tng)
+        __attribute__((unused)) unsigned char *surr_slb,unsigned char *surr_own, __attribute__((unused)) unsigned char **surr_tng)
 {
     int i;
     for (i=0;i<9;i++)
@@ -2269,7 +2269,7 @@ void create_columns_slb_lair_inside(struct COLUMN_REC *clm_recs[9],
 }
 
 void create_columns_slb_graveyard_floor(struct COLUMN_REC *clm_recs[9],
-        unsigned char *surr_slb,unsigned char *surr_own, unsigned char **surr_tng)
+        unsigned char *surr_slb,unsigned char *surr_own, __attribute__((unused)) unsigned char **surr_tng)
 {
   const unsigned short dir_a[]={IDIR_WEST, IDIR_NORTH, IDIR_EAST, IDIR_SOUTH};
   const unsigned short dir_b[]={IDIR_NORTH, IDIR_EAST, IDIR_SOUTH, IDIR_WEST};
@@ -2387,7 +2387,7 @@ void create_columns_slb_graveyard_corner(struct COLUMN_REC *clm_recs[9],
 }
 
 void create_columns_slb_graveyard_inside(struct COLUMN_REC *clm_recs[9],
-        unsigned char *surr_slb,unsigned char *surr_own, unsigned char **surr_tng)
+        __attribute__((unused)) unsigned char *surr_slb,unsigned char *surr_own, __attribute__((unused)) unsigned char **surr_tng)
 {
     int i;
     for (i=0;i<9;i++)
@@ -2395,7 +2395,7 @@ void create_columns_slb_graveyard_inside(struct COLUMN_REC *clm_recs[9],
 }
 
 void create_columns_slb_barracks_floor(struct COLUMN_REC *clm_recs[9],
-        unsigned char *surr_slb,unsigned char *surr_own, unsigned char **surr_tng)
+        __attribute__((unused)) unsigned char *surr_slb,unsigned char *surr_own, __attribute__((unused)) unsigned char **surr_tng)
 {
     int i;
     for (i=0;i<9;i++)
@@ -2417,7 +2417,7 @@ void create_columns_slb_barracks_corner(struct COLUMN_REC *clm_recs[9],
 }
 
 void create_columns_slb_barracks_inside(struct COLUMN_REC *clm_recs[9],
-        unsigned char *surr_slb,unsigned char *surr_own, unsigned char **surr_tng)
+        __attribute__((unused)) unsigned char *surr_slb,unsigned char *surr_own, __attribute__((unused)) unsigned char **surr_tng)
 {
     int i;
     for (i=0;i<9;i++)
@@ -2428,7 +2428,7 @@ void create_columns_slb_barracks_inside(struct COLUMN_REC *clm_recs[9],
 }
 
 void create_columns_slb_training_floor(struct COLUMN_REC *clm_recs[9],
-        unsigned char *surr_slb,unsigned char *surr_own, unsigned char **surr_tng)
+        unsigned char *surr_slb,unsigned char *surr_own, __attribute__((unused)) unsigned char **surr_tng)
 {
   int i,k;
   for (i=0;i<3;i++)
@@ -2460,7 +2460,7 @@ void create_columns_slb_training_inside(struct COLUMN_REC *clm_recs[9],
 }
 
 void create_columns_slb_treasure_floor(struct COLUMN_REC *clm_recs[9],
-        unsigned char *surr_slb,unsigned char *surr_own, unsigned char **surr_tng)
+        unsigned char *surr_slb,unsigned char *surr_own, __attribute__((unused)) unsigned char **surr_tng)
 {
   int i,k;
   for (i=0;i<3;i++)
@@ -2492,7 +2492,7 @@ void create_columns_slb_treasure_inside(struct COLUMN_REC *clm_recs[9],
 }
 
 void create_columns_slb_workshop_floor(struct COLUMN_REC *clm_recs[9],
-        unsigned char *surr_slb,unsigned char *surr_own, unsigned char **surr_tng)
+        unsigned char *surr_slb,unsigned char *surr_own, __attribute__((unused)) unsigned char **surr_tng)
 {
   int i,k;
   for (i=0;i<3;i++)
@@ -2531,7 +2531,7 @@ void create_columns_slb_workshop_inside(struct COLUMN_REC *clm_recs[9],
 }
 
 void create_columns_slb_scavenger_floor(struct COLUMN_REC *clm_recs[9],
-        unsigned char *surr_slb,unsigned char *surr_own, unsigned char **surr_tng)
+        unsigned char *surr_slb,unsigned char *surr_own, __attribute__((unused)) unsigned char **surr_tng)
 {
   int i,k;
   for (i=0;i<3;i++)
@@ -2564,7 +2564,7 @@ void create_columns_slb_scavenger_inside(struct COLUMN_REC *clm_recs[9],
 }
 
 void create_columns_slb_prison_floor(struct COLUMN_REC *clm_recs[9],
-        unsigned char *surr_slb,unsigned char *surr_own, unsigned char **surr_tng)
+        unsigned char *surr_slb,unsigned char *surr_own, __attribute__((unused)) unsigned char **surr_tng)
 {
   const unsigned short dir_a[]={IDIR_WEST, IDIR_NORTH, IDIR_EAST, IDIR_SOUTH};
   const unsigned short dir_b[]={IDIR_NORTH, IDIR_EAST, IDIR_SOUTH, IDIR_WEST};
@@ -2702,7 +2702,7 @@ void create_columns_slb_prison_corner(struct COLUMN_REC *clm_recs[9],
 }
 
 void create_columns_slb_prison_inside(struct COLUMN_REC *clm_recs[9],
-        unsigned char *surr_slb,unsigned char *surr_own, unsigned char **surr_tng)
+        __attribute__((unused)) unsigned char *surr_slb,unsigned char *surr_own, __attribute__((unused)) unsigned char **surr_tng)
 {
     int i;
     for (i=0;i<9;i++)
@@ -2736,7 +2736,7 @@ void create_columns_slb_torture_inside(struct COLUMN_REC *clm_recs[9],
 }
 
 void create_columns_slb_guardpost(struct COLUMN_REC *clm_recs[9],
-        unsigned char *surr_slb,unsigned char *surr_own, unsigned char **surr_tng)
+        __attribute__((unused)) unsigned char *surr_slb,unsigned char *surr_own, __attribute__((unused)) unsigned char **surr_tng)
 {
     fill_column_guardpost_floor_c(clm_recs[IDIR_NORTH], surr_own[IDIR_CENTR]);
     fill_column_guardpost_floor_a(clm_recs[IDIR_NE], surr_own[IDIR_CENTR]);
@@ -2750,7 +2750,7 @@ void create_columns_slb_guardpost(struct COLUMN_REC *clm_recs[9],
 }
 
 void create_columns_slb_bridge(struct COLUMN_REC *clm_recs[9],
-        unsigned char *surr_slb,unsigned char *surr_own, unsigned char **surr_tng)
+        __attribute__((unused)) unsigned char *surr_slb,unsigned char *surr_own, __attribute__((unused)) unsigned char **surr_tng)
 {
     int i;
     for (i=0;i<9;i++)
@@ -2758,7 +2758,7 @@ void create_columns_slb_bridge(struct COLUMN_REC *clm_recs[9],
 }
 
 void create_columns_slb_rock_gndlev(struct COLUMN_REC *clm_recs[9],
-        unsigned char *surr_slb,unsigned char *surr_own, unsigned char **surr_tng)
+        __attribute__((unused)) unsigned char *surr_slb,unsigned char *surr_own, __attribute__((unused)) unsigned char **surr_tng)
 {
   int i,k;
   for (i=0;i<3;i++)
@@ -2769,7 +2769,7 @@ void create_columns_slb_rock_gndlev(struct COLUMN_REC *clm_recs[9],
 }
 
 void create_columns_slb_rockcaped_pathcave(struct COLUMN_REC *clm_recs[9],
-        unsigned char *surr_slb,unsigned char *surr_own, unsigned char **surr_tng)
+        unsigned char *surr_slb,unsigned char *surr_own, __attribute__((unused)) unsigned char **surr_tng)
 {
   int i,k;
   for (i=0;i<3;i++)

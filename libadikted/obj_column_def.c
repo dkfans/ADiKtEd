@@ -903,13 +903,13 @@ void place_column_doormagic_c(struct COLUMN_REC *clm_rec, unsigned char owner)
   clm_rec->height=compute_clm_rec_height(clm_rec);
 }
 
-void fill_column_rock_gndlev(struct COLUMN_REC *clm_rec, unsigned char owner)
+void fill_column_rock_gndlev(struct COLUMN_REC *clm_rec, __attribute__((unused)) unsigned char owner)
 {
      fill_column_rec_simp(clm_rec, 0, CUBE_PATH_SMLSTONES,
          CUBE_ROCK_ANY, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0);
 }
 
-void fill_column_rockground(struct COLUMN_REC *clm_rec, unsigned char owner)
+void fill_column_rockground(struct COLUMN_REC *clm_rec, __attribute__((unused)) unsigned char owner)
 {
      fill_column_rec_simp(clm_rec, 0, CUBE_PATH_SMLSTONES,
          CUBE_ROCK3, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0);
@@ -924,7 +924,7 @@ void fill_column_rock(struct COLUMN_REC *clm_rec, unsigned char owner)
 /*
  * Rock column - should be placed on rock ground.
  */
-void place_column_rock(struct COLUMN_REC *clm_rec, unsigned char owner)
+void place_column_rock(struct COLUMN_REC *clm_rec, __attribute__((unused)) unsigned char owner)
 {
   int pos=clm_rec->height-4;
   if (pos<0) pos=clm_rec->height;
@@ -940,7 +940,7 @@ void place_column_rock(struct COLUMN_REC *clm_rec, unsigned char owner)
 /*
  * Ground for earth, gold and any wall to put on top
  */
-void fill_column_earthground(struct COLUMN_REC *clm_rec, unsigned char owner)
+void fill_column_earthground(struct COLUMN_REC *clm_rec, __attribute__((unused)) unsigned char owner)
 {
      fill_column_rec_sim(clm_rec, 0, CUBE_PATH_SMOOTH3,
          CUBE_PATH_SMOOTH1 +rnd(5), 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0);
@@ -949,7 +949,7 @@ void fill_column_earthground(struct COLUMN_REC *clm_rec, unsigned char owner)
 /*
  * Ground for any wall to put on top; near water version
  */
-void fill_column_wallground_nearwater(struct COLUMN_REC *clm_rec, unsigned char owner)
+void fill_column_wallground_nearwater(struct COLUMN_REC *clm_rec, __attribute__((unused)) unsigned char owner)
 {
      fill_column_rec_sim(clm_rec, 0, CUBE_PATH_SMOOTH3,
          0x075, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0);
@@ -958,43 +958,43 @@ void fill_column_wallground_nearwater(struct COLUMN_REC *clm_rec, unsigned char 
 /*
  * Ground for any wall to put on top; near lava version
  */
-void fill_column_wallground_nearlava(struct COLUMN_REC *clm_rec, unsigned char owner)
+void fill_column_wallground_nearlava(struct COLUMN_REC *clm_rec, __attribute__((unused)) unsigned char owner)
 {
      fill_column_rec_sim(clm_rec, 0, CUBE_PATH_SMOOTH3,
          0x076, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0);
 }
 
-void fill_column_gold(struct COLUMN_REC *clm_rec, unsigned char owner)
+void fill_column_gold(struct COLUMN_REC *clm_rec, __attribute__((unused)) unsigned char owner)
 {
      fill_column_rec_sim(clm_rec, 0, CUBE_PATH_SMOOTH3,
          CUBE_PATH_SMOOTH1 +rnd(5), CUBE_EARTHGRNSDCTR, CUBE_GOLD1 +rnd(3), CUBE_GOLD1 +rnd(3), CUBE_GOLD1 +rnd(3), 0, 0, 0);
 }
 
-void fill_column_gold_nearwater(struct COLUMN_REC *clm_rec, unsigned char owner)
+void fill_column_gold_nearwater(struct COLUMN_REC *clm_rec, __attribute__((unused)) unsigned char owner)
 {
      fill_column_rec_sim(clm_rec, 0, CUBE_PATH_SMOOTH3,
          0x026, CUBE_GOLD1 +rnd(3), CUBE_GOLD1 +rnd(3), CUBE_GOLD1 +rnd(3), CUBE_GOLD1 +rnd(3), 0, 0, 0);
 }
 
-void fill_column_gold_nearlava(struct COLUMN_REC *clm_rec, unsigned char owner)
+void fill_column_gold_nearlava(struct COLUMN_REC *clm_rec, __attribute__((unused)) unsigned char owner)
 {
      fill_column_rec_sim(clm_rec, 0, CUBE_PATH_SMOOTH3,
          CUBE_EARTHBTMLAVA, 0x034+rnd(3), 0x034+rnd(3), 0x034+rnd(3), 0x034+rnd(3), 0, 0, 0);
 }
 
-void fill_column_earth(struct COLUMN_REC *clm_rec, unsigned char owner)
+void fill_column_earth(struct COLUMN_REC *clm_rec, __attribute__((unused)) unsigned char owner)
 {
      fill_column_rec_sim(clm_rec, 0, CUBE_PATH_SMOOTH3,
          CUBE_PATH_SMOOTH1 +rnd(5), CUBE_EARTHGRNSDCTR, 0x001+rnd(3), 0x001+rnd(3), 0x005, 0, 0, 0);
 }
 
-void fill_column_earth_nearwater(struct COLUMN_REC *clm_rec, unsigned char owner)
+void fill_column_earth_nearwater(struct COLUMN_REC *clm_rec, __attribute__((unused)) unsigned char owner)
 {
      fill_column_rec_sim(clm_rec, 0, CUBE_PATH_SMOOTH3,
          0x026, 0x001+rnd(3), 0x001+rnd(3), 0x001+rnd(3), 0x005, 0, 0, 0);
 }
 
-void fill_column_earth_nearlava(struct COLUMN_REC *clm_rec, unsigned char owner)
+void fill_column_earth_nearlava(struct COLUMN_REC *clm_rec, __attribute__((unused)) unsigned char owner)
 {
      fill_column_rec_sim(clm_rec, 0, CUBE_PATH_SMOOTH3,
          CUBE_EARTHBTMLAVA, 0x030, 0x030, 0x030, 0x030, 0, 0, 0);
@@ -1024,7 +1024,7 @@ void fill_column_wall_cobblestones(struct COLUMN_REC *clm_rec, unsigned char own
 /*
  * Column of grey stones with marking only on one of them.
  */
-void place_column_wall_cobblestones(struct COLUMN_REC *clm_rec, unsigned char owner)
+void place_column_wall_cobblestones(struct COLUMN_REC *clm_rec, __attribute__((unused)) unsigned char owner)
 {
   int pos=clm_rec->height-4;
   if (pos<0) pos=clm_rec->height;
@@ -1040,7 +1040,7 @@ void place_column_wall_cobblestones(struct COLUMN_REC *clm_rec, unsigned char ow
 /*
  * Column of grey stones with some markings on.
  */
-void place_column_wall_cobblestones_mk(struct COLUMN_REC *clm_rec, unsigned char owner)
+void place_column_wall_cobblestones_mk(struct COLUMN_REC *clm_rec, __attribute__((unused)) unsigned char owner)
 {
   int pos=clm_rec->height-4;
   if (pos<0) pos=clm_rec->height;
@@ -1053,7 +1053,7 @@ void place_column_wall_cobblestones_mk(struct COLUMN_REC *clm_rec, unsigned char
   clm_rec->height=compute_clm_rec_height(clm_rec);
 }
 
-void place_column_wall_redsmbrick_b(struct COLUMN_REC *clm_rec, unsigned char owner)
+void place_column_wall_redsmbrick_b(struct COLUMN_REC *clm_rec, __attribute__((unused)) unsigned char owner)
 {
   int pos=clm_rec->height-4;
   if (pos<0) pos=clm_rec->height;
@@ -1066,7 +1066,7 @@ void place_column_wall_redsmbrick_b(struct COLUMN_REC *clm_rec, unsigned char ow
   clm_rec->height=compute_clm_rec_height(clm_rec);
 }
 
-void place_column_wall_redsmbrick_dkbtm(struct COLUMN_REC *clm_rec, unsigned char owner)
+void place_column_wall_redsmbrick_dkbtm(struct COLUMN_REC *clm_rec, __attribute__((unused)) unsigned char owner)
 {
   int pos=clm_rec->height-4;
   if (pos<0) pos=clm_rec->height;
@@ -1079,7 +1079,7 @@ void place_column_wall_redsmbrick_dkbtm(struct COLUMN_REC *clm_rec, unsigned cha
   clm_rec->height=compute_clm_rec_height(clm_rec);
 }
 
-void place_column_wall_redsmbrick_c(struct COLUMN_REC *clm_rec, unsigned char owner)
+void place_column_wall_redsmbrick_c(struct COLUMN_REC *clm_rec, __attribute__((unused)) unsigned char owner)
 {
   int pos=clm_rec->height-4;
   if (pos<0) pos=clm_rec->height;
@@ -1092,7 +1092,7 @@ void place_column_wall_redsmbrick_c(struct COLUMN_REC *clm_rec, unsigned char ow
   clm_rec->height=compute_clm_rec_height(clm_rec);
 }
 
-void place_column_wall_redsmbrick(struct COLUMN_REC *clm_rec, unsigned char owner)
+void place_column_wall_redsmbrick(struct COLUMN_REC *clm_rec, __attribute__((unused)) unsigned char owner)
 {
   int pos=clm_rec->height-4;
   if (pos<0) pos=clm_rec->height;
@@ -1105,43 +1105,43 @@ void place_column_wall_redsmbrick(struct COLUMN_REC *clm_rec, unsigned char owne
   clm_rec->height=compute_clm_rec_height(clm_rec);
 }
 
-void fill_column_wall_redsmbrick_b(struct COLUMN_REC *clm_rec, unsigned char owner)
+void fill_column_wall_redsmbrick_b(struct COLUMN_REC *clm_rec, __attribute__((unused)) unsigned char owner)
 {
      fill_column_rec_sim(clm_rec, 0, CUBE_PATH_SMOOTH3,
          CUBE_PATH_SMOOTH1 +rnd(5), 0x053, 0x050, 0x050, 0x04e, 0, 0, 0);
 }
 
-void fill_column_wall_redsmbrick_a(struct COLUMN_REC *clm_rec, unsigned char owner)
+void fill_column_wall_redsmbrick_a(struct COLUMN_REC *clm_rec, __attribute__((unused)) unsigned char owner)
 {
      fill_column_rec_sim(clm_rec, 0, CUBE_PATH_SMOOTH3,
          CUBE_PATH_SMOOTH1 +rnd(5), 0x052, 0x048+rnd(3), 0x048+rnd(3), 0x04d, 0, 0, 0);
 }
 
-void fill_column_wall_redsmbrick_c(struct COLUMN_REC *clm_rec, unsigned char owner)
+void fill_column_wall_redsmbrick_c(struct COLUMN_REC *clm_rec, __attribute__((unused)) unsigned char owner)
 {
      fill_column_rec_sim(clm_rec, 0, CUBE_PATH_SMOOTH3,
          CUBE_PATH_SMOOTH1 +rnd(5), 0x051, 0x04f, 0x04f, 0x04c, 0, 0, 0);
 }
 
-void fill_column_wall_redsmbrick_a_nearwater(struct COLUMN_REC *clm_rec, unsigned char owner)
+void fill_column_wall_redsmbrick_a_nearwater(struct COLUMN_REC *clm_rec, __attribute__((unused)) unsigned char owner)
 {
      fill_column_rec_sim(clm_rec, 0, CUBE_PATH_SMOOTH3,
          0x075, 0x048+rnd(3), 0x048+rnd(3), 0x048+rnd(3), 0x04d, 0, 0, 0);
 }
 
-void fill_column_wall_redsmbrick_a_nearlava(struct COLUMN_REC *clm_rec, unsigned char owner)
+void fill_column_wall_redsmbrick_a_nearlava(struct COLUMN_REC *clm_rec, __attribute__((unused)) unsigned char owner)
 {
      fill_column_rec_sim(clm_rec, 0, CUBE_PATH_SMOOTH3,
          0x076, 0x048+rnd(3), 0x048+rnd(3), 0x048+rnd(3), 0x04d, 0, 0, 0);
 }
 
-void fill_column_wall_redsmbrick_c_nearwater(struct COLUMN_REC *clm_rec, unsigned char owner)
+void fill_column_wall_redsmbrick_c_nearwater(struct COLUMN_REC *clm_rec, __attribute__((unused)) unsigned char owner)
 {
      fill_column_rec_sim(clm_rec, 0, CUBE_PATH_SMOOTH3,
          0x075, 0x04f, 0x04f, 0x04f, 0x04c, 0, 0, 0);
 }
 
-void fill_column_wall_redsmbrick_c_nearlava(struct COLUMN_REC *clm_rec, unsigned char owner)
+void fill_column_wall_redsmbrick_c_nearlava(struct COLUMN_REC *clm_rec, __attribute__((unused)) unsigned char owner)
 {
      fill_column_rec_sim(clm_rec, 0, CUBE_PATH_SMOOTH3,
          0x076, 0x04f, 0x04f, 0x04f, 0x04c, 0, 0, 0);
@@ -1196,67 +1196,67 @@ void fill_column_wall_drapebrick_c(struct COLUMN_REC *clm_rec, unsigned char own
     }
 }
 
-void fill_column_wall_twinsbrick_a(struct COLUMN_REC *clm_rec, unsigned char owner)
+void fill_column_wall_twinsbrick_a(struct COLUMN_REC *clm_rec, __attribute__((unused)) unsigned char owner)
 {
      fill_column_rec_sim(clm_rec, 0, CUBE_PATH_SMOOTH3,
          CUBE_PATH_SMOOTH1 +rnd(5), 0x195, CUBE_BRICK_RTWINSBL, CUBE_BRICK_RTWINSML, CUBE_BRICK_RTWINSTL, 0, 0, 0);
 }
 
-void fill_column_wall_twinsbrick_b(struct COLUMN_REC *clm_rec, unsigned char owner)
+void fill_column_wall_twinsbrick_b(struct COLUMN_REC *clm_rec, __attribute__((unused)) unsigned char owner)
 {
      fill_column_rec_sim(clm_rec, 0, CUBE_PATH_SMOOTH3,
          CUBE_PATH_SMOOTH1 +rnd(5), 0x196, CUBE_BRICK_RTWINSBC, CUBE_BRICK_RTWINSMC, CUBE_BRICK_RTWINSTC, 0, 0, 0);
 }
 
-void fill_column_wall_twinsbrick_c(struct COLUMN_REC *clm_rec, unsigned char owner)
+void fill_column_wall_twinsbrick_c(struct COLUMN_REC *clm_rec, __attribute__((unused)) unsigned char owner)
 {
      fill_column_rec_sim(clm_rec, 0, CUBE_PATH_SMOOTH3,
          CUBE_PATH_SMOOTH1 +rnd(5), 0x197, CUBE_BRICK_RTWINSBR, CUBE_BRICK_RTWINSMR, CUBE_BRICK_RTWINSTR, 0, 0, 0);
 }
 
-void fill_column_wall_womanbrick_a(struct COLUMN_REC *clm_rec, unsigned char owner)
+void fill_column_wall_womanbrick_a(struct COLUMN_REC *clm_rec, __attribute__((unused)) unsigned char owner)
 {
      fill_column_rec_sim(clm_rec, 0, CUBE_PATH_SMOOTH3,
          CUBE_PATH_SMOOTH1 +rnd(5), CUBE_BRICK_RWOMANBL, CUBE_BRICK_RWOMANML,
          CUBE_BRICK_RWOMANUL, CUBE_BRICK_RWOMANTL, 0, 0, 0);
 }
 
-void fill_column_wall_womanbrick_b(struct COLUMN_REC *clm_rec, unsigned char owner)
+void fill_column_wall_womanbrick_b(struct COLUMN_REC *clm_rec, __attribute__((unused)) unsigned char owner)
 {
      fill_column_rec_sim(clm_rec, 0, CUBE_PATH_SMOOTH3,
          CUBE_PATH_SMOOTH1 +rnd(5), CUBE_BRICK_RWOMANBC, CUBE_BRICK_RWOMANMC,
          CUBE_BRICK_RWOMANUC, CUBE_BRICK_RWOMANTC, 0, 0, 0);
 }
 
-void fill_column_wall_womanbrick_c(struct COLUMN_REC *clm_rec, unsigned char owner)
+void fill_column_wall_womanbrick_c(struct COLUMN_REC *clm_rec, __attribute__((unused)) unsigned char owner)
 {
      fill_column_rec_sim(clm_rec, 0, CUBE_PATH_SMOOTH3,
          CUBE_PATH_SMOOTH1 +rnd(5), CUBE_BRICK_RWOMANBR, CUBE_BRICK_RWOMANMR,
          CUBE_BRICK_RWOMANUR, CUBE_BRICK_RWOMANTR, 0, 0, 0);
 }
 
-void fill_column_wall_pairshrbrick_a(struct COLUMN_REC *clm_rec, unsigned char owner)
+void fill_column_wall_pairshrbrick_a(struct COLUMN_REC *clm_rec, __attribute__((unused)) unsigned char owner)
 {
      fill_column_rec_sim(clm_rec, 0, CUBE_PATH_SMOOTH3,
          CUBE_PATH_SMOOTH1 +rnd(5), CUBE_BRICK_PAIRSHBL, CUBE_BRICK_PAIRSHML,
          CUBE_BRICK_PAIRSHUL, CUBE_BRICK_PAIRSHTL, 0, 0, 0);
 }
 
-void fill_column_wall_pairshrbrick_b(struct COLUMN_REC *clm_rec, unsigned char owner)
+void fill_column_wall_pairshrbrick_b(struct COLUMN_REC *clm_rec, __attribute__((unused)) unsigned char owner)
 {
      fill_column_rec_sim(clm_rec, 0, CUBE_PATH_SMOOTH3,
          CUBE_PATH_SMOOTH1 +rnd(5), CUBE_BRICK_PAIRSHBC, CUBE_BRICK_PAIRSHMC,
          CUBE_BRICK_PAIRSHUC, CUBE_BRICK_PAIRSHTC, 0, 0, 0);
 }
 
-void fill_column_wall_pairshrbrick_c(struct COLUMN_REC *clm_rec, unsigned char owner)
+void fill_column_wall_pairshrbrick_c(struct COLUMN_REC *clm_rec, __attribute__((unused)) unsigned char owner)
 {
      fill_column_rec_sim(clm_rec, 0, CUBE_PATH_SMOOTH3,
          CUBE_PATH_SMOOTH1 +rnd(5), CUBE_BRICK_PAIRSHBR, CUBE_BRICK_PAIRSHMR,
          CUBE_BRICK_PAIRSHUR, CUBE_BRICK_PAIRSHTR, 0, 0, 0);
 }
 
-void fill_column_path(struct COLUMN_REC *clm_rec, unsigned char owner)
+void fill_column_path(struct COLUMN_REC *clm_rec, __attribute__((unused)) unsigned char owner)
 {
      fill_column_rec_sim(clm_rec, 0, 0x0cf,
          CUBE_PATH_SMOOTH1 +rnd(5), 0x0, 0x0, 0x0, 0x0, 0, 0, 0);
@@ -1277,49 +1277,49 @@ void fill_column_claimedgnd_centr(struct COLUMN_REC *clm_rec, unsigned char owne
          clm_rec->c[0]=0x0c0+owner;
 }
 
-void fill_column_claimedgnd_surr(struct COLUMN_REC *clm_rec, unsigned char owner)
+void fill_column_claimedgnd_surr(struct COLUMN_REC *clm_rec, __attribute__((unused)) unsigned char owner)
 {
      fill_column_rec_sim(clm_rec, 0, 0x0ce,
          0x07e +rnd(3), 0x0, 0x0, 0x0, 0x0, 0, 0, 0);
 }
 
-void fill_column_claimedgnd_nearwater(struct COLUMN_REC *clm_rec, unsigned char owner)
+void fill_column_claimedgnd_nearwater(struct COLUMN_REC *clm_rec, __attribute__((unused)) unsigned char owner)
 {
      fill_column_rec_sim(clm_rec, 0, 0x0ce,
          0x094, 0x0, 0x0, 0x0, 0x0, 0, 0, 0);
 }
 
-void fill_column_claimedgnd_nearlava(struct COLUMN_REC *clm_rec, unsigned char owner)
+void fill_column_claimedgnd_nearlava(struct COLUMN_REC *clm_rec, __attribute__((unused)) unsigned char owner)
 {
      fill_column_rec_sim(clm_rec, 0, 0x0ce,
          0x093, 0x0, 0x0, 0x0, 0x0, 0, 0, 0);
 }
 
-void fill_column_lava(struct COLUMN_REC *clm_rec, unsigned char owner)
+void fill_column_lava(struct COLUMN_REC *clm_rec, __attribute__((unused)) unsigned char owner)
 { /*Simplicity of this one scares me.. */
      fill_column_rec_sim(clm_rec, 0, CUBE_ANI_LAVA_ANY,
          0x0, 0x0, 0x0, 0x0, 0x0, 0, 0, 0);
 }
 
-void fill_column_water(struct COLUMN_REC *clm_rec, unsigned char owner)
+void fill_column_water(struct COLUMN_REC *clm_rec, __attribute__((unused)) unsigned char owner)
 {
      fill_column_rec_sim(clm_rec, 0, CUBE_ANI_WATER,
          0x0, 0x0, 0x0, 0x0, 0x0, 0, 0, 0);
 }
 
-void fill_column_gem(struct COLUMN_REC *clm_rec, unsigned char owner)
+void fill_column_gem(struct COLUMN_REC *clm_rec, __attribute__((unused)) unsigned char owner)
 {
      fill_column_rec_sim(clm_rec, 0, CUBE_PATH_SMOOTH3,
          CUBE_PATH_SMOOTH1 +rnd(5), 0x00a, CUBE_GEMS_ANY, CUBE_GEMS_ANY, CUBE_GEMS_ANY, 0, 0, 0);
 }
 
-void fill_column_library_pillar(struct COLUMN_REC *clm_rec, unsigned char owner)
+void fill_column_library_pillar(struct COLUMN_REC *clm_rec, __attribute__((unused)) unsigned char owner)
 {
      fill_column_rec_sim(clm_rec, 0, CUBE_PATH_SMOOTH3,
          CUBE_PATH_SMOOTH1 +rnd(5), 0x0b9, 0x0b8, 0x0b7, 0x0b6, 0, 0, 0);
 }
 
-void place_column_library_bookcase_a(struct COLUMN_REC *clm_rec, unsigned char owner)
+void place_column_library_bookcase_a(struct COLUMN_REC *clm_rec, __attribute__((unused)) unsigned char owner)
 {
   clm_rec->base=CUBE_PATH_SMOOTH3;
   clm_rec->c[1]=0x14b;
@@ -1329,7 +1329,7 @@ void place_column_library_bookcase_a(struct COLUMN_REC *clm_rec, unsigned char o
   clm_rec->height=compute_clm_rec_height(clm_rec);
 }
 
-void place_column_library_bookcase_b(struct COLUMN_REC *clm_rec, unsigned char owner)
+void place_column_library_bookcase_b(struct COLUMN_REC *clm_rec, __attribute__((unused)) unsigned char owner)
 {
   clm_rec->base=CUBE_PATH_SMOOTH3;
   clm_rec->c[1]=0x0b1;
@@ -1339,7 +1339,7 @@ void place_column_library_bookcase_b(struct COLUMN_REC *clm_rec, unsigned char o
   clm_rec->height=compute_clm_rec_height(clm_rec);
 }
 
-void place_column_library_bookcase_c(struct COLUMN_REC *clm_rec, unsigned char owner)
+void place_column_library_bookcase_c(struct COLUMN_REC *clm_rec, __attribute__((unused)) unsigned char owner)
 {
   clm_rec->base=CUBE_PATH_SMOOTH3;
   clm_rec->c[1]=0x14c;
@@ -1349,7 +1349,7 @@ void place_column_library_bookcase_c(struct COLUMN_REC *clm_rec, unsigned char o
   clm_rec->height=compute_clm_rec_height(clm_rec);
 }
 
-void place_column_temple_pillar(struct COLUMN_REC *clm_rec, unsigned char owner)
+void place_column_temple_pillar(struct COLUMN_REC *clm_rec, __attribute__((unused)) unsigned char owner)
 {
   int pos=clm_rec->height-1;
   if (pos<0) pos=0;
@@ -1365,13 +1365,13 @@ void place_column_temple_pillar(struct COLUMN_REC *clm_rec, unsigned char owner)
   clm_rec->height=compute_clm_rec_height(clm_rec);
 }
 
-void fill_column_temple_floor(struct COLUMN_REC *clm_rec, unsigned char owner)
+void fill_column_temple_floor(struct COLUMN_REC *clm_rec, __attribute__((unused)) unsigned char owner)
 {
      fill_column_rec_sim(clm_rec, 0, 0x177,
          CUBE_PATH_SMOOTH1 +rnd(5), 0x123, 0x0, 0x0, 0x0, 0, 0, 0);
 }
 
-void place_column_temple_corner(struct COLUMN_REC *clm_rec, unsigned char owner)
+void place_column_temple_corner(struct COLUMN_REC *clm_rec, __attribute__((unused)) unsigned char owner)
 {
   int pos=clm_rec->height-1;
   if (pos<0) pos=0;
@@ -1381,7 +1381,7 @@ void place_column_temple_corner(struct COLUMN_REC *clm_rec, unsigned char owner)
   clm_rec->height=compute_clm_rec_height(clm_rec);
 }
 
-void place_column_temple_edge(struct COLUMN_REC *clm_rec, unsigned char owner)
+void place_column_temple_edge(struct COLUMN_REC *clm_rec, __attribute__((unused)) unsigned char owner)
 {
   int pos=clm_rec->height;
   if (pos<0) pos=0;
@@ -1391,7 +1391,7 @@ void place_column_temple_edge(struct COLUMN_REC *clm_rec, unsigned char owner)
   clm_rec->height=compute_clm_rec_height(clm_rec);
 }
 
-void fill_column_dungheart_floor(struct COLUMN_REC *clm_rec, unsigned char owner)
+void fill_column_dungheart_floor(struct COLUMN_REC *clm_rec, __attribute__((unused)) unsigned char owner)
 {
      fill_column_rec_sim(clm_rec, 0, CUBE_PATH_SMOOTH3,
          0x09f , 0x0, 0x0, 0x0, 0x0, 0, 0, 0);
@@ -1412,14 +1412,14 @@ void fill_column_dungheart_pillar(struct COLUMN_REC *clm_rec, unsigned char owne
     }
 }
 
-void fill_column_dungheart_inside(struct COLUMN_REC *clm_rec, unsigned char owner)
+void fill_column_dungheart_inside(struct COLUMN_REC *clm_rec, __attribute__((unused)) unsigned char owner)
 {
      fill_column_rec_sim(clm_rec, 0, CUBE_PATH_SMOOTH3,
          CUBE_PATH_SMOOTH1 +rnd(5), 0x052, 0x09f, 0x0, 0x0, 0, 0, 0);
 }
 
 
-void place_column_univ_stair(struct COLUMN_REC *clm_rec, unsigned char owner)
+void place_column_univ_stair(struct COLUMN_REC *clm_rec, __attribute__((unused)) unsigned char owner)
 {
   int pos=clm_rec->height-1;
   if (pos<0) pos=0;
@@ -1430,7 +1430,7 @@ void place_column_univ_stair(struct COLUMN_REC *clm_rec, unsigned char owner)
   clm_rec->height=compute_clm_rec_height(clm_rec);
 }
 
-void place_column_dungheart_raise(struct COLUMN_REC *clm_rec, unsigned char owner)
+void place_column_dungheart_raise(struct COLUMN_REC *clm_rec, __attribute__((unused)) unsigned char owner)
 {
   int pos=clm_rec->height;
   if (pos<0) pos=0;
@@ -1441,25 +1441,25 @@ void place_column_dungheart_raise(struct COLUMN_REC *clm_rec, unsigned char owne
   clm_rec->height=compute_clm_rec_height(clm_rec);
 }
 
-void fill_column_portal_edge(struct COLUMN_REC *clm_rec, unsigned char owner)
+void fill_column_portal_edge(struct COLUMN_REC *clm_rec, __attribute__((unused)) unsigned char owner)
 {
      fill_column_rec_sim(clm_rec, 0, CUBE_PATH_SMOOTH3,
          0x138, 0x0, 0x0, 0x0, 0x0, 0, 0, 0);
 }
 
-void fill_column_portal_floor(struct COLUMN_REC *clm_rec, unsigned char owner)
+void fill_column_portal_floor(struct COLUMN_REC *clm_rec, __attribute__((unused)) unsigned char owner)
 {
      fill_column_rec_sim(clm_rec, 0, CUBE_PATH_SMOOTH3,
          CUBE_PATH_SMOOTH1 +rnd(5), 0x00a, 0x0, 0x0, 0x0, 0, 0, 0);
 }
 
-void fill_column_portal_pillar(struct COLUMN_REC *clm_rec, unsigned char owner)
+void fill_column_portal_pillar(struct COLUMN_REC *clm_rec, __attribute__((unused)) unsigned char owner)
 {
     fill_column_rec_sim(clm_rec, 0, CUBE_PATH_SMLSTONES,
         CUBE_PATH_SMOOTH1 +rnd(5), 0x00a, 0x00f, 0x00d, 0x00d, 0x00c, 0x00e, 0x0);
 }
 
-void fill_column_portal_step(struct COLUMN_REC *clm_rec, unsigned char owner)
+void fill_column_portal_step(struct COLUMN_REC *clm_rec, __attribute__((unused)) unsigned char owner)
 {
      fill_column_rec_sim(clm_rec, 0, CUBE_PATH_LRGSTONES +rnd(2),
          0x00a, 0x0, 0x0, 0x0, 0x0, 0x0, 0x00e, 0);
@@ -1480,37 +1480,37 @@ void fill_column_portal_inside_cntr(struct COLUMN_REC *clm_rec, unsigned char ow
     }
 }
 
-void fill_column_hatchery_inside(struct COLUMN_REC *clm_rec, unsigned char owner)
+void fill_column_hatchery_inside(struct COLUMN_REC *clm_rec, __attribute__((unused)) unsigned char owner)
 {
      fill_column_rec_sim(clm_rec, 0, CUBE_PATH_SMOOTH3 +rnd(5),
          0x0, 0x0, 0x0, 0x0, 0x0, 0, 0, 0);
 }
 
-void fill_column_hatchery_edge(struct COLUMN_REC *clm_rec, unsigned char owner)
+void fill_column_hatchery_edge(struct COLUMN_REC *clm_rec, __attribute__((unused)) unsigned char owner)
 {
      fill_column_rec_sim(clm_rec, 0, CUBE_PATH_SMOOTH3,
          0x15a, 0x0, 0x0, 0x0, 0x0, 0, 0, 0);
 }
 
-void fill_column_hatchery_pillar(struct COLUMN_REC *clm_rec, unsigned char owner)
+void fill_column_hatchery_pillar(struct COLUMN_REC *clm_rec, __attribute__((unused)) unsigned char owner)
 {
      fill_column_rec_sim(clm_rec, 0, CUBE_PATH_SMOOTH3,
          0x15b, 0x158, 0x158, 0x158, 0x158, 0x159, 0, 0);
 }
 
-void fill_column_lair_inside(struct COLUMN_REC *clm_rec, unsigned char owner)
+void fill_column_lair_inside(struct COLUMN_REC *clm_rec, __attribute__((unused)) unsigned char owner)
 {
      fill_column_rec_sim(clm_rec, 0, CUBE_PATH_SMOOTH3,
          CUBE_LAIR_INSIDE, 0x0, 0x0, 0x0, 0x0, 0, 0, 0);
 }
 
-void fill_column_graveyard_inside(struct COLUMN_REC *clm_rec, unsigned char owner)
+void fill_column_graveyard_inside(struct COLUMN_REC *clm_rec, __attribute__((unused)) unsigned char owner)
 {
      fill_column_rec_sim(clm_rec, 0, CUBE_PATH_LRGSTONES,
          0x142, 0x0, 0x0, 0x0, 0x0, 0, 0, 0);
 }
 
-void place_column_barracks_raise(struct COLUMN_REC *clm_rec, unsigned char owner)
+void place_column_barracks_raise(struct COLUMN_REC *clm_rec, __attribute__((unused)) unsigned char owner)
 {
   int pos=clm_rec->height;
   if (pos>7) pos=7;
@@ -1521,98 +1521,98 @@ void place_column_barracks_raise(struct COLUMN_REC *clm_rec, unsigned char owner
   clm_rec->height=compute_clm_rec_height(clm_rec);
 }
 
-void fill_column_barracks_floor(struct COLUMN_REC *clm_rec, unsigned char owner)
+void fill_column_barracks_floor(struct COLUMN_REC *clm_rec, __attribute__((unused)) unsigned char owner)
 {
      fill_column_rec_sim(clm_rec, 0, CUBE_PATH_SMOOTH3,
          0x181, 0x0, 0x0, 0x0, 0x0, 0, 0, 0);
 }
 
-void fill_column_barracks_pillar(struct COLUMN_REC *clm_rec, unsigned char owner)
+void fill_column_barracks_pillar(struct COLUMN_REC *clm_rec, __attribute__((unused)) unsigned char owner)
 {
     fill_column_rec_sim(clm_rec, 0, CUBE_PATH_SMOOTH3,
         CUBE_PATH_SMOOTH2, 0x184, 0x184, 0x18f, 0x18e, 0x184, 0x0, 0x0);
 }
 
-void fill_column_training_floor(struct COLUMN_REC *clm_rec, unsigned char owner)
+void fill_column_training_floor(struct COLUMN_REC *clm_rec, __attribute__((unused)) unsigned char owner)
 {
      fill_column_rec_sim(clm_rec, 0, 0x13e,
          0x0fc, 0x0, 0x0, 0x0, 0x0, 0, 0, 0);
 }
 
-void fill_column_training_pillar(struct COLUMN_REC *clm_rec, unsigned char owner)
+void fill_column_training_pillar(struct COLUMN_REC *clm_rec, __attribute__((unused)) unsigned char owner)
 {
     fill_column_rec_sim(clm_rec, 0, 0x13e,
         0x0fc, 0x0fb, 0x0fa, 0x0f9, 0x0f9, 0x0f1, 0x0, 0x0);
 }
 
-void fill_column_treasure_floor(struct COLUMN_REC *clm_rec, unsigned char owner)
+void fill_column_treasure_floor(struct COLUMN_REC *clm_rec, __attribute__((unused)) unsigned char owner)
 {
      fill_column_rec_sim(clm_rec, 0, 0x06a,
          0x09f, 0x0, 0x0, 0x0, 0x0, 0, 0, 0);
 }
 
-void fill_column_treasure_pillar(struct COLUMN_REC *clm_rec, unsigned char owner)
+void fill_column_treasure_pillar(struct COLUMN_REC *clm_rec, __attribute__((unused)) unsigned char owner)
 {
     fill_column_rec_sim(clm_rec, 0, 0x06a,
         0x09f, 0x03e, 0x039, 0x03a, 0x039, 0x041, 0x0, 0x0);
 }
 
-void fill_column_workshop_floor(struct COLUMN_REC *clm_rec, unsigned char owner)
+void fill_column_workshop_floor(struct COLUMN_REC *clm_rec, __attribute__((unused)) unsigned char owner)
 {
      fill_column_rec_sim(clm_rec, 0, 0x15a,
          0x107, 0x0, 0x0, 0x0, 0x0, 0, 0, 0);
 }
 
-void fill_column_workshop_pillar(struct COLUMN_REC *clm_rec, unsigned char owner)
+void fill_column_workshop_pillar(struct COLUMN_REC *clm_rec, __attribute__((unused)) unsigned char owner)
 {
     fill_column_rec_sim(clm_rec, 0, CUBE_PATH_SMOOTH3,
         CUBE_PATH_LRGSTONES, 0x10e, 0x10d, 0x10c, 0x10b, 0x0, 0x0, 0x0);
 }
 
 
-void fill_column_scavenger_floor(struct COLUMN_REC *clm_rec, unsigned char owner)
+void fill_column_scavenger_floor(struct COLUMN_REC *clm_rec, __attribute__((unused)) unsigned char owner)
 {
      fill_column_rec_sim(clm_rec, 0, 0x0f8,
          0x119, 0x0, 0x0, 0x0, 0x0, 0, 0, 0);
 }
 
-void fill_column_scavenger_pillar(struct COLUMN_REC *clm_rec, unsigned char owner)
+void fill_column_scavenger_pillar(struct COLUMN_REC *clm_rec, __attribute__((unused)) unsigned char owner)
 {
     fill_column_rec_sim(clm_rec, 0, 0x0f8,
         CUBE_PATH_SMOOTH1, 0x118, 0x117, 0x116, 0x115, 0x0, 0x0, 0x0);
 }
 
-void fill_column_scavenger_inside_cntr(struct COLUMN_REC *clm_rec, unsigned char owner)
+void fill_column_scavenger_inside_cntr(struct COLUMN_REC *clm_rec, __attribute__((unused)) unsigned char owner)
 {
      fill_column_rec_sim(clm_rec, 0, 0x0f8,
          0x11c, 0x0, 0x0, 0x0, 0x0, 0, 0, 0);
 }
 
-void fill_column_prison_inside(struct COLUMN_REC *clm_rec, unsigned char owner)
+void fill_column_prison_inside(struct COLUMN_REC *clm_rec, __attribute__((unused)) unsigned char owner)
 {
      fill_column_rec_sim(clm_rec, 0, 0x118,
          0x0c8, 0x0, 0x0, 0x0, 0x0, 0, 0, 0);
 }
 
-void fill_column_guardpost_floor_a(struct COLUMN_REC *clm_rec, unsigned char owner)
+void fill_column_guardpost_floor_a(struct COLUMN_REC *clm_rec, __attribute__((unused)) unsigned char owner)
 {
      fill_column_rec_sim(clm_rec, 0, 0x0b0 +rnd(3),
          0x07e +rnd(3), CUBE_WOOD_FLOOR1, 0x0, 0x0, 0x0, 0, 0, 0);
 }
 
-void fill_column_guardpost_floor_b(struct COLUMN_REC *clm_rec, unsigned char owner)
+void fill_column_guardpost_floor_b(struct COLUMN_REC *clm_rec, __attribute__((unused)) unsigned char owner)
 {
      fill_column_rec_sim(clm_rec, 0, 0x0b0 +rnd(3),
          0x07e +rnd(3), CUBE_WOOD_FLOOR2, 0x0, 0x0, 0x0, 0, 0, 0);
 }
 
-void fill_column_guardpost_floor_c(struct COLUMN_REC *clm_rec, unsigned char owner)
+void fill_column_guardpost_floor_c(struct COLUMN_REC *clm_rec, __attribute__((unused)) unsigned char owner)
 {
      fill_column_rec_sim(clm_rec, 0, 0x0b0 +rnd(3),
          0x07e +rnd(3), CUBE_WOOD_FLOOR3, 0x0, 0x0, 0x0, 0, 0, 0);
 }
 
-void fill_column_bridge_inside(struct COLUMN_REC *clm_rec, unsigned char owner)
+void fill_column_bridge_inside(struct COLUMN_REC *clm_rec, __attribute__((unused)) unsigned char owner)
 {
      fill_column_rec_sim(clm_rec, 0, 0x1f3,
          0x1b8, 0x0, 0x0, 0x0, 0x0, 0, 0, 0);
@@ -1672,7 +1672,7 @@ void place_column_wall_drape_c(struct COLUMN_REC *clm_rec, unsigned char owner)
   clm_rec->height=compute_clm_rec_height(clm_rec);
 }
 
-void place_column_wall_portal_a(struct COLUMN_REC *clm_rec, unsigned char owner)
+void place_column_wall_portal_a(struct COLUMN_REC *clm_rec, __attribute__((unused)) unsigned char owner)
 {
   int pos=clm_rec->height-4;
   if (pos<0) pos=0;
@@ -1685,7 +1685,7 @@ void place_column_wall_portal_a(struct COLUMN_REC *clm_rec, unsigned char owner)
   clm_rec->height=compute_clm_rec_height(clm_rec);
 }
 
-void place_column_wall_portal_b(struct COLUMN_REC *clm_rec, unsigned char owner)
+void place_column_wall_portal_b(struct COLUMN_REC *clm_rec, __attribute__((unused)) unsigned char owner)
 {
   int pos=clm_rec->height-4;
   if (pos<0) pos=0;
@@ -1698,7 +1698,7 @@ void place_column_wall_portal_b(struct COLUMN_REC *clm_rec, unsigned char owner)
   clm_rec->height=compute_clm_rec_height(clm_rec);
 }
 
-void place_column_wall_treasure_a(struct COLUMN_REC *clm_rec, unsigned char owner)
+void place_column_wall_treasure_a(struct COLUMN_REC *clm_rec, __attribute__((unused)) unsigned char owner)
 {
   int pos=clm_rec->height-3;
   if (pos<0) pos=0;
@@ -1709,7 +1709,7 @@ void place_column_wall_treasure_a(struct COLUMN_REC *clm_rec, unsigned char owne
   clm_rec->height=compute_clm_rec_height(clm_rec);
 }
 
-void place_column_wall_treasure_b(struct COLUMN_REC *clm_rec, unsigned char owner)
+void place_column_wall_treasure_b(struct COLUMN_REC *clm_rec, __attribute__((unused)) unsigned char owner)
 {
   int pos=clm_rec->height-3;
   if (pos<0) pos=0;
@@ -1720,7 +1720,7 @@ void place_column_wall_treasure_b(struct COLUMN_REC *clm_rec, unsigned char owne
   clm_rec->height=compute_clm_rec_height(clm_rec);
 }
 
-void place_column_wall_treasure_c(struct COLUMN_REC *clm_rec, unsigned char owner)
+void place_column_wall_treasure_c(struct COLUMN_REC *clm_rec, __attribute__((unused)) unsigned char owner)
 {
   int pos=clm_rec->height-3;
   if (pos<0) pos=0;
@@ -1731,7 +1731,7 @@ void place_column_wall_treasure_c(struct COLUMN_REC *clm_rec, unsigned char owne
   clm_rec->height=compute_clm_rec_height(clm_rec);
 }
 
-void place_column_wall_training_a(struct COLUMN_REC *clm_rec, unsigned char owner)
+void place_column_wall_training_a(struct COLUMN_REC *clm_rec, __attribute__((unused)) unsigned char owner)
 {
   int pos=clm_rec->height-4;
   if (pos<0) pos=0;
@@ -1743,7 +1743,7 @@ void place_column_wall_training_a(struct COLUMN_REC *clm_rec, unsigned char owne
   clm_rec->height=compute_clm_rec_height(clm_rec);
 }
 
-void place_column_wall_training_b(struct COLUMN_REC *clm_rec, unsigned char owner)
+void place_column_wall_training_b(struct COLUMN_REC *clm_rec, __attribute__((unused)) unsigned char owner)
 {
   int pos=clm_rec->height-4;
   if (pos<0) pos=0;
@@ -1755,7 +1755,7 @@ void place_column_wall_training_b(struct COLUMN_REC *clm_rec, unsigned char owne
   clm_rec->height=compute_clm_rec_height(clm_rec);
 }
 
-void place_column_wall_training_c(struct COLUMN_REC *clm_rec, unsigned char owner)
+void place_column_wall_training_c(struct COLUMN_REC *clm_rec, __attribute__((unused)) unsigned char owner)
 {
   int pos=clm_rec->height-4;
   if (pos<0) pos=0;
@@ -1767,7 +1767,7 @@ void place_column_wall_training_c(struct COLUMN_REC *clm_rec, unsigned char owne
   clm_rec->height=compute_clm_rec_height(clm_rec);
 }
 
-void place_column_wall_library_a(struct COLUMN_REC *clm_rec, unsigned char owner)
+void place_column_wall_library_a(struct COLUMN_REC *clm_rec, __attribute__((unused)) unsigned char owner)
 {
   int pos=clm_rec->height-3;
   if (pos<0) pos=0;
@@ -1778,7 +1778,7 @@ void place_column_wall_library_a(struct COLUMN_REC *clm_rec, unsigned char owner
   clm_rec->height=compute_clm_rec_height(clm_rec);
 }
 
-void place_column_wall_library_b(struct COLUMN_REC *clm_rec, unsigned char owner)
+void place_column_wall_library_b(struct COLUMN_REC *clm_rec, __attribute__((unused)) unsigned char owner)
 {
   int pos=clm_rec->height-3;
   if (pos<0) pos=0;
@@ -1789,7 +1789,7 @@ void place_column_wall_library_b(struct COLUMN_REC *clm_rec, unsigned char owner
   clm_rec->height=compute_clm_rec_height(clm_rec);
 }
 
-void place_column_wall_library_c(struct COLUMN_REC *clm_rec, unsigned char owner)
+void place_column_wall_library_c(struct COLUMN_REC *clm_rec, __attribute__((unused)) unsigned char owner)
 {
   int pos=clm_rec->height-3;
   if (pos<0) pos=0;
@@ -1800,7 +1800,7 @@ void place_column_wall_library_c(struct COLUMN_REC *clm_rec, unsigned char owner
   clm_rec->height=compute_clm_rec_height(clm_rec);
 }
 
-void place_column_wall_scavenger_a(struct COLUMN_REC *clm_rec, unsigned char owner)
+void place_column_wall_scavenger_a(struct COLUMN_REC *clm_rec, __attribute__((unused)) unsigned char owner)
 {
   int pos=clm_rec->height-3;
   if (pos<0) pos=0;
@@ -1811,7 +1811,7 @@ void place_column_wall_scavenger_a(struct COLUMN_REC *clm_rec, unsigned char own
   clm_rec->height=compute_clm_rec_height(clm_rec);
 }
 
-void place_column_wall_scavenger_b(struct COLUMN_REC *clm_rec, unsigned char owner)
+void place_column_wall_scavenger_b(struct COLUMN_REC *clm_rec, __attribute__((unused)) unsigned char owner)
 {
   int pos=clm_rec->height-3;
   if (pos<0) pos=0;
@@ -1822,7 +1822,7 @@ void place_column_wall_scavenger_b(struct COLUMN_REC *clm_rec, unsigned char own
   clm_rec->height=compute_clm_rec_height(clm_rec);
 }
 
-void place_column_wall_scavenger_c(struct COLUMN_REC *clm_rec, unsigned char owner)
+void place_column_wall_scavenger_c(struct COLUMN_REC *clm_rec, __attribute__((unused)) unsigned char owner)
 {
   int pos=clm_rec->height-3;
   if (pos<0) pos=0;
@@ -1833,7 +1833,7 @@ void place_column_wall_scavenger_c(struct COLUMN_REC *clm_rec, unsigned char own
   clm_rec->height=compute_clm_rec_height(clm_rec);
 }
 
-void place_column_wall_graveyard_a(struct COLUMN_REC *clm_rec, unsigned char owner)
+void place_column_wall_graveyard_a(struct COLUMN_REC *clm_rec, __attribute__((unused)) unsigned char owner)
 {
   int pos=clm_rec->height-4;
   if (pos<0) pos=0;
@@ -1845,7 +1845,7 @@ void place_column_wall_graveyard_a(struct COLUMN_REC *clm_rec, unsigned char own
   clm_rec->height=compute_clm_rec_height(clm_rec);
 }
 
-void place_column_wall_graveyard_b(struct COLUMN_REC *clm_rec, unsigned char owner)
+void place_column_wall_graveyard_b(struct COLUMN_REC *clm_rec, __attribute__((unused)) unsigned char owner)
 {
   int pos=clm_rec->height-4;
   if (pos<0) pos=0;
@@ -1857,7 +1857,7 @@ void place_column_wall_graveyard_b(struct COLUMN_REC *clm_rec, unsigned char own
   clm_rec->height=compute_clm_rec_height(clm_rec);
 }
 
-void place_column_wall_graveyard_c(struct COLUMN_REC *clm_rec, unsigned char owner)
+void place_column_wall_graveyard_c(struct COLUMN_REC *clm_rec, __attribute__((unused)) unsigned char owner)
 {
   int pos=clm_rec->height-4;
   if (pos<0) pos=0;
@@ -1869,7 +1869,7 @@ void place_column_wall_graveyard_c(struct COLUMN_REC *clm_rec, unsigned char own
   clm_rec->height=compute_clm_rec_height(clm_rec);
 }
 
-void place_column_wall_lair_a(struct COLUMN_REC *clm_rec, unsigned char owner)
+void place_column_wall_lair_a(struct COLUMN_REC *clm_rec, __attribute__((unused)) unsigned char owner)
 {
   int pos=clm_rec->height-4;
   if (pos<0) pos=0;
@@ -1880,7 +1880,7 @@ void place_column_wall_lair_a(struct COLUMN_REC *clm_rec, unsigned char owner)
   clm_rec->height=compute_clm_rec_height(clm_rec);
 }
 
-void place_column_wall_lair_b(struct COLUMN_REC *clm_rec, unsigned char owner)
+void place_column_wall_lair_b(struct COLUMN_REC *clm_rec, __attribute__((unused)) unsigned char owner)
 {
   int pos=clm_rec->height-4;
   if (pos<0) pos=0;
@@ -1893,7 +1893,7 @@ void place_column_wall_lair_b(struct COLUMN_REC *clm_rec, unsigned char owner)
   clm_rec->height=compute_clm_rec_height(clm_rec);
 }
 
-void place_column_wall_lair_c(struct COLUMN_REC *clm_rec, unsigned char owner)
+void place_column_wall_lair_c(struct COLUMN_REC *clm_rec, __attribute__((unused)) unsigned char owner)
 {
   int pos=clm_rec->height-4;
   if (pos<0) pos=0;
@@ -1904,7 +1904,7 @@ void place_column_wall_lair_c(struct COLUMN_REC *clm_rec, unsigned char owner)
   clm_rec->height=compute_clm_rec_height(clm_rec);
 }
 
-void place_column_wall_laircrnr_a(struct COLUMN_REC *clm_rec, unsigned char owner)
+void place_column_wall_laircrnr_a(struct COLUMN_REC *clm_rec, __attribute__((unused)) unsigned char owner)
 {
   int pos=clm_rec->height-4;
   if (pos<0) pos=0;
@@ -1915,7 +1915,7 @@ void place_column_wall_laircrnr_a(struct COLUMN_REC *clm_rec, unsigned char owne
   clm_rec->height=compute_clm_rec_height(clm_rec);
 }
 
-void place_column_wall_laircrnr_b(struct COLUMN_REC *clm_rec, unsigned char owner)
+void place_column_wall_laircrnr_b(struct COLUMN_REC *clm_rec, __attribute__((unused)) unsigned char owner)
 {
   int pos=clm_rec->height-4;
   if (pos<0) pos=0;
@@ -1928,7 +1928,7 @@ void place_column_wall_laircrnr_b(struct COLUMN_REC *clm_rec, unsigned char owne
   clm_rec->height=compute_clm_rec_height(clm_rec);
 }
 
-void place_column_wall_laircrnr_c(struct COLUMN_REC *clm_rec, unsigned char owner)
+void place_column_wall_laircrnr_c(struct COLUMN_REC *clm_rec, __attribute__((unused)) unsigned char owner)
 {
   int pos=clm_rec->height-4;
   if (pos<0) pos=0;
@@ -1939,7 +1939,7 @@ void place_column_wall_laircrnr_c(struct COLUMN_REC *clm_rec, unsigned char owne
   clm_rec->height=compute_clm_rec_height(clm_rec);
 }
 
-void place_column_wall_workshop_a(struct COLUMN_REC *clm_rec, unsigned char owner)
+void place_column_wall_workshop_a(struct COLUMN_REC *clm_rec, __attribute__((unused)) unsigned char owner)
 {
   int pos=clm_rec->height-3;
   if (pos<0) pos=0;
@@ -1950,7 +1950,7 @@ void place_column_wall_workshop_a(struct COLUMN_REC *clm_rec, unsigned char owne
   clm_rec->height=compute_clm_rec_height(clm_rec);
 }
 
-void place_column_wall_workshop_b(struct COLUMN_REC *clm_rec, unsigned char owner)
+void place_column_wall_workshop_b(struct COLUMN_REC *clm_rec, __attribute__((unused)) unsigned char owner)
 {
   int pos=clm_rec->height-3;
   if (pos<0) pos=0;
@@ -1961,7 +1961,7 @@ void place_column_wall_workshop_b(struct COLUMN_REC *clm_rec, unsigned char owne
   clm_rec->height=compute_clm_rec_height(clm_rec);
 }
 
-void place_column_wall_workshop_c(struct COLUMN_REC *clm_rec, unsigned char owner)
+void place_column_wall_workshop_c(struct COLUMN_REC *clm_rec, __attribute__((unused)) unsigned char owner)
 {
   int pos=clm_rec->height-3;
   if (pos<0) pos=0;
@@ -1972,7 +1972,7 @@ void place_column_wall_workshop_c(struct COLUMN_REC *clm_rec, unsigned char owne
   clm_rec->height=compute_clm_rec_height(clm_rec);
 }
 
-void place_column_wall_prison_a(struct COLUMN_REC *clm_rec, unsigned char owner)
+void place_column_wall_prison_a(struct COLUMN_REC *clm_rec, __attribute__((unused)) unsigned char owner)
 {
   int pos=clm_rec->height-3;
   if (pos<0) pos=0;
@@ -1983,7 +1983,7 @@ void place_column_wall_prison_a(struct COLUMN_REC *clm_rec, unsigned char owner)
   clm_rec->height=compute_clm_rec_height(clm_rec);
 }
 
-void place_column_wall_prison_b(struct COLUMN_REC *clm_rec, unsigned char owner)
+void place_column_wall_prison_b(struct COLUMN_REC *clm_rec, __attribute__((unused)) unsigned char owner)
 {
   int pos=clm_rec->height-3;
   if (pos<0) pos=0;
@@ -1994,7 +1994,7 @@ void place_column_wall_prison_b(struct COLUMN_REC *clm_rec, unsigned char owner)
   clm_rec->height=compute_clm_rec_height(clm_rec);
 }
 
-void place_column_wall_prison_c(struct COLUMN_REC *clm_rec, unsigned char owner)
+void place_column_wall_prison_c(struct COLUMN_REC *clm_rec, __attribute__((unused)) unsigned char owner)
 {
   int pos=clm_rec->height-3;
   if (pos<0) pos=0;
@@ -2005,7 +2005,7 @@ void place_column_wall_prison_c(struct COLUMN_REC *clm_rec, unsigned char owner)
   clm_rec->height=compute_clm_rec_height(clm_rec);
 }
 
-void place_column_wall_torture_a(struct COLUMN_REC *clm_rec, unsigned char owner)
+void place_column_wall_torture_a(struct COLUMN_REC *clm_rec, __attribute__((unused)) unsigned char owner)
 {
   int pos=clm_rec->height-3;
   if (pos<0) pos=0;
@@ -2017,7 +2017,7 @@ void place_column_wall_torture_a(struct COLUMN_REC *clm_rec, unsigned char owner
   clm_rec->height=compute_clm_rec_height(clm_rec);
 }
 
-void place_column_wall_torture_b(struct COLUMN_REC *clm_rec, unsigned char owner)
+void place_column_wall_torture_b(struct COLUMN_REC *clm_rec, __attribute__((unused)) unsigned char owner)
 {
   int pos=clm_rec->height-3;
   if (pos<0) pos=0;
@@ -2029,7 +2029,7 @@ void place_column_wall_torture_b(struct COLUMN_REC *clm_rec, unsigned char owner
   clm_rec->height=compute_clm_rec_height(clm_rec);
 }
 
-void place_column_wall_torture_c(struct COLUMN_REC *clm_rec, unsigned char owner)
+void place_column_wall_torture_c(struct COLUMN_REC *clm_rec, __attribute__((unused)) unsigned char owner)
 {
   int pos=clm_rec->height-3;
   if (pos<0) pos=0;
@@ -2041,7 +2041,7 @@ void place_column_wall_torture_c(struct COLUMN_REC *clm_rec, unsigned char owner
   clm_rec->height=compute_clm_rec_height(clm_rec);
 }
 
-void place_column_wall_barracks_a(struct COLUMN_REC *clm_rec, unsigned char owner)
+void place_column_wall_barracks_a(struct COLUMN_REC *clm_rec, __attribute__((unused)) unsigned char owner)
 {
   int pos=clm_rec->height-3;
   if (pos<0) pos=0;
@@ -2073,7 +2073,7 @@ void place_column_wall_barracks_b(struct COLUMN_REC *clm_rec, unsigned char owne
   clm_rec->height=compute_clm_rec_height(clm_rec);
 }
 
-void place_column_wall_barracks_c(struct COLUMN_REC *clm_rec, unsigned char owner)
+void place_column_wall_barracks_c(struct COLUMN_REC *clm_rec, __attribute__((unused)) unsigned char owner)
 {
   int pos=clm_rec->height-3;
   if (pos<0) pos=0;
@@ -2085,7 +2085,7 @@ void place_column_wall_barracks_c(struct COLUMN_REC *clm_rec, unsigned char owne
   clm_rec->height=compute_clm_rec_height(clm_rec);
 }
 
-void place_column_wall_temple_a(struct COLUMN_REC *clm_rec, unsigned char owner)
+void place_column_wall_temple_a(struct COLUMN_REC *clm_rec, __attribute__((unused)) unsigned char owner)
 {
   int pos=clm_rec->height-4;
   if (pos<0) pos=0;
@@ -2098,7 +2098,7 @@ void place_column_wall_temple_a(struct COLUMN_REC *clm_rec, unsigned char owner)
   clm_rec->height=compute_clm_rec_height(clm_rec);
 }
 
-void place_column_wall_temple_b(struct COLUMN_REC *clm_rec, unsigned char owner)
+void place_column_wall_temple_b(struct COLUMN_REC *clm_rec, __attribute__((unused)) unsigned char owner)
 {
   int pos=clm_rec->height-4;
   if (pos<0) pos=0;
@@ -2111,7 +2111,7 @@ void place_column_wall_temple_b(struct COLUMN_REC *clm_rec, unsigned char owner)
   clm_rec->height=compute_clm_rec_height(clm_rec);
 }
 
-void place_column_wall_temple_c(struct COLUMN_REC *clm_rec, unsigned char owner)
+void place_column_wall_temple_c(struct COLUMN_REC *clm_rec, __attribute__((unused)) unsigned char owner)
 {
   int pos=clm_rec->height-4;
   if (pos<0) pos=0;
@@ -2124,7 +2124,7 @@ void place_column_wall_temple_c(struct COLUMN_REC *clm_rec, unsigned char owner)
   clm_rec->height=compute_clm_rec_height(clm_rec);
 }
 
-void place_column_wall_hatchery_a(struct COLUMN_REC *clm_rec, unsigned char owner)
+void place_column_wall_hatchery_a(struct COLUMN_REC *clm_rec, __attribute__((unused)) unsigned char owner)
 {
   int pos=clm_rec->height-4;
   if (pos<0) pos=0;
@@ -2136,7 +2136,7 @@ void place_column_wall_hatchery_a(struct COLUMN_REC *clm_rec, unsigned char owne
   clm_rec->height=compute_clm_rec_height(clm_rec);
 }
 
-void place_column_wall_hatchery_b(struct COLUMN_REC *clm_rec, unsigned char owner)
+void place_column_wall_hatchery_b(struct COLUMN_REC *clm_rec, __attribute__((unused)) unsigned char owner)
 {
   int pos=clm_rec->height-4;
   if (pos<0) pos=0;
@@ -2148,7 +2148,7 @@ void place_column_wall_hatchery_b(struct COLUMN_REC *clm_rec, unsigned char owne
   clm_rec->height=compute_clm_rec_height(clm_rec);
 }
 
-void place_column_wall_hatchery_c(struct COLUMN_REC *clm_rec, unsigned char owner)
+void place_column_wall_hatchery_c(struct COLUMN_REC *clm_rec, __attribute__((unused)) unsigned char owner)
 {
   int pos=clm_rec->height-4;
   if (pos<0) pos=0;

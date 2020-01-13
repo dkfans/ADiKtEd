@@ -466,7 +466,7 @@ int compute_graffiti_subtl_length(unsigned short font,char *text)
  * @param text The graffiti message text.
  * @return Returns graffiti height, in cubes (or subtiles).
  */
-int get_graffiti_cube_height(unsigned short font,char *text)
+int get_graffiti_cube_height(unsigned short font, __attribute__((unused)) char *text)
 {
     /*highly simplified - for now... */
     /*TODO: compute height of every char in text, then select the largest. */

@@ -180,7 +180,7 @@ unsigned char *memfile_leave_content(struct MEMORY_FILE **mfile)
  * @param max_size Maximum acceptable input file size.
  * @return Returns MFILE_OK, or negative error code.
  */
-short memfile_read(struct MEMORY_FILE *mfile,const char *fname,unsigned long max_size)
+short memfile_read(struct MEMORY_FILE *mfile,const char *fname, __attribute__((unused)) unsigned long max_size)
 {
     if ((mfile==NULL) || (fname==NULL))
         return MFILE_INTERNAL;

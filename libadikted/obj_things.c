@@ -2103,7 +2103,7 @@ unsigned int get_nulltng_count(void)
      return sizeof(items_nullthings)/sizeof(unsigned char);
 }
 
-short is_false_stype(const unsigned char stype_idx)
+short is_false_stype(__attribute__((unused)) const unsigned char stype_idx)
 {
     return false;
 }

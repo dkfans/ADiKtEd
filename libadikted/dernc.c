@@ -324,7 +324,7 @@ long rnc_plen(void *packed)
 /**
  * Empty callback - for use if no callback is needed.
  */
-long rnc_nocallback(long done,long total)
+long rnc_nocallback(__attribute__((unused)) long done, __attribute__((unused)) long total)
 {}
 
 /**

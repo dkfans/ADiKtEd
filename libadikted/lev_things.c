@@ -82,7 +82,7 @@ short things_verify(struct LEVEL *lvl, char *err_msg,struct IPOINT_2D *errpt)
         unsigned short subtp_x = 0;
         unsigned short subtp_y = 0;
         unsigned short subtp_h = 0;
-        
+
         for (k=0; k <things_count ; k++)
         {
           unsigned char *thing = get_thing(lvl,i,j,k);
@@ -1423,8 +1423,8 @@ void create_things_slb_room_simple(cr_tng_func cr_any,
 }
 
 void delete_room_things(struct LEVEL *lvl, const int tx, const int ty,
-        const unsigned char *surr_slb,const unsigned char *surr_own,
-        const struct UPOINT_2D corner_pos)
+        __attribute__((unused)) const unsigned char *surr_slb, __attribute__((unused)) const unsigned char *surr_own,
+        __attribute__((unused)) const struct UPOINT_2D corner_pos)
 {
     int sx, sy;
     for (sx=tx*MAP_SUBNUM_X; sx < (tx+1)*MAP_SUBNUM_X; sx++)
@@ -1455,8 +1455,8 @@ void delete_room_things_subtl(struct LEVEL *lvl, int sx, int sy)
 }
 
 void update_things_slb_portal_inside(struct LEVEL *lvl, const int tx, const int ty,
-        const unsigned char *surr_slb,const unsigned char *surr_own,
-        const struct UPOINT_2D corner_pos)
+        __attribute__((unused)) const unsigned char *surr_slb, __attribute__((unused)) const unsigned char *surr_own,
+        __attribute__((unused)) const struct UPOINT_2D corner_pos)
 {
     int sx, sy, i;
     unsigned char *thing_eff=NULL;
@@ -1603,78 +1603,78 @@ unsigned char *update_thing_slb_room_one_item_subtl(struct LEVEL *lvl, int sx, i
 }
 
 void update_things_slb_training_inside(struct LEVEL *lvl, const int tx, const int ty,
-        const unsigned char *surr_slb,const unsigned char *surr_own,
-        const struct UPOINT_2D corner_pos)
+        __attribute__((unused)) const unsigned char *surr_slb,__attribute__((unused)) const unsigned char *surr_own,
+        __attribute__((unused)) const struct UPOINT_2D corner_pos)
 {
     update_thing_slb_room_one_central_item(lvl,tx,ty,ITEM_SUBTYPE_TRAINPOST,true);
 }
 
 void update_things_slb_scavenger_inside(struct LEVEL *lvl, const int tx, const int ty,
-        const unsigned char *surr_slb,const unsigned char *surr_own,
-        const struct UPOINT_2D corner_pos)
+        __attribute__((unused)) const unsigned char *surr_slb,__attribute__((unused)) const unsigned char *surr_own,
+        __attribute__((unused)) const struct UPOINT_2D corner_pos)
 {
     update_thing_slb_room_one_central_item(lvl,tx,ty,ITEM_SUBTYPE_SCAVNGEYE,true);
 }
 
 void update_things_slb_graveyard_floor(struct LEVEL *lvl, const int tx, const int ty,
-        const unsigned char *surr_slb,const unsigned char *surr_own,
-        const struct UPOINT_2D corner_pos)
+        __attribute__((unused)) const unsigned char *surr_slb,__attribute__((unused)) const unsigned char *surr_own,
+        __attribute__((unused)) const struct UPOINT_2D corner_pos)
 {
     update_thing_slb_room_one_central_item(lvl,tx,ty,ITEM_SUBTYPE_GRAVSTONE,true);
 }
 
 void update_things_slb_workshop_inside(struct LEVEL *lvl, const int tx, const int ty,
-        const unsigned char *surr_slb,const unsigned char *surr_own,
-        const struct UPOINT_2D corner_pos)
+        __attribute__((unused)) const unsigned char *surr_slb,__attribute__((unused)) const unsigned char *surr_own,
+        __attribute__((unused)) const struct UPOINT_2D corner_pos)
 {
     update_thing_slb_room_one_central_item(lvl,tx,ty,ITEM_SUBTYPE_WRKSHPMCH,true);
 }
 
 void update_things_slb_torture_inside(struct LEVEL *lvl, const int tx, const int ty,
-        const unsigned char *surr_slb,const unsigned char *surr_own,
-        const struct UPOINT_2D corner_pos)
+        __attribute__((unused)) const unsigned char *surr_slb,__attribute__((unused)) const unsigned char *surr_own,
+        __attribute__((unused)) const struct UPOINT_2D corner_pos)
 {
     update_thing_slb_room_one_central_item(lvl,tx,ty,ITEM_SUBTYPE_TORTURER,true);
 }
 
 void update_things_slb_treasure_corner(struct LEVEL *lvl, const int tx, const int ty,
-        const unsigned char *surr_slb,const unsigned char *surr_own,
-        const struct UPOINT_2D corner_pos)
+        __attribute__((unused)) const unsigned char *surr_slb,__attribute__((unused)) const unsigned char *surr_own,
+        __attribute__((unused)) const struct UPOINT_2D corner_pos)
 {
     update_thing_slb_room_one_central_item(lvl,tx,ty,ITEM_SUBTYPE_CANDLSTCK,true);
 }
 
 void update_things_slb_torture_edge(struct LEVEL *lvl, const int tx, const int ty,
-        const unsigned char *surr_slb,const unsigned char *surr_own,
-        const struct UPOINT_2D corner_pos)
+        __attribute__((unused)) const unsigned char *surr_slb,__attribute__((unused)) const unsigned char *surr_own,
+        __attribute__((unused)) const struct UPOINT_2D corner_pos)
 {
     update_thing_slb_room_one_central_item(lvl,tx,ty,ITEM_SUBTYPE_TORTSPIKE,true);
 }
 
 void update_things_slb_training_corner(struct LEVEL *lvl, const int tx, const int ty,
-        const unsigned char *surr_slb,const unsigned char *surr_own,
-        const struct UPOINT_2D corner_pos)
+        __attribute__((unused)) const unsigned char *surr_slb,__attribute__((unused)) const unsigned char *surr_own,
+        __attribute__((unused)) const struct UPOINT_2D corner_pos)
 {
     update_thing_slb_room_one_central_item(lvl,tx,ty,ITEM_SUBTYPE_TORCH,true);
 }
 
 void update_things_slb_scavenger_corner(struct LEVEL *lvl, const int tx, const int ty,
-        const unsigned char *surr_slb,const unsigned char *surr_own,
-        const struct UPOINT_2D corner_pos)
+        __attribute__((unused)) const unsigned char *surr_slb,__attribute__((unused)) const unsigned char *surr_own,
+        __attribute__((unused)) const struct UPOINT_2D corner_pos)
 {
     update_thing_slb_room_one_central_item(lvl,tx,ty,ITEM_SUBTYPE_TORCH,true);
 }
 
 void update_things_slb_hatchery_corner(struct LEVEL *lvl, const int tx, const int ty,
-        const unsigned char *surr_slb,const unsigned char *surr_own,
-        const struct UPOINT_2D corner_pos)
+        __attribute__((unused)) const unsigned char *surr_slb,__attribute__((unused)) const unsigned char *surr_own,
+        __attribute__((unused)) const struct UPOINT_2D corner_pos)
 {
     update_thing_slb_room_one_central_item(lvl,tx,ty,ITEM_SUBTYPE_TORCH,true);
 }
 
 void update_things_slb_temple_corner(struct LEVEL *lvl, const int tx, const int ty,
-        const unsigned char *surr_slb,const unsigned char *surr_own,
-        const struct UPOINT_2D corner_pos)
+        __attribute__((unused)) const unsigned char *surr_slb,__attribute__((unused)) const unsigned char *surr_own,
+        __attribute__((unused)) const struct UPOINT_2D corner_pos)
 {
     unsigned char *thing;
     thing=update_thing_slb_room_one_central_item(lvl,tx,ty,ITEM_SUBTYPE_TEMPLESTA,true);
@@ -1682,14 +1682,14 @@ void update_things_slb_temple_corner(struct LEVEL *lvl, const int tx, const int 
 }
 
 void update_things_slb_workshop_corner(struct LEVEL *lvl, const int tx, const int ty,
-        const unsigned char *surr_slb,const unsigned char *surr_own,
-        const struct UPOINT_2D corner_pos)
+        __attribute__((unused)) const unsigned char *surr_slb,__attribute__((unused)) const unsigned char *surr_own,
+        __attribute__((unused)) const struct UPOINT_2D corner_pos)
 {
     update_thing_slb_room_one_central_item(lvl,tx,ty,ITEM_SUBTYPE_ANVIL,true);
 }
 
 void update_things_slb_barracks_corner(struct LEVEL *lvl, const int tx, const int ty,
-        const unsigned char *surr_slb,const unsigned char *surr_own,
+        const unsigned char *surr_slb, __attribute__((unused)) const unsigned char *surr_own,
         const struct UPOINT_2D corner_pos)
 {
     int sx, sy, i;
@@ -1752,7 +1752,7 @@ void update_things_slb_barracks_corner(struct LEVEL *lvl, const int tx, const in
 }
 
 void update_things_slb_dungheart_corner(struct LEVEL *lvl, const int tx, const int ty,
-        const unsigned char *surr_slb,const unsigned char *surr_own,
+        const unsigned char *surr_slb, const unsigned char *surr_own,
         const struct UPOINT_2D corner_pos)
 {
     unsigned char flame_stype;
@@ -1783,7 +1783,7 @@ void update_things_slb_dungheart_corner(struct LEVEL *lvl, const int tx, const i
 }
 
 void update_things_slb_dungheart_inside(struct LEVEL *lvl, const int tx, const int ty,
-        const unsigned char *surr_slb,const unsigned char *surr_own,
+        const unsigned char *surr_slb, const unsigned char *surr_own,
         const struct UPOINT_2D corner_pos)
 {
     unsigned char own=surr_own[IDIR_CENTR];
@@ -1803,7 +1803,7 @@ void update_things_slb_dungheart_inside(struct LEVEL *lvl, const int tx, const i
 }
 
 void update_things_slb_graveyard_corner(struct LEVEL *lvl, const int tx, const int ty,
-        const unsigned char *surr_slb,const unsigned char *surr_own,
+        const unsigned char *surr_slb,__attribute__((unused)) const unsigned char *surr_own,
         const struct UPOINT_2D corner_pos)
 {
     int sx, sy, i;
@@ -1895,8 +1895,8 @@ void update_things_slb_graveyard_corner(struct LEVEL *lvl, const int tx, const i
 }
 
 void update_things_slb_guardpost_floor(struct LEVEL *lvl, const int tx, const int ty,
-        const unsigned char *surr_slb,const unsigned char *surr_own,
-        const struct UPOINT_2D corner_pos)
+        __attribute__((unused)) const unsigned char *surr_slb, __attribute__((unused)) const unsigned char *surr_own,
+        __attribute__((unused)) const struct UPOINT_2D corner_pos)
 {
     unsigned char flag_stype;
     switch (surr_own[IDIR_CENTR])
@@ -1924,8 +1924,8 @@ void update_things_slb_guardpost_floor(struct LEVEL *lvl, const int tx, const in
 }
 
 void update_things_slb_prison(struct LEVEL *lvl, const int tx, const int ty,
-        const unsigned char *surr_slb,const unsigned char *surr_own,
-        const struct UPOINT_2D corner_pos)
+        const unsigned char *surr_slb, const unsigned char *surr_own,
+        __attribute__((unused)) const struct UPOINT_2D corner_pos)
 {
   unsigned short slab=surr_slb[IDIR_CENTR];
   unsigned char ownr=surr_own[IDIR_CENTR];
