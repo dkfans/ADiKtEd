@@ -325,14 +325,16 @@ long rnc_plen(void *packed)
  * Empty callback - for use if no callback is needed.
  */
 long rnc_nocallback(__attribute__((unused)) long done, __attribute__((unused)) long total)
-{}
+{
+    return true;
+}
 
 /**
  * Console print callback - for use in console tools.
  */
 long rnc_printcallback(long done,long total)
 {
-  printf("\rProcessing, %2.2f percent done",100.0*done/total);
+  return printf("\rProcessing, %2.2f percent done",100.0*done/total);
 }
 
 /**

@@ -317,19 +317,20 @@ short set_thing_owner(unsigned char *thing,unsigned char ownr_idx)
 
 unsigned char get_thing_subtile_x(const unsigned char *thing)
 {
-    if (thing==NULL) return 0;
+    if (thing==NULL) return false;
     return (unsigned char)thing[1];
 }
 
 short set_thing_subtile_x(unsigned char *thing,unsigned char pos_x)
 {
-    if (thing==NULL) return 0;
+    if (thing==NULL) return false;
     thing[1]=pos_x;
+    return true;
 }
 
 unsigned char get_thing_subtile_y(const unsigned char *thing)
 {
-    if (thing==NULL) return 0;
+    if (thing==NULL) return false;
     return (unsigned char)thing[3];
 }
 

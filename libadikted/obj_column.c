@@ -117,6 +117,7 @@ short fill_custom_column_data(unsigned short idx,struct COLUMN_REC *clm_recs[9],
         unsigned char *surr_slb,unsigned char *surr_own, unsigned char **surr_tng)
 {
     custom_columns_gen[idx](clm_recs,surr_slb,surr_own,surr_tng);
+    return true;
 }
 
 /*

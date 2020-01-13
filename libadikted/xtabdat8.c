@@ -351,6 +351,7 @@ int free_dattab_images(struct IMAGELIST *images)
     free(images->items);
     images->items=NULL;
     images->count=0;
+    return true;
 }
 
 int read_dat_image_idx(struct IMAGEITEM *image,unsigned long *readedsize,

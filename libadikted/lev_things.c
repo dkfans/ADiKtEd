@@ -222,6 +222,7 @@ char *get_search_objtype_name(unsigned short idx)
     case 0: return "Clear results";
     case 1: return "Action points";
     case 2: return "Static lights";
+    default: return "error(?!)";
     }
 }
 

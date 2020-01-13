@@ -3721,6 +3721,7 @@ short script_params_to_decomposed(__attribute__((unused)) struct DK_SCRIPT *scri
 /*TODO */
 /* But before start working on this, I must make all script commands */
 /* to be decomposed! */
+  return false;
 }
 
 short script_strword_pos( char const **ptr, unsigned int *ptr_len, const char *str, const short whole_rest )
@@ -4156,6 +4157,7 @@ short renew_cmd_param(const struct DK_SCRIPT_COMMAND *cmd, const unsigned int pa
       return false;
   free(cmd->params[param_idx]);
   cmd->params[param_idx]=wordtxt;
+  return true;
 }
 
 const char *script_cmd_text(const int group,const int cmdidx,const char *prev_val)

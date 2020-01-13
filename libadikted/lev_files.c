@@ -89,6 +89,7 @@ char *levfile_error(int errcode)
           errcode = max_code;
         return warnings[errcode];
    }
+   return warnings[1];
 }
 
 /*

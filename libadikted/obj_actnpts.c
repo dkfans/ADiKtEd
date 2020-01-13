@@ -31,8 +31,9 @@ unsigned char get_actnpt_subtile_x(unsigned char *actnpt)
 
 short set_actnpt_subtile_x(unsigned char *actnpt,unsigned char pos_x)
 {
-    if (actnpt==NULL) return 0;
+    if (actnpt==NULL) return false;
     actnpt[1]=pos_x;
+    return true;
 }
 
 unsigned char get_actnpt_subtile_y(unsigned char *actnpt)
@@ -43,15 +44,17 @@ unsigned char get_actnpt_subtile_y(unsigned char *actnpt)
 
 short set_actnpt_subtile_y(unsigned char *actnpt,unsigned char pos_y)
 {
-    if (actnpt==NULL) return 0;
+    if (actnpt==NULL) return false;
     actnpt[3]=pos_y;
+    return true;
 }
 
 short set_actnpt_subtile(unsigned char *actnpt,unsigned char pos_x,unsigned char pos_y)
 {
-    if (actnpt==NULL) return 0;
+    if (actnpt==NULL) return false;
     actnpt[1]=pos_x;
     actnpt[3]=pos_y;
+    return true;
 }
 
 unsigned char get_actnpt_range_subtile(unsigned char *actnpt)
@@ -62,8 +65,9 @@ unsigned char get_actnpt_range_subtile(unsigned char *actnpt)
 
 short set_actnpt_range_subtile(unsigned char *actnpt,unsigned char rng_tl)
 {
-    if (actnpt==NULL) return 0;
+    if (actnpt==NULL) return false;
     actnpt[5]=rng_tl;
+    return true;
 }
 
 /*
@@ -89,8 +93,9 @@ unsigned short get_actnpt_pos_x_adv(const unsigned char *actnpt)
 
 short set_actnpt_subtpos_x(unsigned char *actnpt,unsigned char pos_x)
 {
-    if (actnpt==NULL) return 0;
+    if (actnpt==NULL) return false;
     actnpt[0]=pos_x;
+    return true;
 }
 
 unsigned char get_actnpt_subtpos_y(unsigned char *actnpt)
@@ -107,15 +112,17 @@ unsigned short get_actnpt_pos_y_adv(const unsigned char *actnpt)
 
 short set_actnpt_subtpos_y(unsigned char *actnpt,unsigned char pos_y)
 {
-    if (actnpt==NULL) return 0;
+    if (actnpt==NULL) return false;
     actnpt[2]=pos_y;
+    return true;
 }
 
 short set_actnpt_subtpos(unsigned char *actnpt,unsigned char pos_x,unsigned char pos_y)
 {
-    if (actnpt==NULL) return 0;
+    if (actnpt==NULL) return false;
     actnpt[0]=pos_x;
     actnpt[2]=pos_y;
+    return true;
 }
 
 unsigned char get_actnpt_range_subtpos(unsigned char *actnpt)
@@ -126,8 +133,9 @@ unsigned char get_actnpt_range_subtpos(unsigned char *actnpt)
 
 short set_actnpt_range_subtpos(unsigned char *actnpt,unsigned char rng_st)
 {
-    if (actnpt==NULL) return 0;
+    if (actnpt==NULL) return false;
     actnpt[4]=rng_st;
+    return true;
 }
 
 unsigned short get_actnpt_number(unsigned char *actnpt)
@@ -138,9 +146,10 @@ unsigned short get_actnpt_number(unsigned char *actnpt)
 
 short set_actnpt_number(unsigned char *actnpt,unsigned short apt_num)
 {
-    if (actnpt==NULL) return 0;
+    if (actnpt==NULL) return false;
     actnpt[7]=(apt_num>>8);
     actnpt[6]=apt_num&255;
+    return true;
 }
 
 /*
@@ -198,7 +207,7 @@ unsigned char *create_actnpt_copy(unsigned int sx, unsigned int sy,unsigned char
  */
 unsigned short get_free_actnpt_number(const struct LEVEL *lvl)
 {
-    get_free_actnpt_number_next(lvl,1);
+    return get_free_actnpt_number_next(lvl,1);
 }
 
 /*
@@ -286,8 +295,9 @@ unsigned char get_stlight_subtile_x(unsigned char *stlight)
 
 short set_stlight_subtile_x(unsigned char *stlight,unsigned char pos_x)
 {
-    if (stlight==NULL) return 0;
+    if (stlight==NULL) return false;
     stlight[11]=pos_x;
+    return true;
 }
 
 unsigned char get_stlight_subtile_y(unsigned char *stlight)
@@ -298,15 +308,17 @@ unsigned char get_stlight_subtile_y(unsigned char *stlight)
 
 short set_stlight_subtile_y(unsigned char *stlight,unsigned char pos_y)
 {
-    if (stlight==NULL) return 0;
+    if (stlight==NULL) return false;
     stlight[13]=pos_y;
+    return true;
 }
 
 short set_stlight_subtile(unsigned char *stlight,unsigned char pos_x,unsigned char pos_y)
 {
-    if (stlight==NULL) return 0;
+    if (stlight==NULL) return false;
     stlight[11]=pos_x;
     stlight[13]=pos_y;
+    return true;
 }
 
 unsigned char get_stlight_subtile_h(unsigned char *stlight)
@@ -317,8 +329,9 @@ unsigned char get_stlight_subtile_h(unsigned char *stlight)
 
 short set_stlight_subtile_h(unsigned char *stlight,unsigned char pos_h)
 {
-    if (stlight==NULL) return 0;
+    if (stlight==NULL) return false;
     stlight[15]=pos_h;
+    return true;
 }
 
 unsigned char get_stlight_subtpos_x(unsigned char *stlight)
@@ -335,8 +348,9 @@ unsigned short get_stlight_pos_x_adv(const unsigned char *stlight)
 
 short set_stlight_subtpos_x(unsigned char *stlight,unsigned char pos_x)
 {
-    if (stlight==NULL) return 0;
+    if (stlight==NULL) return false;
     stlight[10]=pos_x;
+    return true;
 }
 
 unsigned char get_stlight_subtpos_y(unsigned char *stlight)
@@ -353,15 +367,17 @@ unsigned short get_stlight_pos_y_adv(const unsigned char *stlight)
 
 short set_stlight_subtpos_y(unsigned char *stlight,unsigned char pos_y)
 {
-    if (stlight==NULL) return 0;
+    if (stlight==NULL) return false;
     stlight[12]=pos_y;
+    return true;
 }
 
 short set_stlight_subtpos(unsigned char *stlight,unsigned char pos_x,unsigned char pos_y)
 {
-    if (stlight==NULL) return 0;
+    if (stlight==NULL) return false;
     stlight[10]=pos_x;
     stlight[12]=pos_y;
+    return true;
 }
 
 unsigned char get_stlight_subtpos_h(unsigned char *stlight)
@@ -372,8 +388,9 @@ unsigned char get_stlight_subtpos_h(unsigned char *stlight)
 
 short set_stlight_subtpos_h(unsigned char *stlight,unsigned char pos_h)
 {
-    if (stlight==NULL) return 0;
+    if (stlight==NULL) return false;
     stlight[14]=pos_h;
+    return true;
 }
 
 unsigned char get_stlight_range_subtile(unsigned char *stlight)
@@ -384,8 +401,9 @@ unsigned char get_stlight_range_subtile(unsigned char *stlight)
 
 short set_stlight_range_subtile(unsigned char *stlight,unsigned char rng_tl)
 {
-    if (stlight==NULL) return 0;
+    if (stlight==NULL) return false;
     stlight[1]=rng_tl;
+    return true;
 }
 
 unsigned char get_stlight_range_subtpos(unsigned char *stlight)
@@ -396,8 +414,9 @@ unsigned char get_stlight_range_subtpos(unsigned char *stlight)
 
 short set_stlight_range_subtpos(unsigned char *stlight,unsigned char rng_st)
 {
-    if (stlight==NULL) return 0;
+    if (stlight==NULL) return false;
     stlight[0]=rng_st;
+    return true;
 }
 
 /*
@@ -417,9 +436,9 @@ unsigned char get_stlight_intensivity(unsigned char *stlight)
 
 short set_stlight_intensivity(unsigned char *stlight,unsigned char intens)
 {
-    if (stlight==NULL) return 0;
+    if (stlight==NULL) return false;
     stlight[2]=intens;
-    return 1;
+    return true;
 }
 
 /*
