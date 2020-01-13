@@ -190,14 +190,14 @@ short place_room_rndpos(struct LEVEL *lvl, __attribute__((unused)) const unsigne
     __attribute__((unused)) const unsigned char rown, __attribute__((unused)) const struct IPOINT_2D *rsize)
 {
     int surrnd_size=20;
-    struct IPOINT_2D rpos;
+    /*struct IPOINT_2D rpos;*/
     while (surrnd_size>4)
     {
       int lottery_count;
       for (lottery_count=0;lottery_count<16;lottery_count++)
       {
-        rpos.x=(surrnd_size>>1)+1+rnd(lvl->tlsize.x-surrnd_size);
-        rpos.y=(surrnd_size>>1)+1+rnd(lvl->tlsize.y-surrnd_size);
+        /*rpos.x=(surrnd_size>>1)+1+*/rnd(lvl->tlsize.x-surrnd_size);
+        /*rpos.y=(surrnd_size>>1)+1+*/rnd(lvl->tlsize.y-surrnd_size);
 /*TODO!!!!!!!!!!! */
 /*
 4 Check if there's no enemy/short slab/rock in range of surrnd_size

@@ -2054,8 +2054,9 @@ void stlight_del(struct LEVEL *lvl,unsigned int sx, unsigned int sy, unsigned in
     if (num >= lgt_snum)
       return;
     lvl->lgt_total_count--;
+    /* commented due to -Wunused-but-set-variable
     unsigned char *stlight;
-    stlight = lvl->lgt_lookup[sx][sy][num];
+    stlight = lvl->lgt_lookup[sx][sy][num];*/
     free(lvl->lgt_lookup[sx][sy][num]);
     int i;
     lgt_snum--;

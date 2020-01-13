@@ -3108,9 +3108,9 @@ short script_decomposed_to_params_cmd_condit(struct DK_SCRIPT_PARAMETERS *par,
     struct DK_SCRIPT_COMMAND *cmd, __attribute__((unused)) const struct SCRIPT_OPTIONS *optns)
 {
     int plyr_idx;
-    int conditvar_type;
+    /*int conditvar_type;*/
     int conditvar_idx;
-    int cmpvar_type;
+    /*int cmpvar_type;*/
     int cmpvar_idx;
     int opertr_idx;
     int actnpt_num;
@@ -3126,8 +3126,8 @@ short script_decomposed_to_params_cmd_condit(struct DK_SCRIPT_PARAMETERS *par,
             return false;
         conditvar_idx=-1;
         cmpvar_idx=-1;
-        conditvar_type=recognize_script_word_group_and_idx(&conditvar_idx,cmd->params[1],true);
-        cmpvar_type=recognize_script_word_group_and_idx(&cmpvar_idx,cmd->params[3],true);
+        /*conditvar_type=*/recognize_script_word_group_and_idx(&conditvar_idx,cmd->params[1],true);
+        /*cmpvar_type=*/recognize_script_word_group_and_idx(&cmpvar_idx,cmd->params[3],true);
         if ((conditvar_idx<0)||(cmpvar_idx<0))
             return false;
 /*TODO */
@@ -3143,8 +3143,8 @@ short script_decomposed_to_params_cmd_condit(struct DK_SCRIPT_PARAMETERS *par,
             return false;
         conditvar_idx=-1;
         cmpvar_idx=-1;
-        conditvar_type=recognize_script_word_group_and_idx(&conditvar_idx,cmd->params[1],true);
-        cmpvar_type=recognize_script_word_group_and_idx(&cmpvar_idx,cmd->params[3],true);
+        /*conditvar_type=*/recognize_script_word_group_and_idx(&conditvar_idx,cmd->params[1],true);
+        /*cmpvar_type=*/recognize_script_word_group_and_idx(&cmpvar_idx,cmd->params[3],true);
         if ((conditvar_idx<0)||(cmpvar_idx<0))
             return false;
 /*TODO */
