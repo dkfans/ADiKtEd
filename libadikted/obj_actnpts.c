@@ -21,6 +21,7 @@
 #include "globals.h"
 #include "lev_data.h"
 #include "obj_slabs.h"
+#include <math.h>
 
 unsigned char get_actnpt_subtile_x(unsigned char *actnpt)
 {

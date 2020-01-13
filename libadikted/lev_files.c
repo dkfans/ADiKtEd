@@ -1273,7 +1273,7 @@ short write_lif(struct LEVEL *lvl,char *fname)
   char **lines=(char **)malloc(2*sizeof(char *));
   int lines_count=0;
   lines[lines_count]=malloc(LINEMSG_SIZE+1);
-  sprintf(lines[lines_count],"%02d, %s",lvl_num,get_lif_name_text(lvl));
+  sprintf(lines[lines_count],"%02lu, %s",lvl_num,get_lif_name_text(lvl));
   lines_count++;
   /*Writing data */
   short result;

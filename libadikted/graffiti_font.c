@@ -19,7 +19,7 @@
 
 const unsigned char font_any_chnull[] = {0,0x00};
 
-#define f8(c,a1,a2,a3,a4,a5,a6,a7,a8) const static unsigned char font_adisize8_ch##c[] = {8,0x##a1,0x##a2,0x##a3,0x##a4,0x##a5,0x##a6,0x##a7,0x##a8}
+#define f8(c,a1,a2,a3,a4,a5,a6,a7,a8) static const unsigned char font_adisize8_ch##c[] = {8,0x##a1,0x##a2,0x##a3,0x##a4,0x##a5,0x##a6,0x##a7,0x##a8}
 
 f8(notdef,55,AA,55,AA,55,AA,55,AA);
 
@@ -159,11 +159,11 @@ const unsigned char *font_adisize8_chars[] = {
 
 /*Defining "Adikted classic" font */
 
-#define f1(c,a1) const static unsigned char font_adiclssc_ch##c[] = {1,0x##a1}
-#define f2(c,a1,a2) const static unsigned char font_adiclssc_ch##c[] = {2,0x##a1,0x##a2}
-#define f3(c,a1,a2,a3) const static unsigned char font_adiclssc_ch##c[] = {3,0x##a1,0x##a2,0x##a3}
-#define f4(c,a1,a2,a3,a4) const static unsigned char font_adiclssc_ch##c[] = {4,0x##a1,0x##a2,0x##a3,0x##a4}
-#define f5(c,a1,a2,a3,a4,a5) const static unsigned char font_adiclssc_ch##c[] = {5,0x##a1,0x##a2,0x##a3,0x##a4,0x##a5}
+#define f1(c,a1) static const unsigned char font_adiclssc_ch##c[] = {1,0x##a1}
+#define f2(c,a1,a2) static const unsigned char font_adiclssc_ch##c[] = {2,0x##a1,0x##a2}
+#define f3(c,a1,a2,a3) static const unsigned char font_adiclssc_ch##c[] = {3,0x##a1,0x##a2,0x##a3}
+#define f4(c,a1,a2,a3,a4) static const unsigned char font_adiclssc_ch##c[] = {4,0x##a1,0x##a2,0x##a3,0x##a4}
+#define f5(c,a1,a2,a3,a4,a5) static const unsigned char font_adiclssc_ch##c[] = {5,0x##a1,0x##a2,0x##a3,0x##a4,0x##a5}
 
 f4(A,f,14,14,f);
 f4(B,1f,15,15,a);

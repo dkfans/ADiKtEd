@@ -79,7 +79,10 @@ short things_verify(struct LEVEL *lvl, char *err_msg,struct IPOINT_2D *errpt)
         unsigned int booksboxes_on_subtl=0;
         int things_count=get_thing_subnums(lvl,i,j);
         int categr=-1;
-        unsigned short subtp_x,subtp_y,subtp_h;
+        unsigned short subtp_x = 0;
+        unsigned short subtp_y = 0;
+        unsigned short subtp_h = 0;
+        
         for (k=0; k <things_count ; k++)
         {
           unsigned char *thing = get_thing(lvl,i,j,k);

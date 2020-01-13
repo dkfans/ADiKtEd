@@ -2042,8 +2042,8 @@ void create_columns_slb_temple_edge(struct COLUMN_REC *clm_recs[9],
   {
     if (((surr_slb[dir_a[i]]==slab)&&(surr_own[dir_a[i]]==ownr) &&
          (surr_slb[dir_b[i]]==slab)&&(surr_own[dir_b[i]]==ownr)) &&
-        ((surr_slb[dir_d[i]]==slab)&&(surr_own[dir_d[i]]==ownr) ||
-         (surr_slb[dir_e[i]]==slab)&&(surr_own[dir_e[i]]==ownr)))
+        (((surr_slb[dir_d[i]]==slab)&&(surr_own[dir_d[i]]==ownr)) ||
+         ((surr_slb[dir_e[i]]==slab)&&(surr_own[dir_e[i]]==ownr))))
       place_column_temple_edge(clm_recs[dir_c[i]], surr_own[IDIR_CENTR]);
   }
   /*And the edge columns */

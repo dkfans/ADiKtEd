@@ -497,7 +497,10 @@ short columns_verify(struct LEVEL *lvl, char *err_msg,struct IPOINT_2D *errpt)
       result=clm_verify_entry(lvl->clm[i],err_msg);
       if (result!=VERIF_OK)
       {
-        sprintf(err_msg,"%s in column %d.",err_msg,i);
+        char* err_msg_copy = malloc(strlen(err_msg)+1);
+        strcpy(err_msg_copy, err_msg);
+        sprintf(err_msg,"%s in column %d.",err_msg_copy,i);
+        free(err_msg_copy);
         int sx,sy;
         sx=-1;sy=-1;
         if (find_dat_entry(lvl,&sx,&sy,i))

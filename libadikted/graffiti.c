@@ -532,15 +532,33 @@ int place_graffiti_on_slab(struct COLUMN_REC *clm_recs[9],struct LEVEL *lvl, int
       short orient_top=false;
       switch (graf->orient)
       {
-      case ORIENT_TNS: orient_top=true;
-      case ORIENT_NS: graf_subtl_start=ty*MAP_SUBNUM_Y-base_sy; break;
-      case ORIENT_TSN: orient_top=true;
-      case ORIENT_SN: graf_subtl_start=(base_sy+subtl_len-1)-ty*MAP_SUBNUM_Y; break;
-      case ORIENT_TWE: orient_top=true;
-      case ORIENT_WE: graf_subtl_start=tx*MAP_SUBNUM_X-base_sx; break;
-      case ORIENT_TEW: orient_top=true;
-      case ORIENT_EW: graf_subtl_start=(base_sx+subtl_len-1)-tx*MAP_SUBNUM_X; break;
-      default: graf_subtl_start=0; break;
+      case ORIENT_TNS:
+        orient_top=true;
+        /* fall through */
+      case ORIENT_NS:
+        graf_subtl_start=ty*MAP_SUBNUM_Y-base_sy;
+        break;
+      case ORIENT_TSN:
+        orient_top=true;
+        /* fall through */
+      case ORIENT_SN:
+        graf_subtl_start=(base_sy+subtl_len-1)-ty*MAP_SUBNUM_Y;
+        break;
+      case ORIENT_TWE:
+        orient_top=true;
+        /* fall through */
+      case ORIENT_WE:
+        graf_subtl_start=tx*MAP_SUBNUM_X-base_sx;
+        break;
+      case ORIENT_TEW:
+        orient_top=true;
+        /* fall through */
+      case ORIENT_EW:
+        graf_subtl_start=(base_sx+subtl_len-1)-tx*MAP_SUBNUM_X;
+        break;
+      default:
+        graf_subtl_start=0;
+        break;
       }
       if (orient_top)
       {

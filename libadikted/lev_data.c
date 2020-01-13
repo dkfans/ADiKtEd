@@ -576,7 +576,7 @@ short level_clear_datclm(struct LEVEL *lvl)
       set_clm_entry(clmentry, clm_rec);
     }
     #endif
-    
+
     free_column_rec(clm_rec);
     return true;
 }
@@ -1438,7 +1438,7 @@ short level_verify_logic(struct LEVEL *lvl, char *err_msg,struct IPOINT_2D *errp
               if (mod_h<col_h)
                 col_h=mod_h;
             }*/
-            if ((pos_h<col_h)&&(!slab_is_door(slab))||(pos_h<min(col_h,1)))
+            if (((pos_h<col_h)&&(!slab_is_door(slab)))||(pos_h<min(col_h,1)))
             {
               errpt->x=i/MAP_SUBNUM_X;
               errpt->y=j/MAP_SUBNUM_Y;
