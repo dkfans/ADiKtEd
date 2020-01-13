@@ -3125,7 +3125,7 @@ short script_decomposed_to_params_cmd_condit(struct DK_SCRIPT_PARAMETERS *par,
         if ((plyr_idx<0)||(opertr_idx<0))
             return false;
         conditvar_idx=-1;
-        cmpvar_idx-1;
+        cmpvar_idx=-1;
         conditvar_type=recognize_script_word_group_and_idx(&conditvar_idx,cmd->params[1],true);
         cmpvar_type=recognize_script_word_group_and_idx(&cmpvar_idx,cmd->params[3],true);
         if ((conditvar_idx<0)||(cmpvar_idx<0))
@@ -3142,7 +3142,7 @@ short script_decomposed_to_params_cmd_condit(struct DK_SCRIPT_PARAMETERS *par,
         if ((plyr_idx<0)||(opertr_idx<0))
             return false;
         conditvar_idx=-1;
-        cmpvar_idx-1;
+        cmpvar_idx=-1;
         conditvar_type=recognize_script_word_group_and_idx(&conditvar_idx,cmd->params[1],true);
         cmpvar_type=recognize_script_word_group_and_idx(&cmpvar_idx,cmd->params[3],true);
         if ((conditvar_idx<0)||(cmpvar_idx<0))
