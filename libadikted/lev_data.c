@@ -2426,7 +2426,7 @@ unsigned short get_subtl_flg(struct LEVEL *lvl, unsigned int sx, unsigned int sy
 void set_subtl_flg(struct LEVEL *lvl, unsigned int sx, unsigned int sy,unsigned short nval)
 {
     if (lvl->flg==NULL) return;
-    if ((sx<0)||(sy<0)||(sx>=lvl->subsize.x)||(sy>=lvl->subsize.y)) return;
+    if ((sx>=lvl->subsize.x)||(sy>=lvl->subsize.y)) return;
     lvl->flg[sx][sy]=nval;
 }
 

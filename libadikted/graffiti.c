@@ -89,7 +89,7 @@ int graffiti_idx_next(struct LEVEL *lvl, int tx, int ty, int prev_idx)
  */
 char *get_graffiti_text(struct LEVEL *lvl,unsigned int num)
 {
-    if ((num>=lvl->graffiti_count) || (num<0))
+    if ((num>=lvl->graffiti_count))
       return "";
     return lvl->graffiti[num]->text;
 }

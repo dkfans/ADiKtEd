@@ -722,7 +722,7 @@ unsigned char *get_subtile_column(const struct LEVEL *lvl, int sx, int sy)
     return NULL;
   unsigned int clmidx;
   clmidx=get_dat_subtile(lvl, sx, sy);
-  if ((clmidx<0)||(clmidx>=COLUMN_ENTRIES))
+  if (clmidx>=COLUMN_ENTRIES)
     return NULL;
   return (unsigned char *)(lvl->clm[clmidx]);
 }
