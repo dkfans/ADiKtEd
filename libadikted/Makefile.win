@@ -2,7 +2,7 @@
 # Makefile created by Dev-C++ 4.9.9.2
 
 CPP  = g++.exe -std=c89
-CC   = gcc.exe -std=c89 -Wall -Wextra -Wno-pedantic -Wno-conversion -Wno-traditional-conversion -Wno-declaration-after-statement -Wno-sign-compare
+CC   = gcc.exe -std=c89 -Wall -Wextra -Wno-pedantic -Wno-conversion -Wno-traditional-conversion -Wno-sign-compare
 WINDRES = windres.exe
 RES  = adikted_private.res
 OBJ  = libadi_main.o bulcommn.o dernc.o draw_map.o graffiti.o graffiti_font.o lev_column.o lev_data.o lev_files.o lev_script.o lev_things.o memfile.o obj_actnpts.o obj_column.o obj_column_def.o obj_column_per.o obj_slabs.o obj_things.o xcubtxtr.o xtabdat8.o xtabjty.o msg_log.o arr_utils.o lbfileio.o $(RES)
