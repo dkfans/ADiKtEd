@@ -19,6 +19,7 @@
 
 #include "globals.h"
 #include <stdarg.h>
+#include "msg_log.h"
 
 /**
  * Strips control characters from end of a string.

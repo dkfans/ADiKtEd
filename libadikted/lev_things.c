@@ -24,6 +24,9 @@
 #include "obj_slabs.h"
 #include "obj_things.h"
 #include "lev_column.h"
+#include "msg_log.h"
+#include "obj_column_def.h"
+#include "obj_actnpts.h"
 
 /*
  * Functions and names used in search mode
@@ -2189,7 +2192,7 @@ short subtl_in_effectgen_range(struct LEVEL *lvl,unsigned int sx,unsigned int sy
  *     On success, gives thing number and subtile number in (sx,sy,num).
  *     If cannot find, returns -1.
  */
-long get_nearest_thing_idx(struct LEVEL *lvl,
+long get_nearest_thing_idx(const struct LEVEL *lvl,
     const unsigned int ssx,const unsigned int ssy,
     unsigned int *sx,unsigned int *sy,unsigned int *num)
 {
@@ -2324,7 +2327,7 @@ long get_nearest_thing_idx(struct LEVEL *lvl,
  *     On success, gives object indices in (sx,sy,z).
  *     If cannot find, returns -1.
  */
-long get_nearest_object_idx(struct LEVEL *lvl,
+long get_nearest_object_idx(const struct LEVEL *lvl,
     const unsigned int ssx,const unsigned int ssy,
     unsigned int *sx,unsigned int *sy,unsigned int *z)
 {

@@ -25,6 +25,7 @@
 #include "obj_slabs.h"
 #include "obj_things.h"
 #include "graffiti.h"
+#include "msg_log.h"
 
 char const INF_STANDARD_LTEXT[]="Standard";
 char const INF_ANCIENT_LTEXT[]="Ancient";

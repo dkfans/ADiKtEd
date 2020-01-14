@@ -22,6 +22,8 @@
 #include "lev_data.h"
 #include "obj_slabs.h"
 #include "lev_things.h"
+#include "msg_log.h"
+
 /*
 Thing data block:
 0x00 thing_subtpos_x

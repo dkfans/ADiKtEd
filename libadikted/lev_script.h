@@ -373,6 +373,7 @@ DLLIMPORT short script_params_to_decomposed(struct DK_SCRIPT *script,const struc
 DLLIMPORT short execute_script_line(struct LEVEL *lvl,char *line,char *err_msg);
 DLLIMPORT short add_stats_to_script(char ***lines,int *lines_count,struct LEVEL *lvl);
 DLLIMPORT short add_graffiti_to_script(char ***lines,int *lines_count,struct LEVEL *lvl);
+DLLIMPORT short add_custom_clms_to_script(char ***lines,int *lines_count,struct LEVEL *lvl);
 /*Functions - verification */
 DLLIMPORT short dkscript_verify(const struct LEVEL *lvl, char *err_msg,int *err_line,int *err_param);
 DLLIMPORT short txt_verify(const struct LEVEL *lvl, char *err_msg,struct IPOINT_2D *errpt);

@@ -21,6 +21,10 @@
 #include "globals.h"
 #include "obj_cube.h"
 #include "obj_slabs.h"
+#include "msg_log.h"
+#include "lbfileio.h"
+#include "bulcommn.h"
+#include "arr_utils.h"
 
 const char *cube_fullnames[]={
  "empty cube",          "standard earth 1",    "standard earth 2",    "standard earth 3",   /*000 */

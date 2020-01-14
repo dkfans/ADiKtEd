@@ -24,6 +24,10 @@
 #include "obj_slabs.h"
 #include "obj_column.h"
 #include "lev_column.h"
+#include "graffiti.h"
+#include "lev_things.h"
+#include "obj_actnpts.h"
+#include "msg_log.h"
 
 /* Conditional statements */
 const char if_cmdtext[]="IF";

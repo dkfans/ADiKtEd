@@ -22,6 +22,8 @@
 #include "bulcommn.h"
 #include "xcubtxtr.h"
 #include "memfile.h"
+#include "lbfileio.h"
+
 
 short alloc_cubedata(struct CUBES_DATA *cubes,long count)
 {

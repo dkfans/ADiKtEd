@@ -22,6 +22,8 @@
 #include "lev_data.h"
 #include "globals.h"
 #include "obj_things.h"
+#include "bulcommn.h"
+#include "arr_utils.h"
 
 char const SLB_UNKN_LTEXT[]="Unknown slab";
 char const SLB_ROCK_LTEXT[]="Rock";

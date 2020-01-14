@@ -31,6 +31,12 @@
 #include "xcubtxtr.h"
 #include "xtabdat8.h"
 #include "xtabjty.h"
+#include "msg_log.h"
+#include "obj_column_def.h"
+#include "obj_actnpts.h"
+#include "bulcommn.h"
+#include "arr_utils.h"
+#include "lev_things.h"
 
 /**
  * Intensified player colors array.

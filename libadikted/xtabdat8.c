@@ -25,7 +25,9 @@
 
 #include "bulcommn.h"
 #include "xtabdat8.h"
-
+#include "msg_log.h"
+#include "lbfileio.h"
+#include "xtabjty.h"
 
 #ifdef MAIN_XTABDAT8
 
@@ -222,6 +224,21 @@ short write_tabfile_data(const struct TABFILE *tabf,const char *dstfname)
             fputc(curitm->height,tabfp);
     }
     fclose(tabfp);
+    return ERR_NONE;
+}
+
+/*
+ * Allocates given amount of entries in TABFILE structure.
+ */
+short alloc_tabfile_data(struct TABFILE *tabf, long count)
+{
+    tabf->count=count;
+    tabf->items=malloc(tabf->count*sizeof(struct TABFILE_ITEM));
+    if (tabf->items==NULL)
+    {
+        tabf->count=0;
+        return XTABDAT8_MALLOC_ERR;
+    }
     return ERR_NONE;
 }
 
@@ -512,7 +529,7 @@ int write_encimages_dattab(const struct ENCIMAGELIST *images,unsigned long *writ
     short retcode;
     /* Preparing TAB structure */
     tabf->filelength=(images->count*TABFILE_ENTRY_SIZE);
-    retcode=alloc_jtytabfile_data(tabf,images->count);
+    retcode=alloc_tabfile_data(tabf,images->count);
     if (retcode!=ERR_NONE) return retcode;
     /* Preparing DAT structure */
     unsigned long datlength=0;

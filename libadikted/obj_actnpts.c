@@ -18,10 +18,12 @@
 
 #include "obj_actnpts.h"
 
+#include <math.h>
 #include "globals.h"
 #include "lev_data.h"
 #include "obj_slabs.h"
-#include <math.h>
+#include "msg_log.h"
+#include "bulcommn.h"
 
 unsigned char get_actnpt_subtile_x(unsigned char *actnpt)
 {

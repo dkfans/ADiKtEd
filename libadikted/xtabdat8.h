@@ -21,6 +21,7 @@
 #if (defined(MAIN_XTABDAT8)||defined(MAIN_XTABJTY))
  #define msgprintf printf
 #else
+ #include "msg_log.h"
  #define msgprintf message_log
 #endif
 
@@ -97,6 +98,7 @@ struct IMAGELIST {
 
 DLLIMPORT int read_tabfile_data(struct TABFILE *tabf,const char *srcfname);
 DLLIMPORT short write_tabfile_data(const struct TABFILE *tabf,const char *dstfname);
+DLLIMPORT short alloc_tabfile_data(struct TABFILE *tabf, long count);
 DLLIMPORT short free_tabfile_data(struct TABFILE *tabf);
 
 DLLIMPORT short read_datfile_data(struct DATFILE *datf,const char *srcfname);

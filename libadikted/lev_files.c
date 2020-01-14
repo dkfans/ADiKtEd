@@ -30,6 +30,10 @@
 #include "obj_column.h"
 #include "lev_data.h"
 #include "lev_script.h"
+#include "msg_log.h"
+#include "lbfileio.h"
+#include "lev_script.h"
+#include "lev_things.h"
 
 /**
  * Level file load/write function type definition.

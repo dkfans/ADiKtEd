@@ -35,10 +35,10 @@ DLLIMPORT unsigned short get_search_objtype_count(void);
 DLLIMPORT unsigned char *find_next_object_on_map(struct LEVEL *lvl, int *tx, int *ty, unsigned short srch_idx);
 DLLIMPORT short subtl_in_effectgen_range(struct LEVEL *lvl,unsigned int sx,unsigned int sy);
 
-DLLIMPORT long get_nearest_thing_idx(struct LEVEL *lvl,
+DLLIMPORT long get_nearest_thing_idx(const struct LEVEL *lvl,
     const unsigned int ssx,const unsigned int ssy,
     unsigned int *sx,unsigned int *sy,unsigned int *num);
-DLLIMPORT long get_nearest_object_idx(struct LEVEL *lvl,
+DLLIMPORT long get_nearest_object_idx(const struct LEVEL *lvl,
     const unsigned int ssx,const unsigned int ssy,
     unsigned int *sx,unsigned int *sy,unsigned int *z);
 

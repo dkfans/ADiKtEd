@@ -23,6 +23,8 @@
 #include "obj_things.h"
 #include "obj_slabs.h"
 #include "obj_column.h"
+#include "msg_log.h"
+#include "lev_column.h"
 
 /**
  * Frees the whole graffiti structure.

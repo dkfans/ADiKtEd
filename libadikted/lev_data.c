@@ -28,6 +28,14 @@
 #include "obj_column.h"
 #include "lev_script.h"
 #include "draw_map.h"
+#include "msg_log.h"
+#include "lbfileio.h"
+#include "lev_column.h"
+#include "graffiti.h"
+#include "lev_things.h"
+#include "obj_actnpts.h"
+#include "bulcommn.h"
+#include "arr_utils.h"
 
 const int idir_subtl_x[]={
     0, 1, 2,

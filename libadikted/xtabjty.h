@@ -20,6 +20,8 @@
 
 #include "globals.h"
 #include "xtabdat8.h"
+#include "lbfileio.h"
+
 
 /* Error returns */
 

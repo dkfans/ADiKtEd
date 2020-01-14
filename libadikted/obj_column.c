@@ -24,6 +24,7 @@
 #include "obj_slabs.h"
 #include "obj_things.h"
 #include "graffiti.h"
+#include "bulcommn.h"
 
 static void (*custom_columns_gen [])(struct COLUMN_REC *clm_recs[9],
         unsigned char *,unsigned char *, unsigned char **)={
