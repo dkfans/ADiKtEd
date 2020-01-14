@@ -172,7 +172,7 @@ short write_bmp_fp_24b(FILE *out, int width, int height, const char *data)
 {
   int pwidth, pheight;
   long data_len;
-  int i, j;
+  int i;
     
   /* Positive width and height */
   if (width>=0)

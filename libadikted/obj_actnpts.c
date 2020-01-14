@@ -485,7 +485,6 @@ unsigned char *create_stlight_copy(unsigned int sx, unsigned int sy,unsigned cha
         message_error("create_stlight_copy: Out of memory");
         return NULL;
     }
-    int i;
     memcpy(stlight,src,SIZEOF_DK_LGT_REC);
     set_stlight_subtpos(stlight,((sx%MAP_SUBNUM_X)*0x40+0x40),((sy%MAP_SUBNUM_Y)*0x40+0x40));
     set_stlight_subtile(stlight,(unsigned char)sx,(unsigned char)sy);

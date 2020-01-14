@@ -868,8 +868,8 @@ unsigned short get_free_indexedthing_number(const struct LEVEL *lvl)
 unsigned char *create_item_adv(const struct LEVEL *lvl, unsigned int sx, unsigned int sy, unsigned char stype_idx)
 {
     unsigned char *thing;
-    int tx=sx/MAP_SUBNUM_X;
-    int ty=sy/MAP_SUBNUM_Y;
+    /*int tx=sx/MAP_SUBNUM_X;
+    int ty=sy/MAP_SUBNUM_Y;*/
     if (is_torch_stype(stype_idx))
     {
         thing=create_torch(lvl,sx,sy,stype_idx);
@@ -1282,8 +1282,8 @@ void create_things_slb_room(cr_tng_func cr_floor,cr_tng_func cr_edge,
         cr_tng_func cr_corner,cr_tng_func cr_inside,cr_tng_func cr_nearinsd,
         struct LEVEL *lvl, int tx, int ty)
 {
-  const unsigned short dir_a[]={IDIR_NORTH, IDIR_NORTH, IDIR_SOUTH, IDIR_SOUTH};
-  const unsigned short dir_b[]={IDIR_WEST, IDIR_EAST, IDIR_EAST, IDIR_WEST};
+  /*const unsigned short dir_a[]={IDIR_NORTH, IDIR_NORTH, IDIR_SOUTH, IDIR_SOUTH};
+  const unsigned short dir_b[]={IDIR_WEST, IDIR_EAST, IDIR_EAST, IDIR_WEST};*/
   const unsigned short dir_c[]={IDIR_NW, IDIR_NE, IDIR_SE, IDIR_SW};
   const unsigned short dir_x[]={0, 2, 2, 0};
   const unsigned short dir_y[]={0, 0, 2, 2};
@@ -1420,8 +1420,8 @@ void create_things_slb_room_simple(cr_tng_func cr_any,
   unsigned char *surr_own=(unsigned char *)malloc(9*sizeof(unsigned char));
   get_slab_surround(surr_slb,surr_own,NULL,lvl,tx,ty);
   struct UPOINT_2D corner_pos={0,0};
-  unsigned short slab=surr_slb[IDIR_CENTR];
-  unsigned char ownr=surr_own[IDIR_CENTR];
+  /*unsigned short slab=surr_slb[IDIR_CENTR];
+  unsigned char ownr=surr_own[IDIR_CENTR];*/
   /*Very simple... */
   cr_any(lvl,tx,ty,surr_slb,surr_own,corner_pos);
 }
@@ -2058,7 +2058,7 @@ short update_things_subpos_and_height_for_slab(struct LEVEL *lvl, int tx, int ty
 short update_thing_subpos_and_height(unsigned short *clm_height,unsigned char *thing)
 {
     if (thing==NULL) return false;
-    unsigned char stype_idx=get_thing_subtype(thing);
+    /*unsigned char stype_idx=get_thing_subtype(thing);*/
     int sx, sy, i;
     sx=get_thing_subtile_x(thing);
     sy=get_thing_subtile_y(thing);

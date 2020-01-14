@@ -2272,7 +2272,7 @@ short load_draw_data(struct MAPDRAW_DATA **draw_data,const struct MAPDRAW_OPTION
       char *tabfname;
       fnames=NULL;
       tabfname=NULL;
-      int large_tngicons=((opts->rescale)<3);
+      /*int large_tngicons=((opts->rescale)<3);*/
       format_data_fname(&fnames,opts->data_path,"font%d-%d.dat",2,0);
       format_data_fname(&tabfname,opts->data_path,"font%d-%d.tab",2,0);
       result = (create_images_dattab_idx((*draw_data)->font0,fnames,tabfname,0)==ERR_NONE);
@@ -2288,7 +2288,7 @@ short load_draw_data(struct MAPDRAW_DATA **draw_data,const struct MAPDRAW_OPTION
       char *tabfname;
       fnames=NULL;
       tabfname=NULL;
-      int large_tngicons=((opts->rescale)<3);
+      /*int large_tngicons=((opts->rescale)<3);*/
       format_data_fname(&fnames,opts->data_path,"font%d-%d.dat",2,1);
       format_data_fname(&tabfname,opts->data_path,"font%d-%d.tab",2,1);
       result = (create_images_dattab_idx((*draw_data)->font1,fnames,tabfname,0)==ERR_NONE);

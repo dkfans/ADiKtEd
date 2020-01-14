@@ -152,7 +152,6 @@ int column_find_or_create(struct LEVEL *lvl,struct COLUMN_REC *clm_rec)
 int column_get_free_index(struct LEVEL *lvl)
 {
   int num;
-  unsigned char *clmentry;
   /* Search for free column entry */
   /* Skip the first one - it is always zero-filled entry */
   for (num=1;num<COLUMN_ENTRIES;num++)
@@ -492,7 +491,7 @@ short columns_verify(struct LEVEL *lvl, char *err_msg,struct IPOINT_2D *errpt)
 {
     /*checking entries */
     short result;
-    int i,k;
+    int i;
     for (i=0; i<COLUMN_ENTRIES; i++)
     {
       result=clm_verify_entry(lvl->clm[i],err_msg);
@@ -1034,7 +1033,6 @@ short cust_col_add_or_update(struct LEVEL *lvl,int sx,int sy,struct DK_CUSTOM_CL
 {
     if ((lvl==NULL)||(lvl->cust_clm_lookup==NULL)) return false;
     if ((ccol==NULL)||(ccol->rec==NULL)) return false;
-    int idx;
     /*Check if we already have the column at this place */
     struct DK_CUSTOM_CLM *ccol_old;
     ccol_old=get_cust_col(lvl,sx,sy);
@@ -1081,7 +1079,6 @@ int cust_cols_num_on_tile(struct LEVEL *lvl, int tx, int ty)
  */
 struct DK_CUSTOM_CLM *get_cust_col(struct LEVEL *lvl, int sx, int sy)
 {
-    int i;
     if ((lvl==NULL)||(lvl->cust_clm_lookup==NULL))
       return NULL;
     if ((sx<0)||(sx>=lvl->subsize.x)||(sy<0)||(sy>=lvl->subsize.y))
@@ -1130,7 +1127,6 @@ unsigned short get_cust_col_wib_entry(struct LEVEL *lvl, int sx, int sy)
  */
 short set_cust_col(struct LEVEL *lvl,int sx,int sy,struct DK_CUSTOM_CLM *ccol)
 {
-    int i;
     if ((lvl==NULL)||(lvl->cust_clm_lookup==NULL))
       return false;
     if ((sx<0)||(sx>=lvl->subsize.x)||(sy<0)||(sy>=lvl->subsize.y))
@@ -1182,7 +1178,6 @@ struct DK_CUSTOM_CLM *create_cust_col(void)
  */
 short cust_col_del(struct LEVEL *lvl, int sx, int sy)
 {
-    int i;
     if ((lvl==NULL)||(lvl->cust_clm_lookup==NULL))
       return false;
     if ((sx<0)||(sx>=lvl->subsize.x)||(sy<0)||(sy>=lvl->subsize.y))

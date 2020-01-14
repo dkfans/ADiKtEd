@@ -625,7 +625,6 @@ void bitread_fix (bit_stream *bs, const unsigned char **p, const unsigned char *
     bs->bitcount -= 16;
     if (bs->bitcount<0) bs->bitcount=0;
     bs->bitbuf &= (1<<bs->bitcount)-1; /* remove the top 16 bits */
-    int read_val;
     /* replace with what's at *p, or zeroes if nothing more to read */
     if (pend-(*p) >= 1)
     {

@@ -543,8 +543,8 @@ short level_clear_lgt(struct LEVEL *lvl)
 short level_clear_datclm(struct LEVEL *lvl)
 {
     /*Preparing array bounds */
-    const int arr_entries_x=lvl->tlsize.x*MAP_SUBNUM_X;
-    const int arr_entries_y=lvl->tlsize.y*MAP_SUBNUM_Y;
+    /*const int arr_entries_x=lvl->tlsize.x*MAP_SUBNUM_X;
+    const int arr_entries_y=lvl->tlsize.y*MAP_SUBNUM_Y;*/
 
     /* zero-filling CLM memory */
     int i,k;
@@ -733,8 +733,8 @@ short level_clear_script_param(struct DK_SCRIPT_PARAMETERS *par)
 short level_clear_other(struct LEVEL *lvl)
 {
     /*Preparing array bounds */
-    const int arr_entries_x=lvl->tlsize.x*MAP_SUBNUM_X;
-    const int arr_entries_y=lvl->tlsize.y*MAP_SUBNUM_Y;
+    /*const int arr_entries_x=lvl->tlsize.x*MAP_SUBNUM_X;
+    const int arr_entries_y=lvl->tlsize.y*MAP_SUBNUM_Y;*/
 
     int i;
     for (i=0; i < lvl->tlsize.y; i++)
@@ -857,7 +857,7 @@ short level_deinit(struct LEVEL **lvl_ptr)
     struct LEVEL *lvl;
     lvl=(*lvl_ptr);
     /*Preparing array bounds */
-    const int arr_entries_x=lvl->tlsize.x*MAP_SUBNUM_X;
+    /*const int arr_entries_x=lvl->tlsize.x*MAP_SUBNUM_X;*/
     const int arr_entries_y=lvl->tlsize.y*MAP_SUBNUM_Y;
 
 /*    message_log(" level_deinit: Freeing SLB structure"); */
@@ -1373,8 +1373,8 @@ short actnpts_verify(struct LEVEL *lvl, char *err_msg,struct IPOINT_2D *errpt)
             unsigned char subt_y=get_actnpt_subtile_y(actnpt);
             unsigned char subt_r=get_actnpt_range_subtile(actnpt);
             unsigned short n=get_actnpt_number(actnpt);
-            unsigned short slab=get_tile_slab(lvl,i/MAP_SUBNUM_X,j/MAP_SUBNUM_Y);
-            int col_h=get_subtile_column_height(lvl,i,j);
+            /*unsigned short slab=get_tile_slab(lvl,i/MAP_SUBNUM_X,j/MAP_SUBNUM_Y);*/
+            /*int col_h=get_subtile_column_height(lvl,i,j);*/
             if ((subt_x>=arr_entries_x)||(subt_y>=arr_entries_y))
             {
               errpt->x=i/MAP_SUBNUM_X;
@@ -1423,12 +1423,12 @@ short level_verify_logic(struct LEVEL *lvl, char *err_msg,struct IPOINT_2D *errp
         for (k=0; k <things_count ; k++)
         {
           unsigned char *thing = get_thing(lvl,i,j,k);
-          unsigned char type_idx=get_thing_type(thing);
+          /*unsigned char type_idx=get_thing_type(thing);*/
 /*          if ((type_idx==THING_TYPE_ITEM)) */
           {
             int pos_h=(unsigned short)get_thing_subtile_h(thing);
-            int subt_x=(unsigned short)get_thing_subtpos_x(thing);
-            int subt_y=(unsigned short)get_thing_subtpos_y(thing);
+            /*int subt_x=(unsigned short)get_thing_subtpos_x(thing);*/
+            /*int subt_y=(unsigned short)get_thing_subtpos_y(thing);*/
             unsigned short slab=get_tile_slab(lvl,i/MAP_SUBNUM_X,j/MAP_SUBNUM_Y);
             int col_h=get_subtile_column_height(lvl,i,j);
             /*Checking if we're close to sibling column - if we are, its heigh may be */
@@ -1593,7 +1593,7 @@ void generate_slab_bkgnd_random(struct LEVEL *lvl)
     for (i=1; i < (tl_maxindex.y>>1); i++)
       for (j=0; j < tl_maxindex.x-1; j++)
       {
-        int ir=tl_maxindex.y-i;
+        /*int ir=tl_maxindex.y-i;*/
         int rnd_bound=RAND_MAX/((i/2)+1);
         if (rand()<rnd_bound)
         {
@@ -1680,8 +1680,8 @@ void start_new_map(struct LEVEL *lvl)
     message_log(" start_new_map: starting");
     level_clear(lvl);
     /*Preparing array bounds */
-    int arr_entries_x=lvl->tlsize.x*MAP_SUBNUM_X;
-    int arr_entries_y=lvl->tlsize.y*MAP_SUBNUM_Y;
+    /*int arr_entries_x=lvl->tlsize.x*MAP_SUBNUM_X;*/
+    /*int arr_entries_y=lvl->tlsize.y*MAP_SUBNUM_Y;*/
 
     message_log(" start_new_map: generating background");
     generate_slab_bkgnd_default(lvl,SLAB_TYPE_EARTH);
@@ -1709,8 +1709,8 @@ void generate_random_map(struct LEVEL *lvl)
 {
     level_clear(lvl);
     /*Preparing array bounds */
-    int arr_entries_x=lvl->tlsize.x*MAP_SUBNUM_X;
-    int arr_entries_y=lvl->tlsize.y*MAP_SUBNUM_Y;
+    /*int arr_entries_x=lvl->tlsize.x*MAP_SUBNUM_X;*/
+    /*int arr_entries_y=lvl->tlsize.y*MAP_SUBNUM_Y;*/
 
     generate_slab_bkgnd_random(lvl);
 

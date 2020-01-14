@@ -103,7 +103,7 @@ short write_cubedata(struct CUBES_DATA *cubes,const char *fname)
 {
     /*Opening file */
     FILE *fp;
-    int i, k;
+    int i;
     fp = fopen (fname, "wb");
     if (fp==NULL)
       return XCUTX_CANT_OPEN;

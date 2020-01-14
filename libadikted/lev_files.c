@@ -180,8 +180,7 @@ short load_tng(struct LEVEL *lvl,char *fname)
 {
     message_log("  load_tng: started");
     int tng_num;
-    int i, j;
-    unsigned char *thing;
+    int i;
     if (lvl==NULL) return ERR_INTERNAL;
     /*Reading file */
     struct MEMORY_FILE *mem;
@@ -231,7 +230,7 @@ short load_tng(struct LEVEL *lvl,char *fname)
 short load_clm(struct LEVEL *lvl,char *fname)
 {
     message_log("  load_clm: started");
-    int i, j;
+    int i;
     if ((lvl==NULL)||(lvl->clm==NULL)) return ERR_INTERNAL;
     /*Reading file */
     struct MEMORY_FILE *mem;
@@ -976,7 +975,7 @@ short write_own(struct LEVEL *lvl,char *fname)
 short write_dat(struct LEVEL *lvl,char *fname)
 {
     message_log(" write_dat: starting");
-    const unsigned int line_len=2*lvl->subsize.x;
+    /*const unsigned int line_len=2*lvl->subsize.x;*/
 
     FILE *fp;
     fp = fopen (fname, "wb");
@@ -1004,7 +1003,7 @@ short write_dat(struct LEVEL *lvl,char *fname)
 short write_flg(struct LEVEL *lvl,char *fname)
 {
     message_log(" write_flg: starting");
-    const unsigned int line_len=2*lvl->subsize.x;
+    /*const unsigned int line_len=2*lvl->subsize.x;*/
 
     FILE *fp;
     fp = fopen (fname, "wb");
@@ -1144,7 +1143,6 @@ short write_inf(struct LEVEL *lvl,char *fname)
 {
     message_log(" write_inf: starting");
     FILE *fp;
-    int i, j, k;
     fp = fopen (fname, "wb");
     if (fp==NULL)
       return ERR_CANT_OPENWR;
@@ -1164,7 +1162,6 @@ short write_vsn(struct LEVEL *lvl,char *fname)
 {
     message_log(" write_vsn: starting");
     FILE *fp;
-    int i, j, k;
     fp = fopen (fname, "wb");
     if (fp==NULL)
       return ERR_CANT_OPENWR;
@@ -1873,8 +1870,8 @@ short load_dk1_map(struct LEVEL *lvl)
     return result;
   }
   int loaded_files=0;
-  int total_files=0;
-  short file_result;
+  /*int total_files=0;
+  short file_result;*/
   /* Crucial files */
   if (result>=ERR_NONE)
       load_mapfile(lvl,"slb",load_slb,&loaded_files,&result,LFF_IGNORE_NONE);
@@ -1946,11 +1943,11 @@ short load_dke_map(struct LEVEL *lvl)
     return result;
   }
   int loaded_files=0;
-  int total_files=0;
-  short file_result;
+  /*int total_files=0;
+  short file_result;*/
 
-      message_error("Error: Load not supported for extended map format");
-      result=ERR_INTERNAL;
+  message_error("Error: Load not supported for extended map format");
+  result=ERR_INTERNAL;
 #if 0
   /* Crucial files */
   if (result>=ERR_NONE)
@@ -2044,7 +2041,6 @@ short user_load_map(struct LEVEL *lvl,short new_on_error)
  */
 short load_map_preview(struct LEVEL *lvl)
 {
-  char *fnames;
   short result=ERR_NONE;
   level_free(lvl);
   level_clear(lvl);
@@ -2079,7 +2075,7 @@ short load_map_preview(struct LEVEL *lvl)
 short write_def_clm_source(struct LEVEL *lvl,char *fname)
 {
     FILE *fp;
-    int i,k;
+    int i;
     fp = fopen (fname, "w");
     if (!fp)
     {
@@ -2088,8 +2084,8 @@ short write_def_clm_source(struct LEVEL *lvl,char *fname)
     }
 
     /*Preparing array bounds */
-    const int arr_entries_x=lvl->tlsize.x*MAP_SUBNUM_X;
-    const int arr_entries_y=lvl->tlsize.y*MAP_SUBNUM_Y;
+    /*const int arr_entries_x=lvl->tlsize.x*MAP_SUBNUM_X;
+    const int arr_entries_y=lvl->tlsize.y*MAP_SUBNUM_Y;*/
 
     unsigned char *clmentry;
     struct COLUMN_REC *clm_rec;
@@ -2098,7 +2094,7 @@ short write_def_clm_source(struct LEVEL *lvl,char *fname)
       {
         clmentry = (unsigned char *)(lvl->clm[i]);
         get_clm_entry(clm_rec, clmentry);
-        int csum=read_int16_le_buf(clmentry+2);
+        /*int csum=read_int16_le_buf(clmentry+2);*/
 /*        clm_rec->c[0]+clm_rec->c[1]+clm_rec->c[2]+clm_rec->c[3]+
             clm_rec->c[4]+clm_rec->c[5]+clm_rec->c[6]+clm_rec->c[7]+
             clm_rec->base;*/

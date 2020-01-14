@@ -870,10 +870,9 @@ unsigned char *create_thing_copy(const struct LEVEL *lvl,unsigned int sx, unsign
 
     unsigned char *thing;
     thing = create_thing_empty();
-    int i;
     memcpy(thing,src,SIZEOF_DK_TNG_REC);
     unsigned char type_idx=get_thing_type(thing);
-    unsigned char stype_idx=get_thing_subtype(thing);
+    /*unsigned char stype_idx=get_thing_subtype(thing);*/
     set_thing_subtpos(thing,((sx%MAP_SUBNUM_X)*0x40+0x40),((sy%MAP_SUBNUM_Y)*0x40+0x40));
     set_thing_subtile(thing,(unsigned char)sx,(unsigned char)sy);
     if (type_idx==THING_TYPE_EFFECTGEN)
@@ -3284,7 +3283,6 @@ short trap_verify(unsigned char *thing, struct VERIFY_OPTIONS *verif_opt)
 
 short thing_verify(unsigned char *thing, struct VERIFY_OPTIONS *verif_opt)
 {
-  short result;
   int pos_h=get_thing_subtile_h(thing);
   int pos_x=get_thing_subtile_x(thing);
   int pos_y=get_thing_subtile_y(thing);

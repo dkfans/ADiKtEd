@@ -739,7 +739,7 @@ short execute_adikted_command(struct LEVEL *lvl,struct DK_SCRIPT_COMMAND *cmd,ch
        char *levname=strdup_noquot(cmd->params[0]);
        if (levname!=NULL)
            set_lif_name_text(lvl,levname);
-       int pos=0;
+       /*int pos=0;*/
       };return true;
     case LEVEL_DESC:
       {
@@ -1508,8 +1508,7 @@ short script_cmd_verify_condit(__attribute__((unused)) struct SCRIPT_VERIFY_DATA
             (*err_param)=2;
             return VERIF_WARN;
         }
-        long min_val;
-        unsigned long max_val;
+
         switch (cmd_type)
         {
         case CMD_CREATR:
@@ -3384,7 +3383,6 @@ short script_decomposed_to_params_cmd_custobj(__attribute__((unused)) struct DK_
 short script_decomposed_to_params_cmd_setup(struct DK_SCRIPT_PARAMETERS *par,
     struct DK_SCRIPT_COMMAND *cmd, __attribute__((unused)) const struct SCRIPT_OPTIONS *optns)
 {
-    int obj_type;
     int i;
     int plyr_idx;
     int plyr2_idx;

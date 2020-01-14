@@ -341,7 +341,7 @@ short compare_column_recs(struct COLUMN_REC *clm_rec1, struct COLUMN_REC *clm_re
     return false;
   if (clm_rec1->lintel != clm_rec2->lintel)
     return false;
-  unsigned short height=clm_rec1->height;
+  /*unsigned short height=clm_rec1->height;*/
   unsigned int solid=clm_rec1->solid;
   if (clm_rec1->base!=clm_rec2->base)
     return false;

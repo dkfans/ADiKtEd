@@ -69,7 +69,6 @@ char *trim_right(char *string_in)
  */
 char *trim_left(char *string_in)
 {
-    int i;
     unsigned char *string = (unsigned char *) string_in;
     
     while (string[0]!='\0')
