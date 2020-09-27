@@ -21,7 +21,23 @@ LINK				= $(CROSS_COMPILE)gcc
 LFLAGS                          = 
 LFLAGS-DEBUG                    = 
 LIBS				= -L. -L../libadikted -L../lib/$(SLANG_NAME)/src/gw32objs -lslang -ladikted
-SRC				= main.c input_kb.c scr_help.c output_scr.c scr_thing.c scr_list.c scr_slab.c scr_clm.c scr_actn.c scr_txted.c scr_rwrk.c scr_cube.c var_utils.c
+SRC				= \
+main.c \
+input_kb.c \
+scr_help.c \
+output_scr.c \
+scr_thing.c \
+scr_list.c \
+scr_slab.c \
+scr_clm.c \
+scr_actn.c \
+scr_txted.c \
+scr_txtgen.c \
+scr_rwrk.c \
+scr_cube.c \
+textmenu.c \
+var_utils.c
+
 OBJ				= $(SRC:.c=.o)
 BIN				= map
 RM				= rm -f
@@ -30,7 +46,7 @@ ECHO                            = echo
 all: pre-build $(SRC) $(BIN)
 
 $(BIN): $(OBJ)
-	$(LINK) $(if $(filter yes, $(DEBUGME)),$(LFLAGS-DEBUG),$(LFLAGS)) -o $@ $(OBJ) $(LIBS)
+	$(LINK) $(if $(filter yes, $(DEBUGME)),$(LFLAGS-DEBUG),$(LFLAGS)) $(LIBS) -o $@ $(OBJ)
 
 .c.o:
 	$(CC) $(if $(filter yes, $(DEBUGME)),$(CFLAGS-DEBUG),$(CFLAGS)) $< -o $@
