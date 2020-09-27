@@ -20,7 +20,7 @@ CFLAGS-DEBUG                    = -c -g -I. -I../lib/$(SLANG_NAME)/src
 LINK				= $(CROSS_COMPILE)gcc
 LFLAGS                          = 
 LFLAGS-DEBUG                    = 
-LIBS				= -L. -L../libadikted -L../lib/$(SLANG_NAME)/src -lslang -ladikted
+LIBS				= -L. -L../libadikted -L../lib/$(SLANG_NAME)/src/gw32objs -lslang -ladikted
 SRC				= main.c input_kb.c scr_help.c output_scr.c scr_thing.c scr_list.c scr_slab.c scr_clm.c scr_actn.c scr_txted.c scr_rwrk.c scr_cube.c var_utils.c
 OBJ				= $(SRC:.c=.o)
 BIN				= map
@@ -42,9 +42,8 @@ pre-build: ../lib/slang.ok
 
 ../lib/slang.ok: ../lib/slang.tgz
 	-tar -C ../lib/ -xzf $<
-#	cd ../lib/$(SLANG_NAME) && echo `pwd` && CC=$(CC) CPP=$(CPP) ./configure --host=$(SLANG_HOST) && make
-#	touch $@
-	$(ECHO) you should build slang yourself in folder $(abspath ../lib/$(SLANG_NAME)) && false
+	cd ../lib/$(SLANG_NAME) && mkfiles/build.sh WIN32 MINGW32 && make
+	touch $@
 
 clean:
 	${RM} $(OBJ)
