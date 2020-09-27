@@ -3,3 +3,4 @@
 *.res
 *.dll
 *.def
+/lib/slang-*
