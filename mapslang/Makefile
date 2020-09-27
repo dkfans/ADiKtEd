@@ -22,19 +22,19 @@ LFLAGS                          =
 LFLAGS-DEBUG                    = 
 LIBS				= -L. -L../libadikted -L../lib/$(SLANG_NAME)/src/gw32objs -lslang -ladikted
 SRC				= \
-main.c \
 input_kb.c \
-scr_help.c \
+main.c \
 output_scr.c \
-scr_thing.c \
-scr_list.c \
-scr_slab.c \
-scr_clm.c \
 scr_actn.c \
+scr_clm.c \
+scr_cube.c \
+scr_help.c \
+scr_list.c \
+scr_rwrk.c \
+scr_slab.c \
+scr_thing.c \
 scr_txted.c \
 scr_txtgen.c \
-scr_rwrk.c \
-scr_cube.c \
 textmenu.c \
 var_utils.c
 
