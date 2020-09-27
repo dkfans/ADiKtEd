@@ -4,3 +4,5 @@
 *.dll
 *.def
 /lib/slang-*
+/lib/slang.tgz
+/lib/slang.ok
