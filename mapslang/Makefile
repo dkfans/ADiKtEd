@@ -46,22 +46,22 @@ ECHO                            = echo
 all: pre-build $(SRC) $(BIN)
 
 $(BIN): $(OBJ)
-    $(LINK) $(if $(filter yes, $(DEBUGME)),$(LFLAGS-DEBUG),$(LFLAGS)) $(LIBS) -o $@ $(OBJ)
+	$(LINK) $(if $(filter yes, $(DEBUGME)),$(LFLAGS-DEBUG),$(LFLAGS)) $(LIBS) -o $@ $(OBJ)
 
 .c.o:
-    $(CC) $(if $(filter yes, $(DEBUGME)),$(CFLAGS-DEBUG),$(CFLAGS)) $< -o $@
+	$(CC) $(if $(filter yes, $(DEBUGME)),$(CFLAGS-DEBUG),$(CFLAGS)) $< -o $@
 
 pre-build: ../lib/$(SLANG_NAME)/src/gw32objs/libslang.dll
 
 ../lib/slang.tgz:
-    curl -L -o $@ $(SLANG_URL)
+	curl -L -o $@ $(SLANG_URL)
 
 ../lib/$(SLANG_NAME)/src/gw32objs/libslang.dll: ../lib/slang.tgz
-    -tar -C ../lib/ -xzf $<
-    cd ../lib/$(SLANG_NAME) && mkfiles/build.sh WIN32 MINGW32 DLL
+	-tar -C ../lib/ -xzf $<
+	cd ../lib/$(SLANG_NAME) && mkfiles/build.sh WIN32 MINGW32 DLL
 
 clean:
-    ${RM} $(OBJ)
-    ${RM} $(BIN)
+	${RM} $(OBJ)
+	${RM} $(BIN)
 
 
