@@ -3,6 +3,6 @@
 *.res
 *.dll
 *.def
+*.exe
 /lib/slang-*
 /lib/slang.tgz
-/lib/slang.ok

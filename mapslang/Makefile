@@ -18,6 +18,7 @@ CPP                = $(CROSS_COMPILE)g++
 CFLAGS                          = -c -O -I. -I../lib/$(SLANG_NAME)/src -DSLANG_DLL=1
 CFLAGS-DEBUG                    = -c -g -I. -I../lib/$(SLANG_NAME)/src -DSLANG_DLL=1
 LINK                = $(CROSS_COMPILE)gcc
+WINDRES                         = $(CROSS_COMPILE)windres
 LFLAGS                          = 
 LFLAGS-DEBUG                    = 
 LIBS                = -L. -L../libadikted -L../lib/$(SLANG_NAME)/src/gw32objs -lslang -ladikted
@@ -39,30 +40,43 @@ textmenu.c \
 var_utils.c
 
 OBJ                = $(SRC:.c=.o)
+RES                = map_private.res
 BIN                = map
-RM                = rm -f
-ECHO                            = echo
+RM                 = rm -f
+ECHO               = echo
 
-all: pre-build $(SRC) $(BIN)
+.PHONY: pre-build post-build all clean
 
-$(BIN): $(OBJ)
-	$(LINK) $(if $(filter yes, $(DEBUGME)),$(LFLAGS-DEBUG),$(LFLAGS)) $(LIBS) -o $@ $(OBJ)
+all: pre-build $(SRC) $(BIN) post-build
+
+$(BIN): $(OBJ) $(RES)
+	$(LINK) $(if $(filter yes, $(DEBUGME)),$(LFLAGS-DEBUG),$(LFLAGS)) $(LIBS) -o $@ $(OBJ) $(RES)
 
 .c.o:
 	$(CC) $(if $(filter yes, $(DEBUGME)),$(CFLAGS-DEBUG),$(CFLAGS)) $< -o $@
 
-pre-build: ../lib/$(SLANG_NAME)/src/gw32objs/libslang.dll
+post-build:
+
+pre-build: libslang.dll adikted.dll
 
 ../lib/slang.tgz:
 	curl -L -o $@ $(SLANG_URL)
 
-../lib/$(SLANG_NAME)/src/gw32objs/libslang.dll: ../lib/slang.tgz
+libslang.dll: ../lib/slang.tgz
 	-tar -C ../lib/ -xzf $<
 	cd ../lib/$(SLANG_NAME) && mkfiles/build.sh WIN32 MINGW32 DLL
 	-${RM} ../lib/$(SLANG_NAME)/src/gw32objs/libslang.a
+	-cp ../lib/$(SLANG_NAME)/src/gw32objs/libslang.dll ./
+
+adikted.dll:
+	cd ../libadikted && make
+	-cp ../libadikted/adikted.dll ./
+
+map_private.res: map_private.rc
+	$(WINDRES) -i $< --input-format=rc -o $@ -O coff
 
 clean:
 	${RM} $(OBJ)
 	${RM} $(BIN)
-
+	${RM} *.dll
 
