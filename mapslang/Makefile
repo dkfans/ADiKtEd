@@ -59,6 +59,7 @@ pre-build: ../lib/$(SLANG_NAME)/src/gw32objs/libslang.dll
 ../lib/$(SLANG_NAME)/src/gw32objs/libslang.dll: ../lib/slang.tgz
 	-tar -C ../lib/ -xzf $<
 	cd ../lib/$(SLANG_NAME) && mkfiles/build.sh WIN32 MINGW32 DLL
+	-${RM} ../lib/$(SLANG_NAME)/src/gw32objs/libslang.a
 
 clean:
 	${RM} $(OBJ)
