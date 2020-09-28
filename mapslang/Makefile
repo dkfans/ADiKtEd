@@ -13,15 +13,15 @@ endif
 SLANG_URL = https://www.jedsoft.org/snapshots/slang-pre2.3.3-24.tar.gz
 SLANG_NAME=slang-pre2.3.3-24
 
-CC				= $(CROSS_COMPILE)gcc
-CPP				= $(CROSS_COMPILE)g++
-CFLAGS                          = -c -O -I. -I../lib/$(SLANG_NAME)/src
-CFLAGS-DEBUG                    = -c -g -I. -I../lib/$(SLANG_NAME)/src
-LINK				= $(CROSS_COMPILE)gcc
+CC                = $(CROSS_COMPILE)gcc
+CPP                = $(CROSS_COMPILE)g++
+CFLAGS                          = -c -O -I. -I../lib/$(SLANG_NAME)/src -DSLANG_DLL=1
+CFLAGS-DEBUG                    = -c -g -I. -I../lib/$(SLANG_NAME)/src -DSLANG_DLL=1
+LINK                = $(CROSS_COMPILE)gcc
 LFLAGS                          = 
 LFLAGS-DEBUG                    = 
-LIBS				= -L. -L../libadikted -L../lib/$(SLANG_NAME)/src/gw32objs -lslang -ladikted
-SRC				= \
+LIBS                = -L. -L../libadikted -L../lib/$(SLANG_NAME)/src/gw32objs -lslang -ladikted
+SRC                = \
 input_kb.c \
 main.c \
 output_scr.c \
@@ -38,29 +38,30 @@ scr_txtgen.c \
 textmenu.c \
 var_utils.c
 
-OBJ				= $(SRC:.c=.o)
-BIN				= map
-RM				= rm -f
+OBJ                = $(SRC:.c=.o)
+BIN                = map
+RM                = rm -f
 ECHO                            = echo
 
 all: pre-build $(SRC) $(BIN)
 
 $(BIN): $(OBJ)
-	$(LINK) $(if $(filter yes, $(DEBUGME)),$(LFLAGS-DEBUG),$(LFLAGS)) $(LIBS) -o $@ $(OBJ)
+    $(LINK) $(if $(filter yes, $(DEBUGME)),$(LFLAGS-DEBUG),$(LFLAGS)) $(LIBS) -o $@ $(OBJ)
 
 .c.o:
-	$(CC) $(if $(filter yes, $(DEBUGME)),$(CFLAGS-DEBUG),$(CFLAGS)) $< -o $@
+    $(CC) $(if $(filter yes, $(DEBUGME)),$(CFLAGS-DEBUG),$(CFLAGS)) $< -o $@
 
-pre-build: ../lib/slang.ok
+pre-build: ../lib/$(SLANG_NAME)/src/gw32objs/libslang.dll
 
 ../lib/slang.tgz:
-	curl -L -o $@ $(SLANG_URL)
+    curl -L -o $@ $(SLANG_URL)
 
-../lib/slang.ok: ../lib/slang.tgz
-	-tar -C ../lib/ -xzf $<
-	cd ../lib/$(SLANG_NAME) && mkfiles/build.sh WIN32 MINGW32 && make
-	touch $@
+../lib/$(SLANG_NAME)/src/gw32objs/libslang.dll: ../lib/slang.tgz
+    -tar -C ../lib/ -xzf $<
+    cd ../lib/$(SLANG_NAME) && mkfiles/build.sh WIN32 MINGW32 DLL
 
 clean:
-	${RM} $(OBJ)
-	${RM} $(BIN)
+    ${RM} $(OBJ)
+    ${RM} $(BIN)
+
+
