@@ -41,8 +41,8 @@ LINK               = $(CROSS_COMPILE)gcc$(CROSS_EXEEXT)
 WINDRES            = $(CROSS_COMPILE)windres$(CROSS_EXEEXT)
 RES                = obj/adikted_private.res
 RC                 = adikted_private.rc
-LFLAGS             = -shared
-LFLAGS-DEBUG       = -shared
+LFLAGS             = -shared -march=pentium-mmx -mmmx
+LFLAGS-DEBUG       = -shared -march=pentium-mmx -mmmx
 LIBS               = -L.
 SRC                = \
 arr_utils.c \
