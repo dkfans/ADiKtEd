@@ -79,4 +79,4 @@ clean:
 	${RM} $(OBJ)
 	${RM} $(BIN)
 	${RM} *.dll
-
+	cd ../libadikted && make clean
