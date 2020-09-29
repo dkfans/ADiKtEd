@@ -34,10 +34,10 @@ else
   OTHERLIBEXT = .so
 endif
 # Names of utility commands
-CPP                = $(CROSS_COMPILE)g++$(CROSS_EXEEXT)
-CC                 = $(CROSS_COMPILE)gcc$(CROSS_EXEEXT)
-CFLAGS             = -c -O -I. -DBUILD_DLL
-CFLAGS-DEBUG       = -c -g -I. -DBUILD_DLL
+CPP                = $(CROSS_COMPILE)g++$(CROSS_EXEEXT) -std=c89
+CC                 = $(CROSS_COMPILE)gcc$(CROSS_EXEEXT) -std=c89 -Wall -Wextra -Wno-pedantic -Wno-conversion -Wno-traditional-conversion -Wno-sign-compare
+CFLAGS             = -c -O -I. -DBUILD_DLL -fexpensive-optimizations -O3 -march=pentium-mmx -mmmx
+CFLAGS-DEBUG       = -c -g -I. -DBUILD_DLL -fexpensive-optimizations -O3 -march=pentium-mmx -mmmx
 LINK               = $(CROSS_COMPILE)gcc$(CROSS_EXEEXT)
 WINDRES            = $(CROSS_COMPILE)windres$(CROSS_EXEEXT)
 RES                = obj/adikted_private.res
