@@ -673,14 +673,14 @@ void draw_mdtextr(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata)
 void draw_mdcclm(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata)
 {
     draw_numbered_list(get_custom_column_fullname,scrmode,workdata,
-        0,CUST_CLM_GEN_MAX_INDEX,20);
+        0,42,20);
     show_no_cursor();
 }
 
 void draw_mdslbl(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata)
 {
     draw_numbered_list(get_slab_fullname,scrmode,workdata,
-        0,SLAB_TYPE_GUARDPOST,17);
+        0,54,17);
     show_no_cursor();
 }
 
