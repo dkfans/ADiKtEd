@@ -673,7 +673,7 @@ void draw_mdtextr(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata)
 void draw_mdcclm(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata)
 {
     draw_numbered_list(get_custom_column_fullname,scrmode,workdata,
-        0,42,20);
+        0,CUST_CLM_GEN_MAX_INDEX,20);
     show_no_cursor();
 }
 
