@@ -109,8 +109,8 @@ struct workmenu *new_workmenu(menu src);
 short workmenu_enter(struct workmenu *currmnu,menu nmenu);
 short workmenu_compute_size_rect(struct workmenu *currmnu);
 
-inline union _value menu_value_num(long num);
-inline union _value menu_value_longptr(long *longptr);
+extern inline union _value menu_value_num(long num);
+extern inline union _value menu_value_longptr(long *longptr);
 
 short action_menukey(struct WORKMODE_DATA *workdata,struct workmenu *currmnu,int key);
 short action_menukey_treemove(struct WORKMODE_DATA *workdata,struct workmenu *currmnu,int key);
