@@ -1,21 +1,20 @@
 # Project: libadikted
 # Makefile created by KeeperFX/dkfans team
 
-# To create a debug executable, run with the command:
-# make DEBUG (THIS IS NOT IMPLEMENTED)
-
 # Instructions:
-# To create adikted.dll, run:
+# To create the Windows library run:
 # make all
-# To create adikited.so, run:
+# To create the linux library run:
 # make all BUILD_FOR_LINUX=1 (not fully implemented)
+# To create a debug library, run with the command:
+# make DEBUG (THIS IS NOT IMPLEMENTED YET)
 # To clean up the built files (objects, library, and resource file) run:
 # make clean
 
 # Tested and working with:
-# - MSYS2 (MinGW 32-bit) - make
-# - MSYS2 (MinGW 32-bit) - mingw32-make
-# - MinGW (MSYS) - make
+# - Windows : MSYS2 (MinGW 32-bit) - make
+# - Windows : MSYS2 (MinGW 32-bit) - mingw32-make
+# - Windows : MinGW (MSYS) - make
 
 # Executable files extension on host environment
 ifneq (,$(findstring Windows,$(OS)))
