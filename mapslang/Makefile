@@ -42,7 +42,6 @@ endif
 # Names of utility commands
 SLANG_URL          = https://www.jedsoft.org/snapshots/slang-pre2.3.3-24.tar.gz
 SLANG_NAME         = slang-pre2.3.3-24
-CPP                = $(CROSS_COMPILE)g++$(CROSS_EXEEXT) -std=c18
 CC                 = $(CROSS_COMPILE)gcc$(CROSS_EXEEXT) -std=c18 -Wall -Wextra -Wno-pedantic -Wno-conversion -Wno-traditional-conversion -Wno-sign-compare
 CFLAGS             = -c -O -I. -I../lib/$(SLANG_NAME)/src -DSLANG_DLL=1 -march=i486
 CFLAGS-DEBUG       = -c -g -I. -I../lib/$(SLANG_NAME)/src -DSLANG_DLL=1 -march=i486
