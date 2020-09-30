@@ -76,9 +76,9 @@ MKDIR              = mkdir -p
 
 .PHONY: pre-build post-build all clean
 
-all: pre-build $(SRC) $(BIN) post-build
+all: make-directories pre-build $(SRC) $(BIN) post-build
 
-pre-build:
+make-directories:
 	$(MKDIR) bin obj
 
 clean:
