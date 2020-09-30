@@ -31,13 +31,13 @@ ifneq (,$(BUILD_FOR_LINUX))
   OTHEREXEEXT = .exe
   LIBEXT = .so
   OTHERLIBEXT = .dll
-  SLANGPLATFORM = WIN32 MINGW32 DLL
+  SLANGPLATFORM =
 else
   EXEEXT = .exe
   OTHEREXEEXT =
   LIBEXT = .dll
   OTHERLIBEXT = .so
-  SLANGPLATFORM = 
+  SLANGPLATFORM = WIN32 MINGW32 DLL
 endif
 # Names of utility commands
 SLANG_URL          = https://www.jedsoft.org/snapshots/slang-pre2.3.3-24.tar.gz
