@@ -7,7 +7,7 @@
 # To create the linux library run:
 # make all BUILD_FOR_LINUX=1 (not fully implemented)
 # To create a debug library, run with the command:
-# make DEBUG (THIS IS NOT IMPLEMENTED YET)
+# make all DEBUG=1
 # To clean up the built files (objects, library, and resource file) run:
 # make clean
 
@@ -23,8 +23,8 @@ else
   CROSS_EXEEXT =
   CROSS_COMPILE = i686-w64-mingw32-
 endif
-# Executable files extension on target environment (
-#BUILD_FOR_LINUX = 1
+# Executable files extension on target environment
+BUILD_FOR_LINUX ?= 0
 ifneq (,$(BUILD_FOR_LINUX))
   LIBEXT = .so
   OTHERLIBEXT = .dll
@@ -32,16 +32,26 @@ else
   LIBEXT = .dll
   OTHERLIBEXT = .so
 endif
+# Allow debug executables to be created
+DEBUG ?= 0
+ifeq ($(DEBUG), 1)
+  DEBUGME = yes
+else
+  DEBUGME = no
+endif
 # Names of utility commands
-CC                 = $(CROSS_COMPILE)gcc$(CROSS_EXEEXT) -std=c89 -Wall -Wextra -Wno-pedantic -Wno-conversion -Wno-traditional-conversion -Wno-sign-compare
-CFLAGS             = -c -O -I. -DBUILD_DLL -fexpensive-optimizations -O3 -march=pentium-mmx -mmmx
-CFLAGS-DEBUG       = -c -g -I. -DBUILD_DLL -march=pentium-mmx -mmmx
+WARNFLAGS          = -Wall -Wextra -Wno-pedantic -Wno-conversion -Wno-traditional-conversion -Wno-sign-compare
+PLATFORMFLAGS      = -march=pentium-mmx -mmmx
+CSTANDARD          = -std=c89
+CC                 = $(CROSS_COMPILE)gcc$(CROSS_EXEEXT) $(CSTANDARD) $(WARNFLAGS)
+CFLAGS             = -c -O -I. -DBUILD_DLL -fexpensive-optimizations -O3 $(PLATFORMFLAGS)
+CFLAGS-DEBUG       = -c -g -I. -DBUILD_DLL $(PLATFORMFLAGS) -DDEBUG
 LINK               = $(CROSS_COMPILE)gcc$(CROSS_EXEEXT)
 WINDRES            = $(CROSS_COMPILE)windres$(CROSS_EXEEXT)
 RES                = obj/adikted_private.res
 RC                 = adikted_private.rc
-LFLAGS             = -shared -march=pentium-mmx -mmmx
-LFLAGS-DEBUG       = -shared -march=pentium-mmx -mmmx
+LFLAGS             = -shared $(PLATFORMFLAGS)
+LFLAGS-DEBUG       = -shared $(PLATFORMFLAGS) -DDEBUG
 LIBS               = -L.
 SRC                = \
 arr_utils.c \
