@@ -11,20 +11,13 @@
 # To clean up the built files (objects, library, and resource file) run:
 # make clean
 
-# Tested and working with:
-# - Windows : MSYS2 (MinGW 32-bit) - make
-# - Windows : MSYS2 (MinGW 32-bit) - mingw32-make
-# - Windows : MinGW (MSYS) - make
+# Windows version can be built with:
+# - Windows   : MSYS2 (MinGW 32-bit) - make
+# - Windows   : MSYS2 (MinGW 32-bit) - mingw32-make
+# - Windows   : MinGW (MSYS) - make
+# - WSL/Linux : i686-w64-mingw32-gcc - make
 
-# Executable files extension on host environment
-ifneq (,$(findstring Windows,$(OS)))
-  CROSS_EXEEXT = .exe
-else
-  CROSS_EXEEXT =
-  CROSS_COMPILE = i686-w64-mingw32-
-  SLANG_HOST = mingw32
-endif
-# Executable files extension on target environment
+# Executable file extensions on target environment
 BUILD_FOR_LINUX ?= 0
 ifeq ($(BUILD_FOR_LINUX), 1)
   EXEEXT =
@@ -38,6 +31,29 @@ else
   LIBEXT = .dll
   OTHERLIBEXT = .so
   SLANGPLATFORM = WIN32 MINGW32 DLL
+endif
+# Host environment
+ifneq (,$(findstring Windows,$(OS)))
+  CROSS_EXEEXT = .exe
+  ifneq ($(BUILD_FOR_LINUX), 1)
+   SLANGBUILDCOMMAND = mkfiles/build.sh $(SLANGPLATFORM)
+  else
+   SLANGBUILDCOMMAND =
+  endif
+else
+  CROSS_EXEEXT =
+  CROSS_COMPILE = i686-w64-mingw32-
+  ifneq ($(BUILD_FOR_LINUX), 1)
+    SLANGBUILDCOMMAND = cp ./src/slconfig.h ./src/config.h && \
+                        gcc -I./src ./src/mkfiles/mkmake.c ./src/slprepr.c -o ./src/mkfiles/mkmake && \
+                        src/mkfiles/mkmake WIN32 MINGW32 DLL     < src/mkfiles/makefile.all >     src/Makefile && sed -i 's/TOOL_PREFIX =/TOOL_PREFIX = $(CROSS_COMPILE)/g'      src/Makefile && \
+                        src/mkfiles/mkmake WIN32 MINGW32 DLL    < slsh/mkfiles/makefile.all >    slsh/Makefile && sed -i 's/TOOL_PREFIX =/TOOL_PREFIX = $(CROSS_COMPILE)/g'     slsh/Makefile && \
+                        src/mkfiles/mkmake WIN32 MINGW32 DLL < modules/mkfiles/makefile.all > modules/Makefile && sed -i 's/TOOL_PREFIX =/TOOL_PREFIX = $(CROSS_COMPILE)/g'  modules/Makefile && \
+                        cp ./mkfiles/makefile.sh ./Makefile && \
+                        make
+  else
+   SLANGBUILDCOMMAND =
+  endif
 endif
 # Allow debug executables to be created
 DEBUG ?= 0
@@ -124,8 +140,8 @@ $(RES): $(RC)
 
 $(LIBSLANG): ../lib/slang.tgz
 	-tar -C ../lib/ -xzf $<
-	cd ../lib/$(SLANG_NAME) && mkfiles/build.sh $(SLANGPLATFORM)
-	-${RM} ../lib/$(SLANG_NAME)/src/gw32objs/libslang.a
+	cd ../lib/$(SLANG_NAME) && $(SLANGBUILDCOMMAND)
+	-$(RM) ../lib/$(SLANG_NAME)/src/gw32objs/libslang.a
 
 $(LIBADIKTED):
 	cd ../libadikted && make
