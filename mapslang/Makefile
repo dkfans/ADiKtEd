@@ -51,7 +51,7 @@ SLANG_URL          = https://www.jedsoft.org/snapshots/slang-pre2.3.3-24.tar.gz
 SLANG_NAME         = slang-pre2.3.3-24
 WARNFLAGS          = -Wall -Wextra -Wno-pedantic -Wno-conversion -Wno-traditional-conversion -Wno-sign-compare
 PLATFORMFLAGS      = -march=i486
-CSTANDARD          = -std=c18
+CSTANDARD          = -std=gnu89
 CC                 = $(CROSS_COMPILE)gcc$(CROSS_EXEEXT) $(CSTANDARD) $(WARNFLAGS)
 CFLAGS             = -c -O -I. -I../lib/$(SLANG_NAME)/src -DSLANG_DLL=1 $(PLATFORMFLAGS)
 CFLAGS-DEBUG       = -c -g -I. -I../lib/$(SLANG_NAME)/src -DSLANG_DLL=1 $(PLATFORMFLAGS) -DDEBUG
