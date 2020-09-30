@@ -26,7 +26,7 @@ else
 endif
 # Executable files extension on target environment
 BUILD_FOR_LINUX ?= 0
-ifneq (,$(BUILD_FOR_LINUX))
+ifeq ($(BUILD_FOR_LINUX), 1)
   EXEEXT =
   OTHEREXEEXT = .exe
   LIBEXT = .so
