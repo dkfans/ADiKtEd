@@ -31,11 +31,13 @@ ifneq (,$(BUILD_FOR_LINUX))
   OTHEREXEEXT = .exe
   LIBEXT = .so
   OTHERLIBEXT = .dll
+  SLANGPLATFORM = WIN32 MINGW32 DLL
 else
   EXEEXT = .exe
   OTHEREXEEXT =
   LIBEXT = .dll
   OTHERLIBEXT = .so
+  SLANGPLATFORM = 
 endif
 # Names of utility commands
 SLANG_URL          = https://www.jedsoft.org/snapshots/slang-pre2.3.3-24.tar.gz
@@ -69,6 +71,8 @@ textmenu.c \
 var_utils.c
 OBJ                = $(addprefix obj/,$(SRC:.c=.o))
 BIN                = bin/map$(EXEEXT)
+LIBSLANG           = libslang$(LIBEXT)
+LIBADIKTED         = adikted$(LIBEXT)
 RM                 = rm -f
 MKDIR              = mkdir -p
 CP                 = cp -f
@@ -82,15 +86,15 @@ make-directories:
 
 fill-pkg-directory:
 	$(CP) $(BIN) pkg/
-	$(CP) ../libadikted/bin/adikted.dll pkg/
-	$(CP) ../lib/$(SLANG_NAME)/src/gw32objs/libslang.dll pkg/
+	$(CP) ../libadikted/bin/$(LIBADIKTED) pkg/
+	$(CP) ../lib/$(SLANG_NAME)/src/gw32objs/$(LIBSLANG) pkg/
 	$(CP) map.hlp pkg/
 	$(CP) map.ini pkg/
 	$(CP) ../docs/* pkg/docs/
 
 post-build:
 
-pre-build: libslang.dll adikted.dll
+pre-build: $(LIBSLANG) $(LIBADIKTED)
 
 clean:
 	$(RM) $(OBJ) $(BIN) $(BIN:$(EXEEXT)=$(OTHEREXEEXT)) $(RES)
@@ -109,10 +113,10 @@ $(RES): $(RC)
 ../lib/slang.tgz:
 	curl -L -o $@ $(SLANG_URL)
 
-libslang.dll: ../lib/slang.tgz
+$(LIBSLANG): ../lib/slang.tgz
 	-tar -C ../lib/ -xzf $<
-	cd ../lib/$(SLANG_NAME) && mkfiles/build.sh WIN32 MINGW32 DLL
+	cd ../lib/$(SLANG_NAME) && mkfiles/build.sh $(SLANGPLATFORM)
 	-${RM} ../lib/$(SLANG_NAME)/src/gw32objs/libslang.a
 
-adikted.dll:
+$(LIBADIKTED):
 	cd ../libadikted && make
