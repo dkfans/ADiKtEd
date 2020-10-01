@@ -107,7 +107,6 @@ textmenu.c \
 var_utils.c
 OBJ                = $(addprefix obj/,$(SRC:.c=.o))
 BIN                = bin/map$(EXEEXT)
-PKG-BIN            = $(BIN:bin=pkg)
 LIBSLANG           = libslang$(LIBEXT)
 LIBADIKTED         = adikted$(LIBEXT)
 RM                 = rm -f
@@ -125,7 +124,7 @@ make-directories:
 create-package: fill-pkg-directory
 
 strip-executables:
-	$(STRIP) $(PKG-BIN) pkg/$(LIBSLANG) pkg/$(LIBADIKTED)
+	$(STRIP) pkg/map$(EXEEXT) pkg/$(LIBSLANG) pkg/$(LIBADIKTED)
 
 fill-pkg-directory:
 	$(MKDIR) pkg/docs
