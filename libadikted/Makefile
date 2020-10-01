@@ -7,14 +7,15 @@
 # To create the linux library run:
 # make all BUILD_FOR_LINUX=1 (not fully implemented)
 # To create a debug library, run with the command:
-# make all DEBUG=1
+# make all DEBUG=1 (un-tested)
 # To clean up the built files (objects, library, and resource file) run:
 # make clean
 
-# Tested and working with:
-# - Windows : MSYS2 (MinGW 32-bit) - make
-# - Windows : MSYS2 (MinGW 32-bit) - mingw32-make
-# - Windows : MinGW (MSYS) - make
+# Windows version can be built with:
+# - Windows   : MSYS2 (MinGW 32-bit) - make
+# - Windows   : MSYS2 (MinGW 32-bit) - mingw32-make
+# - Windows   : MinGW (MSYS) - make
+# - WSL/Linux : i686-w64-mingw32-gcc - make
 
 # Executable files extension on host environment
 ifneq (,$(findstring Windows,$(OS)))
@@ -27,10 +28,10 @@ endif
 BUILD_FOR_LINUX ?= 0
 ifeq ($(BUILD_FOR_LINUX), 1)
   LIBEXT = .so
-  OTHERLIBEXT = .dll
+  OTHER_LIBEXT = .dll
 else
   LIBEXT = .dll
-  OTHERLIBEXT = .so
+  OTHER_LIBEXT = .so
 endif
 # Allow debug executables to be created
 DEBUG ?= 0
@@ -41,17 +42,17 @@ else
 endif
 # Names of utility commands
 WARNFLAGS          = -Wall -Wextra -Wno-pedantic -Wno-conversion -Wno-traditional-conversion -Wno-sign-compare
-PLATFORMFLAGS      = -march=pentium-mmx -mmmx
+PLATFORM_FLAGS      = -march=pentium-mmx -mmmx
 CSTANDARD          = -std=c89
 CC                 = $(CROSS_COMPILE)gcc$(CROSS_EXEEXT) $(CSTANDARD) $(WARNFLAGS)
-CFLAGS             = -c -O -I. -DBUILD_DLL -fexpensive-optimizations -O3 $(PLATFORMFLAGS)
-CFLAGS-DEBUG       = -c -g -I. -DBUILD_DLL $(PLATFORMFLAGS) -DDEBUG
+CFLAGS             = -c -O -I. -DBUILD_DLL -fexpensive-optimizations -O3 $(PLATFORM_FLAGS)
+CFLAGS_DEBUG       = -c -g -I. -DBUILD_DLL $(PLATFORM_FLAGS) -DDEBUG
 LINK               = $(CROSS_COMPILE)gcc$(CROSS_EXEEXT)
 WINDRES            = $(CROSS_COMPILE)windres$(CROSS_EXEEXT)
 RES                = obj/adikted_private.res
 RC                 = adikted_private.rc
-LFLAGS             = -shared $(PLATFORMFLAGS)
-LFLAGS-DEBUG       = -shared $(PLATFORMFLAGS) -DDEBUG
+LFLAGS             = -shared $(PLATFORM_FLAGS)
+LFLAGS_DEBUG       = -shared $(PLATFORM_FLAGS) -DDEBUG
 LIBS               = -L.
 SRC                = \
 arr_utils.c \
@@ -91,13 +92,13 @@ make-directories:
 	$(MKDIR) bin obj
 
 clean:
-	$(RM) $(OBJ) $(BIN) $(BIN:$(LIBEXT)=$(OTHERLIBEXT)) $(RES)
+	$(RM) $(OBJ) $(BIN) $(BIN:$(LIBEXT)=$(OTHER_LIBEXT)) $(RES)
 
 $(BIN): $(OBJ) $(RES)
-	$(LINK) $(if $(filter yes, $(DEBUGME)),$(LFLAGS-DEBUG),$(LFLAGS)) $(LIBS) -o $@ $(OBJ) $(RES)
+	$(LINK) $(if $(filter yes, $(DEBUGME)),$(LFLAGS_DEBUG),$(LFLAGS)) $(LIBS) -o $@ $(OBJ) $(RES)
 
 obj/%.o: %.c
-	$(CC) $(if $(filter yes, $(DEBUGME)),$(CFLAGS-DEBUG),$(CFLAGS)) $< -o $@
+	$(CC) $(if $(filter yes, $(DEBUGME)),$(CFLAGS_DEBUG),$(CFLAGS)) $< -o $@
 
 $(RES): $(RC)
 	$(WINDRES) -i $< --input-format=rc -o $@ -O coff
