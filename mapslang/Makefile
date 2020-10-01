@@ -8,8 +8,10 @@
 # make all BUILD_FOR_LINUX=1 (not fully implemented)
 # To create a debug executable, run with the command:
 # make all DEBUG=1
-# To clean up the built files (objects, library, and resource file) run:
+# To clean up map and libadikted run:
 # make clean
+# To perform a normal clean, and a clean of libslang run:
+# make clean-inc-libs
 
 # Windows version can be built with:
 # - Windows   : MSYS2 (MinGW 32-bit) - make
@@ -36,9 +38,9 @@ endif
 ifneq (,$(findstring Windows,$(OS)))
   CROSS_EXEEXT = .exe
   ifneq ($(BUILD_FOR_LINUX), 1)
-   SLANGBUILDCOMMAND = mkfiles/build.sh $(SLANGPLATFORM)
+    SLANGBUILDCOMMAND = mkfiles/build.sh $(SLANGPLATFORM)
   else
-   SLANGBUILDCOMMAND =
+    SLANGBUILDCOMMAND =
   endif
 else
   CROSS_EXEEXT =
@@ -96,20 +98,28 @@ textmenu.c \
 var_utils.c
 OBJ                = $(addprefix obj/,$(SRC:.c=.o))
 BIN                = bin/map$(EXEEXT)
+PKG-BIN            = $(BIN:bin=pkg)
 LIBSLANG           = libslang$(LIBEXT)
 LIBADIKTED         = adikted$(LIBEXT)
 RM                 = rm -f
 MKDIR              = mkdir -p
 CP                 = cp -f
+STRIP              = strip --strip-all
 
 .PHONY: pre-build post-build all clean
 
-all: make-directories pre-build $(SRC) $(BIN) fill-pkg-directory post-build
+all: make-directories pre-build $(SRC) $(BIN) post-build
 
 make-directories:
-	$(MKDIR) bin obj pkg/docs
+	$(MKDIR) ../lib bin obj
+
+create-package: fill-pkg-directory
+
+strip-executables:
+	$(STRIP) $(PKG-BIN) pkg/$(LIBSLANG) pkg/$(LIBADIKTED)
 
 fill-pkg-directory:
+	$(MKDIR) pkg/docs
 	$(CP) $(BIN) pkg/
 	$(CP) ../libadikted/bin/$(LIBADIKTED) pkg/
 	$(CP) ../lib/$(SLANG_NAME)/src/gw32objs/$(LIBSLANG) pkg/
@@ -117,9 +127,12 @@ fill-pkg-directory:
 	$(CP) map.ini pkg/
 	$(CP) ../docs/* pkg/docs/
 
-post-build:
+post-build: create-package
 
 pre-build: $(LIBSLANG) $(LIBADIKTED)
+
+clean-inc-libs: clean
+	cd ../lib/$(SLANG_NAME) && make clean
 
 clean:
 	$(RM) $(OBJ) $(BIN) $(BIN:$(EXEEXT)=$(OTHEREXEEXT)) $(RES)
