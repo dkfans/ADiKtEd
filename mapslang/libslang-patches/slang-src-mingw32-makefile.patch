@@ -1,0 +1,24 @@
+85c85
+< TOOL_PREFIX =
+---
+> TOOL_PREFIX ?=
+289c289
+< CFLAGS = -DWIN32 -DSLANG_DLL=1 -O2 $(WFLAGS)
+---
+> override CFLAGS += -DWIN32 -DSLANG_DLL=1 -O2 $(WFLAGS)
+291c291
+< CFLAGS = -DWIN32 -O2 $(WFLAGS)
+---
+> override CFLAGS += -DWIN32 -O2 $(WFLAGS)
+303c303
+< 
+---
+> LFLAGS ?=
+307c307
+< RM = rm
+---
+> RM = rm -f
+442c442
+< 	$(CC) -shared -o $(TGTBASE).dll $(OBJS) -Wl,--out-implib,$(TARGET)
+---
+> 	$(CC) -shared $(LFLAGS) -o $(TGTBASE).dll $(OBJS) -Wl,--out-implib,$(TARGET)
