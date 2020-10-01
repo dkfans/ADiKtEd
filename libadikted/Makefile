@@ -29,9 +29,11 @@ BUILD_FOR_LINUX ?= 0
 ifeq ($(BUILD_FOR_LINUX), 1)
   LIBEXT = .so
   OTHER_LIBEXT = .dll
+  DLL_FLAG =
 else
   LIBEXT = .dll
   OTHER_LIBEXT = .so
+  DLL_FLAG = -DBUILD_DLL
 endif
 # Allow debug executables to be created
 DEBUG ?= 0
@@ -45,8 +47,8 @@ WARNFLAGS          = -Wall -Wextra -Wno-pedantic -Wno-conversion -Wno-traditiona
 PLATFORM_FLAGS      = -march=pentium-mmx -mmmx
 CSTANDARD          = -std=c89
 CC                 = $(CROSS_COMPILE)gcc$(CROSS_EXEEXT) $(CSTANDARD) $(WARNFLAGS)
-CFLAGS             = -c -O -I. -DBUILD_DLL -fexpensive-optimizations -O3 $(PLATFORM_FLAGS)
-CFLAGS_DEBUG       = -c -g -I. -DBUILD_DLL $(PLATFORM_FLAGS) -DDEBUG
+CFLAGS             = -c -O -I. $(DLL_FLAG) -fexpensive-optimizations -O3 $(PLATFORM_FLAGS)
+CFLAGS_DEBUG       = -c -g -I. $(DLL_FLAG) $(PLATFORM_FLAGS) -DDEBUG
 LINK               = $(CROSS_COMPILE)gcc$(CROSS_EXEEXT)
 WINDRES            = $(CROSS_COMPILE)windres$(CROSS_EXEEXT)
 RES                = obj/adikted_private.res

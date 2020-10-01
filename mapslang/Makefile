@@ -24,11 +24,6 @@
 # Host environment
 ifneq (,$(findstring Windows,$(OS)))
   CROSS_EXEEXT = .exe
-  ifneq ($(BUILD_FOR_LINUX), 1)
-    SLANG_BUILDCOMMAND =
-  else
-    SLANG_BUILDCOMMAND =
-  endif
 else
   CROSS_EXEEXT =
   CROSS_COMPILE = i686-w64-mingw32-
@@ -38,7 +33,7 @@ else
     SLANG_BUILDCOMMAND = cp ./src/slconfig.h ./src/config.h && \
                          gcc -I./src ./src/mkfiles/mkmake.c ./src/slprepr.c -o ./src/mkfiles/mkmake &&
   else
-   SLANG_BUILDCOMMAND =
+    SLANG_BUILDCOMMAND = ./configure && make
   endif
 endif
 # Executable file extensions on target environment
@@ -48,11 +43,15 @@ ifeq ($(BUILD_FOR_LINUX), 1)
   OTHER_EXEEXT = .exe
   LIBEXT = .so
   OTHER_LIBEXT = .dll
+  DLL_FLAG =
+  SLANG_OBJ_FOLDER = elfobjs
 else
   EXEEXT = .exe
   OTHER_EXEEXT =
   LIBEXT = .dll
   OTHER_LIBEXT = .so
+  DLL_FLAG = -DSLANG_DLL=1
+  SLANG_OBJ_FOLDER = gw32objs
   # S-Lang MinGW32 Makefile creation:
   # -static-libgcc is also needed by libslang. So the 3 makefile.all files are patched.
   # (Along with tweaking 'del'/'rm' to 'rm -f' for the clean process, and allowing TOOL_PREFIX, 
@@ -77,19 +76,20 @@ endif
 SLANG_URL          = https://www.jedsoft.org/snapshots/slang-pre2.3.3-24.tar.gz
 SLANG_NAME         = slang-pre2.3.3-24
 SLANG_ARCHIVE      = ../lib/slang.tgz
+SLANG_BIN_FOLDER   = /lib/$(SLANG_NAME)/src/$(SLANG_OBJ_FOLDER)
 WARNFLAGS          = -Wall -Wextra -Wno-pedantic -Wno-conversion -Wno-traditional-conversion -Wno-sign-compare
 PLATFORM_FLAGS     = -march=i486
 CSTANDARD          = -std=gnu89
 CC                 = $(CROSS_COMPILE)gcc$(CROSS_EXEEXT) $(CSTANDARD) $(WARNFLAGS)
-CFLAGS             = -c -O -I. -I../lib/$(SLANG_NAME)/src -DSLANG_DLL=1 $(PLATFORM_FLAGS)
-CFLAGS_DEBUG       = -c -g -I. -I../lib/$(SLANG_NAME)/src -DSLANG_DLL=1 $(PLATFORM_FLAGS) -DDEBUG
+CFLAGS             = -c -O -I. -I../lib/$(SLANG_NAME)/src $(DLL_FLAG) $(PLATFORM_FLAGS)
+CFLAGS_DEBUG       = -c -g -I. -I../lib/$(SLANG_NAME)/src $(DLL_FLAG) $(PLATFORM_FLAGS) -DDEBUG
 LINK               = $(CROSS_COMPILE)gcc$(CROSS_EXEEXT)
 WINDRES            = $(CROSS_COMPILE)windres$(CROSS_EXEEXT)
 RES                = obj/map_private.res
 RC                 = map_private.rc
 LFLAGS             = -static-libgcc $(PLATFORM_FLAGS)
 LFLAGS_DEBUG       = -static-libgcc $(PLATFORM_FLAGS) -DDEBUG
-LIBS               = -L. -L../libadikted/bin -L../lib/$(SLANG_NAME)/src/gw32objs -lslang -ladikted
+LIBS               = -L. -L../libadikted/bin -L..$(SLANG_BIN_FOLDER) -lslang -ladikted
 SRC                = \
 input_kb.c \
 main.c \
@@ -131,7 +131,7 @@ fill-pkg-directory:
 	$(MKDIR) pkg/docs
 	$(CP) $(BIN) pkg/
 	$(CP) ../libadikted/bin/$(LIB_ADIKTED) pkg/
-	$(CP) ../lib/$(SLANG_NAME)/src/gw32objs/$(LIB_SLANG) pkg/
+	$(CP) ..$(SLANG_BIN_FOLDER)/$(LIB_SLANG) pkg/
 	$(CP) map.hlp pkg/
 	$(CP) map.ini pkg/
 	$(CP) ../docs/* pkg/docs/
@@ -163,7 +163,7 @@ $(SLANG_ARCHIVE):
 $(LIB_SLANG): $(SLANG_ARCHIVE)
 	-tar -C ../lib/ -xzf $<
 	cd ../lib/$(SLANG_NAME) && $(SLANG_BUILDCOMMAND)
-	-$(RM) ../lib/$(SLANG_NAME)/src/gw32objs/libslang.a
+	-$(RM) ..$(SLANG_BIN_FOLDER)/libslang.a
 
 $(LIB_ADIKTED):
 	cd ../libadikted && make
