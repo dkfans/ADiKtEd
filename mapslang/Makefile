@@ -59,11 +59,12 @@ else
   SLANG_PLATFORM = WIN32 MINGW32 DLL
   SLANG_CFLAGS = -std=gnu89
   SLANG_LFLAGS = -static-libgcc
+  SLANG_RC_FOLDER = ../../../mapslang/libslang-patches
   SLANG_BUILDCOMMAND += \
   patch -r - -N src/mkfiles/makefile.all ../../mapslang/libslang-patches/slang-src-mingw32-makefile.patch && \
   patch -r - -N slsh/mkfiles/makefile.all ../../mapslang/libslang-patches/slang-slsh-mingw32-makefile.patch && \
   patch -r - -N modules/mkfiles/makefile.all ../../mapslang/libslang-patches/slang-modules-mingw32-makefile.patch && \
-  TOOL_PREFIX='$(CROSS_COMPILE)' CFLAGS='$(SLANG_CFLAGS)' LFLAGS='$(SLANG_LFLAGS)' mkfiles/build.sh $(SLANG_PLATFORM)
+  TOOL_PREFIX='$(CROSS_COMPILE)' CFLAGS='$(SLANG_CFLAGS)' LFLAGS='$(SLANG_LFLAGS)' SLANG_RC_FOLDER='$(SLANG_RC_FOLDER)' mkfiles/build.sh $(SLANG_PLATFORM)
 endif
 # Allow debug executables to be created
 DEBUG ?= 0
