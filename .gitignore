@@ -6,3 +6,4 @@
 *.exe
 /lib/slang-*
 /lib/slang.tgz
+/mapslang/pkg/*
