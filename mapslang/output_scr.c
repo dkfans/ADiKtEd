@@ -109,7 +109,7 @@ void screen_printf_toeol(char *format, ...)
 void screen_printchr(char dst)
 {
     if (!screen_initied) return;
-    SLsmg_write_char(dst);
+    SLsmg_write_char((unsigned char)dst);
 }
 
 void screen_clear(void)

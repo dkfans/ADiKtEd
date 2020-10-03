@@ -275,6 +275,7 @@ void get_command_line_options(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA 
  */
 int main(int argc, char **argv)
 {
+    SLutf8_enable(1);
     struct SCRMODE_DATA *scrmode;
     struct WORKMODE_DATA workdata;
     // Initialize the message displaying and storing
