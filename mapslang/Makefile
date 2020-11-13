@@ -74,8 +74,8 @@ else
   DEBUGME = no
 endif
 # Names of utility commands
-SLANG_URL          = https://www.jedsoft.org/snapshots/slang-pre2.3.3-24.tar.gz
-SLANG_NAME         = slang-pre2.3.3-24
+SLANG_URL          = https://www.jedsoft.org/releases/slang/slang-2.3.2.tar.bz2
+SLANG_NAME         = slang-2.3.2
 SLANG_ARCHIVE      = ../lib/slang.tgz
 SLANG_BIN_FOLDER   = /lib/$(SLANG_NAME)/src/$(SLANG_OBJ_FOLDER)
 WARNFLAGS          = -Wall -Wextra -Wno-pedantic -Wno-conversion -Wno-traditional-conversion -Wno-sign-compare
@@ -142,7 +142,7 @@ post-build: create-package
 pre-build: $(LIB_SLANG) $(LIB_ADIKTED)
 
 clean-inc-libs: clean
-	cd ../lib/$(SLANG_NAME) && make clean
+	if [ -e ../lib/$(SLANG_NAME) ]; then cd ../lib/$(SLANG_NAME) && make clean; fi
 
 clean:
 	$(RM) $(OBJ) $(BIN) $(BIN:$(EXEEXT)=$(OTHER_EXEEXT)) $(RES)
@@ -159,10 +159,10 @@ $(RES): $(RC)
 	$(WINDRES) -i $< --input-format=rc -o $@ -O coff
 
 $(SLANG_ARCHIVE):
-	curl -L -o $@ $(SLANG_URL)
+	curl -f -L -o $@ $(SLANG_URL)
 
 $(LIB_SLANG): $(SLANG_ARCHIVE)
-	-tar -C ../lib/ -xzf $<
+	-tar -C ../lib/ -xf $<
 	cd ../lib/$(SLANG_NAME) && $(SLANG_BUILDCOMMAND)
 	-$(RM) ..$(SLANG_BIN_FOLDER)/libslang.a
 
