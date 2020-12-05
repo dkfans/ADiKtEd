@@ -38,13 +38,18 @@
 #include "textmenu.h"
 #include "scr_txtgen.h"
 
+extern void actions_mdtileset(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata,int key);
+extern void draw_mdtileset(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata);
+extern void start_mdtileset(struct SCRMODE_DATA *,struct WORKMODE_DATA *);
+extern void end_mdtileset(struct SCRMODE_DATA *,struct WORKMODE_DATA *);
+
 void (*actions [])(struct SCRMODE_DATA *,struct WORKMODE_DATA *,int)={
      actions_mdslab, actions_mdtng,  actions_crcrtr,  actions_critem,
      actions_help,   actions_mdclm,  actions_scrpt,  actions_mdtextr,
      actions_mdcclm, actions_mdcube, actions_mdslbl, actions_mdrwrk,
      actions_mdsrch, actions_mdlmap, actions_mdsmap, actions_mdgrafit,
      actions_crefct, actions_crtrap, actions_editem, actions_edcrtr,
-     actions_edefct, actions_edtrap, };
+     actions_edefct, actions_edtrap, actions_mdtileset};
 
 // Drawing functions for modes. You can fill new entries
 // with "draw_mdempty" till you create proper draw function.
@@ -54,7 +59,7 @@ void (*mddraw [])(struct SCRMODE_DATA *,struct WORKMODE_DATA *)={
      draw_mdcclm, draw_mdcube, draw_mdslbl, draw_mdrwrk,
      draw_mdsrch, draw_mdlmap, draw_mdsmap, draw_mdgrafit,
      draw_crefct, draw_crtrap, draw_editem, draw_edcrtr,
-     draw_edefct, draw_edtrap, };
+     draw_edefct, draw_edtrap, draw_mdtileset};
 
 short (*mdstart [])(struct SCRMODE_DATA *,struct WORKMODE_DATA *)={
      start_mdslab, start_mdtng,  start_crcrtr,  start_critem,
@@ -62,7 +67,7 @@ short (*mdstart [])(struct SCRMODE_DATA *,struct WORKMODE_DATA *)={
      start_mdcclm, start_mdcube, start_mdslbl, start_mdrwrk,
      start_mdsrch, start_mdlmap, start_mdsmap, start_mdgrafit,
      start_crefct, start_crtrap, start_editem, start_edcrtr,
-     start_edefct, start_edtrap, };
+     start_edefct, start_edtrap, start_mdtileset};
 
 void (*mdend [])(struct SCRMODE_DATA *,struct WORKMODE_DATA *)={
      end_mdslab, end_mdtng,  end_crcrtr,  end_critem,
@@ -70,7 +75,7 @@ void (*mdend [])(struct SCRMODE_DATA *,struct WORKMODE_DATA *)={
      end_mdcclm, end_mdcube, end_mdslbl, end_mdrwrk,
      end_mdsrch, end_mdlmap, end_mdsmap, end_mdgrafit,
      end_crefct, end_crtrap, end_editem, end_edcrtr,
-     end_edefct, end_edtrap, };
+     end_edefct, end_edtrap, end_mdtileset};
 
 // Max. 5 chars mode names
 const char *modenames[]={
@@ -79,7 +84,7 @@ const char *modenames[]={
      "CClm",  "CCube", "SlbLs", "Rewrk",
      "Srch",  "OMap",  "SMap",  "Grft",
      "AEfct", "ATrap", "EItem", "ECrtr",
-     "EEfct", "ETrap", "(bad)",};
+     "EEfct", "ETrap", "TlSet", "(bad)",};
 // longer mode names
 const char *longmodenames[]={
      "slab", "thing", "add creature","add item",
@@ -87,7 +92,7 @@ const char *longmodenames[]={
      "cust.column","cust.cubes","slab list","rework",
      "search", "open map", "save map", "graffiti",
      "add effect", "add trap", "edit item", "edit creatre",
-     "edit effect", "edit trap", "(bad)",};
+     "edit effect", "edit trap", "slab tilesets", "(bad)",};
 
 const char *string_input_msg[]={ "",
      "Map number/name to load:",

@@ -1446,6 +1446,25 @@ short write_text_file(char **lines,int lines_count,char *fname)
 }
 
 /**
+ * Writes extended info
+ * SLX consist of extended slab flags (i.e. tileset)
+ * @param lvl Pointer to the LEVEL structure.
+ * @param fname Destination file name.
+ * @return Returns ERR_NONE on success, error code on failure.
+ */
+short write_slx(struct LEVEL *lvl,char *fname)
+{
+  message_log(" write_slx: starting");
+
+  FILE* fp = fopen(fname, "wb");
+  if (fp==NULL)
+    return ERR_CANT_OPENWR;
+  fwrite(lvl->slx_data, sizeof(lvl->slx_data), 1, fp);
+  fclose(fp);
+  return ERR_NONE;
+}
+
+/**
  * Saves any map file, showing error/warning message if it is required.
  * @param lvl Pointer to the LEVEL structure.
  * @param fext Extension of destination file name.
@@ -1536,6 +1555,8 @@ short save_dk1_map(struct LEVEL *lvl)
     save_mapfile(lvl,lvl->savfname,"vsn",write_vsn,&saved_files,&result);
     total_files++;
     save_mapfile(lvl,lvl->savfname,"adi",write_adi_script,&saved_files,&result);
+    total_files++;
+    save_mapfile(lvl,lvl->savfname,"slx",write_slx,&saved_files,&result);
     total_files++;
 
     if ((result==ERR_NONE)||(strlen(lvl->fname)<1))

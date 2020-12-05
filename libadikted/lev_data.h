@@ -356,6 +356,8 @@ struct LEVEL {
     unsigned int cust_clm_count;
     struct DK_GRAFFITI **graffiti;
     unsigned int graffiti_count;
+
+    unsigned char slx_data[MAP_SIZE_DKSTD_X * MAP_SIZE_DKSTD_Y];
   };
 
 extern const char default_map_name[];
