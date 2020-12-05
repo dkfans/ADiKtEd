@@ -23,6 +23,8 @@
 #include "../libadikted/adikted.h"
 #include <slang.h>
 
+#include "scr_actn.h"
+
 short screen_initied=false;
 struct DRAW_DATA drawdata;
 

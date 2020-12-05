@@ -34,7 +34,6 @@ DLLIMPORT short write_bmp_fp_24b (FILE *out, int width, int height, const char *
 
 DLLIMPORT int read_palette_rgb(unsigned char *palette, const char *fname, unsigned int nColors);
 
-int rnc_compressed_buf (unsigned char *buff);
 int rnc_compressed_file (FILE *fp);
 
 #endif

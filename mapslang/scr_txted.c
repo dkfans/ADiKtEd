@@ -25,6 +25,8 @@
 #include "input_kb.h"
 #include "scr_actn.h"
 #include "scr_txtgen.h"
+#include "textmenu.h"
+#include "var_utils.h"
 
 // Constants
 

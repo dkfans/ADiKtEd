@@ -25,6 +25,7 @@
 #include "scr_actn.h"
 #include "output_scr.h"
 #include "input_kb.h"
+#include "var_utils.h"
 
 // Help variables
 
