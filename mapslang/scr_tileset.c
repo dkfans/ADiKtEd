@@ -49,6 +49,31 @@ void end_mdtileset(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata)
     scrmode->mode=MD_SLB;
 }
 
+static void process_map(struct WORKMODE_DATA *workdata)
+{
+    int tx=workdata->mapmode->screen.x+workdata->mapmode->map.x;
+    int ty=workdata->mapmode->screen.y+workdata->mapmode->map.y;
+
+    if (!is_marking_enab(workdata->mapmode))
+    {
+        set_slx_tileset(workdata->lvl, tx, ty, active_tileset);
+        return;
+    }
+
+    if (   (workdata->mapmode->markr.r+1 > workdata->lvl->tlsize.x) 
+        || (workdata->mapmode->markr.b+1 > workdata->lvl->tlsize.y) 
+        || (workdata->mapmode->markr.l < 0) 
+        || (workdata->mapmode->markr.t < 0))
+      return;
+    for (tx=workdata->mapmode->markr.l; tx<=workdata->mapmode->markr.r; tx++)
+    {
+      for (ty=workdata->mapmode->markr.t; ty<=workdata->mapmode->markr.b; ty++)
+      {
+          set_slx_tileset(workdata->lvl, tx, ty, active_tileset);
+      }
+    }
+    set_marking_disab(workdata->mapmode);
+}
 void actions_mdtileset(struct SCRMODE_DATA *scrmode, struct WORKMODE_DATA *workdata, int key)
 {
     message_release();
@@ -57,22 +82,22 @@ void actions_mdtileset(struct SCRMODE_DATA *scrmode, struct WORKMODE_DATA *workd
         switch (key)
         {
         case KEY_UP:
-            active_tileset-=4;
-            if (active_tileset < 0)
-                active_tileset = 15;
-            return;
-        case KEY_DOWN:
-            active_tileset+=4;
-            if (active_tileset > 15)
-                active_tileset = 0;
-            return;
-        case KEY_LEFT:
             active_tileset-=1;
             if (active_tileset < 0)
                 active_tileset = 15;
             return;
-        case KEY_RIGHT:
+        case KEY_DOWN:
             active_tileset+=1;
+            if (active_tileset > 15)
+                active_tileset = 0;
+            return;
+        case KEY_LEFT:
+            active_tileset-=8;
+            if (active_tileset < 0)
+                active_tileset = 15;
+            return;
+        case KEY_RIGHT:
+            active_tileset+=8;
             if (active_tileset > 15)
                 active_tileset = 0;
             return;
@@ -84,7 +109,7 @@ void actions_mdtileset(struct SCRMODE_DATA *scrmode, struct WORKMODE_DATA *workd
     int ty=workdata->mapmode->screen.y+workdata->mapmode->map.y;
     if (cursor_actions(scrmode,workdata,key))
     {
-        if (is_painting_enab(workdata->mapmode))
+        if (is_painting_enab(workdata->mapmode) && !is_marking_enab(workdata->mapmode))
         {
             set_slx_tileset(workdata->lvl, tx, ty, active_tileset);
         }
@@ -98,14 +123,24 @@ void actions_mdtileset(struct SCRMODE_DATA *scrmode, struct WORKMODE_DATA *workd
     case KEY_TAB:
         choose_tileset = !choose_tileset;
         break;
-    case KEY_ENTER:
+    case KEY_ENTER: // fallthrough
     case KEY_SPACE:
         if (choose_tileset)
         {
             choose_tileset = 0;
         }
-        set_slx_tileset(workdata->lvl, tx, ty, active_tileset);
+        process_map(workdata);
         break;
+    case KEY_CTRL_SPACE:
+      if (is_marking_enab(workdata->mapmode))
+      {
+        set_marking_disab(workdata->mapmode);
+      } else
+      {
+        set_marking_start(workdata->mapmode,tx,ty);
+      }
+      message_info("Mark mode %s",is_marking_enab(workdata->mapmode)?"on":"off");
+      break;
     case KEY_Z:
         if (!is_painting_enab(workdata->mapmode))
         {
@@ -130,21 +165,21 @@ short color_mdtileset(struct SCRMODE_DATA *scrmode, struct MAPMODE_DATA *mapmode
 
 void draw_right_panel(struct SCRMODE_DATA *scrmode)
 {
-    static const char *texture_shortname[16] = { // 7 symbols
-    "( DEF  )", "STNDRD", "ANCIENT", "WINTER",
-     "SNAKE", "STONEFC", "BREASTS", "ROUGH",
-     "SKULL", "(?  9 )", "(? 10 )", "(? 11 )",
-     "(? 12 )", "(? 13 )", "(? 14 )", "(? 15 )",
+    static const char *texture_shortname[16] = { // 15 symbols
+    "( DEFAULT )", "STANDARD", "ANCIENT", "WINTER",
+     "SNAKE KEY", "STONE FACE", "BIG BREASTS", "ROUGH ANCIENT",
+     "SKULL RELIEF", "(?  8 )", "(? 9 )", "(? 10 )",
+     "(? 11 )", "(? 12 )", "(? 13 )", "(? 14 )",
     };
-    for (int j = 0; j < 4; j++)
+    for (int j = 0; j < 8; j++)
     {
-        for (int i = 0; i < 4; i++)
+        for (int i = 0; i < 2; i++)
         {
-            set_cursor_pos(2 + j, scrmode->cols + 3 + 9*i);
+            set_cursor_pos(2 + j, scrmode->cols + 3 + 17*i);
             screen_setcolor(choose_tileset?PRINT_COLOR_WHITE_ON_BLACK:0);
-            screen_printf("%c", (active_tileset == (i + j * 4))?'*':' ');
-            screen_setcolor( i + j * 4  + PRINT_COLOR_TILESET);
-            screen_printf("%7s", texture_shortname[j*4 + i]);
+            screen_printf("%c", (active_tileset == (i*8 + j))?'*':' ');
+            screen_setcolor( i*8 + j + PRINT_COLOR_TILESET);
+            screen_printf("%15s", texture_shortname[i*8 + j]);
         }
     }
 }

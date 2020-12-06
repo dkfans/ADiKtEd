@@ -177,6 +177,7 @@ To toggle \yautomatic update\s of things/dat/clm, press \wctrl+u\s.
 To switch into \y"thing" mode\s, press \wtab\s.
 To switch into \y"column" mode\s, press '\wc\s'.
 To switch into \y"script" mode\s, press \wctrl+t\s.
+To switch into \y"tileset" mode\s, press \wctrl+g\s.
 To change \ymap texture\s (INF file entry), press \wctrl+e\s.
 To \yverify\s the map integrity and rules, press '\wv\s'.
 To toggle view of \ycompass rose\s, press \wctrl+p\s.

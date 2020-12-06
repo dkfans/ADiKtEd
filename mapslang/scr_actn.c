@@ -841,10 +841,15 @@ int get_draw_map_tile_color(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *ma
     //If highlighted - nothing more matters
     int hilight=get_tile_highlight(mapmode,tx,ty);
     if (hilight>0) return hilight;
-    if (mdcolor[scrmode->mode]) return mdcolor[scrmode->mode](scrmode, mapmode, lvl, tx, ty);
     int own=get_tile_owner(lvl,tx,ty);
     short marked=((is_marking_enab(mapmode)) && (tx>=mapmode->markr.l) && (tx<=mapmode->markr.r)
                         && (ty>=mapmode->markr.t) && (ty<=mapmode->markr.b));
+    if (mdcolor[scrmode->mode]) 
+    {
+        if (marked)
+            return PRINT_COLOR_MAGENT_ON_LGREY;
+        return mdcolor[scrmode->mode](scrmode, mapmode, lvl, tx, ty);
+    }
     int col;
     if (special)
     {
