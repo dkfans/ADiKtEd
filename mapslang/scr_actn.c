@@ -42,6 +42,7 @@ extern void actions_mdtileset(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA 
 extern void draw_mdtileset(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata);
 extern void start_mdtileset(struct SCRMODE_DATA *,struct WORKMODE_DATA *);
 extern void end_mdtileset(struct SCRMODE_DATA *,struct WORKMODE_DATA *);
+extern short color_mdtileset(struct SCRMODE_DATA *scrmode, struct MAPMODE_DATA *mapmode, struct LEVEL *lvl, int tx, int ty);
 
 void (*actions [])(struct SCRMODE_DATA *,struct WORKMODE_DATA *,int)={
      actions_mdslab, actions_mdtng,  actions_crcrtr,  actions_critem,
@@ -76,6 +77,16 @@ void (*mdend [])(struct SCRMODE_DATA *,struct WORKMODE_DATA *)={
      end_mdsrch, end_mdlmap, end_mdsmap, end_mdgrafit,
      end_crefct, end_crtrap, end_editem, end_edcrtr,
      end_edefct, end_edtrap, end_mdtileset};
+
+short (*mdcolor[])(struct SCRMODE_DATA *scrmode, struct MAPMODE_DATA *mapmode, struct LEVEL *lvl, int tx, int ty) = 
+{
+    NULL, NULL,  NULL,  NULL,
+    NULL,   NULL,  NULL,  NULL,
+    NULL, NULL, NULL, NULL,
+    NULL, NULL, NULL, NULL,
+    NULL, NULL, NULL, NULL,
+    NULL, NULL, color_mdtileset
+};
 
 // Max. 5 chars mode names
 const char *modenames[]={
@@ -802,6 +813,9 @@ char *mode_status(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata,in
     case MD_GRFT:
       sprintf (buffer, "   (Entering text)");
       break;
+    case MD_TLST:
+      strcpy (buffer, "   (tileset mode)");
+      break;
     default:
       strcpy (buffer, "    (unknown mode)");
       break;
@@ -827,6 +841,7 @@ int get_draw_map_tile_color(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *ma
     //If highlighted - nothing more matters
     int hilight=get_tile_highlight(mapmode,tx,ty);
     if (hilight>0) return hilight;
+    if (mdcolor[scrmode->mode]) return mdcolor[scrmode->mode](scrmode, mapmode, lvl, tx, ty);
     int own=get_tile_owner(lvl,tx,ty);
     short marked=((is_marking_enab(mapmode)) && (tx>=mapmode->markr.l) && (tx<=mapmode->markr.r)
                         && (ty>=mapmode->markr.t) && (ty<=mapmode->markr.b));
@@ -1423,7 +1438,7 @@ short cursor_actions(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata
     case KEY_PGDOWN:
       screen->y+=10;
       break;
-      default:
+    default:
       return false;
     }
     curposcheck(scrmode,workdata->mapmode);

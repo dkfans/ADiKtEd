@@ -224,6 +224,37 @@ void screen_init(void)
     SLtt_set_color (PRINT_COLOR_LGREY_ON_GREY, "Brighened unowned","lightgray","gray");
     SLtt_set_color (PRINT_COLOR_WHITE_ON_GREY, "Brighened","white","gray");
 
+    static const char* bg_color[16] =
+    {
+      "black", "red", "green", "blue",
+      "brown", "magenta", "cyan", "black",
+      "gray", "brightred", "brightgreen", "brightblue",
+      "yellow", "brightmagenta", "brightcyan", "white",
+    };
+    for (int i = 0; i < 16; i++)
+    {
+        char buf[32];
+        sprintf(buf, "tileset %d", i);
+
+        if (i==0)
+            SLtt_set_color (PRINT_COLOR_TILESET + i, buf, "red", bg_color[i]);
+        else if (i==2)
+            SLtt_set_color (PRINT_COLOR_TILESET + i, buf, "gray", bg_color[i]);
+        else if (i==4)
+            SLtt_set_color (PRINT_COLOR_TILESET + i, buf, "gray", bg_color[i]);
+        else if (i==6)
+            SLtt_set_color (PRINT_COLOR_TILESET + i, buf, "gray", bg_color[i]);
+        else if (i==7)
+            SLtt_set_color (PRINT_COLOR_TILESET + i, buf, "green", bg_color[i]);
+        else if (i==8)
+            SLtt_set_color (PRINT_COLOR_TILESET + i, buf, "blue", bg_color[i]);
+        else if (i==13)
+            SLtt_set_color (PRINT_COLOR_TILESET + i, buf, "gray", bg_color[i]);
+        else
+        {
+            SLtt_set_color (PRINT_COLOR_TILESET + i, buf, "gray", bg_color[i]);
+        }
+    }
     screen_initied=true;
 }
 

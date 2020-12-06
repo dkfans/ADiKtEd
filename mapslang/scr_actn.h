@@ -52,7 +52,7 @@ enum adikt_workmode
   MD_TLST
 };
 
-#define MODES_COUNT 22
+#define MODES_COUNT 23
 
 #define TNGDAT_ROWS 8
 

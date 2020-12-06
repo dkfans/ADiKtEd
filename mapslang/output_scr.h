@@ -84,6 +84,8 @@ enum borderStyle {bsSingle,bsDouble,bsSolid};
 #define PRINT_COLOR_WHITE_ON_GREY     82
 #define PRINT_COLOR_LMAGENT_ON_GREY   83
 
+#define PRINT_COLOR_TILESET           100
+
 //The structure with data required for drawing function
 struct DRAW_DATA {
     struct SCRMODE_DATA *scrmode;

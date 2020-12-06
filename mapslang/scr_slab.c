@@ -120,6 +120,9 @@ void actions_mdslab(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata,
           }
           message_info("Mark mode %s",is_marking_enab(workdata->mapmode)?"on":"off");
           break;
+        case KEY_CTRL_G:
+          mdstart[MD_TLST](scrmode,workdata);
+          break;
         case KEY_DEL: // Delete graffiti if there is any here
           d = graffiti_idx(workdata->lvl,tx,ty);
           if (d>=0)

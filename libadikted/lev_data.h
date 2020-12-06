@@ -498,4 +498,6 @@ DLLIMPORT unsigned char get_lvl_inf(struct LEVEL *lvl);
 DLLIMPORT short set_lvl_inf(struct LEVEL *lvl,unsigned char ninf);
 DLLIMPORT short get_lvl_format_version(struct LEVEL *lvl);
 
+DLLIMPORT short get_slx_tileset(const struct LEVEL *lvl, unsigned int tx, unsigned int ty);
+DLLIMPORT void set_slx_tileset(struct LEVEL *lvl, unsigned int tx, unsigned int ty, unsigned short nval);
 #endif /* ADIKT_LEVDATA_H */
