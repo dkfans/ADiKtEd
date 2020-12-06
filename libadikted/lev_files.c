@@ -683,6 +683,25 @@ short load_wlb(struct LEVEL *lvl,char *fname)
 }
 
 /**
+ * Reads the SLX file into LEVEL structure.
+ * @param lvl Pointer to the LEVEL structure.
+ * @param fname Source file name.
+ * @return Returns ERR_NONE on success, error code on failure.
+ */
+short load_slx(struct LEVEL *lvl,char *fname)
+{
+    message_log("  load_slx: started");
+    short result;
+    FILE *F = fopen(fname, "rb");
+    if (F == NULL)
+        return ERR_FILE_BADDATA;
+    if (1 != fread(lvl->slx_data, sizeof(lvl->slx_data), 1, F))
+        return ERR_FILE_BADDATA;
+    fclose(F);
+    return ERR_NONE;
+}
+
+/**
  * Loads the FLG file.
  * These seems to have small priority, but DK loads it when starting a level.
  * @param lvl Pointer to the LEVEL structure.
@@ -1927,6 +1946,8 @@ short load_dk1_map(struct LEVEL *lvl)
       load_mapfile(lvl,"lif",load_lif,&loaded_files,&result,LFF_IGNORE_WITHOUT_WARN);
   if (result>=ERR_NONE)
       load_mapfile(lvl,"vsn",load_vsn,&loaded_files,&result,LFF_IGNORE_WITHOUT_WARN);
+  if (result>=ERR_NONE)
+      load_mapfile(lvl,"slx",load_slx,&loaded_files,&result,LFF_IGNORE_WITHOUT_WARN);
   if (result>=ERR_NONE)
       load_mapfile_msg(lvl,"adi",script_load_and_execute,&loaded_files,&result,LFF_IGNORE_WITHOUT_WARN);
 
