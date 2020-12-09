@@ -32,17 +32,12 @@
 #include "scr_slab.h"
 #include "scr_clm.h"
 #include "scr_list.h"
+#include "scr_tileset.h"
 #include "scr_txted.h"
 #include "scr_rwrk.h"
 #include "scr_cube.h"
 #include "textmenu.h"
 #include "scr_txtgen.h"
-
-extern void actions_mdtileset(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata,int key);
-extern void draw_mdtileset(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata);
-extern void start_mdtileset(struct SCRMODE_DATA *,struct WORKMODE_DATA *);
-extern void end_mdtileset(struct SCRMODE_DATA *,struct WORKMODE_DATA *);
-extern short color_mdtileset(struct SCRMODE_DATA *scrmode, struct MAPMODE_DATA *mapmode, struct LEVEL *lvl, int tx, int ty);
 
 void (*actions [])(struct SCRMODE_DATA *,struct WORKMODE_DATA *,int)={
      actions_mdslab, actions_mdtng,  actions_crcrtr,  actions_critem,

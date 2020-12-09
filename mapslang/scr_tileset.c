@@ -25,6 +25,7 @@
 #include "input_kb.h"
 #include "output_scr.h"
 #include "scr_actn.h"
+#include "scr_tileset.h"
 #include "var_utils.h"
 
 static int active_tileset = 0;
