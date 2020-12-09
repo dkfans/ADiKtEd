@@ -20,6 +20,8 @@
 #include "lev_files.h"
 
 #include <sys/stat.h>
+#include <string.h>
+
 #include "globals.h"
 #include "arr_utils.h"
 #include "memfile.h"

@@ -20,6 +20,7 @@
 #include "lev_data.h"
 
 #include <math.h>
+#include <string.h>
 #include <time.h>
 #include "globals.h"
 #include "obj_column_def.h"
@@ -787,6 +788,7 @@ short level_clear_other(struct LEVEL *lvl)
     lvl->cust_clm_count=0;
     lvl->graffiti=NULL;
     lvl->graffiti_count=0;
+
     return true;
 }
 

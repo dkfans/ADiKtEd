@@ -24,6 +24,8 @@
 #include "output_scr.h"
 #include "input_kb.h"
 #include "scr_actn.h"
+#include "scr_clm.h"
+#include "var_utils.h"
 
 /*
  * Initializes variables for the rework screen.

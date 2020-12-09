@@ -7,6 +7,7 @@
 #include "scr_help.h"
 #include "scr_txted.h"
 #include "input_kb.h"
+#include "var_utils.h"
 
 const char config_filename[]="map.ini";
 

@@ -110,7 +110,7 @@ int main_unpack (char *pname, char *iname, char *oname)
 {
     FILE *ifp, *ofp;
     long plen, ulen;
-    void *packed, *unpacked;
+    unsigned char *packed, *unpacked;
     char buffer[4];
     
     ifp = fopen(iname, "rb");
@@ -473,8 +473,10 @@ long rnc_unpack (const void *packed, void *unpacked, const unsigned int flags
 /*message_log("          while (length--)");*/
         while (length--)
         {
-            if ((((void *)output-posn)<unpacked)||((output-posn)>outputend)||
-                (((void *)output)<unpacked)||((output)>outputend))
+            if (   (((unsigned char *)output - posn) < (unsigned char*)unpacked) 
+                || (((unsigned char *)output-posn) > outputend)
+                || (((unsigned char *)output) < (unsigned char*)unpacked)
+                || (((unsigned char *)output) > outputend))
             {
 /*printf("\nerr place c!! output-outputend=%d input-inputend=%d length=%d\n",
     (void *)output-(void *)outputend,(void *)input-(void *)inputend,length);*/

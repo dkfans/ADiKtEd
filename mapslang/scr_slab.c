@@ -28,6 +28,9 @@
 #include "scr_actn.h"
 #include "scr_help.h"
 #include "scr_thing.h"
+#include "var_utils.h"
+
+int display_graffiti(struct LEVEL *lvl,int scr_row, int scr_col,int graff_idx);
 
 /*
  * Initializes variables for the mdslab screen.

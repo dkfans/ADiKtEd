@@ -27,6 +27,8 @@
 #include "output_scr.h"
 #include "input_kb.h"
 #include "scr_actn.h"
+#include "scr_thing.h"
+#include "var_utils.h"
 
 /*
  * Initializes variables for the tng screen.

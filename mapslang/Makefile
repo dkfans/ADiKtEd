@@ -76,11 +76,11 @@ endif
 # Names of utility commands
 SLANG_URL          = https://www.jedsoft.org/releases/slang/slang-2.3.2.tar.bz2
 SLANG_NAME         = slang-2.3.2
-SLANG_ARCHIVE      = ../lib/slang.tgz
+SLANG_ARCHIVE      = ../lib/slang.tar.bz2
 SLANG_BIN_FOLDER   = /lib/$(SLANG_NAME)/src/$(SLANG_OBJ_FOLDER)
-WARNFLAGS          = -Wall -Wextra -Wno-pedantic -Wno-conversion -Wno-traditional-conversion -Wno-sign-compare
+WARNFLAGS          = -Wall -Wextra -Werror-implicit-function-declaration -Wno-conversion -Wno-traditional-conversion -Wno-sign-compare
 PLATFORM_FLAGS     = -march=i486
-CSTANDARD          = -std=gnu89
+CSTANDARD          = -std=gnu99
 CC                 = $(CROSS_COMPILE)gcc$(CROSS_EXEEXT) $(CSTANDARD) $(WARNFLAGS)
 CFLAGS             = -c -O -I. -I../lib/$(SLANG_NAME)/src $(DLL_FLAG) $(PLATFORM_FLAGS)
 CFLAGS_DEBUG       = -c -g -I. -I../lib/$(SLANG_NAME)/src $(DLL_FLAG) $(PLATFORM_FLAGS) -DDEBUG
