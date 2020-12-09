@@ -103,6 +103,7 @@ scr_list.c \
 scr_rwrk.c \
 scr_slab.c \
 scr_thing.c \
+scr_tileset.c \
 scr_txted.c \
 scr_txtgen.c \
 textmenu.c \

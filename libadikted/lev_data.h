@@ -356,6 +356,8 @@ struct LEVEL {
     unsigned int cust_clm_count;
     struct DK_GRAFFITI **graffiti;
     unsigned int graffiti_count;
+
+    unsigned char slx_data[MAP_SIZE_DKSTD_X * MAP_SIZE_DKSTD_Y];
   };
 
 extern const char default_map_name[];
@@ -496,4 +498,6 @@ DLLIMPORT unsigned char get_lvl_inf(struct LEVEL *lvl);
 DLLIMPORT short set_lvl_inf(struct LEVEL *lvl,unsigned char ninf);
 DLLIMPORT short get_lvl_format_version(struct LEVEL *lvl);
 
+DLLIMPORT short get_slx_tileset(const struct LEVEL *lvl, unsigned int tx, unsigned int ty);
+DLLIMPORT void set_slx_tileset(struct LEVEL *lvl, unsigned int tx, unsigned int ty, unsigned short nval);
 #endif /* ADIKT_LEVDATA_H */

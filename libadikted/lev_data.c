@@ -789,6 +789,7 @@ short level_clear_other(struct LEVEL *lvl)
     lvl->graffiti=NULL;
     lvl->graffiti_count=0;
 
+    memset(lvl->slx_data, 0, sizeof(lvl->slx_data));
     return true;
 }
 
@@ -2386,6 +2387,35 @@ void set_tile_slab(struct LEVEL *lvl, unsigned int tx, unsigned int ty, unsigned
     /*Bounding position */
     if ((tx>=lvl->tlsize.x)||(ty>=lvl->tlsize.y)) return;
     lvl->slb[tx][ty]=nval;
+}
+
+/**
+ * Gives extended slab value for a tile.
+ * @param lvl Pointer to the LEVEL structure.
+ * @param tx,ty Map tile at which we want the slab value.
+ * @return Returns tileset number
+ */
+short get_slx_tileset(const struct LEVEL *lvl, unsigned int tx, unsigned int ty)
+{
+    if (lvl->slb==NULL) return 0;
+    /*Bounding position */
+    if ( (tx >= MAP_SIZE_DKSTD_X) || (ty >= MAP_SIZE_DKSTD_Y) ) return 0;
+    return (lvl->slx_data[tx + ty * MAP_SIZE_DKSTD_Y] & 0x0F);
+}
+
+/**
+ * Sets a new tileset for a slab
+ * @see user_set_slab
+ * @param lvl Pointer to the LEVEL structure.
+ * @param tx,ty Map tile at which we want to set slab value.
+ * @param nval New tileset value
+ */
+void set_slx_tileset(struct LEVEL *lvl, unsigned int tx, unsigned int ty, unsigned short nval)
+{
+    /*Bounding position */
+    if ( (tx >= MAP_SIZE_DKSTD_X) || (ty >= MAP_SIZE_DKSTD_Y) ) return;
+    lvl->slx_data[tx + ty * MAP_SIZE_DKSTD_Y] &= 0xF0;
+    lvl->slx_data[tx + ty * MAP_SIZE_DKSTD_Y] |= nval & 0x0F;
 }
 
 /**

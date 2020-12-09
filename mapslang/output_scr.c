@@ -224,6 +224,27 @@ void screen_init(void)
     SLtt_set_color (PRINT_COLOR_LGREY_ON_GREY, "Brighened unowned","lightgray","gray");
     SLtt_set_color (PRINT_COLOR_WHITE_ON_GREY, "Brighened","white","gray");
 
+    static const char* fg_color[16] =
+    {
+        "red", "lightgray", "black", "lightgray",
+        "black", "lightgray", "black", "green",
+        "blue", "black", "gray", "gray",
+        "gray", "black", "gray", "gray",
+    };
+    static const char* bg_color[16] =
+    {
+      "black", "red", "green", "blue",
+      "brown", "magenta", "cyan", "black",
+      "gray", "brightred", "brightgreen", "brightblue",
+      "yellow", "brightmagenta", "brightcyan", "white",
+    };
+    for (int i = 0; i < 16; i++)
+    {
+        char buf[32];
+        sprintf(buf, "tileset %d", i);
+
+        SLtt_set_color (PRINT_COLOR_TILESET + i, buf, fg_color[i], bg_color[i]);
+    }
     screen_initied=true;
 }
 
