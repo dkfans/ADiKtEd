@@ -2759,7 +2759,7 @@ char *get_item_subtype_fullname(const unsigned short stype_idx)
         case ITEM_SUBTYPE_SPHIDNWRL:
           return "Reveal hiddn world";
         case ITEM_SUBTYPE_SPCUSTOM:
-          return "Custom special";
+          return "Custom box";
         /*Traps */
         case ITEM_SUBTYPE_TBBOULDER:
           return "Boulder trap box";
