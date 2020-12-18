@@ -125,7 +125,7 @@ const unsigned char items_crtrlairs[]={
 const unsigned char items_specboxes[]={
       ITEM_SUBTYPE_SPREVMAP,ITEM_SUBTYPE_SPRESURCT,ITEM_SUBTYPE_SPTRANSFR,
       ITEM_SUBTYPE_SPSTEALHR,ITEM_SUBTYPE_SPMULTPLY,ITEM_SUBTYPE_SPINCLEV,
-      ITEM_SUBTYPE_SPMKSAFE,ITEM_SUBTYPE_SPHIDNWRL};
+      ITEM_SUBTYPE_SPMKSAFE,ITEM_SUBTYPE_SPHIDNWRL, ITEM_SUBTYPE_SPCUSTOM};
 
 const unsigned char items_spellbooks[]={
       ITEM_SUBTYPE_SPELLHOE,ITEM_SUBTYPE_SPELLIMP,ITEM_SUBTYPE_SPELLMUST,
@@ -169,7 +169,7 @@ const unsigned char items_polebars[]={
 const unsigned char items_statues[]={
       ITEM_SUBTYPE_TEMPLESTA,ITEM_SUBTYPE_STATUEWO,ITEM_SUBTYPE_STATUHORN,
       ITEM_SUBTYPE_STATUE2,ITEM_SUBTYPE_STATUE3,ITEM_SUBTYPE_STATUE4,
-      ITEM_SUBTYPE_STATUE5,ITEM_SUBTYPE_STATUE6,};
+      ITEM_SUBTYPE_STATUE5,};
 
 const unsigned char items_furniture[]={
       ITEM_SUBTYPE_BARREL,ITEM_SUBTYPE_POTION1,ITEM_SUBTYPE_POTION2,
@@ -2758,6 +2758,8 @@ char *get_item_subtype_fullname(const unsigned short stype_idx)
           return "Make safe";
         case ITEM_SUBTYPE_SPHIDNWRL:
           return "Reveal hiddn world";
+        case ITEM_SUBTYPE_SPCUSTOM:
+          return "Custom box";
         /*Traps */
         case ITEM_SUBTYPE_TBBOULDER:
           return "Boulder trap box";
@@ -2844,8 +2846,6 @@ char *get_item_subtype_fullname(const unsigned short stype_idx)
           return "Statue 4";
         case ITEM_SUBTYPE_STATUE5:
           return "Statue 5";
-        case ITEM_SUBTYPE_STATUE6:
-          return "Statue 6";
         case ITEM_SUBTYPE_SPELLARMG:
           return "Armageddon Spell";
         default:
@@ -2878,7 +2878,6 @@ char *get_item_subtype_shortname(const unsigned short stype_idx)
         case ITEM_SUBTYPE_STATUE3:
         case ITEM_SUBTYPE_STATUE4:
         case ITEM_SUBTYPE_STATUE5:
-        case ITEM_SUBTYPE_STATUE6:
           return "Statu";
         case ITEM_SUBTYPE_DNHEART:
           return "Heart";
@@ -2992,6 +2991,7 @@ char *get_item_subtype_shortname(const unsigned short stype_idx)
         case ITEM_SUBTYPE_SPINCLEV:
         case ITEM_SUBTYPE_SPMKSAFE:
         case ITEM_SUBTYPE_SPHIDNWRL:
+        case ITEM_SUBTYPE_SPCUSTOM:
           return "SpcBx";
         /*Traps */
         case ITEM_SUBTYPE_TBBOULDER:

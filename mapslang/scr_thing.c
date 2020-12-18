@@ -73,6 +73,43 @@ int get_visited_obj_idx(struct WORKMODE_DATA *workdata)
 }
 
 /*
+ * Returns if it is a custom box
+ */
+static int obj_is_custombox(struct WORKMODE_DATA *workdata)
+{
+    struct IPOINT_2D subpos;
+    unsigned char *thing;
+    int visiting_z=get_visited_obj_idx(workdata);
+
+    get_map_subtile_pos(workdata->mapmode, &subpos);
+    thing = get_object(workdata->lvl, subpos.x, subpos.y, visiting_z);
+
+    return (get_thing_type(thing)==THING_TYPE_ITEM) && (get_thing_subtype(thing) == ITEM_SUBTYPE_SPCUSTOM);
+}
+
+/*
+ * Change custom box number
+ */
+void tng_change_custom(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata, unsigned int sx, unsigned int sy,unsigned int z,int delta)
+{
+    unsigned char *thing = get_object(workdata->lvl, sx, sy, z);
+    unsigned short num = get_thing_level(thing);
+    unsigned short newnum = num + delta;
+    if ((newnum >= 0) && (newnum < 255))
+    {
+        set_thing_level(thing,newnum);
+        char *oper;
+        if (newnum>num)
+          oper="increased";
+        else
+          oper="decreased";
+        message_info("%s number %s.", "Custom box id", oper);
+    } else
+    {
+        message_error("Unable to change box id");
+    }
+}
+/*
  * Set a visited object on subtile to the exact index
  */
 void set_visited_obj_idx(struct WORKMODE_DATA *workdata,int obj_idx)
@@ -372,13 +409,27 @@ void actions_mdtng(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata,i
         case KEY_UNDERLN:
           {
             int visiting_z=get_visited_obj_idx(workdata);
-            tng_change_range(scrmode,workdata,subpos.x,subpos.y,visiting_z,-64);
+            if (obj_is_custombox(workdata))
+            {
+              tng_change_custom(scrmode,workdata,subpos.x,subpos.y,visiting_z, -1);
+            }
+            else
+            {
+              tng_change_range(scrmode,workdata,subpos.x,subpos.y,visiting_z,-64);
+            }
           };break;
         case KEY_NPLUS:
         case KEY_EQUAL:
           {
             int visiting_z=get_visited_obj_idx(workdata);
-            tng_change_range(scrmode,workdata,subpos.x,subpos.y,visiting_z,+64);
+            if (obj_is_custombox(workdata))
+            {
+              tng_change_custom(scrmode,workdata,subpos.x,subpos.y,visiting_z, +1);
+            }
+            else
+            {
+              tng_change_range(scrmode,workdata,subpos.x,subpos.y,visiting_z,+64);
+            }
           };break;
 
         case KEY_DEL: // delete
@@ -787,6 +838,15 @@ int display_thing(struct HELP_DATA *help,const unsigned char *thing, const struc
       screen_printf(get_item_subtype_fullname(stype_idx));
       screen_setcolor(PRINT_COLOR_LGREY_ON_BLACK);
       if (stype_idx==ITEM_SUBTYPE_HEROGATE)
+      {
+          unsigned int cnum=get_thing_level(thing);
+          set_cursor_pos(scr_row-1, scr_col+20);
+          screen_printf("number: ");
+          screen_setcolor(PRINT_COLOR_LGREEN_ON_BLACK);
+          screen_printf("%d", cnum);
+          screen_setcolor(PRINT_COLOR_LGREY_ON_BLACK);
+      }
+      else if (stype_idx==ITEM_SUBTYPE_SPCUSTOM)
       {
           unsigned int cnum=get_thing_level(thing);
           set_cursor_pos(scr_row-1, scr_col+20);
