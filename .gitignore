@@ -4,6 +4,7 @@
 *.dll
 *.def
 *.exe
-/lib/slang-*
-/lib/slang.tgz
+/lib/slang*
 /mapslang/pkg/*
+.vs/
+.git
