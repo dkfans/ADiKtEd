@@ -18,7 +18,8 @@
 #ifndef ADIKT_LEVCOLMN_H
 #define ADIKT_LEVCOLMN_H
 
-#define INF_MAX_INDEX 7
+//Size of texture/tileset list
+#define INF_MAX_INDEX 10
 
 struct LEVEL;
 struct COLUMN_REC;
