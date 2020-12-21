@@ -35,6 +35,9 @@ char const INF_FACE_LTEXT[]="Stone face";
 char const INF_BRESTS_LTEXT[]="Big breasts";
 char const INF_RGANCNT_LTEXT[]="Rough Ancient";
 char const INF_SKULL_LTEXT[]="Skull relief";
+char const INF_DESERT_LTEXT[]="Desert Tomb";
+char const INF_GYPSYM_LTEXT[]="Gypsym";
+char const INF_LILAC_LTEXT[]="Lilac Stone";
 
 /**
  * Text names of standard textures.
@@ -42,7 +45,8 @@ char const INF_SKULL_LTEXT[]="Skull relief";
 const char * const inf_texture_fullnames[]={
       INF_STANDARD_LTEXT,INF_ANCIENT_LTEXT,INF_WINTER_LTEXT,
       INF_SNAKE_LTEXT,INF_FACE_LTEXT,INF_BRESTS_LTEXT,
-      INF_RGANCNT_LTEXT,INF_SKULL_LTEXT,
+      INF_RGANCNT_LTEXT,INF_SKULL_LTEXT,INF_DESERT_LTEXT,
+      INF_GYPSYM_LTEXT, INF_LILAC_LTEXT,
       };
 
 /**
