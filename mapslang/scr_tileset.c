@@ -169,7 +169,7 @@ void draw_right_panel(struct SCRMODE_DATA *scrmode)
     static const char *texture_shortname[16] = { // 15 symbols
     "( DEFAULT )", "STANDARD", "ANCIENT", "WINTER",
      "SNAKE KEY", "STONE FACE", "BIG BREASTS", "ROUGH ANCIENT",
-     "SKULL RELIEF", "DESERT TOMB", "GYPSYM", "LILAC STONE",
+     "SKULL RELIEF", "DESERT TOMB", "GYPSUM", "LILAC STONE",
      "(? 11 )", "(? 12 )", "(? 13 )", "(? 14 )",
     };
     for (int j = 0; j < 8; j++)
