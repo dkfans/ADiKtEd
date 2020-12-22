@@ -2312,14 +2312,14 @@ This one looks dark.
 
 
 
-\rStatue 6\s
+\rCustom special box\s
 
+Dungeon Special box that allows 
+the mapmaker to trigger a custom
+script. So anything goes.
 
-
-
-
-
-
+The number determines you give it
+determines the box flag.
 \rArmageddon Spell\s
 
 A spell book. If taken to Library
