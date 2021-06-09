@@ -22,18 +22,21 @@ ifneq (,$(findstring Windows,$(OS)))
   CROSS_EXEEXT = .exe
 else
   CROSS_EXEEXT =
-  CROSS_COMPILE = i686-w64-mingw32-
 endif
 # Executable files extension on target environment
 BUILD_FOR_LINUX ?= 0
 ifeq ($(BUILD_FOR_LINUX), 1)
+  CROSS_COMPILE = 
   LIBEXT = .so
   OTHER_LIBEXT = .dll
   DLL_FLAG =
+  PLATFORM_FLAGS      = -fPIC
 else
+  CROSS_COMPILE = i686-w64-mingw32-
   LIBEXT = .dll
   OTHER_LIBEXT = .so
-  DLL_FLAG = -DBUILD_DLL
+  DLL_FLAG = -DBUILD_DLL -DUSE_FASTCALL
+  PLATFORM_FLAGS      = -march=pentium-mmx -mmmx
 endif
 # Allow debug executables to be created
 DEBUG ?= 0
@@ -44,7 +47,6 @@ else
 endif
 # Names of utility commands
 WARNFLAGS          = -Wall -Wextra -pedantic -Werror-implicit-function-declaration -Wno-conversion -Wno-traditional-conversion -Wno-sign-compare
-PLATFORM_FLAGS      = -march=pentium-mmx -mmmx
 CSTANDARD          = -std=gnu99
 CC                 = $(CROSS_COMPILE)gcc$(CROSS_EXEEXT) $(CSTANDARD) $(WARNFLAGS)
 CFLAGS             = -c -O -I. $(DLL_FLAG) -fexpensive-optimizations -O3 $(PLATFORM_FLAGS)
@@ -94,13 +96,13 @@ make-directories:
 	$(MKDIR) bin obj
 
 clean:
-	$(RM) $(OBJ) $(BIN) $(BIN:$(LIBEXT)=$(OTHER_LIBEXT)) $(RES)
+	$(RM) $(OBJ) $(BIN) $(BIN:$(LIBEXT)=$(OTHER_LIBEXT)) #$(RES)
 
-$(BIN): $(OBJ) $(RES)
-	$(LINK) $(if $(filter yes, $(DEBUGME)),$(LFLAGS_DEBUG),$(LFLAGS)) $(LIBS) -o $@ $(OBJ) $(RES)
+$(BIN): $(OBJ) #$(RES)
+	$(LINK) $(if $(filter yes, $(DEBUGME)),$(LFLAGS_DEBUG),$(LFLAGS)) $(LIBS) -o $@ $(OBJ) #$(RES)
 
 obj/%.o: %.c
 	$(CC) $(if $(filter yes, $(DEBUGME)),$(CFLAGS_DEBUG),$(CFLAGS)) $< -o $@
 
 $(RES): $(RC)
-	$(WINDRES) -i $< --input-format=rc -o $@ -O coff
+	#$(WINDRES) -i $< --input-format=rc -o $@ -O coff

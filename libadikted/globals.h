@@ -44,7 +44,14 @@
 #elif defined(BUILD_SINGLE)
 # define DLLIMPORT 
 #else /* Not defined BUILD_DLL */
-# define DLLIMPORT __declspec (dllimport)
+# define DLLIMPORT
+//# define DLLIMPORT __declspec (dllimport)
+#endif
+
+#if defined(USE_FASTCALL)
+# define FASTCALL __fastcall
+#else
+# define FASTCALL
 #endif
 
 /* Basic Definitions */
