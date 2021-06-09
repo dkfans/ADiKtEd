@@ -2172,6 +2172,7 @@ short load_draw_data(struct MAPDRAW_DATA **draw_data,const struct MAPDRAW_OPTION
     (*draw_data)->cubes=malloc(sizeof(struct CUBES_DATA));
     (*draw_data)->palette=malloc(256*sizeof(struct PALETTE_ENTRY));
     (*draw_data)->images=malloc(sizeof(struct IMAGELIST));
+    (*draw_data)->images->count = 0;                                    /* prevents segfault in case of error */
     (*draw_data)->rand_size=total_subtiles*sizeof(int);
     (*draw_data)->rand_pool=malloc((*draw_data)->rand_size);
     if ((*draw_data)->cubes != NULL)
