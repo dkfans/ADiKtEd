@@ -143,6 +143,7 @@ const char *all_slabs_fullnames[]={
      SLB_DOORMAGIC_LTEXT,SLB_DOORMAGIC_LTEXT, /*2f */
      SLB_UNKN_LTEXT,SLB_BRIDGE_LTEXT,
      SLB_GEMS_LTEXT,SLB_GUARDPOST_LTEXT,
+     SLB_UNKN_LTEXT,
      };
 
 unsigned char get_owner_next(unsigned char plyr_idx)
