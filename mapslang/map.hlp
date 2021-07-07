@@ -7064,4 +7064,6 @@ Shouldn't be used.
         <\y/\s> )\y|\s( <\y\\\s>
        \wSW\s    \y|\s    \wSE\s
              \wS\s
+[tilesethelp]
+ Type help here!
 [end]
