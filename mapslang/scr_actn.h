@@ -49,7 +49,7 @@ enum adikt_workmode
   MD_ECRT   = 0x013, // Edit Creature mode
   MD_EFCT   = 0x014, // Edit Effect Generator mode
   MD_ETRP   = 0x015, // Edit Trap mode
-  MD_TLST
+  MD_TLST            // Edit Tileset mode
 };
 
 #define MODES_COUNT 23
