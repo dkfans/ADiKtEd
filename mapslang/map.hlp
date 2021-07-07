@@ -7065,5 +7065,34 @@ Shouldn't be used.
        \wSW\s    \y|\s    \wSE\s
              \wS\s
 [tilesethelp]
- Type help here!
+"Tileset" mode help:
+
+Use Tileset mode to create maps with multiple textures.
+
+The map slabs view is simplified - you won't see all the different 
+items from slab mode, but only three background terrain types:
+'#' for rock, '.' for earth, walls, gold etc (tall slabs),
+and ' ' for path, lava, water etc (ground level slabs). The colors 
+are what matters. The default color is the texture you have configured 
+for the map in texture select mode and may be changed at any point.
+
+\yMove around\s as in slab mode.
+
+Press \wTab\s to go to the menu, use \warrow keys\s to select either 
+<default> or one of the tilesets, then press \wTab\s again to go back 
+to edit mode.
+
+In edit mode, press \wenter\s or \wspace\s to mark tiles. These tiles 
+will change color to match the selected tileset.
+
+To \ychange large areas\s, press \wctrl+space\s. This will put you into
+marking mode. Draw out a rectangle with the movement keys, then
+press \wenter\ to change the map. Pressing \wctrl+space\s again will 
+take you out of marking mode.
+
+Press '\wz\s' to go into \ypaint mode\s. Now when you move, you paint 
+the tile your cursor is over with the tileset you selected. To stop 
+painting, press '\wz\s' again.
+
+Press '\wEsc\s' to exit Tileset mode.
 [end]
