@@ -28,17 +28,17 @@ endif
 BUILD_FOR_LINUX ?= 0
 ifeq ($(BUILD_FOR_LINUX), 1)
   CROSS_COMPILE  = 
-  LIBEXT 		 = .so
-  OTHER_LIBEXT 	 = .dll
-  DLL_FLAG 		 =
+  LIBEXT         = .so
+  OTHER_LIBEXT   = .dll
+  DLL_FLAG       =
   PLATFORM_FLAGS = -fPIC
   RES            =
   RC             =
 else
   CROSS_COMPILE  = i686-w64-mingw32-
-  LIBEXT 		 = .dll
-  OTHER_LIBEXT 	 = .so
-  DLL_FLAG 		 = -DBUILD_DLL -DUSE_FASTCALL
+  LIBEXT         = .dll
+  OTHER_LIBEXT   = .so
+  DLL_FLAG       = -DBUILD_DLL -DUSE_FASTCALL
   PLATFORM_FLAGS = -march=pentium-mmx -mmmx
   RES            = obj/adikted_private.res
   RC             = adikted_private.rc 
