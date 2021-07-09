@@ -8,3 +8,6 @@
 /mapslang/pkg/*
 .vs/
 .git
+/.cproject
+/.project
+/.settings/

@@ -1,4 +1,6 @@
 
+#if defined(BUILD_DLL)
+
 #include <windows.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -62,3 +64,5 @@ BOOL APIENTRY DllMain (__attribute__((unused)) HINSTANCE hInst,    /* Library in
     /* Returns TRUE on success, FALSE on failure */
     return TRUE;
 }
+
+#endif

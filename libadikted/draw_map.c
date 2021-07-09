@@ -168,9 +168,9 @@ struct PALETTE_ENTRY intense_slab_palette_weak[] =
 /* { {8,3,4,0}, {7,7,0,0}, }; */ /* for sum */
  { {62,20,34,0}, {56,56,4,0}, }; /* for mul */
 
-const char *palette_fname="palette.dat";
-const char *cube_fname="cube.dat";
-const char *tmapanim_fname="tmapanim.dat";
+const char *palette_fname="PALETTE.DAT";
+const char *cube_fname="CUBE.DAT";
+const char *tmapanim_fname="TMAPANIM.DAT";
 
 struct MAPDRAW_DATA *glb_draw_data;
 
@@ -973,7 +973,7 @@ short draw_texture_on_buffer_avg2(unsigned char *dest,const struct IPOINT_2D des
  * @param scale Destination buffer scale.
  * @return Returns ERR_NONE on success, error code on failure.
  */
-__fastcall short draw_texture_on_buffer_avg2_fast(unsigned char *dest,const struct IPOINT_2D dest_pos,
+FASTCALL short draw_texture_on_buffer_avg2_fast(unsigned char *dest,const struct IPOINT_2D dest_pos,
     const struct IPOINT_2D dest_size, const unsigned int dest_scanln,
     const unsigned char *src,const struct IPOINT_2D src_pos,const struct IPOINT_2D src_size,
     const struct IPOINT_2D rect_size,struct PALETTE_ENTRY *pal,const struct IPOINT_2D scale)
@@ -1052,7 +1052,7 @@ __fastcall short draw_texture_on_buffer_avg2_fast(unsigned char *dest,const stru
  * @param scale Destination buffer scale.
  * @return Returns ERR_NONE on success, error code on failure.
  */
-__fastcall short draw_texture_on_buffer_avg2_fast_unsafe(unsigned char *dest,const struct IPOINT_2D dest_pos,
+FASTCALL short draw_texture_on_buffer_avg2_fast_unsafe(unsigned char *dest,const struct IPOINT_2D dest_pos,
     __attribute__((unused)) const struct IPOINT_2D dest_size, const unsigned int dest_scanln,
     const unsigned char *src,const struct IPOINT_2D src_pos,const struct IPOINT_2D src_size,
     const struct IPOINT_2D rect_size,struct PALETTE_ENTRY *pal,const struct IPOINT_2D scale)
@@ -2172,6 +2172,7 @@ short load_draw_data(struct MAPDRAW_DATA **draw_data,const struct MAPDRAW_OPTION
     (*draw_data)->cubes=malloc(sizeof(struct CUBES_DATA));
     (*draw_data)->palette=malloc(256*sizeof(struct PALETTE_ENTRY));
     (*draw_data)->images=malloc(sizeof(struct IMAGELIST));
+    (*draw_data)->images->count = 0;                                    /* prevents segfault in case of error */
     (*draw_data)->rand_size=total_subtiles*sizeof(int);
     (*draw_data)->rand_pool=malloc((*draw_data)->rand_size);
     if ((*draw_data)->cubes != NULL)
@@ -2257,8 +2258,8 @@ short load_draw_data(struct MAPDRAW_DATA **draw_data,const struct MAPDRAW_OPTION
       fnames=NULL;
       tabfname=NULL;
       int large_tngicons=((opts->rescale)<3);
-      format_data_fname(&fnames,opts->data_path,"gui%d-%d-%d.dat",2,0,large_tngicons);
-      format_data_fname(&tabfname,opts->data_path,"gui%d-%d-%d.tab",2,0,large_tngicons);
+      format_data_fname(&fnames,opts->data_path,"GUI%d-%d-%d.DAT",2,0,large_tngicons);
+      format_data_fname(&tabfname,opts->data_path,"GUI%d-%d-%d.TAB",2,0,large_tngicons);
       result = (create_images_dattab_idx((*draw_data)->images,fnames,tabfname,0)==ERR_NONE);
       if (!result)
           message_error("Error when loading dat/tab pair \"%s\"",fnames);
@@ -2273,8 +2274,8 @@ short load_draw_data(struct MAPDRAW_DATA **draw_data,const struct MAPDRAW_OPTION
       fnames=NULL;
       tabfname=NULL;
       /*int large_tngicons=((opts->rescale)<3);*/
-      format_data_fname(&fnames,opts->data_path,"font%d-%d.dat",2,0);
-      format_data_fname(&tabfname,opts->data_path,"font%d-%d.tab",2,0);
+      format_data_fname(&fnames,opts->data_path,"FONT%d-%d.DAT",2,0);
+      format_data_fname(&tabfname,opts->data_path,"FONT%d-%d.TAB",2,0);
       result = (create_images_dattab_idx((*draw_data)->font0,fnames,tabfname,0)==ERR_NONE);
       if (!result)
           message_error("Error when loading dat/tab pair \"%s\"",fnames);
@@ -2289,8 +2290,8 @@ short load_draw_data(struct MAPDRAW_DATA **draw_data,const struct MAPDRAW_OPTION
       fnames=NULL;
       tabfname=NULL;
       /*int large_tngicons=((opts->rescale)<3);*/
-      format_data_fname(&fnames,opts->data_path,"font%d-%d.dat",2,1);
-      format_data_fname(&tabfname,opts->data_path,"font%d-%d.tab",2,1);
+      format_data_fname(&fnames,opts->data_path,"FONT%d-%d.DAT",2,1);
+      format_data_fname(&tabfname,opts->data_path,"FONT%d-%d.TAB",2,1);
       result = (create_images_dattab_idx((*draw_data)->font1,fnames,tabfname,0)==ERR_NONE);
       if (!result)
           message_error("Error when loading dat/tab pair \"%s\"",fnames);
@@ -2328,7 +2329,7 @@ short change_draw_data_texture(struct MAPDRAW_DATA *draw_data,
 {
   char *fname;
   short result;
-  format_data_fname(&fname,opts->data_path,"tmapa%03d.dat",textr_idx);
+  format_data_fname(&fname,opts->data_path,"TMAPA%03d.DAT",textr_idx);
   free(draw_data->texture);
   draw_data->texture=NULL;
   result = load_texture(&(draw_data->texture),fname);
