@@ -2,6 +2,8 @@
  * main.c   contains main() and initialization functions
  */
 
+#include <slang.h>
+
 #include "../libadikted/adikted.h"
 #include "scr_actn.h"
 #include "scr_help.h"
