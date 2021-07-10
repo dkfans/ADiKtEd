@@ -215,7 +215,6 @@ short write_bmp_fp_24b(FILE *out, int width, int height, const char *data)
         }
     }
     
-    /* fclose (out); */                                             /* fixes UB, moreover callers of function should close the file */
     return 0;
 }
 
