@@ -1289,8 +1289,20 @@ short write_lif(struct LEVEL *lvl,char *fname)
   message_log(" write_lif: starting");
   /*Acquiring map number */
   long lvl_num;
-  char *fname_num=fname;
-  while (((*fname_num)!='\0')&&(!isdigit(*fname_num))) fname_num++;
+
+  /**
+   * Start detecting digits counting from position of last slash ('/').
+   * It fulfills case when given 'fname' contains full path to file and
+   * that path contains digits in directory names, e.g.:
+   *    '/path/to/game/keeperfx_0_4_8/levels/map00123.lit'.
+   * In following case desired number is '123', but algorithm wrongly finds '0'.
+   */
+  char *fname_num = strrchr( fname, '/' );
+  if ( fname_num == NULL ) {
+      fname_num = fname;
+  }
+
+  while ( ((*fname_num)!='\0') && (!isdigit(*fname_num)) ) fname_num++;
   lvl_num=atol(fname_num);
   /*Creating text lines */
   char **lines=(char **)malloc(2*sizeof(char *));
