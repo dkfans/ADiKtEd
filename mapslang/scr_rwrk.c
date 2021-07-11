@@ -252,7 +252,7 @@ void draw_rework_map_area(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapm
             int tx=mapmode->map.x+i;
             if (tx < lvl->tlsize.x)
             {
-              char out_ch;
+              unsigned long out_ch;
               int sx, sy;
               sx = tx*3+mapmode->subtl.x;
               sy = ty*3+mapmode->subtl.y;
@@ -277,7 +277,7 @@ void draw_rework_map_area(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapm
  */
 int get_rework_map_tile_char(struct LEVEL *lvl,int sx,int sy,unsigned short view)
 {
-    char out_ch;
+    unsigned long out_ch;
     unsigned short field;
     switch (view)
     {

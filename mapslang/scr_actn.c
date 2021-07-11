@@ -1018,7 +1018,7 @@ unsigned char simplify_map_slab(unsigned short slab)
 int get_draw_map_tile_char(const struct MAPMODE_DATA *mapmode,const struct LEVEL *lvl,
     int tx,int ty,short show_ground,short show_rooms,short show_things,short force_at)
 {
-    char out_ch;
+    unsigned long out_ch;
     unsigned short slab;
     if (show_things)
       out_ch=get_thing_char(lvl,tx,ty);
@@ -1060,7 +1060,7 @@ void draw_map_area(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,str
             int tx=mapmode->map.x+i;
             if (tx < lvl->tlsize.x)
             {
-              char out_ch;
+              unsigned long out_ch;
               int g;
               short has_ccol;
               short darken_fg;
@@ -1109,7 +1109,7 @@ void draw_map_cursor(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,s
 {
     int tx=mapmode->screen.x+mapmode->map.x;
     int ty=mapmode->screen.y+mapmode->map.y;
-    char out_ch;
+    unsigned long out_ch;
     int g;
     if (show_rooms)
       g = graffiti_idx(lvl,tx,ty);
@@ -1123,7 +1123,7 @@ void draw_map_cursor(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,s
  * Shows map cursor at position from mapmode; the cursor is a character
  * same as in the current map background written in different colors.
  */
-void show_cursor(const struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,char cur)
+void show_cursor(const struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,unsigned long cur)
 {
     set_cursor_pos(mapmode->screen.y, mapmode->screen.x);
     screen_setcolor(PRINT_COLOR_RED_ON_WHITE);
@@ -1136,7 +1136,7 @@ void show_cursor(const struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode
  * Shows map cursor at given position; the cursor is a character
  * from the parameter written in highlighted colors.
  */
-void show_cursor_at(const struct SCRMODE_DATA *scrmode,int row,int col,char cur)
+void show_cursor_at(const struct SCRMODE_DATA *scrmode,int row,int col,unsigned long cur)
 {
     set_cursor_pos(row,col);
     screen_setcolor(PRINT_COLOR_RED_ON_WHITE);
