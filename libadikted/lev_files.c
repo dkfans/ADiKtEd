@@ -1278,6 +1278,19 @@ short write_wlb(struct LEVEL *lvl,char *fname)
 }
 
 /**
+ * Wrapper around 'strrchr()'. Tries to find last occurrence of 'item' in 'buffer.
+ * @return Returns pointer to last 'item' in 'buffer' on success, otherwise 'buffer'.
+ */
+static char* find_last( char *buffer, const char item )
+{
+    char *found = strrchr( buffer, item );
+    if ( found != NULL ) {
+        return found;
+    }
+    return buffer;
+}
+
+/**
  * Writes the LIF file from LEVEL structure into disk.
  * LIFs are used to save text name of the level.
  * @param lvl Pointer to the LEVEL structure.
@@ -1289,8 +1302,13 @@ short write_lif(struct LEVEL *lvl,char *fname)
   message_log(" write_lif: starting");
   /*Acquiring map number */
   long lvl_num;
-  char *fname_num=fname;
-  while (((*fname_num)!='\0')&&(!isdigit(*fname_num))) fname_num++;
+  char *fname_num = fname;
+
+  /* Separating filename from directory subpath */
+  fname_num = find_last( fname_num, '/' );                 /* Linux path separator */
+  fname_num = find_last( fname_num, '\\' );                /* Windows path separator */
+
+  while ( ((*fname_num)!='\0') && (!isdigit(*fname_num)) ) fname_num++;
   lvl_num=atol(fname_num);
   /*Creating text lines */
   char **lines=(char **)malloc(2*sizeof(char *));
