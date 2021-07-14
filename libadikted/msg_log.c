@@ -27,6 +27,50 @@ unsigned int message_getcount;
 char *msgout_fname;
 
 /**
+ * Global state prevents massive fopen()/fclose()
+ */
+#define ALLOW_GLOBAL_MSGOUT_FP  1
+/* #define ALLOW_GLOBAL_MSGOUT_FP  0 */
+FILE *msgout_global_fp;
+
+
+/**
+ * Get/ensure opened global log file.
+ */
+static FILE* ensure_log_file()
+{
+#if ALLOW_GLOBAL_MSGOUT_FP
+    if ( msgout_global_fp == NULL )
+        msgout_global_fp = fopen(msgout_fname,"ab");
+    return msgout_global_fp;
+#else
+    return fopen(msgout_fname,"ab");
+#endif
+}
+
+static void write_log_file( FILE* msgout_fp ) {
+#if ALLOW_GLOBAL_MSGOUT_FP
+    fflush( msgout_fp );
+#else
+    fclose( msgout_fp );
+#endif
+}
+
+/**
+ * Close global log file.
+ */
+static void close_log_file()
+{
+#if ALLOW_GLOBAL_MSGOUT_FP
+    if ( msgout_global_fp == NULL ) return;
+    fclose( msgout_global_fp );
+    msgout_global_fp = NULL;
+#else
+    /// global state disabled -- do nothing
+#endif
+}
+
+/**
  * Only logs the message, without showing on screen.
  * The va_list version - mainly for internal use.
  * @param format Specifies the string pattern.
@@ -36,13 +80,13 @@ void message_log_vl(const char *format, va_list val)
 {
     if (msgout_fname==NULL) return;
     FILE *msgout_fp;
-    msgout_fp=fopen(msgout_fname,"ab");
+    msgout_fp = ensure_log_file();
     if (msgout_fp!=NULL)
     {
       /* Write to log file if it is opened */
       vfprintf(msgout_fp, format, val);
       fprintf(msgout_fp,"\r\n");
-      fclose(msgout_fp);
+      write_log_file( msgout_fp );
     }
 }
 
@@ -55,12 +99,12 @@ void message_log_simp(const char *str)
 {
     if (msgout_fname==NULL) return;
     FILE *msgout_fp;
-    msgout_fp=fopen(msgout_fname,"ab");
+    msgout_fp = ensure_log_file();
     /* Write to log file if it is opened */
     if (msgout_fp!=NULL)
     {
       fprintf(msgout_fp, "%s\r\n",str);
-      fclose(msgout_fp);
+      write_log_file( msgout_fp );
     }
 }
 
@@ -251,6 +295,9 @@ short set_msglog_fname(char *fname)
         msgout_fname=NULL;
         return false;
     }
+
+    close_log_file();
+
     FILE *msgout_fp;
     msgout_fname=strdup(fname);
     msgout_fp=fopen(msgout_fname,"wb");
@@ -279,6 +326,7 @@ void init_messages(void)
   message_hold=false;
   message_getcount=0;
   msgout_fname=NULL;
+  msgout_global_fp = NULL;
 }
 
 /**
@@ -289,4 +337,5 @@ void free_messages(void)
     free(message_prv);
     free(message);
     free(msgout_fname);
+    close_log_file();
 }
