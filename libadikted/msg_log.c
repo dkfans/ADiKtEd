@@ -27,10 +27,12 @@ unsigned int message_getcount;
 char *msgout_fname;
 
 /**
- * Global state prevents massive fopen()/fclose()
+ * Control behaviour of message logging regarding log file open/close operations.
+ * Allowed values:
+ *      0 -- open and close log file with every call to log function
+ *      1 -- reuse once opened log file (prevents massive 'fopen()'/'fclose()')
  */
-#define ALLOW_GLOBAL_MSGOUT_FP  1
-/* #define ALLOW_GLOBAL_MSGOUT_FP  0 */
+#define REUSE_MESSAGE_LOG_FILE_HANDLE  1
 FILE *msgout_global_fp;
 
 
@@ -39,7 +41,7 @@ FILE *msgout_global_fp;
  */
 static FILE* ensure_log_file()
 {
-#if ALLOW_GLOBAL_MSGOUT_FP
+#if REUSE_MESSAGE_LOG_FILE_HANDLE
     if ( msgout_global_fp == NULL )
         msgout_global_fp = fopen(msgout_fname,"ab");
     return msgout_global_fp;
@@ -49,7 +51,7 @@ static FILE* ensure_log_file()
 }
 
 static void write_log_file( FILE* msgout_fp ) {
-#if ALLOW_GLOBAL_MSGOUT_FP
+#if REUSE_MESSAGE_LOG_FILE_HANDLE
     fflush( msgout_fp );
 #else
     fclose( msgout_fp );
@@ -61,7 +63,7 @@ static void write_log_file( FILE* msgout_fp ) {
  */
 static void close_log_file()
 {
-#if ALLOW_GLOBAL_MSGOUT_FP
+#if REUSE_MESSAGE_LOG_FILE_HANDLE
     if ( msgout_global_fp == NULL ) return;
     fclose( msgout_global_fp );
     msgout_global_fp = NULL;
