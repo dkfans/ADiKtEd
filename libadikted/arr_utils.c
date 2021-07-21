@@ -234,7 +234,7 @@ char *prepare_short_fname(const char *fname, unsigned int maxlen)
         message_error("prepare_short_fname: Cannot allocate memory.");
         return NULL;
     }
-    strncpy(retname,start,strlen(retname));
+    strncpy( retname, start, len );
     retname[len]='\0';
     return retname;
 }
