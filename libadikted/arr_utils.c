@@ -224,14 +224,18 @@ char *prepare_short_fname(const char *fname, unsigned int maxlen)
     unsigned int len=strlen(start);
     if (len > maxlen)
           len=maxlen;
-    char *retname = NULL;
+    char *retname;
     if (len>0)
-        retname = strndup( start, len );
+        retname=(char *)malloc(len+1);
+    else
+        retname=NULL;
     if (retname==NULL)
     {
         message_error("prepare_short_fname: Cannot allocate memory.");
         return NULL;
     }
+    strncpy( retname, start, len );
+    retname[len]='\0';
     return retname;
 }
 
