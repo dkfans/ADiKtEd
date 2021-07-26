@@ -3,7 +3,8 @@
 ##
 
 
-cmake_minimum_required(VERSION 3.8)
+## 3.1 -- CMAKE_C_STANDARD
+cmake_minimum_required( VERSION 3.1 )
 
 
 if( "${CMAKE_CURRENT_SOURCE_DIR}" STREQUAL "${CMAKE_CURRENT_BINARY_DIR}" )
@@ -11,15 +12,15 @@ if( "${CMAKE_CURRENT_SOURCE_DIR}" STREQUAL "${CMAKE_CURRENT_BINARY_DIR}" )
 endif()
 
 
-project( libadikted )
+project( libadikted LANGUAGES C )
 
 
 if( NOT CMAKE_BUILD_TYPE )
-    ##set( CMAKE_BUILD_TYPE "Debug")
-    set( CMAKE_BUILD_TYPE Debug CACHE STRING "Choose the type of build." FORCE)
+    set( CMAKE_BUILD_TYPE Debug CACHE STRING "Choose the type of build." FORCE )
 endif()
 
 if (CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
+    ## do not install accidentally to system directory
     set( CMAKE_INSTALL_PREFIX "${CMAKE_BINARY_DIR}/install" CACHE PATH "Install path prefix" FORCE )
 endif()
 
@@ -30,12 +31,8 @@ set(CMAKE_DEBUG_POSTFIX _d)
 ##
 ## set default compilation standard
 ##
-if (CMAKE_VERSION VERSION_LESS "3.1")
-    set( CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=gnu99" )
-else()
-    set( CMAKE_C_STANDARD 99 )
-    set( CMAKE_C_STANDARD_REQUIRED ON )
-endif()
+set( CMAKE_C_STANDARD 99 )
+set( CMAKE_C_STANDARD_REQUIRED ON )
 
 
 ##
@@ -52,8 +49,8 @@ set( CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Werror-implicit-function-declaration -Wno-
 
 set( TARGET_NAME adikted )
 
-file(GLOB_RECURSE c_files *.c )
-file(GLOB_RECURSE h_files *.h )
+file( GLOB_RECURSE c_files *.c )
+file( GLOB_RECURSE h_files *.h )
 
 add_library( ${TARGET_NAME} SHARED ${c_files} )
 target_include_directories( ${TARGET_NAME} PUBLIC ".." PRIVATE "." )
