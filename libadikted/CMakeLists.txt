@@ -49,14 +49,19 @@ set( CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Werror-implicit-function-declaration -Wno-
 
 set( TARGET_NAME adikted )
 
+if( NOT ${TARGET_NAME}_TYPE )
+    ## build library as shared by default
+    set( ${TARGET_NAME}_TYPE SHARED )
+endif()
+
 file( GLOB_RECURSE c_files *.c )
 file( GLOB_RECURSE h_files *.h )
 
-add_library( ${TARGET_NAME} SHARED ${c_files} )
+add_library( ${TARGET_NAME} ${${TARGET_NAME}_TYPE} ${c_files} )
 target_include_directories( ${TARGET_NAME} PUBLIC ".." PRIVATE "." )
 set_target_properties( ${TARGET_NAME} PROPERTIES PUBLIC_HEADER "${h_files}" )
 
 install( TARGETS ${TARGET_NAME} 
-         LIBRARY DESTINATION lib
-         PUBLIC_HEADER DESTINATION include/lib${TARGET_NAME}
-       )
+         PUBLIC_HEADER DESTINATION include/lib${TARGET_NAME} COMPONENT headers
+         LIBRARY DESTINATION lib COMPONENT binaries
+        )
