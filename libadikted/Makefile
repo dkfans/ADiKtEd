@@ -85,6 +85,7 @@ obj_column_def.c \
 obj_column_per.c \
 obj_slabs.c \
 obj_things.c \
+rng.c \
 xcubtxtr.c \
 xtabdat8.c \
 xtabjty.c
