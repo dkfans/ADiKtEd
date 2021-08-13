@@ -1598,7 +1598,7 @@ void generate_slab_bkgnd_random(struct LEVEL *lvl)
       for (j=0; j < tl_maxindex.x-1; j++)
       {
         /*int ir=tl_maxindex.y-i;*/
-        int rnd_bound=RAND_MAX/((i/2)+1);
+        int rnd_bound = rng_rand_max() / ((i/2)+1);
         if (rng_rand()<rnd_bound)
         {
           set_tile_slab(lvl,j,i,SLAB_TYPE_ROCK);
