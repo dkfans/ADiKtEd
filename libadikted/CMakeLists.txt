@@ -60,8 +60,15 @@ if( NOT ${TARGET_NAME}_TYPE )
     set( ${TARGET_NAME}_TYPE SHARED )
 endif()
 
+
 file( GLOB_RECURSE c_files *.c )
 file( GLOB_RECURSE h_files *.h )
+
+if( NOT USE_RNG_MT )
+    list(REMOVE_ITEM h_files "${CMAKE_CURRENT_SOURCE_DIR}/mtwist/mtwist.h" )
+    list(REMOVE_ITEM c_files "${CMAKE_CURRENT_SOURCE_DIR}/mtwist/mtwist.c" )
+endif()
+
 
 add_library( ${TARGET_NAME} ${${TARGET_NAME}_TYPE} ${c_files} )
 target_include_directories( ${TARGET_NAME} PUBLIC ".." PRIVATE "." )
