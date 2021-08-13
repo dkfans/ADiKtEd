@@ -27,8 +27,6 @@ DLLIMPORT void rng_srand( unsigned int seed );
  */
 DLLIMPORT unsigned int rng_srand_random();
 
-DLLIMPORT void rng_srand();
-
 DLLIMPORT unsigned int rng_rand();
 
 
