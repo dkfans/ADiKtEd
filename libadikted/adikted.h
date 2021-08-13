@@ -35,3 +35,4 @@
 #include "xcubtxtr.h"
 #include "xtabdat8.h"
 #include "xtabjty.h"
+#include "rng.h"

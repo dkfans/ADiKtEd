@@ -22,6 +22,7 @@
 #include "lbfileio.h"
 
 #include "bulcommn.h"
+#include "rng.h"
 
 /**
  * RNC compression magic identifier, as string.
@@ -241,7 +242,7 @@ int read_palette_rgb(unsigned char *palette, const char *fname, unsigned int nCo
  */
 unsigned int rnd(const unsigned int range)
 {
-    return (rand()%(range));
+    return (rng_rand()%(range));
 }
 
 /**

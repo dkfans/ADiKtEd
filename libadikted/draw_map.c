@@ -37,6 +37,7 @@
 #include "bulcommn.h"
 #include "arr_utils.h"
 #include "lev_things.h"
+#include "rng.h"
 
 /**
  * Intensified player colors array.
@@ -2207,7 +2208,7 @@ short load_draw_data(struct MAPDRAW_DATA **draw_data,const struct MAPDRAW_OPTION
     for (i=0;i<total_subtiles;i++)
     {
         int *rnd_ints=(int *)(*draw_data)->rand_pool;
-        rnd_ints[i]=rand();
+        rnd_ints[i]=rng_rand();
     }
     (*draw_data)->rand_count=0;
     /* Setting map drawing rectangle */

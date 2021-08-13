@@ -120,7 +120,7 @@ void init_levscr_basics(struct SCRMODE_DATA **scrmode,struct WORKMODE_DATA *work
     // variable that informs if main program loop should finish
     finished=false;
     // random num gen seed selection
-    srand(time(0));
+    rng_srand(time(0));
     //Creating and clearing screen mode info variable
     *scrmode=(struct SCRMODE_DATA *)malloc(sizeof(struct SCRMODE_DATA));
     if ((*scrmode)==NULL)

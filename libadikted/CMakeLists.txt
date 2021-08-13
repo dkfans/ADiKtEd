@@ -47,6 +47,12 @@ set( CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Werror-implicit-function-declaration -Wno-
 
 ## ================= build =================
 
+option( USE_RNG_MT "Use Mersenne Twister RNG" OFF )
+if( USE_RNG_MT )
+    add_definitions( -DRNG_MT )
+endif()
+
+
 set( TARGET_NAME adikted )
 
 if( NOT ${TARGET_NAME}_TYPE )
