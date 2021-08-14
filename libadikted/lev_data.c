@@ -37,6 +37,7 @@
 #include "obj_actnpts.h"
 #include "bulcommn.h"
 #include "arr_utils.h"
+#include "rng.h"
 
 const int idir_subtl_x[]={
     0, 1, 2,
@@ -1597,40 +1598,40 @@ void generate_slab_bkgnd_random(struct LEVEL *lvl)
       for (j=0; j < tl_maxindex.x-1; j++)
       {
         /*int ir=tl_maxindex.y-i;*/
-        int rnd_bound=RAND_MAX/((i/2)+1);
-        if (rand()<rnd_bound)
+        int rnd_bound = rng_rand_max() / ((i/2)+1);
+        if (rng_rand()<rnd_bound)
         {
           set_tile_slab(lvl,j,i,SLAB_TYPE_ROCK);
         }
-        if (rand()<rnd_bound)
+        if (rng_rand()<rnd_bound)
         {
           set_tile_slab(lvl,j,tl_maxindex.y-i,SLAB_TYPE_ROCK);
         }
-        if (rand()<rnd_bound)
+        if (rng_rand()<rnd_bound)
         {
           set_tile_slab(lvl,i,j,SLAB_TYPE_ROCK);
         }
-        if (rand()<rnd_bound)
+        if (rng_rand()<rnd_bound)
         {
           set_tile_slab(lvl,tl_maxindex.x-i,j,SLAB_TYPE_ROCK);
         }
       }
-    int num_smears=(rand()%20);
+    int num_smears=(rng_rand()%20);
     if (num_smears<10)
     {
       while (num_smears>4) num_smears=num_smears>>1;
       for (l=0;l<num_smears;l++)
       {
-        int val=rand();
+        int val=rng_rand();
         int smr_startx = val%lvl->tlsize.x;
         int smr_starty=(val>>8)%lvl->tlsize.y;
-        val=rand();
+        val=rng_rand();
         int smr_endx = (val)%lvl->tlsize.x;
         int smr_endy=(val>>8)%lvl->tlsize.y;
-        val=rand();
+        val=rng_rand();
         int startr=(val)%4+2;
         int endr=(val>>8)%3+1;
-        val=rand();
+        val=rng_rand();
         int distance=ceil(sqrt((smr_startx-smr_endx)*(smr_startx-smr_endx)+(smr_starty-smr_endy)*(smr_starty-smr_endy)));
         int bend=((val)%(distance+1))-(distance>>1);
         slab_draw_smear(lvl,smr_startx,smr_starty,startr,smr_endx,smr_endy,endr,bend,SLAB_TYPE_ROCK);
