@@ -59,6 +59,18 @@ enum VERIFY_WARN_FLAGS {
 /*     VWFLAG_NOWARN_           =  2, */
      };
 
+/* Select level verification steps to skip (bit fields) */
+enum VERIFY_SKIP_FLAGS {
+    VSF_STRUCT      = 0x01,
+    VSF_THINGS      = VSF_STRUCT    << 1,
+    VSF_SLABS       = VSF_THINGS    << 1,
+    VSF_ACTNPNTS    = VSF_SLABS     << 1,
+    VSF_COLUMNS     = VSF_ACTNPNTS  << 1,
+    VSF_DAT         = VSF_COLUMNS   << 1,
+    VSF_TXT         = VSF_DAT       << 1,
+    VSF_LOGIC       = VSF_TXT       << 1
+};
+
 /*Disk files entries */
 
 #define SIZEOF_DK_TNG_REC 21
@@ -389,6 +401,7 @@ DLLIMPORT short level_free_script_param(struct DK_SCRIPT_PARAMETERS *par);
 DLLIMPORT short free_text_file(char ***lines,int *lines_count);
 
 DLLIMPORT short level_verify(struct LEVEL *lvl, char *actn_name,struct IPOINT_2D *errpt);
+DLLIMPORT short level_verify_control(struct LEVEL *lvl, char *actn_name, unsigned long skip_step_flags, struct IPOINT_2D *errpt);
 DLLIMPORT short level_verify_struct(struct LEVEL *lvl, char *err_msg,struct IPOINT_2D *errpt);
 short actnpts_verify(struct LEVEL *lvl, char *err_msg,struct IPOINT_2D *errpt);
 DLLIMPORT short level_verify_logic(struct LEVEL *lvl, char *err_msg,struct IPOINT_2D *errpt);

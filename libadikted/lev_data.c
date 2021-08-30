@@ -1184,48 +1184,51 @@ struct DK_SCRIPT_PARAMETERS *level_get_script_param(struct LEVEL *lvl)
  * @return Returns VERIF_ERROR, VERIF_WARN or VERIF_OK.
  *     If a problem was found, adds error message and sets errpt accordingly.
  */
-short level_verify(struct LEVEL *lvl, char *actn_name,struct IPOINT_2D *errpt)
-{
+short level_verify(struct LEVEL *lvl, char *actn_name,struct IPOINT_2D *errpt) {
+    return level_verify_control( lvl, actn_name, 0, errpt );
+}
+
+short level_verify_control(struct LEVEL *lvl, char *actn_name, unsigned long skip_step_flags, struct IPOINT_2D *errpt) {
   char err_msg[LINEMSG_SIZE];
   strcpy(err_msg,"Unknown error");
   short result=VERIF_OK;
   short nres;
-  if (result!=VERIF_ERROR)
+  if ( result!=VERIF_ERROR && !(skip_step_flags & VSF_STRUCT) )
   {
     nres=level_verify_struct(lvl,err_msg,errpt);
     if (nres!=VERIF_OK) result=nres;
   }
-  if (result!=VERIF_ERROR)
+  if ( result!=VERIF_ERROR && !(skip_step_flags & VSF_THINGS) )
   {
     nres=things_verify(lvl,err_msg,errpt);
     if (nres!=VERIF_OK) result=nres;
   }
-  if (result!=VERIF_ERROR)
+  if ( result!=VERIF_ERROR && !(skip_step_flags & VSF_SLABS) )
   {
     nres=slabs_verify(lvl,err_msg,errpt);
     if (nres!=VERIF_OK) result=nres;
   }
-  if (result!=VERIF_ERROR)
+  if ( result!=VERIF_ERROR && !(skip_step_flags & VSF_ACTNPNTS) )
   {
     nres=actnpts_verify(lvl,err_msg,errpt);
     if (nres!=VERIF_OK) result=nres;
   }
-  if (result!=VERIF_ERROR)
+  if ( result!=VERIF_ERROR && !(skip_step_flags & VSF_COLUMNS) )
   {
     nres=columns_verify(lvl,err_msg,errpt);
     if (nres!=VERIF_OK) result=nres;
   }
-  if (result!=VERIF_ERROR)
+  if ( result!=VERIF_ERROR && !(skip_step_flags & VSF_DAT) )
   {
     nres=dat_verify(lvl,err_msg,errpt);
     if (nres!=VERIF_OK) result=nres;
   }
-  if (result!=VERIF_ERROR)
+  if ( result!=VERIF_ERROR && !(skip_step_flags & VSF_TXT) )
   {
     nres=txt_verify(lvl,err_msg,errpt);
     if (nres!=VERIF_OK) result=nres;
   }
-  if (result!=VERIF_ERROR)
+  if ( result!=VERIF_ERROR && !(skip_step_flags & VSF_LOGIC) )
   {
     nres=level_verify_logic(lvl,err_msg,errpt);
     if (nres!=VERIF_OK) result=nres;
