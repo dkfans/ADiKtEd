@@ -2,11 +2,14 @@
  * main.c   contains main() and initialization functions
  */
 
+#include <slang.h>
+
 #include "../libadikted/adikted.h"
 #include "scr_actn.h"
 #include "scr_help.h"
 #include "scr_txted.h"
 #include "input_kb.h"
+#include "var_utils.h"
 
 const char config_filename[]="map.ini";
 
@@ -274,6 +277,7 @@ void get_command_line_options(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA 
  */
 int main(int argc, char **argv)
 {
+    SLutf8_enable(1);
     struct SCRMODE_DATA *scrmode;
     struct WORKMODE_DATA workdata;
     // Initialize the message displaying and storing

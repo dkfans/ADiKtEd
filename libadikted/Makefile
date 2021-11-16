@@ -1,14 +1,69 @@
 # Project: libadikted
+# Makefile created by KeeperFX/dkfans team
 
-#To create a debug executable, run with the command:
-# make DEBUG
+# Instructions:
+# To create the Windows library run:
+# make all
+# To create the linux library run:
+# make all BUILD_FOR_LINUX=1 (not fully implemented)
+# To create a debug library, run with the command:
+# make all DEBUG=1 (un-tested)
+# To clean up the built files (objects, library, and resource file) run:
+# make clean
 
-#CROSS_COMPILE = i686-w64-mingw32-
+# Windows version can be built with:
+# - Windows   : MSYS2 (MinGW 32-bit) - make
+# - Windows   : MSYS2 (MinGW 32-bit) - mingw32-make
+# - Windows   : MinGW (MSYS) - make
+# - WSL/Linux : i686-w64-mingw32-gcc - make
 
+# Executable files extension on host environment
+ifneq (,$(findstring Windows,$(OS)))
+  CROSS_EXEEXT = .exe
+else
+  CROSS_EXEEXT =
+endif
 
-CC           = $(CROSS_COMPILE)gcc
-LINK         = $(CROSS_COMPILE)gcc
-SRC          = \
+# Executable files extension on target environment
+BUILD_FOR_LINUX ?= 0
+ifeq ($(BUILD_FOR_LINUX), 1)
+  CROSS_COMPILE  = 
+  LIBEXT         = .so
+  OTHER_LIBEXT   = .dll
+  DLL_FLAG       =
+  PLATFORM_FLAGS = -fPIC
+  RES            =
+  RC             =
+else
+  CROSS_COMPILE  = i686-w64-mingw32-
+  LIBEXT         = .dll
+  OTHER_LIBEXT   = .so
+  DLL_FLAG       = -DBUILD_DLL -DUSE_FASTCALL
+  PLATFORM_FLAGS = -march=pentium-mmx -mmmx
+  RES            = obj/adikted_private.res
+  RC             = adikted_private.rc 
+endif
+
+# Allow debug executables to be created
+DEBUG ?= 0
+ifeq ($(DEBUG), 1)
+  DEBUGME = yes
+else
+  DEBUGME = no
+endif
+
+# Names of utility commands
+WARNFLAGS          = -Wall -Wextra -pedantic -Werror-implicit-function-declaration -Wno-conversion -Wno-traditional-conversion -Wno-sign-compare
+CSTANDARD          = -std=gnu99
+CC                 = $(CROSS_COMPILE)gcc$(CROSS_EXEEXT) $(CSTANDARD) $(WARNFLAGS)
+CFLAGS             = -c -O -I. $(DLL_FLAG) -fexpensive-optimizations -O3 $(PLATFORM_FLAGS)
+CFLAGS_DEBUG       = -c -g -I. $(DLL_FLAG) $(PLATFORM_FLAGS) -DDEBUG
+LINK               = $(CROSS_COMPILE)gcc$(CROSS_EXEEXT)
+WINDRES            = $(CROSS_COMPILE)windres$(CROSS_EXEEXT)
+LFLAGS             = -shared $(PLATFORM_FLAGS)
+LFLAGS_DEBUG       = -shared $(PLATFORM_FLAGS) -DDEBUG
+LIBS               = -L.
+SRC                = \
 arr_utils.c \
 bulcommn.c \
 dernc.c \
@@ -30,28 +85,35 @@ obj_column_def.c \
 obj_column_per.c \
 obj_slabs.c \
 obj_things.c \
+rng.c \
 xcubtxtr.c \
 xtabdat8.c \
 xtabjty.c
+OBJ                = $(addprefix obj/,$(SRC:.c=.o))
+BIN                = bin/adikted$(LIBEXT)
+RM                 = rm -f
+MKDIR              = mkdir -p
 
-OBJ          = $(SRC:.c=.o)
-LIBS         = -L. 
-# --no-export-all-symbols --add-stdcall-alias
-CFLAGS       = -c -O -I. -DBUILD_DLL
-CFLAGS-DEBUG = -c -g -I. -DBUILD_DLL
-LFLAGS       = -shared
-LFLAGS-DEBUG = -shared
-BIN          = adikted.dll
-RM           = rm -f
+.PHONY: pre-build post-build all clean
 
-all: $(SRC) $(BIN)
+all: make-directories pre-build $(SRC) $(BIN) post-build
+
+make-directories:
+	$(MKDIR) bin obj
 
 clean:
-	${RM} $(OBJ)
-	${RM} $(BIN)
+	$(RM) $(OBJ) $(BIN) $(BIN:$(LIBEXT)=$(OTHER_LIBEXT)) $(RES)
 
-$(BIN): $(OBJ)
-	$(LINK) $(if $(filter yes, $(DEBUGME)),$(LFLAGS-DEBUG),$(LFLAGS)) $(LIBS) -o $@ $(OBJ)
+$(BIN): $(OBJ) $(RES)
+	$(LINK) $(if $(filter yes, $(DEBUGME)),$(LFLAGS_DEBUG),$(LFLAGS)) $(LIBS) -o $@ $(OBJ) $(RES)
 
-.c.o:
-	$(CC) $(if $(filter yes, $(DEBUGME)),$(CFLAGS-DEBUG),$(CFLAGS)) $< -o $@
+obj/%.o: %.c
+	$(CC) $(if $(filter yes, $(DEBUGME)),$(CFLAGS_DEBUG),$(CFLAGS)) $< -o $@
+
+ifeq ($(BUILD_FOR_LINUX), 1)
+  ## Linux -- do not user RC files -- do nothing
+else
+  ## Windows -- compile resource file
+  $(RES): $(RC)
+	  $(WINDRES) -i $< --input-format=rc -o $@ -O coff
+endif

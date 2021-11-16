@@ -27,6 +27,8 @@
 #include "scr_list.h"
 #include "scr_help.h"
 
+#include "var_utils.h"
+
 /*
  * Initializes variables for the mdcube screen.
  * Note: init_list must be called too for the mode to work.

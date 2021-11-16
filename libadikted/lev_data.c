@@ -20,6 +20,7 @@
 #include "lev_data.h"
 
 #include <math.h>
+#include <string.h>
 #include <time.h>
 #include "globals.h"
 #include "obj_column_def.h"
@@ -36,6 +37,7 @@
 #include "obj_actnpts.h"
 #include "bulcommn.h"
 #include "arr_utils.h"
+#include "rng.h"
 
 const int idir_subtl_x[]={
     0, 1, 2,
@@ -787,6 +789,8 @@ short level_clear_other(struct LEVEL *lvl)
     lvl->cust_clm_count=0;
     lvl->graffiti=NULL;
     lvl->graffiti_count=0;
+
+    memset(lvl->slx_data, 0, sizeof(lvl->slx_data));
     return true;
 }
 
@@ -1180,48 +1184,51 @@ struct DK_SCRIPT_PARAMETERS *level_get_script_param(struct LEVEL *lvl)
  * @return Returns VERIF_ERROR, VERIF_WARN or VERIF_OK.
  *     If a problem was found, adds error message and sets errpt accordingly.
  */
-short level_verify(struct LEVEL *lvl, char *actn_name,struct IPOINT_2D *errpt)
-{
+short level_verify(struct LEVEL *lvl, char *actn_name,struct IPOINT_2D *errpt) {
+    return level_verify_control( lvl, actn_name, 0, errpt );
+}
+
+short level_verify_control(struct LEVEL *lvl, char *actn_name, unsigned long skip_step_flags, struct IPOINT_2D *errpt) {
   char err_msg[LINEMSG_SIZE];
   strcpy(err_msg,"Unknown error");
   short result=VERIF_OK;
   short nres;
-  if (result!=VERIF_ERROR)
+  if ( result!=VERIF_ERROR && !(skip_step_flags & VSF_STRUCT) )
   {
     nres=level_verify_struct(lvl,err_msg,errpt);
     if (nres!=VERIF_OK) result=nres;
   }
-  if (result!=VERIF_ERROR)
+  if ( result!=VERIF_ERROR && !(skip_step_flags & VSF_THINGS) )
   {
     nres=things_verify(lvl,err_msg,errpt);
     if (nres!=VERIF_OK) result=nres;
   }
-  if (result!=VERIF_ERROR)
+  if ( result!=VERIF_ERROR && !(skip_step_flags & VSF_SLABS) )
   {
     nres=slabs_verify(lvl,err_msg,errpt);
     if (nres!=VERIF_OK) result=nres;
   }
-  if (result!=VERIF_ERROR)
+  if ( result!=VERIF_ERROR && !(skip_step_flags & VSF_ACTNPNTS) )
   {
     nres=actnpts_verify(lvl,err_msg,errpt);
     if (nres!=VERIF_OK) result=nres;
   }
-  if (result!=VERIF_ERROR)
+  if ( result!=VERIF_ERROR && !(skip_step_flags & VSF_COLUMNS) )
   {
     nres=columns_verify(lvl,err_msg,errpt);
     if (nres!=VERIF_OK) result=nres;
   }
-  if (result!=VERIF_ERROR)
+  if ( result!=VERIF_ERROR && !(skip_step_flags & VSF_DAT) )
   {
     nres=dat_verify(lvl,err_msg,errpt);
     if (nres!=VERIF_OK) result=nres;
   }
-  if (result!=VERIF_ERROR)
+  if ( result!=VERIF_ERROR && !(skip_step_flags & VSF_TXT) )
   {
     nres=txt_verify(lvl,err_msg,errpt);
     if (nres!=VERIF_OK) result=nres;
   }
-  if (result!=VERIF_ERROR)
+  if ( result!=VERIF_ERROR && !(skip_step_flags & VSF_LOGIC) )
   {
     nres=level_verify_logic(lvl,err_msg,errpt);
     if (nres!=VERIF_OK) result=nres;
@@ -1594,40 +1601,40 @@ void generate_slab_bkgnd_random(struct LEVEL *lvl)
       for (j=0; j < tl_maxindex.x-1; j++)
       {
         /*int ir=tl_maxindex.y-i;*/
-        int rnd_bound=RAND_MAX/((i/2)+1);
-        if (rand()<rnd_bound)
+        int rnd_bound = rng_rand_max() / ((i/2)+1);
+        if (rng_rand()<rnd_bound)
         {
           set_tile_slab(lvl,j,i,SLAB_TYPE_ROCK);
         }
-        if (rand()<rnd_bound)
+        if (rng_rand()<rnd_bound)
         {
           set_tile_slab(lvl,j,tl_maxindex.y-i,SLAB_TYPE_ROCK);
         }
-        if (rand()<rnd_bound)
+        if (rng_rand()<rnd_bound)
         {
           set_tile_slab(lvl,i,j,SLAB_TYPE_ROCK);
         }
-        if (rand()<rnd_bound)
+        if (rng_rand()<rnd_bound)
         {
           set_tile_slab(lvl,tl_maxindex.x-i,j,SLAB_TYPE_ROCK);
         }
       }
-    int num_smears=(rand()%20);
+    int num_smears=(rng_rand()%20);
     if (num_smears<10)
     {
       while (num_smears>4) num_smears=num_smears>>1;
       for (l=0;l<num_smears;l++)
       {
-        int val=rand();
+        int val=rng_rand();
         int smr_startx = val%lvl->tlsize.x;
         int smr_starty=(val>>8)%lvl->tlsize.y;
-        val=rand();
+        val=rng_rand();
         int smr_endx = (val)%lvl->tlsize.x;
         int smr_endy=(val>>8)%lvl->tlsize.y;
-        val=rand();
+        val=rng_rand();
         int startr=(val)%4+2;
         int endr=(val>>8)%3+1;
-        val=rand();
+        val=rng_rand();
         int distance=ceil(sqrt((smr_startx-smr_endx)*(smr_startx-smr_endx)+(smr_starty-smr_endy)*(smr_starty-smr_endy)));
         int bend=((val)%(distance+1))-(distance>>1);
         slab_draw_smear(lvl,smr_startx,smr_starty,startr,smr_endx,smr_endy,endr,bend,SLAB_TYPE_ROCK);
@@ -2384,6 +2391,35 @@ void set_tile_slab(struct LEVEL *lvl, unsigned int tx, unsigned int ty, unsigned
     /*Bounding position */
     if ((tx>=lvl->tlsize.x)||(ty>=lvl->tlsize.y)) return;
     lvl->slb[tx][ty]=nval;
+}
+
+/**
+ * Gives extended slab value for a tile.
+ * @param lvl Pointer to the LEVEL structure.
+ * @param tx,ty Map tile at which we want the slab value.
+ * @return Returns tileset number
+ */
+short get_slx_tileset(const struct LEVEL *lvl, unsigned int tx, unsigned int ty)
+{
+    if (lvl->slb==NULL) return 0;
+    /*Bounding position */
+    if ( (tx >= MAP_SIZE_DKSTD_X) || (ty >= MAP_SIZE_DKSTD_Y) ) return 0;
+    return (lvl->slx_data[tx + ty * MAP_SIZE_DKSTD_Y] & 0x0F);
+}
+
+/**
+ * Sets a new tileset for a slab
+ * @see user_set_slab
+ * @param lvl Pointer to the LEVEL structure.
+ * @param tx,ty Map tile at which we want to set slab value.
+ * @param nval New tileset value
+ */
+void set_slx_tileset(struct LEVEL *lvl, unsigned int tx, unsigned int ty, unsigned short nval)
+{
+    /*Bounding position */
+    if ( (tx >= MAP_SIZE_DKSTD_X) || (ty >= MAP_SIZE_DKSTD_Y) ) return;
+    lvl->slx_data[tx + ty * MAP_SIZE_DKSTD_Y] &= 0xF0;
+    lvl->slx_data[tx + ty * MAP_SIZE_DKSTD_Y] |= nval & 0x0F;
 }
 
 /**

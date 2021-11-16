@@ -23,8 +23,8 @@
 DLLIMPORT void strip_crlf(char *string_in);
 DLLIMPORT char *prepare_short_fname(const char *fname, unsigned int maxlen);
 DLLIMPORT char *filename_from_path(char *pathname);
-char *strdup_noquot(char *src);
-char *strdup_trim(char *src);
+DLLIMPORT char *strdup_noquot(char *src);
+DLLIMPORT char *strdup_trim(char *src);
 
 DLLIMPORT short format_map_fname(char *fname, const char *usrinput,const char *levels_path);
 DLLIMPORT short format_data_fname(char **fullname, const char *data_path, const char *format, ...);

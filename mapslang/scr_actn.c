@@ -22,7 +22,7 @@
 #include "scr_actn.h"
 
 #include <math.h>
-#include <strings.h>
+#include <string.h>
 #include "../libadikted/adikted.h"
 #include "var_utils.h"
 #include "output_scr.h"
@@ -32,6 +32,7 @@
 #include "scr_slab.h"
 #include "scr_clm.h"
 #include "scr_list.h"
+#include "scr_tileset.h"
 #include "scr_txted.h"
 #include "scr_rwrk.h"
 #include "scr_cube.h"
@@ -44,7 +45,7 @@ void (*actions [])(struct SCRMODE_DATA *,struct WORKMODE_DATA *,int)={
      actions_mdcclm, actions_mdcube, actions_mdslbl, actions_mdrwrk,
      actions_mdsrch, actions_mdlmap, actions_mdsmap, actions_mdgrafit,
      actions_crefct, actions_crtrap, actions_editem, actions_edcrtr,
-     actions_edefct, actions_edtrap, };
+     actions_edefct, actions_edtrap, actions_mdtileset};
 
 // Drawing functions for modes. You can fill new entries
 // with "draw_mdempty" till you create proper draw function.
@@ -54,7 +55,7 @@ void (*mddraw [])(struct SCRMODE_DATA *,struct WORKMODE_DATA *)={
      draw_mdcclm, draw_mdcube, draw_mdslbl, draw_mdrwrk,
      draw_mdsrch, draw_mdlmap, draw_mdsmap, draw_mdgrafit,
      draw_crefct, draw_crtrap, draw_editem, draw_edcrtr,
-     draw_edefct, draw_edtrap, };
+     draw_edefct, draw_edtrap, draw_mdtileset};
 
 short (*mdstart [])(struct SCRMODE_DATA *,struct WORKMODE_DATA *)={
      start_mdslab, start_mdtng,  start_crcrtr,  start_critem,
@@ -62,7 +63,7 @@ short (*mdstart [])(struct SCRMODE_DATA *,struct WORKMODE_DATA *)={
      start_mdcclm, start_mdcube, start_mdslbl, start_mdrwrk,
      start_mdsrch, start_mdlmap, start_mdsmap, start_mdgrafit,
      start_crefct, start_crtrap, start_editem, start_edcrtr,
-     start_edefct, start_edtrap, };
+     start_edefct, start_edtrap, start_mdtileset};
 
 void (*mdend [])(struct SCRMODE_DATA *,struct WORKMODE_DATA *)={
      end_mdslab, end_mdtng,  end_crcrtr,  end_critem,
@@ -70,7 +71,17 @@ void (*mdend [])(struct SCRMODE_DATA *,struct WORKMODE_DATA *)={
      end_mdcclm, end_mdcube, end_mdslbl, end_mdrwrk,
      end_mdsrch, end_mdlmap, end_mdsmap, end_mdgrafit,
      end_crefct, end_crtrap, end_editem, end_edcrtr,
-     end_edefct, end_edtrap, };
+     end_edefct, end_edtrap, end_mdtileset};
+
+short (*mdcolor[])(struct SCRMODE_DATA *scrmode, struct MAPMODE_DATA *mapmode, struct LEVEL *lvl, int tx, int ty) = 
+{
+    NULL, NULL,  NULL,  NULL,
+    NULL,   NULL,  NULL,  NULL,
+    NULL, NULL, NULL, NULL,
+    NULL, NULL, NULL, NULL,
+    NULL, NULL, NULL, NULL,
+    NULL, NULL, color_mdtileset
+};
 
 // Max. 5 chars mode names
 const char *modenames[]={
@@ -79,7 +90,7 @@ const char *modenames[]={
      "CClm",  "CCube", "SlbLs", "Rewrk",
      "Srch",  "OMap",  "SMap",  "Grft",
      "AEfct", "ATrap", "EItem", "ECrtr",
-     "EEfct", "ETrap", "(bad)",};
+     "EEfct", "ETrap", "TlSet", "(bad)",};
 // longer mode names
 const char *longmodenames[]={
      "slab", "thing", "add creature","add item",
@@ -87,7 +98,7 @@ const char *longmodenames[]={
      "cust.column","cust.cubes","slab list","rework",
      "search", "open map", "save map", "graffiti",
      "add effect", "add trap", "edit item", "edit creatre",
-     "edit effect", "edit trap", "(bad)",};
+     "edit effect", "edit trap", "slab tilesets", "(bad)",};
 
 const char *string_input_msg[]={ "",
      "Map number/name to load:",
@@ -109,7 +120,7 @@ void init_levscr_basics(struct SCRMODE_DATA **scrmode,struct WORKMODE_DATA *work
     // variable that informs if main program loop should finish
     finished=false;
     // random num gen seed selection
-    srand(time(0));
+    rng_srand(time(0));
     //Creating and clearing screen mode info variable
     *scrmode=(struct SCRMODE_DATA *)malloc(sizeof(struct SCRMODE_DATA));
     if ((*scrmode)==NULL)
@@ -797,6 +808,9 @@ char *mode_status(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata,in
     case MD_GRFT:
       sprintf (buffer, "   (Entering text)");
       break;
+    case MD_TLST:
+      strcpy (buffer, "   (tileset mode)");
+      break;
     default:
       strcpy (buffer, "    (unknown mode)");
       break;
@@ -825,6 +839,12 @@ int get_draw_map_tile_color(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *ma
     int own=get_tile_owner(lvl,tx,ty);
     short marked=((is_marking_enab(mapmode)) && (tx>=mapmode->markr.l) && (tx<=mapmode->markr.r)
                         && (ty>=mapmode->markr.t) && (ty<=mapmode->markr.b));
+    if (mdcolor[scrmode->mode]) 
+    {
+        if (marked)
+            return PRINT_COLOR_MAGENT_ON_LGREY;
+        return mdcolor[scrmode->mode](scrmode, mapmode, lvl, tx, ty);
+    }
     int col;
     if (special)
     {
@@ -998,7 +1018,7 @@ unsigned char simplify_map_slab(unsigned short slab)
 int get_draw_map_tile_char(const struct MAPMODE_DATA *mapmode,const struct LEVEL *lvl,
     int tx,int ty,short show_ground,short show_rooms,short show_things,short force_at)
 {
-    char out_ch;
+    unsigned long out_ch;
     unsigned short slab;
     if (show_things)
       out_ch=get_thing_char(lvl,tx,ty);
@@ -1040,7 +1060,7 @@ void draw_map_area(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,str
             int tx=mapmode->map.x+i;
             if (tx < lvl->tlsize.x)
             {
-              char out_ch;
+              unsigned long out_ch;
               int g;
               short has_ccol;
               short darken_fg;
@@ -1089,7 +1109,7 @@ void draw_map_cursor(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,s
 {
     int tx=mapmode->screen.x+mapmode->map.x;
     int ty=mapmode->screen.y+mapmode->map.y;
-    char out_ch;
+    unsigned long out_ch;
     int g;
     if (show_rooms)
       g = graffiti_idx(lvl,tx,ty);
@@ -1103,7 +1123,7 @@ void draw_map_cursor(struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,s
  * Shows map cursor at position from mapmode; the cursor is a character
  * same as in the current map background written in different colors.
  */
-void show_cursor(const struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,char cur)
+void show_cursor(const struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode,unsigned long cur)
 {
     set_cursor_pos(mapmode->screen.y, mapmode->screen.x);
     screen_setcolor(PRINT_COLOR_RED_ON_WHITE);
@@ -1116,7 +1136,7 @@ void show_cursor(const struct SCRMODE_DATA *scrmode,struct MAPMODE_DATA *mapmode
  * Shows map cursor at given position; the cursor is a character
  * from the parameter written in highlighted colors.
  */
-void show_cursor_at(const struct SCRMODE_DATA *scrmode,int row,int col,char cur)
+void show_cursor_at(const struct SCRMODE_DATA *scrmode,int row,int col,unsigned long cur)
 {
     set_cursor_pos(row,col);
     screen_setcolor(PRINT_COLOR_RED_ON_WHITE);
@@ -1418,7 +1438,7 @@ short cursor_actions(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata
     case KEY_PGDOWN:
       screen->y+=10;
       break;
-      default:
+    default:
       return false;
     }
     curposcheck(scrmode,workdata->mapmode);

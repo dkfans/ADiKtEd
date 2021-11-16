@@ -22,6 +22,8 @@
 #include "../libadikted/globals.h"
 #include <stdarg.h>
 #include "input_kb.h"
+#include "../libadikted/msg_log.h"
+#include "../libadikted/lev_data.h"
 #include "output_scr.h"
 #include "scr_actn.h"
 

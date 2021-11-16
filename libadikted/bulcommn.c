@@ -22,6 +22,7 @@
 #include "lbfileio.h"
 
 #include "bulcommn.h"
+#include "rng.h"
 
 /**
  * RNC compression magic identifier, as string.
@@ -215,7 +216,6 @@ short write_bmp_fp_24b(FILE *out, int width, int height, const char *data)
         }
     }
     
-    fclose (out);
     return 0;
 }
 
@@ -242,7 +242,7 @@ int read_palette_rgb(unsigned char *palette, const char *fname, unsigned int nCo
  */
 unsigned int rnd(const unsigned int range)
 {
-    return (rand()%(range));
+    return (rng_rand()%(range));
 }
 
 /**
@@ -252,7 +252,7 @@ unsigned int rnd(const unsigned int range)
  * @return Returns 0 if buff seems not to be RNC compressed,
  *     or RNC version (positive number) if buff is compressed.
  */
-int rnc_compressed_buf (unsigned char *buff)
+int rnc_compressed_buf (char *buff)
 {
     if (strncmp(buff,RNC_SIGNATURE_STR,3)!=0)
         return 0;
@@ -271,7 +271,7 @@ int rnc_compressed_buf (unsigned char *buff)
  */
 int rnc_compressed_file (FILE *fp)
 {
-    unsigned char buff[5];
+    char buff[5];
     long lastpos = ftell (fp);
     fseek (fp, 0, SEEK_SET);
     int readed=fread (buff, 1, 4, fp);

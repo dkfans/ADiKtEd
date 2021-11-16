@@ -28,6 +28,12 @@ struct WORKMODE_DATA;
 
 #define DHFLAG_USE_COLORS 1
 
+struct HelpInfo
+{
+    int numrows;
+    char **lines;
+};
+
 // Help variables
 struct HELP_DATA {
     int formode;
@@ -117,6 +123,8 @@ struct HELP_DATA {
     char **trapdesc;
     int cclmdescrows;
     char **cclmdesc;
+
+    struct HelpInfo tileset;
   };
 
 //Functions - init and free

@@ -23,6 +23,8 @@
 #include "../libadikted/adikted.h"
 #include <slang.h>
 
+#include "scr_actn.h"
+
 short screen_initied=false;
 struct DRAW_DATA drawdata;
 
@@ -104,7 +106,7 @@ void screen_printf_toeol(char *format, ...)
     SLsmg_erase_eol();
 }
 
-void screen_printchr(char dst)
+void screen_printchr(unsigned long dst)
 {
     if (!screen_initied) return;
     SLsmg_write_char(dst);
@@ -222,16 +224,37 @@ void screen_init(void)
     SLtt_set_color (PRINT_COLOR_LGREY_ON_GREY, "Brighened unowned","lightgray","gray");
     SLtt_set_color (PRINT_COLOR_WHITE_ON_GREY, "Brighened","white","gray");
 
+    static const char* fg_color[16] =
+    {
+        "red", "lightgray", "black", "lightgray",
+        "black", "lightgray", "black", "green",
+        "blue", "black", "gray", "gray",
+        "gray", "black", "gray", "gray",
+    };
+    static const char* bg_color[16] =
+    {
+      "black", "red", "green", "blue",
+      "brown", "magenta", "cyan", "black",
+      "gray", "brightred", "brightgreen", "brightblue",
+      "yellow", "brightmagenta", "brightcyan", "white",
+    };
+    for (int i = 0; i < 16; i++)
+    {
+        char buf[32];
+        sprintf(buf, "tileset %d", i);
+
+        SLtt_set_color (PRINT_COLOR_TILESET + i, buf, fg_color[i], bg_color[i]);
+    }
     screen_initied=true;
 }
 
 void screen_draw_vline(int posy,int posx,int length,short border_style)
 {
-  char fill;
+  unsigned long fill;
   switch (border_style)
   {
-  case bsSingle :fill=179; break;
-  case bsDouble :fill=186; break;
+  case bsSingle :fill=0x2502; break;
+  case bsDouble :fill=0x2551; break;
   case bsSolid  :fill=32; break;
   default: fill='.'; break;
   }
@@ -246,11 +269,11 @@ void screen_draw_vline(int posy,int posx,int length,short border_style)
 void screen_draw_hline(int posy,int posx,int length,short border_style)
 {
   set_cursor_pos(posy,posx);
-  char fill;
+  unsigned long fill;
   switch (border_style)
   {
-  case bsSingle :fill=196; break;
-  case bsDouble :fill=205; break;
+  case bsSingle :fill=0x2500; break;
+  case bsDouble :fill=0x2550; break;
   case bsSolid  :fill=32; break;
   default: fill='.'; break;
   }
@@ -277,11 +300,11 @@ void screen_draw_window(int posy,int posx,int sizey,int sizex,int border_size,sh
     starty++;
   }
   //draw frame corners
-  char corner1,corner2,corner3,corner4;
+  unsigned long corner1,corner2,corner3,corner4;
   switch (border_style)
   {
-  case bsSingle :corner1=218;corner2=191;corner3=192;corner4=217; break;
-  case bsDouble :corner1=201;corner2=187;corner3=200;corner4=188; break;
+  case bsSingle :corner1=0x250C;corner2=0x2510;corner3=0x2514;corner4=0x2518; break;
+  case bsDouble :corner1=0x2554;corner2=0x2557;corner3=0x255A;corner4=0x255D; break;
   case bsSolid  :corner1=32; corner2=32; corner3=32; corner4=32; break;
   default       :corner1='.'; corner2='.'; corner3='.'; corner4='.'; break;
   };

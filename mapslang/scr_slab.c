@@ -28,6 +28,9 @@
 #include "scr_actn.h"
 #include "scr_help.h"
 #include "scr_thing.h"
+#include "var_utils.h"
+
+int display_graffiti(struct LEVEL *lvl,int scr_row, int scr_col,int graff_idx);
 
 /*
  * Initializes variables for the mdslab screen.
@@ -116,6 +119,11 @@ void actions_mdslab(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata,
             set_marking_start(workdata->mapmode,tx,ty);
           }
           message_info("Mark mode %s",is_marking_enab(workdata->mapmode)?"on":"off");
+          break;
+        case KEY_CTRL_G:
+          end_mdslab(scrmode,workdata);
+          mdstart[MD_TLST](scrmode,workdata);
+          message_info("Tileset mode activated");
           break;
         case KEY_DEL: // Delete graffiti if there is any here
           d = graffiti_idx(workdata->lvl,tx,ty);

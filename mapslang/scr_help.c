@@ -25,6 +25,7 @@
 #include "scr_actn.h"
 #include "output_scr.h"
 #include "input_kb.h"
+#include "var_utils.h"
 
 // Help variables
 
@@ -38,89 +39,7 @@ short init_help(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata)
     struct HELP_DATA *help=workdata->help;
     if (help==NULL)
      die("init_help: Cannot allocate memory.");
-    help->formode=0;
-    help->y=0;
-    help->rows=0;
-    help->text=NULL;
-    help->drows=0;
-    help->desc=NULL;
-
-    help->clmrows=0;
-    help->clm=NULL;
-    help->slbkeyrows=0;
-    help->slbkey=NULL;
-    help->tngkeyrows=0;
-    help->tngkey=NULL;
-    help->crtkeyrows=0;
-    help->crtkey=NULL;
-    help->itmtkeyrows=0;
-    help->itmtkey=NULL;
-    help->txtrkeyrows=0;
-    help->txtrkey=NULL;
-    help->cclmkeyrows=0;
-    help->cclmkey=NULL;
-    help->cubekeyrows=0;
-    help->cubekey=NULL;
-    help->slblkeyrows=0;
-    help->slblkey=NULL;
-    help->srchkeyrows=0;
-    help->srchkey=NULL;
-    help->slbrows=0;
-    help->slb=NULL;
-    help->tngrows=0;
-    help->tng=NULL;
-    help->crtrows=0;
-    help->crt=NULL;
-    help->itmtrows=0;
-    help->itmt=NULL;
-    help->scrprows=0;
-    help->scrp=NULL;
-    help->txtrrows=0;
-    help->txtr=NULL;
-    help->cclmrows=0;
-    help->cclm=NULL;
-    help->cuberows=0;
-    help->cube=NULL;
-    help->slblrows=0;
-    help->slbl=NULL;
-    help->srchrows=0;
-    help->srch=NULL;
-    help->rwrkrows=0;
-    help->rwrk=NULL;
-    help->lmaprows=0;
-    help->lmap=NULL;
-    help->smaprows=0;
-    help->smap=NULL;
-    help->tiprows=0;
-    help->tips=NULL;
-    help->compassrows=0;
-    help->compass=NULL;
-    help->mcompassrows=0;
-    help->mcompass=NULL;
-    help->cubedescrows=0;
-    help->cubedesc=NULL;
-    help->slabdescrows=0;
-    help->slabdesc=NULL;
-    help->crtrdescrows=0;
-    help->crtrdesc=NULL;
-    help->itmtdescrows=0;
-    help->itmtdesc=NULL;
-    help->txtrdescrows=0;
-    help->txtrdesc=NULL;
-    help->efctrows=0;
-    help->efct=NULL;
-    help->efctkeyrows=0;
-    help->efctkey=NULL;
-    help->efctdescrows=0;
-    help->efctdesc=NULL;
-    help->traprows=0;
-    help->trap=NULL;
-    help->trapkeyrows=0;
-    help->trapkey=NULL;
-    help->trapdescrows=0;
-    help->trapdesc=NULL;
-    help->cclmdescrows=0;
-    help->cclmdesc=NULL;
+    memset(help, 0, sizeof(*help));
 
     char buffer[READ_BUFSIZE];
     char title[READ_BUFSIZE];
@@ -251,12 +170,13 @@ char ***match_title(struct HELP_DATA *help,const char *title, const int n)
             "efcthelp", "traphelp",       //34,35
             "efctkeyhelp", "trapkeyhelp", //36,37
             "efctdesc", "trapdesc",       //38,39
+            "tilesethelp",                //40
             NULL,};
     int i=0;
 
     while (titles[i] && strcmp(titles[i], title))
       i++;
-    switch (i)
+    switch (i) // TODO: remove switch and move data pointers to list above
     {
       case 0 :
         if (n!=-1)
@@ -418,6 +338,10 @@ char ***match_title(struct HELP_DATA *help,const char *title, const int n)
         if (n!=-1)
           help->trapdescrows=n;
         return &(help->trapdesc);
+      case 40:
+        if (n!=-1)
+            help->tileset.numrows=n;
+        return &(help->tileset.lines);
       default:
         return NULL;
     }
@@ -508,6 +432,10 @@ short start_help(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata)
         help->rows=help->traprows;
         help->text=help->trap;
         break;
+      case MD_TLST:
+          help->rows=help->tileset.numrows;
+          help->text = help->tileset.lines;
+          break;
       default:
         help->rows=0;
         help->text=NULL;
