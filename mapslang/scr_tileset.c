@@ -170,7 +170,7 @@ void draw_right_panel(struct SCRMODE_DATA *scrmode)
     "( DEFAULT )", "STANDARD", "ANCIENT", "WINTER",
      "SNAKE KEY", "STONE FACE", "BIG BREASTS", "ROUGH ANCIENT",
      "SKULL RELIEF", "DESERT TOMB", "GYPSUM", "LILAC STONE",
-     "(? 11 )", "(? 12 )", "(? 13 )", "(? 14 )",
+     "SWAMP SERPENT", "(? 12 )", "(? 13 )", "(? 14 )",
     };
     for (int j = 0; j < 8; j++)
     {
