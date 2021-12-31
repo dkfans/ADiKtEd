@@ -38,6 +38,7 @@ char const INF_SKULL_LTEXT[]="Skull relief";
 char const INF_DESERT_LTEXT[]="Desert Tomb";
 char const INF_GYPSUM_LTEXT[]="Gypsum";
 char const INF_LILAC_LTEXT[]="Lilac Stone";
+char const INF_SWAMP_LTEXT[] = "Swamp Serpent";
 
 /**
  * Text names of standard textures.
@@ -46,7 +47,7 @@ const char * const inf_texture_fullnames[]={
       INF_STANDARD_LTEXT,INF_ANCIENT_LTEXT,INF_WINTER_LTEXT,
       INF_SNAKE_LTEXT,INF_FACE_LTEXT,INF_BRESTS_LTEXT,
       INF_RGANCNT_LTEXT,INF_SKULL_LTEXT,INF_DESERT_LTEXT,
-      INF_GYPSUM_LTEXT, INF_LILAC_LTEXT,
+      INF_GYPSUM_LTEXT, INF_LILAC_LTEXT, INF_SWAMP_LTEXT
       };
 
 /**
