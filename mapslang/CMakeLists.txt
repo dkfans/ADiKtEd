@@ -34,8 +34,8 @@ target_include_directories( map
 if( UNIX AND NOT APPLE AND NOT EMSCRIPTEN AND NOT ANDROID )
 	pkg_search_module(SLANG REQUIRED slang)
 	pkg_search_module(ADIKTED REQUIRED libadikted)
-	target_compile_options( mapslang PUBLIC ${ADIKTED_CFLAGS} ${SLANG_CFLAGS})
-	target_link_libraries( mapslang PUBLIC ${ADIKTED_LIBRARIES}
+	target_compile_options( map PUBLIC ${ADIKTED_CFLAGS} ${SLANG_CFLAGS})
+	target_link_libraries( map PUBLIC ${ADIKTED_LIBRARIES}
 		${SLANG_LIBRARIES} -ldl -lm)
 endif()
 
@@ -54,9 +54,9 @@ endif ()
 set(uppercase_CMAKE_BUILD_TYPE TOUPPER "${CMAKE_BUILD_TYPE}" "NONE")
 # Add debug config required in keeperfx headers since bx is private
 if ( uppercase_CMAKE_BUILD_TYPE} STREQUAL "DEBUG" )
-	target_compile_definitions( mapslang PUBLIC "MAPSLANG_DEBUG=1" )
+	target_compile_definitions( map PUBLIC "MAP_DEBUG=1" )
 else()
-	target_compile_definitions( mapslang PUBLIC "MAPSLANG_DEBUG=0" )
+	target_compile_definitions( map PUBLIC "MAP_DEBUG=0" )
 endif()
 
 install( TARGETS map
