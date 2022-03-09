@@ -1,7 +1,7 @@
 cmake_minimum_required( VERSION 3.1 )
 
 project( libadikted LANGUAGES C )
-set(PROJECT_DESCRIPTION "Dungeon Keeper 1 ADiKtEd map editor C library"
+set( PROJECT_DESCRIPTION "Dungeon Keeper 1 ADiKtEd map editor C library" )
 
 include(GNUInstallDirs)
 include(FindPkgConfig)
