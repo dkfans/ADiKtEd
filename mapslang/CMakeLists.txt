@@ -25,8 +25,8 @@ endif()
 # Grab the keeperfx source files
 file( GLOB MAPSLANG_SOURCES input_kb.c main.c output_scr.c scr_actn.c scr_clm.c scr_cube.c scr_help.c scr_list.c scr_rwrk.c scr_slab.c scr_thing.c scr_tileset.c scr_txted.c scr_txtgen.c textmenu.c var_utils.c )
 
-add_executable( mapslang ${MAPSLANG_SOURCES} )
-target_include_directories( mapslang
+add_executable( map ${MAPSLANG_SOURCES} )
+target_include_directories( map
 	PUBLIC
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
 	$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>)
@@ -40,11 +40,11 @@ if( UNIX AND NOT APPLE AND NOT EMSCRIPTEN AND NOT ANDROID )
 endif()
 
 # Put in a "mapslang" folder in Visual Studio
-set_target_properties( mapslang PROPERTIES FOLDER "mapslang" )
+set_target_properties( map PROPERTIES FOLDER "mapslang" )
 
 # Special Visual Studio Flags
 if( MSVC )
-	target_compile_definitions( mapslang PRIVATE "_CRT_SECURE_NO_WARNINGS" )
+	target_compile_definitions( map PRIVATE "_CRT_SECURE_NO_WARNINGS" )
 endif()
 
 if ("${CMAKE_BUILD_TYPE}" STREQUAL "")
@@ -59,7 +59,7 @@ else()
 	target_compile_definitions( mapslang PUBLIC "MAPSLANG_DEBUG=0" )
 endif()
 
-install( TARGETS mapslang
+install( TARGETS map
 	EXPORT "${TARGETS_EXPORT_NAME}"
 	LIBRARY DESTINATION "${CMAKE_INSTALL_LIBDIR}"
 	ARCHIVE DESTINATION "${CMAKE_INSTALL_LIBDIR}"

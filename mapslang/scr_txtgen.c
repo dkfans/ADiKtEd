@@ -24,7 +24,7 @@
 
 #include "scr_txtgen.h"
 
-#include "../libadikted/adikted.h"
+#include "libadikted/adikted.h"
 #include "var_utils.h"
 #include "input_kb.h"
 #include "output_scr.h"

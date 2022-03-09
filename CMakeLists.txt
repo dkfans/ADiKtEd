@@ -26,35 +26,35 @@ file( GLOB_RECURSE EXAMPLES_VIEWMAP_SOURCES examples/viewmap/*.c
 file( GLOB_RECURSE EXAMPLES_PUTEMPLE_SOURCES examples/putemple/*.c
 	examples/putemple/*.h )
 
-find_package(SDL REQUIRED SDL::Main)
-include_directories(${SDL_INCLUDE_DIR})
+find_package( SDL REQUIRED SDL::Main )
+include_directories( ${SDL_INCLUDE_DIR} )
 
-add_subdirectory(libadikted)
-add_subdirectory(mapslang)
+add_subdirectory( libadikted )
+add_subdirectory( mapslang   )
 
-add_executable(putgems ${EXAMPLES_PUTGEMS_SOURCES} )
+add_executable( putgems ${EXAMPLES_PUTGEMS_SOURCES} )
 target_link_libraries( putgems PUBLIC adikted m dl)
 set_target_properties( putgems PROPERTIES RUNTIME_OUTPUT_DIRECTORY
 	${CMAKE_BINARY_DIR} )
-add_test(putgems putgems)
+add_test( putgems putgems)
 
-add_executable(puttrain ${EXAMPLES_PUTTRAIN_SOURCES} )
+add_executable( puttrain ${EXAMPLES_PUTTRAIN_SOURCES} )
 target_link_libraries( puttrain PUBLIC adikted m dl)
 set_target_properties( putgems PROPERTIES RUNTIME_OUTPUT_DIRECTORY
 	${CMAKE_BINARY_DIR} )
-add_test(puttrain puttrain)
+add_test( puttrain puttrain )
 
-add_executable(viewmap ${EXAMPLES_VIEWMAP_SOURCES} )
+add_executable( viewmap ${EXAMPLES_VIEWMAP_SOURCES} )
 target_link_libraries( viewmap PUBLIC adikted m dl ${SDL_LIBRARIES})
 set_target_properties( viewmap PROPERTIES RUNTIME_OUTPUT_DIRECTORY
 	${CMAKE_BINARY_DIR} )
-add_test(viewmap viewmap)
+add_test( viewmap viewmap )
 
-add_executable(putemple ${EXAMPLES_PUTEMPLE_SOURCES} )
+add_executable( putemple ${EXAMPLES_PUTEMPLE_SOURCES} )
 target_link_libraries( putemple PRIVATE adikted m dl ${SDL_LIBRARIES})
 set_target_properties( putemple PROPERTIES RUNTIME_OUTPUT_DIRECTORY
 	${CMAKE_BINARY_DIR} )
-add_test(putemple putemple)
+add_test( putemple putemple )
 
 install(TARGETS putgems puttrain viewmap putemple EXPORT ${PROJECT_NAME}Config
 	LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}

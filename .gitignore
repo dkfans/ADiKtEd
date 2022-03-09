@@ -5,10 +5,14 @@
 *.def
 *.exe
 *.so
+*.a
 *.pc
 *.cmake
 /lib/slang*
 /mapslang/pkg/*
+mapslang/mapslang
+mapslang/map
+map
 .vs/
 .git
 /.cproject
