@@ -30,6 +30,7 @@
 #include "output_scr.h"
 #include "var_utils.h"
 
+
 inline union _value menu_value_num(long num)
 { union _value ret; ret.num=num; return ret; }
 

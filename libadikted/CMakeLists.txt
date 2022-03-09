@@ -1,43 +1,19 @@
-##
-##
-##
-
-
-## 3.1 -- CMAKE_C_STANDARD
 cmake_minimum_required( VERSION 3.1 )
 
-
-if( "${CMAKE_CURRENT_SOURCE_DIR}" STREQUAL "${CMAKE_CURRENT_BINARY_DIR}" )
-    message( FATAL_ERROR "Building in source is forbidden. Change output directory.")
-endif()
-
-
 project( libadikted LANGUAGES C )
+set(PROJECT_DESCRIPTION "Dungeon Keeper 1 ADiKtEd map editor C library"
 
+include(GNUInstallDirs)
+include(FindPkgConfig)
 
 if( NOT CMAKE_BUILD_TYPE )
-    set( CMAKE_BUILD_TYPE Debug CACHE STRING "Choose the type of build." FORCE )
+	set( CMAKE_BUILD_TYPE Release CACHE STRING "Choose the type of build." FORCE )
 endif()
-
-if (CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
-    ## do not install accidentally to system directory
-    set( CMAKE_INSTALL_PREFIX "${CMAKE_BINARY_DIR}/install" CACHE PATH "Install path prefix" FORCE )
-endif()
-
 
 set(CMAKE_DEBUG_POSTFIX _d)
 
-
-##
-## set default compilation standard
-##
 set( CMAKE_C_STANDARD 99 )
 set( CMAKE_C_STANDARD_REQUIRED ON )
-
-
-##
-## compiler flags, gcc does not handle "appended" values
-##
 set( CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall" )
 set( CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -pedantic" )
 set( CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wextra" )
@@ -47,7 +23,7 @@ set( CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Werror-implicit-function-declaration -Wno-
 
 ## ================= build =================
 
-option( USE_RNG_MT "Use Mersenne Twister RNG" OFF )
+option( USE_RNG_MT "Use Mersenne Twister RNG" ON )
 if( USE_RNG_MT )
     add_definitions( -DRNG_MT )
 endif()
@@ -69,12 +45,33 @@ if( NOT USE_RNG_MT )
     list(REMOVE_ITEM c_files "${CMAKE_CURRENT_SOURCE_DIR}/mtwist/mtwist.c" )
 endif()
 
-
 add_library( ${TARGET_NAME} ${${TARGET_NAME}_TYPE} ${c_files} )
-target_include_directories( ${TARGET_NAME} PUBLIC ".." PRIVATE "." )
+
+target_include_directories(${TARGET_NAME} PUBLIC
+			".."
+			$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src>
+			$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}/lib${TARGET_NAME}>
+			PRIVATE "."
+			)
+
 set_target_properties( ${TARGET_NAME} PROPERTIES PUBLIC_HEADER "${h_files}" )
 
-install( TARGETS ${TARGET_NAME} 
-         PUBLIC_HEADER DESTINATION include/lib${TARGET_NAME} COMPONENT headers
-         LIBRARY DESTINATION lib COMPONENT binaries
+# pkg-config variables
+set(target_name "${TARGET_NAME}")
+set(install_prefix "${CMAKE_INSTALL_PREFIX}")
+set(install_libdir "${CMAKE_INSTALL_LIBDIR}")
+set(install_includedir "${CMAKE_INSTALL_INCLUDEDIR}")
+
+configure_file(lib${TARGET_NAME}.pc.in ${PROJECT_BINARY_DIR}/lib${TARGET_NAME}.pc @ONLY)
+
+set(ENV{PKG_CONFIG_PATH} "${PROJECT_BINARY_DIR}:$ENV{PKG_CONFIG_PATH}")
+
+install( TARGETS ${TARGET_NAME} EXPORT lib${TARGET_NAME}Config 
+	LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR} COMPONENT binaries
+	ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+	RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+	PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/lib${TARGET_NAME} COMPONENT headers
         )
+
+install(FILES ${PROJECT_BINARY_DIR}/lib${TARGET_NAME}.pc DESTINATION
+	${CMAKE_INSTALL_LIBDIR}/pkgconfig/)
