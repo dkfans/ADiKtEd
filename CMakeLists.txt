@@ -29,6 +29,9 @@ file( GLOB_RECURSE EXAMPLES_PUTEMPLE_SOURCES examples/putemple/*.c
 find_package(SDL REQUIRED SDL::Main)
 include_directories(${SDL_INCLUDE_DIR})
 
+add_subdirectory(libadikted)
+add_subdirectory(mapslang)
+
 add_executable(putgems ${EXAMPLES_PUTGEMS_SOURCES} )
 target_link_libraries( putgems PUBLIC adikted m dl)
 set_target_properties( putgems PROPERTIES RUNTIME_OUTPUT_DIRECTORY
