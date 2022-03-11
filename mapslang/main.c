@@ -4,7 +4,7 @@
 
 #include <slang.h>
 
-#include "../libadikted/adikted.h"
+#include "libadikted/adikted.h"
 #include "scr_actn.h"
 #include "scr_help.h"
 #include "scr_txted.h"
