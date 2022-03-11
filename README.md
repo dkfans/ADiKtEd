@@ -3,7 +3,7 @@
 Note - there is now a manual available for ADiKtEd.
 It even includes a basic tutorial to quickly learn the program.
 A version of it is included within this distribution,
-called dk_adikted_manual.htm. You may wish to print this out.
+called `dk_adikted_manual.htm`. You may wish to print this out.
 ## Build
 
 ### Unix-like systems
