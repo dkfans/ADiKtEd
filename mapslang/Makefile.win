@@ -132,7 +132,7 @@ strip-executables:
 fill-pkg-directory:
 	$(MKDIR) pkg/docs
 	$(CP) $(BIN) pkg/
-	$(CP) libadikted/bin/$(LIB_ADIKTED) pkg/
+	$(CP) ../libadikted/bin/$(LIB_ADIKTED) pkg/
 	$(CP) ..$(SLANG_BIN_FOLDER)/$(LIB_SLANG) pkg/
 	$(CP) map.hlp pkg/
 	$(CP) map.ini pkg/
