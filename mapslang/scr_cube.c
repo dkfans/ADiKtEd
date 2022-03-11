@@ -20,7 +20,7 @@
 
 #include "scr_cube.h"
 
-#include "../libadikted/adikted.h"
+#include "libadikted/adikted.h"
 #include "output_scr.h"
 #include "input_kb.h"
 #include "scr_actn.h"
