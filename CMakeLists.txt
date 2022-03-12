@@ -10,6 +10,15 @@ if( NOT CMAKE_BUILD_TYPE )
 	set( CMAKE_BUILD_TYPE Release CACHE STRING "Choose the type of build." FORCE )
 endif()
 
+set( CMAKE_C_STANDARD 99 )
+set( CMAKE_C_STANDARD_REQUIRED ON )
+set( CMAKE_C_STANDARD_LIBRARIES_INIT "-lm ${CMAKE_DL_LIBS}" )
+
+set( CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -Wno-switch" )
+set( CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -pedantic" )
+set( CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wextra" )
+set( CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Werror-implicit-function-declaration -Wno-conversion -Wno-traditional-conversion -Wno-sign-compare" )
+
 add_subdirectory(libadikted)
 add_subdirectory(mapslang)
 
@@ -27,13 +36,13 @@ function( add_example ARG_NAME )
 	target_link_libraries( ${ARG_NAME} PUBLIC
 		adikted ${CMAKE_C_STANDARD_LIBRARIES} )
 	find_package( SDL REQUIRED )
-	target_link_libraries( ${ARG_NAME} PUBLIC ${SDL_LIBRARIES} )
+	target_link_libraries( ${ARG_NAME} PUBLIC ${SDL_LIBRARY} ${CMAKE_C_STANDARD_LIBRARIES} )
 	target_compile_definitions( ${ARG_NAME} PUBLIC ENTRY_CONFIG_USE_SDL )
 	target_link_libraries( ${ARG_NAME} PUBLIC X11 )
 	target_include_directories(${ARG_NAME} PUBLIC
 		$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/examples/putgems>
 		$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}/lib${TARGET_NAME}>
-		${SDL_INCLUDEDIR}
+		${SDL_INCLUDE_DIR}
 		PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/.)
 
 	# Directory name
