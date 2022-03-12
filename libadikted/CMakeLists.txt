@@ -50,7 +50,7 @@ endif()
 add_library( ${TARGET_NAME} ${${TARGET_NAME}_TYPE} ${c_files} )
 set_target_properties( ${TARGET_NAME} PROPERTIES PUBLIC_HEADER "${h_files}" )
 target_include_directories(${TARGET_NAME} PUBLIC
-			$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src>
+			$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
 			$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}/lib${TARGET_NAME}>
 			PRIVATE "."
 			)
