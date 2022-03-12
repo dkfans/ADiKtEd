@@ -29,7 +29,7 @@
 
 // Help variables
 
-const char *help_filename="map.hlp";
+char *help_filename = NULL;
 const int itm_desc_rows=8;
 
 short init_help(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata)
@@ -47,6 +47,13 @@ short init_help(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata)
     char ***what;
     FILE *fp;
     strcpy (title, "");
+    
+    if(format_data_fname(&help_filename, INSTALL_DATADIR, "%s", "map.hlp") == false)
+    {
+      message_info("Error concatenating data_dir and help_filename.");
+      return false;
+    }
+
     fp = fopen (help_filename, "rb");
     // Non-fatal error
     if (!fp)

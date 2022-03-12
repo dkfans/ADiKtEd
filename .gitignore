@@ -35,6 +35,7 @@ mapslang/CMakeCache.txt
 mapslang/cmake_install.cmake
 mapslang/Makefile
 mapslang/install_manifest.txt
+mapslang/map
 putemple
 puttrain
 putgems
