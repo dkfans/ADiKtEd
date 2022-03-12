@@ -70,5 +70,5 @@ install( TARGETS map
 	INCLUDES DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}"
 	)
 
-install(FILES map.hlp map.ini DESTINATION "${CMAKE_INSTALL_DATADIR}/${TARGET_NAME}"
-	COMPONENT Documentation )
+install(FILES map.hlp map.ini map.ico DESTINATION "${CMAKE_INSTALL_DATADIR}/${TARGET_NAME}"
+	COMPONENT Resources )
