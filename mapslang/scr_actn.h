@@ -21,7 +21,7 @@
 #ifndef ADIKT_SCRACTN_H
 #define ADIKT_SCRACTN_H
 
-#include "../libadikted/globals.h"
+#include "libadikted/globals.h"
 
 struct LEVEL;
 

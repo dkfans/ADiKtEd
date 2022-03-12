@@ -22,7 +22,7 @@
 #include "scr_thing.h"
 
 #include <math.h>
-#include "../libadikted/adikted.h"
+#include "libadikted/adikted.h"
 #include "scr_help.h"
 #include "output_scr.h"
 #include "input_kb.h"

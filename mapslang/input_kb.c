@@ -23,7 +23,7 @@
 #include <slang.h>
 #include "output_scr.h"
 #include "var_utils.h"
-#include "../libadikted/adikted.h"
+#include "libadikted/adikted.h"
 
 short input_initied=false;
 short disable_sounds=false;

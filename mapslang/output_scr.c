@@ -20,7 +20,7 @@
 
 #include "output_scr.h"
 
-#include "../libadikted/adikted.h"
+#include "libadikted/adikted.h"
 #include <slang.h>
 
 #include "scr_actn.h"
