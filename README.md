@@ -18,7 +18,7 @@ and copy the examples to the keeperfx directory
 
 #### make
 
-Run `make -f Makefile.win`
+Run `cd libadikted/ && make -f Makefile.win && cd mapslang && make -f Makefile.win`
 
 Here's the Win32 version executable. Just put all the
 files in the same directory, edit map.ini as appropriate (you should
