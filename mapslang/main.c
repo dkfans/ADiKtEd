@@ -4,14 +4,14 @@
 
 #include <slang.h>
 
-#include "../libadikted/adikted.h"
+#include "libadikted/adikted.h"
 #include "scr_actn.h"
 #include "scr_help.h"
 #include "scr_txted.h"
 #include "input_kb.h"
 #include "var_utils.h"
 
-const char config_filename[]="map.ini";
+char *config_filename = NULL;
 
 void read_init(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata)
 {
@@ -21,7 +21,13 @@ void read_init(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata)
     char buffer[READ_BUFSIZE];
     char *p;
     int l;
-    
+
+    if(format_data_fname(&config_filename, INSTALL_DATADIR, "%s", "map.ini") == false)
+    {
+      message_info_force("Couldn't concatenate data_dir and config_filename string, defaults loaded.");
+      return;
+    }
+
     FILE *fp;
     fp = fopen (config_filename, "rb");
     // If we can't get anything, warn but don't die

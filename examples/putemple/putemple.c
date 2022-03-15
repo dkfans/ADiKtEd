@@ -1,15 +1,16 @@
 /******************************************************************************/
-/** @file viewmap.c
- * ADiKtEd library example 3.
+/** @file putemple.c
+ * ADiKtEd library putemple example.
  * @par Purpose:
- *     This example shows how to view maps graphically using libAdikted.
- *     Move with mouse, zoom with numpad +/-.
- *     You can maximize the window for better effect.
+ *     Demonstrates fast drawing routines and putting slabs with mouse.
+ *     Also, shows how to draw ADiKtEd messages using DK font.
+ *     Use left/right arrows to switch levels, numpad +/- to zoom,
+ *     LMB to move, RMB to put temple tiles. You can't save.
  * @par Comment:
  *     The program will require library SDL.
  *     You have to download it and install before recompiling.
  * @author   Tomasz Lis
- * @date     28 Jul 2008 - 29 Jul 2008
+ * @date     28 Jul 2008 - 02 Jun 2008
  * @par  Copying and copyrights:
  *     This program is free software; you can redistribute it and/or modify
  *     it under the terms of the GNU General Public License as published by
@@ -22,9 +23,9 @@
 #include <string.h>
 #include <SDL/SDL.h>
 
-#include "../libadikted/adikted.h"
+#include "libadikted/adikted.h"
 
-#define ONE_LOOP_DELAY 32
+#define ONE_LOOP_DELAY 20
 /**
  * The screen surface.
  */
@@ -56,17 +57,18 @@ struct IPOINT_2D map_size;
 struct LEVEL *lvl;
 
 /**
+ * Level index.
+ */
+static int lvl_idx=11;
+
+/**
  * Finish program flag.
  */
 static short done=0;
 
 /**
- * Main loop counter.
- */
-static unsigned int loop_count=0;
-
-/**
  * Loads files required to draw map.
+ * Both normal and fast drawing require same code here.
  */
 short prepare_map_drawing(struct LEVEL *lvl, int width, int height)
 {
@@ -79,7 +81,7 @@ short prepare_map_drawing(struct LEVEL *lvl, int width, int height)
     struct IPOINT_2D bmp_size;
     // Settings to draw whole map
     get_full_draw_dimensions_opt(&map_size,&(lvl->subsize),opts);
-    message_error("Map dimensions %d,%d.",map_size.x,map_size.y);
+    message_log("Map dimensions %d,%d.",map_size.x,map_size.y);
     if (map_size.x>width)
         bmp_size.x=width+1;
     else
@@ -88,7 +90,7 @@ short prepare_map_drawing(struct LEVEL *lvl, int width, int height)
         bmp_size.y=height+1;
     else
         bmp_size.y=map_size.y;
-    message_error("Bitmap dimensions %d,%d.",bmp_size.x,bmp_size.y);
+    message_log("Bitmap dimensions %d,%d.",bmp_size.x,bmp_size.y);
     // Load the data files
     result=load_draw_data(&draw_data,opts,&(lvl->subsize),bmp_size,get_lvl_inf(lvl));
     if (result==ERR_NONE)
@@ -135,8 +137,11 @@ static void draw_screen()
 static void process_events()
 {
     static struct IPOINT_2D viewmove={0,0};
-    static int clip_view=0;
-    static int reload_data=1;
+    static short clip_view=0;
+    static short reload_data=1;
+    static short reload_lvl=1;
+    static short level_redraw=1;
+    static short slab_drawing = -1;
     static struct IPOINT_2D mouse_movestart={-1,0};
 
     SDL_Event event;
@@ -160,6 +165,10 @@ static void process_events()
                             startpt.y = (startpt.y<<1) + (bitmap->h/2);
                             clip_view=1;
                             reload_data=1;
+                        } else
+                        {
+                            message_error("Scale factor minimum reached");
+                            level_redraw=1;
                         }
                     };break;
                 case SDLK_MINUS:
@@ -173,13 +182,21 @@ static void process_events()
                             startpt.y = (startpt.y>>1) - (bitmap->h/4);
                             clip_view=1;
                             reload_data=1;
+                        } else
+                        {
+                            message_error("Maxumum scale factor reached");
+                            level_redraw=1;
                         }
                     };break;
                 case SDLK_RIGHT:
-                    viewmove.x=1;
+                    lvl_idx%=20;
+                    lvl_idx+=1;
+                    reload_lvl=1;
                     break;
                 case SDLK_LEFT:
-                    viewmove.x=-1;
+                    lvl_idx--;
+                    if (lvl_idx<=0) lvl_idx=20;
+                    reload_lvl=1;
                     break;
                 case SDLK_DOWN:
                     viewmove.y=1;
@@ -222,20 +239,117 @@ static void process_events()
                 }
                 break;
             case SDL_MOUSEBUTTONDOWN:
-                mouse_movestart.x=event.motion.x;
-                mouse_movestart.y=event.motion.y;
+                switch (event.button.button)
+                {
+                case SDL_BUTTON_LEFT:
+                    {
+                      short obj_reslt;
+                      unsigned int sx,sy,z;
+                      obj_reslt=get_object_with_circle_at(&sx,&sy,&z,draw_data,lvl,
+                          event.button.x,event.button.y);
+                      if (obj_reslt==ERR_NONE)
+                      {
+                          unsigned char *obj=get_object(lvl,sx,sy,z);
+                          char *obj_name;
+                          switch (get_object_type(lvl,sx,sy,z))
+                          {
+                          case OBJECT_TYPE_THING:
+                              obj_name=get_thing_subtype_fullname(get_thing_type(obj),get_thing_subtype(obj));
+                              break;
+                          case OBJECT_TYPE_ACTNPT:
+                              obj_name="Action point";
+                              break;
+                          case OBJECT_TYPE_STLIGHT:
+                              obj_name="Static light";
+                              break;
+                          default:
+                              obj_name="Unknown object";
+                              break;
+                          }
+                          message_info("%s at (%d,%d)",obj_name,sx,sy);
+                          level_redraw=1;
+                      } else
+                      {
+                          mouse_movestart.x=event.button.x;
+                          mouse_movestart.y=event.button.y;
+                      }
+                    }
+                    break;
+                case SDL_BUTTON_RIGHT:
+                    {
+                      slab_drawing=SLAB_TYPE_TEMPLE;
+                      unsigned int sx,sy;
+                      get_subtile_from_draw_coords(&sx,&sy,draw_data,
+                          event.button.x,event.button.y);
+                      unsigned int tx,ty;
+                      tx=sx/MAP_SUBNUM_X;ty=sy/MAP_SUBNUM_Y;
+                      if (get_tile_slab(lvl,tx,ty)!=slab_drawing)
+                      {
+                          user_set_slab(lvl,tx,ty,slab_drawing);
+                          user_set_tile_owner(lvl,tx,ty,PLAYER0);
+                      }
+                      message_info("New %s put at (%d,%d)",
+                          get_slab_fullname(get_tile_slab(lvl,tx,ty)),tx,ty);
+                      level_redraw=1;
+                    }
+                    break;
+                }
                 break;
             case SDL_MOUSEBUTTONUP:
-                mouse_movestart.x=-1;
+                switch (event.button.button)
+                {
+                case SDL_BUTTON_LEFT:
+                    mouse_movestart.x=-1;
+                    break;
+                case SDL_BUTTON_RIGHT:
+                    slab_drawing=-1;
+                    break;
+                }
                 break;
             case SDL_MOUSEMOTION:
                 if (mouse_movestart.x>=0)
                 {
-                  startpt.x+=mouse_movestart.x-event.motion.x;
-                  startpt.y+=mouse_movestart.y-event.motion.y;
-                  mouse_movestart.x=event.motion.x;
-                  mouse_movestart.y=event.motion.y;
-                  clip_view=1;
+                      startpt.x+=mouse_movestart.x-event.motion.x;
+                      startpt.y+=mouse_movestart.y-event.motion.y;
+                      mouse_movestart.x=event.motion.x;
+                      mouse_movestart.y=event.motion.y;
+                      clip_view=1;
+                }
+                if (slab_drawing>=0)
+                {
+                      unsigned int sx,sy;
+                      get_subtile_from_draw_coords(&sx,&sy,draw_data,
+                          event.motion.x-event.motion.xrel,event.motion.y-event.motion.yrel);
+                      struct IPOINT_2D tile_prv;
+                      tile_prv.x=sx/MAP_SUBNUM_X;
+                      tile_prv.y=sy/MAP_SUBNUM_Y;
+                      get_subtile_from_draw_coords(&sx,&sy,draw_data,
+                          event.motion.x,event.motion.y);
+                      struct IPOINT_2D tile_cur;
+                      tile_cur.x=sx/MAP_SUBNUM_X;
+                      tile_cur.y=sy/MAP_SUBNUM_Y;
+                      int dist_x=(tile_prv.x-tile_cur.x);
+                      int dist_y=(tile_prv.y-tile_cur.y);
+                      int max_dist=max(abs(dist_x),abs(dist_y));
+                      max_dist++;
+                      int i;
+                      int tx,ty;
+                      for (i=0;i<max_dist;i++)
+                      {
+                          tx=tile_cur.x+(dist_x*i/max_dist);
+                          ty=tile_cur.y+(dist_y*i/max_dist);
+                          if (get_tile_slab(lvl,tx,ty)!=slab_drawing)
+                          {
+                            user_set_slab(lvl,tx,ty,slab_drawing);
+                            user_set_tile_owner(lvl,tx,ty,PLAYER0);
+                          }
+                      }
+                      if (max_dist==1)
+                          message_info("New %s put at (%d,%d)",
+                              get_slab_fullname(get_tile_slab(lvl,tx,ty)),tx,ty);
+                      else
+                          message_info("Changed %d slabs, last at (%d,%d)",max_dist,tx,ty);
+                      level_redraw=1;
                 }
                 break;
             case SDL_VIDEORESIZE: //Screen resized
@@ -244,6 +358,7 @@ static void process_events()
                 {
                   message_error("Couldn't change video mode: %s\n", SDL_GetError());
                   reload_data=0;
+                  level_redraw=0;
                   clip_view=0;
                   done = 1;
                   return;
@@ -270,6 +385,38 @@ static void process_events()
           clip_view=1;
       }
 
+      if (reload_lvl)
+      {
+          // Here we will store map file name
+          char level_fname[16];
+          sprintf(level_fname,"MAP%05d",lvl_idx);
+          // Form a file name of the map to load.
+          format_lvl_fname(lvl,level_fname);
+          // Sending message into buffer allows it to be logged
+          // into file if we use set_msglog_fname() before.
+          message_info("loading map file...");
+          // Loading map
+          short result;
+          result=user_load_map(lvl,0);
+          if (result!=ERR_NONE)
+          {
+            // If an error occurs, then the message buffer
+            // contains error message.
+            // Release the error message.
+            message_release();
+            message_info("putemple finished with map load error");
+            reload_data=0;
+            level_redraw=0;
+            clip_view=0;
+            done = 1;
+            return;
+          }
+          message_info("%s loaded successfully",level_fname);
+          reload_lvl=0;
+          reload_data=1;
+          level_redraw=1;
+      }
+
       if (reload_data)
       {
         short result;
@@ -278,14 +425,15 @@ static void process_events()
         {
           // Release the error message.
           message_release();
-
-          message_info("example3 finished with data files load error");
-
+          message_info("putemple finished with data files load error");
+          level_redraw=0;
           clip_view=0;
           done = 1;
           return;
         }
+        message_info("Data reloaded for rescale %d",draw_data->rescale);
         reload_data=0;
+        level_redraw=1;
       }
 
       if (clip_view)
@@ -300,18 +448,23 @@ static void process_events()
         set_draw_data_rect(draw_data,startpt.x,startpt.y,
                 startpt.x+bitmap->w-1,startpt.y+bitmap->h-1,bitmap->pitch,opts->rescale);
         clip_view=0;
+        level_redraw=1;
       }
 
-      // Redrawing the level bitmap
+      if (level_redraw)
       {
           struct MAPDRAW_OPTIONS *opts=level_get_mapdraw_options(lvl);
-          // Using standard version of the drawing routine
+          // Notice that here we're using fast version of the drawing routine
           SDL_LockSurface(bitmap);
-          draw_map_on_buffer(bitmap->pixels,lvl,draw_data,loop_count>>2);
+          draw_map_on_buffer_fast(bitmap->pixels,lvl,draw_data,0);
           // If the image is big enough, put things on it
           if ((opts->rescale)<5)
             draw_things_on_buffer(bitmap->pixels,lvl,draw_data);
+          draw_text_on_buffer(bitmap->pixels,16,bitmap->h-18,message_get(),draw_data,1);
+          draw_text_on_buffer(bitmap->pixels,16,bitmap->h-32,message_get_prev(),draw_data,0);
+          message_release();
           SDL_UnlockSurface(bitmap);
+          level_redraw=0;
     }
 }
 
@@ -320,8 +473,9 @@ int main (int argc, char *argv[])
   // Initialize the message displaying and storing
   init_messages();
   // Logging messages into file
-  set_msglog_fname("viewmap.log");
+  set_msglog_fname("putemple.log");
 
+  message_log("Initializing SDL");
   // Initialize SDL
   if (SDL_Init (SDL_INIT_VIDEO) < 0)
   {
@@ -339,48 +493,30 @@ int main (int argc, char *argv[])
         free_messages();
         return 2;
   }
-  SDL_WM_SetCaption ("ADiKtEd Libray example 3", NULL);
+  SDL_WM_SetCaption ("ADiKtEd Libray putemple example", NULL);
 
+  message_log("Preparing data structures");
   // create object for storing map
   level_init(&lvl,MFV_DKGOLD,NULL);
   // Set path to levels
   set_levels_path(lvl,"./Levels");
   // And to data files
   set_data_path(lvl,"./data");
-  // Form a file name of the map to load.
-  format_lvl_fname(lvl,"MAP00147");
-//  format_lvl_fname(lvl,"MAP00011");
-
-  // Sending message into buffer allows it to be logged
-  // into file if we use set_msglog_fname() before.
-  message_info("loading map file");
-
-  // Loading map
-  short result;
-  result=user_load_map(lvl,0);
-  if (result!=ERR_NONE)
-  {
-    // If an error occurs, then the message buffer
-    // contains error message.
-    // Release the error message.
-    message_release();
-
-    message_info("example3 finished with map load error");
-
-    level_free(lvl);
-    level_deinit(&lvl);
-    free_messages();
-    return 3;
-  }
+  struct MAPDRAW_OPTIONS *opts=level_get_mapdraw_options(lvl);
+  opts->rescale = 3;
+  // If you want to use the bitmap fonts, you must set that
+  // before creating MAPDRAW_DATA structure!
+  opts->bmfonts |= BMFONT_LOAD_SMALL|BMFONT_LOAD_LARGE;
+  opts->tngflags |= TNGFLG_SHOW_CIRCLES;
 
   message_info("entering application loop");
 
-  time_t begin_tm;
-  time_t end_tm;
-  // Prepare the time control
-  time(&begin_tm);
   while (!done)
   {
+      // Prepare the time control
+      time_t begin_tm;
+      time_t end_tm;
+      time(&begin_tm);
       // Get input events
       process_events();
       // Draw to screen
@@ -389,16 +525,7 @@ int main (int argc, char *argv[])
       time(&end_tm);
       int delay=(end_tm-begin_tm);
       if (delay<ONE_LOOP_DELAY)
-      {
         SDL_Delay(ONE_LOOP_DELAY-delay);
-        // Increase amount of loops by one
-        loop_count++;
-      } else
-      {
-        // The loop has taken too much time - make bigger increase
-        loop_count+=(delay/ONE_LOOP_DELAY);
-      }
-      begin_tm=end_tm;
   }
 
   message_info("application loop terminated");

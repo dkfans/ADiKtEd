@@ -1,6 +1,6 @@
 /******************************************************************************/
 /** @file putgems.c
- * ADiKtEd library example 1.
+ * ADiKtEd library putgems example.
  * @par Purpose:
  *     This example puts gems on center of gold vein in map 1.
  *     Demonstrates how to load/save map, and how to change slabs.
@@ -19,7 +19,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "../libadikted/adikted.h"
+#include "libadikted/adikted.h"
 
 int main(int argc, char *argv[])
 {
@@ -34,7 +34,7 @@ int main(int argc, char *argv[])
   // but still they have to be initialized)
   init_messages();
 
-  printf("\nexample1: how to put gems on map\n\n");
+  printf("\nputgems: how to put gems on map\n\n");
 
   // Setting file name of the map to load
   format_lvl_fname(lvl,"Levels/MAP00001");
@@ -46,7 +46,7 @@ int main(int argc, char *argv[])
   if (result!=ERR_NONE)
   {
     printf("cannot load map\n");
-    printf("example1 finished with error\n");
+    printf("putgems finished with error\n");
     system("pause");	
 
     // The following two commands should be used to free memory
@@ -72,7 +72,7 @@ int main(int argc, char *argv[])
   if (result!=ERR_NONE)
   {
     printf("cannot save map\n");
-    printf("example1 finished with error\n");
+    printf("putgems finished with error\n");
     system("pause");	
 
     // The following two commands should be used to free memory
@@ -85,7 +85,7 @@ int main(int argc, char *argv[])
     return 1;
   }
   printf("map \"%s\" saved\n", get_lvl_savfname(lvl));
-  printf("example1 finished successfully\n");
+  printf("putgems finished successfully\n");
   system("pause");	
 
   // The following two commands should be used to free memory
