@@ -19,9 +19,9 @@
 /******************************************************************************/
 
 
-#include "../libadikted/globals.h"
-#include "../libadikted/lev_data.h"
-#include "../libadikted/msg_log.h"
+#include "libadikted/globals.h"
+#include "libadikted/lev_data.h"
+#include "libadikted/msg_log.h"
 #include "input_kb.h"
 #include "output_scr.h"
 #include "scr_actn.h"
