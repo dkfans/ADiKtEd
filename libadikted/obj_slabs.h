@@ -61,6 +61,7 @@ struct IPOINT_2D;
 #define SLAB_TYPE_BRIDGE       0x33
 #define SLAB_TYPE_GEMS         0x34
 #define SLAB_TYPE_GUARDPOST    0x35
+#define SLAB_TYPE_PURPLE_PATH  0x36
 
 #define PLAYERS_COUNT          6
 #define PLAYER0                0x00
