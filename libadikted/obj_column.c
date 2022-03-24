@@ -249,11 +249,11 @@ void create_columns_for_slab(struct COLUMN_REC *clm_recs[9],struct LEVOPTIONS *o
     case SLAB_TYPE_GUARDPOST:
       create_columns_slb_guardpost(clm_recs,surr_slb,surr_own,surr_tng);
       break;
-    case 54:
+    case SLAB_TYPE_PURPLE_PATH:
       create_columns_slb_purple_path(clm_recs,surr_slb,surr_own,surr_tng);
       break;
-    default: /*on error, make path */
-      create_columns_slb_path(clm_recs,surr_slb,surr_own,surr_tng);
+    default: /*on error, make purple_path */
+      create_columns_slb_purple_path(clm_recs,surr_slb,surr_own,surr_tng);
       break;
     }
 }
