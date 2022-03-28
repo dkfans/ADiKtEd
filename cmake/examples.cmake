@@ -13,8 +13,8 @@ function( add_example ARG_NAME )
 	find_package( SDL REQUIRED )
 	target_link_libraries( ${ARG_NAME} PUBLIC ${SDL_LIBRARY} )
 	target_compile_definitions( ${ARG_NAME} PUBLIC ENTRY_CONFIG_USE_SDL )
-	target_link_libraries( ${ARG_NAME} PUBLIC X11 Math::Math )
-	target_include_directories(${ARG_NAME} PUBLIC Math::Math
+	target_link_libraries( ${ARG_NAME} PUBLIC X11 m )
+	target_include_directories(${ARG_NAME} PUBLIC
 		$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/examples/${ARG_NAME}>
 		$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}/lib${TARGET_NAME}>
 		${SDL_INCLUDE_DIR}

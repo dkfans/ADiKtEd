@@ -24,9 +24,6 @@ if(POLICY CMP0072)
   cmake_policy(SET CMP0072 NEW)
 endif()
 
-# Add Math::Math
-include(cmake/FindMath.cmake)
-
 # check for installed slang
 pkg_search_module(SLANG REQUIRED slang)
 # check for installed libadikted
@@ -44,7 +41,7 @@ target_include_directories( ${TARGET_NAME}
 
 target_compile_options( ${TARGET_NAME} PUBLIC ${ADIKTED_CFLAGS} ${SLANG_CFLAGS})
 target_link_libraries( ${TARGET_NAME} PUBLIC ${ADIKTED_LIBRARIES} 
-	${SLANG_LIBRARIES} Math::Math)
+	${SLANG_LIBRARIES} m)
 
 # Put in a "mapslang" folder in Visual Studio
 set_target_properties( ${TARGET_NAME} PROPERTIES FOLDER "mapslang" )

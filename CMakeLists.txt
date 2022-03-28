@@ -18,9 +18,6 @@ set( CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -pedantic" )
 set( CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wextra" )
 set( CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Werror-implicit-function-declaration -Wno-conversion -Wno-traditional-conversion -Wno-sign-compare" )
 
-# Add Math::Math
-include(cmake/FindMath.cmake)
-
 # Add examples
 include(cmake/examples.cmake)
 option( ADIKTED_BUILD_EXAMPLES "Build ADiKtEd examples" ON )
