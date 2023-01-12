@@ -1351,7 +1351,7 @@ short write_lof(struct LEVEL *lvl,char *fname)
     char* nameId = "";
     sprintf(lines[lines_count],"NAME_ID = %s",nameId);
     lines_count++;
-    char* kind = "";
+    char* kind = "FREE";
     sprintf(lines[lines_count],"KIND = %s",kind);
     lines_count++;
     char* ensignPos = "";
