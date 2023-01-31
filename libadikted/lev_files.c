@@ -1336,7 +1336,7 @@ short write_lof(struct LEVEL *lvl,char *fname)
     message_log(" write_lof: starting");
 
     /*Creating text lines */
-    char **lines=(char **)malloc(2*sizeof(char *));
+    char **lines=(char **)malloc(13*sizeof(char *));
     int lines_count=0;
     for (size_t i = 0; i < 13; i++)
     {
