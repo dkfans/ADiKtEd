@@ -28,6 +28,11 @@ struct WORKMODE_DATA;
 
 #define DHFLAG_USE_COLORS 1
 
+#ifndef INSTALL_DATADIR
+#define INSTALL_DATADIR "."
+#endif
+
+
 struct HelpInfo
 {
     int numrows;

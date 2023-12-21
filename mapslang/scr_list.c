@@ -21,7 +21,7 @@
 
 #include "scr_list.h"
 
-#include "../libadikted/adikted.h"
+#include "libadikted/adikted.h"
 #include "output_scr.h"
 #include "input_kb.h"
 #include "scr_actn.h"
@@ -682,7 +682,7 @@ void draw_mdcclm(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata)
 void draw_mdslbl(struct SCRMODE_DATA *scrmode,struct WORKMODE_DATA *workdata)
 {
     draw_numbered_list(get_slab_fullname,scrmode,workdata,
-        0,SLAB_TYPE_GUARDPOST,17);
+        0,SLAB_TYPE_PURPLE_PATH,17);
     show_no_cursor();
 }
 
