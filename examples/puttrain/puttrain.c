@@ -1,6 +1,6 @@
 /******************************************************************************/
 /** @file puttrain.c
- * ADiKtEd library example 2.
+ * ADiKtEd library puttrain example.
  * @par Purpose:
  *     This example puts 3x5 training room in bottom right part of map 1.
  *     Demonstrates how to change many slabs at once,
@@ -20,7 +20,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "../libadikted/adikted.h"
+#include "libadikted/adikted.h"
 
 int main(int argc, char *argv[])
 {
@@ -36,7 +36,7 @@ int main(int argc, char *argv[])
 
   // Instead of printing the message directly, we will send it
   // to the internal messages system.
-  message_info("example2: how to put a larger room on map");
+  message_info("puttrain: how to put a larger room on map");
   // Now we can easily get the message back, even multiple times.
   printf("%s\n",message_get());
 
@@ -74,7 +74,7 @@ int main(int argc, char *argv[])
 
     // Now, as the buffer is released, the message_info() function
     // can be used to store next message.
-    message_info("example2 finished with load error");
+    message_info("puttrain finished with load error");
     printf("%s\n",message_get());
     system("pause");	
 
@@ -118,7 +118,7 @@ int main(int argc, char *argv[])
 
     // Now, as the buffer is released, the message_info() function
     // can be used to store next message.
-    message_info("example2 finished with save error");
+    message_info("puttrain finished with save error");
     printf("%s\n",message_get());
     system("pause");	
 
@@ -138,7 +138,7 @@ int main(int argc, char *argv[])
   printf("%s\n",message_get());
   message_release();
 
-  message_info("example2 finished successfully");
+  message_info("puttrain finished successfully");
   printf("%s\n",message_get());
   system("pause");	
 
