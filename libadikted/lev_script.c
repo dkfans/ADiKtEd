@@ -16,6 +16,7 @@
 /******************************************************************************/
 
 #include <string.h>
+#include <bsd/inttypes.h>
 
 #include "lev_script.h"
 
@@ -518,32 +519,40 @@ const char *cmd_font_fullnames[]={
 const char *object_available_shortnames[]={
         "None", "Rsch", "Got",};
 
-short script_param_to_int(int *val,const char *param)
+int script_param_to_s32(const char *param, int* e)
 {
-  if ((param==NULL)||(val==NULL)) return false;
-  int n_read;
-  if (strncmp(param,"0x",2)==0)
-  {
-    n_read=sscanf(param+2,"%x",val);
-  } else
-  {
-    n_read=sscanf(param,"%d",val);
-  }
-  return (n_read==1);
+  if (param==NULL) { *e = -1; return -1; }
+  return strtoi(param, NULL, 0, 0, INT_MAX, e); 
 }
 
-short script_param_to_ulong(unsigned long *val,const char *param)
+unsigned int script_param_to_u32(const char *param, int* e)
 {
-  if ((param==NULL)||(val==NULL)) return false;
-  int n_read;
-  if (strncmp(param,"0x",2)==0)
-  {
-    n_read=sscanf(param+2,"%lx",val);
-  } else
-  {
-    n_read=sscanf(param,"%lu",val);
-  }
-  return (n_read==1);
+  if (param==NULL) { *e = -1; return UINT_MAX; }
+  return strtou(param, NULL, 0, 0, UINT_MAX, e);
+}
+
+bool script_param_read_s32(int* dst, size_t count, unsigned char** params)
+{
+	int result[count];
+	for(size_t i = 0; i < count; i++)
+	{
+		dst[i] = script_param_to_s32((const char*)params[i], &result[i]);
+		if (result[i] != 0)
+			return false;
+	}
+	return true;
+}
+
+bool script_param_read_u32(unsigned int* dst, size_t count, unsigned char** params)
+{
+	int result[count];
+	for(size_t i = 0; i < count; i++)
+	{
+		dst[i] = script_param_to_u32((const char*)params[i], &result[i]);
+		if (result[i] != 0)
+			return false;
+	}
+	return true;
 }
 
 /*
@@ -560,33 +569,21 @@ short execute_adikted_command(struct LEVEL *lvl,struct DK_SCRIPT_COMMAND *cmd,ch
          sprintf(err_msg,"%s requires more parameters",adikted_cmd_text(cmd->index));
          return false;
        }
-       int sx=-1,sy=-1;
-       short result=true;
-       result&=script_param_to_int(&sx,cmd->params[0]);
-       result&=script_param_to_int(&sy,cmd->params[1]);
-       if (!result)
+       int s[2] = { -1 };
+       if(!script_param_read_s32(s, 2, &cmd->params[0]))
        {
          sprintf(err_msg,"Cannot read map subtile coordinates");
          return false;
        }
-       int wib_val;
-       int lintel;
-       int orient;
-       int base;
-       result&=script_param_to_int(&wib_val,cmd->params[2]);
-       result&=script_param_to_int(&lintel,cmd->params[3]);
-       result&=script_param_to_int(&orient,cmd->params[4]);
-       result&=script_param_to_int(&base,cmd->params[5]);
-       if (!result)
+       int p[4];
+       if(script_param_read_s32(p, 4, &cmd->params[2]))
        {
          sprintf(err_msg,"Cannot read basic column parameters");
          return false;
        }
        int c[8];
        int i;
-       for (i=0;i<8;i++)
-           result&=script_param_to_int(&c[i],cmd->params[6+i]);
-       if (!result)
+       if(!script_param_read_s32(c, 8, &cmd->params[6+i]))
        {
          sprintf(err_msg,"Cannot read column cubes");
          return false;
@@ -595,13 +592,13 @@ short execute_adikted_command(struct LEVEL *lvl,struct DK_SCRIPT_COMMAND *cmd,ch
        struct DK_CUSTOM_CLM *ccol;
        ccol=create_cust_col();
        struct COLUMN_REC *clm_rec=ccol->rec;
-       ccol->wib_val=wib_val;
-       fill_column_rec_sim(clm_rec, 0, base,
+       ccol->wib_val=p[0];
+       fill_column_rec_sim(clm_rec, 0, p[3],
            c[0],c[1],c[2],c[3],c[4],c[5],c[6],c[7]);
-       clm_rec->lintel=lintel;
-       clm_rec->orientation=orient;
+       clm_rec->lintel=p[1];
+       clm_rec->orientation=p[2];
        /*Adding custom column to level */
-       cust_col_add_or_update(lvl,sx,sy,ccol);
+       cust_col_add_or_update(lvl,s[0],s[0],ccol);
        return true;
     case DEFINE_GRAFFITI:
       {
@@ -610,18 +607,10 @@ short execute_adikted_command(struct LEVEL *lvl,struct DK_SCRIPT_COMMAND *cmd,ch
          sprintf(err_msg,"%s requires more parameters",adikted_cmd_text(cmd->index));
          return false;
        }
-       int tx=-1,ty=-1,height=0;
-       short result=true;
-       result&=script_param_to_int(&tx,cmd->params[0]);
-       result&=script_param_to_int(&ty,cmd->params[1]);
-       if (!result)
+       int t[3] = { -1 };
+       if(!script_param_read_s32(t, 3, &cmd->params[0]))
        {
-         sprintf(err_msg,"Cannot read map tile coordinates");
-         return false;
-       }
-       if (sscanf(cmd->params[2],"%d",&height)<1)
-       {
-         sprintf(err_msg,"Cannot read height in tile");
+         sprintf(err_msg,"Cannot read map tile coordinates/height");
          return false;
        }
        int orient;
@@ -633,7 +622,7 @@ short execute_adikted_command(struct LEVEL *lvl,struct DK_SCRIPT_COMMAND *cmd,ch
        int i,textlen;
        unsigned int cube=0x0184;
        /*Note: +2 is to skip 0x; must change this later... */
-       if (sscanf(cmd->params[5]+2,"%x",&cube)<1)
+       if(!script_param_read_u32(&cube, 1, &cmd->params[5]))
        {
          sprintf(err_msg,"Cannot read filler cube index");
          return false;
@@ -650,7 +639,7 @@ short execute_adikted_command(struct LEVEL *lvl,struct DK_SCRIPT_COMMAND *cmd,ch
            text[i]=c;
        }
        text[textlen]='\0';
-       int graf_idx=graffiti_add(lvl,tx,ty,height,text,font,orient,cube);
+       int graf_idx=graffiti_add(lvl,t[0],t[1],t[2],text,font,orient,cube);
        if (graf_idx<0)
        {
          sprintf(err_msg,"Cannot add graffiti");
@@ -664,18 +653,14 @@ short execute_adikted_command(struct LEVEL *lvl,struct DK_SCRIPT_COMMAND *cmd,ch
          sprintf(err_msg,"%s requires more parameters",adikted_cmd_text(cmd->index));
          return false;
        }
-       short result=true;
-       unsigned long creat_date;
-       unsigned long lastsav_date;
-       result&=script_param_to_ulong(&creat_date,cmd->params[0]);
-       result&=script_param_to_ulong(&lastsav_date,cmd->params[1]);
-       if (!result)
+       unsigned int date[2];
+       if(!script_param_read_u32(date, 2, cmd->params))
        {
          sprintf(err_msg,"Cannot read level date parameters");
          return false;
        }
-       lvl->info.creat_date=creat_date;
-       lvl->info.lastsav_date=lastsav_date;
+       lvl->info.creat_date=date[0];
+       lvl->info.lastsav_date=date[1];
       };return true;
     case USER_CMNDS_COUNT:
       {
@@ -684,30 +669,24 @@ short execute_adikted_command(struct LEVEL *lvl,struct DK_SCRIPT_COMMAND *cmd,ch
          sprintf(err_msg,"%s requires more parameters",adikted_cmd_text(cmd->index));
          return false;
        }
-       short result=true;
-       unsigned long ucmdcnt;
-       unsigned long umdswcnt,umslbcnt,ucrobcnt;
-       result&=script_param_to_ulong(&ucmdcnt,cmd->params[0]);
-       if (!result)
+       unsigned int count[4];
+       if(!script_param_read_u32(count, 1, cmd->params))
        {
          sprintf(err_msg,"Cannot read first user commands count parameter");
          return false;
        }
-       lvl->info.usr_cmds_count=ucmdcnt;
+       lvl->info.usr_cmds_count=count[0];
        /* The rest of parameters don't have to be present */
        if (cmd->param_count>3)
        {
-         result&=script_param_to_ulong(&umdswcnt,cmd->params[1]);
-         result&=script_param_to_ulong(&umslbcnt,cmd->params[2]);
-         result&=script_param_to_ulong(&ucrobcnt,cmd->params[3]);
-         if (!result)
-         {
-           sprintf(err_msg,"Cannot read user commands count parameters");
-           return false;
-         }
-         lvl->info.usr_mdswtch_count=umdswcnt;
-         lvl->info.usr_slbchng_count=umslbcnt;
-         lvl->info.usr_creatobj_count=ucrobcnt;
+	       if(!script_param_read_u32(count, 3, &cmd->params[1]))
+	       {
+		       sprintf(err_msg,"Cannot read user commands count parameters");
+		       return false;
+	       }
+	       lvl->info.usr_mdswtch_count  = count[1];
+	       lvl->info.usr_slbchng_count  = count[2];
+	       lvl->info.usr_creatobj_count = count[3];
        }
       };return true;
     case LEVEL_VERSION:
@@ -717,19 +696,15 @@ short execute_adikted_command(struct LEVEL *lvl,struct DK_SCRIPT_COMMAND *cmd,ch
          sprintf(err_msg,"%s requires more parameters",adikted_cmd_text(cmd->index));
          return false;
        }
-       short result=true;
-       int vma,vmi,vre;
-       result&=script_param_to_int(&vma,cmd->params[0]);
-       result&=script_param_to_int(&vmi,cmd->params[1]);
-       result&=script_param_to_int(&vre,cmd->params[2]);
-       if (!result)
+       int v[3];
+       if(!script_param_read_s32(v, 3, cmd->params))
        {
-         sprintf(err_msg,"Cannot read version parameters");
-         return false;
+	       sprintf(err_msg,"Cannot read version parameters");
+	       return false;
        }
-       lvl->info.ver_major=vma;
-       lvl->info.ver_minor=vmi;
-       lvl->info.ver_rel=vre;
+       lvl->info.ver_major=v[0];
+       lvl->info.ver_minor=v[1];
+       lvl->info.ver_rel=v[2];
       };return true;
     case LEVEL_NAME:
       {
@@ -860,7 +835,7 @@ short script_cmd_verify_arg_actnpt(__attribute__((unused)) struct SCRIPT_VERIFY_
         return false;
     }
     int val;
-    if (!script_param_to_int(&val,param))
+    if (!script_param_read_s32(&val, 1, (unsigned char**)&param))
     {
         if (strlen(param) <= 16)
           sprintf(err_msg,"Internal - no numeric value for \"%s\" in script",param);
@@ -921,7 +896,7 @@ short script_cmd_verify_arg_gameturn(__attribute__((unused)) struct SCRIPT_VERIF
         return false;
     }
     int val;
-    if (!script_param_to_int(&val,param))
+    if (!script_param_read_s32(&val, 1, (unsigned char**)&param))
     {
         if (strlen(param) <= 16)
           sprintf(err_msg,"Internal - no numeric value for \"%s\" in script",param);
@@ -965,7 +940,7 @@ short script_cmd_verify_arg_goldamnt(__attribute__((unused)) struct SCRIPT_VERIF
         return false;
     }
     int val;
-    if (!script_param_to_int(&val,param))
+    if (!script_param_read_s32(&val, 1, (unsigned char**)&param))
     {
         if (strlen(param) <= 16)
           sprintf(err_msg,"Internal - no numeric value for \"%s\" in script",param);
@@ -1009,7 +984,7 @@ short script_cmd_verify_arg_experience(__attribute__((unused)) struct SCRIPT_VER
         return false;
     }
     int val;
-    if (!script_param_to_int(&val,param))
+    if (!script_param_read_s32(&val, 1, (unsigned char**)&param))
     {
         if (strlen(param) <= 16)
           sprintf(err_msg,"Internal - no numeric value for \"%s\" in script",param);
@@ -1050,7 +1025,7 @@ short script_cmd_verify_arg_ncrtrs(__attribute__((unused)) struct SCRIPT_VERIFY_
         return false;
     }
     int val;
-    if (!script_param_to_int(&val,param))
+    if (!script_param_read_s32(&val, 1, (unsigned char**)&param))
     {
         if (strlen(param) <= 16)
           sprintf(err_msg,"Internal - no numeric value for \"%s\" in script",param);
@@ -1204,7 +1179,7 @@ short script_cmd_verify_arg_btnparam(__attribute__((unused)) struct SCRIPT_VERIF
         return false;
     }
     int val;
-    if (!script_param_to_int(&val,param))
+    if (!script_param_read_s32(&val, 1, (unsigned char**)&param))
     {
         if (strlen(param) <= 16)
           sprintf(err_msg,"Internal - no numeric value for \"%s\" in script",param);
@@ -1375,7 +1350,7 @@ short script_cmd_verify_arg_limparam(__attribute__((unused)) struct SCRIPT_VERIF
         return false;
     }
     int val;
-    if (!script_param_to_int(&val,param))
+    if (!script_param_read_s32(&val, 1, (unsigned char**)&param))
     {
         sprintf(err_msg,"Internal - no numeric value for \"%s\" in script",param);
         return false;
@@ -1417,7 +1392,7 @@ short script_cmd_verify_arg_unsg_int(__attribute__((unused)) struct SCRIPT_VERIF
         return false;
     }
     int val;
-    if (!script_param_to_int(&val,param))
+    if (!script_param_read_s32(&val, 1, (unsigned char**)&param))
     {
         sprintf(err_msg,"Internal - no numeric value for \"%s\" in script",param);
         return false;
@@ -3159,7 +3134,7 @@ short script_decomposed_to_params_cmd_condit(struct DK_SCRIPT_PARAMETERS *par,
         par->end_level++;
         if (cmd->param_count<2)
             return false;
-        if (!script_param_to_int(&actnpt_num,cmd->params[0]))
+        if (!script_param_read_s32(&actnpt_num, 1, &cmd->params[0]))
             return false;
         plyr_idx=players_cmd_index(cmd->params[1]);
         if (plyr_idx<0)
@@ -3222,9 +3197,9 @@ short script_decomposed_to_params_cmd_avail(struct DK_SCRIPT_PARAMETERS *par,
         object_idx=room_cmd_index(cmd->params[1]);
         if ((plyr_idx<0)||(object_idx<0))
             return false;
-        if (!script_param_to_int(&logic_val,cmd->params[2]))
+        if (!script_param_read_s32(&logic_val, 1, &cmd->params[2]))
             return false;
-        if (!script_param_to_int(&amount,cmd->params[3]))
+        if (!script_param_read_s32(&amount, 1, &cmd->params[3]))
             return false;
         if (amount)
             available=AVAIL_INSTANT;
@@ -3253,9 +3228,9 @@ short script_decomposed_to_params_cmd_avail(struct DK_SCRIPT_PARAMETERS *par,
         object_idx=creatures_cmd_index(cmd->params[1]);
         if ((plyr_idx<0)||(object_idx<0))
             return false;
-        if (!script_param_to_int(&logic_val,cmd->params[2]))
+        if (!script_param_read_s32(&logic_val, 1, &cmd->params[2]))
             return false;
-        if (!script_param_to_int(&amount,cmd->params[3]))
+        if (!script_param_read_s32(&amount, 1, &cmd->params[3]))
             return false;
         if (amount)
             available=AVAIL_INSTANT;
@@ -3284,9 +3259,9 @@ short script_decomposed_to_params_cmd_avail(struct DK_SCRIPT_PARAMETERS *par,
         object_idx=spell_cmd_index(cmd->params[1]);
         if ((plyr_idx<0)||(object_idx<0))
             return false;
-        if (!script_param_to_int(&logic_val,cmd->params[2]))
+        if (!script_param_read_s32(&logic_val, 1, &cmd->params[2]))
             return false;
-        if (!script_param_to_int(&amount,cmd->params[3]))
+        if (!script_param_read_s32(&amount, 1, &cmd->params[3]))
             return false;
         if (amount)
             available=AVAIL_INSTANT;
@@ -3315,9 +3290,9 @@ short script_decomposed_to_params_cmd_avail(struct DK_SCRIPT_PARAMETERS *par,
         object_idx=trap_cmd_index(cmd->params[1]);
         if ((plyr_idx<0)||(object_idx<0))
             return false;
-        if (!script_param_to_int(&logic_val,cmd->params[2]))
+        if (!script_param_read_s32(&logic_val, 1, &cmd->params[2]))
             return false;
-        if (!script_param_to_int(&amount,cmd->params[3]))
+        if (!script_param_read_s32(&amount, 1, &cmd->params[3]))
             return false;
         if (plyr_idx<PLAYERS_COUNT)
         {
@@ -3343,9 +3318,9 @@ short script_decomposed_to_params_cmd_avail(struct DK_SCRIPT_PARAMETERS *par,
         object_idx=door_cmd_index(cmd->params[1]);
         if ((plyr_idx<0)||(object_idx<0))
             return false;
-        if (!script_param_to_int(&logic_val,cmd->params[2]))
+        if (!script_param_read_s32(&logic_val, 1, &cmd->params[2]))
             return false;
-        if (!script_param_to_int(&amount,cmd->params[3]))
+        if (!script_param_read_s32(&amount, 1, &cmd->params[3]))
             return false;
         if (plyr_idx<PLAYERS_COUNT)
         {
@@ -3395,7 +3370,7 @@ short script_decomposed_to_params_cmd_setup(struct DK_SCRIPT_PARAMETERS *par,
     case SET_GEN_SPEED:
         if (cmd->param_count<1)
             return false;
-        if (!script_param_to_int(&amount,cmd->params[0]))
+        if (!script_param_read_s32(&amount, 1, &cmd->params[0]))
             return false;
         par->portal_gen_speed=amount;
         break;
@@ -3405,7 +3380,7 @@ short script_decomposed_to_params_cmd_setup(struct DK_SCRIPT_PARAMETERS *par,
         plyr_idx=players_cmd_index(cmd->params[0]);
         if (plyr_idx<0)
             return false;
-        if (!script_param_to_int(&amount,cmd->params[1]))
+        if (!script_param_read_s32(&amount, 1, &cmd->params[1]))
             return false;
         if (plyr_idx<PLAYERS_COUNT)
         {
@@ -3426,7 +3401,7 @@ short script_decomposed_to_params_cmd_setup(struct DK_SCRIPT_PARAMETERS *par,
         plyr_idx=players_cmd_index(cmd->params[0]);
         if (plyr_idx<0)
             return false;
-        if (!script_param_to_int(&amount,cmd->params[1]))
+        if (!script_param_read_s32(&amount, 1, &cmd->params[1]))
             return false;
         if (plyr_idx<PLAYERS_COUNT)
         {
@@ -3523,7 +3498,7 @@ short script_decomposed_to_params_cmd_setup(struct DK_SCRIPT_PARAMETERS *par,
         plyr_idx=players_cmd_index(cmd->params[0]);
         if ((plyr_idx<0))
             return false;
-        if (!script_param_to_int(&amount,cmd->params[1]))
+        if (!script_param_read_s32(&amount, 1, &cmd->params[1]))
             return false;
         if (plyr_idx<PLAYERS_COUNT)
         {
@@ -3570,7 +3545,7 @@ short script_decomposed_to_params_cmd_crtradj(struct DK_SCRIPT_PARAMETERS *par,
     case DEAD_CREATURES_RET_TO_POOL:
         if (cmd->param_count<1)
             return false;
-        if (!script_param_to_int(&logic_val,cmd->params[0]))
+        if (!script_param_read_s32(&logic_val, 1, &cmd->params[0]))
             return false;
         par->dead_return_to_pool=(logic_val!=0);
         break;
@@ -3580,7 +3555,7 @@ short script_decomposed_to_params_cmd_crtradj(struct DK_SCRIPT_PARAMETERS *par,
         crtr_idx=creatures_cmd_index(cmd->params[0]);
         if (crtr_idx<0)
             return false;
-        if (!script_param_to_int(&amount,cmd->params[1]))
+        if (!script_param_read_s32(&amount, 1, &cmd->params[1]))
             return false;
         par->creature_pool[crtr_idx]=amount;
         break;
@@ -3591,7 +3566,7 @@ short script_decomposed_to_params_cmd_crtradj(struct DK_SCRIPT_PARAMETERS *par,
         crtr_idx=creatures_cmd_index(cmd->params[1]);
         if ((plyr_idx<0)||(crtr_idx<0))
             return false;
-        if (!script_param_to_int(&amount,cmd->params[2]))
+        if (!script_param_read_s32(&amount, 1, &cmd->params[2]))
             return false;
         if (plyr_idx<PLAYERS_COUNT)
         {
@@ -3612,7 +3587,7 @@ short script_decomposed_to_params_cmd_crtradj(struct DK_SCRIPT_PARAMETERS *par,
         crtr_idx=creatures_cmd_index(cmd->params[0]);
         if (crtr_idx<0)
             return false;
-        if (!script_param_to_int(&amount,cmd->params[1]))
+        if (!script_param_read_s32(&amount, 1, &cmd->params[1]))
             return false;
         /*TODO */
         break;
@@ -3622,7 +3597,7 @@ short script_decomposed_to_params_cmd_crtradj(struct DK_SCRIPT_PARAMETERS *par,
         crtr_idx=creatures_cmd_index(cmd->params[0]);
         if (crtr_idx<0)
             return false;
-        if (!script_param_to_int(&amount,cmd->params[1]))
+        if (!script_param_read_s32(&amount, 1, &cmd->params[1]))
             return false;
         /*TODO */
         break;
@@ -3632,7 +3607,7 @@ short script_decomposed_to_params_cmd_crtradj(struct DK_SCRIPT_PARAMETERS *par,
         crtr_idx=creatures_cmd_index(cmd->params[0]);
         if (crtr_idx<0)
             return false;
-        if (!script_param_to_int(&amount,cmd->params[1]))
+        if (!script_param_read_s32(&amount, 1, &cmd->params[1]))
             return false;
         /*TODO */
         break;
@@ -3642,7 +3617,7 @@ short script_decomposed_to_params_cmd_crtradj(struct DK_SCRIPT_PARAMETERS *par,
         crtr_idx=creatures_cmd_index(cmd->params[0]);
         if (crtr_idx<0)
             return false;
-        if (!script_param_to_int(&amount,cmd->params[1]))
+        if (!script_param_read_s32(&amount, 1, &cmd->params[1]))
             return false;
         /*TODO */
         break;
@@ -4595,7 +4570,7 @@ int special_cmd_index(const char *cmdtext)
     if (stricmp(random_cmdtext,cmdtext)==0)
         return SPEC_RANDOM;
     int val;
-    if (script_param_to_int(&val,cmdtext))
+    if (script_param_read_s32(&val, 1, (unsigned char**)&cmdtext))
         return SPEC_NUMBER;
     return -1;
 }

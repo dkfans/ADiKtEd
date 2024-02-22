@@ -691,7 +691,6 @@ short load_wlb(struct LEVEL *lvl,char *fname)
 short load_slx(struct LEVEL *lvl,char *fname)
 {
     message_log("  load_slx: started");
-    short result;
     FILE *F = fopen(fname, "rb");
     if (F == NULL)
         return ERR_FILE_BADDATA;

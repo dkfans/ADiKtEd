@@ -714,7 +714,7 @@ short draw_rect_sum_on_buffer(unsigned char *dest,const struct IPOINT_2D dest_po
  * @param scale Destination buffer scale.
  * @return Returns ERR_NONE on success, error code on failure.
  */
-short draw_texture_on_buffer_avg4(unsigned char *dest,const struct IPOINT_2D dest_pos,
+short draw_texture_on_buffer_avg4(char *dest,const struct IPOINT_2D dest_pos,
     const struct IPOINT_2D dest_size, const unsigned int dest_scanln,
     const unsigned char *src,const struct IPOINT_2D src_pos,const struct IPOINT_2D src_size,
     const struct IPOINT_2D rect_size,struct PALETTE_ENTRY *pal,const struct IPOINT_2D scale)
@@ -818,7 +818,7 @@ short draw_texture_on_buffer_avg4(unsigned char *dest,const struct IPOINT_2D des
  * @param scale Destination buffer scale.
  * @return Returns ERR_NONE on success, error code on failure.
  */
-short draw_texture_on_buffer_avg4_unsafe(unsigned char *dest,const struct IPOINT_2D dest_pos,
+short draw_texture_on_buffer_avg4_unsafe(char *dest,const struct IPOINT_2D dest_pos,
     __attribute__((unused)) const struct IPOINT_2D dest_size, const unsigned int dest_scanln,
     const unsigned char *src,const struct IPOINT_2D src_pos,const struct IPOINT_2D src_size,
     const struct IPOINT_2D rect_size,struct PALETTE_ENTRY *pal,const struct IPOINT_2D scale)
@@ -884,7 +884,7 @@ short draw_texture_on_buffer_avg4_unsafe(unsigned char *dest,const struct IPOINT
  * @param scale Destination buffer scale.
  * @return Returns ERR_NONE on success, error code on failure.
  */
-short draw_texture_on_buffer_avg2(unsigned char *dest,const struct IPOINT_2D dest_pos,
+short draw_texture_on_buffer_avg2(char *dest,const struct IPOINT_2D dest_pos,
     const struct IPOINT_2D dest_size, const unsigned int dest_scanln,
     const unsigned char *src,const struct IPOINT_2D src_pos,const struct IPOINT_2D src_size,
     const struct IPOINT_2D rect_size,struct PALETTE_ENTRY *pal,const struct IPOINT_2D scale)
@@ -974,7 +974,7 @@ short draw_texture_on_buffer_avg2(unsigned char *dest,const struct IPOINT_2D des
  * @param scale Destination buffer scale.
  * @return Returns ERR_NONE on success, error code on failure.
  */
-FASTCALL short draw_texture_on_buffer_avg2_fast(unsigned char *dest,const struct IPOINT_2D dest_pos,
+FASTCALL short draw_texture_on_buffer_avg2_fast(char *dest,const struct IPOINT_2D dest_pos,
     const struct IPOINT_2D dest_size, const unsigned int dest_scanln,
     const unsigned char *src,const struct IPOINT_2D src_pos,const struct IPOINT_2D src_size,
     const struct IPOINT_2D rect_size,struct PALETTE_ENTRY *pal,const struct IPOINT_2D scale)
@@ -1053,7 +1053,7 @@ FASTCALL short draw_texture_on_buffer_avg2_fast(unsigned char *dest,const struct
  * @param scale Destination buffer scale.
  * @return Returns ERR_NONE on success, error code on failure.
  */
-FASTCALL short draw_texture_on_buffer_avg2_fast_unsafe(unsigned char *dest,const struct IPOINT_2D dest_pos,
+FASTCALL short draw_texture_on_buffer_avg2_fast_unsafe(char *dest,const struct IPOINT_2D dest_pos,
     __attribute__((unused)) const struct IPOINT_2D dest_size, const unsigned int dest_scanln,
     const unsigned char *src,const struct IPOINT_2D src_pos,const struct IPOINT_2D src_size,
     const struct IPOINT_2D rect_size,struct PALETTE_ENTRY *pal,const struct IPOINT_2D scale)
@@ -1104,7 +1104,7 @@ FASTCALL short draw_texture_on_buffer_avg2_fast_unsafe(unsigned char *dest,const
  * @param scale Destination buffer scale.
  * @return Returns ERR_NONE on success, error code on failure.
  */
-short draw_texture_on_buffer_noavg(unsigned char *dest,const struct IPOINT_2D dest_pos,
+short draw_texture_on_buffer_noavg(char *dest,const struct IPOINT_2D dest_pos,
     const struct IPOINT_2D dest_size, const unsigned int dest_scanln,
     const unsigned char *src,const struct IPOINT_2D src_pos,const struct IPOINT_2D src_size,
     const struct IPOINT_2D rect_size,struct PALETTE_ENTRY *pal,const struct IPOINT_2D scale)
@@ -1198,7 +1198,7 @@ short draw_texture_on_buffer_noavg(unsigned char *dest,const struct IPOINT_2D de
  * @param scale Destination buffer scale.
  * @return Returns ERR_NONE on success, error code on failure.
  */
-short draw_texture_on_buffer_noavg_unsafe(unsigned char *dest,const struct IPOINT_2D dest_pos,
+short draw_texture_on_buffer_noavg_unsafe(char *dest,const struct IPOINT_2D dest_pos,
     __attribute__((unused)) const struct IPOINT_2D dest_size, const unsigned int dest_scanln,
     const unsigned char *src,const struct IPOINT_2D src_pos,const struct IPOINT_2D src_size,
     const struct IPOINT_2D rect_size,struct PALETTE_ENTRY *pal,const struct IPOINT_2D scale)
@@ -1251,7 +1251,7 @@ short draw_texture_on_buffer_noavg_unsafe(unsigned char *dest,const struct IPOIN
  * @param pal Texture palette.
  * @return Returns ERR_NONE on success, error code on failure.
  */
-short draw_texture_on_buffer_noscale(unsigned char *dest,const struct IPOINT_2D dest_pos,
+short draw_texture_on_buffer_noscale(char *dest,const struct IPOINT_2D dest_pos,
     const struct IPOINT_2D dest_size, const unsigned int dest_scanln,
     const unsigned char *src,const struct IPOINT_2D src_pos,const struct IPOINT_2D src_size,
     const struct IPOINT_2D rect_size,struct PALETTE_ENTRY *pal)
@@ -1305,7 +1305,7 @@ short draw_texture_on_buffer_noscale(unsigned char *dest,const struct IPOINT_2D 
  * @param scale Destination buffer scale.
  * @return Returns ERR_NONE on success, error code on failure.
  */
-short draw_texture_on_buffer(unsigned char *dest,const struct IPOINT_2D dest_pos,
+short draw_texture_on_buffer(char *dest,const struct IPOINT_2D dest_pos,
     const struct IPOINT_2D dest_size, const unsigned int dest_scanln,
     const unsigned char *src,const struct IPOINT_2D src_pos,const struct IPOINT_2D src_size,
     const struct IPOINT_2D rect_size,struct PALETTE_ENTRY *pal,const struct IPOINT_2D scale)
@@ -1343,7 +1343,7 @@ short draw_texture_on_buffer(unsigned char *dest,const struct IPOINT_2D dest_pos
  * @param scale Destination buffer scale.
  * @return Returns ERR_NONE on success, error code on failure.
  */
-short draw_texture_on_buffer_unsafe(unsigned char *dest,const struct IPOINT_2D dest_pos,
+short draw_texture_on_buffer_unsafe(char *dest,const struct IPOINT_2D dest_pos,
     const struct IPOINT_2D dest_size, const unsigned int dest_scanln,
     const unsigned char *src,const struct IPOINT_2D src_pos,const struct IPOINT_2D src_size,
     const struct IPOINT_2D rect_size,struct PALETTE_ENTRY *pal,const struct IPOINT_2D scale)
@@ -1379,7 +1379,7 @@ short draw_texture_on_buffer_unsafe(unsigned char *dest,const struct IPOINT_2D d
  * @param scale Destination buffer scale.
  * @return Returns ERR_NONE on success, error code on failure.
  */
-short draw_texture_on_buffer_fast(unsigned char *dest,const struct IPOINT_2D dest_pos,
+short draw_texture_on_buffer_fast(char *dest,const struct IPOINT_2D dest_pos,
     const struct IPOINT_2D dest_size, const unsigned int dest_scanln,
     const unsigned char *src,const struct IPOINT_2D src_pos,const struct IPOINT_2D src_size,
     const struct IPOINT_2D rect_size,struct PALETTE_ENTRY *pal,const struct IPOINT_2D scale)
@@ -1413,7 +1413,7 @@ short draw_texture_on_buffer_fast(unsigned char *dest,const struct IPOINT_2D des
  * @param scale Destination buffer scale.
  * @return Returns ERR_NONE on success, error code on failure.
  */
-short draw_texture_on_buffer_fast_unsafe(unsigned char *dest,const struct IPOINT_2D dest_pos,
+short draw_texture_on_buffer_fast_unsafe(char *dest,const struct IPOINT_2D dest_pos,
     const struct IPOINT_2D dest_size, const unsigned int dest_scanln,
     const unsigned char *src,const struct IPOINT_2D src_pos,const struct IPOINT_2D src_size,
     const struct IPOINT_2D rect_size,struct PALETTE_ENTRY *pal,const struct IPOINT_2D scale)

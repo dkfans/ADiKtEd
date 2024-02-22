@@ -1,4 +1,4 @@
-cmake_minimum_required( VERSION 3.1 )
+cmake_minimum_required( VERSION 3.5 )
 
 project( ADiKtED LANGUAGES C )
 set(PROJECT_DESCRIPTION "Dungeon Keeper 1 map editor")
@@ -18,8 +18,11 @@ set( CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -pedantic" )
 set( CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wextra" )
 set( CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Werror-implicit-function-declaration -Wno-conversion -Wno-traditional-conversion -Wno-sign-compare" )
 
-# Add Math::Math
-include(cmake/FindMath.cmake)
+list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
+
+include(LibFindMacros)
+include(FindMath)
+include(FindBsd)
 
 # Add examples
 include(cmake/examples.cmake)

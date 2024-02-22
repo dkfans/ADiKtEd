@@ -1,4 +1,4 @@
-cmake_minimum_required( VERSION 3.1 )
+cmake_minimum_required( VERSION 3.5 )
 
 set( TARGET_NAME adikted )
 project( lib${TARGET_NAME} LANGUAGES C )
@@ -21,7 +21,11 @@ set( CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -pedantic" )
 set( CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wextra" )
 set( CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Werror-implicit-function-declaration -Wno-conversion -Wno-traditional-conversion -Wno-sign-compare" )
 
-include(cmake/FindMath.cmake)
+list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
+
+include(LibFindMacros)
+include(FindMath)
+include(FindBsd)
 
 ## ================= build =================
 
@@ -30,7 +34,7 @@ if( USE_RNG_MT )
     add_definitions( -DRNG_MT )
 endif()
 
-
+find_package(Bsd)
 
 if( NOT ${TARGET_NAME}_TYPE )
     ## build library as shared by default
@@ -48,16 +52,16 @@ endif()
 
 add_library( ${TARGET_NAME} ${${TARGET_NAME}_TYPE} ${c_files} )
 set_target_properties( ${TARGET_NAME} PROPERTIES PUBLIC_HEADER "${h_files}" )
-target_include_directories(${TARGET_NAME} PUBLIC Math::Math
+target_include_directories(${TARGET_NAME} PUBLIC Math::Math ${BSD_PROCESS_INCLUDES}
 			$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
 			$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}/lib${TARGET_NAME}>
 			PRIVATE "."
 			)
-target_link_libraries(${TARGET_NAME} Math::Math)
+			target_link_libraries(${TARGET_NAME} Math::Math ${BSD_PROCESS_LIBS})
 
 # pkg-config variables
 set(target_name "${TARGET_NAME}")
-set(stdclibs "${CMAKE_C_STANDARD_LIBRARIES}" Math::Math)
+set(stdclibs "${CMAKE_C_STANDARD_LIBRARIES}" Math::Math ${BSD_PROCESS_LIBS})
 set(install_prefix "${CMAKE_INSTALL_PREFIX}")
 set(install_libdir "${CMAKE_INSTALL_LIBDIR}")
 set(install_includedir "${CMAKE_INSTALL_INCLUDEDIR}")
